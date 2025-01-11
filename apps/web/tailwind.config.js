@@ -7,6 +7,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["NB Akademie", "sans-serif"],
+        mono: ["NB Akademie Mono", "monospace"],
+      },
       colors: {
         white: "hsl(var(--color-white))",
         whitest: "hsl(var(--color-whitest))",
