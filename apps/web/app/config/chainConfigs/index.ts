@@ -1,6 +1,6 @@
 "use client";
 
-import type { CosmosChains, EvmChainInfo, EvmChains } from "../index";
+import type { CosmosChains, EvmChainInfo, EvmChains } from "./types";
 
 export enum FlameNetwork {
   LOCAL = "local",

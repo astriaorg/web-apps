@@ -30,7 +30,7 @@ jest.mock("@interchain-ui/react/styles", () => ({}), { virtual: true });
 
 // mock cosmos-kit stuff
 jest.mock("@cosmos-kit/react", () => ({
-  // biome-ignore lint/suspicious/noExplicitAny: idc b/c it's for testing
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   ChainProvider: jest.fn(({ children }: { children: any }) => children),
   useWalletModal: jest.fn(() => ({
     openWalletModal: jest.fn(),

@@ -69,7 +69,6 @@ describe("GenericContractService", () => {
         mockAbi,
       );
 
-      // biome-ignore lint/complexity/useLiteralKeys: testing private method
       await service["readContractMethod"](1, "testMethod", []);
 
       expect(mockPublicClient.readContract).toHaveBeenCalledWith({
@@ -89,7 +88,6 @@ describe("GenericContractService", () => {
       );
 
       await expect(
-        // biome-ignore lint/complexity/useLiteralKeys: testing private method
         service["readContractMethod"](1, "testMethod", []),
       ).rejects.toThrow("No public client available");
     });
@@ -104,7 +102,6 @@ describe("GenericContractService", () => {
       mockPublicClient.readContract.mockRejectedValue(new Error(errorMessage));
 
       await expect(
-        // biome-ignore lint/complexity/useLiteralKeys: testing private method
         service["readContractMethod"](1, "testMethod", []),
       ).rejects.toThrow(errorMessage);
     });
@@ -118,7 +115,6 @@ describe("GenericContractService", () => {
         mockAbi,
       );
 
-      // biome-ignore lint/complexity/useLiteralKeys: testing private method
       await service["writeContractMethod"](1, "testMethod", [], 100n);
 
       expect(mockWalletClient.writeContract).toHaveBeenCalledWith({
@@ -139,7 +135,6 @@ describe("GenericContractService", () => {
       );
 
       await expect(
-        // biome-ignore lint/complexity/useLiteralKeys: testing private method
         service["writeContractMethod"](1, "testMethod", []),
       ).rejects.toThrow("No wallet client available");
     });
@@ -154,7 +149,6 @@ describe("GenericContractService", () => {
       mockWalletClient.writeContract.mockRejectedValue(new Error(errorMessage));
 
       await expect(
-        // biome-ignore lint/complexity/useLiteralKeys: testing private method
         service["writeContractMethod"](1, "testMethod", []),
       ).rejects.toThrow(errorMessage);
     });
