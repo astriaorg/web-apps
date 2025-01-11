@@ -24,13 +24,17 @@ function Navbar() {
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
     hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
-    ${pathname === path ? `
+    ${
+      pathname === path
+        ? `
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
       after:left-1/2 after:transform after:-translate-x-1/2
       after:w-[85%] after:h-1 after:bg-gradient-to-r
       after:from-[#EA9B57] after:to-[#CB513F]
-    ` : ""}
+    `
+        : ""
+    }
   `;
 
   return (
@@ -61,44 +65,39 @@ function Navbar() {
           data-target="topNavbar"
           onClick={onHamburgerClick}
         >
-          <span className="block w-6 h-0.5 bg-white mb-1.5" aria-hidden="true"/>
-          <span className="block w-6 h-0.5 bg-white mb-1.5" aria-hidden="true"/>
-          <span className="block w-6 h-0.5 bg-white" aria-hidden="true"/>
+          <span
+            className="block w-6 h-0.5 bg-white mb-1.5"
+            aria-hidden="true"
+          />
+          <span
+            className="block w-6 h-0.5 bg-white mb-1.5"
+            aria-hidden="true"
+          />
+          <span className="block w-6 h-0.5 bg-white" aria-hidden="true" />
         </button>
       </div>
 
       <div
         id="topNavbar"
-        className={`flex-1 ${
-          isMobileMenuActive ? "block" : "hidden md:block"
-        }`}
+        className={`flex-1 ${isMobileMenuActive ? "block" : "hidden md:block"}`}
       >
         <div className="flex justify-center items-center font-mono font-medium">
-          <Link
-            href="/"
-            className={navLinkClasses("/")}
-          >
+          <Link href="/" className={navLinkClasses("/")}>
             BRIDGE
           </Link>
-          <Link
-            href="/swap"
-            className={navLinkClasses("/swap")}
-          >
+          <Link href="/swap" className={navLinkClasses("/swap")}>
             SWAP
           </Link>
-          <Link
-            href="/pool"
-            className={navLinkClasses("/pool")}
-          >
+          <Link href="/pool" className={navLinkClasses("/pool")}>
             POOL
           </Link>
         </div>
       </div>
 
-      <div className="w-[185px]"/>
+      <div className="w-[185px]" />
       <div className="navbar-end">
-        <NetworkSelector/>
-        <ConnectWalletsButton/>
+        <NetworkSelector />
+        <ConnectWalletsButton />
       </div>
     </nav>
   );

@@ -336,11 +336,11 @@ export default function WithdrawCard(): React.ReactElement {
                 )}
               {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: <i className="fas fa-spinner fa-pulse"/>
+                  Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
               {selectedEvmCurrency?.erc20ContractAddress && (
-                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency}/>
+                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
               )}
             </div>
           )}
@@ -348,7 +348,7 @@ export default function WithdrawCard(): React.ReactElement {
       </div>
 
       {isAnimating ? (
-        <AnimatedArrowSpacer isAnimating={isAnimating}/>
+        <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
         <div className="is-flex is-flex-direction-row">
           <div className="">

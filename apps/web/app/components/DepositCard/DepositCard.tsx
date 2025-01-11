@@ -338,7 +338,7 @@ export default function DepositCard(): React.ReactElement {
                 )}
               {fromAddress && isLoadingCosmosBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: <i className="fas fa-spinner fa-pulse"/>
+                  Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
             </div>
@@ -347,7 +347,7 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       {isAnimating ? (
-        <AnimatedArrowSpacer isAnimating={isAnimating}/>
+        <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
         <div className="is-flex is-flex-direction-row">
           <div>

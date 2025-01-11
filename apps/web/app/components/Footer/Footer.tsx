@@ -6,7 +6,10 @@ export default function Footer(): React.ReactElement {
       <div className="text-center">
         <p>
           &copy; 2024. All Rights Reserved.{" "}
-          <a href="https://www.astria.org/" className="text-orange-soft hover:underline">
+          <a
+            href="https://www.astria.org/"
+            className="text-orange-soft hover:underline"
+          >
             Astria.org
           </a>
         </p>
