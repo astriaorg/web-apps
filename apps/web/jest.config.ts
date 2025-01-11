@@ -102,6 +102,7 @@ const config: Config = {
     "^components/(.*)$": "<rootDir>/app/components/$1",
     "^config": "<rootDir>/app/config/$1",
     "^features/(.*)$": "<rootDir>/app/features/$1",
+    "^testing/(.*)$": "<rootDir>/app/testing/$1",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader

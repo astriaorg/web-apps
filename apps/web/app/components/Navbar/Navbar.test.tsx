@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import type React from "react";
 
-import { renderWithProviders } from "../../../testHelpers";
+import { renderWithProviders } from "testing/helpers";
 import Navbar from "./Navbar";
 
 describe("Navbar Component", () => {

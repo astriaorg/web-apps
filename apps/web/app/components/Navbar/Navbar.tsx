@@ -5,9 +5,9 @@ import { useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
-import { NetworkSelector, useConfig } from "../../config";
-import ConnectWalletsButton from "../ConnectWalletsButton/ConnectWalletsButton";
-// import logo from "logo-flame-w-text.svg";
+
+import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
+import { NetworkSelector, useConfig } from "config";
 
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);

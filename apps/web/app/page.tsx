@@ -1,6 +1,5 @@
 import BridgePage from "./bridge/page";
 
-export default function Home() {
-  // Next.js will automatically route / to this page
+export default function Bridge() {
   return <BridgePage />;
 }
