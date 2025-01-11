@@ -99,9 +99,9 @@ const config: Config = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     // ...
-    '^components/(.*)$': '<rootDir>/app/components/$1',
-    '^config': '<rootDir>/app/config/$1',
-    '^features/(.*)$': '<rootDir>/app/features/$1',
+    "^components/(.*)$": "<rootDir>/app/components/$1",
+    "^config": "<rootDir>/app/config/$1",
+    "^features/(.*)$": "<rootDir>/app/features/$1",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -195,7 +195,7 @@ const config: Config = {
     "\\.pnp\\.[^\\/]+$",
     // FIXME - the regex defined below is not being used for some reason.
     //  i had to add it manually in package.json as a flag. why??
-    "/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/"
+    "/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/",
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

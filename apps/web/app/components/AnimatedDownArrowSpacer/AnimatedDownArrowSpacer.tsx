@@ -1,6 +1,8 @@
 export default function AnimatedArrowSpacer({
   isAnimating,
-}: { isAnimating: boolean }) {
+}: {
+  isAnimating: boolean;
+}) {
   return (
     <div className="arrow-spacer my-4">
       <style>
