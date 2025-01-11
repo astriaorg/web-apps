@@ -14,6 +14,7 @@ describe("ConfigContextProvider", () => {
     renderWithProviders(<TestComponent />);
 
     const configString = screen.getByText(
+      // this string in the mainnet configs, which are used by default
       /astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p/,
     );
     expect(configString).toBeInTheDocument();

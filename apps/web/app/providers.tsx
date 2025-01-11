@@ -25,7 +25,7 @@ const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const { evm: evmChains, cosmos: cosmosChains } = getAllChainConfigs();
+  const { evmChains, cosmosChains } = getAllChainConfigs();
 
   // wagmi and rainbowkit config, for evm chains
   const rainbowKitConfig = getDefaultConfig({

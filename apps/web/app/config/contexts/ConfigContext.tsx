@@ -38,7 +38,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const { evm, cosmos } = getChainConfigs(selectedFlameNetwork);
+  const { evmChains: evm, cosmosChains: cosmos } =
+    getChainConfigs(selectedFlameNetwork);
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
@@ -47,9 +48,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
-    const { evm, cosmos } = getChainConfigs(network);
-    setEvmChains(evm);
-    setCosmosChains(cosmos);
+    const { evmChains, cosmosChains } = getChainConfigs(selectedFlameNetwork);
+    setEvmChains(evmChains);
+    setCosmosChains(cosmosChains);
     setSelectedFlameNetwork(network);
   };
 

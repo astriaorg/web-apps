@@ -13,8 +13,8 @@ describe("Chain Configs", () => {
       for (const network of networks) {
         const config = getChainConfigs(network);
         expect(config).toBeDefined();
-        expect(config.cosmos).toBeDefined();
-        expect(config.evm).toBeDefined();
+        expect(config.cosmosChains).toBeDefined();
+        expect(config.evmChains).toBeDefined();
       }
     });
   });

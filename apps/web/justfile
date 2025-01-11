@@ -5,9 +5,9 @@ _default:
 ai-digest:
    npx ai-digest -i app --show-output-files
 
-fmt:
+format:
   npm run format
-alias f := fmt
+alias f := format
 
 lint-md:
   docker run --rm -v $PWD:/workdir davidanson/markdownlint-cli2:v0.8.1 \
@@ -17,6 +17,7 @@ lint-md:
 
 lint:
   npm run lint
+  just lint-md
 
 alias l := lint
 

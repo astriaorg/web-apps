@@ -10,8 +10,8 @@ export enum FlameNetwork {
 }
 
 export interface ChainConfigs {
-  evm: EvmChains;
-  cosmos: CosmosChains;
+  evmChains: EvmChains;
+  cosmosChains: CosmosChains;
 }
 
 import * as dawn from "./ChainConfigsDawn";
@@ -20,22 +20,10 @@ import * as local from "./ChainConfigsLocal";
 import * as mainnet from "./ChainConfigsMainnet";
 
 const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {
-  [FlameNetwork.LOCAL]: {
-    evm: local.evmChains,
-    cosmos: local.cosmosChains,
-  },
-  [FlameNetwork.DUSK]: {
-    evm: dusk.evmChains,
-    cosmos: dusk.cosmosChains,
-  },
-  [FlameNetwork.DAWN]: {
-    evm: dawn.evmChains,
-    cosmos: dawn.cosmosChains,
-  },
-  [FlameNetwork.MAINNET]: {
-    evm: mainnet.evmChains,
-    cosmos: mainnet.cosmosChains,
-  },
+  [FlameNetwork.LOCAL]: local,
+  [FlameNetwork.DUSK]: dusk,
+  [FlameNetwork.DAWN]: dawn,
+  [FlameNetwork.MAINNET]: mainnet,
 };
 
 /**
@@ -52,13 +40,13 @@ export function getChainConfigs(network: FlameNetwork): ChainConfigs {
  */
 export function getAllChainConfigs(): ChainConfigs {
   return {
-    evm: {
+    evmChains: {
       ...local.evmChains,
       ...dusk.evmChains,
       ...dawn.evmChains,
       ...mainnet.evmChains,
     },
-    cosmos: {
+    cosmosChains: {
       ...local.cosmosChains,
       ...dusk.cosmosChains,
       ...dawn.cosmosChains,
@@ -69,7 +57,7 @@ export function getAllChainConfigs(): ChainConfigs {
 
 export function getEvmChainByChainId(chainId: number): EvmChainInfo {
   const allChainConfigs = getAllChainConfigs();
-  const found = Object.values(allChainConfigs.evm).find(
+  const found = Object.values(allChainConfigs.evmChains).find(
     (chainConfig) => chainConfig.chainId === chainId,
   );
   if (!found) {

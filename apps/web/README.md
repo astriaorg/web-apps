@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+# Astria BridgePage Web App
 
-## Getting Started
+This directory contains the source code and tooling for the front-end for
+the Astria Flame app.
 
-First, run the development server:
+## `web` application directory structure
+
+### Application directory structure
+
+- `app/bridge` - bridge page
+- `app/components` - More general React components for the app, e.g. Navbar,
+  Dropdown, CopyToClipboardButton, etc
+- `app/config` - Configuration for the web app
+  - `app/config/chainConfigs` - Celestia and Astria chain information
+  - `app/config/components` - components for config, e.g. `NetworkSelector`
+  - `app/config/contexts` - Config context and context provider
+  - `app/config/hooks` - Custom hook to make config easy to use
+  - `app/config/env.ts` - Environment variable definitions plus utilities for
+    consuming them
+  - `app/config/index.ts` - AppConfig and exports
+- `app/features` - Organizes components, contexts, hooks, services, types, and
+  utils for different features
+  - `app/features/CosmosWallet` - User for interacting with Keplr wallet
+  - `app/features/EvmWallet` - Used for interacting with EVM wallets
+  - `app/features/Notifications` - Used for displaying notifications and toasts
+- `app/fonts` - Fonts
+- `app/pool` - pool page
+- `app/swap` - swap page
+- `app/testing/helpers.tsx` - helper functions for testing
+- `favicon.ico` - favicon
+- `globals.css` - global styles
+- `layout.tsx` - the root layout for the app
+- `page.tsx` - the root page for the app
+- `providers.tsx` - the providers for the app
+
+### Non-application files
+
+- `.aidigestignore` - files to ignore when running `aidigest`
+- `.eslintrc.json` - eslint config
+- `eslint.config.js` - eslint config
+- `jest.config.ts` - jest configuration
+- `jest.setup.tsx`
+  - most jest mocks defined here (some mocks defined in individual test files)
+  - browser global mocks defined here
+- `justfile` - commands to aid in development
+- `next.config.js` - Next.js configuration
+- `next-env.d.ts` - Next.js types
+- `postcss.config.js` - PostCSS configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+- `types-for-contrib.d.ts` - types for 3rd party libraries
+
+## Commands
 
 ```bash
+# install npm deps and run web app locally
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# test, format, lint
+npm run test
+npm run format
+npm run lint
+# or with just
+just t
+just f
+just l
+
+# build web app static files
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How Tos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- How to add new chain configs for a new network (e.g. you want to add new
+  chain configs for "mainnet")
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
+  - create file that will contain the config values
 
-## Learn More
+    ```sh
+    touch app/config/chainConfigs/ChainConfigsMainnet.ts
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+  - import new configs in
+    `astria-bridge-web-app/web/src/config/chainConfigs/index.ts`, while renaming
+    them
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```typescript
+    import * as mainnet from "./ChainConfigsMainnet";
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+  - add entry to `NETWORK_CONFIGS`
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    ```typescript
+    const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {
+      [FlameNetwork.LOCAL]: local,
+      [FlameNetwork.DUSK]: dusk,
+      [FlameNetwork.DAWN]: dawn,
+      [FlameNetwork.MAINNET]: mainnet,
+    };
+    ```
