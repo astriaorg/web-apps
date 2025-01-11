@@ -1,16 +1,13 @@
 "use client";
 
-import { ChainProvider } from "@cosmos-kit/react";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { ChainProvider } from "@cosmos-kit/react";
+import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from "wagmi";
 import { assets, chains } from "chain-registry";
+import { WagmiProvider } from "wagmi";
 
-import { CosmosWalletProvider } from "./features/CosmosWallet";
-import { EvmWalletProvider } from "./features/EvmWallet";
-import { NotificationsContextProvider } from "./features/Notifications";
 import {
   ConfigContextProvider,
   cosmosChainInfosToCosmosKitAssetLists,
@@ -18,6 +15,9 @@ import {
   evmChainsToRainbowKitChains,
   getAllChainConfigs,
 } from "./config";
+import { CosmosWalletProvider } from "./features/CosmosWallet";
+import { EvmWalletProvider } from "./features/EvmWallet";
+import { NotificationsContextProvider } from "./features/Notifications";
 
 // TODO - move to envar
 const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";

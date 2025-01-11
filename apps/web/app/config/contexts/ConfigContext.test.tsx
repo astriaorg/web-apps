@@ -11,11 +11,11 @@ const TestComponent: React.FC = () => {
 
 describe("ConfigContextProvider", () => {
   it("provides the correct config values", () => {
-    renderWithProviders(
-      <TestComponent/>
-    );
+    renderWithProviders(<TestComponent />);
 
-    const configString = screen.getByText(/astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p/);
+    const configString = screen.getByText(
+      /astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p/,
+    );
     expect(configString).toBeInTheDocument();
     expect(configString).toHaveTextContent("Celestia");
   });
@@ -24,9 +24,8 @@ describe("ConfigContextProvider", () => {
     // this blocks the console.error output so the test output is clean
     const consoleErrorSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => {
-      });
-    expect(() => render(<TestComponent/>)).toThrow(
+      .mockImplementation(() => {});
+    expect(() => render(<TestComponent />)).toThrow(
       "useConfig must be used within a ConfigContextProvider",
     );
     consoleErrorSpy.mockRestore();

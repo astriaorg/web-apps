@@ -95,10 +95,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
 
   console.log("evm wallet context user account", userAccount?.chainId);
-  useEffect(() => {
-    // TODO - detect when user changes networks from wallet and update selected network
-    selectFlameNetwork;
-  }, [userAccount.chainId]);
+  // useEffect(() => {
+  //   // TODO - detect when user changes networks from wallet and update selected network
+  //   selectFlameNetwork;
+  // }, [userAccount.chainId]);
 
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
@@ -191,7 +191,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   useEffect(() => {
     resetState();
     // TODO - make wallet switch network? e.g. the balance from
-  }, [selectedFlameNetwork]);
+    console.log("selectedFlameNetwork", selectedFlameNetwork);
+  }, [resetState, selectedFlameNetwork]);
 
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {

@@ -48,7 +48,8 @@
   * {
     @apply border-border;
   }
-  html, body {
+  html,
+  body {
     @apply h-screen;
   }
   body {
@@ -65,7 +66,6 @@
     @apply flex items-center px-3 py-2 text-white transition-colors duration-200 hover:bg-black/10;
   }
 }
-
 
 @layer utilities {
   .fade-out {

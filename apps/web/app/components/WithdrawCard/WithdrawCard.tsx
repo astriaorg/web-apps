@@ -12,10 +12,7 @@ import {
   createWithdrawerService,
   useEvmWallet,
 } from "features/EvmWallet";
-import {
-  NotificationType,
-  useNotifications,
-} from "features/Notifications";
+import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();

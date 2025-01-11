@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import DepositCard from "components/DepositCard/DepositCard";
 import WithdrawCard from "components/WithdrawCard/WithdrawCard";
+import { useState } from "react";
 
-type TabType = "DEPOSIT" | "WITHDRAW"
+type TabType = "DEPOSIT" | "WITHDRAW";
 
 interface TabProps {
   label: TabType;
@@ -15,6 +15,7 @@ interface TabProps {
 const Tab = ({ label, isActive, onClick }: TabProps) => (
   <li className={`${isActive ? "border-b-2 border-orange-500" : ""}`}>
     <button
+      type="button"
       onClick={() => onClick(label)}
       className="px-4 py-2 text-white hover:text-orange-300"
     >
@@ -45,7 +46,7 @@ export default function BridgePage() {
               </ul>
             </div>
             <div className="p-6">
-              {activeTab === "DEPOSIT" ? <DepositCard/> : <WithdrawCard/>}
+              {activeTab === "DEPOSIT" ? <DepositCard /> : <WithdrawCard />}
             </div>
           </div>
         </div>

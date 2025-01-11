@@ -8,10 +8,7 @@ import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDown
 import Dropdown from "components/Dropdown/Dropdown";
 import { sendIbcTransfer, useCosmosWallet } from "features/CosmosWallet";
 import { AddErc20ToWalletButton, useEvmWallet } from "features/EvmWallet";
-import {
-  NotificationType,
-  useNotifications,
-} from "features/Notifications";
+import { NotificationType, useNotifications } from "features/Notifications";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();

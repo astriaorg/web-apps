@@ -1,6 +1,9 @@
 import { useContext } from "react";
 
-import { CosmosWalletContext, CosmosWalletContextProps } from "../contexts/CosmosWalletContext";
+import {
+  CosmosWalletContext,
+  type CosmosWalletContextProps,
+} from "../contexts/CosmosWalletContext";
 
 export const useCosmosWallet = (): CosmosWalletContextProps => {
   const context = useContext(CosmosWalletContext);

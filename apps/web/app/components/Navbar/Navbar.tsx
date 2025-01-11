@@ -3,10 +3,10 @@
 import type React from "react";
 import { useState } from "react";
 
+import Image from "next/image";
+import Link from "next/link";
 import { NetworkSelector, useConfig } from "../../config";
 import ConnectWalletsButton from "../ConnectWalletsButton/ConnectWalletsButton";
-import Link from "next/link";
-import Image from "next/image";
 // import logo from "logo-flame-w-text.svg";
 
 function Navbar() {

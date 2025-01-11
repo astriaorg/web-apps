@@ -14,9 +14,9 @@ export interface ChainConfigs {
   cosmos: CosmosChains;
 }
 
-import * as local from "./ChainConfigsLocal";
-import * as dusk from "./ChainConfigsDusk";
 import * as dawn from "./ChainConfigsDawn";
+import * as dusk from "./ChainConfigsDusk";
+import * as local from "./ChainConfigsLocal";
 import * as mainnet from "./ChainConfigsMainnet";
 
 const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {

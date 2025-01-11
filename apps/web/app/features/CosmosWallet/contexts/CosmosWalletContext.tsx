@@ -126,7 +126,8 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   useEffect(() => {
     resetState();
     // TODO - make wallet switch network?
-  }, [selectedFlameNetwork]);
+    console.log("selectedFlameNetwork", selectedFlameNetwork);
+  }, [resetState, selectedFlameNetwork]);
 
   const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {
     setSelectedCosmosChain(chain);
