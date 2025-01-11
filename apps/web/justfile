@@ -4,3 +4,22 @@ _default:
 # generate codebase.md that is useful to feed to LLMs
 ai-digest:
    npx ai-digest -i app --show-output-files
+
+fmt:
+  npm run format
+alias f := fmt
+
+lint-md:
+  docker run --rm -v $PWD:/workdir davidanson/markdownlint-cli2:v0.8.1 \
+    "**/*.md" \
+    "#node_modules" \
+    "#codebase.md"
+
+lint:
+  npm run lint
+
+alias l := lint
+
+test:
+  npm run test
+alias t := test
