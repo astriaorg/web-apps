@@ -1,6 +1,5 @@
 "use client";
 
-import type { Chain } from "@chain-registry/types";
 import { ChainProvider } from "@cosmos-kit/react";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
@@ -23,6 +22,8 @@ import {
 // TODO - move to envar
 const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
 
+const queryClient = new QueryClient();
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const { evm: evmChains, cosmos: cosmosChains } = getAllChainConfigs();
 
@@ -32,8 +33,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
     projectId: WALLET_CONNECT_PROJECT_ID,
     chains: evmChainsToRainbowKitChains(evmChains),
   });
-
-  const queryClient = new QueryClient();
 
   // cosmoskit config
   const cosmosWalletConnectOptions = {
@@ -58,7 +57,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                 wallets={[...keplrWallets, ...leapWallets]}
                 walletConnectOptions={cosmosWalletConnectOptions}
                 signerOptions={{
-                  preferredSignType: (chain: string | Chain) => {
+                  preferredSignType: () => {
                     return "amino";
                   },
                 }}

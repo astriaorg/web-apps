@@ -6,6 +6,7 @@ import { useState } from "react";
 import { NetworkSelector, useConfig } from "../../config";
 import ConnectWalletsButton from "../ConnectWalletsButton/ConnectWalletsButton";
 import Link from "next/link";
+import Image from "next/image";
 // import logo from "logo-flame-w-text.svg";
 
 function Navbar() {
@@ -30,6 +31,13 @@ function Navbar() {
           rel="noreferrer"
         >
           {/* <img src={logo} width="161" height="32" alt="logo" /> */}
+          <Image
+            src="/assets/logo-flame-w-text.svg"
+            width={161}
+            height={32}
+            alt="Flame Logo"
+            priority
+          />
         </a>
         <button
           type="button"
