@@ -1,9 +1,9 @@
 _default:
   @just --list
 
-# generate codebase.md that is useful to feed to LLMs
-ai-digest:
-   npx ai-digest -i app --show-output-files
+# copy .env.example to .env.local
+cp-env:
+  cp .env.example .env.local
 
 format:
   npm run format
@@ -24,3 +24,7 @@ alias l := lint
 test:
   npm run test
 alias t := test
+
+# generate codebase.md that is useful to feed to LLMs
+ai-digest:
+   npx ai-digest -i app --show-output-files

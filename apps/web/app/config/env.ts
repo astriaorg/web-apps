@@ -4,7 +4,6 @@
  * Environment variables
  */
 export const ENV = {
-  NEXT_PUBLIC_NETWORK: process.env.NEXT_PUBLIC_NETWORK,
   NEXT_PUBLIC_VERSION: process.env.NEXT_PUBLIC_VERSION,
   NEXT_PUBLIC_BRAND_URL: process.env.NEXT_PUBLIC_BRAND_URL,
   NEXT_PUBLIC_BRIDGE_URL: process.env.NEXT_PUBLIC_BRIDGE_URL,

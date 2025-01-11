@@ -27,11 +27,12 @@ the Astria Flame app.
 - `app/pool` - pool page
 - `app/swap` - swap page
 - `app/testing/helpers.tsx` - helper functions for testing
-- `favicon.ico` - favicon
-- `globals.css` - global styles
-- `layout.tsx` - the root layout for the app
-- `page.tsx` - the root page for the app
-- `providers.tsx` - the providers for the app
+- `app/favicon.ico` - favicon
+- `app/globals.css` - global styles
+- `app/layout.tsx` - the root layout for the app
+- `app/page.tsx` - the root page for the app
+- `app/providers.tsx` - the providers for the app
+- `types-for-contrib.d.ts` - types for 3rd party libraries
 
 ### Non-application files
 
@@ -48,12 +49,12 @@ the Astria Flame app.
 - `postcss.config.js` - PostCSS configuration
 - `tailwind.config.js` - Tailwind CSS configuration
 - `tsconfig.json` - TypeScript configuration
-- `types-for-contrib.d.ts` - types for 3rd party libraries
 
 ## Commands
 
 ```bash
 # install npm deps and run web app locally
+just cp-env
 npm install
 npm run dev
 
