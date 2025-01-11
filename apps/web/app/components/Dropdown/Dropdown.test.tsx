@@ -25,6 +25,9 @@ describe("Dropdown Component", () => {
     render(<Dropdown options={mockOptions} onSelect={() => {}} />);
     const dropdownButtons = screen.getAllByRole("button");
     const dropdownButton = dropdownButtons[0];
+    if (!dropdownButton) {
+      throw new Error("Dropdown button not found");
+    }
     fireEvent.click(dropdownButton);
     expect(screen.getByRole("menu")).toBeInTheDocument();
   });
@@ -35,6 +38,9 @@ describe("Dropdown Component", () => {
 
     const dropdownButtons = screen.getAllByRole("button");
     const dropdownButton = dropdownButtons[0];
+    if (!dropdownButton) {
+      throw new Error("Dropdown button not found");
+    }
     fireEvent.click(dropdownButton);
 
     const option = screen.getByText("Option 1");
@@ -53,6 +59,9 @@ describe("Dropdown Component", () => {
     render(<Dropdown options={mockOptions} onSelect={() => {}} />);
     const dropdownButtons = screen.getAllByRole("button");
     const dropdownButton = dropdownButtons[0];
+    if (!dropdownButton) {
+      throw new Error("Dropdown button not found");
+    }
     fireEvent.click(dropdownButton);
 
     const selectedOption = screen.getByText("Option 3");
@@ -68,6 +77,9 @@ describe("Dropdown Component", () => {
 
     const dropdownButtons = screen.getAllByRole("button");
     const dropdownButton = dropdownButtons[0];
+    if (!dropdownButton) {
+      throw new Error("Dropdown button not found");
+    }
     fireEvent.click(dropdownButton);
 
     const option = screen.getByText("Option 3");
