@@ -297,11 +297,11 @@ export default function DepositCard(): React.ReactElement {
 
   return (
     <div>
-      <div className="field">
-        <div className="is-flex is-flex-direction-column">
-          <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
-            <div className="label-left">From</div>
-            <div className="is-flex-grow-1">
+      <div className="mb-4">
+        <div className="flex flex-col">
+          <div className="flex flex-row items-center mb-3">
+            <div className="mr-4 min-w-[70px] md:min-w-[60px]">From</div>
+            <div className="flex-grow">
               <Dropdown
                 placeholder="Select..."
                 options={cosmosChainsOptions}
@@ -338,7 +338,7 @@ export default function DepositCard(): React.ReactElement {
                 )}
               {fromAddress && isLoadingCosmosBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: <i className="fas fa-spinner fa-pulse" />
+                  Balance: <i className="fas fa-spinner fa-pulse"/>
                 </p>
               )}
             </div>
@@ -347,7 +347,7 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       {isAnimating ? (
-        <AnimatedArrowSpacer isAnimating={isAnimating} />
+        <AnimatedArrowSpacer isAnimating={isAnimating}/>
       ) : (
         <div className="is-flex is-flex-direction-row">
           <div>

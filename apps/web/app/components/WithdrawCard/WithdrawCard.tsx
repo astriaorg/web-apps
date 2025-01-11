@@ -295,11 +295,11 @@ export default function WithdrawCard(): React.ReactElement {
 
   return (
     <div>
-      <div className="field">
-        <div className="is-flex is-flex-direction-column">
-          <div className="is-flex is-flex-direction-row is-align-items-center mb-3">
-            <div className="label-left">From</div>
-            <div className="is-flex-grow-1">
+      <div className="mb-4">
+        <div className="flex flex-col">
+          <div className="flex items-center mb-3">
+            <div className="mr-4 min-w-[70px] sm:min-w-[60px]">From</div>
+            <div className="flex-grow">
               <Dropdown
                 placeholder="Connect EVM Wallet"
                 options={evmChainsOptions}
@@ -336,11 +336,11 @@ export default function WithdrawCard(): React.ReactElement {
                 )}
               {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
                 <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
-                  Balance: <i className="fas fa-spinner fa-pulse" />
+                  Balance: <i className="fas fa-spinner fa-pulse"/>
                 </p>
               )}
               {selectedEvmCurrency?.erc20ContractAddress && (
-                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
+                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency}/>
               )}
             </div>
           )}
@@ -348,7 +348,7 @@ export default function WithdrawCard(): React.ReactElement {
       </div>
 
       {isAnimating ? (
-        <AnimatedArrowSpacer isAnimating={isAnimating} />
+        <AnimatedArrowSpacer isAnimating={isAnimating}/>
       ) : (
         <div className="is-flex is-flex-direction-row">
           <div className="">
