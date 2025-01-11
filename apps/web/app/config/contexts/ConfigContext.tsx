@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 
 import { FlameNetwork, getChainConfigs } from "../chainConfigs";
 import { getEnvVariable } from "../env";
@@ -29,7 +29,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   let feedbackFormURL: string | null;
   try {
     feedbackFormURL = getEnvVariable("NEXT_PUBLIC_FEEDBACK_FORM_URL");
-  } catch (e) {
+  } catch {
     feedbackFormURL = null;
   }
 

@@ -35,10 +35,10 @@ export default function useBalancePolling<T>(
     } finally {
       setIsLoading(false);
     }
-  }, [fetchBalance, config.enabled, config.onError]);
+  }, [config, fetchBalance]);
 
   useEffect(() => {
-    getBalance().then((_) => {});
+    getBalance().then(() => {});
 
     // setup polling if enabled
     if (config.enabled && config.intervalMS) {

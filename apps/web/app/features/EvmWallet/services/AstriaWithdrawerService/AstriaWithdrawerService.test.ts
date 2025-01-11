@@ -179,7 +179,7 @@ describe("AstriaWithdrawerService", () => {
         mockContractAddress,
       );
       const writeContractMethodSpy = jest.spyOn(
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         service as any,
         "writeContractMethod",
       );
@@ -212,7 +212,7 @@ describe("AstriaWithdrawerService", () => {
       );
       const errorMessage = "Withdrawal failed";
       jest
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         .spyOn(service as any, "writeContractMethod")
         .mockRejectedValue(new Error(errorMessage));
 
@@ -246,7 +246,7 @@ describe("AstriaErc20WithdrawerService", () => {
         mockContractAddress,
       );
       const writeContractMethodSpy = jest.spyOn(
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         service as any,
         "writeContractMethod",
       );
@@ -279,7 +279,7 @@ describe("AstriaErc20WithdrawerService", () => {
       );
       const errorMessage = "ERC20 withdrawal failed";
       jest
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         .spyOn(service as any, "writeContractMethod")
         .mockRejectedValue(new Error(errorMessage));
 
@@ -303,7 +303,7 @@ describe("AstriaErc20WithdrawerService", () => {
         mockContractAddress,
       );
       const readContractMethodSpy = jest.spyOn(
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         service as any,
         "readContractMethod",
       );
@@ -323,7 +323,7 @@ describe("AstriaErc20WithdrawerService", () => {
       );
       const errorMessage = "Balance check failed";
       jest
-        // biome-ignore lint/suspicious/noExplicitAny: This is a test mock
+        /* eslint-disable @typescript-eslint/no-explicit-any */
         .spyOn(service as any, "readContractMethod")
         .mockRejectedValue(new Error(errorMessage));
       const mockAddress = "0x1234567890123456789012345678901234567890";

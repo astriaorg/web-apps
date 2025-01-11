@@ -12,7 +12,7 @@ import ConnectWalletsButton from "../ConnectWalletsButton/ConnectWalletsButton";
 function Navbar() {
   const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
 
-  const onHamburgerClick = (_: React.SyntheticEvent<HTMLButtonElement>) => {
+  const onHamburgerClick = () => {
     setIsMobileMenuActive((prev) => !prev);
   };
 

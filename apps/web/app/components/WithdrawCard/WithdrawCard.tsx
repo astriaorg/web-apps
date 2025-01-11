@@ -135,13 +135,12 @@ export default function WithdrawCard(): React.ReactElement {
   }, [connectCosmosWallet]);
 
   // ensure evm wallet connection when selected EVM chain changes
-  /* biome-ignore lint/correctness/useExhaustiveDependencies: */
   useEffect(() => {
     if (!selectedEvmChain) {
       return;
     }
     connectEvmWallet();
-  }, [selectedEvmChain]);
+  }, [connectEvmWallet, selectedEvmChain]);
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {

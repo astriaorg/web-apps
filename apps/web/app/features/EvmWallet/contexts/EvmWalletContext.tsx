@@ -50,8 +50,7 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { evmChains, selectedFlameNetwork, selectFlameNetwork } =
-    useAppConfig();
+  const { evmChains, selectedFlameNetwork } = useAppConfig();
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();

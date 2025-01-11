@@ -193,7 +193,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   ]);
 
   const disconnectCosmosWallet = useCallback(() => {
-    disconnect().then((_) => {});
+    disconnect().then(() => {});
     resetState();
   }, [disconnect, resetState]);
 

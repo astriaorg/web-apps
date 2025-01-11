@@ -78,7 +78,7 @@ export default function ConnectCosmosWalletButton({
       await disconnectCosmosWallet();
     };
 
-    disconnect().then((_) => {});
+    disconnect().then(() => {});
   }, [disconnectCosmosWallet]);
 
   return (
