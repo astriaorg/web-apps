@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "format": "turbo format",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "jest"
+    "dev": "turbo dev",
+    "test": "turbo test"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
