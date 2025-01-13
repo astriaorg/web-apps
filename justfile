@@ -1,5 +1,5 @@
-# recipes for the defi app
-mod defi 'apps/defi'
+# recipes for the flame defi app
+mod flame-defi 'apps/flame-defi'
 
 _default:
   @just --list

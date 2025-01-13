@@ -1,5 +1,5 @@
 {
-  "name": "flame-apps",
+  "name": "web-apps",
   "private": true,
   "scripts": {
     "build": "turbo build",

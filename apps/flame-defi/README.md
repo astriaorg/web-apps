@@ -3,7 +3,7 @@
 This directory contains the source code and tooling for the front-end for
 the Astria Flame app.
 
-## `defi` application directory structure
+## `flame-defi` application directory structure
 
 ### Application directory structure
 
@@ -37,7 +37,6 @@ the Astria Flame app.
 ### Non-application files
 
 - `.aidigestignore` - files to ignore when running `aidigest`
-- `.eslintrc.json` - eslint config
 - `eslint.config.js` - eslint config
 - `jest.config.ts` - jest configuration
 - `jest.setup.tsx`
