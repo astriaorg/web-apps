@@ -1,16 +1,16 @@
-# Astria BridgePage Web App
+# Flame Defi Frontend
 
 This directory contains the source code and tooling for the front-end for
 the Astria Flame app.
 
-## `web` application directory structure
+## `defi` application directory structure
 
 ### Application directory structure
 
 - `app/bridge` - bridge page
 - `app/components` - More general React components for the app, e.g. Navbar,
   Dropdown, CopyToClipboardButton, etc
-- `app/config` - Configuration for the web app
+- `app/config` - Configuration for the app
   - `app/config/chainConfigs` - Celestia and Astria chain information
   - `app/config/components` - components for config, e.g. `NetworkSelector`
   - `app/config/contexts` - Config context and context provider
@@ -53,7 +53,7 @@ the Astria Flame app.
 ## Commands
 
 ```bash
-# install npm deps and run web app locally
+# install npm deps and run app locally
 just cp-env
 npm install
 npm run dev
@@ -67,7 +67,7 @@ just t
 just f
 just l
 
-# build web app static files
+# build app static files
 npm run build
 ```
 
@@ -79,11 +79,11 @@ npm run build
   - create file that will contain the config values
 
     ```sh
-    touch app/config/chainConfigs/ChainConfigsMainnet.ts
+    touch ./config/chainConfigs/ChainConfigsMainnet.ts
     ```
 
   - import new configs in
-    `astria-bridge-web-app/web/src/config/chainConfigs/index.ts`, while renaming
+    `./config/chainConfigs/index.ts`, while renaming
     them
 
     ```typescript
