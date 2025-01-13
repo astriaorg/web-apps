@@ -25,6 +25,13 @@ test:
   npm run test
 alias t := test
 
+run:
+  npm run dev
+
+build:
+  npm run build
+alias b := build
+
 # generate codebase.md that is useful to feed to LLMs
 ai-digest:
    npx ai-digest -i app --show-output-files
