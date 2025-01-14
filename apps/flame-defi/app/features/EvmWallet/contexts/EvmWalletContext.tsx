@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
 
-import type { DropdownOption } from "components/Dropdown/Dropdown";
+import { DropdownOption } from "@repo/ui/components";
 import {
   type EvmChainInfo,
   type EvmCurrency,
@@ -181,7 +181,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
         label: chainLabel,
         value: chain,
-        leftIconClass: chain.iconClass,
+        LeftIcon: chain.IconComponent,
       }),
     );
   }, [evmChains]);
@@ -200,7 +200,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     return {
       label: selectedEvmChain?.chainName || "",
       value: selectedEvmChain,
-      leftIconClass: selectedEvmChain?.iconClass || "",
+      LeftIcon: selectedEvmChain?.IconComponent,
     } as DropdownOption<EvmChainInfo>;
   }, [selectedEvmChain]);
 
@@ -223,7 +223,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       (currency): DropdownOption<EvmCurrency> => ({
         label: currency.coinDenom,
         value: currency,
-        leftIconClass: currency.iconClass,
+        LeftIcon: currency.IconComponent,
       }),
     );
   }, [selectedEvmChain]);
