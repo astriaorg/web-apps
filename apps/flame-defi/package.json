@@ -9,8 +9,7 @@
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\"",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
   },
   "dependencies": {
     "@cosmjs/launchpad": "^0.27.1",
