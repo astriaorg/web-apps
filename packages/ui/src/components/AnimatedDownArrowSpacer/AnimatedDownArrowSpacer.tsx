@@ -1,6 +1,8 @@
 export const AnimatedArrowSpacer = ({
   isAnimating,
-}: { isAnimating: boolean }) => {
+}: {
+  isAnimating: boolean;
+}) => {
   return (
     <div className="my-4">
       {[100, 80, 60, 40, 20, 10, 5, 1].map((width, index) => (

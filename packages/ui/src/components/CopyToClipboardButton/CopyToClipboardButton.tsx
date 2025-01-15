@@ -30,9 +30,7 @@ export const CopyToClipboardButton = ({
       onClick={() => copyToClipboard(textToCopy)}
       className="p-2 text-white hover:text-gray-200 transition-colors"
     >
-      {copyStatus && (
-        <div className="animate-fade-out">{copyStatus}</div>
-      )}
+      {copyStatus && <div className="animate-fade-out">{copyStatus}</div>}
       {!copyStatus && (
         <span className={`inline-block ${fadeInClass}`}>
           <i className="fas fa-clipboard" />
@@ -40,4 +38,4 @@ export const CopyToClipboardButton = ({
       )}
     </button>
   );
-}
+};

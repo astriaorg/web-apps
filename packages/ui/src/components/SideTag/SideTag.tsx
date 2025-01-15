@@ -11,10 +11,7 @@ interface SideTagProps {
  * @param url
  * @param iconClass
  */
-export const SideTag = ({
-  label,
-  url,
-}: SideTagProps) => {
+export const SideTag = ({ label, url }: SideTagProps) => {
   return (
     <div className="inline-flex items-center">
       <a

@@ -64,7 +64,7 @@ export default function DepositCard(): React.ReactElement {
       return defaultEvmCurrencyOption;
     }
     const matchingEvmCurrency = selectedEvmChain?.currencies.find(
-      (currency) => currency.coinDenom === selectedIbcCurrency.coinDenom,
+      (currency) => currency.coinDenom === selectedIbcCurrency.coinDenom
     );
     if (!matchingEvmCurrency) {
       return null;
@@ -102,7 +102,7 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddressOverride("");
   };
   const updateRecipientAddressOverride = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setRecipientAddressOverride(event.target.value);
   };
@@ -123,7 +123,7 @@ export default function DepositCard(): React.ReactElement {
 
   const checkIsFormValid = (
     addressInput: string | null,
-    amountInput: string,
+    amountInput: string
   ) => {
     if (addressInput === null) {
       setIsRecipientAddressValid(false);
@@ -194,7 +194,7 @@ export default function DepositCard(): React.ReactElement {
     try {
       const formattedAmount = Decimal.fromUserInput(
         amount,
-        selectedIbcCurrency.coinDecimals,
+        selectedIbcCurrency.coinDecimals
       ).atomics;
 
       const signer = await getCosmosSigningClient();
@@ -203,7 +203,7 @@ export default function DepositCard(): React.ReactElement {
         fromAddress,
         recipientAddress,
         formattedAmount,
-        selectedIbcCurrency,
+        selectedIbcCurrency
       );
       addNotification({
         toastOpts: {
@@ -280,7 +280,7 @@ export default function DepositCard(): React.ReactElement {
         RightIcon: PlusIcon,
       },
     ],
-    [connectCosmosWallet],
+    [connectCosmosWallet]
   );
 
   const additionalEvmChainOptions = useMemo(() => {
@@ -436,7 +436,9 @@ export default function DepositCard(): React.ReactElement {
                 onKeyDown={handleEditRecipientClick}
                 onClick={handleEditRecipientClick}
               >
-                <span className="mr-2">Address: {recipientAddressOverride}</span>
+                <span className="mr-2">
+                  Address: {recipientAddressOverride}
+                </span>
                 <i className="fas fa-pen-to-square" />
               </p>
               {!isRecipientAddressValid && hasTouchedForm && (
@@ -487,7 +489,9 @@ export default function DepositCard(): React.ReactElement {
         <div className="flex flex-col">
           <div className="mb-2 sm:hidden">Amount</div>
           <div className="flex flex-col sm:flex-row sm:items-center">
-            <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">Amount</div>
+            <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
+              Amount
+            </div>
             <div className="flex-grow">
               <input
                 className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-none rounded-xl text-white text-[20px]"

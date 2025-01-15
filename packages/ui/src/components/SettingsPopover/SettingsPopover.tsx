@@ -47,10 +47,7 @@ export const SettingsPopover: React.FC<SettingsPopoverProps> = () => {
   return (
     <Popover>
       <PopoverTrigger>
-        <a
-          className="text-grey-light hover:text-white"
-          aria-label="Settings"
-        >
+        <a className="text-grey-light hover:text-white" aria-label="Settings">
           <GearIcon className="transition duration-300" />
         </a>
       </PopoverTrigger>

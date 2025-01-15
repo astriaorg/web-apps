@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export interface DropdownOption<T> {
   label: string;
   value: T;
-  LeftIcon?: FC<{className?: string; size?: number}>;
+  LeftIcon?: FC<{ className?: string; size?: number }>;
 }
 
 // DropdownAdditionalOption is an interface for additional options that can be added to the dropdown.
@@ -19,9 +19,9 @@ export interface DropdownAdditionalOption {
   // className allows for additional classes to be added to the additional option
   className?: string;
   // LeftIcon allows for an icon to be displayed to the left of the label in the dropdown content
-  LeftIcon?: FC<{className?: string; size?: number}>;
+  LeftIcon?: FC<{ className?: string; size?: number }>;
   // RightIcon allows for an icon to be displayed to the right of the label in the dropdown content
-  RightIcon?: FC<{className?: string; size?: number}>;
+  RightIcon?: FC<{ className?: string; size?: number }>;
 }
 
 interface DropdownProps<T> {
@@ -97,7 +97,7 @@ export const Dropdown = <T,>({
       setIsActive(false);
       onSelect(option.value);
     },
-    [onSelect],
+    [onSelect]
   );
 
   const toggleDropdown = useCallback(() => {
@@ -136,7 +136,7 @@ export const Dropdown = <T,>({
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <span className="ml-auto text-white">
-            <i className={`fas fa-angle-${isActive ? 'up' : 'down'}`} />
+            <i className={`fas fa-angle-${isActive ? "up" : "down"}`} />
           </span>
         </button>
       </div>
@@ -180,13 +180,11 @@ export const Dropdown = <T,>({
                         <option.LeftIcon />
                       </span>
                     )}
-                    <span className="truncate flex-grow">
-                      {option.label}
-                    </span>
+                    <span className="truncate flex-grow">{option.label}</span>
                   </span>
                   {option.RightIcon && (
                     <span className="text-white flex">
-                      <option.RightIcon size={20}/>
+                      <option.RightIcon size={20} />
                     </span>
                   )}
                 </span>
@@ -197,4 +195,4 @@ export const Dropdown = <T,>({
       )}
     </div>
   );
-}
+};
