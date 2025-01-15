@@ -52,7 +52,7 @@ export interface CosmosChainInfo {
   readonly feeCurrencies: CosmosFeeCurrency[];
 
   // The icon to use for this chain in the ui
-  readonly iconClass?: string;
+  readonly IconComponent?: React.FC;
 }
 
 /**
@@ -146,7 +146,7 @@ export interface IbcCurrency extends CosmosCurrency {
   // The sequencer bridge account used to bridge this currency to the evm
   sequencerBridgeAccount?: string;
   // The icon to use for this currency in the ui
-  iconClass?: string;
+  IconComponent?: React.FC;
 }
 
 /**
@@ -240,7 +240,7 @@ export type EvmChainInfo = {
   chainName: string;
   currencies: [EvmCurrency, ...EvmCurrency[]];
   rpcUrls: string[];
-  iconClass?: string;
+  IconComponent?: React.FC;
   blockExplorerUrl?: string;
 };
 
@@ -303,7 +303,7 @@ export type EvmCurrency = {
   nativeTokenWithdrawerContractAddress?: `0x${string}`;
   // fee needed to pay for the ibc withdrawal, 18 decimals
   ibcWithdrawalFeeWei: string;
-  iconClass?: string;
+  IconComponent?: React.FC;
 };
 
 /**

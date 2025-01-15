@@ -1,8 +1,8 @@
 import type React from "react";
 
-export default function Footer(): React.ReactElement {
+export const Footer = (): React.ReactElement => {
   return (
-    <footer className="mt-auto">
+    <footer className="mt-[100px] pb-[50px]">
       <div className="text-center">
         <p>
           &copy; 2024. All Rights Reserved.{" "}
@@ -34,4 +34,4 @@ export default function Footer(): React.ReactElement {
       </div>
     </footer>
   );
-}
+};

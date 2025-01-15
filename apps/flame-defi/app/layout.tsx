@@ -1,4 +1,4 @@
-import Footer from "./components/Footer/Footer";
+import { Footer } from "@repo/ui/components";
 import Navbar from "./components/Navbar/Navbar";
 import { Providers } from "./providers";
 import "./globals.css";

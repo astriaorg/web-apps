@@ -3,9 +3,7 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConfig as useWagmiConfig } from "wagmi";
-
-import AnimatedArrowSpacer from "components/AnimatedDownArrowSpacer/AnimatedDownArrowSpacer";
-import Dropdown from "components/Dropdown/Dropdown";
+import { Dropdown } from "@repo/ui/components";
 import { useCosmosWallet } from "features/CosmosWallet";
 import {
   AddErc20ToWalletButton,
@@ -13,6 +11,8 @@ import {
   useEvmWallet,
 } from "features/EvmWallet";
 import { NotificationType, useNotifications } from "features/Notifications";
+import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
+import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();
@@ -64,7 +64,7 @@ export default function WithdrawCard(): React.ReactElement {
     return {
       label: matchingIbcCurrency.coinDenom,
       value: matchingIbcCurrency,
-      leftIconClass: matchingIbcCurrency.iconClass,
+      LeftIcon: matchingIbcCurrency.IconComponent,
     };
   }, [selectedEvmCurrency, selectedCosmosChain, defaultIbcCurrencyOption]);
 
@@ -297,45 +297,48 @@ export default function WithdrawCard(): React.ReactElement {
     <div>
       <div className="mb-4">
         <div className="flex flex-col">
-          <div className="flex items-center mb-3">
-            <div className="mr-4 min-w-[70px] sm:min-w-[60px]">From</div>
-            <div className="flex-grow">
-              <Dropdown
-                placeholder="Connect EVM Wallet"
-                options={evmChainsOptions}
-                onSelect={selectEvmChain}
-                leftIconClass={"i-wallet"}
-                additionalOptions={additionalEvmOptions}
-                valueOverride={selectedEvmChainOption}
-              />
-            </div>
-            {selectedEvmChain && evmCurrencyOptions && (
-              <div className="ml-3">
+          <div className="mb-2 sm:hidden">From</div>
+          <div className="flex flex-col sm:flex-row sm:items-center">
+            <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">From</div>
+            <div className="flex flex-col sm:flex-row w-full gap-3">
+              <div className="flex-grow">
                 <Dropdown
-                  placeholder="Select a token"
-                  options={evmCurrencyOptions}
-                  defaultOption={defaultEvmCurrencyOption}
-                  onSelect={selectEvmCurrency}
+                  placeholder="Connect EVM Wallet"
+                  options={evmChainsOptions}
+                  onSelect={selectEvmChain}
+                  LeftIcon={WalletIcon}
+                  additionalOptions={additionalEvmOptions}
+                  valueOverride={selectedEvmChainOption}
                 />
               </div>
-            )}
+              {selectedEvmChain && evmCurrencyOptions && (
+                <div className="w-full sm:w-auto">
+                  <Dropdown
+                    placeholder="Select a token"
+                    options={evmCurrencyOptions}
+                    defaultOption={defaultEvmCurrencyOption}
+                    onSelect={selectEvmCurrency}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           {fromAddress && (
-            <div className="field-info-box py-2 px-3">
+            <div className="py-2 px-3 rounded-xl bg-grey-dark">
               {fromAddress && (
-                <p className="has-text-grey-light has-text-weight-semibold">
+                <p className="text-grey-light font-semibold">
                   Address: {fromAddress}
                 </p>
               )}
               {fromAddress &&
                 selectedEvmCurrency &&
                 !isLoadingSelectedEvmCurrencyBalance && (
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  <p className="mt-2 text-grey-lighter font-semibold">
                     Balance: {selectedEvmCurrencyBalance}
                   </p>
                 )}
               {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
-                <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                <p className="mt-2 text-grey-lighter font-semibold">
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
@@ -350,52 +353,54 @@ export default function WithdrawCard(): React.ReactElement {
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="is-flex is-flex-direction-row">
-          <div className="">
-            <span className="icon is-medium">
-              <i className="i-arrow-up-arrow-down" />
-            </span>
+        <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
+          <div>
+            <ArrowUpDownIcon size={32} />
           </div>
-          <div className="ml-4 card-spacer" />
+          <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
         </div>
       )}
 
-      <div className="field">
-        <div className="is-flex is-flex-direction-column">
-          <div className="is-flex is-flex-direction-row is-align-items-center">
-            <div className="label-left">To</div>
-            <div className="is-flex-grow-1">
-              <Dropdown
-                placeholder="Connect Keplr Wallet or enter address"
-                options={cosmosChainsOptions}
-                onSelect={selectCosmosChain}
-                leftIconClass={"i-wallet"}
-                additionalOptions={additionalIbcOptions}
-                valueOverride={selectedCosmosChainOption}
-              />
-            </div>
-            {selectedCosmosChain && ibcCurrencyOptions && (
-              <div className="ml-3">
+      <div className="mb-4">
+        <div className="flex flex-col">
+          <div className="mb-2 sm:hidden">To</div>
+          <div className="flex flex-col sm:flex-row sm:items-center">
+            <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">To</div>
+            <div className="flex flex-col sm:flex-row w-full gap-3">
+              <div className="flex-grow">
                 <Dropdown
-                  placeholder="No matching token"
-                  options={ibcCurrencyOptions}
-                  defaultOption={defaultIbcCurrencyOption}
-                  onSelect={selectIbcCurrency}
-                  valueOverride={selectedIbcCurrencyOption}
-                  disabled={true}
+                  placeholder="Connect Keplr Wallet or enter address"
+                  options={cosmosChainsOptions}
+                  onSelect={selectCosmosChain}
+                  LeftIcon={WalletIcon}
+                  additionalOptions={additionalIbcOptions}
+                  valueOverride={selectedCosmosChainOption}
                 />
               </div>
-            )}
+              {selectedCosmosChain && ibcCurrencyOptions && (
+                <div className="w-full sm:w-auto">
+                  <Dropdown
+                    placeholder="No matching token"
+                    options={ibcCurrencyOptions}
+                    defaultOption={defaultIbcCurrencyOption}
+                    onSelect={selectIbcCurrency}
+                    valueOverride={selectedIbcCurrencyOption}
+                    disabled={true}
+                  />
+                </div>
+              )}
+            </div>
           </div>
+
           {cosmosAccountAddress &&
             !isRecipientAddressEditable &&
             !recipientAddressOverride && (
-              <div className="field-info-box mt-3 py-2 px-3">
+              <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
                 {cosmosAccountAddress && (
                   <p
-                    className="has-text-grey-light has-text-weight-semibold is-clickable"
-                    onKeyDown={handleEditRecipientClick}
+                    className="text-grey-light font-semibold cursor-pointer"
                     onClick={handleEditRecipientClick}
+                    onKeyDown={handleEditRecipientClick}
                   >
                     <span className="mr-2">
                       Address: {cosmosAccountAddress}
@@ -404,28 +409,29 @@ export default function WithdrawCard(): React.ReactElement {
                   </p>
                 )}
                 {cosmosAccountAddress && !isLoadingCosmosBalance && (
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  <p className="mt-2 text-grey-lighter font-semibold">
                     Balance: {cosmosBalance}
                   </p>
                 )}
                 {cosmosAccountAddress && isLoadingCosmosBalance && (
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold">
+                  <p className="mt-2 text-grey-lighter font-semibold">
                     Balance: <i className="fas fa-spinner fa-pulse" />
                   </p>
                 )}
                 {withdrawFeeDisplay && (
-                  <div className="mt-2 has-text-grey-light help">
+                  <div className="mt-2 text-grey-light text-sm">
                     Withdrawal fee: {withdrawFeeDisplay}
                   </div>
                 )}
               </div>
             )}
+
           {recipientAddressOverride && !isRecipientAddressEditable && (
-            <div className="field-info-box mt-3 py-2 px-3">
+            <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
               <p
-                className="has-text-grey-light has-text-weight-semibold is-clickable"
-                onKeyDown={handleEditRecipientClick}
+                className="text-grey-light font-semibold cursor-pointer"
                 onClick={handleEditRecipientClick}
+                onKeyDown={handleEditRecipientClick}
               >
                 <span className="mr-2">
                   Address: {recipientAddressOverride}
@@ -433,20 +439,21 @@ export default function WithdrawCard(): React.ReactElement {
                 <i className="fas fa-pen-to-square" />
               </p>
               {!isRecipientAddressValid && hasTouchedForm && (
-                <div className="help is-danger mt-2">
+                <div className="mt-2 text-red-500 text-sm">
                   Recipient address must be a valid address
                 </div>
               )}
-              <p className="mt-2 has-text-grey-lighter has-text-weight-semibold is-size-7">
+              <p className="mt-2 text-grey-lighter font-semibold text-xs">
                 Connect via wallet to show balance
               </p>
             </div>
           )}
+
           {isRecipientAddressEditable && (
-            <div className="field-info-box mt-3 py-2 px-3">
-              <div className="has-text-grey-light has-text-weight-semibold">
+            <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
+              <div className="text-grey-light font-semibold">
                 <input
-                  className="input is-medium is-outlined-white"
+                  className="w-full p-2 bg-transparent border border-white rounded text-white"
                   type="text"
                   placeholder="Enter address"
                   onChange={updateRecipientAddressOverride}
@@ -454,14 +461,14 @@ export default function WithdrawCard(): React.ReactElement {
                 />
                 <button
                   type="button"
-                  className="button is-ghost is-outlined-white mr-2 mt-2"
+                  className="mr-2 mt-2 text-white hover:opacity-75"
                   onClick={handleEditRecipientSave}
                 >
                   Save
                 </button>
                 <button
                   type="button"
-                  className="button is-ghost is-outlined-white mt-2"
+                  className="mt-2 text-white hover:opacity-75"
                   onClick={handleEditRecipientClear}
                 >
                   Clear
@@ -472,39 +479,42 @@ export default function WithdrawCard(): React.ReactElement {
         </div>
       </div>
 
-      <div className="is-flex is-flex-direction-row is-align-items-center">
-        <div className="card-spacer" />
+      <div className="flex items-center">
+        <div className="w-full border-t border-grey-dark my-4" />
       </div>
 
-      <div className="field">
-        <div className="is-flex is-flex-direction-row is-align-items-center">
-          <div className="label-left">Amount</div>
-          <div className="control mt-1 is-flex-grow-1">
-            <input
-              className="input is-medium"
-              type="text"
-              placeholder="0.00"
-              onChange={updateAmount}
-              value={amount}
-            />
+      <div className="mb-4">
+        <div className="flex flex-col">
+          <div className="mb-2 sm:hidden">Amount</div>
+          <div className="flex flex-col sm:flex-row sm:items-center">
+            <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
+              Amount
+            </div>
+            <div className="flex-grow">
+              <input
+                className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-none rounded-xl text-white text-[20px]"
+                type="text"
+                placeholder="0.00"
+                onChange={updateAmount}
+                value={amount}
+              />
+            </div>
           </div>
+          {!isAmountValid && hasTouchedForm && (
+            <div className="mt-2 text-red-500 text-sm">
+              Amount must be a number greater than 0
+            </div>
+          )}
         </div>
-        {!isAmountValid && hasTouchedForm && (
-          <div className="help is-danger mt-2">
-            Amount must be a number greater than 0
-          </div>
-        )}
       </div>
 
-      <div className="card-footer mt-4">
-        <button
-          type="button"
-          className="button is-tall is-wide has-gradient-to-right-orange has-text-weight-bold has-text-white"
+      <div className="mt-4">
+        <ActionButton
           onClick={handleWithdraw}
           disabled={isWithdrawDisabled}
-        >
-          {isLoading ? "Processing..." : "Withdraw"}
-        </button>
+          isLoading={isLoading}
+          buttonText={"Withdraw"}
+        />
       </div>
     </div>
   );

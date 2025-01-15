@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 
-import CopyToClipboardButton from "components/CopyToClipboardButton/CopyToClipboardButton";
+import { CopyToClipboardButton } from "@repo/ui/components";
 
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
 

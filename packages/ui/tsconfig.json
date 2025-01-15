@@ -1,8 +1,12 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "types": ["@radix-ui/react-tooltip", "@radix-ui/react-dialog", "@radix-ui/react-popover", "@radix-ui/react-switch", "@radix-ui/react-slot", "@radix-ui/react-alert-dialog", "@radix-ui/react-accordion"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
+

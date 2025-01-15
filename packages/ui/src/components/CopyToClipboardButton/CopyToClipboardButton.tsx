@@ -1,10 +1,12 @@
+"use client";
+
 import { useState } from "react";
 
-export default function CopyToClipboardButton({
+export const CopyToClipboardButton = ({
   textToCopy,
 }: {
   textToCopy: string | undefined;
-}) {
+}) => {
   const [copyStatus, setCopyStatus] = useState("");
 
   const [fadeInClass, setFadeInClass] = useState("");
@@ -36,4 +38,4 @@ export default function CopyToClipboardButton({
       )}
     </button>
   );
-}
+};
