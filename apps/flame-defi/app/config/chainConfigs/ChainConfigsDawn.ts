@@ -1,4 +1,9 @@
-import { CelestiaIcon, FlameIcon, NeutronIcon, NobleIcon } from "@repo/ui/icons";
+import {
+  CelestiaIcon,
+  FlameIcon,
+  NeutronIcon,
+  NobleIcon,
+} from "@repo/ui/icons";
 import type {
   CosmosChainInfo,
   CosmosChains,

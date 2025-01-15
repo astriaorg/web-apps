@@ -56,7 +56,7 @@ export default function WithdrawCard(): React.ReactElement {
       return defaultIbcCurrencyOption;
     }
     const matchingIbcCurrency = selectedCosmosChain?.currencies.find(
-      (currency) => currency.coinDenom === selectedEvmCurrency.coinDenom
+      (currency) => currency.coinDenom === selectedEvmCurrency.coinDenom,
     );
     if (!matchingIbcCurrency) {
       return null;
@@ -95,7 +95,7 @@ export default function WithdrawCard(): React.ReactElement {
     setRecipientAddressOverride("");
   };
   const updateRecipientAddressOverride = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRecipientAddressOverride(event.target.value);
   };
@@ -115,7 +115,7 @@ export default function WithdrawCard(): React.ReactElement {
 
   const checkIsFormValid = (
     recipientAddressInput: string | null,
-    amountInput: string
+    amountInput: string,
   ) => {
     if (recipientAddressInput === null) {
       setIsRecipientAddressValid(false);
@@ -199,7 +199,7 @@ export default function WithdrawCard(): React.ReactElement {
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
         contractAddress,
-        Boolean(selectedEvmCurrency.erc20ContractAddress)
+        Boolean(selectedEvmCurrency.erc20ContractAddress),
       );
       await withdrawerSvc.withdrawToIbcChain(
         selectedEvmChain.chainId,
@@ -207,7 +207,7 @@ export default function WithdrawCard(): React.ReactElement {
         amount,
         selectedEvmCurrency.coinDecimals,
         selectedEvmCurrency.ibcWithdrawalFeeWei,
-        ""
+        "",
       );
       addNotification({
         toastOpts: {
@@ -279,7 +279,7 @@ export default function WithdrawCard(): React.ReactElement {
         rightIconClass: "fas fa-pen-to-square",
       },
     ],
-    [handleConnectCosmosWallet, handleEditRecipientClick]
+    [handleConnectCosmosWallet, handleEditRecipientClick],
   );
 
   const additionalEvmOptions = useMemo(() => {

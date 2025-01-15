@@ -46,7 +46,7 @@ export default function SwapPage(): React.ReactElement {
     setInputSelected(
       inputSelected === TOKEN_INPUTS.TOKEN_ONE
         ? TOKEN_INPUTS.TOKEN_TWO
-        : TOKEN_INPUTS.TOKEN_ONE
+        : TOKEN_INPUTS.TOKEN_ONE,
     );
     setInputOne((prev) => ({ ...prev, token: inputTwo.token }));
     setInputTwo((prev) => ({ ...prev, token: inputOne.token }));

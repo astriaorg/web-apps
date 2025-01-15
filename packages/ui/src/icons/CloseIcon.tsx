@@ -1,6 +1,9 @@
 import { IconProps } from "../types";
 
-export const CloseIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => {
+export const CloseIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => {
   return (
     <svg
       width={size}
@@ -14,7 +17,11 @@ export const CloseIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =>
       className={className}
       aria-hidden="true"
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18 18 6M6 6l12 12"
+      />
     </svg>
   );
-}; 
+};

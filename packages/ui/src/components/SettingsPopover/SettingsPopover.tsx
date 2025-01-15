@@ -26,7 +26,7 @@ export const SettingsPopover: React.FC<SettingsPopoverProps> = () => {
   const [showExpertModeDialog, setShowExpertModeDialog] = useState(false);
 
   const handleCustomSlippageChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const value = e.target.value;
     setCustomSlippage(value);

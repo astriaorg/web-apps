@@ -97,7 +97,7 @@ export const Dropdown = <T,>({
       setIsActive(false);
       onSelect(option.value);
     },
-    [onSelect]
+    [onSelect],
   );
 
   const toggleDropdown = useCallback(() => {

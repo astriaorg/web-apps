@@ -19,4 +19,4 @@ export const GasIcon: React.FC<IconProps> = ({ className = "", size = 24 }) => {
       <path d="M4 8.16113H8" />
     </svg>
   );
-}; 
+};

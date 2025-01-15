@@ -47,26 +47,25 @@ describe("Dropdown Component", () => {
     { label: "Option 2", value: "option2" },
     { label: "Option 3", value: "option3" },
   ];
-  
+
   test("displays selected option", () => {
     render(
       <Dropdown
         options={mockOptions}
         defaultOption={mockOptions[1]} // Use "Option 2" as default
         onSelect={() => {}}
-      />
+      />,
     );
     expect(screen.getByText("Option 2")).toBeInTheDocument();
   });
 
   test("displays selected option after user clicks it", () => {
     render(<Dropdown options={mockOptions} onSelect={() => {}} />);
-  
+
     fireEvent.click(screen.getByRole("button"));
     fireEvent.click(screen.getByText("Option 2"));
     expect(screen.getByText("Option 2")).toBeInTheDocument();
   });
-  
 
   test("calls onSelect with correct value when option is clicked", () => {
     const onSelect = jest.fn();

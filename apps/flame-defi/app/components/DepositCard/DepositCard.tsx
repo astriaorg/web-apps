@@ -64,7 +64,7 @@ export default function DepositCard(): React.ReactElement {
       return defaultEvmCurrencyOption;
     }
     const matchingEvmCurrency = selectedEvmChain?.currencies.find(
-      (currency) => currency.coinDenom === selectedIbcCurrency.coinDenom
+      (currency) => currency.coinDenom === selectedIbcCurrency.coinDenom,
     );
     if (!matchingEvmCurrency) {
       return null;
@@ -102,7 +102,7 @@ export default function DepositCard(): React.ReactElement {
     setRecipientAddressOverride("");
   };
   const updateRecipientAddressOverride = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRecipientAddressOverride(event.target.value);
   };
@@ -123,7 +123,7 @@ export default function DepositCard(): React.ReactElement {
 
   const checkIsFormValid = (
     addressInput: string | null,
-    amountInput: string
+    amountInput: string,
   ) => {
     if (addressInput === null) {
       setIsRecipientAddressValid(false);
@@ -194,7 +194,7 @@ export default function DepositCard(): React.ReactElement {
     try {
       const formattedAmount = Decimal.fromUserInput(
         amount,
-        selectedIbcCurrency.coinDecimals
+        selectedIbcCurrency.coinDecimals,
       ).atomics;
 
       const signer = await getCosmosSigningClient();
@@ -203,7 +203,7 @@ export default function DepositCard(): React.ReactElement {
         fromAddress,
         recipientAddress,
         formattedAmount,
-        selectedIbcCurrency
+        selectedIbcCurrency,
       );
       addNotification({
         toastOpts: {
@@ -280,7 +280,7 @@ export default function DepositCard(): React.ReactElement {
         RightIcon: PlusIcon,
       },
     ],
-    [connectCosmosWallet]
+    [connectCosmosWallet],
   );
 
   const additionalEvmChainOptions = useMemo(() => {
