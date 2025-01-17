@@ -1,13 +1,13 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
+import React, { useMemo } from "react";
 import { ConnectCosmosWalletButton } from "features/CosmosWallet";
-import { ConnectEvmWalletButton } from "features/EvmWallet";
+import { ConnectEvmWalletButton, SingleWalletButton } from "features/EvmWallet";
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/shadcn-primitives";
+import { usePathname } from "next/navigation";
 
 interface ConnectWalletsButtonProps {
   // Label to show before the user is connected to any wallets.
@@ -20,70 +20,39 @@ interface ConnectWalletsButtonProps {
 export default function ConnectWalletsButton({
   labelBeforeConnected,
 }: ConnectWalletsButtonProps) {
-  // information dropdown
-  const [isDropdownActive, setIsDropdownActive] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const toggleDropdown = useCallback(() => {
-    setIsDropdownActive(!isDropdownActive);
-  }, [isDropdownActive]);
+  const pathname = usePathname();
 
-  // handle clicking outside dropdown to close it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownActive(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // ui
   const label = useMemo(() => {
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected]);
 
   return (
-    <div
-      ref={dropdownRef}
-      className={`connect-wallet-dropdown ${isDropdownActive ? "is-active" : ""}`}
-    >
-      <div className="connect-wallet-button-container">
-        <button
-          type="button"
-          key="connect-evm-wallet-button"
-          onClick={toggleDropdown}
-          className="button is-ghost is-rounded-hover"
-        >
-          <span className="connect-wallet-button-label">{label}</span>
-          <span className="icon icon-right is-small">
-            {isDropdownActive ? (
-              <i className="fas fa-angle-up" />
-            ) : (
-              <i className="fas fa-angle-down" />
-            )}
-          </span>
-        </button>
-      </div>
-
-      {/* Dropdown element */}
-      {isDropdownActive && (
-        <div className="dropdown-card card">
-          <div className="">
-            <div>
+    <div>
+      {pathname === "/" ? (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="default"
+              className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+            >
+              <span>{label}</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="flex flex-col w-30 mr-12 text-white gap-3 p-5 bg-radial-dark"
+            side="bottom"
+          >
+            <div className="hover:text-orange-soft transition">
               <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
             </div>
-            <div>
+            <hr className="border-border" />
+            <div className="hover:text-orange-soft transition">
               <ConnectCosmosWalletButton labelBeforeConnected="Connect to Cosmos wallet" />
             </div>
-          </div>
-        </div>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <SingleWalletButton />
       )}
     </div>
   );

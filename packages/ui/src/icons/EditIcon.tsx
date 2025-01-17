@@ -3,7 +3,7 @@ import type { IconProps } from "../types";
 export const EditIcon: React.FC<IconProps> = ({
   className = "",
   size = 24,
-}) => {
+}: IconProps) => {
   return (
     <svg
       width={size}

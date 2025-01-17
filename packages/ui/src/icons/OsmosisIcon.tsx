@@ -3,7 +3,7 @@ import type { IconProps } from "../types";
 export const OsmosisIcon: React.FC<IconProps> = ({
   className = "",
   size = 24,
-}) => {
+}: IconProps) => {
   return (
     <svg
       width={size}

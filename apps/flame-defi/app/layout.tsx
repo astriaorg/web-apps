@@ -2,6 +2,8 @@ import { Footer } from "@repo/ui/components";
 import Navbar from "./components/Navbar/Navbar";
 import { Providers } from "./providers";
 import "./globals.css";
+import "@interchain-ui/react/styles";
+import "@rainbow-me/rainbowkit/styles.css";
 
 export const metadata = {
   title: "Flame App",

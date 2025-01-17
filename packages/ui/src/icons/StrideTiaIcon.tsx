@@ -3,7 +3,7 @@ import type { IconProps } from "../types";
 export const StrideTiaIcon: React.FC<IconProps> = ({
   className = "",
   size = 24,
-}) => {
+}: IconProps) => {
   return (
     <div
       className={`inline-block bg-contain bg-no-repeat bg-center ${className}`}

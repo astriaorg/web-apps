@@ -125,8 +125,9 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   // deselect chain and currency when network is changed
   useEffect(() => {
     resetState();
-    // TODO - make wallet switch network?
-    console.log("selectedFlameNetwork", selectedFlameNetwork);
+    if (selectedFlameNetwork) {
+      resetState();
+    }
   }, [resetState, selectedFlameNetwork]);
 
   const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {

@@ -1,13 +1,21 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
-import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useBalance,
+  useConfig,
+  useDisconnect,
+  useSwitchChain,
+} from "wagmi";
 
 import { DropdownOption } from "@repo/ui/components";
 import {
   type EvmChainInfo,
   type EvmCurrency,
   evmCurrencyBelongsToChain,
+  getFlameChainId,
+  getFlameNetworkByChainId,
   useConfig as useAppConfig,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
@@ -16,7 +24,7 @@ import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { formatBalance } from "../utils/utils";
+import { formatBalance } from "../../../utils/utils";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -50,12 +58,14 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { evmChains, selectedFlameNetwork } = useAppConfig();
+  const { evmChains, selectedFlameNetwork, selectFlameNetwork } =
+    useAppConfig();
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
+  const { switchChain } = useSwitchChain();
 
   const {
     status: nativeBalanceStatus,
@@ -93,17 +103,30 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
 
-  console.log("evm wallet context user account", userAccount?.chainId);
-  // useEffect(() => {
-  //   // TODO - detect when user changes networks from wallet and update selected network
-  //   selectFlameNetwork;
-  // }, [userAccount.chainId]);
+  useEffect(() => {
+    if (!userAccount?.chainId) {
+      return;
+    }
+    const network = getFlameNetworkByChainId(userAccount.chainId);
+    selectFlameNetwork(network);
+  }, [selectFlameNetwork, userAccount.chainId]);
 
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
     setEvmAccountAddress(null);
   }, []);
+
+  // deselect chain and currency when network is changed and switch chains in wallet
+  useEffect(() => {
+    if (selectedFlameNetwork) {
+      resetState();
+      const chainId = getFlameChainId(selectedFlameNetwork);
+      switchChain({ chainId });
+    }
+  }, [selectedFlameNetwork, switchChain, resetState]);
+
+
 
   // polling get balance
   const getBalanceCallback = useCallback(async () => {
@@ -186,13 +209,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     );
   }, [evmChains]);
 
-  // deselect chain and currency when network is changed
-  useEffect(() => {
-    resetState();
-    // TODO - make wallet switch network? e.g. the balance from
-    console.log("selectedFlameNetwork", selectedFlameNetwork);
-  }, [resetState, selectedFlameNetwork]);
-
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {
       return null;
@@ -237,11 +253,11 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, []);
 
   const connectEvmWallet = useCallback(() => {
-    // if no chain is set, set the first one and return
-    // FIXME - the caller has to to re-trigger the connect function
-    //  by watching the selectedEvmChain value. this is a foot gun for sure.
     if (!selectedEvmChain) {
       setSelectedEvmChain(evmChainsOptions[0]?.value || null);
+      if (openConnectModal) {
+        openConnectModal();
+      }
       return;
     }
 

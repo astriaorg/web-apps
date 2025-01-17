@@ -56,7 +56,7 @@ export const TokenSelector: React.FC<TokenSelectorProps> = ({
               <div
                 onClick={() => handleSelectToken({ symbol, title, Icon })}
                 key={symbol}
-                className="flex items-center space-x-2 p-2 rounded-md hover:bg-grey-dark transition duration-300 cursor-pointer"
+                className="flex items-center space-x-2 p-2 rounded-md hover:bg-grey-dark transition cursor-pointer"
               >
                 <Icon size={32} />
                 <div className="flex flex-col">

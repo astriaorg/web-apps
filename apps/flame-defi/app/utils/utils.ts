@@ -1,3 +1,16 @@
+export function getFromLocalStorage(item: string) {
+  const retrievedItem = window.localStorage.getItem(item);
+
+  if (retrievedItem) {
+    return JSON.parse(retrievedItem);
+  }
+  return {};
+}
+
+export function setInLocalStorage(key: string, item: unknown) {
+  window.localStorage.setItem(key, JSON.stringify(item));
+}
+
 /**
  * Formats a raw balance amount into a human-readable decimal number with 2 decimal places.
  * Converts from the smallest unit (e.g. wei, satoshi) to the standard unit (e.g. ETH, BTC)

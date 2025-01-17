@@ -18,7 +18,7 @@ export const ActionButton = ({
   return (
     <button
       type="button"
-      className={`flex items-center justify-center bg-button-gradient text-white font-semibold px-4 py-3 rounded-xl ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${className || ""}`}
+      className={`flex items-center justify-center bg-button-gradient text-white font-semibold px-4 py-3 rounded-xl transition border border-button-gradient hover:border-white ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${className || ""}`}
       onClick={callback}
       disabled={disabled}
     >
