@@ -5,10 +5,16 @@ import React, {
   useRef,
   useState,
 } from "react";
-
 import { CopyToClipboardButton } from "@repo/ui/components";
-
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
+import { shortenAddress } from "../../../../utils/utils";
+import { CosmosIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@repo/ui/shadcn-primitives";
 
 interface ConnectCosmosWalletButtonProps {
   // Label to show before the user is connected to a wallet.
@@ -31,7 +37,7 @@ export default function ConnectCosmosWalletButton({
 
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
-  const [showTransactions, setShowTransactions] = useState(false);
+  // const [showTransactions, setShowTransactions] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleDropdown = useCallback(() => {
     setIsDropdownActive(!isDropdownActive);
@@ -57,7 +63,7 @@ export default function ConnectCosmosWalletButton({
   // ui
   const label = useMemo(() => {
     if (cosmosAccountAddress) {
-      return cosmosAccountAddress;
+      return shortenAddress(cosmosAccountAddress);
     }
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, cosmosAccountAddress]);
@@ -80,94 +86,73 @@ export default function ConnectCosmosWalletButton({
 
     disconnect().then(() => {});
   }, [disconnectCosmosWallet]);
-
-  return (
-    <div
-      ref={dropdownRef}
-      className={`connect-wallet-dropdown ${isDropdownActive ? "is-active" : ""}`}
-    >
-      <div className="connect-wallet-button-container">
-        <button
-          type="button"
-          key="connect-evm-wallet-button"
-          onClick={handleConnectWallet}
-          className="button is-ghost is-rounded-hover"
-        >
-          <span className="connect-wallet-button-label">{label}</span>
-          <span className="icon icon-right is-small">
-            {isDropdownActive ? (
-              <i className="fas fa-angle-up" />
-            ) : (
-              <i className="fas fa-angle-down" />
-            )}
-          </span>
-        </button>
-      </div>
-
-      {/* Dropdown element */}
-      {isDropdownActive && cosmosAccountAddress && (
-        <div className="dropdown-card card">
-          {/* Top Row - Address and Actions */}
-          <div className="dropdown-header">
-            <div className="address-container">
-              <span className="address">{cosmosAccountAddress}</span>
-            </div>
-            <div className="action-buttons">
-              <CopyToClipboardButton textToCopy={cosmosAccountAddress} />
-              <button
-                type="button"
-                className="button is-ghost"
-                onClick={() => {
-                  console.log("TODO open explorer");
-                }}
-              >
-                <span>
-                  <i className="fas fa-up-right-from-square" />
-                </span>
-              </button>
-              <button
-                type="button"
-                className="button is-ghost"
-                onClick={handleDisconnectWallet}
-              >
-                <span>
-                  <i className="fas fa-power-off" />
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Balance Row */}
-          <div className="balance-container">
-            {isLoadingCosmosBalance && (
-              <div className="balance-loading">Loading...</div>
-            )}
-            {!isLoadingCosmosBalance && cosmosBalance && (
-              <div className="balance-amount">{cosmosBalance}</div>
-            )}
-            {/* TODO - price in USD */}
-            <div className="balance-usd">$0.00 USD</div>
-          </div>
-
-          {/* Transactions Section - TODO */}
-          <div className="transactions-container">
-            <button
-              type="button"
-              className="transactions-header"
-              onClick={() => setShowTransactions(!showTransactions)}
-            >
-              <span>Transactions</span>
-              <i className="fas fa-chevron-right" />
+  return cosmosAccountAddress ? (
+    <Accordion type="single" collapsible>
+      <AccordionItem
+        value="transaction-details"
+        className="text-grey-light text-sm border-b-0"
+      >
+        <div className="flex items-center justify-between w-[300px]">
+          <AccordionTrigger className="flex items-center gap-2 w-[162px]">
+            {cosmosAccountAddress && <CosmosIcon />}
+            <span className="text-white text-base font-normal">{label}</span>
+          </AccordionTrigger>
+          <div className="flex items-center gap-3">
+            <CopyToClipboardButton textToCopy={cosmosAccountAddress} />
+            <UpRightSquareIcon
+              className="cursor-pointer hover:text-white transition"
+              size={21}
+            />
+            <button type="button" onClick={() => handleDisconnectWallet()}>
+              <PowerIcon
+                className="cursor-pointer hover:text-white transition"
+                size={21}
+              />
             </button>
-
-            {showTransactions && (
-              <div className="transactions-list">
-                <div className="no-transactions">No recent transactions</div>
-              </div>
-            )}
           </div>
         </div>
-      )}
-    </div>
+        <AccordionContent>
+          <div className="text-white ml-8">
+            <div>
+              {isLoadingCosmosBalance && <div>Loading...</div>}
+              {!isLoadingCosmosBalance && cosmosBalance && (
+                <div className="text-[20px] mb-2 font-bold">
+                  {cosmosBalance}
+                </div>
+              )}
+              {/* TODO - price in USD */}
+              <div>$0.00 USD</div>
+            </div>
+
+            {/* Transactions Section - TODO */}
+            {/* <div>
+              <button
+                type="button"
+                onClick={() => setShowTransactions(!showTransactions)}
+              >
+                <span>Transactions</span>
+                <ChevronDownIcon className="rotate-[270deg]"/>
+              </button>
+
+              {showTransactions && (
+                <div>
+                  <div>No recent transactions</div>
+                </div>
+              )}
+            </div> */}
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  ) : (
+    <button
+      type="button"
+      key="connect-cosmos-wallet-button"
+      onClick={handleConnectWallet}
+      className="flex items-center gap-2 py-4 w-[300px]"
+    >
+      <CosmosIcon />
+      <span>{label}</span>
+    </button>
   );
 }

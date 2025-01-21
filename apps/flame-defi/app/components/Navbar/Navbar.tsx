@@ -20,7 +20,7 @@ function Navbar() {
   const { brandURL } = useConfig();
 
   const navLinkClasses = (path: string) => `
-    relative px-4 py-2 text-[#9CA3AF] hover:text-white
+    relative px-4 py-2 text-grey-light hover:text-white
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
     hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
@@ -39,14 +39,14 @@ function Navbar() {
 
   return (
     <nav
-      className="flex border-b border-[#2A2A2A] px-8 py-4 w-full"
+      className="flex border-b border-[#2A2A2A] px-12 py-4 w-full"
       aria-label="main navigation"
     >
       <div className="flex items-center">
         <a
           target="_blank"
           href={brandURL}
-          className="flex items-center p-2 px-3"
+          className="flex items-center pl-0 p-2 px-3 w-[290px]"
           rel="noreferrer"
         >
           <Image
@@ -76,7 +76,6 @@ function Navbar() {
           <span className="block w-6 h-0.5 bg-white" aria-hidden="true" />
         </button>
       </div>
-
       <div
         id="topNavbar"
         className={`flex-1 ${isMobileMenuActive ? "block" : "hidden md:block"}`}
@@ -93,9 +92,7 @@ function Navbar() {
           </Link>
         </div>
       </div>
-
-      <div className="w-[185px]" />
-      <div className="navbar-end">
+      <div className="navbar-end flex gap-6 items-center ">
         <NetworkSelector />
         <ConnectWalletsButton />
       </div>

@@ -26,7 +26,7 @@ const Tab: React.FC<TabProps> = ({ label, isActive, onClick }) => (
   >
     <a
       onClick={() => {}}
-      className={`px-6 py-4 font-mono font-medium transition-all duration-100 ease-in ${
+      className={`px-6 py-4 font-mono font-medium transition ease-in ${
         isActive
           ? "text-white font-bold"
           : "text-[#9B9B9B] hover:text-[#D9D9D9]"

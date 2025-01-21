@@ -23,3 +23,5 @@ export * from "./InfoIcon";
 export * from "./InboxIcon";
 export * from "./GasIcon";
 export * from "./UpRightSquareIcon";
+export * from "./ClipboardIcon";
+export * from "./PowerIcon";

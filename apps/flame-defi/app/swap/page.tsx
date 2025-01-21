@@ -62,7 +62,7 @@ export default function SwapPage(): React.ReactElement {
         <div
           onKeyDown={() => null}
           onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_ONE)}
-          className={`flex flex-col rounded-md p-2 transition duration-300 border border-solid border-border hover:border-grey-light ${
+          className={`flex flex-col rounded-md p-2 transition border border-solid border-border hover:border-grey-light ${
             inputSelected === TOKEN_INPUTS.TOKEN_ONE
               ? "bg-background"
               : "bg-grey-dark"
@@ -96,7 +96,7 @@ export default function SwapPage(): React.ReactElement {
         >
           <button
             type="button"
-            className="z-10 cursor-pointer p-1 bg-grey-medium hover:bg-black transition duration-300 rounded-xl border-4 border-black"
+            className="z-10 cursor-pointer p-1 bg-grey-medium hover:bg-black transition rounded-xl border-4 border-black"
             onClick={() => handleArrowClick()}
           >
             <DownArrowIcon aria-label="Swap" size={28} />
@@ -105,7 +105,7 @@ export default function SwapPage(): React.ReactElement {
         <div
           onKeyDown={() => null}
           onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_TWO)}
-          className={`flex flex-col rounded-md p-2 transition duration-300 border border-solid border-border hover:border-grey-light ${
+          className={`flex flex-col rounded-md p-2 transition border border-solid border-border hover:border-grey-light ${
             inputSelected === TOKEN_INPUTS.TOKEN_TWO
               ? "bg-background"
               : "bg-grey-dark"

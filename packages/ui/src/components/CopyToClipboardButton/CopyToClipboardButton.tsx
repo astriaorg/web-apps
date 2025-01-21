@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ClipboardIcon } from "../../icons";
 
 export const CopyToClipboardButton = ({
   textToCopy,
@@ -8,12 +9,7 @@ export const CopyToClipboardButton = ({
   textToCopy: string | undefined;
 }) => {
   const [copyStatus, setCopyStatus] = useState("");
-
-  const [fadeInClass, setFadeInClass] = useState("");
-
   const copyToClipboard = (text: string) => {
-    // we only want the icon to fade in after it's clicked, not on first page render.
-    setFadeInClass("fade-in");
     void navigator.clipboard.writeText(text);
     setCopyStatus("Copied!");
     setTimeout(() => setCopyStatus(""), 500);
@@ -28,14 +24,22 @@ export const CopyToClipboardButton = ({
       type="button"
       key={textToCopy}
       onClick={() => copyToClipboard(textToCopy)}
-      className="p-2 text-white hover:text-gray-200 transition-colors"
+      className="hover:text-white transition flex relative items-center justify-center w-5 h-5"
     >
-      {copyStatus && <div className="animate-fade-out">{copyStatus}</div>}
-      {!copyStatus && (
-        <span className={`inline-block ${fadeInClass}`}>
-          <i className="fas fa-clipboard" />
-        </span>
-      )}
+      <div
+        className={`mr-7 absolute transition text-xs whitespace-nowrap ${
+          copyStatus ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {copyStatus}
+      </div>
+      <span
+        className={`absolute transition-opacity duration-300 ${
+          copyStatus ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        <ClipboardIcon className="cursor-pointer" size={21} />
+      </span>
     </button>
   );
 };

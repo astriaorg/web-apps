@@ -3,7 +3,7 @@ import { IconProps } from "../types";
 export const GearIcon: React.FC<IconProps> = ({
   className = "",
   size = 24,
-}) => {
+}: IconProps) => {
   return (
     <svg
       width={size}

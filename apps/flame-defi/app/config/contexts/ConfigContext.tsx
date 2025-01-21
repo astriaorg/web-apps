@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-
 import { FlameNetwork, getChainConfigs } from "../chainConfigs";
 import { getEnvVariable } from "../env";
 import type { AppConfig, CosmosChains, EvmChains } from "../index";
@@ -43,12 +40,13 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
-  const showLocalNetwork =
-    process.env.NEXT_PUBLIC_SHOW_LOCAL_NETWORK === "true";
+  const networksList = (
+    process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+  ).split(",") as FlameNetwork[];
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
-    const { evmChains, cosmosChains } = getChainConfigs(selectedFlameNetwork);
+    const { evmChains, cosmosChains } = getChainConfigs(network);
     setEvmChains(evmChains);
     setCosmosChains(cosmosChains);
     setSelectedFlameNetwork(network);
@@ -66,7 +64,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         swapURL,
         poolURL,
         feedbackFormURL,
-        showLocalNetwork,
+        networksList,
       }}
     >
       {children}

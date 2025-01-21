@@ -76,6 +76,12 @@ export default {
           foreground: 'hsl(var(--card-foreground))'
         }
       },
+      transitionDuration: {
+        DEFAULT: '300ms', // Sets the default duration to 300ms
+      },
+      transitionTimingFunction: {
+        DEFAULT: 'ease', // Optional: Sets the default easing
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

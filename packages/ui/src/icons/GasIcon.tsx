@@ -1,6 +1,9 @@
 import type { IconProps } from "../types";
 
-export const GasIcon: React.FC<IconProps> = ({ className = "", size = 24 }) => {
+export const GasIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}: IconProps) => {
   return (
     <svg
       width={size}
