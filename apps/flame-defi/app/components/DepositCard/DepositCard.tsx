@@ -14,6 +14,7 @@ import {
   PlusIcon,
   WalletIcon,
 } from "@repo/ui/icons";
+import { shortenAddress } from "utils/utils";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();
@@ -332,10 +333,10 @@ export default function DepositCard(): React.ReactElement {
             </div>
           </div>
           {fromAddress && (
-            <div className="bg-grey-dark rounded-xl py-2 px-3">
+            <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
               {fromAddress && (
                 <p className="text-grey-light font-semibold">
-                  Address: {fromAddress}
+                  Address: {shortenAddress(fromAddress)}
                 </p>
               )}
               {fromAddress &&
@@ -406,7 +407,9 @@ export default function DepositCard(): React.ReactElement {
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
-                    <span className="mr-2">Address: {evmAccountAddress}</span>
+                    <span className="mr-2">
+                      Address: {shortenAddress(evmAccountAddress)}
+                    </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
                 )}

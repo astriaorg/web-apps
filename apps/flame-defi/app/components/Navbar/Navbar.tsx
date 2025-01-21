@@ -1,22 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-
-import { NetworkSelector, useConfig } from "config";
+import { useConfig } from "config";
 import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
-
+import { FlameIcon } from "@repo/ui/icons";
+import MobileNav from "../MobileNav/MobileNav";
+import NetworkSelector from "../NetworkSelector/NetworkSelector";
 function Navbar() {
-  const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
-
   const pathname = usePathname();
-
-  const onHamburgerClick = () => {
-    setIsMobileMenuActive((prev) => !prev);
-  };
-
   const { brandURL } = useConfig();
 
   const navLinkClasses = (path: string) => `
@@ -39,14 +32,14 @@ function Navbar() {
 
   return (
     <nav
-      className="flex border-b border-[#2A2A2A] px-12 py-4 w-full"
+      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full bg-black"
       aria-label="main navigation"
     >
       <div className="flex items-center">
         <a
           target="_blank"
           href={brandURL}
-          className="flex items-center pl-0 p-2 px-3 w-[290px]"
+          className="flex flex-1 items-center pl-0 p-2 px-3 md:w-[290px]"
           rel="noreferrer"
         >
           <Image
@@ -54,32 +47,13 @@ function Navbar() {
             width={161}
             height={32}
             alt="Flame Logo"
+            className="hidden lg:block"
             priority
           />
+          <FlameIcon size={36} className="block lg:hidden" />
         </a>
-        <button
-          type="button"
-          className={`md:hidden p-2 ${isMobileMenuActive ? "is-active" : ""}`}
-          aria-label="menu"
-          aria-expanded="false"
-          data-target="topNavbar"
-          onClick={onHamburgerClick}
-        >
-          <span
-            className="block w-6 h-0.5 bg-white mb-1.5"
-            aria-hidden="true"
-          />
-          <span
-            className="block w-6 h-0.5 bg-white mb-1.5"
-            aria-hidden="true"
-          />
-          <span className="block w-6 h-0.5 bg-white" aria-hidden="true" />
-        </button>
       </div>
-      <div
-        id="topNavbar"
-        className={`flex-1 ${isMobileMenuActive ? "block" : "hidden md:block"}`}
-      >
+      <div id="topNavbar" className="flex-1 hidden md:block">
         <div className="flex justify-center items-center font-mono font-medium">
           <Link href="/" className={navLinkClasses("/")}>
             BRIDGE
@@ -92,10 +66,11 @@ function Navbar() {
           </Link>
         </div>
       </div>
-      <div className="navbar-end flex gap-6 items-center ">
+      <div className="hidden md:flex gap-6 items-center">
         <NetworkSelector />
         <ConnectWalletsButton />
       </div>
+      <MobileNav />
     </nav>
   );
 }

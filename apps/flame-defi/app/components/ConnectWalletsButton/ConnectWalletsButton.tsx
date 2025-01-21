@@ -1,6 +1,9 @@
 import React, { useMemo } from "react";
 import { ConnectCosmosWalletButton } from "features/CosmosWallet";
-import { ConnectEvmWalletButton, SingleWalletButton } from "features/EvmWallet";
+import {
+  ConnectEvmWalletButton,
+  SingleWalletConnect,
+} from "features/EvmWallet";
 import {
   Button,
   Popover,
@@ -52,7 +55,7 @@ export default function ConnectWalletsButton({
           </PopoverContent>
         </Popover>
       ) : (
-        <SingleWalletButton />
+        <SingleWalletConnect />
       )}
     </div>
   );

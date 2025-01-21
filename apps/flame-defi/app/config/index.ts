@@ -18,7 +18,6 @@ import {
   evmCurrencyBelongsToChain,
   ibcCurrencyBelongsToChain,
 } from "./chainConfigs/types";
-import NetworkSelector from "./components/NetworkSelector/NetworkSelector";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
 import { useConfig } from "./hooks/useConfig";
@@ -59,7 +58,7 @@ export {
   type CosmosChainInfo,
   type CosmosChains,
   type IbcCurrency,
-  NetworkSelector,
+  type FlameNetwork,
   ibcCurrencyBelongsToChain,
   cosmosChainInfosToCosmosKitChains,
   cosmosChainInfosToCosmosKitAssetLists,

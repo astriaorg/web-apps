@@ -22,8 +22,8 @@
     /* Semantic Colors */
     --background: var(--color-black);
     --foreground: var(--color-black);
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted: var(--color-grey-dark);
+    --muted-foreground: var(--color-grey-light);
     --accent: var(--color-orange-soft);
     --accent-foreground: 210 40% 98%;
     --popover: 224 71% 4%;

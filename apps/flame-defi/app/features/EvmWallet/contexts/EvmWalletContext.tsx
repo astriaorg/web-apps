@@ -126,8 +126,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
   }, [selectedFlameNetwork, switchChain, resetState]);
 
-
-
   // polling get balance
   const getBalanceCallback = useCallback(async () => {
     if (
