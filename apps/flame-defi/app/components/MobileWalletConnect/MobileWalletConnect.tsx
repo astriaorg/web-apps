@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/shadcn-primitives";
 import { Drawer } from "@repo/ui/shadcn-primitives";
 import { SingleWalletContent, useEvmWallet } from "features/EvmWallet";
-import { ConnectCosmosWalletButton } from "features/CosmosWallet";
+import { ConnectCosmosWalletButton, useCosmosWallet } from "features/CosmosWallet";
 import { ConnectEvmWalletButton } from "features/EvmWallet";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
@@ -81,7 +81,9 @@ export default function MobileWalletConnect({
   const pathname = usePathname();
   const { connectEvmWallet } = useEvmWallet();
   const userAccount = useAccount();
+  const { cosmosAccountAddress } = useCosmosWallet();
   const isBridgePage = pathname === "/";
+  const isConnected = userAccount.address || cosmosAccountAddress;
 
   const onOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -99,7 +101,7 @@ export default function MobileWalletConnect({
               variant="default"
               className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
             >
-              Connect
+              {isConnected ? "Connected" : "Connect"}
             </Button>
           )}
 
