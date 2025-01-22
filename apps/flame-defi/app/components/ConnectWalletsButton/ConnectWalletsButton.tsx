@@ -1,6 +1,8 @@
-import React, { useMemo } from "react";
-import { ConnectCosmosWalletButton } from "features/CosmosWallet";
-import { ConnectEvmWalletButton, SingleWalletButton } from "features/EvmWallet";
+import { ConnectCosmosWalletButton, useCosmosWallet } from "features/CosmosWallet";
+import {
+  ConnectEvmWalletButton,
+  SingleWalletConnect,
+} from "features/EvmWallet";
 import {
   Button,
   Popover,
@@ -8,23 +10,17 @@ import {
   PopoverTrigger,
 } from "@repo/ui/shadcn-primitives";
 import { usePathname } from "next/navigation";
-
-interface ConnectWalletsButtonProps {
-  // Label to show before the user is connected to any wallets.
-  labelBeforeConnected?: string;
-}
+import { useAccount } from "wagmi";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
-export default function ConnectWalletsButton({
-  labelBeforeConnected,
-}: ConnectWalletsButtonProps) {
+export default function ConnectWalletsButton() {
   const pathname = usePathname();
+  const { cosmosAccountAddress } = useCosmosWallet();
+  const userAccount = useAccount();
 
-  const label = useMemo(() => {
-    return labelBeforeConnected ?? "Connect";
-  }, [labelBeforeConnected]);
+  const isConnected = userAccount.address || cosmosAccountAddress;
 
   return (
     <div>
@@ -35,7 +31,7 @@ export default function ConnectWalletsButton({
               variant="default"
               className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
             >
-              <span>{label}</span>
+              <span>{isConnected ? "Connected" : "Connect"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -52,7 +48,7 @@ export default function ConnectWalletsButton({
           </PopoverContent>
         </Popover>
       ) : (
-        <SingleWalletButton />
+        <SingleWalletConnect />
       )}
     </div>
   );

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Tooltip,
   TooltipContent,
@@ -5,6 +7,7 @@ import {
   TooltipTrigger,
 } from "../../shadcn-primitives";
 import { InfoIcon } from "../../icons";
+import { useState } from "react";
 
 interface InfoTooltipProps {
   content: string;
@@ -15,11 +18,13 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
   content,
   side,
 }: InfoTooltipProps) => {
+  const [open, setOpen] = useState(false);
+
   return (
     <TooltipProvider>
-      <Tooltip defaultOpen={false}>
+      <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger asChild>
-          <span onMouseDown={(e) => e.stopPropagation()}>
+          <span onClick={() => setOpen(!open)}>
             <InfoIcon
               size={16}
               className="text-grey-light hover:text-white cursor-pointer"

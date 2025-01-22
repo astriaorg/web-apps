@@ -51,7 +51,7 @@ export default function ConnectEvmWalletButton({
         value="transaction-details"
         className="text-grey-light text-sm border-b-0"
       >
-        <div className="flex items-center justify-between w-[300px]">
+        <div className="flex items-center justify-between w-full md:w-[300px]">
           <AccordionTrigger className="flex items-center gap-2 w-[162px]">
             {userAccount?.address && <FlameIcon />}
             <span className="text-white text-base font-normal">{label}</span>
@@ -108,7 +108,7 @@ export default function ConnectEvmWalletButton({
       type="button"
       key="connect-evm-wallet-button"
       onClick={handleConnectWallet}
-      className="flex items-center gap-2 py-4 w-[300px] text-base"
+      className="flex items-center gap-2 py-4 w-full md:w-[300px] text-base"
     >
       <FlameIcon />
       <span>{label}</span>

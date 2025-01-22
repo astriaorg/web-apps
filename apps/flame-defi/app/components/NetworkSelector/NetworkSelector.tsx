@@ -2,8 +2,7 @@
 
 import type React from "react";
 import { useCallback } from "react";
-import type { FlameNetwork } from "../../chainConfigs";
-import { useConfig } from "../../hooks/useConfig";
+import { useConfig, FlameNetwork } from "config";
 import {
   Select,
   SelectContent,

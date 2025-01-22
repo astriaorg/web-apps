@@ -6,35 +6,40 @@ import {
   ActionButton,
   TokenSelector,
   SettingsPopover,
-  TxnInfo,
 } from "@repo/ui/components";
 import type { TokenItem } from "./useTokenModal";
 import { useTokenModal } from "./useTokenModal";
 import { useState } from "react";
-
+import { useAccount } from "wagmi";
+import { useEvmWallet } from "features/EvmWallet";
+import { useTxnInfo } from "./useTxnInfo";
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
   TOKEN_TWO = "token_two",
 }
 
-interface TokenState {
+export interface TokenState {
   token?: TokenItem | null;
-  value: string;
+  value: number | undefined;
 }
 
 export default function SwapPage(): React.ReactElement {
   const { tokens } = useTokenModal();
+  const { connectEvmWallet } = useEvmWallet();
+  const userAccount = useAccount();
   const [inputSelected, setInputSelected] = useState(TOKEN_INPUTS.TOKEN_ONE);
   const [inputOne, setInputOne] = useState<TokenState>({
     token: tokens[0],
-    value: "",
+    value: undefined,
   });
   const [inputTwo, setInputTwo] = useState<TokenState>({
     token: null,
-    value: "",
+    value: undefined,
   });
 
-  const handleInputChange = (value: string, isInputOne: boolean) => {
+  const actionText = useTxnInfo(inputOne, inputTwo);
+
+  const handleInputChange = (value: number, isInputOne: boolean) => {
     if (isInputOne) {
       setInputOne((prev) => ({ ...prev, value }));
     } else {
@@ -62,17 +67,17 @@ export default function SwapPage(): React.ReactElement {
         <div
           onKeyDown={() => null}
           onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_ONE)}
-          className={`flex flex-col rounded-md p-2 transition border border-solid border-border hover:border-grey-light ${
+          className={`flex flex-col rounded-md p-2 transition border border-solid border-transparent hover:border-grey-light ${
             inputSelected === TOKEN_INPUTS.TOKEN_ONE
-              ? "bg-background"
-              : "bg-grey-dark"
+              ? "bg-background border-grey-medium"
+              : "bg-white/[0.04]"
           }`}
         >
           <div className="flex justify-between items-center">
             <input
               type="number"
               value={inputOne.value}
-              onChange={(e) => handleInputChange(e.target.value, true)}
+              onChange={(e) => handleInputChange(Number(e.target.value), true)}
               className="w-[45%] sm:max-w-[62%] flex-1 bg-transparent focus:outline-none text-[36px] placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="0"
             />
@@ -96,7 +101,7 @@ export default function SwapPage(): React.ReactElement {
         >
           <button
             type="button"
-            className="z-10 cursor-pointer p-1 bg-grey-medium hover:bg-black transition rounded-xl border-4 border-black"
+            className="z-10 cursor-pointer p-1 bg-grey-dark hover:bg-black transition rounded-xl border-4 border-black"
             onClick={() => handleArrowClick()}
           >
             <DownArrowIcon aria-label="Swap" size={28} />
@@ -105,17 +110,17 @@ export default function SwapPage(): React.ReactElement {
         <div
           onKeyDown={() => null}
           onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_TWO)}
-          className={`flex flex-col rounded-md p-2 transition border border-solid border-border hover:border-grey-light ${
+          className={`flex flex-col rounded-md p-2 transition border border-solid border-transparent hover:border-grey-light ${
             inputSelected === TOKEN_INPUTS.TOKEN_TWO
-              ? "bg-background"
-              : "bg-grey-dark"
+              ? "bg-background border-grey-medium"
+              : "bg-white/[0.04]"
           }`}
         >
           <div className="flex justify-between items-center">
             <input
               type="number"
               value={inputTwo.value}
-              onChange={(e) => handleInputChange(e.target.value, false)}
+              onChange={(e) => handleInputChange(Number(e.target.value), false)}
               className="w-[45%] sm:max-w-[62%] flex-1 bg-transparent focus:outline-none text-[36px] placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="0"
             />
@@ -133,8 +138,29 @@ export default function SwapPage(): React.ReactElement {
             <span className="text-sm font-medium">$100</span>
           </div>
         </div>
-        <ActionButton buttonText="Connect Wallet" className="w-full mt-4" />
-        <TxnInfo />
+        {!userAccount.address && (
+          <ActionButton
+            callback={connectEvmWallet}
+            buttonText="Connect Wallet"
+            className="w-full mt-2"
+          />
+        )}
+        {/* TODO: This is a temp example of how we might conditionally render the action button */}
+        {userAccount.address && actionText !== "Swap" && (
+          <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-white/[0.04] mt-2">
+            {actionText}
+          </div>
+        )}
+        {/* TODO: This is a temp example of how we might conditionally render the action button */}
+        {userAccount.address && actionText === "Swap" && (
+          <ActionButton
+            callback={() => console.log("DO A SWAP")}
+            buttonText="Swap"
+            className="w-full mt-2"
+          />
+        )}
+        {/* TODO: ADD THIS IN WHEN WE HAVE THE TXN INFO */}
+        {/* <TxnInfo /> */}
       </div>
     </section>
   );

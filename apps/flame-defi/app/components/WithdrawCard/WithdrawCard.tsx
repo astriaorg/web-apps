@@ -13,6 +13,7 @@ import {
 import { NotificationType, useNotifications } from "features/Notifications";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { shortenAddress } from "utils/utils";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();
@@ -324,10 +325,10 @@ export default function WithdrawCard(): React.ReactElement {
             </div>
           </div>
           {fromAddress && (
-            <div className="py-2 px-3 rounded-xl bg-grey-dark">
+            <div className="py-2 px-3 mt-4 rounded-xl bg-grey-dark">
               {fromAddress && (
                 <p className="text-grey-light font-semibold">
-                  Address: {fromAddress}
+                  Address: {shortenAddress(fromAddress)}
                 </p>
               )}
               {fromAddress &&
@@ -403,7 +404,7 @@ export default function WithdrawCard(): React.ReactElement {
                     onKeyDown={handleEditRecipientClick}
                   >
                     <span className="mr-2">
-                      Address: {cosmosAccountAddress}
+                      Address: {shortenAddress(cosmosAccountAddress)}
                     </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
