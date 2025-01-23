@@ -37,7 +37,8 @@
     "util": "^0.12.5",
     "uuid": "^9.0.1",
     "viem": "^2.21.49",
-    "wagmi": "^2.13.0"
+    "wagmi": "^2.13.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

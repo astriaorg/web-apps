@@ -49,6 +49,16 @@ const NETWORK_CONFIGS: NetworkConfigs = {
 };
 
 /**
+ * Chain IDs for different Flame networks.
+ */
+export enum ChainId {
+  MAINNET = getFlameChainId(FlameNetwork.MAINNET),
+  DUSK = getFlameChainId(FlameNetwork.DUSK),
+  DAWN = getFlameChainId(FlameNetwork.DAWN),
+  LOCAL = getFlameChainId(FlameNetwork.LOCAL),
+}
+
+/**
  * Gets the chain ID for a Flame network.
  */
 export function getFlameChainId(network: FlameNetwork): number {

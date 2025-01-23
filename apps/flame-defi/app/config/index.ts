@@ -1,5 +1,6 @@
 import {
   type FlameNetwork,
+  ChainId,
   getAllChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
@@ -59,6 +60,7 @@ export {
   type CosmosChains,
   type IbcCurrency,
   type FlameNetwork,
+  ChainId,
   ibcCurrencyBelongsToChain,
   cosmosChainInfosToCosmosKitChains,
   cosmosChainInfosToCosmosKitAssetLists,
