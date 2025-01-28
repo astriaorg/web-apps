@@ -7,7 +7,7 @@ on:
       - "main"
 
 jobs:
-  test-and-lint-front-end:
+  test-lint-format:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,6 +26,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm install
+      - name: Check Format
+        run: npm run format:check
       - name: Lint
         run: npm run lint
       - name: Test

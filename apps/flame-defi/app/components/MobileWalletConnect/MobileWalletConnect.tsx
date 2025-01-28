@@ -9,7 +9,10 @@ import {
 } from "@repo/ui/shadcn-primitives";
 import { Drawer } from "@repo/ui/shadcn-primitives";
 import { SingleWalletContent, useEvmWallet } from "features/EvmWallet";
-import { ConnectCosmosWalletButton, useCosmosWallet } from "features/CosmosWallet";
+import {
+  ConnectCosmosWalletButton,
+  useCosmosWallet,
+} from "features/CosmosWallet";
 import { ConnectEvmWalletButton } from "features/EvmWallet";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";

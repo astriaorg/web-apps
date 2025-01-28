@@ -1,4 +1,7 @@
-import { ConnectCosmosWalletButton, useCosmosWallet } from "features/CosmosWallet";
+import {
+  ConnectCosmosWalletButton,
+  useCosmosWallet,
+} from "features/CosmosWallet";
 import {
   ConnectEvmWalletButton,
   SingleWalletConnect,
