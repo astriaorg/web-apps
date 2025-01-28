@@ -511,7 +511,7 @@ export default function WithdrawCard(): React.ReactElement {
 
       <div className="mt-4">
         <ActionButton
-          onClick={handleWithdraw}
+          callback={handleWithdraw}
           disabled={isWithdrawDisabled}
           isLoading={isLoading}
           buttonText={"Withdraw"}

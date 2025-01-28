@@ -15,6 +15,7 @@ export default {
       colors: {
         white: 'hsl(var(--color-white))',
         whitest: 'hsl(var(--color-whitest))',
+        'semi-white': 'hsl(var(--color-semi-white))',
         'grey-dark': 'hsl(var(--color-grey-dark))',
         'grey-medium': 'hsl(var(--color-grey-medium))',
         'grey-light': 'hsl(var(--color-grey-light))',

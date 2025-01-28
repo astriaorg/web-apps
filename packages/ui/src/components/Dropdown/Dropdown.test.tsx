@@ -1,13 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import React from "react";
 import "@testing-library/jest-dom";
-import Dropdown, { type DropdownOption } from "./Dropdown"; // Adjust the import path as needed
-
-const mockOptions: DropdownOption<string>[] = [
-  { label: "Option 1", value: "option1" },
-  { label: "Option 2", value: "option2" },
-  { label: "Option 3", value: "option3" },
-];
+import { Dropdown } from "./Dropdown"; // Adjust the import path as needed
 
 describe("Dropdown Component", () => {
   test("renders with placeholder text", () => {

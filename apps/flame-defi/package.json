@@ -24,6 +24,8 @@
     "@repo/ui": "*",
     "@tanstack/react-query": "^5.61.0",
     "chain-registry": "^1.69.45",
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
     "ethers": "^6.13.2",
     "next": "^15.1.0",
     "osmojs": "^16.15.0",

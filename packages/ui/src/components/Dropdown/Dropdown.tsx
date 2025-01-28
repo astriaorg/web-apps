@@ -148,11 +148,11 @@ export const Dropdown = <T,>({
                 type="button"
                 key={option.label}
                 className={`w-full text-left ${
-                  selectedOption?.value === option.value ? "bg-white/5" : ""
+                  selectedOption?.value === option.value ? "bg-semi-white" : ""
                 }`}
                 onClick={() => handleSelect(option)}
               >
-                <span className="flex items-center w-full p-4 text-sm rounded-xl hover:bg-white/5 transition">
+                <span className="flex items-center w-full p-4 text-sm rounded-xl hover:bg-semi-white transition">
                   {option.LeftIcon && (
                     <span className="ml-1 mr-3 flex">
                       <option.LeftIcon />
@@ -173,7 +173,7 @@ export const Dropdown = <T,>({
                   setIsActive(false);
                 }}
               >
-                <span className="flex items-center justify-between w-full p-4 text-sm rounded-xl hover:bg-white/5 transition">
+                <span className="flex items-center justify-between w-full p-4 text-sm rounded-xl hover:bg-semi-white transition">
                   <span className="flex items-center">
                     {option.LeftIcon && (
                       <span className="ml-1 mr-3 text-white flex">

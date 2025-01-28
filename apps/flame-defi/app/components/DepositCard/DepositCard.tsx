@@ -90,14 +90,17 @@ export default function DepositCard(): React.ReactElement {
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
+
   const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(!isRecipientAddressEditable);
   }, [isRecipientAddressEditable]);
+
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset evmWalletState when user manually enters address
     resetEvmWalletState();
   };
+
   const handleEditRecipientClear = () => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
@@ -166,6 +169,7 @@ export default function DepositCard(): React.ReactElement {
   }, [selectedEvmChain, handleConnectEvmWallet]);
 
   const handleDeposit = async () => {
+    console.log("handleDeposit");
     if (!selectedCosmosChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
@@ -359,7 +363,7 @@ export default function DepositCard(): React.ReactElement {
       {isAnimating ? (
         <AnimatedArrowSpacer isAnimating={isAnimating} />
       ) : (
-        <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
+        <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4 h-[40px]">
           <div>
             <ArrowUpDownIcon size={32} />
           </div>
@@ -515,7 +519,7 @@ export default function DepositCard(): React.ReactElement {
 
       <div className="mt-4">
         <ActionButton
-          onClick={handleDeposit}
+          callback={handleDeposit}
           disabled={isDepositDisabled}
           isLoading={isLoading}
           buttonText={"Deposit"}

@@ -15,27 +15,26 @@ import {
   CloseIcon,
   SearchIcon,
 } from "../../icons";
-import { IconProps } from "../../types";
-
-interface TokenItem {
-  Icon: React.ComponentType<IconProps>;
-  title: string;
-  symbol: string;
-}
+import { TokenItem } from "../../types";
 
 interface TokenSelectorProps {
   tokens: TokenItem[];
   defaultTitle?: string;
   setSelectedToken: (token: TokenItem) => void;
   selectedToken?: TokenItem | null;
+  CustomTokenButton?: (props: {
+    selectedToken?: TokenItem | null;
+    defaultTitle: string;
+  }) => React.ReactElement;
 }
 
-export const TokenSelector: React.FC<TokenSelectorProps> = ({
+export const TokenSelector = ({
   tokens,
   defaultTitle = "Select token",
   selectedToken,
   setSelectedToken,
-}: TokenSelectorProps) => {
+  CustomTokenButton,
+}: TokenSelectorProps): React.ReactElement => {
   const [open, setOpen] = useState(false);
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,15 +57,24 @@ export const TokenSelector: React.FC<TokenSelectorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <div className="flex items-center bg-radial-dark px-1 rounded-2xl border border-solid border-border">
-          {selectedToken?.Icon && <selectedToken.Icon size={20} />}
-          <h2 className="text-lg font-medium mx-2 whitespace-nowrap">
-            {selectedToken?.symbol || defaultTitle}
-          </h2>
-          <ChevronDownIcon size={20} />
-        </div>
-      </DialogTrigger>
+      {CustomTokenButton ? (
+        <CustomTokenButton
+          selectedToken={selectedToken}
+          defaultTitle="Select token"
+        />
+      ) : (
+        <DialogTrigger>
+          <div
+            className={`flex items-center bg-radial-dark px-1 rounded-2xl border border-solid border-border`}
+          >
+            {selectedToken?.Icon && <selectedToken.Icon size={20} />}
+            <h2 className="text-lg font-medium mx-2 whitespace-nowrap">
+              {selectedToken?.symbol || defaultTitle}
+            </h2>
+            <ChevronDownIcon size={20} />
+          </div>
+        </DialogTrigger>
+      )}
       <DialogPortal>
         <DialogContent className="bg-radial-dark w-[90%] md:w-[90%] lg:w-[450px] [&>button]:hidden fixed top-[440px] left-[50%] -translate-x-[50%] transition rounded-xl">
           <div className="flex items-center justify-between">
@@ -88,7 +96,7 @@ export const TokenSelector: React.FC<TokenSelectorProps> = ({
               <div
                 onClick={() => handleSelectToken({ symbol, title, Icon })}
                 key={symbol}
-                className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-white/[0.04] transition cursor-pointer ${selectedToken?.symbol === symbol ? "bg-white/[0.04]" : ""}`}
+                className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${selectedToken?.symbol === symbol ? "bg-semi-white" : ""}`}
               >
                 <div className="flex items-center">
                   <Icon size={32} className="mr-3" />
