@@ -8,7 +8,7 @@ export const AnimatedArrowSpacer = ({
       {[100, 80, 60, 40, 20, 10, 5, 1].map((width, index) => (
         <div
           key={width}
-          className={`mt-1 border-t border-white transition ${
+          className={`mt-1 border-t-[3px] p-[1px] border-white transition ${
             isAnimating ? "animate-light-up-orange" : ""
           }`}
           style={{

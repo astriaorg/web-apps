@@ -25,6 +25,11 @@ export default function NetworkSelector(): React.ReactElement {
     [selectFlameNetwork],
   );
 
+  //NOTES: THING TO TRACK:
+  // evmChainOptions
+  // selectedEvmChain
+  // selectedEvmNetwork
+
   return (
     <Select
       defaultValue={selectedFlameNetwork}
@@ -52,7 +57,7 @@ export default function NetworkSelector(): React.ReactElement {
             <SelectItem
               key={network}
               value={network}
-              className="capitalize cursor-pointer data-[state=checked]:bg-white/5 data-[state=checked]:text-orange-soft [&:hover]:bg-white/5"
+              className="capitalize cursor-pointer data-[state=checked]:bg-semi-white data-[state=checked]:text-orange-soft [&:hover]:bg-semi-white"
             >
               <div className="flex items-center gap-1 text-white text-base">
                 <FlameIcon size={16} />

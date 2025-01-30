@@ -7,13 +7,14 @@
     /* Base Colors */
     --color-white: 0 0% 96%;
     --color-whitest: 0 0% 100%;
+    --color-semi-white: 0 0% 96% / 0.06;
     --color-black: 203 45% 4%;
     --color-grey-dark: 0 0% 20%;
     --color-grey-medium: 0 0% 40%;
     --color-grey-light: 0 0% 60%;
     --color-grey-lighter: 0 0% 80%;
     --color-red: 2 58% 46%;
-    --color-orange: 17 73% 50%;
+    --color-orange: 24 96% 51%;
     --color-orange-soft: 35 87% 54%;
     --color-green: 140 35% 36%;
     --color-blue-light: 203 35% 60%;
@@ -58,12 +59,11 @@
 }
 
 @layer components {
-  .side-tag {
-    @apply absolute top-1/2 right-0 bg-orange-soft text-white text-xs font-bold translate-x-10 -rotate-90 overflow-hidden;
+  .gradient-container {
+    @apply p-4 sm:p-4 md:p-8 lg:p-12 border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)] rounded-2xl;
   }
-
-  .side-tag-link {
-    @apply flex items-center px-3 py-2 text-white transition-colors duration-200 hover:bg-black/10;
+  .normalize-input {
+    @apply flex-1 bg-transparent focus:outline-none text-[36px] placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
   }
 }
 

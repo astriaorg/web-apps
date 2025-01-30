@@ -107,11 +107,10 @@ export default function MobileWalletConnect({
               {isConnected ? "Connected" : "Connect"}
             </Button>
           )}
-
           {!isBridgePage && (
             <div>
               {userAccount.address ? (
-                <div className="flex items-center border border-border rounded-md px-3 py-2 h-[36px]">
+                <div className="flex items-center border border-border rounded-md px-3 py-2 h-[36px] cursor-pointer">
                   <div className="flex items-center gap-2">
                     <FlameIcon size={16} />
                     <span className="text-white text-base font-normal">

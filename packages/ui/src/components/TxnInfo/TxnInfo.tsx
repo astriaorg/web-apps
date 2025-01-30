@@ -7,9 +7,7 @@ import {
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 
-interface TxnInfoProps {}
-
-export const TxnInfo = ({}: TxnInfoProps) => {
+export const TxnInfo = () => {
   // TODO: get the real calculated data
   return (
     <Accordion type="single" collapsible>

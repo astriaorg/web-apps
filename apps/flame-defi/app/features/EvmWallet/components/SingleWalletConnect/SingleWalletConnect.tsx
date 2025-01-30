@@ -39,6 +39,7 @@ export function SingleWalletContent({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FlameIcon />
+
           <span className="text-white text-base font-normal">
             {shortenAddress(address)}
           </span>

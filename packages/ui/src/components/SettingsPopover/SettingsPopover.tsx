@@ -18,9 +18,7 @@ import { GearIcon } from "@repo/ui/icons";
 import { InfoTooltip } from "../InfoTooltip/InfoTooltip";
 import { useState } from "react";
 
-interface SettingsPopoverProps {}
-
-export const SettingsPopover: React.FC<SettingsPopoverProps> = () => {
+export const SettingsPopover: React.FC = () => {
   const [customSlippage, setCustomSlippage] = useState<string>("");
   const [expertMode, setExpertMode] = useState(false);
   const [showExpertModeDialog, setShowExpertModeDialog] = useState(false);

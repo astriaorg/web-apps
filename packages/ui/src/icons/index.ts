@@ -27,3 +27,5 @@ export * from "./ClipboardIcon";
 export * from "./PowerIcon";
 export * from "./SearchIcon";
 export * from "./CheckMarkIcon";
+export * from "./MinusIcon";
+export * from "./ResetIcon";
