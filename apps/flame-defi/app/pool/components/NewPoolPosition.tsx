@@ -15,7 +15,7 @@ import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
 import { useConfig } from "config";
 import React from "react";
-import { EvmTokenType } from "@repo/ui/types";
+import { EvmCurrency } from "@repo/ui/types";
 
 export interface StepProps {
   step: number;
@@ -25,8 +25,8 @@ export interface StepProps {
 }
 
 export interface TokenPair {
-  tokenOne: EvmTokenType | undefined;
-  tokenTwo: EvmTokenType | undefined;
+  tokenOne: EvmCurrency | undefined;
+  tokenTwo: EvmCurrency | undefined;
 }
 
 export interface FeeData {

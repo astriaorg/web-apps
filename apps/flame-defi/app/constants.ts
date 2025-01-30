@@ -3,14 +3,6 @@ export enum TOKEN_INPUTS {
   TOKEN_TWO = "token_two",
 }
 
-export enum SupportedChainId {
-  MAINNET = 253368190,
-  FLAME_TESTNET = 16604737732183,
-  FLAME_DEVNET = 912559,
-}
-
-// NOTE: temporary tokens until we have a real token list from a ap
-
 export const feeData = [
   {
     id: 0,

@@ -15,15 +15,15 @@ import {
   CloseIcon,
   SearchIcon,
 } from "../../icons";
-import { EvmTokenType } from "../../types";
+import { EvmCurrency } from "../../types";
 
 interface TokenSelectorProps {
-  tokens: EvmTokenType[] | undefined;
+  tokens: EvmCurrency[] | undefined;
   defaultTitle?: string;
-  setSelectedToken: (token: EvmTokenType) => void;
-  selectedToken?: EvmTokenType | null;
+  setSelectedToken: (token: EvmCurrency) => void;
+  selectedToken?: EvmCurrency | null;
   CustomTokenButton?: (props: {
-    selectedToken?: EvmTokenType | null;
+    selectedToken?: EvmCurrency | null;
     defaultTitle: string;
   }) => React.ReactElement;
 }
@@ -39,7 +39,7 @@ export const TokenSelector = ({
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSelectToken = (token: EvmTokenType) => {
+  const handleSelectToken = (token: EvmCurrency) => {
     setOpen(false);
     setSelectedToken(token);
   };

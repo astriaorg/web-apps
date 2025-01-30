@@ -7,6 +7,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
+import { EvmCurrency } from "@repo/ui/types";
 
 // FIXME - i manually recreated types from keplr here as a stop gap.
 //  this will get refactored further when i update the config logic
@@ -289,23 +290,6 @@ export function evmChainsToRainbowKitChains(
     evmChainToRainbowKitChain(evmChain),
   ) as [Chain, ...Chain[]];
 }
-
-/**
- * Represents information about a currency used in an EVM chain.
- */
-export type EvmCurrency = {
-  title: string;
-  coinDenom: string;
-  coinMinimalDenom: string;
-  coinDecimals: number;
-  // contract address if this is a ERC20 token
-  erc20ContractAddress?: `0x${string}`;
-  // contract address if this a native token
-  nativeTokenWithdrawerContractAddress?: `0x${string}`;
-  // fee needed to pay for the ibc withdrawal, 18 decimals
-  ibcWithdrawalFeeWei: string;
-  IconComponent?: React.FC;
-};
 
 /**
  * Returns true if the given currency belongs to the given chain.

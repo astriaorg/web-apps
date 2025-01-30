@@ -1,4 +1,4 @@
-import { EvmTokenType, EvmChainInfo } from "@repo/ui/types";
+import { EvmCurrency, EvmChainInfo } from "@repo/ui/types";
 import { createWithdrawerService } from "features/EvmWallet";
 import type { AstriaErc20WithdrawerService } from "features/EvmWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { useBalancePolling } from "features/GetBalancePolling";
@@ -8,7 +8,7 @@ import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
 export const useTokenBalance = (
-  selectedToken: EvmTokenType | null | undefined,
+  selectedToken: EvmCurrency | null | undefined,
   evmChain: EvmChainInfo | undefined,
 ) => {
   const wagmiConfig = useConfig();

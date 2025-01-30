@@ -1,6 +1,6 @@
 import { ActionButton, TokenSelector } from "@repo/ui/components";
 import { Button, DialogTrigger } from "@repo/ui/shadcn-primitives";
-import { EvmTokenType } from "@repo/ui/types";
+import { EvmCurrency } from "@repo/ui/types";
 import { feeData } from "../../constants";
 import { useState } from "react";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
@@ -21,7 +21,7 @@ const CustomTokenButton = ({
   selectedToken,
   defaultTitle,
 }: {
-  selectedToken?: EvmTokenType | null;
+  selectedToken?: EvmCurrency | null;
   defaultTitle: string;
 }) => (
   <DialogTrigger className="w-full">
@@ -57,7 +57,7 @@ export default function TokenPairsStep({
   const { tokenOne, tokenTwo } = tokenPair;
   const setToken = (
     position: "tokenOne" | "tokenTwo",
-    token: EvmTokenType | undefined,
+    token: EvmCurrency | undefined,
   ) => {
     setTokenPair({
       ...tokenPair,
