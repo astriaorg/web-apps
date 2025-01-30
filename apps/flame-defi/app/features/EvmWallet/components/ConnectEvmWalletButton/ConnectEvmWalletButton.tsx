@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { CopyToClipboardButton } from "@repo/ui/components";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { shortenAddress } from "../../../../utils/utils";
+import { formatBalanceValues, shortenAddress } from "../../../../utils/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,
@@ -31,6 +31,9 @@ export default function ConnectEvmWalletButton({
     isLoadingEvmNativeTokenBalance,
   } = useEvmWallet();
   const userAccount = useAccount();
+  const formattedEvmBalanceValue = formatBalanceValues(
+    evmNativeTokenBalance?.value,
+  );
   // const [showTransactions, setShowTransactions] = useState(false);
 
   // ui
@@ -75,8 +78,9 @@ export default function ConnectEvmWalletButton({
             <div>
               {isLoadingEvmNativeTokenBalance && <div>Loading...</div>}
               {!isLoadingEvmNativeTokenBalance && evmNativeTokenBalance && (
-                <div className="text-[20px] mb-2 font-bold">
-                  {evmNativeTokenBalance}
+                <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
+                  {formattedEvmBalanceValue}
+                  {evmNativeTokenBalance.symbol}
                 </div>
               )}
               {/* TODO - price in USD */}

@@ -1,4 +1,9 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
+import {
+  CelestiaIcon,
+  FlameIcon,
+  NobleIcon,
+  WrappedTiaIcon,
+} from "@repo/ui/icons";
 import type {
   CosmosChainInfo,
   CosmosChains,
@@ -196,13 +201,24 @@ const FlameChainInfo: EvmChainInfo = {
   currencies: [
     {
       coinDenom: "RIA",
+      title: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
     },
     {
+      coinDenom: "WTIA",
+      title: "Wrapped Celestia",
+      coinMinimalDenom: "wtia",
+      coinDecimals: 18,
+      erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: WrappedTiaIcon,
+    },
+    {
       coinDenom: "USDC",
+      title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       // address of erc20 contract on dusk-11
@@ -214,6 +230,7 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "fakeTIA",
+      title: "fakeTIA",
       coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
       // NOTE - there is not actually a contract for this fakeTIA.

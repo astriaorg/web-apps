@@ -13,7 +13,7 @@ import {
 import { NotificationType, useNotifications } from "features/Notifications";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
-import { shortenAddress } from "utils/utils";
+import { formatBalanceValues, shortenAddress } from "utils/utils";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();
@@ -77,7 +77,10 @@ export default function WithdrawCard(): React.ReactElement {
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-
+  const formattedEvmBalanceValue = formatBalanceValues(
+    selectedEvmCurrencyBalance?.value,
+  );
+  const formattedCosmosBalanceValue = formatBalanceValues(cosmosBalance?.value);
   // recipientAddressOverride is used to allow manual entry of an address
   const [recipientAddressOverride, setRecipientAddressOverride] =
     useState<string>("");
@@ -335,7 +338,8 @@ export default function WithdrawCard(): React.ReactElement {
                 selectedEvmCurrency &&
                 !isLoadingSelectedEvmCurrencyBalance && (
                   <p className="mt-2 text-grey-lighter font-semibold">
-                    Balance: {selectedEvmCurrencyBalance}
+                    Balance: {formattedEvmBalanceValue}{" "}
+                    {selectedEvmCurrencyBalance?.symbol}
                   </p>
                 )}
               {fromAddress && isLoadingSelectedEvmCurrencyBalance && (
@@ -411,7 +415,8 @@ export default function WithdrawCard(): React.ReactElement {
                 )}
                 {cosmosAccountAddress && !isLoadingCosmosBalance && (
                   <p className="mt-2 text-grey-lighter font-semibold">
-                    Balance: {cosmosBalance}
+                    Balance: {formattedCosmosBalanceValue}{" "}
+                    {cosmosBalance?.symbol}
                   </p>
                 )}
                 {cosmosAccountAddress && isLoadingCosmosBalance && (

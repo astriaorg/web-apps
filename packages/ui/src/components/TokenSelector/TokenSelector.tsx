@@ -15,15 +15,15 @@ import {
   CloseIcon,
   SearchIcon,
 } from "../../icons";
-import { TokenItem } from "../../types";
+import { EvmTokenType } from "../../types";
 
 interface TokenSelectorProps {
-  tokens: TokenItem[];
+  tokens: EvmTokenType[] | undefined;
   defaultTitle?: string;
-  setSelectedToken: (token: TokenItem) => void;
-  selectedToken?: TokenItem | null;
+  setSelectedToken: (token: EvmTokenType) => void;
+  selectedToken?: EvmTokenType | null;
   CustomTokenButton?: (props: {
-    selectedToken?: TokenItem | null;
+    selectedToken?: EvmTokenType | null;
     defaultTitle: string;
   }) => React.ReactElement;
 }
@@ -39,17 +39,17 @@ export const TokenSelector = ({
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSelectToken = (token: TokenItem) => {
+  const handleSelectToken = (token: EvmTokenType) => {
     setOpen(false);
     setSelectedToken(token);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    const filteredTokens = tokens.filter(
+    const filteredTokens = tokens?.filter(
       (token) =>
         token.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        token.symbol.toLowerCase().includes(e.target.value.toLowerCase()),
+        token?.coinDenom?.toLowerCase().includes(e.target.value.toLowerCase()),
     );
 
     setFilteredTokens(filteredTokens);
@@ -67,9 +67,11 @@ export const TokenSelector = ({
           <div
             className={`flex items-center bg-radial-dark px-1 rounded-2xl border border-solid border-border`}
           >
-            {selectedToken?.Icon && <selectedToken.Icon size={20} />}
+            {selectedToken?.IconComponent && (
+              <selectedToken.IconComponent size={20} />
+            )}
             <h2 className="text-lg font-medium mx-2 whitespace-nowrap">
-              {selectedToken?.symbol || defaultTitle}
+              {selectedToken?.coinDenom || defaultTitle}
             </h2>
             <ChevronDownIcon size={20} />
           </div>
@@ -92,26 +94,51 @@ export const TokenSelector = ({
             startAdornment={<SearchIcon size={16} />}
           />
           <div className="h-[380px]">
-            {filteredTokens.map(({ symbol, title, Icon }) => (
-              <div
-                onClick={() => handleSelectToken({ symbol, title, Icon })}
-                key={symbol}
-                className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${selectedToken?.symbol === symbol ? "bg-semi-white" : ""}`}
-              >
-                <div className="flex items-center">
-                  <Icon size={32} className="mr-3" />
-                  <div className="flex flex-col">
-                    <span className="text-white text-md font-semibold">
-                      {title}
-                    </span>
-                    <span className="text-grey-light text-sm">{symbol}</span>
+            {filteredTokens?.map(
+              ({
+                coinDenom,
+                title,
+                IconComponent,
+                coinDecimals,
+                ibcWithdrawalFeeWei,
+                erc20ContractAddress,
+                nativeTokenWithdrawerContractAddress,
+              }) => (
+                <div
+                  onClick={() =>
+                    handleSelectToken({
+                      coinDenom,
+                      title,
+                      IconComponent,
+                      coinMinimalDenom: coinDenom,
+                      coinDecimals,
+                      ibcWithdrawalFeeWei,
+                      erc20ContractAddress,
+                      nativeTokenWithdrawerContractAddress,
+                    })
+                  }
+                  key={coinDenom}
+                  className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${selectedToken?.coinDenom === coinDenom ? "bg-semi-white" : ""}`}
+                >
+                  <div className="flex items-center">
+                    {IconComponent && (
+                      <IconComponent size={32} className="mr-3" />
+                    )}
+                    <div className="flex flex-col">
+                      <span className="text-white text-md font-semibold">
+                        {title}
+                      </span>
+                      <span className="text-grey-light text-sm">
+                        {coinDenom}
+                      </span>
+                    </div>
                   </div>
+                  {selectedToken?.coinDenom === coinDenom && (
+                    <CheckMarkIcon className="text-orange-soft" />
+                  )}
                 </div>
-                {selectedToken?.symbol === symbol && (
-                  <CheckMarkIcon className="text-orange-soft" />
-                )}
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </DialogContent>
       </DialogPortal>

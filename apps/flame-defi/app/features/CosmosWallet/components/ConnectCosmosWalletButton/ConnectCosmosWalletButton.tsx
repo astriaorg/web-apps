@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { CopyToClipboardButton } from "@repo/ui/components";
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
-import { shortenAddress } from "../../../../utils/utils";
+import { formatBalanceValues, shortenAddress } from "../../../../utils/utils";
 import { CosmosIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,
@@ -34,6 +34,7 @@ export default function ConnectCosmosWalletButton({
     disconnectCosmosWallet,
     isLoadingCosmosBalance,
   } = useCosmosWallet();
+  const formattedCosmosBalanceValue = formatBalanceValues(cosmosBalance?.value);
 
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
@@ -117,8 +118,9 @@ export default function ConnectCosmosWalletButton({
             <div>
               {isLoadingCosmosBalance && <div>Loading...</div>}
               {!isLoadingCosmosBalance && cosmosBalance && (
-                <div className="text-[20px] mb-2 font-bold">
-                  {cosmosBalance}
+                <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
+                  {formattedCosmosBalanceValue}
+                  {cosmosBalance.symbol}
                 </div>
               )}
               {/* TODO - price in USD */}

@@ -14,7 +14,7 @@ import {
   PlusIcon,
   WalletIcon,
 } from "@repo/ui/icons";
-import { shortenAddress } from "utils/utils";
+import { formatBalanceValues, shortenAddress } from "utils/utils";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();
@@ -84,7 +84,10 @@ export default function DepositCard(): React.ReactElement {
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-
+  const formattedEvmBalanceValue = formatBalanceValues(
+    selectedEvmCurrencyBalance?.value,
+  );
+  const formattedCosmosBalanceValue = formatBalanceValues(cosmosBalance?.value);
   // recipientAddressOverride is used to allow manual entry of an address
   const [recipientAddressOverride, setRecipientAddressOverride] =
     useState<string>("");
@@ -169,7 +172,6 @@ export default function DepositCard(): React.ReactElement {
   }, [selectedEvmChain, handleConnectEvmWallet]);
 
   const handleDeposit = async () => {
-    console.log("handleDeposit");
     if (!selectedCosmosChain || !selectedIbcCurrency) {
       addNotification({
         toastOpts: {
@@ -347,7 +349,8 @@ export default function DepositCard(): React.ReactElement {
                 selectedIbcCurrency &&
                 !isLoadingCosmosBalance && (
                   <p className="mt-2 text-grey-lighter font-semibold">
-                    Balance: {cosmosBalance}
+                    Balance: {formattedCosmosBalanceValue}{" "}
+                    {cosmosBalance?.symbol}
                   </p>
                 )}
               {fromAddress && isLoadingCosmosBalance && (
@@ -421,7 +424,8 @@ export default function DepositCard(): React.ReactElement {
                   selectedEvmChain &&
                   !isLoadingSelectedEvmCurrencyBalance && (
                     <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {selectedEvmCurrencyBalance}
+                      Balance: {formattedEvmBalanceValue}{" "}
+                      {selectedEvmCurrencyBalance?.symbol}
                     </p>
                   )}
                 {evmAccountAddress && isLoadingSelectedEvmCurrencyBalance && (

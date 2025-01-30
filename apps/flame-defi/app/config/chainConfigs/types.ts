@@ -294,6 +294,7 @@ export function evmChainsToRainbowKitChains(
  * Represents information about a currency used in an EVM chain.
  */
 export type EvmCurrency = {
+  title: string;
   coinDenom: string;
   coinMinimalDenom: string;
   coinDecimals: number;

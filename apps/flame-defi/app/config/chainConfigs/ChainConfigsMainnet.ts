@@ -7,6 +7,7 @@ import {
   StrideIcon,
   StrideTiaIcon,
   UsdcIcon,
+  WrappedTiaIcon,
 } from "@repo/ui/icons";
 import type {
   CosmosChainInfo,
@@ -253,6 +254,7 @@ const FlameChainInfo: EvmChainInfo = {
   currencies: [
     {
       coinDenom: "TIA",
+      title: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
@@ -261,7 +263,17 @@ const FlameChainInfo: EvmChainInfo = {
       IconComponent: CelestiaIcon,
     },
     {
+      coinDenom: "WTIA",
+      title: "Wrapped Celestia",
+      coinMinimalDenom: "wtia",
+      coinDecimals: 18,
+      erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: WrappedTiaIcon,
+    },
+    {
       coinDenom: "USDC",
+      title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
       erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
@@ -270,6 +282,7 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "milkTIA",
+      title: "Milk TIA",
       coinMinimalDenom:
         "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 18,
@@ -279,6 +292,7 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "stTIA",
+      title: "Stride TIA",
       coinMinimalDenom: "stutia",
       coinDecimals: 18,
       erc20ContractAddress: "0xdf941D092b10FF07eAb44bD174dEe915c13FECcd",

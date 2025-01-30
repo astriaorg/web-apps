@@ -33,7 +33,7 @@ export interface EvmWalletContextProps {
   evmAccountAddress: string | null;
   evmChainsOptions: DropdownOption<EvmChainInfo>[];
   evmCurrencyOptions: DropdownOption<EvmCurrency>[];
-  evmNativeTokenBalance: string | null;
+  evmNativeTokenBalance: { value: string; symbol: string } | null;
   isLoadingEvmNativeTokenBalance: boolean;
   isLoadingSelectedEvmCurrencyBalance: boolean;
   resetState: () => void;
@@ -41,7 +41,7 @@ export interface EvmWalletContextProps {
   selectedEvmChainNativeToken: EvmCurrency | undefined;
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
   selectedEvmCurrency: EvmCurrency | null;
-  selectedEvmCurrencyBalance: string | null;
+  selectedEvmCurrencyBalance: { value: string; symbol: string } | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   selectEvmCurrency: (currency: EvmCurrency) => void;
   withdrawFeeDisplay: string;
@@ -84,7 +84,12 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     if (nativeBalanceStatus !== "success") {
       return null;
     }
-    return `${nativeBalance.formatted} ${nativeBalance.symbol}`;
+    const formattedBalance = formatUnits(
+      nativeBalance.value,
+      nativeBalance.decimals,
+    );
+
+    return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
@@ -147,6 +152,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         selectedEvmCurrency.erc20ContractAddress,
         true,
       ) as AstriaErc20WithdrawerService;
+
       const balanceRes = await withdrawerSvc.getBalance(
         selectedEvmChain.chainId,
         evmAccountAddress,
@@ -155,13 +161,22 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         balanceRes.toString(),
         selectedEvmCurrency.coinDecimals,
       );
-      return `${balanceStr} ${selectedEvmCurrency.coinDenom}`;
+      return {
+        value: balanceStr.toString(),
+        symbol: selectedEvmCurrency.coinDenom,
+      };
     }
 
-    return `${nativeBalance?.formatted} ${selectedEvmCurrency.coinDenom}`;
+    if (!nativeBalance?.value) return null;
+    const formattedBalance = formatUnits(
+      nativeBalance.value,
+      nativeBalance.decimals,
+    );
+    return { value: formattedBalance, symbol: selectedEvmCurrency.coinDenom };
   }, [
     wagmiConfig,
-    nativeBalance?.formatted,
+    nativeBalance?.value,
+    nativeBalance?.decimals,
     selectedEvmChain,
     selectedEvmCurrency,
     evmAccountAddress,
@@ -176,6 +191,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }),
     [selectedEvmChain, selectedEvmCurrency],
   );
+
   const {
     balance: selectedEvmCurrencyBalance,
     isLoading: isLoadingSelectedEvmCurrencyBalance,
