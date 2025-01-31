@@ -14,14 +14,14 @@ export default function PriceRangeStep({
   tokenPair,
 }: StepProps): React.ReactElement {
   const { tokenOne, tokenTwo } = tokenPair;
-  const [selectedToken, setSelectedToken] = useState(tokenOne?.symbol || "");
+  const [selectedToken, setSelectedToken] = useState(tokenOne?.coinDenom || "");
   const [selectedRange, setSelectedRange] = useState("Full Range");
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(Infinity);
 
   useEffect(() => {
     if (step === 0) {
-      setSelectedToken(tokenOne?.symbol || "");
+      setSelectedToken(tokenOne?.coinDenom || "");
       setSelectedRange("Full Range");
       setMinPrice(0);
       setMaxPrice(Infinity);
@@ -101,7 +101,10 @@ export default function PriceRangeStep({
             <h2 className="text-lg font-medium">Set price range</h2>
             <div className="w-[200px] h-[40px]">
               <ToggleSwitch
-                toggleOptions={[tokenOne?.symbol || "", tokenTwo?.symbol || ""]}
+                toggleOptions={[
+                  tokenOne?.coinDenom || "",
+                  tokenTwo?.coinDenom || "",
+                ]}
                 className="text-sm"
                 selectedOption={selectedToken}
                 setSelectedOption={setSelectedToken}
@@ -138,9 +141,9 @@ export default function PriceRangeStep({
                   onChange={(e) => setMinPrice(Number(e.target.value))}
                 />
                 <span className="text-sm text-grey-light font-medium">
-                  {selectedToken === tokenOne?.symbol
-                    ? tokenTwo?.symbol
-                    : tokenOne?.symbol}{" "}
+                  {selectedToken === tokenOne?.coinDenom
+                    ? tokenTwo?.coinDenom
+                    : tokenOne?.coinDenom}{" "}
                   per {selectedToken}
                 </span>
               </div>
@@ -172,9 +175,9 @@ export default function PriceRangeStep({
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                 />
                 <span className="text-sm text-grey-light font-medium">
-                  {selectedToken === tokenOne?.symbol
-                    ? tokenTwo?.symbol
-                    : tokenOne?.symbol}{" "}
+                  {selectedToken === tokenOne?.coinDenom
+                    ? tokenTwo?.coinDenom
+                    : tokenOne?.coinDenom}{" "}
                   per {selectedToken}
                 </span>
               </div>

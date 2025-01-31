@@ -3,6 +3,7 @@ import {
   FlameIcon,
   NeutronIcon,
   NobleIcon,
+  WrappedTiaIcon,
 } from "@repo/ui/icons";
 import type {
   CosmosChainInfo,
@@ -287,6 +288,7 @@ const FlameChainInfo: EvmChainInfo = {
   currencies: [
     {
       coinDenom: "TIA",
+      title: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
@@ -295,7 +297,17 @@ const FlameChainInfo: EvmChainInfo = {
       IconComponent: CelestiaIcon,
     },
     {
+      coinDenom: "WTIA",
+      title: "Wrapped Celestia",
+      coinMinimalDenom: "wtia",
+      coinDecimals: 18,
+      erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: WrappedTiaIcon,
+    },
+    {
       coinDenom: "USDC",
+      title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
@@ -304,6 +316,7 @@ const FlameChainInfo: EvmChainInfo = {
     },
     {
       coinDenom: "dTIA",
+      title: "Drop Staked TIA",
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 18,

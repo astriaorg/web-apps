@@ -13,20 +13,19 @@ export default function DepositAmountsStep({
   const { tokenOne, tokenTwo } = tokenPair;
   const [inputOne, setInputOne] = useState<TokenState>({
     token: tokenOne,
-    value: undefined,
+    value: "",
   });
   const [inputTwo, setInputTwo] = useState<TokenState>({
     token: tokenTwo,
-    value: undefined,
+    value: "",
   });
   const actionText = useDepositTxn(inputOne, inputTwo);
 
-  const handleInputChange = (value: number, isInputOne: boolean) => {
-    const inputVal = value === 0 ? undefined : value;
+  const handleInputChange = (value: string, isInputOne: boolean) => {
     if (isInputOne) {
-      setInputOne((prev) => ({ ...prev, value: inputVal }));
+      setInputOne((prev) => ({ ...prev, value: value }));
     } else {
-      setInputTwo((prev) => ({ ...prev, value: inputVal }));
+      setInputTwo((prev) => ({ ...prev, value: value }));
     }
   };
 
@@ -47,9 +46,7 @@ export default function DepositAmountsStep({
                 <input
                   type="number"
                   value={inputOne.value}
-                  onChange={(e) =>
-                    handleInputChange(Number(e.target.value), true)
-                  }
+                  onChange={(e) => handleInputChange(e.target.value, true)}
                   className="normalize-input w-[100%]"
                   placeholder="0"
                 />
@@ -57,13 +54,15 @@ export default function DepositAmountsStep({
               </div>
               <div className="flex flex-col items-end">
                 <div className="flex items-center space-x-2 text-lg font-medium gap-2">
-                  {tokenOne?.Icon && <tokenOne.Icon size={24} />}
-                  {tokenOne?.symbol}
+                  {tokenOne?.IconComponent && (
+                    <tokenOne.IconComponent size={24} />
+                  )}
+                  {tokenOne?.coinDenom}
                 </div>
                 <div className="text-sm font-medium text-grey-light flex items-center mt-3">
                   {/* TODO: This will be replaced with the wallet balance */}
                   <span>{"0"}</span>
-                  <span className="ml-1">{tokenOne?.symbol}</span>
+                  <span className="ml-1">{tokenOne?.coinDenom}</span>
                   <span className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition">
                     Max
                   </span>
@@ -80,9 +79,7 @@ export default function DepositAmountsStep({
                 <input
                   type="number"
                   value={inputTwo.value}
-                  onChange={(e) =>
-                    handleInputChange(Number(e.target.value), false)
-                  }
+                  onChange={(e) => handleInputChange(e.target.value, false)}
                   className="normalize-input w-[100%]"
                   placeholder="0"
                 />
@@ -90,13 +87,15 @@ export default function DepositAmountsStep({
               </div>
               <div className="flex flex-col items-end">
                 <div className="flex items-center space-x-2 text-lg font-medium gap-2">
-                  {tokenTwo?.Icon && <tokenTwo.Icon size={24} />}
-                  {tokenTwo?.symbol}
+                  {tokenTwo?.IconComponent && (
+                    <tokenTwo.IconComponent size={24} />
+                  )}
+                  {tokenTwo?.coinDenom}
                 </div>
                 <div className="text-sm font-medium text-grey-light flex items-center mt-3">
                   {/* TODO: This will be replaced with the wallet balance */}
                   <span>{"0"}</span>
-                  <span className="ml-1">{tokenTwo?.symbol}</span>
+                  <span className="ml-1">{tokenTwo?.coinDenom}</span>
                   <span className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition">
                     Max
                   </span>

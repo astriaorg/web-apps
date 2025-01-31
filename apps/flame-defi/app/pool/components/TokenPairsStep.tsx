@@ -1,10 +1,12 @@
 import { ActionButton, TokenSelector } from "@repo/ui/components";
 import { Button, DialogTrigger } from "@repo/ui/shadcn-primitives";
-import { TokenItem } from "@repo/ui/types";
-import { tokens, feeData } from "../../constants";
+import { EvmCurrency } from "@repo/ui/types";
+import { feeData } from "../../constants";
 import { useState } from "react";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
 import { FeeData, TokenPair } from "./NewPoolPosition";
+import { useConfig } from "config";
+import React from "react";
 
 export interface TokenPairsStepProps {
   step: number;
@@ -19,7 +21,7 @@ const CustomTokenButton = ({
   selectedToken,
   defaultTitle,
 }: {
-  selectedToken?: TokenItem | null;
+  selectedToken?: EvmCurrency | null;
   defaultTitle: string;
 }) => (
   <DialogTrigger className="w-full">
@@ -27,9 +29,11 @@ const CustomTokenButton = ({
       className={`flex items-center justify-between bg-black rounded-2xl border border-solid border-border p-3 hover:border-grey-medium transition px-4`}
     >
       <div className="flex items-center">
-        {selectedToken?.Icon && <selectedToken.Icon size={20} />}
+        {selectedToken?.IconComponent && (
+          <selectedToken.IconComponent size={20} />
+        )}
         <h2 className="text-lg font-medium mx-2 whitespace-nowrap">
-          {selectedToken?.symbol || defaultTitle}
+          {selectedToken?.coinDenom || defaultTitle}
         </h2>
       </div>
       <ChevronDownIcon size={20} />
@@ -45,11 +49,15 @@ export default function TokenPairsStep({
   selectedFeeTier,
   setSelectedFeeTier,
 }: TokenPairsStepProps): React.ReactElement {
+  const { evmChains } = useConfig();
+  const evmChainsData = Object.values(evmChains);
+  const currencies = evmChainsData[0]?.currencies;
+
   const [showMore, setShowMore] = useState(false);
   const { tokenOne, tokenTwo } = tokenPair;
   const setToken = (
     position: "tokenOne" | "tokenTwo",
-    token: TokenItem | undefined,
+    token: EvmCurrency | undefined,
   ) => {
     setTokenPair({
       ...tokenPair,
@@ -63,10 +71,12 @@ export default function TokenPairsStep({
         <div className="gradient-container lg:p-6 lg:px-12">
           <div className="flex justify-between">
             <div className="flex items-center gap-2">
-              {tokenOne?.Icon && <tokenOne.Icon />}
-              {tokenTwo?.Icon && <tokenTwo.Icon className="absolute ml-4" />}
+              {tokenOne?.IconComponent && <tokenOne.IconComponent />}
+              {tokenTwo?.IconComponent && (
+                <tokenTwo.IconComponent className="absolute ml-4" />
+              )}
               <h2 className="text-lg font-semibold ml-5">
-                {tokenOne?.symbol} / {tokenTwo?.symbol}
+                {tokenOne?.coinDenom} / {tokenTwo?.coinDenom}
               </h2>
               <span className="bg-semi-white text-white text-xs px-3 py-1 rounded-xl">
                 Fees: {selectedFeeTier?.feePercent}
@@ -95,13 +105,13 @@ export default function TokenPairsStep({
             </p>
             <div className="flex gap-8 justify-between mt-4">
               <TokenSelector
-                tokens={tokens}
+                tokens={currencies}
                 selectedToken={tokenPair.tokenOne}
                 setSelectedToken={(token) => setToken("tokenOne", token)}
                 CustomTokenButton={CustomTokenButton}
               />
               <TokenSelector
-                tokens={tokens}
+                tokens={currencies}
                 selectedToken={tokenPair.tokenTwo}
                 setSelectedToken={(token) => setToken("tokenTwo", token)}
                 CustomTokenButton={CustomTokenButton}

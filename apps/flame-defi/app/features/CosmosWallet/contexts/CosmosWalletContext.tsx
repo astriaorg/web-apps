@@ -17,7 +17,7 @@ import { getBalanceFromChain } from "../services/cosmos";
 export interface CosmosWalletContextProps {
   connectCosmosWallet: () => void;
   cosmosAccountAddress: string | null;
-  cosmosBalance: string | null;
+  cosmosBalance: { value: string; symbol: string } | null;
   cosmosChainsOptions: DropdownOption<CosmosChainInfo>[];
   defaultIbcCurrencyOption: DropdownOption<IbcCurrency> | undefined;
   disconnectCosmosWallet: () => void;
@@ -92,11 +92,13 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedCosmosChain)) {
       return null;
     }
-    return getBalanceFromChain(
+    const balance = await getBalanceFromChain(
       selectedCosmosChain,
       selectedIbcCurrency,
       cosmosAccountAddress,
     );
+
+    return { value: balance.toString(), symbol: selectedIbcCurrency.coinDenom };
   }, [selectedCosmosChain, selectedIbcCurrency, cosmosAccountAddress]);
 
   const pollingConfig = useMemo(

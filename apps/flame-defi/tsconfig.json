@@ -12,7 +12,5 @@
     ".next/types/**/*.ts",
     "types-for-contrib.d.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

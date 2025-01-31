@@ -21,7 +21,7 @@ export function setInLocalStorage(key: string, item: unknown) {
  */
 export function formatBalance(rawBalance: string, decimals = 18): string {
   const denom = 10 ** decimals;
-  return (Number.parseInt(rawBalance) / denom).toFixed(2);
+  return `${Number.parseInt(rawBalance) / denom}`;
 }
 
 /**
@@ -47,4 +47,8 @@ export function shortenAddress(
   const end = endLength > 0 ? address.slice(-endLength) : "";
 
   return `${start}...${end}`;
+}
+
+export function formatBalanceValues(balance?: string): string {
+  return balance ? parseFloat(balance).toFixed(4) : "0";
 }

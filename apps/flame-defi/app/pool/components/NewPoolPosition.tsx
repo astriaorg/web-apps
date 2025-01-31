@@ -10,10 +10,12 @@ import { useState } from "react";
 import TokenPairsStep from "./TokenPairsStep";
 import PriceRangeStep from "./PriceRangeStep";
 import DepositAmountsStep from "./DepositAmountsStep";
-import { feeData, tokens } from "../../constants";
-import { TokenItem } from "@repo/ui/types";
+import { feeData } from "../../constants";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
+import { useConfig } from "config";
+import React from "react";
+import { EvmCurrency } from "@repo/ui/types";
 
 export interface StepProps {
   step: number;
@@ -23,8 +25,8 @@ export interface StepProps {
 }
 
 export interface TokenPair {
-  tokenOne: TokenItem | undefined;
-  tokenTwo: TokenItem | undefined;
+  tokenOne: EvmCurrency | undefined;
+  tokenTwo: EvmCurrency | undefined;
 }
 
 export interface FeeData {
@@ -43,19 +45,22 @@ export default function NewPoolPosition({
   setNewPositionPage: (newPositionPage: boolean) => void;
 }): React.ReactElement {
   const userAccount = useAccount();
+  const { evmChains } = useConfig();
+  const evmChainsData = Object.values(evmChains);
+  const currencies = evmChainsData[0]?.currencies;
   const [step, setStep] = useState(0);
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeData | undefined>(
     feeData[0],
   );
   const [tokenPair, setTokenPair] = useState<TokenPair>({
-    tokenOne: tokens[0],
+    tokenOne: currencies?.[0],
     tokenTwo: undefined,
   });
 
   const reset = () => {
     setStep(0);
     setTokenPair({
-      tokenOne: tokens[0],
+      tokenOne: currencies?.[0],
       tokenTwo: undefined,
     });
     setSelectedFeeTier(feeData[0]);

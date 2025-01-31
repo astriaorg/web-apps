@@ -189,6 +189,7 @@ const FlameChainInfo: EvmChainInfo = {
   rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
     {
+      title: "RIA",
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
@@ -196,6 +197,7 @@ const FlameChainInfo: EvmChainInfo = {
       IconComponent: CelestiaIcon,
     },
     {
+      title: "TIA",
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
@@ -214,6 +216,7 @@ const FakeChainInfo: EvmChainInfo = {
   rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
     {
+      title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
@@ -221,6 +224,7 @@ const FakeChainInfo: EvmChainInfo = {
       IconComponent: CelestiaIcon,
     },
     {
+      title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 6,

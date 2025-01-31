@@ -1,45 +1,7 @@
-import {
-  CelestiaIcon,
-  MilkTiaIcon,
-  StrideTiaIcon,
-  UsdcIcon,
-  WrappedTiaIcon,
-} from "@repo/ui/icons";
-import { TokenItem } from "@repo/ui/types";
-
 export enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
   TOKEN_TWO = "token_two",
 }
-
-// NOTE: temporary tokens until we have a real token list from a api
-export const tokens: TokenItem[] = [
-  {
-    Icon: CelestiaIcon,
-    title: "TIA",
-    symbol: "TIA",
-  },
-  {
-    Icon: WrappedTiaIcon,
-    title: "Wrapped Celestia",
-    symbol: "WTIA",
-  },
-  {
-    Icon: MilkTiaIcon,
-    title: "Milk TIA",
-    symbol: "milkTIA",
-  },
-  {
-    Icon: StrideTiaIcon,
-    title: "Stride TIA",
-    symbol: "stTIA",
-  },
-  {
-    Icon: UsdcIcon,
-    title: "USDC",
-    symbol: "USDC",
-  },
-];
 
 export const feeData = [
   {

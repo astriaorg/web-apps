@@ -5,7 +5,7 @@ export function useDepositTxn(inputOne: TokenState, inputTwo: TokenState) {
 
   if (inputOne.value === undefined || inputTwo.value === undefined) {
     return "Enter an amount";
-  } else if (inputOne.value === 0 || inputTwo.value === 0) {
+  } else if (inputOne.value === "0" || inputTwo.value === "0") {
     return "Amount must be greater than 0";
   } else {
     return "Deposit";

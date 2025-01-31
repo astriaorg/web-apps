@@ -1,10 +1,7 @@
-import React from "react";
 import { useAccount } from "wagmi";
-
 import { CopyToClipboardButton } from "@repo/ui/components";
-
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { shortenAddress } from "../../../../utils/utils";
+import { formatBalanceValues, shortenAddress } from "../../../../utils/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Button,
@@ -63,7 +60,10 @@ export function SingleWalletContent({
         <div>
           {isLoadingEvmNativeTokenBalance && <div>Loading...</div>}
           {!isLoadingEvmNativeTokenBalance && evmNativeTokenBalance && (
-            <div className="text-[20px] font-bold">{evmNativeTokenBalance}</div>
+            <div className="text-[20px] font-bold">
+              {formatBalanceValues(evmNativeTokenBalance.value)}{" "}
+              {evmNativeTokenBalance.symbol}
+            </div>
           )}
           {/* TODO - price in USD */}
           <div>$0.00 USD</div>
