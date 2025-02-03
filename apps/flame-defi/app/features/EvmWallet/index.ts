@@ -5,7 +5,7 @@ import { SingleWalletContent } from "./components/SingleWalletConnect/SingleWall
 import { EvmWalletProvider } from "./contexts/EvmWalletContext";
 import { useEvmWallet } from "./hooks/useEvmWallet";
 import { createWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { createWrapService } from "./services/SwapService/SwapService";
+import { createWrapService } from "./services/SwapServices/WrapService";
 
 export {
   AddErc20ToWalletButton,

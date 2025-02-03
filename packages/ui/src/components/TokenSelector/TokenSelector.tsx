@@ -22,6 +22,7 @@ interface TokenSelectorProps {
   defaultTitle?: string;
   setSelectedToken: (token: EvmCurrency) => void;
   selectedToken?: EvmCurrency | null;
+  unavailableToken?: EvmCurrency | null;
   CustomTokenButton?: (props: {
     selectedToken?: EvmCurrency | null;
     defaultTitle: string;
@@ -33,15 +34,22 @@ export const TokenSelector = ({
   defaultTitle = "Select token",
   selectedToken,
   setSelectedToken,
+  unavailableToken,
   CustomTokenButton,
 }: TokenSelectorProps): React.ReactElement => {
   const [open, setOpen] = useState(false);
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSelectToken = (token: EvmCurrency) => {
-    setOpen(false);
-    setSelectedToken(token);
+  
+
+  const handleSelectToken = (token: EvmCurrency) => {    
+    console.log("unavailableToken?.coinDenom", unavailableToken?.coinDenom)
+    console.log("token.coinDenom", token.coinDenom)
+    if(token.coinDenom !== selectedToken?.coinDenom && unavailableToken?.coinDenom !== token.coinDenom) {
+      setOpen(false);
+      setSelectedToken(token);
+    }    
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +126,7 @@ export const TokenSelector = ({
                     })
                   }
                   key={coinDenom}
-                  className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${selectedToken?.coinDenom === coinDenom ? "bg-semi-white" : ""}`}
+                  className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${unavailableToken?.coinDenom === coinDenom || selectedToken?.coinDenom === coinDenom ? "bg-semi-white cursor-not-allowed" : ""}`}
                 >
                   <div className="flex items-center">
                     {IconComponent && (
