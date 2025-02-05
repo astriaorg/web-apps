@@ -28,7 +28,7 @@ export const TxnInfo = ({ inputOne, inputTwo }: TxnInfoProps) => {
   // TODO: redo this to calculate the token values in the useGetQuote hook
   const tokenData = flipDirection ? [inputOne, inputTwo] : [inputTwo, inputOne];
 
-  const { quote, loading, error } = useGetQuote(
+  const { quote } = useGetQuote(
     chainId,
     tokenData[0],
     tokenData[1],

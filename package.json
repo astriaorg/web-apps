@@ -21,9 +21,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "jsbi": "^4.3.0"
-  }
+  ]
 }

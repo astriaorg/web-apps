@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { DownArrowIcon } from "@repo/ui/icons";
 import { ActionButton, SettingsPopover } from "@repo/ui/components";
 import { useState } from "react";

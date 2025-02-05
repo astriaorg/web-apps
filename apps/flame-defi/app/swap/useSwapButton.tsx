@@ -31,8 +31,6 @@ export function useSwapButton({
   tokenOneBalance,
   evmChainsData,
   quote,
-  loading,
-  error,
 }: SwapButtonProps) {
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();

@@ -1,12 +1,9 @@
-// swapRouter.ts
 import JSBI from "jsbi";
 import { GetQuoteResult } from "@repo/ui/types";
 import { Chain, PublicClient, WalletClient } from "viem";
 
 // Define a zero address constant for ETH
 export const ZeroAddress = "0x0000000000000000000000000000000000000000";
-
-// =================== Core Types ===================
 
 export enum TradeType {
   EXACT_INPUT,
@@ -124,9 +121,9 @@ export interface SwapOptions {
 // =================== SwapRouter Class ===================
 
 export class SwapRouter {
-  private routerAddress: `0x${string}`;
-  private chainConfig: Chain;
-  private routerAbi: Array<{
+  private readonly routerAddress: `0x${string}`;
+  private readonly chainConfig: Chain;
+  private readonly routerAbi: Array<{
     name: string;
     type: string;
     inputs: Array<{
@@ -266,9 +263,11 @@ export class SwapRouter {
 
   /**
    * Checks the token allowance and, if needed, sends an approval transaction.
-   * @param token The ERC20 token to approve.
-   * @param amount The required amount (as a JSBI).
-   * @param walletClient The connected wallet client (from wagmi/viem).
+   *
+   * @param token - The ERC20 token to approve.
+   * @param amount - The required amount (as a JSBI).
+   * @param walletClient - The connected wallet client (from wagmi/viem).
+   * @param publicClient - The public client for reading blockchain data.
    */
   private async approveTokenIfNeeded(
     token: Token,
@@ -365,9 +364,11 @@ export class SwapRouter {
 
   /**
    * Executes a swap using the connected wallet (via viem).
-   * @param trade The trade details.
-   * @param options Swap options such as recipient, slippage, and deadline.
-   * @param walletClient The connected wallet client (from wagmi/viem).
+   *
+   * @param trade - The trade details.
+   * @param options - Swap options such as recipient, slippage, and deadline.
+   * @param walletClient - The connected wallet client (from wagmi/viem).
+   * @param publicClient - The public client for reading blockchain data.
    * @returns The transaction hash if successful.
    */
   async executeSwap(
@@ -405,7 +406,7 @@ export class SwapRouter {
       // Determine whether the trade is multi-hop.
       const isMultiHop = trade.route.pools.length > 1;
       let functionName: string;
-      let args: any[];
+      let args: unknown[];
 
       if (trade.type === TradeType.EXACT_INPUT) {
         if (isMultiHop) {
@@ -501,6 +502,7 @@ export class SwapRouter {
           value: BigInt(value),
         });
       } catch (err) {
+        console.error("Gas estimation failed, using default limit", err);
         gasLimit = DEFAULT_GAS_LIMIT;
       }
       // Increase the estimated gas by 20%
@@ -532,6 +534,7 @@ export function createTradeFromQuote(
   type: "exactIn" | "exactOut",
 ): Trade {
   // Convert the first route from the quote.
+  // TODO - find best route
   const routePools: Pool[] = (quoteResult.route[0] || []).map((poolRoute) => {
     return {
       token0: new Token(
