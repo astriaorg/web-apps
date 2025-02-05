@@ -23,18 +23,25 @@ function useGetQuote(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const amount = primaryToken?.value 
-    ? parseUnits(primaryToken.value, primaryToken.token?.coinDecimals || 18).toString() 
+  const amount = primaryToken?.value
+    ? parseUnits(
+        primaryToken.value,
+        primaryToken.token?.coinDecimals || 18,
+      ).toString()
     : "";
 
   // TODO: This is temp fix for TIA/WTIA swap.
-  const tokenInAddress = primaryToken?.token?.erc20ContractAddress || "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+  const tokenInAddress =
+    primaryToken?.token?.erc20ContractAddress ||
+    "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
   const tokenInDecimals = primaryToken?.token?.coinDecimals;
   const tokenInSymbol = primaryToken?.token?.coinDenom.toLocaleLowerCase();
-  const tokenOutAddress = secondToken?.token?.erc20ContractAddress || "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+  const tokenOutAddress =
+    secondToken?.token?.erc20ContractAddress ||
+    "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
   const tokenOutDecimals = secondToken?.token?.coinDecimals;
   const tokenOutSymbol = secondToken?.token?.coinDenom.toLocaleLowerCase();
-  const type = 'exactIn';
+  const type = "exactIn";
 
   useEffect(() => {
     if (
@@ -79,7 +86,7 @@ function useGetQuote(
 
           const { data } = await response.json();
 
-          setQuote({...data});
+          setQuote({ ...data });
         } catch (err) {
           console.warn(err);
           // TODO: Add real error here later when type is known

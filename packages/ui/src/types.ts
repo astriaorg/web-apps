@@ -34,7 +34,7 @@ export interface EvmChainInfo {
 export enum ChainId {
   MAINNET = 253368190,
   FLAME_DEVNET = 912559,
-  FLAME_TESTNET = 16604737732183
+  FLAME_TESTNET = 16604737732183,
 }
 
 export interface GetQuoteParams {
@@ -91,4 +91,3 @@ export type V3PoolInRoute = {
   // not used in the interface
   address?: string;
 };
-

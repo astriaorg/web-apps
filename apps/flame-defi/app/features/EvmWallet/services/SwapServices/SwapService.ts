@@ -23,7 +23,7 @@ export class Token {
     chainId: number,
     address: string,
     decimals: number,
-    symbol: string
+    symbol: string,
   ) {
     this.chainId = chainId;
     this.address = address;
@@ -48,7 +48,7 @@ export class TokenAmount {
     this.token = token;
     this.decimalScale = JSBI.exponentiate(
       JSBI.BigInt(10),
-      JSBI.BigInt(token.decimals)
+      JSBI.BigInt(token.decimals),
     );
     this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
   }
@@ -106,7 +106,7 @@ export class Trade {
     route: Route,
     inputAmount: TokenAmount,
     outputAmount: TokenAmount,
-    type: TradeType
+    type: TradeType,
   ) {
     this.route = route;
     this.type = type;
@@ -226,13 +226,13 @@ export class SwapRouter {
 
   private calculateMinimumOut(
     amount: TokenAmount,
-    slippageTolerance: number
+    slippageTolerance: number,
   ): JSBI {
     // slippageTolerance is in basis points (1 = 0.01%)
     const slippagePercent = JSBI.BigInt(10000 - slippageTolerance);
     const minimumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
-      JSBI.BigInt(10000)
+      JSBI.BigInt(10000),
     );
 
     console.log("MinimumOut calculation:", {
@@ -246,13 +246,13 @@ export class SwapRouter {
 
   private calculateMaximumIn(
     amount: TokenAmount,
-    slippageTolerance: number
+    slippageTolerance: number,
   ): JSBI {
     // slippageTolerance is in basis points (1 = 0.01%)
     const slippagePercent = JSBI.BigInt(10000 + slippageTolerance);
     const maximumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
-      JSBI.BigInt(10000)
+      JSBI.BigInt(10000),
     );
 
     console.log("MaximumIn calculation:", {
@@ -274,7 +274,7 @@ export class SwapRouter {
     token: Token,
     amount: JSBI,
     walletClient: WalletClient,
-    publicClient: PublicClient
+    publicClient: PublicClient,
   ): Promise<void> {
     const erc20Abi = [
       {
@@ -374,7 +374,7 @@ export class SwapRouter {
     trade: Trade,
     options: SwapOptions,
     walletClient: WalletClient,
-    publicClient: PublicClient
+    publicClient: PublicClient,
   ): Promise<string | undefined> {
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
@@ -391,14 +391,14 @@ export class SwapRouter {
           trade.inputAmount.token,
           trade.inputAmount.raw,
           walletClient,
-          publicClient
+          publicClient,
         );
       } else {
         await this.approveTokenIfNeeded(
           trade.inputAmount.token,
           this.calculateMaximumIn(trade.inputAmount, options.slippageTolerance),
           walletClient,
-          publicClient
+          publicClient,
         );
       }
 
@@ -417,7 +417,7 @@ export class SwapRouter {
               amountIn: trade.inputAmount.raw.toString(),
               amountOutMinimum: this.calculateMinimumOut(
                 trade.outputAmount,
-                options.slippageTolerance
+                options.slippageTolerance,
               ).toString(),
             },
           ];
@@ -436,7 +436,7 @@ export class SwapRouter {
               amountIn: trade.inputAmount.raw.toString(),
               amountOutMinimum: this.calculateMinimumOut(
                 trade.outputAmount,
-                options.slippageTolerance
+                options.slippageTolerance,
               ).toString(),
               sqrtPriceLimitX96: 0n,
             },
@@ -454,7 +454,7 @@ export class SwapRouter {
               amountOut: trade.outputAmount.raw.toString(),
               amountInMaximum: this.calculateMaximumIn(
                 trade.inputAmount,
-                options.slippageTolerance
+                options.slippageTolerance,
               ).toString(),
             },
           ];
@@ -473,7 +473,7 @@ export class SwapRouter {
               amountOut: trade.outputAmount.raw.toString(),
               amountInMaximum: this.calculateMaximumIn(
                 trade.inputAmount,
-                options.slippageTolerance
+                options.slippageTolerance,
               ).toString(),
               sqrtPriceLimitX96: 0n,
             },
@@ -529,7 +529,7 @@ export class SwapRouter {
 
 export function createTradeFromQuote(
   quoteResult: GetQuoteResult,
-  type: "exactIn" | "exactOut"
+  type: "exactIn" | "exactOut",
 ): Trade {
   // Convert the first route from the quote.
   const routePools: Pool[] = (quoteResult.route[0] || []).map((poolRoute) => {
@@ -538,13 +538,13 @@ export function createTradeFromQuote(
         poolRoute.tokenIn.chainId,
         poolRoute.tokenIn.address,
         poolRoute.tokenIn.decimals,
-        poolRoute.tokenIn.symbol
+        poolRoute.tokenIn.symbol,
       ),
       token1: new Token(
         poolRoute.tokenOut.chainId,
         poolRoute.tokenOut.address,
         poolRoute.tokenOut.decimals,
-        poolRoute.tokenOut.symbol
+        poolRoute.tokenOut.symbol,
       ),
       fee: parseInt(poolRoute.fee),
       sqrtRatioX96: poolRoute.sqrtRatioX96,

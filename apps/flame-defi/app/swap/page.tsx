@@ -2,10 +2,7 @@
 
 import React, { use, useCallback, useEffect } from "react";
 import { DownArrowIcon } from "@repo/ui/icons";
-import {
-  ActionButton,
-  SettingsPopover,
-} from "@repo/ui/components";
+import { ActionButton, SettingsPopover } from "@repo/ui/components";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { TOKEN_INPUTS } from "../constants";
@@ -21,7 +18,9 @@ export default function SwapPage(): React.ReactElement {
   const evmChainsData = Object.values(evmChains);
   const currencies = evmChainsData[0]?.currencies;
   const userAccount = useAccount();
-  const [argumentToken, setArgumentToken] = useState<string>(TOKEN_INPUTS.TOKEN_ONE);
+  const [argumentToken, setArgumentToken] = useState<string>(
+    TOKEN_INPUTS.TOKEN_ONE,
+  );
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
     value: "",
@@ -31,9 +30,11 @@ export default function SwapPage(): React.ReactElement {
     value: "",
   });
   const [flipTokens, setFlipTokens] = useState(false);
-  const isTiaWtia = 
-      (inputOne.token?.coinDenom === 'TIA' && inputTwo.token?.coinDenom === 'WTIA') ||
-      (inputOne.token?.coinDenom === 'WTIA' && inputTwo.token?.coinDenom === 'TIA');
+  const isTiaWtia =
+    (inputOne.token?.coinDenom === "TIA" &&
+      inputTwo.token?.coinDenom === "WTIA") ||
+    (inputOne.token?.coinDenom === "WTIA" &&
+      inputTwo.token?.coinDenom === "TIA");
 
   const { quote, loading, error } = useGetQuote(
     evmChainsData[0]?.chainId,
@@ -44,11 +45,15 @@ export default function SwapPage(): React.ReactElement {
   const { handleButtonAction, buttonText, validSwapInputs } = useSwapButton({
     inputOne: flipTokens ? inputTwo : inputOne,
     inputTwo: flipTokens ? inputOne : inputTwo,
-    tokenOneBalance: useTokenBalance(flipTokens ? inputTwo.token : inputOne.token, evmChainsData[0]).balance?.value || "0",
+    tokenOneBalance:
+      useTokenBalance(
+        flipTokens ? inputTwo.token : inputOne.token,
+        evmChainsData[0],
+      ).balance?.value || "0",
     evmChainsData,
-    quote, 
+    quote,
     loading,
-    error
+    error,
   });
 
   const handleTiaWtia = (value: string) => {
@@ -57,18 +62,23 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleInputChange = useCallback(
-    (value: string, setInput: React.Dispatch<React.SetStateAction<TokenState>>, setOppositeInput: React.Dispatch<React.SetStateAction<TokenState>>, currentInput: string) => {
+    (
+      value: string,
+      setInput: React.Dispatch<React.SetStateAction<TokenState>>,
+      setOppositeInput: React.Dispatch<React.SetStateAction<TokenState>>,
+      currentInput: string,
+    ) => {
       setArgumentToken(currentInput);
       if (isTiaWtia) {
         handleTiaWtia(value);
       } else {
         setInput((prev) => ({ ...prev, value: value }));
-        if (value === '' || value === "0") {
+        if (value === "" || value === "0") {
           setOppositeInput((prev) => ({ ...prev, value: "" }));
         }
       }
     },
-    [isTiaWtia]
+    [isTiaWtia],
   );
 
   useEffect(() => {
@@ -83,7 +93,10 @@ export default function SwapPage(): React.ReactElement {
     if (quote?.quoteDecimals && !isTiaWtia) {
       if (argumentToken === TOKEN_INPUTS.TOKEN_ONE && inputOne.value !== "") {
         setInputTwo((prev) => ({ ...prev, value: quote.quoteDecimals }));
-      } else if (argumentToken === TOKEN_INPUTS.TOKEN_TWO && inputTwo.value !== "") {
+      } else if (
+        argumentToken === TOKEN_INPUTS.TOKEN_TWO &&
+        inputTwo.value !== ""
+      ) {
         setInputOne((prev) => ({ ...prev, value: quote.quoteDecimals }));
       }
     }
@@ -92,21 +105,33 @@ export default function SwapPage(): React.ReactElement {
   const swapInputs = [
     {
       inputValue: inputOne,
-      onInputChange: (value: string) => handleInputChange(value, setInputOne, setInputTwo, TOKEN_INPUTS.TOKEN_ONE),
+      onInputChange: (value: string) =>
+        handleInputChange(
+          value,
+          setInputOne,
+          setInputTwo,
+          TOKEN_INPUTS.TOKEN_ONE,
+        ),
       availableTokens: currencies,
       selectedToken: inputOne.token,
       oppositeToken: inputTwo.token,
-      onTokenSelect: (token: EvmCurrency) => setInputOne(({ value: '', token })),
+      onTokenSelect: (token: EvmCurrency) => setInputOne({ value: "", token }),
       balance: useTokenBalance(inputOne.token, evmChainsData[0]).balance,
       label: flipTokens ? "Buy" : "Sell",
     },
     {
       inputValue: inputTwo,
-      onInputChange: (value: string) => handleInputChange(value, setInputTwo, setInputOne, TOKEN_INPUTS.TOKEN_TWO),
+      onInputChange: (value: string) =>
+        handleInputChange(
+          value,
+          setInputTwo,
+          setInputOne,
+          TOKEN_INPUTS.TOKEN_TWO,
+        ),
       availableTokens: currencies,
       selectedToken: inputTwo.token,
       oppositeToken: inputOne.token,
-      onTokenSelect: (token: EvmCurrency) => setInputTwo(({ value: '', token })),
+      onTokenSelect: (token: EvmCurrency) => setInputTwo({ value: "", token }),
       balance: useTokenBalance(inputTwo.token, evmChainsData[0]).balance,
       label: flipTokens ? "Sell" : "Buy",
     },
@@ -116,7 +141,7 @@ export default function SwapPage(): React.ReactElement {
     setFlipTokens((prev) => !prev);
   };
 
-  // TODO: 
+  // TODO:
   // TokenOne = TokenTwo with tooltip. On click swaps direction
 
   return (
@@ -128,9 +153,11 @@ export default function SwapPage(): React.ReactElement {
         </div>
         <div className="relative flex flex-col items-center">
           <div className="flex flex-col gap-1 w-full">
-            {(flipTokens ? swapInputs.reverse() : swapInputs).map((props, index) => (
-              <SwapInput key={index} {...props} />
-            ))}
+            {(flipTokens ? swapInputs.reverse() : swapInputs).map(
+              (props, index) => (
+                <SwapInput key={index} {...props} />
+              ),
+            )}
           </div>
           <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
             <button

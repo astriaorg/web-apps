@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Accordion,
@@ -15,21 +15,24 @@ import { useConfig } from "config";
 import useGetQuote from "../useGetQuote";
 
 interface TxnInfoProps {
-  inputOne: TokenState,
-  inputTwo: TokenState,
+  inputOne: TokenState;
+  inputTwo: TokenState;
 }
 
-export const TxnInfo = ({inputOne, inputTwo}: TxnInfoProps) => {
+export const TxnInfo = ({ inputOne, inputTwo }: TxnInfoProps) => {
   const { evmChains } = useConfig();
   const evmChainsData = Object.values(evmChains);
   const chainId = evmChainsData[0]?.chainId;
   // const {amountDecimals, quoteDecimals} = quote
-  const [flipDirection, setFlipDirection] = useState(true)
+  const [flipDirection, setFlipDirection] = useState(true);
   // TODO: redo this to calculate the token values in the useGetQuote hook
-  const tokenData = flipDirection ? [inputOne, inputTwo] : [inputTwo, inputOne]
+  const tokenData = flipDirection ? [inputOne, inputTwo] : [inputTwo, inputOne];
 
-  const { quote, loading, error } = useGetQuote(chainId, tokenData[0], tokenData[1]);
-
+  const { quote, loading, error } = useGetQuote(
+    chainId,
+    tokenData[0],
+    tokenData[1],
+  );
 
   return (
     <Accordion type="single" collapsible>
@@ -38,16 +41,19 @@ export const TxnInfo = ({inputOne, inputTwo}: TxnInfoProps) => {
         className="text-grey-light text-sm border-b-0"
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center cursor-pointer text-white font-medium gap-1" onClick={() => setFlipDirection(!flipDirection)}>
-              <div className="flex items-center gap-1">
-                <span>{formatBalanceValues(tokenData[0]?.value)}</span>
-                <span>{tokenData[0]?.token?.coinDenom}</span>
-              </div>
-              <div>=</div>
-              <div className="flex items-center gap-1">
-                <span>{formatBalanceValues(quote?.quoteDecimals)}</span>
-                <span>{tokenData[1]?.token?.coinDenom}</span>
-              </div>
+          <div
+            className="flex items-center cursor-pointer text-white font-medium gap-1"
+            onClick={() => setFlipDirection(!flipDirection)}
+          >
+            <div className="flex items-center gap-1">
+              <span>{formatBalanceValues(tokenData[0]?.value)}</span>
+              <span>{tokenData[0]?.token?.coinDenom}</span>
+            </div>
+            <div>=</div>
+            <div className="flex items-center gap-1">
+              <span>{formatBalanceValues(quote?.quoteDecimals)}</span>
+              <span>{tokenData[1]?.token?.coinDenom}</span>
+            </div>
           </div>
           <AccordionTrigger>
             <div className="[&>svg]:!transform-none">

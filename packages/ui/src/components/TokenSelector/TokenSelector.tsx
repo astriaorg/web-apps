@@ -41,15 +41,16 @@ export const TokenSelector = ({
   const [filteredTokens, setFilteredTokens] = useState(tokens);
   const [searchQuery, setSearchQuery] = useState("");
 
-  
-
-  const handleSelectToken = (token: EvmCurrency) => {    
-    console.log("unavailableToken?.coinDenom", unavailableToken?.coinDenom)
-    console.log("token.coinDenom", token.coinDenom)
-    if(token.coinDenom !== selectedToken?.coinDenom && unavailableToken?.coinDenom !== token.coinDenom) {
+  const handleSelectToken = (token: EvmCurrency) => {
+    console.log("unavailableToken?.coinDenom", unavailableToken?.coinDenom);
+    console.log("token.coinDenom", token.coinDenom);
+    if (
+      token.coinDenom !== selectedToken?.coinDenom &&
+      unavailableToken?.coinDenom !== token.coinDenom
+    ) {
       setOpen(false);
       setSelectedToken(token);
-    }    
+    }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {

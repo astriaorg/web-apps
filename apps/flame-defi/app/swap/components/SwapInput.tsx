@@ -26,7 +26,6 @@ export function SwapInput({
   balance,
   label,
 }: SwapInputProps) {
-
   return (
     <div
       className={`flex flex-col rounded-md p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium focus-within:bg-background focus-within:border-grey-medium`}
@@ -54,14 +53,16 @@ export function SwapInput({
               <span className="flex items-center gap-2">
                 {formatBalanceValues(balance?.value)} {balance?.symbol}
               </span>
-              {balance?.value && parseFloat(balance?.value) > 0 && <span
-                onClick={() => {
-                  onInputChange(balance?.value || "0");
-                }}
-                className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
-              >
-                Max
-              </span>}
+              {balance?.value && parseFloat(balance?.value) > 0 && (
+                <span
+                  onClick={() => {
+                    onInputChange(balance?.value || "0");
+                  }}
+                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
+                >
+                  Max
+                </span>
+              )}
             </div>
           ) : (
             <div className="h-[20px] mt-3 w-[100%]"></div>

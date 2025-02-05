@@ -49,8 +49,9 @@ export function shortenAddress(
   return `${start}...${end}`;
 }
 
-export function formatBalanceValues(balance?: string, decimals?: number): string {
+export function formatBalanceValues(
+  balance?: string,
+  decimals?: number,
+): string {
   return balance ? parseFloat(balance).toFixed(decimals || 4) : "0";
 }
-
-
