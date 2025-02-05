@@ -7,6 +7,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "codegen": "graphql-codegen",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit",
     "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
@@ -27,6 +28,8 @@
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
     "ethers": "^6.13.2",
+    "graphql": "^16.10.0",
+    "graphql-request": "^7.1.2",
     "next": "^15.1.0",
     "osmojs": "^16.15.0",
     "react": "^18.0.0",
@@ -42,6 +45,7 @@
     "wagmi": "^2.13.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.4",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@testing-library/dom": "^10.4.0",
