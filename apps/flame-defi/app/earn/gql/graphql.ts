@@ -1910,6 +1910,7 @@ export type SearchResults = {
 };
 
 export enum TimeseriesInterval {
+  /** @deprecated Use startTimestamp and endTimestamp instead. */
   All = 'ALL',
   Day = 'DAY',
   FifteenMinutes = 'FIFTEEN_MINUTES',
@@ -1924,10 +1925,11 @@ export enum TimeseriesInterval {
 }
 
 export type TimeseriesOptions = {
-  /** Unix timestamp (Inclusive) */
+  /** Unix timestamp (Inclusive). Defaults to the maximum: 2^31 - 1. */
   endTimestamp?: InputMaybe<Scalars['Int']['input']>;
+  /** The timestamp interval to space and group points. Defaults to around 50 points between startTimestamp and endTimestamp. */
   interval?: InputMaybe<TimeseriesInterval>;
-  /** Unix timestamp (Inclusive) */
+  /** Unix timestamp (Inclusive). Defaults to the minimum: 0. */
   startTimestamp?: InputMaybe<Scalars['Int']['input']>;
 };
 
