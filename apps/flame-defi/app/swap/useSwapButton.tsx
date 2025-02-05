@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createTradeFromQuote, SwapRouter } from "features/EvmWallet/services/SwapServices/SwapService";
 import { SWAP_ROUTER_ADDRESS, QUOTE_TYPE, TRADE_TYPE, TXN_STATUS, TOKEN_INPUTS } from "../constants";
 import { Chain } from "viem";
+import { isTiaWtiaSwapPair } from "./page";
 
 interface SwapButtonProps {
   inputOne: TokenState,
@@ -41,11 +42,15 @@ export function useSwapButton({
   const userInput = inputOne.selectedInput ? inputOne : inputTwo;
   const quoteInput = inputOne.selectedInput ? inputTwo : inputOne;
 
+  const wrapTia = userInput.token?.coinDenom === "TIA" &&
+      quoteInput.token?.coinDenom === "WTIA"
+  const unwrapTia = userInput.token?.coinDenom === "WTIA" &&
+      quoteInput.token?.coinDenom === "TIA"
+
   const result = useWaitForTransactionReceipt({hash: txnHash});
 
 
   useEffect(() => {
-    console.log('result', result.data);
     if (result.data?.status === "success") {
       setTxnStatus(TXN_STATUS.SUCCESS);
     } else if (result.data?.status === "reverted") {
@@ -58,6 +63,7 @@ export function useSwapButton({
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wrapService = createWrapService(wagmiConfig, WTIA_ADDRESS);
     if (!evmChainsData[0]?.chainId) return;
+    setTxnStatus(TXN_STATUS.PENDING);
 
     if (type === "wrap") {
       const tx = await wrapService.deposit(
@@ -65,7 +71,7 @@ export function useSwapButton({
         userInput.value,
         userInput.token?.coinDecimals || 18
       );
-      console.log({ tx });
+      setTxnHash(tx);
       // TODO: Add loading state for these txns. This loading state will be displayed in the buttonText component.
       // TODO: Also add text pointing the user to complete the txn in their wallet
     } else {
@@ -74,7 +80,7 @@ export function useSwapButton({
         userInput.value,
         userInput.token?.coinDecimals || 18
       );
-      console.log({ tx });
+      setTxnHash(tx);
     }
   };
 
@@ -99,8 +105,6 @@ export function useSwapButton({
     }
 
     setTxnStatus(TXN_STATUS.PENDING);
-
-    console.log('trade', trade);
 
     try {
       const chainConfig: Chain = {
@@ -143,15 +147,9 @@ export function useSwapButton({
   const onSubmitCallback = () => {
     if (!userAccount.address) {
       return connectEvmWallet();
-    } else if (
-      userInput.token?.coinDenom === "WTIA" &&
-      quoteInput.token?.coinDenom === "TIA"
-    ) {
+    } else if (unwrapTia) {
       return handleWrap("unwrap");
-    } else if (
-      userInput.token?.coinDenom === "TIA" &&
-      quoteInput.token?.coinDenom === "WTIA"
-    ) {
+    } else if (wrapTia) {
       return handleWrap("wrap");
     } else if (validSwapInputs) {
       return handleSwap();
@@ -177,11 +175,9 @@ export function useSwapButton({
       case tokenOneBalance === "0" ||
         parseFloat(tokenOneBalance) < parseFloat(userInput.value):
         return "Insufficient funds";
-      case userInput.token?.coinDenom === "TIA" &&
-        quoteInput.token?.coinDenom === "WTIA":
+      case wrapTia:
         return "Wrap";
-      case userInput.token?.coinDenom === "WTIA" &&
-        quoteInput.token?.coinDenom === "TIA":
+      case unwrapTia:
         return "Unwrap";
       default:
         return "Swap";
@@ -196,6 +192,10 @@ export function useSwapButton({
         return "Close";
       case txnStatus === TXN_STATUS.FAILED:
         return "Dismiss";
+      case wrapTia:
+        return "Confirm Wrap";
+      case unwrapTia:
+        return "Confirm Unwrap";
       default:
         return "Confirm Swap";
     }

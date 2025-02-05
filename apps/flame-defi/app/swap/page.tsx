@@ -237,9 +237,11 @@ export default function SwapPage(): React.ReactElement {
             handleResetInputs={handleResetInputs}
             title="Confirm Swap"
           >
-            <SwapTxnSteps txnStatus={txnStatus} setTxnStatus={setTxnStatus} swapPairs={swapPairs} /> 
+            <SwapTxnSteps txnStatus={txnStatus} setTxnStatus={setTxnStatus} swapPairs={swapPairs} isTiaWtia={isTiaWtia}/> 
           </ConfirmationModal>
         )}
+
+
         {onSubmitCallback && !userAccount.address && (
           <ActionButton
             callback={onSubmitCallback}
