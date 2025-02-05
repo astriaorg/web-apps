@@ -77,6 +77,12 @@ function MobileNav() {
               >
                 Pool
               </Link>
+              <Link
+                href="/earn"
+                className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
+              >
+                Earn
+              </Link>
             </div>
           </div>
           <div className="pt-4 pb-0 px-8 flex flex-col items-start">
