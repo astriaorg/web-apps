@@ -1,18 +1,47 @@
-import { TokenState } from "@repo/ui/types";
+import { GetQuoteResult } from "@repo/ui/types";
+import { formatDecimalValues } from "utils/utils";
+import { formatUnits } from "viem";
+import { TxnInfoProps } from "./components/TxnInfo";
 
-export function useTxnInfo(inputOne: TokenState, inputTwo: TokenState) {
-  // TODO: pull in real token values and balances from api and calculate the txn info here
+function calculatePriceImpact(data: GetQuoteResult): string {
+  const quoteValue = parseFloat(data.quoteDecimals);
+  const quoteGasAdjustedValue = parseFloat(data.quoteGasAdjustedDecimals);
 
-  switch (true) {
-    case !inputOne.token || !inputTwo.token:
-      return "Select a token";
-    case inputOne.value === undefined || inputTwo.value === undefined:
-      return "Enter an amount";
-    case inputOne.value === "0" || inputTwo.value === "0":
-      return "Amount must be greater than 0";
-    case inputTwo.token?.coinDenom === "WTIA":
-      return "Wrap";
-    default:
-      return "Swap";
+  const gasFee = quoteValue - quoteGasAdjustedValue;
+  const priceImpact = (gasFee / quoteValue) * 100;
+  return priceImpact.toFixed(2);
+}
+
+function calculateMinimumReceived(
+  data: GetQuoteResult,
+  slippageTolerance: number
+): string {
+  const adjustedQuote = parseFloat(data.quoteGasAdjustedDecimals);
+  const minimumReceived = adjustedQuote * (1 - slippageTolerance);
+
+  return formatDecimalValues(`${minimumReceived}`, 6);
+}
+
+  export function useTxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
+    const inputTokenOne = swapPairs[0]?.inputToken
+    const inputTokenTwo = swapPairs[1]?.inputToken
+    const txnQuoteData = swapPairs[0]?.txnQuoteData
+
+  return {
+    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
+    formattedGasUseEstimateUSD: formatDecimalValues(txnQuoteData?.gasUseEstimateUSD, 2),
+    expectedOutputBigInt: BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
+    expectedOutputFormatted: formatDecimalValues(
+      formatUnits(
+        BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
+        inputTokenTwo?.token?.coinDecimals || 18
+      ), 6
+    ),
+    priceImpact: txnQuoteData ? calculatePriceImpact(txnQuoteData) : '0.00',
+    minimumReceived: txnQuoteData ? calculateMinimumReceived(txnQuoteData, 0.01) : '0.00',
+    txnQuoteLoading: swapPairs[0]?.txnQuoteLoading,
+    inputTokenOne,
+    inputTokenTwo,
+    txnQuoteData,
   }
 }

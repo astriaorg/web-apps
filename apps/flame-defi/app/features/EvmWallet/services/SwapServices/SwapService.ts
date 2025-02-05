@@ -529,8 +529,9 @@ export class SwapRouter {
 
 export function createTradeFromQuote(
   quoteResult: GetQuoteResult,
-  type: "exactIn" | "exactOut"
+  type: "exactIn" | "exactOut",
 ): Trade {
+  console.log('quoteResult', quoteResult);
   // Convert the first route from the quote.
   const routePools: Pool[] = (quoteResult.route[0] || []).map((poolRoute) => {
     return {

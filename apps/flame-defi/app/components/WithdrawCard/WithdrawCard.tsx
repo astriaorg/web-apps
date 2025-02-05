@@ -13,7 +13,7 @@ import {
 import { NotificationType, useNotifications } from "features/Notifications";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
-import { formatBalanceValues, shortenAddress } from "utils/utils";
+import { formatDecimalValues, shortenAddress } from "utils/utils";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();
@@ -77,10 +77,10 @@ export default function WithdrawCard(): React.ReactElement {
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const formattedEvmBalanceValue = formatBalanceValues(
+  const formattedEvmBalanceValue = formatDecimalValues(
     selectedEvmCurrencyBalance?.value,
   );
-  const formattedCosmosBalanceValue = formatBalanceValues(cosmosBalance?.value);
+  const formattedCosmosBalanceValue = formatDecimalValues(cosmosBalance?.value);
   // recipientAddressOverride is used to allow manual entry of an address
   const [recipientAddressOverride, setRecipientAddressOverride] =
     useState<string>("");

@@ -1,78 +1,140 @@
 "use client";
 
-import React, { use, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { DownArrowIcon } from "@repo/ui/icons";
-import {
-  ActionButton,
-  SettingsPopover,
-} from "@repo/ui/components";
+import { ActionButton, SettingsPopover } from "@repo/ui/components";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { TOKEN_INPUTS } from "../constants";
-import { TokenState, EvmCurrency } from "@repo/ui/types";
+import { QUOTE_TYPE, TOKEN_INPUTS } from "../constants";
+import { TokenState, EvmCurrency, GetQuoteResult } from "@repo/ui/types";
 import { useConfig } from "config";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
 import { useSwapButton } from "./useSwapButton";
-import useGetQuote from "./useGetQuote";
+import { getQuote } from "./getQuote";
 import { SwapInput } from "./components/SwapInput";
+import { TxnInfo } from "./components/TxnInfo";
+import { useTxnInfo } from "./useTxnInfo";
+import ConfirmationModal from "components/ConfirmationModal/ConfirmationModal";
+import { SwapTxnSteps } from "./components/SwapTxnSteps";
+import { useGetQuote } from "./useGetQuote";
+
+export const isTiaWtiaSwapPair = (
+  inputOne: TokenState,
+  inputTwo: TokenState
+) => {
+  const isTiaWtia =
+    (inputOne.token?.coinDenom === "TIA" &&
+      inputTwo.token?.coinDenom === "WTIA") ||
+    (inputOne.token?.coinDenom === "WTIA" &&
+      inputTwo.token?.coinDenom === "TIA");
+
+  return isTiaWtia;
+};
 
 export default function SwapPage(): React.ReactElement {
   const { evmChains } = useConfig();
   const evmChainsData = Object.values(evmChains);
   const currencies = evmChainsData[0]?.currencies;
   const userAccount = useAccount();
-  const [argumentToken, setArgumentToken] = useState<string>(TOKEN_INPUTS.TOKEN_ONE);
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
     value: "",
+    selectedInput: true,
   });
   const [inputTwo, setInputTwo] = useState<TokenState>({
     token: null,
     value: "",
+    selectedInput: false,
   });
+  const [quoteInput, setQuoteInput] = useState<TokenState>({
+    token: null,
+    value: "",
+  });
+  const isTiaWtia = isTiaWtiaSwapPair(inputOne, inputTwo);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [flipTokens, setFlipTokens] = useState(false);
-  const isTiaWtia = 
-      (inputOne.token?.coinDenom === 'TIA' && inputTwo.token?.coinDenom === 'WTIA') ||
-      (inputOne.token?.coinDenom === 'WTIA' && inputTwo.token?.coinDenom === 'TIA');
+  const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
+  const { quote, loading, error, getQuote } = useGetQuote();
 
-  const { quote, loading, error } = useGetQuote(
-    evmChainsData[0]?.chainId,
-    argumentToken === TOKEN_INPUTS.TOKEN_ONE ? inputOne : inputTwo,
-    argumentToken === TOKEN_INPUTS.TOKEN_ONE ? inputTwo : inputOne,
-  );
+  // FACTORS:
+  // QUOTE TYPE = EXACT_IN or EXACT_OUT
+  // FLIP TOKENS = TRUE or FALSE
+  // SELECTED INDEX = 0 or 1
+  // SELECTED INPUT = TRUE or FALSE
 
-  const { handleButtonAction, buttonText, validSwapInputs } = useSwapButton({
-    inputOne: flipTokens ? inputTwo : inputOne,
-    inputTwo: flipTokens ? inputOne : inputTwo,
-    tokenOneBalance: useTokenBalance(flipTokens ? inputTwo.token : inputOne.token, evmChainsData[0]).balance?.value || "0",
+  const {
+    onSubmitCallback,
+    buttonText,
+    actionButtonText,
+    validSwapInputs,
+    txnStatus,
+    setTxnStatus,
+    isCloseModalAction,
+  } = useSwapButton({
+    inputOne,
+    inputTwo,
+    tokenOneBalance:
+      useTokenBalance(
+        flipTokens ? inputTwo.token : inputOne.token,
+        evmChainsData[0]
+      ).balance?.value || "0",
     evmChainsData,
-    quote, 
+    quote,
     loading,
-    error
+    error,
+    quoteType,
   });
+
+  useEffect(() => {
+    const tokenOne = !flipTokens ? inputOne : inputTwo;
+    const tokenTwo = !flipTokens ? inputTwo : inputOne;
+    if (tokenOne.value || tokenTwo.value) {
+      getQuote(quoteType, tokenOne, tokenTwo);
+    }
+  }, [inputOne, inputTwo, getQuote, quoteType, flipTokens]);
+
+  const handleSelectedInput = (index: number, id: TOKEN_INPUTS) => {
+    setSelectedIndex(index);
+    if (index === 0) {
+      setQuoteType(QUOTE_TYPE.EXACT_IN);
+    } else if (index === 1) {
+      setQuoteType(QUOTE_TYPE.EXACT_OUT);
+    }
+    if (id === TOKEN_INPUTS.TOKEN_ONE) {
+      setInputOne((prev) => ({ ...prev, selectedInput: true }));
+      setInputTwo((prev) => ({ ...prev, selectedInput: false }));
+    } else if (id === TOKEN_INPUTS.TOKEN_TWO) {
+      setInputOne((prev) => ({ ...prev, selectedInput: false }));
+      setInputTwo((prev) => ({ ...prev, selectedInput: true }));
+    }
+  };
 
   const handleTiaWtia = (value: string) => {
     setInputOne((prev) => ({ ...prev, value: value }));
     setInputTwo((prev) => ({ ...prev, value: value }));
+    setQuoteInput((prev) => ({ ...prev, value: value }));
+  };
+
+  const handleResetInputs = () => {
+    setInputOne((prev) => ({ ...prev, value: "" }));
+    setInputTwo((prev) => ({ ...prev, value: "" }));
+    setQuoteInput((prev) => ({ ...prev, value: "" }));
   };
 
   const handleInputChange = useCallback(
-    (value: string, setInput: React.Dispatch<React.SetStateAction<TokenState>>, setOppositeInput: React.Dispatch<React.SetStateAction<TokenState>>, currentInput: string) => {
-      setArgumentToken(currentInput);
-      if (isTiaWtia) {
-        handleTiaWtia(value);
-      } else {
-        setInput((prev) => ({ ...prev, value: value }));
-        if (value === '' || value === "0") {
-          setOppositeInput((prev) => ({ ...prev, value: "" }));
-        }
+    (
+      value: string,
+      setInput: React.Dispatch<React.SetStateAction<TokenState>>
+    ) => {
+      setInput((prev) => ({ ...prev, value: value }));
+      if (value === "" || value === "0") {
+        setQuoteInput((prev) => ({ ...prev, value: "" }));
       }
     },
-    [isTiaWtia]
+    []
   );
 
   useEffect(() => {
-    // NOTE: This is needed because the useGetQuote hook does not return values for TIA/WTIA since they are the same
     const value = inputOne.value || inputTwo.value;
     if (isTiaWtia) {
       handleTiaWtia(value);
@@ -80,44 +142,61 @@ export default function SwapPage(): React.ReactElement {
   }, [isTiaWtia, inputOne.value, inputTwo.value]);
 
   useEffect(() => {
-    if (quote?.quoteDecimals && !isTiaWtia) {
-      if (argumentToken === TOKEN_INPUTS.TOKEN_ONE && inputOne.value !== "") {
-        setInputTwo((prev) => ({ ...prev, value: quote.quoteDecimals }));
-      } else if (argumentToken === TOKEN_INPUTS.TOKEN_TWO && inputTwo.value !== "") {
-        setInputOne((prev) => ({ ...prev, value: quote.quoteDecimals }));
-      }
+    if (quote?.quoteDecimals) {
+      setQuoteInput((prev) => ({ ...prev, value: quote.quoteDecimals }));
     }
-  }, [inputOne.value, inputTwo.value, quote, argumentToken, isTiaWtia]);
+  }, [quote]);
 
   const swapInputs = [
     {
-      inputValue: inputOne,
-      onInputChange: (value: string) => handleInputChange(value, setInputOne, setInputTwo, TOKEN_INPUTS.TOKEN_ONE),
+      id: TOKEN_INPUTS.TOKEN_ONE,
+      inputToken: inputOne,
+      onInputChange: (value: string) => handleInputChange(value, setInputOne),
+      selectedIndex,
+      quoteInput,
       availableTokens: currencies,
-      selectedToken: inputOne.token,
-      oppositeToken: inputTwo.token,
-      onTokenSelect: (token: EvmCurrency) => setInputOne(({ value: '', token })),
+      oppositeToken: inputTwo,
+      onTokenSelect: (token: EvmCurrency) => setInputOne({ value: "", token }),
+      onInputClick: (key: number, id: TOKEN_INPUTS) =>
+        handleSelectedInput(key, id),
       balance: useTokenBalance(inputOne.token, evmChainsData[0]).balance,
       label: flipTokens ? "Buy" : "Sell",
+      txnQuoteData: quote,
+      txnQuoteLoading: loading,
+      txnQuoteError: error,
     },
     {
-      inputValue: inputTwo,
-      onInputChange: (value: string) => handleInputChange(value, setInputTwo, setInputOne, TOKEN_INPUTS.TOKEN_TWO),
+      id: TOKEN_INPUTS.TOKEN_TWO,
+      inputToken: inputTwo,
+      onInputChange: (value: string) => handleInputChange(value, setInputTwo),
+      selectedIndex,
+      quoteInput,
       availableTokens: currencies,
-      selectedToken: inputTwo.token,
-      oppositeToken: inputOne.token,
-      onTokenSelect: (token: EvmCurrency) => setInputTwo(({ value: '', token })),
+      oppositeToken: inputOne,
+      onTokenSelect: (token: EvmCurrency) => setInputTwo({ value: "", token }),
+      onInputClick: (key: number, id: TOKEN_INPUTS) =>
+        handleSelectedInput(key, id),
       balance: useTokenBalance(inputTwo.token, evmChainsData[0]).balance,
       label: flipTokens ? "Sell" : "Buy",
+      txnQuoteData: quote,
+      txnQuoteLoading: loading,
+      txnQuoteError: error,
     },
   ];
 
   const handleArrowClick = () => {
     setFlipTokens((prev) => !prev);
+    setInputOne((prev) => ({
+      ...prev,
+      value: prev.value === "" ? quote?.quoteDecimals || "" : prev.value,
+    }));
+    setInputTwo((prev) => ({
+      ...prev,
+      value: prev.value === "" ? quote?.quoteDecimals || "" : prev.value,
+    }));
   };
 
-  // TODO: 
-  // TokenOne = TokenTwo with tooltip. On click swaps direction
+  const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -128,8 +207,8 @@ export default function SwapPage(): React.ReactElement {
         </div>
         <div className="relative flex flex-col items-center">
           <div className="flex flex-col gap-1 w-full">
-            {(flipTokens ? swapInputs.reverse() : swapInputs).map((props, index) => (
-              <SwapInput key={index} {...props} />
+            {swapPairs.map((props, index) => (
+              <SwapInput key={index} {...props} index={index} />
             ))}
           </div>
           <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
@@ -147,22 +226,31 @@ export default function SwapPage(): React.ReactElement {
             {buttonText}
           </div>
         )}
-        {handleButtonAction && validSwapInputs && (
+        {onSubmitCallback && validSwapInputs && (
+          <ConfirmationModal
+            onSubmitCallback={onSubmitCallback}
+            buttonText={buttonText}
+            actionButtonText={actionButtonText}
+            txnStatus={txnStatus}
+            setTxnStatus={setTxnStatus}
+            isCloseModalAction={isCloseModalAction}
+            handleResetInputs={handleResetInputs}
+            title="Confirm Swap"
+          >
+            <SwapTxnSteps txnStatus={txnStatus} setTxnStatus={setTxnStatus} swapPairs={swapPairs} /> 
+          </ConfirmationModal>
+        )}
+        {onSubmitCallback && !userAccount.address && (
           <ActionButton
-            callback={handleButtonAction}
+            callback={onSubmitCallback}
             buttonText={buttonText}
             className="w-full mt-2"
           />
         )}
-        {handleButtonAction && !userAccount.address && (
-          <ActionButton
-            callback={handleButtonAction}
-            buttonText={buttonText}
-            className="w-full mt-2"
-          />
+
+        {inputOne.token && inputTwo.token && !isTiaWtia && validSwapInputs && (
+          <TxnInfo swapPairs={swapPairs} />
         )}
-        {/* TODO: ADD THIS IN WHEN WE HAVE THE TXN INFO */}
-        {/* {inputOne && inputTwo && <TxnInfo inputOne={inputOne} inputTwo={inputTwo}/>} */}
       </div>
     </section>
   );

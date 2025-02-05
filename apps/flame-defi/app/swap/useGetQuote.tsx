@@ -1,59 +1,59 @@
+import { useState, useCallback } from "react";
 import { GetQuoteResult, TokenState } from "@repo/ui/types";
-import { useState, useEffect } from "react";
+import { QUOTE_TYPE } from "../constants";
 import { parseUnits } from "viem";
+import { useConfig } from "config";
+import { isTiaWtiaSwapPair } from "./page";
 
-export interface GetQuoteParams {
-  chainId?: number; // ChainId;
-  tokenInAddress?: string;
-  tokenInDecimals?: number;
-  tokenInSymbol?: string;
-  tokenOutAddress?: string;
-  tokenOutDecimals?: number;
-  tokenOutSymbol?: string;
-  amount?: string;
-  type: "exactIn" | "exactOut";
-}
-
-function useGetQuote(
-  chainId?: number,
-  primaryToken?: TokenState,
-  secondToken?: TokenState,
-) {
+export function useGetQuote() {
+  const { evmChains } = useConfig();
+  const evmChainsData = Object.values(evmChains);
+  const chainId = evmChainsData[0]?.chainId || 0;
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const amount = primaryToken?.value 
-    ? parseUnits(primaryToken.value, primaryToken.token?.coinDecimals || 18).toString() 
-    : "";
+  const getQuote = useCallback(
+    async (
+      type: string,
+      tokenOne: TokenState,
+      tokenTwo: TokenState
+    ) => {
+      const isTiaWtia = isTiaWtiaSwapPair(tokenOne, tokenTwo);
+      if (isTiaWtia) {
+        return;
+      }
+      const token = type === QUOTE_TYPE.EXACT_IN ? tokenOne : tokenTwo;
+      const amount = token?.value
+        ? parseUnits(token.value, token?.token?.coinDecimals || 18).toString()
+        : "";
 
-  // TODO: This is temp fix for TIA/WTIA swap.
-  const tokenInAddress = primaryToken?.token?.erc20ContractAddress || "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
-  const tokenInDecimals = primaryToken?.token?.coinDecimals;
-  const tokenInSymbol = primaryToken?.token?.coinDenom.toLocaleLowerCase();
-  const tokenOutAddress = secondToken?.token?.erc20ContractAddress || "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
-  const tokenOutDecimals = secondToken?.token?.coinDecimals;
-  const tokenOutSymbol = secondToken?.token?.coinDenom.toLocaleLowerCase();
-  const type = 'exactIn';
+      const tokenInAddress =
+        tokenOne?.token?.erc20ContractAddress ||
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+      const tokenInDecimals = tokenOne?.token?.coinDecimals;
+      const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
+      const tokenOutAddress =
+        tokenTwo?.token?.erc20ContractAddress ||
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+      const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
+      const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
 
-  useEffect(() => {
-    if (
-      chainId &&
-      tokenInAddress &&
-      tokenInDecimals !== undefined &&
-      tokenInSymbol &&
-      tokenOutAddress &&
-      tokenOutDecimals !== undefined &&
-      tokenOutSymbol &&
-      amount &&
-      type
-    ) {
-      const fetchQuote = async () => {
+      if (
+        chainId &&
+        tokenInAddress &&
+        tokenInDecimals !== undefined &&
+        tokenInSymbol &&
+        tokenOutAddress &&
+        tokenOutDecimals !== undefined &&
+        tokenOutSymbol &&
+        amount &&
+        type
+      ) {
         try {
           setLoading(true);
           setError(null);
 
-          // Construct the URL
           const url =
             `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
             `chainId=${chainId}` +
@@ -78,32 +78,18 @@ function useGetQuote(
           }
 
           const { data } = await response.json();
-
-          setQuote({...data});
+          setQuote({ ...data });
+          return data;
         } catch (err) {
           console.warn(err);
-          // TODO: Add real error here later when type is known
           setError("error message");
         } finally {
           setLoading(false);
         }
-      };
+      }
+    },
+    [chainId]
+  );
 
-      fetchQuote();
-    }
-  }, [
-    chainId,
-    tokenInAddress,
-    tokenInDecimals,
-    tokenInSymbol,
-    tokenOutAddress,
-    tokenOutDecimals,
-    tokenOutSymbol,
-    amount,
-    type,
-  ]);
-
-  return { quote, loading, error };
+  return { quote, loading, error, getQuote };
 }
-
-export default useGetQuote;

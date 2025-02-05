@@ -49,8 +49,9 @@ export function shortenAddress(
   return `${start}...${end}`;
 }
 
-export function formatBalanceValues(balance?: string, decimals?: number): string {
-  return balance ? parseFloat(balance).toFixed(decimals || 4) : "0";
+export function formatDecimalValues(value?: string, decimals?: number): string {
+  const decimalVal = decimals === undefined ? 4 : decimals
+  return value ? parseFloat(value).toFixed(decimalVal) : "0";
 }
 
 
