@@ -4,7 +4,7 @@ import { getEnvVariable } from "../env";
 import type { AppConfig, CosmosChains, EvmChains } from "../index";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
-  undefined,
+  undefined
 );
 
 type ConfigContextProps = {
@@ -22,6 +22,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const bridgeURL = getEnvVariable("NEXT_PUBLIC_BRIDGE_URL");
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
+  const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
 
   let feedbackFormURL: string | null;
   try {
@@ -63,6 +64,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         bridgeURL,
         swapURL,
         poolURL,
+        earnAPIURL,
         feedbackFormURL,
         networksList,
       }}
