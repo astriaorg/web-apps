@@ -1,6 +1,5 @@
 import {
   CosmosChains,
-  EvmChainInfo,
   EvmChains,
   FlameNetwork,
 } from "@repo/flame-types";
