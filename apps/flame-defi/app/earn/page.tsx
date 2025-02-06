@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowDownIcon } from "@repo/ui/icons";
 import {
   Pagination,
   PaginationContent,
@@ -13,6 +14,8 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
@@ -28,6 +31,7 @@ import {
 
 export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const { data, isPending } = useFetchVaults({
     variables: {
@@ -62,6 +66,7 @@ export default function EarnPage(): React.ReactElement {
             </div>
           );
         },
+        enableSorting: false,
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.totalAssets", {
@@ -92,6 +97,7 @@ export default function EarnPage(): React.ReactElement {
             </div>
           );
         },
+        enableSorting: true,
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.apy", {
@@ -106,6 +112,12 @@ export default function EarnPage(): React.ReactElement {
               />
             </div>
           );
+        },
+        enableSorting: true,
+        sortingFn: (a, b) => {
+          return new Big(a.original.state?.apy ?? 0)
+            .sub(b.original.state?.apy ?? 0)
+            .toNumber();
         },
         footer: (info) => info.column.id,
       }),
@@ -124,6 +136,11 @@ export default function EarnPage(): React.ReactElement {
     columns,
     data: formattedData,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   return (
@@ -134,13 +151,26 @@ export default function EarnPage(): React.ReactElement {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="h-16 pl-5 text-left">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                  <th
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                    className="h-16 px-5 text-left"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div>
+                        {flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
                         )}
+                      </div>
+                      {header.column.getCanSort() && (
+                        <ArrowDownIcon
+                          aria-label="Sort"
+                          className={`text-grey-light`}
+                          size={16}
+                        />
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>
@@ -152,7 +182,7 @@ export default function EarnPage(): React.ReactElement {
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="h-12 pl-5 last:pr-5 border-t border-grey-dark "
+                    className="h-12 px-5 border-t border-grey-dark"
                   >
                     <Skeleton isLoading={isPending}>
                       {flexRender(

@@ -1,9 +1,6 @@
-import type { IconProps } from "@repo/flame-types";
+import type { IconProps } from "../types";
 
-/**
- * @deprecated Use `ArrowDownIcon` instead.
- */
-export const DownArrowIcon: React.FC<IconProps> = ({
+export const ArrowDownIcon: React.FC<IconProps> = ({
   className = "",
   size = 24,
 }: IconProps) => {
