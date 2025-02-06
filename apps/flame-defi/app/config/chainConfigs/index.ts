@@ -101,18 +101,3 @@ export function getAllChainConfigs(): ChainConfigsObject {
     cosmosChains,
   };
 }
-
-/**
- * Gets EVM chain configuration by chain ID.
- */
-export function getEvmChainByChainId(chainId: number): EvmChainInfo {
-  const allChainConfigs = getAllChainConfigs();
-  const found = Object.values(allChainConfigs.evmChains).find(
-    (chainConfig) => chainConfig.chainId === chainId,
-  );
-
-  if (!found) {
-    throw new Error(`Chain with chainId ${chainId} not found`);
-  }
-  return found;
-}
