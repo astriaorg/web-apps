@@ -1,8 +1,4 @@
-import {
-  CosmosChains,
-  EvmChains,
-  FlameNetwork,
-} from "@repo/flame-types";
+import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 export interface FlameNetworkConfig {
   name: FlameNetwork;
