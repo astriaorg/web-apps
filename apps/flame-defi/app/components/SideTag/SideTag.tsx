@@ -1,6 +1,6 @@
 "use client";
 
-import { useConfig } from "../../config";
+import { useConfig } from "config";
 import { UpRightSquareIcon } from "@repo/ui/icons";
 
 interface SideTagProps {
