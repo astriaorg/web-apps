@@ -3,6 +3,7 @@ import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/ui/types";
 import useUsdQuote from "swap/useUsdQuote";
 import { formatDecimalValues, isDustAmount } from "utils/utils";
 import { isTiaWtiaSwapPair } from "swap/page";
+import { Skeleton } from "@repo/ui/shadcn-primitives";
 
 interface SwapInputProps {
   inputToken: TokenState;
@@ -36,9 +37,7 @@ export function SwapInput({
   const isTiaWtia = isTiaWtiaSwapPair(inputToken, oppositeToken);
 
   const handleUsdValue = () => {
-      if(usdQuote?.loading || txnQuoteLoading){
-      return "loading..."
-    } else if(inputToken.token?.coinDenom === "USDC" && inputToken.value !== ""){
+      if(inputToken.token?.coinDenom === "USDC" && inputToken.value !== ""){
       return `$${formatDecimalValues(inputToken.value, 2)}`
     } else if(usdQuote?.quote){
       return `$${formatDecimalValues(usdQuote?.quote?.quoteDecimals, 2)}`
@@ -53,7 +52,7 @@ export function SwapInput({
     >
       <div className="text-base font-medium text-grey-light">{label}</div>
       <div className="flex justify-between items-center">
-        {txnQuoteLoading && inputToken.isQuoteValue && !isTiaWtia ? <div className="w-[45%] sm:max-w-[62%] h-[20px] mt-3">Loading...</div> : 
+        <Skeleton isLoading={txnQuoteLoading && inputToken.isQuoteValue} className="rounded w-[45%] sm:max-w-[62%] h-[40px] mt-3"> 
         <input
           type="number"
           value={inputToken.value}
@@ -62,7 +61,8 @@ export function SwapInput({
           }}
           className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden"
           placeholder="0"
-        />}
+        />
+        </Skeleton>
         <div className="flex flex-col items-end">
           <TokenSelector
             tokens={availableTokens}
@@ -90,7 +90,9 @@ export function SwapInput({
         </div>
       </div>
       <div>
+        <Skeleton isLoading={usdQuote?.loading || txnQuoteLoading} className="rounded w-[70px]"> 
         <span className="text-sm font-medium text-grey-light">{handleUsdValue()}</span>
+        </Skeleton>
       </div>
     </div>
   );

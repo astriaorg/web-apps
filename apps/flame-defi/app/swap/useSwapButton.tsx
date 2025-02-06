@@ -117,8 +117,8 @@ export function useSwapButton({
 
       const options = {
         recipient: userAccount.address,
-        slippageTolerance: 10, // 0.5%
-        deadline: Math.floor(Date.now() / 1000) + 1800, // 30 minutes from now
+        slippageTolerance: 10, // 0.10%
+        deadline: Math.floor(Date.now() / 1000) + 1800,
       };
       const tx = await router.executeSwap(trade, options, walletClient, publicClient) as `0x${string}`;
       setTxnHash(tx);

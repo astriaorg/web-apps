@@ -46,7 +46,7 @@ export default function SwapPage(): React.ReactElement {
   const isTiaWtia = isTiaWtiaSwapPair(inputOne, inputTwo);
   const [flipTokens, setFlipTokens] = useState(false);
   const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
-  const { quote, loading, error, getQuote } = useGetQuote();
+  const { quote, loading, error, getQuote, setQuote } = useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
   const tokenOneBalance =
@@ -84,12 +84,11 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleResetInputs = useCallback(() => {
-    // TODO: ensure that the inputs get rest after a successful txn
     setInputOne({ token: currencies?.[0], value: "", isQuoteValue: false });
     setInputTwo({ token: null, value: "", isQuoteValue: true });
+    setQuote(null);
     setFlipTokens(false);
-    setQuoteType(QUOTE_TYPE.EXACT_IN);
-  }, [currencies]);
+  }, [currencies, setQuote]);
 
   const handleInputChange = useCallback(
     (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
@@ -129,6 +128,7 @@ export default function SwapPage(): React.ReactElement {
   );
 
   useEffect(() => {
+    console.log("SET QUOTE TWO", tokenTwo, tokenOne);
     if (
       tokenOne.token &&
       tokenTwo.token &&
@@ -249,7 +249,6 @@ export default function SwapPage(): React.ReactElement {
             />
           </ConfirmationModal>
         )}
-
         {onSubmitCallback && !userAccount.address && (
           <ActionButton
             callback={onSubmitCallback}
@@ -257,7 +256,6 @@ export default function SwapPage(): React.ReactElement {
             className="w-full mt-2"
           />
         )}
-
         {inputOne.token && inputTwo.token && !isTiaWtia && validSwapInputs && (
           <TxnInfo swapPairs={swapPairs} />
         )}

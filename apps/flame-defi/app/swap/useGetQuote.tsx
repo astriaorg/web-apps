@@ -89,5 +89,5 @@ export function useGetQuote() {
     [chainId]
   );
 
-  return { quote, loading, error, getQuote };
+  return { quote, loading, error, getQuote, setQuote };
 }
