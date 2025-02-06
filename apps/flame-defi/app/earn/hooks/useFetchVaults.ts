@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import Big from "big.js";
 import { useConfig } from "config/hooks/useConfig";
 import { graphql } from "earn/gql";
 import { VaultsQuery } from "earn/gql/graphql";
@@ -45,7 +44,7 @@ export const PLACEHOLDER_DATA: VaultsQuery = {
 
 const query = graphql(`
   query Vaults {
-    vaults {
+    vaults(where: { totalAssets_gte: 1 }) {
       items {
         address
         symbol
@@ -85,14 +84,7 @@ export const useFetchVaults = () => {
   return useQuery({
     queryKey: ["data"],
     queryFn: async () => {
-      // TODO: Pagination.
-      const result = await request(earnAPIURL, query);
-
-      result.vaults.items = result.vaults?.items?.filter((it) => {
-        return new Big(it.state?.totalAssets ?? 0).gt(0);
-      });
-
-      return result;
+      return request(earnAPIURL, query);
     },
   });
 };
