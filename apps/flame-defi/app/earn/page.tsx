@@ -3,11 +3,10 @@
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  renderPaginationItems,
   Skeleton,
 } from "@repo/ui/shadcn-primitives";
 import {
@@ -18,7 +17,7 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
 import { Vault } from "./gql/graphql";
 import {
@@ -40,78 +39,6 @@ export default function EarnPage(): React.ReactElement {
   const totalPages = Math.ceil(
     (data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE,
   );
-
-  const renderPaginationItems = useCallback(() => {
-    const paginationItems = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        paginationItems.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              href="#"
-              isActive={currentPage === i}
-              onClick={() => setCurrentPage(i)}
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
-    } else {
-      paginationItems.push(
-        <PaginationItem key={1}>
-          <PaginationLink
-            href="#"
-            isActive={currentPage === 1}
-            onClick={() => setCurrentPage(1)}
-          >
-            1
-          </PaginationLink>
-        </PaginationItem>,
-      );
-
-      if (currentPage > 3) {
-        paginationItems.push(<PaginationEllipsis key="start-ellipsis" />);
-      }
-
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = startPage; i <= endPage; i++) {
-        paginationItems.push(
-          <PaginationItem key={i}>
-            <PaginationLink
-              href="#"
-              isActive={currentPage === i}
-              onClick={() => setCurrentPage(i)}
-            >
-              {i}
-            </PaginationLink>
-          </PaginationItem>,
-        );
-      }
-
-      if (currentPage < totalPages - 2) {
-        paginationItems.push(<PaginationEllipsis key="end-ellipsis" />);
-      }
-
-      paginationItems.push(
-        <PaginationItem key={totalPages}>
-          <PaginationLink
-            href="#"
-            isActive={currentPage === totalPages}
-            onClick={() => setCurrentPage(totalPages)}
-          >
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>,
-      );
-    }
-
-    return paginationItems;
-  }, [currentPage, setCurrentPage, totalPages]);
 
   const columnHelper = createColumnHelper<Vault>();
 
@@ -182,6 +109,7 @@ export default function EarnPage(): React.ReactElement {
         },
         footer: (info) => info.column.id,
       }),
+      /*
       columnHelper.accessor("metadata.curators", {
         header: "Curator",
         cell: ({ row }) => {
@@ -213,6 +141,7 @@ export default function EarnPage(): React.ReactElement {
         },
         footer: (info) => info.column.id,
       }),
+      */
     ];
   }, [columnHelper]);
 
@@ -283,7 +212,11 @@ export default function EarnPage(): React.ReactElement {
                   isDisabled={currentPage === 1}
                 />
               </PaginationItem>
-              {renderPaginationItems()}
+              {renderPaginationItems({
+                totalPages,
+                currentPage,
+                setCurrentPage,
+              })}
               <PaginationItem>
                 <PaginationNext
                   href="#"

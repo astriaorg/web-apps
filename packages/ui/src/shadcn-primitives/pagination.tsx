@@ -109,6 +109,86 @@ const PaginationEllipsis = ({
 );
 PaginationEllipsis.displayName = "PaginationEllipsis";
 
+const renderPaginationItems = ({
+  totalPages,
+  currentPage,
+  setCurrentPage,
+}: {
+  totalPages: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+}) => {
+  const paginationItems = [];
+  const maxVisiblePages = 5;
+
+  if (totalPages <= maxVisiblePages) {
+    for (let i = 1; i <= totalPages; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            isActive={currentPage === i}
+            onClick={() => setCurrentPage(i)}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>,
+      );
+    }
+  } else {
+    paginationItems.push(
+      <PaginationItem key={1}>
+        <PaginationLink
+          href="#"
+          isActive={currentPage === 1}
+          onClick={() => setCurrentPage(1)}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>,
+    );
+
+    if (currentPage > 3) {
+      paginationItems.push(<PaginationEllipsis key="start-ellipsis" />);
+    }
+
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            isActive={currentPage === i}
+            onClick={() => setCurrentPage(i)}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>,
+      );
+    }
+
+    if (currentPage < totalPages - 2) {
+      paginationItems.push(<PaginationEllipsis key="end-ellipsis" />);
+    }
+
+    paginationItems.push(
+      <PaginationItem key={totalPages}>
+        <PaginationLink
+          href="#"
+          isActive={currentPage === totalPages}
+          onClick={() => setCurrentPage(totalPages)}
+        >
+          {totalPages}
+        </PaginationLink>
+      </PaginationItem>,
+    );
+  }
+
+  return paginationItems;
+};
+
 export {
   Pagination,
   PaginationContent,
@@ -117,4 +197,5 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  renderPaginationItems,
 };
