@@ -109,39 +109,6 @@ export default function EarnPage(): React.ReactElement {
         },
         footer: (info) => info.column.id,
       }),
-      /*
-      columnHelper.accessor("metadata.curators", {
-        header: "Curator",
-        cell: ({ row }) => {
-          return (
-            <div className="flex items-center space-x-2">
-              {row.original.metadata?.curators.map((it) => {
-                if (!it.image) {
-                  return null;
-                }
-
-                return (
-                  <div
-                    key={`${row.id}_${row.original.address}_${it.name}`}
-                    className="flex items-center space-x-2"
-                  >
-                    <Image
-                      src={it.image}
-                      alt={it.name}
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                    <span>{it.name}</span>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        },
-        footer: (info) => info.column.id,
-      }),
-      */
     ];
   }, [columnHelper]);
 
