@@ -126,10 +126,9 @@ export function useSwapButton({
       const options = {
         recipient: userAccount.address,
         slippageTolerance: 50, // 0.5%
-        deadline: Math.floor(Date.now() / 1000) + 1800, // 30 minutes from now
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
       };
 
-      // Execute the swap using the walletClient instead of an ethers wallet
       const tx = await router.executeSwap(
         trade,
         options,
