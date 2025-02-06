@@ -50,7 +50,7 @@ export default function EarnPage(): React.ReactElement {
                 <FormattedNumber
                   value={
                     +new Big(row.original.state?.totalAssets ?? 0)
-                      .div(row.original.asset.decimals)
+                      .div(10 ** row.original.asset.decimals)
                       .toFixed(2)
                   }
                 />
