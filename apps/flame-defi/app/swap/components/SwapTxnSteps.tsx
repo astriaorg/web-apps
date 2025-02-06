@@ -24,7 +24,6 @@ interface TxnDetailsProps extends TxnStepsProps {
 interface SwapTxnStepsProps {
   swapPairs: TxnInfoProps[];
   txnStatus: TXN_STATUS | undefined;
-  setTxnStatus: (txnStatus?: TXN_STATUS) => void;
   isTiaWtia: boolean;
 }
 
@@ -242,7 +241,6 @@ function TxnFailed(props: TxnStepsProps) {
 export function SwapTxnSteps({
   swapPairs,
   txnStatus,
-  setTxnStatus,
   isTiaWtia,
 }: SwapTxnStepsProps) {
   const inputOne = swapPairs[0]?.inputToken;
@@ -251,11 +249,9 @@ export function SwapTxnSteps({
     swapPairs,
   });
 
-  console.log({expectedOutputFormatted})
-
   return (
     <div className="h-[320px]">
-      {txnStatus === TXN_STATUS.IDLE && (
+      {txnStatus === TXN_STATUS.IDLE && !isTiaWtia && (
         <TxnDetails
           inputOne={inputOne}
           inputTwo={inputTwo}

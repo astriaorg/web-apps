@@ -1,19 +1,19 @@
 import { TokenState } from "@repo/ui/types";
-import { useConfig } from "config";
+import { useEvmChainData } from "config";
 import { useGetQuote } from "./useGetQuote";
 import { useEffect } from "react";
-function useUsdQuote(token?: TokenState, quoteInput?: TokenState, isSelected?: boolean) {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const usdcToken = evmChainsData[0]?.currencies.find(currency => currency.coinDenom === "USDC");
+import { QUOTE_TYPE } from "../constants";
+
+function useUsdQuote(inputToken?: TokenState) {
+  const { currencies } = useEvmChainData();
+  const usdcToken = currencies?.find(currency => currency.coinDenom === "USDC");
   const { quote, loading, error, getQuote } = useGetQuote();
-  const tokenValue = isSelected ? token?.value : quoteInput?.value;
   
   useEffect(() => {
-    if (token && tokenValue) {
-      getQuote("exactIn", {token: token.token, value: tokenValue || "" }, {token: usdcToken, value: ""});
+    if (inputToken && inputToken.value) {
+      getQuote(QUOTE_TYPE.EXACT_IN, {token: inputToken.token, value: inputToken.value }, {token: usdcToken, value: ""});
     }
-  }, [token, getQuote, usdcToken, tokenValue]);
+  }, [inputToken, getQuote, usdcToken]);
 
   return {quote, loading, error}
 }

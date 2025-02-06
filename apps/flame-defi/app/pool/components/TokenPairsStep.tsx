@@ -5,7 +5,7 @@ import { feeData } from "../../constants";
 import { useState } from "react";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
 import { FeeData, TokenPair } from "./NewPoolPosition";
-import { useConfig } from "config";
+import { useConfig, useEvmChainData } from "config";
 import React from "react";
 
 export interface TokenPairsStepProps {
@@ -49,9 +49,7 @@ export default function TokenPairsStep({
   selectedFeeTier,
   setSelectedFeeTier,
 }: TokenPairsStepProps): React.ReactElement {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const currencies = evmChainsData[0]?.currencies;
+  const { currencies } = useEvmChainData();
 
   const [showMore, setShowMore] = useState(false);
   const { tokenOne, tokenTwo } = tokenPair;

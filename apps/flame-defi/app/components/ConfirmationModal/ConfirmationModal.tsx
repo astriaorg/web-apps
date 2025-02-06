@@ -17,11 +17,12 @@ interface ConfirmationModalProps {
   buttonText: string;
   setTxnStatus: (txnStatus: TXN_STATUS | undefined) => void;
   txnStatus: TXN_STATUS | undefined;
-  handleResetInputs?: () => void;
+  handleResetInputs: () => void;
   children?: React.ReactNode;
   title?: string;
   actionButtonText?: string;
   isCloseModalAction?: boolean;
+  skipIdleTxnStatus?: boolean;
 }
 
 export default function ConfirmationModal({
@@ -34,6 +35,7 @@ export default function ConfirmationModal({
   title,
   actionButtonText,
   isCloseModalAction,
+  skipIdleTxnStatus,
 }: ConfirmationModalProps): React.ReactElement {
   const [open, setOpen] = useState(false);
 
@@ -45,14 +47,19 @@ export default function ConfirmationModal({
 
   const handleClose = () => {
     setOpen(false);
-    if(handleResetInputs && txnStatus === TXN_STATUS.SUCCESS) {
+    if(txnStatus === TXN_STATUS.SUCCESS) {
       handleResetInputs();
     }
   };
 
   const handleOpen = () => {
     setOpen(true);
-    setTxnStatus(TXN_STATUS.IDLE);
+    if(skipIdleTxnStatus) {
+      setTxnStatus(TXN_STATUS.PENDING);
+      onSubmitCallback();
+    } else {
+      setTxnStatus(TXN_STATUS.IDLE);
+    }
   };
 
   return (

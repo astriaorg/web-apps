@@ -13,7 +13,7 @@ import DepositAmountsStep from "./DepositAmountsStep";
 import { feeData } from "../../constants";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
-import { useConfig } from "config";
+import { useConfig, useEvmChainData } from "config";
 import React from "react";
 import { EvmCurrency } from "@repo/ui/types";
 
@@ -45,9 +45,7 @@ export default function NewPoolPosition({
   setNewPositionPage: (newPositionPage: boolean) => void;
 }): React.ReactElement {
   const userAccount = useAccount();
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const currencies = evmChainsData[0]?.currencies;
+  const { currencies } = useEvmChainData();
   const [step, setStep] = useState(0);
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeData | undefined>(
     feeData[0],

@@ -54,4 +54,16 @@ export function formatDecimalValues(value?: string, decimals?: number): string {
   return value ? parseFloat(value).toFixed(decimalVal) : "0";
 }
 
+/**
+ * Checks if an amount is dust (close to zero)
+ * @param amount - The amount to check
+ * @param threshold - The threshold for dust amounts (default is 1e-10)
+ * @returns true if the amount is dust (aka negligible) and we want to ignore it
+ */
+export function isDustAmount(amount: number | string, threshold: number = 1e-10): boolean {
+  const amountNumber = typeof amount === 'string' ? Number(amount) : amount;
+
+  return Math.abs(amountNumber) < threshold;
+}
+
 

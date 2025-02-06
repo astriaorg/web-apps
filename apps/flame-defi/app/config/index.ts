@@ -19,7 +19,7 @@ import {
 } from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
-import { useConfig } from "./hooks/useConfig";
+import { useConfig, useEvmChainData } from "./hooks/useConfig";
 
 /**
  * Represents the configuration object for the application.
@@ -66,4 +66,5 @@ export {
   getFlameChainId,
   getFlameNetworkByChainId,
   useConfig,
+  useEvmChainData,
 };

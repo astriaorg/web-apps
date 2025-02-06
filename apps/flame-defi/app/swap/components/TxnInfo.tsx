@@ -9,7 +9,7 @@ import {
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues } from "utils/utils";
-import { EvmCurrency, TokenState, GetQuoteResult } from "@repo/ui/types";
+import { TokenState, GetQuoteResult } from "@repo/ui/types";
 import useOneToOneQuote from "swap/useOneToOneQuote";
 import { TOKEN_INPUTS } from "../../constants";
 import { useTxnInfo } from "swap/useTxnInfo";
@@ -17,15 +17,6 @@ import { useTxnInfo } from "swap/useTxnInfo";
 export interface TxnInfoProps {
   id: TOKEN_INPUTS;
   inputToken: TokenState;
-  onInputChange: (value: string) => void;
-  selectedIndex: number;
-  quoteInput: TokenState;
-  availableTokens?: EvmCurrency[] | undefined;
-  oppositeToken: TokenState;
-  onTokenSelect: (token: EvmCurrency) => void;
-  onInputClick: (key: number, id: TOKEN_INPUTS) => void;
-  balance: { value: string; symbol: string } | null | undefined;
-  label: string;
   txnQuoteData: GetQuoteResult | null;
   txnQuoteLoading: boolean;
   txnQuoteError: string | null;

@@ -1,49 +1,38 @@
 import { TokenSelector } from "@repo/ui/components";
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/ui/types";
-import { TOKEN_INPUTS } from "../../constants";
 import useUsdQuote from "swap/useUsdQuote";
-import { formatDecimalValues } from "utils/utils";
+import { formatDecimalValues, isDustAmount } from "utils/utils";
 import { isTiaWtiaSwapPair } from "swap/page";
 
 interface SwapInputProps {
   inputToken: TokenState;
   oppositeToken: TokenState;
-  onInputChange: (value: string) => void;
+  onInputChange: (value: string, index: number) => void;
   availableTokens?: EvmCurrency[];
   onTokenSelect: (token: EvmCurrency) => void;
-  onInputClick: (index: number, id: TOKEN_INPUTS) => void;
-  balance?: {
-    value: string;
-    symbol: string;
-  } | null;
   label: string;
   txnQuoteData: GetQuoteResult | null;
   txnQuoteLoading: boolean;
   txnQuoteError: string | null;
-  id: TOKEN_INPUTS;
   index: number;
-  selectedIndex: number;
-  quoteInput: TokenState;
+  balance: {
+    value: string;
+    symbol: string;
+} | null | undefined;  
 }
 
 export function SwapInput({
   inputToken,
   onInputChange,
-  selectedIndex,
   availableTokens,
-  quoteInput,
   oppositeToken,
   onTokenSelect,
-  onInputClick,
-  balance,
   label,
   txnQuoteLoading,
-  id,
   index,
+  balance,
 }: SwapInputProps) {
-  const isSelected = selectedIndex === index;
-  const usdQuote = useUsdQuote(inputToken, quoteInput, isSelected)
-
+  const usdQuote = useUsdQuote(inputToken)
   const isTiaWtia = isTiaWtiaSwapPair(inputToken, oppositeToken);
 
   const handleUsdValue = () => {
@@ -64,13 +53,12 @@ export function SwapInput({
     >
       <div className="text-base font-medium text-grey-light">{label}</div>
       <div className="flex justify-between items-center">
-        {txnQuoteLoading && !isSelected && !isTiaWtia ? <div className="w-[45%] sm:max-w-[62%] h-[20px] mt-3">Loading...</div> : 
+        {txnQuoteLoading && inputToken.isQuoteValue && !isTiaWtia ? <div className="w-[45%] sm:max-w-[62%] h-[20px] mt-3">Loading...</div> : 
         <input
           type="number"
-          value={isSelected || isTiaWtia ? inputToken.value : quoteInput.value}
+          value={inputToken.value}
           onChange={(e) => {
-            onInputChange(e.target.value);
-            onInputClick(index, id)
+            onInputChange(e.target.value, index);
           }}
           className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden"
           placeholder="0"
@@ -82,15 +70,14 @@ export function SwapInput({
             unavailableToken={oppositeToken?.token}
             setSelectedToken={onTokenSelect}
           />
-          {inputToken.token && parseFloat(balance?.value || "0") > 0 ? (
+          {inputToken.token && balance?.value && !isDustAmount(balance.value) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
               <span className="flex items-center gap-2">
                 {formatDecimalValues(balance?.value)} {balance?.symbol}
               </span>
-              {balance?.value && parseFloat(balance?.value) > 0 && <span
+              {<span
                 onClick={() => {
-                  onInputChange(balance?.value || "0");
-                  onInputClick(index, id)
+                  onInputChange(balance?.value || "0", index);
                 }}
                 className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
               >

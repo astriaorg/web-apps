@@ -20,7 +20,7 @@ export type EvmCurrency = {
 export interface TokenState {
   token?: EvmCurrency | null;
   value: string;
-  selectedInput?: boolean;
+  isQuoteValue?: boolean;
 }
 
 export interface EvmChainInfo {

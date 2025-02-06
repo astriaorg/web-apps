@@ -2,20 +2,18 @@ import { useState, useCallback } from "react";
 import { GetQuoteResult, TokenState } from "@repo/ui/types";
 import { QUOTE_TYPE } from "../constants";
 import { parseUnits } from "viem";
-import { useConfig } from "config";
+import { useEvmChainData } from "config";
 import { isTiaWtiaSwapPair } from "./page";
 
 export function useGetQuote() {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const chainId = evmChainsData[0]?.chainId || 0;
+  const { chainId } = useEvmChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const getQuote = useCallback(
     async (
-      type: string,
+      type: QUOTE_TYPE,
       tokenOne: TokenState,
       tokenTwo: TokenState
     ) => {
@@ -23,9 +21,8 @@ export function useGetQuote() {
       if (isTiaWtia) {
         return;
       }
-      const token = type === QUOTE_TYPE.EXACT_IN ? tokenOne : tokenTwo;
-      const amount = token?.value
-        ? parseUnits(token.value, token?.token?.coinDecimals || 18).toString()
+      const amount = tokenOne?.value
+        ? parseUnits(tokenOne.value, tokenOne?.token?.coinDecimals || 18).toString()
         : "";
 
       const tokenInAddress =
@@ -48,6 +45,7 @@ export function useGetQuote() {
         tokenOutDecimals !== undefined &&
         tokenOutSymbol &&
         amount &&
+        parseFloat(amount) > 0 &&
         type
       ) {
         try {

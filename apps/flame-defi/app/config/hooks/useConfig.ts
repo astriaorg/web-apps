@@ -14,3 +14,12 @@ export const useConfig = () => {
   }
   return context;
 };
+
+export const useEvmChainData = () => {
+  const { evmChains } = useConfig();
+  const evmChainsData = Object.values(evmChains);
+  const chainId = evmChainsData[0]?.chainId || 0;
+  const currencies = evmChainsData[0]?.currencies;
+
+  return { chainId, currencies, evmChainsData: evmChainsData[0] };
+};

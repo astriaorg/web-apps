@@ -5,18 +5,17 @@ import { DownArrowIcon } from "@repo/ui/icons";
 import { ActionButton, SettingsPopover } from "@repo/ui/components";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { QUOTE_TYPE, TOKEN_INPUTS } from "../constants";
-import { TokenState, EvmCurrency, GetQuoteResult } from "@repo/ui/types";
-import { useConfig } from "config";
+import { QUOTE_TYPE, TOKEN_INPUTS, TXN_STATUS } from "../constants";
+import { TokenState, EvmCurrency } from "@repo/ui/types";
+import { useEvmChainData } from "config";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
 import { useSwapButton } from "./useSwapButton";
-import { getQuote } from "./getQuote";
 import { SwapInput } from "./components/SwapInput";
 import { TxnInfo } from "./components/TxnInfo";
-import { useTxnInfo } from "./useTxnInfo";
 import ConfirmationModal from "components/ConfirmationModal/ConfirmationModal";
 import { SwapTxnSteps } from "./components/SwapTxnSteps";
 import { useGetQuote } from "./useGetQuote";
+import { isDustAmount } from "utils/utils";
 
 export const isTiaWtiaSwapPair = (
   inputOne: TokenState,
@@ -32,35 +31,26 @@ export const isTiaWtiaSwapPair = (
 };
 
 export default function SwapPage(): React.ReactElement {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const currencies = evmChainsData[0]?.currencies;
+  const { currencies, evmChainsData } = useEvmChainData();
   const userAccount = useAccount();
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
     value: "",
-    selectedInput: true,
+    isQuoteValue: false,
   });
   const [inputTwo, setInputTwo] = useState<TokenState>({
     token: null,
     value: "",
-    selectedInput: false,
-  });
-  const [quoteInput, setQuoteInput] = useState<TokenState>({
-    token: null,
-    value: "",
+    isQuoteValue: true,
   });
   const isTiaWtia = isTiaWtiaSwapPair(inputOne, inputTwo);
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [flipTokens, setFlipTokens] = useState(false);
   const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
   const { quote, loading, error, getQuote } = useGetQuote();
-
-  // FACTORS:
-  // QUOTE TYPE = EXACT_IN or EXACT_OUT
-  // FLIP TOKENS = TRUE or FALSE
-  // SELECTED INDEX = 0 or 1
-  // SELECTED INPUT = TRUE or FALSE
+  const tokenOne = !flipTokens ? inputOne : inputTwo;
+  const tokenTwo = !flipTokens ? inputTwo : inputOne;
+  const tokenOneBalance =
+    useTokenBalance(tokenOne.token, evmChainsData).balance?.value || "0";
 
   const {
     onSubmitCallback,
@@ -71,95 +61,113 @@ export default function SwapPage(): React.ReactElement {
     setTxnStatus,
     isCloseModalAction,
   } = useSwapButton({
-    inputOne,
-    inputTwo,
-    tokenOneBalance:
-      useTokenBalance(
-        flipTokens ? inputTwo.token : inputOne.token,
-        evmChainsData[0]
-      ).balance?.value || "0",
-    evmChainsData,
+    tokenOne,
+    tokenTwo,
+    tokenOneBalance: tokenOneBalance,
     quote,
     loading,
     error,
     quoteType,
   });
 
-  useEffect(() => {
-    const tokenOne = !flipTokens ? inputOne : inputTwo;
-    const tokenTwo = !flipTokens ? inputTwo : inputOne;
-    if (tokenOne.value || tokenTwo.value) {
-      getQuote(quoteType, tokenOne, tokenTwo);
-    }
-  }, [inputOne, inputTwo, getQuote, quoteType, flipTokens]);
-
-  const handleSelectedInput = (index: number, id: TOKEN_INPUTS) => {
-    setSelectedIndex(index);
+  const handleQuoteType = useCallback((index: number) => {
     if (index === 0) {
       setQuoteType(QUOTE_TYPE.EXACT_IN);
     } else if (index === 1) {
       setQuoteType(QUOTE_TYPE.EXACT_OUT);
     }
-    if (id === TOKEN_INPUTS.TOKEN_ONE) {
-      setInputOne((prev) => ({ ...prev, selectedInput: true }));
-      setInputTwo((prev) => ({ ...prev, selectedInput: false }));
-    } else if (id === TOKEN_INPUTS.TOKEN_TWO) {
-      setInputOne((prev) => ({ ...prev, selectedInput: false }));
-      setInputTwo((prev) => ({ ...prev, selectedInput: true }));
-    }
-  };
+  }, []);
 
   const handleTiaWtia = (value: string) => {
     setInputOne((prev) => ({ ...prev, value: value }));
     setInputTwo((prev) => ({ ...prev, value: value }));
-    setQuoteInput((prev) => ({ ...prev, value: value }));
   };
 
-  const handleResetInputs = () => {
-    setInputOne((prev) => ({ ...prev, value: "" }));
-    setInputTwo((prev) => ({ ...prev, value: "" }));
-    setQuoteInput((prev) => ({ ...prev, value: "" }));
-  };
+  const handleResetInputs = useCallback(() => {
+    // TODO: ensure that the inputs get rest after a successful txn
+    setInputOne({ token: currencies?.[0], value: "", isQuoteValue: false });
+    setInputTwo({ token: null, value: "", isQuoteValue: true });
+    setFlipTokens(false);
+    setQuoteType(QUOTE_TYPE.EXACT_IN);
+  }, [currencies]);
 
   const handleInputChange = useCallback(
-    (
-      value: string,
-      setInput: React.Dispatch<React.SetStateAction<TokenState>>
-    ) => {
-      setInput((prev) => ({ ...prev, value: value }));
+    (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
+      if (isTiaWtia) {
+        handleTiaWtia(value);
+        return;
+      }
+
+      handleQuoteType(index);
+      const quoteType =
+        index === 0 ? QUOTE_TYPE.EXACT_IN : QUOTE_TYPE.EXACT_OUT;
+
+      if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
+        setInputOne((prev) => ({ ...prev, value: value, isQuoteValue: false }));
+        setInputTwo((prev) => ({ ...prev, value: "", isQuoteValue: true }));
+      } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
+        setInputTwo((prev) => ({ ...prev, value: value, isQuoteValue: false }));
+        setInputOne((prev) => ({ ...prev, value: "", isQuoteValue: true }));
+      }
+
+      if (tokenOne.value && tokenTwo.value) {
+        getQuote(quoteType, { token: tokenOne.token, value: value }, tokenTwo);
+      }
+
       if (value === "" || value === "0") {
-        setQuoteInput((prev) => ({ ...prev, value: "" }));
+        handleResetInputs();
       }
     },
-    []
+    [
+      tokenOne,
+      tokenTwo,
+      getQuote,
+      handleResetInputs,
+      handleQuoteType,
+      isTiaWtia,
+    ]
   );
 
   useEffect(() => {
-    const value = inputOne.value || inputTwo.value;
-    if (isTiaWtia) {
-      handleTiaWtia(value);
+    if (
+      tokenOne.token &&
+      tokenTwo.token &&
+      !tokenTwo.value &&
+      tokenTwo.isQuoteValue
+    ) {
+      getQuote(quoteType, tokenOne, tokenTwo);
     }
-  }, [isTiaWtia, inputOne.value, inputTwo.value]);
+    if (
+      tokenOne.token &&
+      tokenTwo.token &&
+      !tokenOne.value &&
+      tokenOne.isQuoteValue
+    ) {
+      getQuote(quoteType, tokenOne, tokenTwo);
+    }
+  }, [quoteType, tokenOne, tokenTwo, getQuote]);
+
 
   useEffect(() => {
-    if (quote?.quoteDecimals) {
-      setQuoteInput((prev) => ({ ...prev, value: quote.quoteDecimals }));
+    if (quote?.quoteDecimals && inputOne.isQuoteValue) {
+      setInputOne((prev) => ({ ...prev, value: quote.quoteDecimals }));
+    } else if (quote?.quoteDecimals && inputTwo.isQuoteValue) {
+      setInputTwo((prev) => ({ ...prev, value: quote.quoteDecimals }));
     }
-  }, [quote]);
+  }, [quote, inputOne.isQuoteValue, inputTwo.isQuoteValue]);
+
 
   const swapInputs = [
     {
       id: TOKEN_INPUTS.TOKEN_ONE,
       inputToken: inputOne,
-      onInputChange: (value: string) => handleInputChange(value, setInputOne),
-      selectedIndex,
-      quoteInput,
+      onInputChange: (value: string, index: number) =>
+        handleInputChange(value, TOKEN_INPUTS.TOKEN_ONE, index),
       availableTokens: currencies,
       oppositeToken: inputTwo,
-      onTokenSelect: (token: EvmCurrency) => setInputOne({ value: "", token }),
-      onInputClick: (key: number, id: TOKEN_INPUTS) =>
-        handleSelectedInput(key, id),
-      balance: useTokenBalance(inputOne.token, evmChainsData[0]).balance,
+      balance: useTokenBalance(inputOne.token, evmChainsData).balance,
+      onTokenSelect: (token: EvmCurrency) =>
+        setInputOne((prev) => ({ ...prev, value: "", token })),
       label: flipTokens ? "Buy" : "Sell",
       txnQuoteData: quote,
       txnQuoteLoading: loading,
@@ -168,15 +176,13 @@ export default function SwapPage(): React.ReactElement {
     {
       id: TOKEN_INPUTS.TOKEN_TWO,
       inputToken: inputTwo,
-      onInputChange: (value: string) => handleInputChange(value, setInputTwo),
-      selectedIndex,
-      quoteInput,
+      onInputChange: (value: string, index: number) =>
+        handleInputChange(value, TOKEN_INPUTS.TOKEN_TWO, index),
       availableTokens: currencies,
       oppositeToken: inputOne,
-      onTokenSelect: (token: EvmCurrency) => setInputTwo({ value: "", token }),
-      onInputClick: (key: number, id: TOKEN_INPUTS) =>
-        handleSelectedInput(key, id),
-      balance: useTokenBalance(inputTwo.token, evmChainsData[0]).balance,
+      balance: useTokenBalance(inputTwo.token, evmChainsData).balance,
+      onTokenSelect: (token: EvmCurrency) =>
+        setInputTwo((prev) => ({ ...prev, value: "", token })),
       label: flipTokens ? "Sell" : "Buy",
       txnQuoteData: quote,
       txnQuoteLoading: loading,
@@ -186,14 +192,12 @@ export default function SwapPage(): React.ReactElement {
 
   const handleArrowClick = () => {
     setFlipTokens((prev) => !prev);
-    setInputOne((prev) => ({
-      ...prev,
-      value: prev.value === "" ? quote?.quoteDecimals || "" : prev.value,
-    }));
-    setInputTwo((prev) => ({
-      ...prev,
-      value: prev.value === "" ? quote?.quoteDecimals || "" : prev.value,
-    }));
+    setInputOne((prev) => ({ ...prev, isQuoteValue: !prev.isQuoteValue }));
+    setInputTwo((prev) => ({ ...prev, isQuoteValue: !prev.isQuoteValue }));
+
+    const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
+    const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
+    getQuote(QUOTE_TYPE.EXACT_IN, preFlipTokenOne, preFlipTokenTwo);
   };
 
   const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;
@@ -235,12 +239,16 @@ export default function SwapPage(): React.ReactElement {
             setTxnStatus={setTxnStatus}
             isCloseModalAction={isCloseModalAction}
             handleResetInputs={handleResetInputs}
+            skipIdleTxnStatus={isTiaWtia}
             title="Confirm Swap"
           >
-            <SwapTxnSteps txnStatus={txnStatus} setTxnStatus={setTxnStatus} swapPairs={swapPairs} isTiaWtia={isTiaWtia}/> 
+            <SwapTxnSteps
+              txnStatus={txnStatus}
+              swapPairs={swapPairs}
+              isTiaWtia={isTiaWtia}
+            />
           </ConfirmationModal>
         )}
-
 
         {onSubmitCallback && !userAccount.address && (
           <ActionButton
