@@ -21,6 +21,7 @@
     "@creativebulma/bulma-tooltip": "^1.2.0",
     "@metamask/jazzicon": "^2.0.0",
     "@rainbow-me/rainbowkit": "^2.2.2",
+    "@repo/flame-types": "*",
     "@repo/ui": "*",
     "@tanstack/react-query": "^5.61.0",
     "chain-registry": "^1.69.45",

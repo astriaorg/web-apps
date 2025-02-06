@@ -1,4 +1,4 @@
-import { EvmCurrency, EvmChainInfo } from "@repo/ui/types";
+import { EvmCurrency, EvmChainInfo } from "@repo/flame-types";
 import { createWithdrawerService } from "features/EvmWallet";
 import type { AstriaErc20WithdrawerService } from "features/EvmWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { useBalancePolling } from "features/GetBalancePolling";

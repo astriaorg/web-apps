@@ -1,11 +1,4 @@
-import type { CosmosChains, EvmChainInfo, EvmChains } from "./types";
-
-export enum FlameNetwork {
-  LOCAL = "local",
-  DUSK = "dusk",
-  DAWN = "dawn",
-  MAINNET = "mainnet",
-}
+import { CosmosChains, EvmChainInfo, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 export interface FlameNetworkConfig {
   name: FlameNetwork;

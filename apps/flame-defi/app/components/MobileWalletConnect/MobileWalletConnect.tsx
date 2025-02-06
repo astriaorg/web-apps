@@ -1,3 +1,7 @@
+import { useCallback, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
+
 import {
   Accordion,
   AccordionContent,
@@ -14,13 +18,10 @@ import {
   useCosmosWallet,
 } from "features/CosmosWallet";
 import { ConnectEvmWalletButton } from "features/EvmWallet";
-import { usePathname } from "next/navigation";
-import { useAccount } from "wagmi";
-import { shortenAddress } from "../../utils/utils";
-import { useConfig } from "config/hooks/useConfig";
+import { useConfig } from "config";
 import { CheckMarkIcon, FlameIcon } from "@repo/ui/icons";
-import { useCallback, useState } from "react";
-import { FlameNetwork } from "config";
+import { FlameNetwork } from "@repo/flame-types";
+import { shortenAddress } from "../../utils/utils";
 
 const MobileNetworkSelector = () => {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =

@@ -1,5 +1,5 @@
 import { TokenSelector } from "@repo/ui/components";
-import { EvmCurrency, TokenState } from "@repo/ui/types";
+import { EvmCurrency, TokenState } from "@repo/flame-types";
 import { formatBalanceValues } from "utils/utils";
 
 interface SwapInputProps {

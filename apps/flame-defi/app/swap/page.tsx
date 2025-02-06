@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect } from "react";
-import { DownArrowIcon } from "@repo/ui/icons";
-import { ActionButton, SettingsPopover } from "@repo/ui/components";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { TOKEN_INPUTS } from "../constants";
-import { TokenState, EvmCurrency } from "@repo/ui/types";
+
+import { TokenState, EvmCurrency, EvmChainInfo } from "@repo/flame-types";
+import { ActionButton, SettingsPopover } from "@repo/ui/components";
+import { DownArrowIcon } from "@repo/ui/icons";
 import { useConfig } from "config";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
+
+import { TOKEN_INPUTS } from "../constants";
 import { useSwapButton } from "./useSwapButton";
 import useGetQuote from "./useGetQuote";
 import { SwapInput } from "./components/SwapInput";
@@ -16,7 +18,10 @@ import { SwapInput } from "./components/SwapInput";
 export default function SwapPage(): React.ReactElement {
   const { evmChains } = useConfig();
   const evmChainsData = Object.values(evmChains);
-  const currencies = evmChainsData[0]?.currencies;
+  // NOTE - this is a stop gap till we have more than one evm chain for swapping
+  const selectedChain = evmChainsData[0] as EvmChainInfo;
+
+  const currencies = selectedChain?.currencies;
   const userAccount = useAccount();
   const [argumentToken, setArgumentToken] = useState<string>(
     TOKEN_INPUTS.TOKEN_ONE,
@@ -37,7 +42,7 @@ export default function SwapPage(): React.ReactElement {
       inputTwo.token?.coinDenom === "TIA");
 
   const { quote, loading, error } = useGetQuote(
-    evmChainsData[0]?.chainId,
+    selectedChain?.chainId,
     argumentToken === TOKEN_INPUTS.TOKEN_ONE ? inputOne : inputTwo,
     argumentToken === TOKEN_INPUTS.TOKEN_ONE ? inputTwo : inputOne,
   );
@@ -48,9 +53,9 @@ export default function SwapPage(): React.ReactElement {
     tokenOneBalance:
       useTokenBalance(
         flipTokens ? inputTwo.token : inputOne.token,
-        evmChainsData[0],
+        selectedChain,
       ).balance?.value || "0",
-    evmChainsData,
+    selectedChain,
     quote,
     loading,
     error,
@@ -116,7 +121,7 @@ export default function SwapPage(): React.ReactElement {
       selectedToken: inputOne.token,
       oppositeToken: inputTwo.token,
       onTokenSelect: (token: EvmCurrency) => setInputOne({ value: "", token }),
-      balance: useTokenBalance(inputOne.token, evmChainsData[0]).balance,
+      balance: useTokenBalance(inputOne.token, selectedChain).balance,
       label: flipTokens ? "Buy" : "Sell",
     },
     {
@@ -132,7 +137,7 @@ export default function SwapPage(): React.ReactElement {
       selectedToken: inputTwo.token,
       oppositeToken: inputOne.token,
       onTokenSelect: (token: EvmCurrency) => setInputTwo({ value: "", token }),
-      balance: useTokenBalance(inputTwo.token, evmChainsData[0]).balance,
+      balance: useTokenBalance(inputTwo.token, selectedChain).balance,
       label: flipTokens ? "Sell" : "Buy",
     },
   ];

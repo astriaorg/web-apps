@@ -5,21 +5,21 @@ import {
   useWalletClient,
 } from "wagmi";
 import { getPublicClient } from "@wagmi/core";
-import { EvmChainInfo, GetQuoteResult, TokenState } from "@repo/ui/types";
+import { EvmChainInfo, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { useEvmWallet } from "features/EvmWallet";
 import { useCallback, useMemo } from "react";
 import {
   createTradeFromQuote,
   SwapRouter,
 } from "features/EvmWallet/services/SwapServices/SwapService";
-import { SWAP_ROUTER_ADDRESS, TRADE_TYPE } from "../constants";
+import { TRADE_TYPE } from "../constants";
 import { Chain } from "viem";
 
 interface SwapButtonProps {
   inputOne: TokenState;
   inputTwo: TokenState;
   tokenOneBalance: string;
-  evmChainsData: EvmChainInfo[];
+  selectedChain: EvmChainInfo;
   quote: GetQuoteResult | null;
   loading: boolean;
   error: string | null;
@@ -29,26 +29,34 @@ export function useSwapButton({
   inputOne,
   inputTwo,
   tokenOneBalance,
-  evmChainsData,
+  selectedChain,
   quote,
 }: SwapButtonProps) {
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const publicClient = getPublicClient(wagmiConfig, {
-    chainId: evmChainsData[0]?.chainId,
+    chainId: selectedChain?.chainId,
   });
   const { connectEvmWallet } = useEvmWallet();
   const { data: walletClient } = useWalletClient();
 
-  const WTIA_ADDRESS = "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
-
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wrapService = createWrapService(wagmiConfig, WTIA_ADDRESS);
-    if (!evmChainsData[0]?.chainId) return;
+    if (!selectedChain?.chainId) {
+      // TODO - handle error better?
+      console.error("Chain ID is not defined. Cannot wrap/unwrap.");
+      return;
+    }
+    const wtiaAddress = selectedChain.contracts?.wrappedCelestia?.address;
+    if (!wtiaAddress) {
+      // TODO - handle error better?
+      console.error("WTIA address is not defined. Cannot wrap/unwrap.");
+      return;
+    }
 
+    const wrapService = createWrapService(wagmiConfig, wtiaAddress);
     if (type === "wrap") {
       const tx = await wrapService.deposit(
-        evmChainsData[0]?.chainId,
+        selectedChain?.chainId,
         inputOne.value,
         inputOne.token?.coinDecimals || 18,
       );
@@ -57,7 +65,7 @@ export function useSwapButton({
       // TODO: Also add text pointing the user to complete the txn in their wallet
     } else {
       const tx = await wrapService.withdraw(
-        evmChainsData[0]?.chainId,
+        selectedChain?.chainId,
         inputOne.value,
         inputOne.token?.coinDecimals || 18,
       );
@@ -69,12 +77,13 @@ export function useSwapButton({
     if (!quote) {
       return null;
     }
+    // TODO - trade type will be different depending on which input the user inputted the number
     return createTradeFromQuote(quote, TRADE_TYPE);
   }, [quote]);
 
   const handleSwap = useCallback(async () => {
     console.log("handleSwap");
-    if (!trade || !userAccount.address || !evmChainsData[0]?.chainId) {
+    if (!trade || !userAccount.address || !selectedChain?.chainId) {
       return;
     }
 
@@ -91,22 +100,27 @@ export function useSwapButton({
 
     try {
       const chainConfig: Chain = {
-        id: evmChainsData[0]?.chainId,
-        name: evmChainsData[0]?.chainName,
+        id: selectedChain?.chainId,
+        name: selectedChain?.chainName,
         nativeCurrency: {
-          name: evmChainsData[0]?.currencies[0]?.title, // Assuming the first currency is the native one
-          symbol: evmChainsData[0]?.currencies[0]?.coinDenom, // Assuming the first currency is the native one
-          decimals: evmChainsData[0]?.currencies[0]?.coinDecimals || 18, // Assuming the first currency is the native one
+          name: selectedChain?.currencies[0]?.title, // Assuming the first currency is the native one
+          symbol: selectedChain?.currencies[0]?.coinDenom, // Assuming the first currency is the native one
+          decimals: selectedChain?.currencies[0]?.coinDecimals || 18, // Assuming the first currency is the native one
         },
         rpcUrls: {
           default: {
-            http: evmChainsData[0]?.rpcUrls, // Assuming these are the RPC URLs
+            http: selectedChain?.rpcUrls, // Assuming these are the RPC URLs
           },
         },
       };
 
-      // Create an instance of your router
-      const router = new SwapRouter(SWAP_ROUTER_ADDRESS, chainConfig);
+      const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
+      if (!swapRouterAddress) {
+        console.error("Swap router address is not defined. Cannot swap.");
+        return;
+      }
+
+      const router = new SwapRouter(swapRouterAddress, chainConfig);
 
       // Set up the swap options
       const options = {
@@ -126,7 +140,7 @@ export function useSwapButton({
     } catch (error) {
       console.error("Error executing swap:", error);
     }
-  }, [trade, userAccount, evmChainsData, walletClient, publicClient]);
+  }, [trade, userAccount, selectedChain, walletClient, publicClient]);
 
   const validSwapInputs =
     inputOne.token &&

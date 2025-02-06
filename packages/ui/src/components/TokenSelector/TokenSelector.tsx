@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+
+import { EvmCurrency } from "@repo/flame-types";
 import {
   Dialog,
   DialogContent,
@@ -8,14 +11,12 @@ import {
   DialogTrigger,
   Input,
 } from "../../shadcn-primitives";
-import { useState } from "react";
 import {
   CheckMarkIcon,
   ChevronDownIcon,
   CloseIcon,
   SearchIcon,
 } from "../../icons";
-import { EvmCurrency } from "../../types";
 
 interface TokenSelectorProps {
   tokens: EvmCurrency[] | undefined;

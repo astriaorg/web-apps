@@ -2,7 +2,7 @@
 
 import { StepProps } from "./NewPoolPosition";
 import { ActionButton } from "@repo/ui/components";
-import { TokenState } from "@repo/ui/types";
+import { TokenState } from "@repo/flame-types";
 import { useState } from "react";
 import { useDepositTxn } from "../useDepositTxn";
 

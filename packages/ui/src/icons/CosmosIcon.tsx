@@ -1,4 +1,4 @@
-import type { IconProps } from "../types";
+import type { IconProps } from "@repo/flame-types";
 
 export const CosmosIcon: React.FC<IconProps> = ({
   className = "",

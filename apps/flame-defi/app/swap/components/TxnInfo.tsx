@@ -8,7 +8,7 @@ import {
 } from "@repo/ui/shadcn-primitives";
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
-import { TokenState } from "@repo/ui/types";
+import { TokenState } from "@repo/flame-types";
 import { useState } from "react";
 import { formatBalanceValues } from "utils/utils";
 import { useConfig } from "config";

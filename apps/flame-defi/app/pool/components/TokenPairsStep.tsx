@@ -1,6 +1,6 @@
 import { ActionButton, TokenSelector } from "@repo/ui/components";
 import { Button, DialogTrigger } from "@repo/ui/shadcn-primitives";
-import { EvmCurrency } from "@repo/ui/types";
+import { EvmCurrency } from "@repo/flame-types";
 import { feeData } from "../../constants";
 import { useState } from "react";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";

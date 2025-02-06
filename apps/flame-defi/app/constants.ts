@@ -3,10 +3,6 @@ export enum TOKEN_INPUTS {
   TOKEN_TWO = "token_two",
 }
 
-export const RPC_URL = "https://rpc.flame.astria.org";
-export const SWAP_ROUTER_ADDRESS = "0x29bBaFf21695fA41e446c4f37c07C699d9f08021";
-export const RECIPIENT_ADDRESS = "0xb0E31D878F49Ec0403A25944d6B1aE1bf05D17E1";
-export const AMOUNT = "100000";
 export const TRADE_TYPE = "exactIn";
 
 export const feeData = [

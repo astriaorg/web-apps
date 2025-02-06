@@ -1,5 +1,5 @@
 import JSBI from "jsbi";
-import { GetQuoteResult } from "@repo/ui/types";
+import { GetQuoteResult } from "@repo/flame-types";
 import { Chain, PublicClient, WalletClient } from "viem";
 
 // Define a zero address constant for ETH

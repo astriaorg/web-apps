@@ -1,4 +1,4 @@
-import { GetQuoteResult, TokenState } from "@repo/ui/types";
+import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { useState, useEffect } from "react";
 import { parseUnits } from "viem";
 

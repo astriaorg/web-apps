@@ -1,4 +1,4 @@
-import { IconProps } from "../types";
+import { IconProps } from "@repo/flame-types";
 
 export const InfoIcon: React.FC<IconProps> = ({
   className = "",
