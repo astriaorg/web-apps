@@ -1,13 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { FlameIcon } from "@repo/ui/icons";
+import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
+import { useConfig } from "config";
 import Image from "next/image";
 import Link from "next/link";
-import { useConfig } from "config";
-import ConnectWalletsButton from "components/ConnectWalletsButton/ConnectWalletsButton";
-import { FlameIcon } from "@repo/ui/icons";
+import { usePathname } from "next/navigation";
 import MobileNav from "../MobileNav/MobileNav";
 import NetworkSelector from "../NetworkSelector/NetworkSelector";
+
 function Navbar() {
   const pathname = usePathname();
   const { brandURL } = useConfig();
@@ -63,6 +64,9 @@ function Navbar() {
           </Link>
           <Link href="/pool" className={navLinkClasses("/pool")}>
             POOL
+          </Link>
+          <Link href="/earn" className={navLinkClasses("/earn")}>
+            EARN
           </Link>
         </div>
       </div>

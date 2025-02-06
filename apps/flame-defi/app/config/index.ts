@@ -41,6 +41,8 @@ export interface AppConfig {
   swapURL: string;
   // The URL for the pool link in the navbar.
   poolURL: string;
+  // The base URL for the Morpho API.
+  earnAPIURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
   // List of networks to display in the network selector.
@@ -49,21 +51,21 @@ export interface AppConfig {
 
 export {
   ConfigContextProvider,
-  type EvmChainInfo,
-  type EvmChains,
-  evmCurrencyBelongsToChain,
-  getEnvVariable,
-  type CosmosChainInfo,
-  type CosmosChains,
-  type IbcCurrency,
-  type FlameNetwork,
-  ibcCurrencyBelongsToChain,
-  cosmosChainInfosToCosmosKitChains,
   cosmosChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitChains,
   cosmosChainNameFromId,
   evmChainsToRainbowKitChains,
+  evmCurrencyBelongsToChain,
   getAllChainConfigs,
+  getEnvVariable,
   getFlameChainId,
   getFlameNetworkByChainId,
+  ibcCurrencyBelongsToChain,
   useConfig,
+  type CosmosChainInfo,
+  type CosmosChains,
+  type EvmChainInfo,
+  type EvmChains,
+  type FlameNetwork,
+  type IbcCurrency,
 };
