@@ -4,7 +4,7 @@ import { getEnvVariable } from "../env";
 import type { AppConfig, CosmosChains, EvmChains } from "../index";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
-  undefined
+  undefined,
 );
 
 type ConfigContextProps = {

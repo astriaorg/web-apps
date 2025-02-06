@@ -147,7 +147,7 @@ export default function EarnPage(): React.ReactElement {
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </th>
                 ))}
@@ -165,7 +165,7 @@ export default function EarnPage(): React.ReactElement {
                     <Skeleton isLoading={isPending}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </Skeleton>
                   </td>

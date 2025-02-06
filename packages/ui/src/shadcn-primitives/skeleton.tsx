@@ -19,13 +19,13 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         aria-hidden
         className={cn(
           "animate-pulse rounded-xs bg-primary/10 *:invisible",
-          className
+          className,
         )}
       >
         {children}
       </div>
     );
-  }
+  },
 );
 
 Skeleton.displayName = "Skeleton";
