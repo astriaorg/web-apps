@@ -4,7 +4,7 @@ import { graphql } from "earn/gql";
 import { VaultsQuery } from "earn/gql/graphql";
 import request from "graphql-request";
 
-const PAGE_SIZE = 25;
+export const PAGE_SIZE = 25;
 
 export const PLACEHOLDER_DATA: VaultsQuery = {
   vaults: {
@@ -39,12 +39,18 @@ export const PLACEHOLDER_DATA: VaultsQuery = {
         totalAssetsUsd: 0,
       },
     })),
+    pageInfo: {
+      countTotal: PAGE_SIZE,
+      count: PAGE_SIZE,
+      limit: PAGE_SIZE,
+      skip: 0,
+    },
   },
 };
 
 const query = graphql(`
-  query Vaults {
-    vaults(where: { totalAssets_gte: 1 }) {
+  query Vaults($first: Int, $skip: Int) {
+    vaults(first: $first, skip: $skip, where: { totalAssets_gte: 1 }) {
       items {
         address
         symbol
@@ -74,17 +80,30 @@ const query = graphql(`
           totalAssetsUsd
         }
       }
+      pageInfo {
+        countTotal
+        count
+        limit
+        skip
+      }
     }
   }
 `);
 
-export const useFetchVaults = () => {
+export const useFetchVaults = ({
+  variables,
+}: {
+  variables: {
+    first: number;
+    skip: number;
+  };
+}) => {
   const { earnAPIURL } = useConfig();
 
   return useQuery({
-    queryKey: ["data"],
+    queryKey: ["useFetchVaults", variables],
     queryFn: async () => {
-      return request(earnAPIURL, query);
+      return request(earnAPIURL, query, variables);
     },
   });
 };

@@ -1,6 +1,15 @@
 "use client";
 
-import { Skeleton } from "@repo/ui/shadcn-primitives";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  Skeleton,
+} from "@repo/ui/shadcn-primitives";
 import {
   createColumnHelper,
   flexRender,
@@ -9,13 +18,100 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
 import { Vault } from "./gql/graphql";
-import { PLACEHOLDER_DATA, useFetchVaults } from "./hooks/useFetchVaults";
+import {
+  PAGE_SIZE,
+  PLACEHOLDER_DATA,
+  useFetchVaults,
+} from "./hooks/useFetchVaults";
 
 export default function EarnPage(): React.ReactElement {
-  const { data, isPending } = useFetchVaults();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data, isPending } = useFetchVaults({
+    variables: {
+      first: PAGE_SIZE,
+      skip: (currentPage - 1) * PAGE_SIZE,
+    },
+  });
+
+  const totalPages = Math.ceil(
+    (data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE,
+  );
+
+  const renderPaginationItems = useCallback(() => {
+    const paginationItems = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        paginationItems.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              href="#"
+              isActive={currentPage === i}
+              onClick={() => setCurrentPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>,
+        );
+      }
+    } else {
+      paginationItems.push(
+        <PaginationItem key={1}>
+          <PaginationLink
+            href="#"
+            isActive={currentPage === 1}
+            onClick={() => setCurrentPage(1)}
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>,
+      );
+
+      if (currentPage > 3) {
+        paginationItems.push(<PaginationEllipsis key="start-ellipsis" />);
+      }
+
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        paginationItems.push(
+          <PaginationItem key={i}>
+            <PaginationLink
+              href="#"
+              isActive={currentPage === i}
+              onClick={() => setCurrentPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>,
+        );
+      }
+
+      if (currentPage < totalPages - 2) {
+        paginationItems.push(<PaginationEllipsis key="end-ellipsis" />);
+      }
+
+      paginationItems.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink
+            href="#"
+            isActive={currentPage === totalPages}
+            onClick={() => setCurrentPage(totalPages)}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>,
+      );
+    }
+
+    return paginationItems;
+  }, [currentPage, setCurrentPage, totalPages]);
 
   const columnHelper = createColumnHelper<Vault>();
 
@@ -174,6 +270,30 @@ export default function EarnPage(): React.ReactElement {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-center mt-10">
+        <Skeleton isLoading={isPending} className="w-[200px]">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  isDisabled={currentPage === 1}
+                />
+              </PaginationItem>
+              {renderPaginationItems()}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  isDisabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </Skeleton>
       </div>
     </section>
   );
