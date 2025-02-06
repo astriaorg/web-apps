@@ -22,7 +22,11 @@ import {
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "../../../utils/utils";
-import { EvmChainInfo, EvmCurrency, evmCurrencyBelongsToChain } from "@repo/flame-types";
+import {
+  EvmChainInfo,
+  EvmCurrency,
+  evmCurrencyBelongsToChain,
+} from "@repo/flame-types";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;

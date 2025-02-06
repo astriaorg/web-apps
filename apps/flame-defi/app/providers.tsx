@@ -8,10 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { assets, chains } from "chain-registry";
 import { WagmiProvider } from "wagmi";
 
-import {
-  ConfigContextProvider,
-  getAllChainConfigs,
-} from "./config";
+import { ConfigContextProvider, getAllChainConfigs } from "./config";
 import { CosmosWalletProvider } from "./features/CosmosWallet";
 import { EvmWalletProvider } from "./features/EvmWallet";
 import { NotificationsContextProvider } from "./features/Notifications";
