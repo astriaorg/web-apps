@@ -1,0 +1,2 @@
+# Ignore codegen files:
+apps/flame-defi/**/gql/*
