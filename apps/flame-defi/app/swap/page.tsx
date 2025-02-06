@@ -2,10 +2,10 @@
 
 import React, { useCallback, useEffect } from "react";
 import { DownArrowIcon } from "@repo/ui/icons";
-import { ActionButton, SettingsPopover } from "@repo/ui/components";
+import { ActionButton } from "@repo/ui/components";
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { QUOTE_TYPE, TOKEN_INPUTS, TXN_STATUS } from "../constants";
+import { QUOTE_TYPE, TOKEN_INPUTS } from "../constants";
 import { TokenState, EvmCurrency } from "@repo/ui/types";
 import { useEvmChainData } from "config";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
@@ -15,7 +15,8 @@ import { TxnInfo } from "./components/TxnInfo";
 import ConfirmationModal from "components/ConfirmationModal/ConfirmationModal";
 import { SwapTxnSteps } from "./components/SwapTxnSteps";
 import { useGetQuote } from "./useGetQuote";
-import { isDustAmount } from "utils/utils";
+import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
+
 
 export const isTiaWtiaSwapPair = (
   inputOne: TokenState,
@@ -128,7 +129,6 @@ export default function SwapPage(): React.ReactElement {
   );
 
   useEffect(() => {
-    console.log("SET QUOTE TWO", tokenTwo, tokenOne);
     if (
       tokenOne.token &&
       tokenTwo.token &&

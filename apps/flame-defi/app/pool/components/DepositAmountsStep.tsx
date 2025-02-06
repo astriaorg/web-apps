@@ -47,7 +47,7 @@ export default function DepositAmountsStep({
                   type="number"
                   value={inputOne.value}
                   onChange={(e) => handleInputChange(e.target.value, true)}
-                  className="normalize-input w-[100%]"
+                  className="normalize-input w-[100%] text-[36px]"
                   placeholder="0"
                 />
                 <span className="text-grey-light text-sm font-medium">$0</span>
@@ -80,7 +80,7 @@ export default function DepositAmountsStep({
                   type="number"
                   value={inputTwo.value}
                   onChange={(e) => handleInputChange(e.target.value, false)}
-                  className="normalize-input w-[100%]"
+                  className="normalize-input w-[100%] text-[36px]"
                   placeholder="0"
                 />
                 <span className="text-grey-light text-sm font-medium">$0</span>

@@ -5,10 +5,11 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
+  Skeleton,
 } from "@repo/ui/shadcn-primitives";
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
-import { formatDecimalValues } from "utils/utils";
+import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
 import { TokenState, GetQuoteResult } from "@repo/ui/types";
 import useOneToOneQuote from "swap/useOneToOneQuote";
 import { TOKEN_INPUTS } from "../../constants";
@@ -25,6 +26,7 @@ export interface TxnInfoProps {
 export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
   const inputTokenOne = swapPairs[0]?.inputToken
   const inputTokenTwo = swapPairs[1]?.inputToken
+  const slippageTolerance = getSlippageTolerance();
   const {gasUseEstimateUSD, formattedGasUseEstimateUSD, expectedOutputFormatted, priceImpact, minimumReceived} = useTxnInfo({ swapPairs });
   const { tokenOneSymbol, tokenTwoSymbol, tokenTwoValue, oneToOneLoading, error, setFlipDirection, flipDirection } = useOneToOneQuote(inputTokenOne, inputTokenTwo);
 
@@ -39,6 +41,7 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
         className="text-grey-light text-sm border-b-0"
       >
         <div className="flex items-center justify-between">
+        <Skeleton className="rounded" isLoading={oneToOneLoading}>
           <div
             className="flex items-center cursor-pointer text-white font-medium gap-1"
             onClick={() => setFlipDirection(!flipDirection)}
@@ -49,16 +52,11 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
             </div>
             <div>=</div>
             <div className="flex items-center gap-1">
-              {oneToOneLoading ? (
-                <span>loading...</span>
-              ) : (
-                <>
                   <span>{tokenTwoValue}</span>
                   <span>{tokenTwoSymbol}</span>
-                </>
-              )}
             </div>
           </div>
+          </Skeleton>
           <AccordionTrigger>
             {gasUseEstimateUSD && (
               <div className="[&>svg]:!transform-none flex items-center gap-1 width: 100%">
@@ -94,7 +92,7 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
             </p>
             <p className="flex justify-between">
               <span className="text-grey-light flex items-center gap-1">
-                Minimum received after slippage (0.10%){" "}
+                Minimum received after slippage ({slippageTolerance}%){" "}
                 <InfoTooltip
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"

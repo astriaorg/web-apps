@@ -5,7 +5,6 @@ export * from "./CopyToClipboardButton/CopyToClipboardButton";
 export * from "./Dropdown/Dropdown";
 export * from "./Footer/Footer";
 export * from "./InfoTooltip/InfoTooltip";
-export * from "./SettingsPopover/SettingsPopover";
 export * from "./SuccessCheck/SuccessCheck";
 export * from "./ToggleSwitch/ToggleSwitch";
 export * from "./TokenSelector/TokenSelector";

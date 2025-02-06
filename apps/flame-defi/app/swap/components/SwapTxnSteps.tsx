@@ -1,13 +1,14 @@
 "use client";
 
 import { InfoTooltip, BlockLoader, SuccessCheck } from "@repo/ui/components";
-import { formatDecimalValues } from "utils/utils";
+import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
 import { TokenState } from "@repo/ui/types";
 import { DownArrowIcon } from "@repo/ui/icons";
 import { TXN_STATUS } from "../../constants";
 import useOneToOneQuote from "swap/useOneToOneQuote";
 import { TxnInfoProps } from "./TxnInfo";
 import { useTxnInfo } from "../useTxnInfo";
+import { Skeleton } from "@repo/ui/shadcn-primitives";
 
 interface TxnStepsProps {
   expectedOutputFormatted: string | undefined;
@@ -81,6 +82,7 @@ export function TxnDetails({
     setFlipDirection,
     flipDirection,
   } = useOneToOneQuote(inputOne, inputTwo);
+  const slippageTolerance = getSlippageTolerance();
 
   return (
     <>
@@ -115,6 +117,7 @@ export function TxnDetails({
             </div>
           </div>
           <div className="flex items-center justify-between mb-4">
+          <Skeleton className="rounded" isLoading={oneToOneLoading}>
             <div
               className="flex items-center cursor-pointer text-white font-medium gap-1"
               onClick={() => setFlipDirection(!flipDirection)}
@@ -125,16 +128,11 @@ export function TxnDetails({
               </div>
               <div>=</div>
               <div className="flex items-center gap-1">
-                {oneToOneLoading ? (
-                  <span>loading...</span>
-                ) : (
-                  <>
                     <span>{tokenTwoValue}</span>
                     <span>{tokenTwoSymbol}</span>
-                  </>
-                )}
               </div>
             </div>
+            </Skeleton>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
@@ -164,7 +162,7 @@ export function TxnDetails({
             </div>
             <div className="flex justify-between">
               <span className="text-grey-light flex items-center text-sm gap-1">
-                Minimum received after slippage (0.10%){" "}
+                Minimum received after slippage ({slippageTolerance}%){" "}
                 <InfoTooltip
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"

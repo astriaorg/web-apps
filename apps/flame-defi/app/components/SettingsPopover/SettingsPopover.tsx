@@ -15,14 +15,19 @@ import {
   AlertDialogAction,
 } from "@repo/ui/shadcn-primitives";
 import { GearIcon } from "@repo/ui/icons";
-import { InfoTooltip } from "../InfoTooltip/InfoTooltip";
+import { InfoTooltip } from "@repo/ui/components";
 import { useState } from "react";
+import { getFromLocalStorage, setInLocalStorage } from "utils/utils";
+import { defaultSlippageTolerance } from "../../constants";
 
-export const SettingsPopover: React.FC = () => {
-  const [customSlippage, setCustomSlippage] = useState<string>("");
-  const [expertMode, setExpertMode] = useState(false);
+export const SettingsPopover = () => {
+  const currentSettings = getFromLocalStorage("settings") || {};
+  const [customSlippage, setCustomSlippage] = useState<string>(currentSettings?.slippageTolerance?.toString() || defaultSlippageTolerance.toString());
+  const [expertMode, setExpertMode] = useState(currentSettings?.expertMode || false);
   const [showExpertModeDialog, setShowExpertModeDialog] = useState(false);
 
+
+  // TODO: add in whatever validation is needed for the slippage tolerance
   const handleCustomSlippageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -30,7 +35,7 @@ export const SettingsPopover: React.FC = () => {
     setCustomSlippage(value);
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue > 0) {
-      // TODO: SET SLIPPAGE
+      setInLocalStorage("settings", { ...currentSettings, slippageTolerance: numValue });
     }
   };
 
@@ -39,6 +44,8 @@ export const SettingsPopover: React.FC = () => {
       setShowExpertModeDialog(true);
     } else {
       setExpertMode(false);
+      setCustomSlippage("0.10");
+      setInLocalStorage("settings", { ...currentSettings, expertMode: false, slippageTolerance: 0.10 });
     }
   };
 
@@ -46,7 +53,9 @@ export const SettingsPopover: React.FC = () => {
     <Popover>
       <PopoverTrigger>
         <a className="text-grey-light hover:text-white" aria-label="Settings">
-          <GearIcon className="transition" />
+          <GearIcon
+            className={`transition ${expertMode ? 'stroke-orange-soft' : ''}`}
+          />
         </a>
       </PopoverTrigger>
       <PopoverContent className="w-80 bg-radial-dark border-border" align="end">
@@ -58,16 +67,17 @@ export const SettingsPopover: React.FC = () => {
               <InfoTooltip content="Your transaction will revert if the price changes unfavorably by more than this percentage." />
             </div>
             <div className="flex justify-between">
-              <button className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2">
+              {/* TODO: have auto button actually have logic to find whatever slippage is best */}
+              <button className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2" onClick={() => setCustomSlippage("0.10")}>
                 Auto
               </button>
               <div className="flex-1 relative">
                 <input
-                  type="text"
+                  type="number"
                   value={customSlippage}
                   onChange={handleCustomSlippageChange}
                   placeholder="0.10"
-                  className="w-full px-3 py-1 pr-7 bg-grey-dark rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full px-3 py-1 pr-7 bg-grey-dark rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary normalize-input"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white">
                   %
@@ -120,6 +130,7 @@ export const SettingsPopover: React.FC = () => {
               className="bg-accent text-white hover:bg-accent/90"
               onClick={() => {
                 setExpertMode(true);
+                setInLocalStorage("settings", { ...currentSettings, expertMode: true });
                 setShowExpertModeDialog(false);
               }}
             >

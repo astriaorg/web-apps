@@ -1,3 +1,5 @@
+import { defaultSlippageTolerance } from "../constants";
+
 export function getFromLocalStorage(item: string) {
   const retrievedItem = window.localStorage.getItem(item);
 
@@ -10,6 +12,12 @@ export function getFromLocalStorage(item: string) {
 export function setInLocalStorage(key: string, item: unknown) {
   window.localStorage.setItem(key, JSON.stringify(item));
 }
+
+export function getSlippageTolerance() {
+  const settings = getFromLocalStorage("settings");
+  return settings?.slippageTolerance || defaultSlippageTolerance;
+}
+
 
 /**
  * Formats a raw balance amount into a human-readable decimal number with 2 decimal places.

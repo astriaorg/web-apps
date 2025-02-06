@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useGetQuote } from './useGetQuote';
 import { GetQuoteResult, TokenState } from '@repo/ui/types';
 import { formatDecimalValues } from 'utils/utils';
+import { QUOTE_TYPE } from '../constants';
 
 function useOneToOneQuote(inputOne?: TokenState, inputTwo?: TokenState) {
   const [flipDirection, setFlipDirection] = useState(true);
@@ -20,14 +21,14 @@ function useOneToOneQuote(inputOne?: TokenState, inputTwo?: TokenState) {
   useEffect(() => {
     const fetchQuotes = async () => {
       const quote1 = await getQuote(
-        "exactIn",
+        QUOTE_TYPE.EXACT_IN,
         { token: inputOne?.token, value: "1" },
         { token: inputTwo?.token, value: "0" }
       );
       setQuoteOne({...quote1});
 
       const quote2 = await getQuote(
-        "exactIn",
+        QUOTE_TYPE.EXACT_IN,
         { token: inputTwo?.token, value: "1" },
         { token: inputOne?.token, value: "0" }
       );

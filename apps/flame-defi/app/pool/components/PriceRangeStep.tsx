@@ -135,7 +135,7 @@ export default function PriceRangeStep({
                 </span>
                 <input
                   type="number"
-                  className="normalize-input w-[75%] sm:max-w-[75%]"
+                  className="normalize-input w-[75%] sm:max-w-[75%] text-[36px]"
                   placeholder="0"
                   value={minPrice}
                   onChange={(e) => setMinPrice(Number(e.target.value))}
@@ -169,7 +169,7 @@ export default function PriceRangeStep({
                 </span>
                 <input
                   type="number"
-                  className="normalize-input w-[75%] sm:max-w-[75%]"
+                  className="normalize-input w-[75%] sm:max-w-[75%] text-[36px]"
                   placeholder="∞"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}

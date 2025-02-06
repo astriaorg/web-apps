@@ -59,7 +59,7 @@ export function SwapInput({
           onChange={(e) => {
             onInputChange(e.target.value, index);
           }}
-          className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden"
+          className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden text-[36px]"
           placeholder="0"
         />
         </Skeleton>

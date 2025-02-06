@@ -8,6 +8,7 @@ import { createTradeFromQuote, SwapRouter } from "features/EvmWallet/services/Sw
 import { SWAP_ROUTER_ADDRESS, QUOTE_TYPE, TXN_STATUS } from "../constants";
 import { Chain } from "viem";
 import { useEvmChainData } from "config";
+import { getSlippageTolerance } from "utils/utils";
 interface SwapButtonProps {
   tokenOne: TokenState,
   tokenTwo: TokenState,
@@ -30,6 +31,7 @@ export function useSwapButton({
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const { chainId, evmChainsData, currencies } = useEvmChainData();
+  const slippageTolerance = getSlippageTolerance();
   const publicClient = getPublicClient(wagmiConfig, { chainId: chainId });
   const { connectEvmWallet } = useEvmWallet();
   const { data: walletClient } = useWalletClient();
@@ -96,6 +98,7 @@ export function useSwapButton({
       return;
     }
 
+
     setTxnStatus(TXN_STATUS.PENDING);
 
     try {
@@ -117,7 +120,7 @@ export function useSwapButton({
 
       const options = {
         recipient: userAccount.address,
-        slippageTolerance: 10, // 0.10%
+        slippageTolerance: slippageTolerance,
         deadline: Math.floor(Date.now() / 1000) + 1800,
       };
       const tx = await router.executeSwap(trade, options, walletClient, publicClient) as `0x${string}`;
@@ -126,7 +129,7 @@ export function useSwapButton({
       setTxnStatus(TXN_STATUS.FAILED);
       console.error('Error executing swap:', error);
     }
-  }, [trade, userAccount, chainId, evmChainsData, currencies, walletClient, publicClient]);
+  }, [trade, userAccount, chainId, evmChainsData, currencies, walletClient, publicClient, slippageTolerance]);
 
   const validSwapInputs =
     !loading &&
