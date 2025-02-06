@@ -16,6 +16,6 @@
       "@radix-ui/react-select"
     ]
   },
-  "include": ["src", "../../apps/flame-defi/app/components/TxnInfo"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
