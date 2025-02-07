@@ -78,7 +78,7 @@ export function TxnDetails({
     tokenTwoSymbol,
     tokenTwoValue,
     oneToOneLoading,
-    error,
+    // error,
     setFlipDirection,
     flipDirection,
   } = useOneToOneQuote(inputOne, inputTwo);
@@ -238,7 +238,9 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed(props: TxnStepsProps) {
+// FIXME - commented out to get around lint
+// function TxnFailed(_props: TxnStepsProps) {
+function TxnFailed() {
   return <div>TxnFailed</div>;
 }
 

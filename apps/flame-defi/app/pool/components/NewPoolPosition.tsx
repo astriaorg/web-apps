@@ -13,7 +13,7 @@ import DepositAmountsStep from "./DepositAmountsStep";
 import { feeData } from "../../constants";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
-import { useConfig, useEvmChainData } from "config";
+import { useEvmChainData } from "config";
 import React from "react";
 import { EvmCurrency } from "@repo/flame-types";
 

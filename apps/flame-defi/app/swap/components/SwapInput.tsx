@@ -1,9 +1,4 @@
-import {
-  ChainId,
-  EvmCurrency,
-  GetQuoteResult,
-  TokenState,
-} from "@repo/flame-types";
+import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { TokenSelector } from "@repo/ui/components";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { formatDecimalValues, isDustAmount } from "utils/utils";

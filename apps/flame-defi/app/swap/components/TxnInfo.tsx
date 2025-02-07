@@ -39,7 +39,7 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
     tokenTwoSymbol,
     tokenTwoValue,
     oneToOneLoading,
-    error,
+    // error,
     setFlipDirection,
     flipDirection,
   } = useOneToOneQuote(inputTokenOne, inputTokenTwo);

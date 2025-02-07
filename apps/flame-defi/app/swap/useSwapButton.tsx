@@ -15,15 +15,14 @@ import {
   createWrapService,
   SwapRouter,
 } from "features/EvmWallet";
-import { EvmChainInfo, GetQuoteResult, TokenState } from "@repo/flame-types";
-import { QUOTE_TYPE, TXN_STATUS } from "../constants";
+import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { getSlippageTolerance } from "utils/utils";
+import { QUOTE_TYPE, TXN_STATUS } from "../constants";
 
 interface SwapButtonProps {
   tokenOne: TokenState;
   tokenTwo: TokenState;
   tokenOneBalance: string;
-  selectedChain: EvmChainInfo;
   quote: GetQuoteResult | null;
   loading: boolean;
   error: string | null;
@@ -34,12 +33,12 @@ export function useSwapButton({
   tokenOne,
   tokenTwo,
   tokenOneBalance,
-  selectedChain,
   quote,
   loading,
-  error,
+  // error,
   quoteType,
 }: SwapButtonProps) {
+  const { selectedChain } = useEvmChainData();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSlippageTolerance();
@@ -165,7 +164,14 @@ export function useSwapButton({
     } catch (error) {
       console.error("Error executing swap:", error);
     }
-  }, [trade, userAccount, selectedChain, walletClient, publicClient]);
+  }, [
+    trade,
+    userAccount,
+    selectedChain,
+    walletClient,
+    publicClient,
+    slippageTolerance,
+  ]);
 
   const validSwapInputs =
     !loading &&

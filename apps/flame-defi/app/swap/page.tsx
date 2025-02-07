@@ -146,7 +146,7 @@ export default function SwapPage(): React.ReactElement {
     ) {
       getQuote(quoteType, tokenOne, tokenTwo);
     }
-  }, [quoteType, tokenOne, tokenTwo, getQuote]);
+  }, [isTiaWtia, tokenOne, tokenTwo, getQuote, quoteType]);
 
   useEffect(() => {
     if (quote?.quoteDecimals && inputOne.isQuoteValue) {
