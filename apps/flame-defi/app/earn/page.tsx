@@ -1,5 +1,6 @@
 "use client";
 
+import { useDebounce } from "@repo/ui/hooks";
 import { ArrowDownIcon, SearchIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
 import {
@@ -23,6 +24,7 @@ import Big from "big.js";
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
+import { TableCard } from "./components/TableCard/TableCard";
 import { OrderDirection, Vault, VaultOrderBy } from "./gql/graphql";
 import {
   PAGE_SIZE,
@@ -33,7 +35,9 @@ import {
 export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [search, setSearch] = useState(""); // TODO: Add debounce.
+
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
 
   const { orderBy, orderDirection } = useMemo(() => {
     return {
@@ -47,23 +51,27 @@ export default function EarnPage(): React.ReactElement {
     };
   }, [sorting]);
 
-  const { data, isPending } = useFetchVaults({
+  const { data, isError, isPending, isRefetching } = useFetchVaults({
     variables: {
       first: PAGE_SIZE,
       skip: (currentPage - 1) * PAGE_SIZE,
       orderBy,
       orderDirection,
-      where: { search: search || null, totalAssets_gte: 1 },
+      where: { search: debouncedSearch || null, totalAssets_gte: 1 },
     },
   });
 
-  const totalPages = Math.ceil(
-    (data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE,
-  );
+  const totalPages = useMemo(() => {
+    return Math.ceil((data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE);
+  }, [data?.vaults?.pageInfo?.countTotal]);
+
+  const isEmptyState = useMemo(() => {
+    return !isPending && !data?.vaults?.items?.length;
+  }, [isPending, data?.vaults?.items?.length]);
 
   const columnHelper = createColumnHelper<Vault>();
 
-  const columns = React.useMemo(() => {
+  const columns = useMemo(() => {
     // Use `VaultOrderBy` as ID for sorting.
     return [
       columnHelper.accessor("name", {
@@ -162,100 +170,117 @@ export default function EarnPage(): React.ReactElement {
 
   return (
     <section className="flex flex-col p-20">
-      <div className="flex justify-end w-full">
-        <Skeleton isLoading={isPending} className=" w-[200px]">
+      <div className="flex justify-end w-full mb-6">
+        <Skeleton
+          isLoading={isRefetching && !data?.vaults.items?.length}
+          className="w-[200px]"
+        >
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="text"
             placeholder="Search vaults"
             startAdornment={<SearchIcon size={16} />}
+            className="w-[200px]"
           />
         </Skeleton>
       </div>
 
-      <div className="mt-6 rounded-lg overflow-x-auto bg-semi-white">
-        <table className="w-full">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="h-16 px-5 text-left">
-                    <div className="flex items-center space-x-2">
-                      <div>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                      </div>
-                      {header.column.getCanSort() && (
-                        <div
-                          className={cn(
-                            "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
-                            header.id === orderBy ? "opacity-100" : "opacity-0",
-                            orderDirection === OrderDirection.Asc &&
-                              "rotate-180",
+      {isError ? (
+        <TableCard className="h-[250px] text-lg">
+          {`We couldn't fetch vault data. Please try again later.`}
+        </TableCard>
+      ) : isEmptyState ? (
+        <TableCard className="h-[250px] text-lg">{`No vaults found.`}</TableCard>
+      ) : (
+        <>
+          <TableCard>
+            <table className="w-full">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} className="h-16 px-5 text-left">
+                        <div className="flex items-center space-x-2">
+                          <div>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </div>
+                          {header.column.getCanSort() && (
+                            <div
+                              className={cn(
+                                "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
+                                "transform transition-transform duration-200",
+                                header.id === orderBy
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                                orderDirection === OrderDirection.Asc &&
+                                  "rotate-180",
+                              )}
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              <ArrowDownIcon aria-label="Sort" size={16} />
+                            </div>
                           )}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          <ArrowDownIcon aria-label="Sort" size={16} />
                         </div>
-                      )}
-                    </div>
-                  </th>
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="whitespace-nowrap">
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="h-12 px-5 border-t border-grey-dark"
-                  >
-                    <Skeleton isLoading={isPending}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </Skeleton>
-                  </td>
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="whitespace-nowrap">
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className="h-12 px-5 border-t border-grey-dark"
+                      >
+                        <Skeleton isLoading={isPending}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </Skeleton>
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </tbody>
+            </table>
+          </TableCard>
 
-      <div className="flex justify-center mt-10">
-        <Skeleton isLoading={isPending} className="w-[200px]">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  isDisabled={currentPage === 1}
-                />
-              </PaginationItem>
-              {renderPaginationItems({
-                totalPages,
-                currentPage,
-                setCurrentPage,
-              })}
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  isDisabled={currentPage === totalPages}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </Skeleton>
-      </div>
+          <div className="flex justify-center mt-10">
+            <Skeleton isLoading={isPending} className="w-[200px]">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      isDisabled={currentPage === 1}
+                    />
+                  </PaginationItem>
+                  {renderPaginationItems({
+                    totalPages,
+                    currentPage,
+                    setCurrentPage,
+                  })}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      isDisabled={currentPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </Skeleton>
+          </div>
+        </>
+      )}
     </section>
   );
 }
