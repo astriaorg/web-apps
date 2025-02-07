@@ -1,11 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import Big from "big.js";
 import { useConfig } from "config/hooks/useConfig";
 import { graphql } from "earn/gql";
-import { VaultsQuery } from "earn/gql/graphql";
+import {
+  OrderDirection,
+  VaultFilters,
+  VaultOrderBy,
+  VaultsQuery,
+} from "earn/gql/graphql";
 import request from "graphql-request";
 
-const PAGE_SIZE = 25;
+export const PAGE_SIZE = 25;
 
 export const PLACEHOLDER_DATA: VaultsQuery = {
   vaults: {
@@ -40,12 +44,30 @@ export const PLACEHOLDER_DATA: VaultsQuery = {
         totalAssetsUsd: 0,
       },
     })),
+    pageInfo: {
+      countTotal: PAGE_SIZE,
+      count: PAGE_SIZE,
+      limit: PAGE_SIZE,
+      skip: 0,
+    },
   },
 };
 
 const query = graphql(`
-  query Vaults {
-    vaults {
+  query Vaults(
+    $first: Int
+    $skip: Int
+    $orderBy: VaultOrderBy
+    $orderDirection: OrderDirection
+    $where: VaultFilters
+  ) {
+    vaults(
+      first: $first
+      skip: $skip
+      orderBy: $orderBy
+      orderDirection: $orderDirection
+      where: $where
+    ) {
       items {
         address
         symbol
@@ -75,24 +97,33 @@ const query = graphql(`
           totalAssetsUsd
         }
       }
+      pageInfo {
+        countTotal
+        count
+        limit
+        skip
+      }
     }
   }
 `);
 
-export const useFetchVaults = () => {
+export const useFetchVaults = ({
+  variables,
+}: {
+  variables: {
+    first: number;
+    skip: number;
+    orderBy: VaultOrderBy;
+    orderDirection: OrderDirection;
+    where: VaultFilters;
+  };
+}) => {
   const { earnAPIURL } = useConfig();
 
   return useQuery({
-    queryKey: ["data"],
+    queryKey: ["useFetchVaults", variables],
     queryFn: async () => {
-      // TODO: Pagination.
-      const result = await request(earnAPIURL, query);
-
-      result.vaults.items = result.vaults?.items?.filter((it) => {
-        return new Big(it.state?.totalAssets ?? 0).gt(0);
-      });
-
-      return result;
+      return request(earnAPIURL, query, variables);
     },
   });
 };
