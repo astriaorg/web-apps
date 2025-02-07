@@ -6,7 +6,10 @@ export const TableCard = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn("rounded-lg bg-semi-white overflow-x-auto", className)}
+      className={cn(
+        "rounded-lg bg-semi-white overflow-x-auto gradient-background",
+        className,
+      )}
       {...props}
     />
   );

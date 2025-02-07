@@ -59,8 +59,11 @@
 }
 
 @layer components {
+  .gradient-background {
+    @apply border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)];
+  }
   .gradient-container {
-    @apply p-4 sm:p-4 md:p-8 lg:p-12 border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)] rounded-2xl;
+    @apply gradient-background p-4 sm:p-4 md:p-8 lg:p-12 rounded-2xl;
   }
   .normalize-input {
     @apply flex-1 bg-transparent focus:outline-none placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;

@@ -113,7 +113,7 @@ export default function EarnPage(): React.ReactElement {
                 &nbsp;
                 {row.original.symbol}
               </span>
-              <span className="text-sm text-secondary bg-muted-foreground px-2 py-0.5 rounded-sm">
+              <span className="text-xs text-secondary bg-muted-foreground px-2 py-0.5 rounded-sm opacity-75">
                 <FormattedNumber
                   value={
                     +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(2)
@@ -187,24 +187,27 @@ export default function EarnPage(): React.ReactElement {
       </div>
 
       {isError ? (
-        <TableCard className="h-[250px] text-lg flex items-center justify-center">
+        <TableCard className="h-[250px] text-lg text-grey-light flex items-center justify-center">
           {`We couldn't fetch vault data. Please try again later.`}
         </TableCard>
       ) : isEmptyState ? (
-        <TableCard className="h-[250px] text-lg flex items-center justify-center">
+        <TableCard className="h-[250px] text-lg text-grey-light flex items-center justify-center">
           {`No vaults found.`}
         </TableCard>
       ) : (
         <>
           <TableCard>
-            <table className="w-full">
+            <table className="w-full text-left whitespace-nowrap">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <th key={header.id} className="h-16 px-5 text-left">
+                      <th
+                        key={header.id}
+                        className="h-16 px-5 first:pl-8 last:pr-8"
+                      >
                         <div className="flex items-center space-x-2">
-                          <div className="text-sm text-grey-light font-normal">
+                          <div className="text-sm text-grey-light font-mono font-medium uppercase">
                             {flexRender(
                               header.column.columnDef.header,
                               header.getContext(),
@@ -213,7 +216,7 @@ export default function EarnPage(): React.ReactElement {
                           {header.column.getCanSort() && (
                             <div
                               className={cn(
-                                "cursor-pointer text-grey-light hover:text-white hover:opacity-100 hover:text-yellow",
+                                "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
                                 "transform transition-transform duration-200",
                                 header.id === orderBy
                                   ? "opacity-100"
@@ -234,11 +237,11 @@ export default function EarnPage(): React.ReactElement {
               </thead>
               <tbody>
                 {table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="whitespace-nowrap">
+                  <tr key={row.id} className="hover:bg-white/5">
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="h-14 px-5 border-t border-dark"
+                        className="h-14 px-5 first:pl-8 last:pr-8 border-t border-dark text-sm"
                       >
                         <Skeleton isLoading={isPending}>
                           {flexRender(
