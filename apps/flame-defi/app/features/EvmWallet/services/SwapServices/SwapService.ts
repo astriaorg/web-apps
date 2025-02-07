@@ -423,7 +423,7 @@ export function createTradeFromQuote(
   quoteResult: GetQuoteResult,
   type: "exactIn" | "exactOut",
 ): Trade {
-  console.log('quoteResult', quoteResult);
+  console.log("quoteResult", quoteResult);
   // Convert the first route from the quote.
   // TODO - find best route
   const routePools: Pool[] = (quoteResult.route[0] || []).map((poolRoute) => {

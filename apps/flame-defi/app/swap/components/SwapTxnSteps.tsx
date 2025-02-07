@@ -117,21 +117,21 @@ export function TxnDetails({
             </div>
           </div>
           <div className="flex items-center justify-between mb-4">
-          <Skeleton className="rounded" isLoading={oneToOneLoading}>
-            <div
-              className="flex items-center cursor-pointer text-white font-medium gap-1"
-              onClick={() => setFlipDirection(!flipDirection)}
-            >
-              <div className="flex items-center gap-1">
-                <span>{formatDecimalValues("1", 0)}</span>
-                <span>{tokenOneSymbol}</span>
+            <Skeleton className="rounded" isLoading={oneToOneLoading}>
+              <div
+                className="flex items-center cursor-pointer text-white font-medium gap-1"
+                onClick={() => setFlipDirection(!flipDirection)}
+              >
+                <div className="flex items-center gap-1">
+                  <span>{formatDecimalValues("1", 0)}</span>
+                  <span>{tokenOneSymbol}</span>
+                </div>
+                <div>=</div>
+                <div className="flex items-center gap-1">
+                  <span>{tokenTwoValue}</span>
+                  <span>{tokenTwoSymbol}</span>
+                </div>
               </div>
-              <div>=</div>
-              <div className="flex items-center gap-1">
-                    <span>{tokenTwoValue}</span>
-                    <span>{tokenTwoSymbol}</span>
-              </div>
-            </div>
             </Skeleton>
           </div>
           <div className="space-y-2">
@@ -197,7 +197,10 @@ function TxnLoader({
           </span>
           <span>for</span>
           <span>
-            {isTiaWtia ? formatDecimalValues(inputTwo?.value || "0", 6) : expectedOutputFormatted} <span>{" "}{inputTwo?.token?.coinDenom}</span>
+            {isTiaWtia
+              ? formatDecimalValues(inputTwo?.value || "0", 6)
+              : expectedOutputFormatted}{" "}
+            <span> {inputTwo?.token?.coinDenom}</span>
           </span>
         </div>
       </div>
@@ -224,7 +227,10 @@ function TxnSuccess({
           </span>
           <span>for</span>
           <span>
-          {isTiaWtia ? formatDecimalValues(inputTwo?.value || "0", 6) : expectedOutputFormatted} <span>{" "}{inputTwo?.token?.coinDenom}</span>
+            {isTiaWtia
+              ? formatDecimalValues(inputTwo?.value || "0", 6)
+              : expectedOutputFormatted}{" "}
+            <span> {inputTwo?.token?.coinDenom}</span>
           </span>
         </div>
       </div>

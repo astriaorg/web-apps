@@ -24,11 +24,25 @@ export interface TxnInfoProps {
 }
 
 export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
-  const inputTokenOne = swapPairs[0]?.inputToken
-  const inputTokenTwo = swapPairs[1]?.inputToken
+  const inputTokenOne = swapPairs[0]?.inputToken;
+  const inputTokenTwo = swapPairs[1]?.inputToken;
   const slippageTolerance = getSlippageTolerance();
-  const {gasUseEstimateUSD, formattedGasUseEstimateUSD, expectedOutputFormatted, priceImpact, minimumReceived} = useTxnInfo({ swapPairs });
-  const { tokenOneSymbol, tokenTwoSymbol, tokenTwoValue, oneToOneLoading, error, setFlipDirection, flipDirection } = useOneToOneQuote(inputTokenOne, inputTokenTwo);
+  const {
+    gasUseEstimateUSD,
+    formattedGasUseEstimateUSD,
+    expectedOutputFormatted,
+    priceImpact,
+    minimumReceived,
+  } = useTxnInfo({ swapPairs });
+  const {
+    tokenOneSymbol,
+    tokenTwoSymbol,
+    tokenTwoValue,
+    oneToOneLoading,
+    error,
+    setFlipDirection,
+    flipDirection,
+  } = useOneToOneQuote(inputTokenOne, inputTokenTwo);
 
   if (swapPairs[0]?.txnQuoteLoading) {
     return <div></div>;
@@ -41,21 +55,21 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
         className="text-grey-light text-sm border-b-0"
       >
         <div className="flex items-center justify-between">
-        <Skeleton className="rounded" isLoading={oneToOneLoading}>
-          <div
-            className="flex items-center cursor-pointer text-white font-medium gap-1"
-            onClick={() => setFlipDirection(!flipDirection)}
-          >
-            <div className="flex items-center gap-1">
-              <span>{formatDecimalValues("1", 0)}</span>
-              <span>{tokenOneSymbol}</span>
+          <Skeleton className="rounded" isLoading={oneToOneLoading}>
+            <div
+              className="flex items-center cursor-pointer text-white font-medium gap-1"
+              onClick={() => setFlipDirection(!flipDirection)}
+            >
+              <div className="flex items-center gap-1">
+                <span>{formatDecimalValues("1", 0)}</span>
+                <span>{tokenOneSymbol}</span>
+              </div>
+              <div>=</div>
+              <div className="flex items-center gap-1">
+                <span>{tokenTwoValue}</span>
+                <span>{tokenTwoSymbol}</span>
+              </div>
             </div>
-            <div>=</div>
-            <div className="flex items-center gap-1">
-                  <span>{tokenTwoValue}</span>
-                  <span>{tokenTwoSymbol}</span>
-            </div>
-          </div>
           </Skeleton>
           <AccordionTrigger>
             {gasUseEstimateUSD && (
@@ -77,7 +91,8 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
                 />
               </span>
               <span className="text-grey-light">
-                {expectedOutputFormatted} <span>{inputTokenTwo?.token?.coinDenom}</span>
+                {expectedOutputFormatted}{" "}
+                <span>{inputTokenTwo?.token?.coinDenom}</span>
               </span>
             </p>
             <p className="flex justify-between">

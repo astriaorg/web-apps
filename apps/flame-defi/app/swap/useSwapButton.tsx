@@ -1,23 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getPublicClient } from "@wagmi/core";
-import { useAccount, useConfig as useWagmiConfig, useWaitForTransactionReceipt, useWalletClient } from "wagmi";
+import {
+  useAccount,
+  useConfig as useWagmiConfig,
+  useWaitForTransactionReceipt,
+  useWalletClient,
+} from "wagmi";
 import { Chain } from "viem";
 
 import { useEvmChainData } from "config";
-import { useEvmWallet, createTradeFromQuote, createWrapService, SwapRouter } from "features/EvmWallet";
+import {
+  useEvmWallet,
+  createTradeFromQuote,
+  createWrapService,
+  SwapRouter,
+} from "features/EvmWallet";
 import { EvmChainInfo, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { QUOTE_TYPE, TXN_STATUS } from "../constants";
 import { getSlippageTolerance } from "utils/utils";
 
 interface SwapButtonProps {
-  tokenOne: TokenState,
-  tokenTwo: TokenState,
-  tokenOneBalance: string,
+  tokenOne: TokenState;
+  tokenTwo: TokenState;
+  tokenOneBalance: string;
   selectedChain: EvmChainInfo;
-  quote: GetQuoteResult | null,
-  loading: boolean,
-  error: string | null,
-  quoteType: QUOTE_TYPE,
+  quote: GetQuoteResult | null;
+  loading: boolean;
+  error: string | null;
+  quoteType: QUOTE_TYPE;
 }
 
 export function useSwapButton({
@@ -40,11 +50,13 @@ export function useSwapButton({
   const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
-  const wrapTia = tokenOne?.token?.coinDenom === "TIA" &&
-      tokenTwo?.token?.coinDenom === "WTIA"
-  const unwrapTia = tokenOne?.token?.coinDenom === "WTIA" &&
-      tokenTwo?.token?.coinDenom === "TIA"
-  const result = useWaitForTransactionReceipt({hash: txnHash});
+  const wrapTia =
+    tokenOne?.token?.coinDenom === "TIA" &&
+    tokenTwo?.token?.coinDenom === "WTIA";
+  const unwrapTia =
+    tokenOne?.token?.coinDenom === "WTIA" &&
+    tokenTwo?.token?.coinDenom === "TIA";
+  const result = useWaitForTransactionReceipt({ hash: txnHash });
 
   useEffect(() => {
     if (result.data?.status === "success") {
@@ -75,7 +87,7 @@ export function useSwapButton({
       const tx = await wrapService.deposit(
         selectedChain.chainId,
         tokenOne.value,
-        tokenOne.token?.coinDecimals || 18
+        tokenOne.token?.coinDecimals || 18,
       );
       setTxnHash(tx);
       // TODO: Add loading state for these txns. This loading state will be displayed in the buttonText component.
@@ -84,7 +96,7 @@ export function useSwapButton({
       const tx = await wrapService.withdraw(
         selectedChain.chainId,
         tokenOne.value,
-        tokenOne.token?.coinDecimals || 18
+        tokenOne.token?.coinDecimals || 18,
       );
       setTxnHash(tx);
     }
@@ -110,7 +122,6 @@ export function useSwapButton({
       return;
     }
 
-
     setTxnStatus(TXN_STATUS.PENDING);
 
     try {
@@ -128,7 +139,6 @@ export function useSwapButton({
           },
         },
       };
-
 
       const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
       if (!swapRouterAddress) {
@@ -222,7 +232,18 @@ export function useSwapButton({
     }
   };
 
-  const isCloseModalAction = txnStatus === TXN_STATUS.SUCCESS || txnStatus === TXN_STATUS.FAILED || txnStatus === TXN_STATUS.PENDING
+  const isCloseModalAction =
+    txnStatus === TXN_STATUS.SUCCESS ||
+    txnStatus === TXN_STATUS.FAILED ||
+    txnStatus === TXN_STATUS.PENDING;
 
-  return { onSubmitCallback, buttonText: getButtonText(), actionButtonText: getActionButtonText(), validSwapInputs, txnStatus, setTxnStatus, isCloseModalAction};
+  return {
+    onSubmitCallback,
+    buttonText: getButtonText(),
+    actionButtonText: getActionButtonText(),
+    validSwapInputs,
+    txnStatus,
+    setTxnStatus,
+    isCloseModalAction,
+  };
 }

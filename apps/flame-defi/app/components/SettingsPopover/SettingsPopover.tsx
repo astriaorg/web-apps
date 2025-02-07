@@ -22,10 +22,14 @@ import { defaultSlippageTolerance } from "../../constants";
 
 export const SettingsPopover = () => {
   const currentSettings = getFromLocalStorage("settings") || {};
-  const [customSlippage, setCustomSlippage] = useState<string>(currentSettings?.slippageTolerance?.toString() || defaultSlippageTolerance.toString());
-  const [expertMode, setExpertMode] = useState(currentSettings?.expertMode || false);
+  const [customSlippage, setCustomSlippage] = useState<string>(
+    currentSettings?.slippageTolerance?.toString() ||
+      defaultSlippageTolerance.toString(),
+  );
+  const [expertMode, setExpertMode] = useState(
+    currentSettings?.expertMode || false,
+  );
   const [showExpertModeDialog, setShowExpertModeDialog] = useState(false);
-
 
   // TODO: add in whatever validation is needed for the slippage tolerance
   const handleCustomSlippageChange = (
@@ -35,7 +39,10 @@ export const SettingsPopover = () => {
     setCustomSlippage(value);
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue > 0) {
-      setInLocalStorage("settings", { ...currentSettings, slippageTolerance: numValue });
+      setInLocalStorage("settings", {
+        ...currentSettings,
+        slippageTolerance: numValue,
+      });
     }
   };
 
@@ -45,7 +52,11 @@ export const SettingsPopover = () => {
     } else {
       setExpertMode(false);
       setCustomSlippage("0.10");
-      setInLocalStorage("settings", { ...currentSettings, expertMode: false, slippageTolerance: 0.10 });
+      setInLocalStorage("settings", {
+        ...currentSettings,
+        expertMode: false,
+        slippageTolerance: 0.1,
+      });
     }
   };
 
@@ -54,7 +65,7 @@ export const SettingsPopover = () => {
       <PopoverTrigger>
         <a className="text-grey-light hover:text-white" aria-label="Settings">
           <GearIcon
-            className={`transition ${expertMode ? 'stroke-orange-soft' : ''}`}
+            className={`transition ${expertMode ? "stroke-orange-soft" : ""}`}
           />
         </a>
       </PopoverTrigger>
@@ -68,7 +79,10 @@ export const SettingsPopover = () => {
             </div>
             <div className="flex justify-between">
               {/* TODO: have auto button actually have logic to find whatever slippage is best */}
-              <button className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2" onClick={() => setCustomSlippage("0.10")}>
+              <button
+                className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2"
+                onClick={() => setCustomSlippage("0.10")}
+              >
                 Auto
               </button>
               <div className="flex-1 relative">
@@ -130,7 +144,10 @@ export const SettingsPopover = () => {
               className="bg-accent text-white hover:bg-accent/90"
               onClick={() => {
                 setExpertMode(true);
-                setInLocalStorage("settings", { ...currentSettings, expertMode: true });
+                setInLocalStorage("settings", {
+                  ...currentSettings,
+                  expertMode: true,
+                });
                 setShowExpertModeDialog(false);
               }}
             >

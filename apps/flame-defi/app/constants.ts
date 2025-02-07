@@ -15,7 +15,7 @@ export enum TXN_STATUS {
   FAILED = "failed",
 }
 
-export const defaultSlippageTolerance = 0.10;
+export const defaultSlippageTolerance = 0.1;
 
 export const feeData = [
   {

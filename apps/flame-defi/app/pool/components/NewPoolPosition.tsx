@@ -45,7 +45,9 @@ export default function NewPoolPosition({
   setNewPositionPage: (newPositionPage: boolean) => void;
 }): React.ReactElement {
   const userAccount = useAccount();
-  const { selectedChain: { currencies } } = useEvmChainData();
+  const {
+    selectedChain: { currencies },
+  } = useEvmChainData();
   const [step, setStep] = useState(0);
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeData | undefined>(
     feeData[0],

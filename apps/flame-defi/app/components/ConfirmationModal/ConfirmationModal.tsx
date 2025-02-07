@@ -47,14 +47,14 @@ export default function ConfirmationModal({
 
   const handleClose = () => {
     setOpen(false);
-    if(txnStatus === TXN_STATUS.SUCCESS) {
+    if (txnStatus === TXN_STATUS.SUCCESS) {
       handleResetInputs();
     }
   };
 
   const handleOpen = () => {
     setOpen(true);
-    if(skipIdleTxnStatus) {
+    if (skipIdleTxnStatus) {
       setTxnStatus(TXN_STATUS.PENDING);
       onSubmitCallback();
     } else {
@@ -80,14 +80,14 @@ export default function ConfirmationModal({
               <CloseIcon className="text-grey-light hover:text-white transition" />
             </button>
           </div>
-            <div className="flex flex-col justify-between">
-              <div>{children}</div>
-              <ActionButton
-                callback={isCloseModalAction ? handleClose : onSubmitCallback}
-                buttonText={actionButtonText}
-                className="w-full mt-6"
-              />
-            </div>
+          <div className="flex flex-col justify-between">
+            <div>{children}</div>
+            <ActionButton
+              callback={isCloseModalAction ? handleClose : onSubmitCallback}
+              buttonText={actionButtonText}
+              className="w-full mt-6"
+            />
+          </div>
         </DialogContent>
       </DialogPortal>
     </Dialog>

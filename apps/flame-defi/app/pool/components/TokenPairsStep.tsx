@@ -49,7 +49,9 @@ export default function TokenPairsStep({
   selectedFeeTier,
   setSelectedFeeTier,
 }: TokenPairsStepProps): React.ReactElement {
-  const { selectedChain: { currencies } } = useEvmChainData();
+  const {
+    selectedChain: { currencies },
+  } = useEvmChainData();
 
   const [showMore, setShowMore] = useState(false);
   const { tokenOne, tokenTwo } = tokenPair;

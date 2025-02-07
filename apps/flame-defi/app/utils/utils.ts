@@ -18,7 +18,6 @@ export function getSlippageTolerance() {
   return settings?.slippageTolerance || defaultSlippageTolerance;
 }
 
-
 /**
  * Formats a raw balance amount into a human-readable decimal number with 2 decimal places.
  * Converts from the smallest unit (e.g. wei, satoshi) to the standard unit (e.g. ETH, BTC)
@@ -58,7 +57,7 @@ export function shortenAddress(
 }
 
 export function formatDecimalValues(value?: string, decimals?: number): string {
-  const decimalVal = decimals === undefined ? 4 : decimals
+  const decimalVal = decimals === undefined ? 4 : decimals;
   return value ? parseFloat(value).toFixed(decimalVal) : "0";
 }
 
@@ -68,10 +67,11 @@ export function formatDecimalValues(value?: string, decimals?: number): string {
  * @param threshold - The threshold for dust amounts (default is 1e-10)
  * @returns true if the amount is dust (aka negligible) and we want to ignore it
  */
-export function isDustAmount(amount: number | string, threshold: number = 1e-10): boolean {
-  const amountNumber = typeof amount === 'string' ? Number(amount) : amount;
+export function isDustAmount(
+  amount: number | string,
+  threshold: number = 1e-10,
+): boolean {
+  const amountNumber = typeof amount === "string" ? Number(amount) : amount;
 
   return Math.abs(amountNumber) < threshold;
 }
-
-

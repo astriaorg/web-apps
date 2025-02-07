@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // “Top” face
 // backgroundColor: "#DD5022",
@@ -9,7 +9,7 @@ import React from 'react';
 // “Right” face
 // backgroundColor: "#F09727",
 
-export function BlockLoader({className}: {className?: string}) {
+export function BlockLoader({ className }: { className?: string }) {
   // Generate the keyframe rules for each combination (h1–h3, w1–w3, l1–l3)
   const keyframesCSS = generateKeyframes();
 
@@ -64,7 +64,7 @@ export function BlockLoader({className}: {className?: string}) {
                       }}
                     ></div>
                   </div>
-                ))
+                )),
               )}
             </div>
           ))}
@@ -72,7 +72,7 @@ export function BlockLoader({className}: {className?: string}) {
       </div>
     </>
   );
-};
+}
 
 /**
  * Generate the keyframe animation CSS rules.
@@ -144,5 +144,3 @@ function generateKeyframes() {
   }
   return css;
 }
-
-

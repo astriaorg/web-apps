@@ -6,7 +6,10 @@ import { EvmWalletProvider } from "./contexts/EvmWalletContext";
 import { useEvmWallet } from "./hooks/useEvmWallet";
 import { createWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { createWrapService } from "./services/SwapServices/WrapService";
-import { SwapRouter, createTradeFromQuote } from "./services/SwapServices/SwapService";
+import {
+  SwapRouter,
+  createTradeFromQuote,
+} from "./services/SwapServices/SwapService";
 
 export {
   AddErc20ToWalletButton,

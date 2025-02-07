@@ -6,19 +6,20 @@ import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { QUOTE_TYPE } from "../constants";
 
 export function useGetQuote() {
-  const { selectedChain: { chainId } } = useEvmChainData();
+  const {
+    selectedChain: { chainId },
+  } = useEvmChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const getQuote = useCallback(
-    async (
-      type: QUOTE_TYPE,
-      tokenOne: TokenState,
-      tokenTwo: TokenState,
-    ) => {
+    async (type: QUOTE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
       const amount = tokenOne?.value
-        ? parseUnits(tokenOne.value, tokenOne?.token?.coinDecimals || 18).toString()
+        ? parseUnits(
+            tokenOne.value,
+            tokenOne?.token?.coinDecimals || 18,
+          ).toString()
         : "";
 
       const tokenInAddress =
@@ -82,7 +83,7 @@ export function useGetQuote() {
         }
       }
     },
-    [chainId]
+    [chainId],
   );
 
   return { quote, loading, error, getQuote, setQuote };

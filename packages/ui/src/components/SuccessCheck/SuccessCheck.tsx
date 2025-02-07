@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export function SuccessCheck() {
   return (
@@ -32,4 +32,4 @@ export function SuccessCheck() {
       </svg>
     </div>
   );
-};
+}

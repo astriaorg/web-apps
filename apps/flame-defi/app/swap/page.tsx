@@ -34,11 +34,13 @@ export default function SwapPage(): React.ReactElement {
     isQuoteValue: true,
   });
   const isTiaWtia = useMemo(() => {
-    return (inputOne.token?.coinDenom === "TIA" &&
+    return (
+      (inputOne.token?.coinDenom === "TIA" &&
         inputTwo.token?.coinDenom === "WTIA") ||
       (inputOne.token?.coinDenom === "WTIA" &&
-        inputTwo.token?.coinDenom === "TIA");
-  }, [inputOne, inputTwo])
+        inputTwo.token?.coinDenom === "TIA")
+    );
+  }, [inputOne, inputTwo]);
 
   const [flipTokens, setFlipTokens] = useState(false);
   const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
@@ -121,7 +123,7 @@ export default function SwapPage(): React.ReactElement {
       handleResetInputs,
       handleQuoteType,
       isTiaWtia,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -146,7 +148,6 @@ export default function SwapPage(): React.ReactElement {
     }
   }, [quoteType, tokenOne, tokenTwo, getQuote]);
 
-
   useEffect(() => {
     if (quote?.quoteDecimals && inputOne.isQuoteValue) {
       setInputOne((prev) => ({ ...prev, value: quote.quoteDecimals }));
@@ -154,7 +155,6 @@ export default function SwapPage(): React.ReactElement {
       setInputTwo((prev) => ({ ...prev, value: quote.quoteDecimals }));
     }
   }, [quote, inputOne.isQuoteValue, inputTwo.isQuoteValue]);
-
 
   const swapInputs = [
     {
