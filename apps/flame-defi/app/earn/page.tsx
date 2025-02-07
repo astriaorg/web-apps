@@ -33,10 +33,8 @@ export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { data, isPending } = useFetchVaults({
-    variables: {
-      first: PAGE_SIZE,
-      skip: (currentPage - 1) * PAGE_SIZE,
+  const { orderBy, orderDirection } = useMemo(() => {
+    return {
       orderBy:
         (sorting.map((it) => it.id).join(",") as VaultOrderBy) ||
         VaultOrderBy.TotalAssets,
@@ -44,6 +42,15 @@ export default function EarnPage(): React.ReactElement {
         (sorting
           .map((it) => (it.desc ? OrderDirection.Desc : OrderDirection.Asc))
           .join(",") as OrderDirection) || OrderDirection.Desc,
+    };
+  }, [sorting]);
+
+  const { data, isPending } = useFetchVaults({
+    variables: {
+      first: PAGE_SIZE,
+      skip: (currentPage - 1) * PAGE_SIZE,
+      orderBy,
+      orderDirection,
     },
   });
 
@@ -147,6 +154,7 @@ export default function EarnPage(): React.ReactElement {
       sorting,
     },
     onSortingChange: setSorting,
+    enableSortingRemoval: false,
   });
 
   return (
@@ -157,11 +165,7 @@ export default function EarnPage(): React.ReactElement {
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
-                    className="h-16 px-5 text-left"
-                  >
+                  <th key={header.id} className="h-16 px-5 text-left">
                     <div className="flex items-center space-x-2">
                       <div>
                         {flexRender(
@@ -170,15 +174,17 @@ export default function EarnPage(): React.ReactElement {
                         )}
                       </div>
                       {header.column.getCanSort() && (
-                        <ArrowDownIcon
-                          aria-label="Sort"
+                        <div
                           className={cn(
-                            "text-grey-light",
-                            header.column.getNextSortingOrder() === "desc" &&
+                            "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
+                            header.id === orderBy ? "opacity-100" : "opacity-0",
+                            orderDirection === OrderDirection.Asc &&
                               "rotate-180",
                           )}
-                          size={16}
-                        />
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <ArrowDownIcon aria-label="Sort" size={16} />
+                        </div>
                       )}
                     </div>
                   </th>
