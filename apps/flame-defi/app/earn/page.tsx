@@ -204,7 +204,7 @@ export default function EarnPage(): React.ReactElement {
                     {headerGroup.headers.map((header) => (
                       <th key={header.id} className="h-16 px-5 text-left">
                         <div className="flex items-center space-x-2">
-                          <div>
+                          <div className="text-sm text-grey-light font-normal">
                             {flexRender(
                               header.column.columnDef.header,
                               header.getContext(),
@@ -213,7 +213,7 @@ export default function EarnPage(): React.ReactElement {
                           {header.column.getCanSort() && (
                             <div
                               className={cn(
-                                "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
+                                "cursor-pointer text-grey-light hover:text-white hover:opacity-100 hover:text-yellow",
                                 "transform transition-transform duration-200",
                                 header.id === orderBy
                                   ? "opacity-100"
@@ -238,7 +238,7 @@ export default function EarnPage(): React.ReactElement {
                     {row.getVisibleCells().map((cell) => (
                       <td
                         key={cell.id}
-                        className="h-12 px-5 border-t border-grey-dark"
+                        className="h-14 px-5 border-t border-dark"
                       >
                         <Skeleton isLoading={isPending}>
                           {flexRender(
