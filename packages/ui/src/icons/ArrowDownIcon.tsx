@@ -1,4 +1,4 @@
-import { IconProps } from "@repo/flame-types";
+import type { IconProps } from "@repo/flame-types";
 
 export const ArrowDownIcon: React.FC<IconProps> = ({
   className = "",
