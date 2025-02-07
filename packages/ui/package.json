@@ -6,7 +6,9 @@
   "exports": {
     "./shadcn-primitives": "./src/shadcn-primitives/index.ts",
     "./components": "./src/components/index.ts",
-    "./icons": "./src/icons/index.ts"
+    "./icons": "./src/icons/index.ts",
+    "./lib": "./src/lib/index.ts",
+    "./types": "./src/types.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
