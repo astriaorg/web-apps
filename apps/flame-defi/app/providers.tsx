@@ -6,6 +6,7 @@ import { ChainProvider } from "@cosmos-kit/react";
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { assets, chains } from "chain-registry";
+import { IntlProvider } from "react-intl";
 import { WagmiProvider } from "wagmi";
 
 import { ConfigContextProvider, getAllChainConfigs } from "./config";
@@ -46,29 +47,31 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ConfigContextProvider>
-      <NotificationsContextProvider>
-        <WagmiProvider config={rainbowKitConfig}>
-          <QueryClientProvider client={queryClient}>
-            <RainbowKitProvider>
-              <ChainProvider
-                assetLists={[...assets, ...cosmosKitAssetLists]}
-                chains={[...chains, ...cosmosKitChains]}
-                wallets={[...keplrWallets, ...leapWallets]}
-                walletConnectOptions={cosmosWalletConnectOptions}
-                signerOptions={{
-                  preferredSignType: () => {
-                    return "amino";
-                  },
-                }}
-              >
-                <CosmosWalletProvider>
-                  <EvmWalletProvider>{children}</EvmWalletProvider>
-                </CosmosWalletProvider>
-              </ChainProvider>
-            </RainbowKitProvider>
-          </QueryClientProvider>
-        </WagmiProvider>
-      </NotificationsContextProvider>
+      <IntlProvider locale="en">
+        <NotificationsContextProvider>
+          <WagmiProvider config={rainbowKitConfig}>
+            <QueryClientProvider client={queryClient}>
+              <RainbowKitProvider>
+                <ChainProvider
+                  assetLists={[...assets, ...cosmosKitAssetLists]}
+                  chains={[...chains, ...cosmosKitChains]}
+                  wallets={[...keplrWallets, ...leapWallets]}
+                  walletConnectOptions={cosmosWalletConnectOptions}
+                  signerOptions={{
+                    preferredSignType: () => {
+                      return "amino";
+                    },
+                  }}
+                >
+                  <CosmosWalletProvider>
+                    <EvmWalletProvider>{children}</EvmWalletProvider>
+                  </CosmosWalletProvider>
+                </ChainProvider>
+              </RainbowKitProvider>
+            </QueryClientProvider>
+          </WagmiProvider>
+        </NotificationsContextProvider>
+      </IntlProvider>
     </ConfigContextProvider>
   );
 }

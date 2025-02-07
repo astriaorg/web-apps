@@ -1,5 +1,4 @@
 import { screen } from "@testing-library/react";
-import type React from "react";
 
 import { renderWithProviders } from "testing/helpers";
 import Navbar from "./Navbar";
@@ -19,5 +18,7 @@ describe("Navbar Component", () => {
     expect(swapLink).toBeInTheDocument();
     const poolLink = screen.getByText(/pool/i);
     expect(poolLink).toBeInTheDocument();
+    const earnLink = screen.getByText(/earn/i);
+    expect(earnLink).toBeInTheDocument();
   });
 });

@@ -28,6 +28,8 @@ export interface AppConfig {
   swapURL: string;
   // The URL for the pool link in the navbar.
   poolURL: string;
+  // The base URL for the Morpho API.
+  earnAPIURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
   // List of networks to display in the network selector.
@@ -36,8 +38,8 @@ export interface AppConfig {
 
 export {
   ConfigContextProvider,
-  getEnvVariable,
   getAllChainConfigs,
+  getEnvVariable,
   getFlameChainId,
   getFlameNetworkByChainId,
   useConfig,
