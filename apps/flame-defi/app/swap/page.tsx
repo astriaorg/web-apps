@@ -112,6 +112,9 @@ export default function SwapPage(): React.ReactElement {
       }
 
       if (value === "" || value === "0") {
+        // FIXME - this is resetting tokens when you clear the input.
+        //  i actually type "0.1" usually, and there is some sort of mask that won't let you begin with 0,
+        //  and this also clears out the selected tokens
         handleResetInputs();
       }
     },
