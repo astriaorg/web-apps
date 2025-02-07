@@ -1,4 +1,4 @@
-import { GetQuoteResult } from "@repo/ui/types";
+import { GetQuoteResult } from "@repo/flame-types";
 import { formatDecimalValues } from "utils/utils";
 import { formatUnits } from "viem";
 import { TxnInfoProps } from "./components/TxnInfo";

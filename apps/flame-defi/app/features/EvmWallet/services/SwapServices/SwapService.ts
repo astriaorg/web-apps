@@ -97,6 +97,7 @@ export class SwapRouter {
     slippageTolerance: number,
     isMinimum: boolean,
   ): JSBI {
+    slippageTolerance = slippageTolerance * 100;
     const basisPoints = JSBI.BigInt(10000);
     let adjustedBasisPoints: JSBI;
 
@@ -259,7 +260,7 @@ export class SwapRouter {
     options: SwapOptions,
     walletClient: WalletClient,
     publicClient: PublicClient,
-  ): Promise<string | undefined> {
+  ): Promise<`0x${string}` | undefined> {
     // FIXME - we're depending on the fact that the usage of `getQuote` doesn't change the symbol
     //  to wtia when getting an estimate for wtia to show in the ui
     const isNativeIn =

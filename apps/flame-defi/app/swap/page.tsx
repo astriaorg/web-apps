@@ -1,38 +1,27 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useAccount } from "wagmi";
+
+import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
+import { useEvmChainData } from "config";
 import { DownArrowIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
-import { useState } from "react";
-import { useAccount } from "wagmi";
+import { EvmCurrency, TokenState } from "@repo/flame-types";
 import { QUOTE_TYPE, TOKEN_INPUTS } from "../constants";
-import { TokenState, EvmCurrency } from "@repo/ui/types";
-import { useEvmChainData } from "config";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
+
 import { useSwapButton } from "./useSwapButton";
 import { SwapInput } from "./components/SwapInput";
 import { TxnInfo } from "./components/TxnInfo";
 import ConfirmationModal from "components/ConfirmationModal/ConfirmationModal";
 import { SwapTxnSteps } from "./components/SwapTxnSteps";
 import { useGetQuote } from "./useGetQuote";
-import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
-
-
-export const isTiaWtiaSwapPair = (
-  inputOne: TokenState,
-  inputTwo: TokenState
-) => {
-  const isTiaWtia =
-    (inputOne.token?.coinDenom === "TIA" &&
-      inputTwo.token?.coinDenom === "WTIA") ||
-    (inputOne.token?.coinDenom === "WTIA" &&
-      inputTwo.token?.coinDenom === "TIA");
-
-  return isTiaWtia;
-};
 
 export default function SwapPage(): React.ReactElement {
-  const { currencies, evmChainsData } = useEvmChainData();
+  const { selectedChain } = useEvmChainData();
+  const { currencies } = selectedChain;
+
   const userAccount = useAccount();
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
@@ -44,14 +33,20 @@ export default function SwapPage(): React.ReactElement {
     value: "",
     isQuoteValue: true,
   });
-  const isTiaWtia = isTiaWtiaSwapPair(inputOne, inputTwo);
+  const isTiaWtia = useMemo(() => {
+    return (inputOne.token?.coinDenom === "TIA" &&
+        inputTwo.token?.coinDenom === "WTIA") ||
+      (inputOne.token?.coinDenom === "WTIA" &&
+        inputTwo.token?.coinDenom === "TIA");
+  }, [inputOne, inputTwo])
+
   const [flipTokens, setFlipTokens] = useState(false);
   const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
   const { quote, loading, error, getQuote, setQuote } = useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
   const tokenOneBalance =
-    useTokenBalance(tokenOne.token, evmChainsData).balance?.value || "0";
+    useTokenBalance(tokenOne.token, selectedChain).balance?.value || "0";
 
   const {
     onSubmitCallback,
@@ -65,6 +60,7 @@ export default function SwapPage(): React.ReactElement {
     tokenOne,
     tokenTwo,
     tokenOneBalance: tokenOneBalance,
+    selectedChain,
     quote,
     loading,
     error,
@@ -129,6 +125,9 @@ export default function SwapPage(): React.ReactElement {
   );
 
   useEffect(() => {
+    if (isTiaWtia) {
+      return;
+    }
     if (
       tokenOne.token &&
       tokenTwo.token &&
@@ -165,7 +164,7 @@ export default function SwapPage(): React.ReactElement {
         handleInputChange(value, TOKEN_INPUTS.TOKEN_ONE, index),
       availableTokens: currencies,
       oppositeToken: inputTwo,
-      balance: useTokenBalance(inputOne.token, evmChainsData).balance,
+      balance: useTokenBalance(inputOne.token, selectedChain).balance,
       onTokenSelect: (token: EvmCurrency) =>
         setInputOne((prev) => ({ ...prev, value: "", token })),
       label: flipTokens ? "Buy" : "Sell",
@@ -180,7 +179,7 @@ export default function SwapPage(): React.ReactElement {
         handleInputChange(value, TOKEN_INPUTS.TOKEN_TWO, index),
       availableTokens: currencies,
       oppositeToken: inputOne,
-      balance: useTokenBalance(inputTwo.token, evmChainsData).balance,
+      balance: useTokenBalance(inputTwo.token, selectedChain).balance,
       onTokenSelect: (token: EvmCurrency) =>
         setInputTwo((prev) => ({ ...prev, value: "", token })),
       label: flipTokens ? "Sell" : "Buy",

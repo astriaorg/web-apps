@@ -10,7 +10,7 @@ import {
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
-import { TokenState, GetQuoteResult } from "@repo/ui/types";
+import { TokenState, GetQuoteResult } from "@repo/flame-types";
 import useOneToOneQuote from "swap/useOneToOneQuote";
 import { TOKEN_INPUTS } from "../../constants";
 import { useTxnInfo } from "swap/useTxnInfo";

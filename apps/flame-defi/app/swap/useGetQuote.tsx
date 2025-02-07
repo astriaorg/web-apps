@@ -1,12 +1,12 @@
 import { useState, useCallback } from "react";
-import { GetQuoteResult, TokenState } from "@repo/ui/types";
-import { QUOTE_TYPE } from "../constants";
 import { parseUnits } from "viem";
+
 import { useEvmChainData } from "config";
-import { isTiaWtiaSwapPair } from "./page";
+import { GetQuoteResult, TokenState } from "@repo/flame-types";
+import { QUOTE_TYPE } from "../constants";
 
 export function useGetQuote() {
-  const { chainId } = useEvmChainData();
+  const { selectedChain: { chainId } } = useEvmChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,12 +15,8 @@ export function useGetQuote() {
     async (
       type: QUOTE_TYPE,
       tokenOne: TokenState,
-      tokenTwo: TokenState
+      tokenTwo: TokenState,
     ) => {
-      const isTiaWtia = isTiaWtiaSwapPair(tokenOne, tokenTwo);
-      if (isTiaWtia) {
-        return;
-      }
       const amount = tokenOne?.value
         ? parseUnits(tokenOne.value, tokenOne?.token?.coinDecimals || 18).toString()
         : "";

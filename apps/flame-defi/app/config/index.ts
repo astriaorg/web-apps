@@ -6,7 +6,6 @@ import {
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
 import { useConfig, useEvmChainData } from "./hooks/useConfig";
-import { useConfig } from "./hooks/useConfig";
 import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 /**

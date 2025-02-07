@@ -335,6 +335,7 @@ export type EvmChains = {
 export interface TokenState {
   token?: EvmCurrency | null;
   value: string;
+  isQuoteValue?: boolean;
 }
 
 export enum ChainId {

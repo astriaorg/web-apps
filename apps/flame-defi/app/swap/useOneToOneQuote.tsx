@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useGetQuote } from './useGetQuote';
-import { GetQuoteResult, TokenState } from '@repo/ui/types';
+import { GetQuoteResult, TokenState } from '@repo/flame-types';
 import { formatDecimalValues } from 'utils/utils';
 import { QUOTE_TYPE } from '../constants';
 

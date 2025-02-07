@@ -2,7 +2,7 @@
 
 import { InfoTooltip, BlockLoader, SuccessCheck } from "@repo/ui/components";
 import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
-import { TokenState } from "@repo/ui/types";
+import { TokenState } from "@repo/flame-types";
 import { DownArrowIcon } from "@repo/ui/icons";
 import { TXN_STATUS } from "../../constants";
 import useOneToOneQuote from "swap/useOneToOneQuote";

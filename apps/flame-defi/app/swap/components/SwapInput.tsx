@@ -1,9 +1,9 @@
+import { ChainId, EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { TokenSelector } from "@repo/ui/components";
-import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/ui/types";
-import useUsdQuote from "swap/useUsdQuote";
-import { formatDecimalValues, isDustAmount } from "utils/utils";
-import { isTiaWtiaSwapPair } from "swap/page";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { formatDecimalValues, isDustAmount } from "utils/utils";
+
+import useUsdQuote from "../useUsdQuote";
 
 interface SwapInputProps {
   inputToken: TokenState;
@@ -34,7 +34,6 @@ export function SwapInput({
   balance,
 }: SwapInputProps) {
   const usdQuote = useUsdQuote(inputToken)
-  const isTiaWtia = isTiaWtiaSwapPair(inputToken, oppositeToken);
 
   const handleUsdValue = () => {
       if(inputToken.token?.coinDenom === "USDC" && inputToken.value !== ""){

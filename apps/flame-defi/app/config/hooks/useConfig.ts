@@ -3,6 +3,7 @@
 import { useContext } from "react";
 
 import { ConfigContext } from "../contexts/ConfigContext";
+import { EvmChainInfo } from "@repo/flame-types";
 
 /**
  * Hook to use the config context.
@@ -18,8 +19,7 @@ export const useConfig = () => {
 export const useEvmChainData = () => {
   const { evmChains } = useConfig();
   const evmChainsData = Object.values(evmChains);
-  const chainId = evmChainsData[0]?.chainId || 0;
-  const currencies = evmChainsData[0]?.currencies;
+  const selectedChain = evmChainsData[0] as EvmChainInfo;
 
-  return { chainId, currencies, evmChainsData: evmChainsData[0] };
+  return { selectedChain };
 };

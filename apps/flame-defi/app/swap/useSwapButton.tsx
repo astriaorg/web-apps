@@ -1,18 +1,19 @@
-import { createWrapService } from "features/EvmWallet/services/SwapServices/WrapService";
-import { useAccount, useConfig as useWagmiConfig, useWaitForTransactionReceipt, useWalletClient } from "wagmi";
-import { getPublicClient } from "@wagmi/core";
-import { GetQuoteResult, TokenState } from "@repo/ui/types";
-import { useEvmWallet } from "features/EvmWallet";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createTradeFromQuote, SwapRouter } from "features/EvmWallet/services/SwapServices/SwapService";
-import { SWAP_ROUTER_ADDRESS, QUOTE_TYPE, TXN_STATUS } from "../constants";
+import { getPublicClient } from "@wagmi/core";
+import { useAccount, useConfig as useWagmiConfig, useWaitForTransactionReceipt, useWalletClient } from "wagmi";
 import { Chain } from "viem";
+
 import { useEvmChainData } from "config";
+import { useEvmWallet, createTradeFromQuote, createWrapService, SwapRouter } from "features/EvmWallet";
+import { EvmChainInfo, GetQuoteResult, TokenState } from "@repo/flame-types";
+import { QUOTE_TYPE, TXN_STATUS } from "../constants";
 import { getSlippageTolerance } from "utils/utils";
+
 interface SwapButtonProps {
   tokenOne: TokenState,
   tokenTwo: TokenState,
   tokenOneBalance: string,
+  selectedChain: EvmChainInfo;
   quote: GetQuoteResult | null,
   loading: boolean,
   error: string | null,
@@ -31,7 +32,6 @@ export function useSwapButton({
 }: SwapButtonProps) {
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
-  const { chainId, evmChainsData, currencies } = useEvmChainData();
   const slippageTolerance = getSlippageTolerance();
   const publicClient = getPublicClient(wagmiConfig, {
     chainId: selectedChain?.chainId,
@@ -40,7 +40,6 @@ export function useSwapButton({
   const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
-  const WTIA_ADDRESS = "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
   const wrapTia = tokenOne?.token?.coinDenom === "TIA" &&
       tokenTwo?.token?.coinDenom === "WTIA"
   const unwrapTia = tokenOne?.token?.coinDenom === "WTIA" &&
@@ -116,8 +115,6 @@ export function useSwapButton({
 
     try {
       const chainConfig: Chain = {
-        id: chainId,
-        name: evmChainsData?.chainName || "",
         id: selectedChain?.chainId,
         name: selectedChain?.chainName,
         nativeCurrency: {
