@@ -1,7 +1,8 @@
 import React from "react";
-import { FlameNetwork, getChainConfigs } from "../chainConfigs";
+import { getChainConfigs } from "../chainConfigs";
 import { getEnvVariable } from "../env";
-import type { AppConfig, CosmosChains, EvmChains } from "../index";
+import type { AppConfig } from "../index";
+import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,

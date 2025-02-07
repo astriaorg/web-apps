@@ -9,7 +9,7 @@ import type {
   CosmosChains,
   EvmChainInfo,
   EvmChains,
-} from "./types";
+} from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.

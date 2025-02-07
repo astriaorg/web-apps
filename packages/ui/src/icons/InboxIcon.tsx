@@ -1,4 +1,4 @@
-import type { IconProps } from "../types";
+import type { IconProps } from "@repo/flame-types";
 
 export const InboxIcon: React.FC<IconProps> = ({
   className = "",

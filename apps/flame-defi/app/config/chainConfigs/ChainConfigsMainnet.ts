@@ -14,7 +14,7 @@ import type {
   CosmosChains,
   EvmChainInfo,
   EvmChains,
-} from "./types";
+} from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
@@ -251,6 +251,19 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 253368190,
   chainName: "Flame",
   rpcUrls: ["https://rpc.flame.astria.org"],
+  blockExplorerUrl: "https://explorer.flame.astria.org",
+  contracts: {
+    // from https://explorer.flame.astria.org/tx/0x4d1be5b490199ae1350d6ac47070def19eab35a7b1a08ba7d35244ad10c781fe
+    wrappedCelestia: {
+      address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      blockCreated: 42997,
+    },
+    // from https://explorer.flame.astria.org/tx/0x50ee298330422d04f8502050e2e677141f9eb4e9baff6a2904537d9e29c8c10e
+    swapRouter: {
+      address: "0x29bBaFf21695fA41e446c4f37c07C699d9f08021",
+      blockCreated: 43087,
+    },
+  },
   currencies: [
     {
       coinDenom: "TIA",

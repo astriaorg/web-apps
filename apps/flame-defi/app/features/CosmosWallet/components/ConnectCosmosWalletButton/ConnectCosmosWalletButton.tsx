@@ -80,14 +80,6 @@ export default function ConnectCosmosWalletButton({
     }
   }, [connectCosmosWallet, toggleDropdown, cosmosAccountAddress]);
 
-  const handleDisconnectWallet = useCallback(() => {
-    const disconnect = async () => {
-      await disconnectCosmosWallet();
-    };
-
-    disconnect().then(() => {});
-  }, [disconnectCosmosWallet]);
-
   return cosmosAccountAddress ? (
     <Accordion type="single" collapsible>
       <AccordionItem
@@ -105,7 +97,7 @@ export default function ConnectCosmosWalletButton({
               className="cursor-pointer hover:text-white transition"
               size={21}
             />
-            <button type="button" onClick={() => handleDisconnectWallet()}>
+            <button type="button" onClick={disconnectCosmosWallet}>
               <PowerIcon
                 className="cursor-pointer hover:text-white transition"
                 size={21}

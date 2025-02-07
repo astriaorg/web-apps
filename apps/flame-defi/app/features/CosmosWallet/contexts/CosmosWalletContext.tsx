@@ -3,16 +3,16 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SigningStargateClient } from "@cosmjs/stargate";
 import { DropdownOption } from "@repo/ui/components";
-import {
-  type CosmosChainInfo,
-  type IbcCurrency,
-  cosmosChainNameFromId,
-  ibcCurrencyBelongsToChain,
-  useConfig,
-} from "config";
+import { useConfig } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
 
 import { getBalanceFromChain } from "../services/cosmos";
+import {
+  CosmosChainInfo,
+  cosmosChainNameFromId,
+  IbcCurrency,
+  ibcCurrencyBelongsToChain,
+} from "@repo/flame-types";
 
 export interface CosmosWalletContextProps {
   connectCosmosWallet: () => void;

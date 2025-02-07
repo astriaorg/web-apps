@@ -15,7 +15,7 @@ import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
 import { useConfig, useEvmChainData } from "config";
 import React from "react";
-import { EvmCurrency } from "@repo/ui/types";
+import { EvmCurrency } from "@repo/flame-types";
 
 export interface StepProps {
   step: number;

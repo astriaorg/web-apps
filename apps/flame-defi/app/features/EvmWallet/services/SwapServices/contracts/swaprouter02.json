@@ -1,0 +1,249 @@
+[
+  {
+    "name": "exactInputSingle",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "tokenIn",
+            "type": "address"
+          },
+          {
+            "name": "tokenOut",
+            "type": "address"
+          },
+          {
+            "name": "fee",
+            "type": "uint24"
+          },
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "amountIn",
+            "type": "uint256"
+          },
+          {
+            "name": "amountOutMinimum",
+            "type": "uint256"
+          },
+          {
+            "name": "sqrtPriceLimitX96",
+            "type": "uint160"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "exactInput",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "path",
+            "type": "bytes"
+          },
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "amountIn",
+            "type": "uint256"
+          },
+          {
+            "name": "amountOutMinimum",
+            "type": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "exactOutputSingle",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "tokenIn",
+            "type": "address"
+          },
+          {
+            "name": "tokenOut",
+            "type": "address"
+          },
+          {
+            "name": "fee",
+            "type": "uint24"
+          },
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "amountOut",
+            "type": "uint256"
+          },
+          {
+            "name": "amountInMaximum",
+            "type": "uint256"
+          },
+          {
+            "name": "sqrtPriceLimitX96",
+            "type": "uint160"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "exactOutput",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "params",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "path",
+            "type": "bytes"
+          },
+          {
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "name": "amountOut",
+            "type": "uint256"
+          },
+          {
+            "name": "amountInMaximum",
+            "type": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ]
+  },
+  {
+    "name": "multicall",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "results",
+        "type": "bytes[]"
+      }
+    ]
+  },
+  {
+    "name": "wrapETH",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "name": "unwrapWETH9",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "amountMinimum",
+        "type": "uint256"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "name": "approve",
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool"
+      }
+    ]
+  },
+  {
+    "name": "allowance",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "remaining",
+        "type": "uint256"
+      }
+    ]
+  }
+]

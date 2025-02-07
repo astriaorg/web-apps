@@ -1,6 +1,6 @@
 "use client";
 
-import { useConfig } from "../../config/hooks/useConfig";
+import { useConfig } from "config";
 import { UpRightSquareIcon } from "@repo/ui/icons";
 
 interface SideTagProps {
@@ -11,7 +11,6 @@ interface SideTagProps {
  * SideTag component to render a side tag with an icon and label.
  * @param label
  */
-
 export const SideTag = ({ label }: SideTagProps) => {
   const { feedbackFormURL } = useConfig();
 

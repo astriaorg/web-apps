@@ -1,11 +1,4 @@
-import type { CosmosChains, EvmChainInfo, EvmChains } from "./types";
-
-export enum FlameNetwork {
-  LOCAL = "local",
-  DUSK = "dusk",
-  DAWN = "dawn",
-  MAINNET = "mainnet",
-}
+import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 export interface FlameNetworkConfig {
   name: FlameNetwork;
@@ -102,19 +95,4 @@ export function getAllChainConfigs(): ChainConfigsObject {
     evmChains,
     cosmosChains,
   };
-}
-
-/**
- * Gets EVM chain configuration by chain ID.
- */
-export function getEvmChainByChainId(chainId: number): EvmChainInfo {
-  const allChainConfigs = getAllChainConfigs();
-  const found = Object.values(allChainConfigs.evmChains).find(
-    (chainConfig) => chainConfig.chainId === chainId,
-  );
-
-  if (!found) {
-    throw new Error(`Chain with chainId ${chainId} not found`);
-  }
-  return found;
 }

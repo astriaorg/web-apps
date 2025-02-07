@@ -8,16 +8,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { assets, chains } from "chain-registry";
 import { WagmiProvider } from "wagmi";
 
-import {
-  ConfigContextProvider,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  evmChainsToRainbowKitChains,
-  getAllChainConfigs,
-} from "./config";
+import { ConfigContextProvider, getAllChainConfigs } from "./config";
 import { CosmosWalletProvider } from "./features/CosmosWallet";
 import { EvmWalletProvider } from "./features/EvmWallet";
 import { NotificationsContextProvider } from "./features/Notifications";
+import {
+  cosmosChainInfosToCosmosKitAssetLists,
+  cosmosChainInfosToCosmosKitChains,
+  evmChainsToRainbowKitChains,
+} from "@repo/flame-types";
 
 // TODO - move to envar
 const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";

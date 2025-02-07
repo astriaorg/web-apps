@@ -6,8 +6,7 @@
   "exports": {
     "./shadcn-primitives": "./src/shadcn-primitives/index.ts",
     "./components": "./src/components/index.ts",
-    "./icons": "./src/icons/index.ts",
-    "./types": "./src/types.ts"
+    "./icons": "./src/icons/index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -32,6 +31,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-switch": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@repo/flame-types": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.471.1",

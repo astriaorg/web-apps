@@ -11,8 +11,6 @@ import {
 
 import { DropdownOption } from "@repo/ui/components";
 import {
-  type EvmChainInfo,
-  evmCurrencyBelongsToChain,
   getFlameChainId,
   getFlameNetworkByChainId,
   useConfig as useAppConfig,
@@ -24,7 +22,11 @@ import {
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { formatBalance } from "../../../utils/utils";
-import { EvmCurrency } from "@repo/ui/types";
+import {
+  EvmChainInfo,
+  EvmCurrency,
+  evmCurrencyBelongsToChain,
+} from "@repo/flame-types";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;

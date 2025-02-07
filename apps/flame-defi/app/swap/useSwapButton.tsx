@@ -23,6 +23,7 @@ export function useSwapButton({
   tokenOne,
   tokenTwo,
   tokenOneBalance,
+  selectedChain,
   quote,
   loading,
   error,
@@ -32,7 +33,9 @@ export function useSwapButton({
   const userAccount = useAccount();
   const { chainId, evmChainsData, currencies } = useEvmChainData();
   const slippageTolerance = getSlippageTolerance();
-  const publicClient = getPublicClient(wagmiConfig, { chainId: chainId });
+  const publicClient = getPublicClient(wagmiConfig, {
+    chainId: selectedChain?.chainId,
+  });
   const { connectEvmWallet } = useEvmWallet();
   const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
@@ -55,13 +58,23 @@ export function useSwapButton({
   }, [result.data]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wrapService = createWrapService(wagmiConfig, WTIA_ADDRESS);
-    if (!chainId) return;
     setTxnStatus(TXN_STATUS.PENDING);
+    if (!selectedChain?.chainId) {
+      // TODO - handle error better?
+      console.error("Chain ID is not defined. Cannot wrap/unwrap.");
+      return;
+    }
+    const wtiaAddress = selectedChain.contracts?.wrappedCelestia?.address;
+    if (!wtiaAddress) {
+      // TODO - handle error better?
+      console.error("WTIA address is not defined. Cannot wrap/unwrap.");
+      return;
+    }
 
+    const wrapService = createWrapService(wagmiConfig, wtiaAddress);
     if (type === "wrap") {
       const tx = await wrapService.deposit(
-        chainId,
+        selectedChain.chainId,
         tokenOne.value,
         tokenOne.token?.coinDecimals || 18
       );
@@ -70,7 +83,7 @@ export function useSwapButton({
       // TODO: Also add text pointing the user to complete the txn in their wallet
     } else {
       const tx = await wrapService.withdraw(
-        chainId,
+        selectedChain.chainId,
         tokenOne.value,
         tokenOne.token?.coinDecimals || 18
       );
@@ -86,15 +99,15 @@ export function useSwapButton({
   }, [quote, quoteType]);
 
   const handleSwap = useCallback(async () => {
-    if (!trade || !userAccount.address || !chainId) {
+    if (!trade || !userAccount.address || !selectedChain?.chainId) {
       return;
     }
     if (!walletClient || !walletClient.account) {
-      console.error('No wallet connected or account is undefined.');
+      console.error("No wallet connected or account is undefined.");
       return;
     }
     if (!publicClient) {
-      console.error('Public client is not configured.');
+      console.error("Public client is not configured.");
       return;
     }
 
@@ -105,31 +118,47 @@ export function useSwapButton({
       const chainConfig: Chain = {
         id: chainId,
         name: evmChainsData?.chainName || "",
+        id: selectedChain?.chainId,
+        name: selectedChain?.chainName,
         nativeCurrency: {
-          name: currencies?.[0]?.title || "",
-          symbol: currencies?.[0]?.coinDenom || "",
-          decimals: currencies?.[0]?.coinDecimals || 18,
+          name: selectedChain?.currencies[0]?.title, // Assuming the first currency is the native one
+          symbol: selectedChain?.currencies[0]?.coinDenom, // Assuming the first currency is the native one
+          decimals: selectedChain?.currencies[0]?.coinDecimals || 18, // Assuming the first currency is the native one
         },
         rpcUrls: {
           default: {
-            http: evmChainsData?.rpcUrls || [],
+            http: selectedChain?.rpcUrls, // Assuming these are the RPC URLs
           },
         },
       };
-      const router = new SwapRouter(SWAP_ROUTER_ADDRESS, chainConfig);
 
+
+      const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
+      if (!swapRouterAddress) {
+        console.error("Swap router address is not defined. Cannot swap.");
+        return;
+      }
+
+      const router = new SwapRouter(swapRouterAddress, chainConfig);
+
+      // Set up the swap options
       const options = {
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
-        deadline: Math.floor(Date.now() / 1000) + 1800,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
       };
-      const tx = await router.executeSwap(trade, options, walletClient, publicClient) as `0x${string}`;
+
+      const tx = await router.executeSwap(
+        trade,
+        options,
+        walletClient,
+        publicClient,
+      );
       setTxnHash(tx);
     } catch (error) {
-      setTxnStatus(TXN_STATUS.FAILED);
-      console.error('Error executing swap:', error);
+      console.error("Error executing swap:", error);
     }
-  }, [trade, userAccount, chainId, evmChainsData, currencies, walletClient, publicClient, slippageTolerance]);
+  }, [trade, userAccount, selectedChain, walletClient, publicClient]);
 
   const validSwapInputs =
     !loading &&

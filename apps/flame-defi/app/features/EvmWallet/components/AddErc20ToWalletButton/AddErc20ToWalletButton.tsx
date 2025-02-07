@@ -1,6 +1,6 @@
 import type { EIP1193Provider } from "viem";
 import { useAccount } from "wagmi";
-import type { EvmCurrency } from "@repo/ui/types";
+import type { EvmCurrency } from "@repo/flame-types";
 
 interface AddErc20ToWalletButtonProps {
   evmCurrency: EvmCurrency;
