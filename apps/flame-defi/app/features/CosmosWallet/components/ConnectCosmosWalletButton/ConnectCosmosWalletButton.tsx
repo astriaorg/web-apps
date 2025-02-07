@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { CopyToClipboardButton } from "@repo/ui/components";
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
-import { formatBalanceValues, shortenAddress } from "../../../../utils/utils";
+import { formatDecimalValues, shortenAddress } from "../../../../utils/utils";
 import { CosmosIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,
@@ -34,7 +34,7 @@ export default function ConnectCosmosWalletButton({
     disconnectCosmosWallet,
     isLoadingCosmosBalance,
   } = useCosmosWallet();
-  const formattedCosmosBalanceValue = formatBalanceValues(cosmosBalance?.value);
+  const formattedCosmosBalanceValue = formatDecimalValues(cosmosBalance?.value);
 
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
@@ -80,14 +80,6 @@ export default function ConnectCosmosWalletButton({
     }
   }, [connectCosmosWallet, toggleDropdown, cosmosAccountAddress]);
 
-  const handleDisconnectWallet = useCallback(() => {
-    const disconnect = async () => {
-      await disconnectCosmosWallet();
-    };
-
-    disconnect().then(() => {});
-  }, [disconnectCosmosWallet]);
-
   return cosmosAccountAddress ? (
     <Accordion type="single" collapsible>
       <AccordionItem
@@ -105,7 +97,7 @@ export default function ConnectCosmosWalletButton({
               className="cursor-pointer hover:text-white transition"
               size={21}
             />
-            <button type="button" onClick={() => handleDisconnectWallet()}>
+            <button type="button" onClick={disconnectCosmosWallet}>
               <PowerIcon
                 className="cursor-pointer hover:text-white transition"
                 size={21}

@@ -1,52 +1,58 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
+import { parseUnits } from "viem";
 
-export interface GetQuoteParams {
-  // no cross chain swaps yet, so we only need to specify one chain right now,
-  // which will be one of the Flame networks
-  chainId?: number; // ChainId;
-  tokenInAddress?: string;
-  tokenInDecimals?: number;
-  tokenInSymbol?: string;
-  tokenOutAddress?: string;
-  tokenOutDecimals?: number;
-  tokenOutSymbol?: string;
-  amount?: string;
-  type: "exactIn" | "exactOut";
-}
+import { useEvmChainData } from "config";
+import { GetQuoteResult, TokenState } from "@repo/flame-types";
+import { TRADE_TYPE } from "../constants";
 
-function useGetQuote({
-  chainId,
-  tokenInAddress,
-  tokenInDecimals,
-  tokenInSymbol,
-  tokenOutAddress,
-  tokenOutDecimals,
-  tokenOutSymbol,
-  amount,
-  type,
-}: GetQuoteParams) {
-  const [quote, setQuote] = useState(null);
-  const [loading, setLoading] = useState(false);
+export function useGetQuote() {
+  const {
+    selectedChain: { chainId },
+  } = useEvmChainData();
+  const [quote, setQuote] = useState<GetQuoteResult | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (
-      chainId &&
-      tokenInAddress &&
-      tokenInDecimals !== undefined &&
-      tokenInSymbol &&
-      tokenOutAddress &&
-      tokenOutDecimals !== undefined &&
-      tokenOutSymbol &&
-      amount &&
-      type
-    ) {
-      const fetchQuote = async () => {
+  const getQuote = useCallback(
+    async (type: TRADE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
+      if (tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom) {
+        return;
+      }
+
+      const amount = tokenOne?.value
+        ? parseUnits(
+            tokenOne.value,
+            tokenOne?.token?.coinDecimals || 18,
+          ).toString()
+        : "";
+
+      const tokenInAddress =
+        tokenOne?.token?.erc20ContractAddress ||
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+      const tokenInDecimals = tokenOne?.token?.coinDecimals;
+      const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
+      const tokenOutAddress =
+        tokenTwo?.token?.erc20ContractAddress ||
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+      const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
+      const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
+
+      if (
+        chainId &&
+        tokenInAddress &&
+        tokenInDecimals !== undefined &&
+        tokenInSymbol &&
+        tokenOutAddress &&
+        tokenOutDecimals !== undefined &&
+        tokenOutSymbol &&
+        amount &&
+        parseFloat(amount) > 0 &&
+        type
+      ) {
         try {
           setLoading(true);
           setError(null);
 
-          // Construct the URL
           const url =
             `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
             `chainId=${chainId}` +
@@ -70,32 +76,19 @@ function useGetQuote({
             throw new Error(`Request failed with status ${response.status}`);
           }
 
-          const data = await response.json();
-          setQuote(data);
+          const { data } = await response.json();
+          setQuote({ ...data });
+          return data;
         } catch (err) {
           console.warn(err);
-          // TODO: Add real error here later when type is known
           setError("error message");
         } finally {
           setLoading(false);
         }
-      };
+      }
+    },
+    [chainId],
+  );
 
-      fetchQuote();
-    }
-  }, [
-    chainId,
-    tokenInAddress,
-    tokenInDecimals,
-    tokenInSymbol,
-    tokenOutAddress,
-    tokenOutDecimals,
-    tokenOutSymbol,
-    amount,
-    type,
-  ]);
-
-  return { quote, loading, error };
+  return { quote, loading, error, getQuote, setQuote };
 }
-
-export default useGetQuote;

@@ -1,3 +1,5 @@
+import { defaultSlippageTolerance } from "../constants";
+
 export function getFromLocalStorage(item: string) {
   const retrievedItem = window.localStorage.getItem(item);
 
@@ -9,6 +11,11 @@ export function getFromLocalStorage(item: string) {
 
 export function setInLocalStorage(key: string, item: unknown) {
   window.localStorage.setItem(key, JSON.stringify(item));
+}
+
+export function getSlippageTolerance() {
+  const settings = getFromLocalStorage("settings");
+  return settings?.slippageTolerance || defaultSlippageTolerance;
 }
 
 /**
@@ -49,6 +56,22 @@ export function shortenAddress(
   return `${start}...${end}`;
 }
 
-export function formatBalanceValues(balance?: string): string {
-  return balance ? parseFloat(balance).toFixed(4) : "0";
+export function formatDecimalValues(value?: string, decimals?: number): string {
+  const decimalVal = decimals === undefined ? 4 : decimals;
+  return value ? parseFloat(value).toFixed(decimalVal) : "0";
+}
+
+/**
+ * Checks if an amount is dust (close to zero)
+ * @param amount - The amount to check
+ * @param threshold - The threshold for dust amounts (default is 1e-10)
+ * @returns true if the amount is dust (aka negligible) and we want to ignore it
+ */
+export function isDustAmount(
+  amount: number | string,
+  threshold: number = 1e-10,
+): boolean {
+  const amountNumber = typeof amount === "string" ? Number(amount) : amount;
+
+  return Math.abs(amountNumber) < threshold;
 }

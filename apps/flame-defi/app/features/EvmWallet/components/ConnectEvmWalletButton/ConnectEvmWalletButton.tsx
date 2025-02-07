@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { CopyToClipboardButton } from "@repo/ui/components";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { formatBalanceValues, shortenAddress } from "../../../../utils/utils";
+import { formatDecimalValues, shortenAddress } from "../../../../utils/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,
@@ -31,7 +31,7 @@ export default function ConnectEvmWalletButton({
     isLoadingEvmNativeTokenBalance,
   } = useEvmWallet();
   const userAccount = useAccount();
-  const formattedEvmBalanceValue = formatBalanceValues(
+  const formattedEvmBalanceValue = formatDecimalValues(
     evmNativeTokenBalance?.value,
   );
   // const [showTransactions, setShowTransactions] = useState(false);

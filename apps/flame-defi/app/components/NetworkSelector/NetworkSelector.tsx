@@ -2,7 +2,8 @@
 
 import type React from "react";
 import { useCallback } from "react";
-import { useConfig, FlameNetwork } from "config";
+
+import { useConfig } from "config";
 import {
   Select,
   SelectContent,
@@ -13,6 +14,7 @@ import {
   SelectValue,
 } from "@repo/ui/shadcn-primitives";
 import { FlameIcon } from "@repo/ui/icons";
+import { FlameNetwork } from "@repo/flame-types";
 
 export default function NetworkSelector(): React.ReactElement {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =

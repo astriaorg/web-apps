@@ -1,7 +1,8 @@
 import { type Abi, type Address, parseUnits } from "viem";
 import type { Config } from "wagmi";
+
+import WETH_ABI from "./contracts/weth.json";
 import { GenericContractService } from "../GenericContractService";
-import WETH_ABI from "../../../../contracts/weth.json";
 
 export class AstriaErc20WrapService extends GenericContractService {
   private static readonly ABI = WETH_ABI as unknown as Abi;
@@ -13,8 +14,9 @@ export class AstriaErc20WrapService extends GenericContractService {
   /**
    * Wrap TIA (native currency on Astria Flame EVM) to WTIA by calling `deposit()`.
    *
-   * @param amount The amount of TIA to deposit as a string (e.g. "1.234")
-   * @param decimals The decimals for TIA (commonly 18 on EVMs)
+   * @param chainId - The chain ID of the EVM chain
+   * @param amount - The amount of TIA to deposit as a string (e.g. "1.234")
+   * @param decimals - The decimals for TIA (commonly 18 on EVMs)
    */
   async deposit(
     chainId: number,
@@ -28,8 +30,9 @@ export class AstriaErc20WrapService extends GenericContractService {
   /**
    * Unwrap WTIA back into TIA by calling the `withdraw()` function.
    *
-   * @param amount The amount of WTIA to withdraw as a string (e.g. "1.234")
-   * @param decimals The decimals for WTIA (commonly 18 for EVM-compatible)
+   * @param chainId - The chain ID of the EVM chain
+   * @param amount - The amount of WTIA to withdraw as a string (e.g. "1.234")
+   * @param decimals - The decimals for WTIA (commonly 18 for EVM-compatible)
    */
   async withdraw(
     chainId: number,

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { EvmCurrency } from "@repo/flame-types";
 import {
   Dialog,
   DialogContent,
@@ -8,20 +11,19 @@ import {
   DialogTrigger,
   Input,
 } from "../../shadcn-primitives";
-import { useState } from "react";
 import {
   CheckMarkIcon,
   ChevronDownIcon,
   CloseIcon,
   SearchIcon,
 } from "../../icons";
-import { EvmCurrency } from "../../types";
 
 interface TokenSelectorProps {
   tokens: EvmCurrency[] | undefined;
   defaultTitle?: string;
   setSelectedToken: (token: EvmCurrency) => void;
   selectedToken?: EvmCurrency | null;
+  unavailableToken?: EvmCurrency | null;
   CustomTokenButton?: (props: {
     selectedToken?: EvmCurrency | null;
     defaultTitle: string;
@@ -33,6 +35,7 @@ export const TokenSelector = ({
   defaultTitle = "Select token",
   selectedToken,
   setSelectedToken,
+  unavailableToken,
   CustomTokenButton,
 }: TokenSelectorProps): React.ReactElement => {
   const [open, setOpen] = useState(false);
@@ -40,8 +43,13 @@ export const TokenSelector = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSelectToken = (token: EvmCurrency) => {
-    setOpen(false);
-    setSelectedToken(token);
+    if (
+      token.coinDenom !== selectedToken?.coinDenom &&
+      unavailableToken?.coinDenom !== token.coinDenom
+    ) {
+      setOpen(false);
+      setSelectedToken(token);
+    }
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,41 +111,56 @@ export const TokenSelector = ({
                 ibcWithdrawalFeeWei,
                 erc20ContractAddress,
                 nativeTokenWithdrawerContractAddress,
-              }) => (
-                <div
-                  onClick={() =>
-                    handleSelectToken({
-                      coinDenom,
-                      title,
-                      IconComponent,
-                      coinMinimalDenom: coinDenom,
-                      coinDecimals,
-                      ibcWithdrawalFeeWei,
-                      erc20ContractAddress,
-                      nativeTokenWithdrawerContractAddress,
-                    })
-                  }
-                  key={coinDenom}
-                  className={`flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer ${selectedToken?.coinDenom === coinDenom ? "bg-semi-white" : ""}`}
-                >
-                  <div className="flex items-center">
-                    {IconComponent && (
-                      <IconComponent size={32} className="mr-3" />
+              }) => {
+                const isUnavailableOrSelected =
+                  unavailableToken?.coinDenom === coinDenom ||
+                  selectedToken?.coinDenom === coinDenom;
+                const baseClasses =
+                  "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
+                const conditionalClasses = isUnavailableOrSelected
+                  ? "cursor-not-allowed"
+                  : "";
+
+                return (
+                  <div
+                    onClick={() =>
+                      handleSelectToken({
+                        coinDenom,
+                        title,
+                        IconComponent,
+                        coinMinimalDenom: coinDenom,
+                        coinDecimals,
+                        ibcWithdrawalFeeWei,
+                        erc20ContractAddress,
+                        nativeTokenWithdrawerContractAddress,
+                      })
+                    }
+                    key={coinDenom}
+                    className={twMerge(baseClasses, conditionalClasses)}
+                    style={{ position: "relative" }}
+                  >
+                    {isUnavailableOrSelected && (
+                      <div className="absolute inset-0 bg-black opacity-40 z-10 cursor-not-allowed rounded-md"></div>
                     )}
-                    <div className="flex flex-col">
-                      <span className="text-white text-md font-semibold">
-                        {title}
-                      </span>
-                      <span className="text-grey-light text-sm">
-                        {coinDenom}
-                      </span>
+                    <div className="flex items-center relative z-1">
+                      {IconComponent && (
+                        <IconComponent size={32} className="mr-3" />
+                      )}
+                      <div className="flex flex-col">
+                        <span className="text-white text-md font-semibold">
+                          {title}
+                        </span>
+                        <span className="text-grey-light text-sm">
+                          {coinDenom}
+                        </span>
+                      </div>
                     </div>
+                    {selectedToken?.coinDenom === coinDenom && (
+                      <CheckMarkIcon className="text-orange-soft relative z-1" />
+                    )}
                   </div>
-                  {selectedToken?.coinDenom === coinDenom && (
-                    <CheckMarkIcon className="text-orange-soft" />
-                  )}
-                </div>
-              ),
+                );
+              },
             )}
           </div>
         </DialogContent>

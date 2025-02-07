@@ -1,68 +1,193 @@
-import { createWrapService } from "features/EvmWallet/services/SwapService/SwapService";
-import { useAccount, useConfig as useWagmiConfig } from "wagmi";
-import { EvmChainInfo, TokenState } from "@repo/ui/types";
-import { useEvmWallet } from "features/EvmWallet";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getPublicClient } from "@wagmi/core";
+import {
+  useAccount,
+  useConfig as useWagmiConfig,
+  useWaitForTransactionReceipt,
+  useWalletClient,
+} from "wagmi";
+import { Chain } from "viem";
 
-export function useSwapButton(
-  inputOne: TokenState,
-  inputTwo: TokenState,
-  tokenOneBalance: string,
-  evmChainsData: EvmChainInfo[],
-) {
+import { useEvmChainData } from "config";
+import {
+  useEvmWallet,
+  createTradeFromQuote,
+  createWrapService,
+  SwapRouter,
+} from "features/EvmWallet";
+import { GetQuoteResult, TokenState } from "@repo/flame-types";
+import { getSlippageTolerance } from "utils/utils";
+import { TRADE_TYPE, TXN_STATUS } from "../constants";
+
+interface SwapButtonProps {
+  tokenOne: TokenState;
+  tokenTwo: TokenState;
+  tokenOneBalance: string;
+  quote: GetQuoteResult | null;
+  loading: boolean;
+  error: string | null;
+  quoteType: TRADE_TYPE;
+}
+
+export function useSwapButton({
+  tokenOne,
+  tokenTwo,
+  tokenOneBalance,
+  quote,
+  loading,
+  // error,
+  quoteType,
+}: SwapButtonProps) {
+  const { selectedChain } = useEvmChainData();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
+  const slippageTolerance = getSlippageTolerance();
+  const publicClient = getPublicClient(wagmiConfig, {
+    chainId: selectedChain?.chainId,
+  });
   const { connectEvmWallet } = useEvmWallet();
-  const WTIA_ADDRESS = "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+  const { data: walletClient } = useWalletClient();
+  const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
+  const wrapTia =
+    tokenOne?.token?.coinDenom === "TIA" &&
+    tokenTwo?.token?.coinDenom === "WTIA";
+  const unwrapTia =
+    tokenOne?.token?.coinDenom === "WTIA" &&
+    tokenTwo?.token?.coinDenom === "TIA";
+  const result = useWaitForTransactionReceipt({ hash: txnHash });
+
+  useEffect(() => {
+    if (result.data?.status === "success") {
+      setTxnStatus(TXN_STATUS.SUCCESS);
+    } else if (result.data?.status === "reverted") {
+      setTxnStatus(TXN_STATUS.FAILED);
+    } else if (result.data?.status === "error") {
+      setTxnStatus(TXN_STATUS.FAILED);
+    }
+  }, [result.data]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wrapService = createWrapService(wagmiConfig, WTIA_ADDRESS);
-    if (!evmChainsData[0]?.chainId) return;
+    setTxnStatus(TXN_STATUS.PENDING);
+    if (!selectedChain?.chainId) {
+      // TODO - handle error better?
+      console.error("Chain ID is not defined. Cannot wrap/unwrap.");
+      return;
+    }
+    const wtiaAddress = selectedChain.contracts?.wrappedCelestia?.address;
+    if (!wtiaAddress) {
+      // TODO - handle error better?
+      console.error("WTIA address is not defined. Cannot wrap/unwrap.");
+      return;
+    }
 
+    const wrapService = createWrapService(wagmiConfig, wtiaAddress);
     if (type === "wrap") {
       const tx = await wrapService.deposit(
-        evmChainsData[0]?.chainId,
-        inputOne.value,
-        inputOne.token?.coinDecimals || 18,
+        selectedChain.chainId,
+        tokenOne.value,
+        tokenOne.token?.coinDecimals || 18,
       );
-      console.log({ tx });
+      setTxnHash(tx);
       // TODO: Add loading state for these txns. This loading state will be displayed in the buttonText component.
       // TODO: Also add text pointing the user to complete the txn in their wallet
     } else {
       const tx = await wrapService.withdraw(
-        evmChainsData[0]?.chainId,
-        inputOne.value,
-        inputOne.token?.coinDecimals || 18,
+        selectedChain.chainId,
+        tokenOne.value,
+        tokenOne.token?.coinDecimals || 18,
       );
-      console.log({ tx });
+      setTxnHash(tx);
     }
   };
 
-  const handleSwap = async () => {
-    // TODO: Add swap service call here
-    console.log("DO A SWAP");
-  };
+  const trade = useMemo(() => {
+    if (!quote) {
+      return null;
+    }
+    return createTradeFromQuote(quote, quoteType);
+  }, [quote, quoteType]);
+
+  const handleSwap = useCallback(async () => {
+    if (!trade || !userAccount.address || !selectedChain?.chainId) {
+      return;
+    }
+    if (!walletClient || !walletClient.account) {
+      console.error("No wallet connected or account is undefined.");
+      return;
+    }
+    if (!publicClient) {
+      console.error("Public client is not configured.");
+      return;
+    }
+
+    setTxnStatus(TXN_STATUS.PENDING);
+
+    try {
+      const chainConfig: Chain = {
+        id: selectedChain?.chainId,
+        name: selectedChain?.chainName,
+        nativeCurrency: {
+          name: selectedChain?.currencies[0]?.title, // Assuming the first currency is the native one
+          symbol: selectedChain?.currencies[0]?.coinDenom, // Assuming the first currency is the native one
+          decimals: selectedChain?.currencies[0]?.coinDecimals || 18, // Assuming the first currency is the native one
+        },
+        rpcUrls: {
+          default: {
+            http: selectedChain?.rpcUrls, // Assuming these are the RPC URLs
+          },
+        },
+      };
+
+      const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
+      if (!swapRouterAddress) {
+        console.error("Swap router address is not defined. Cannot swap.");
+        return;
+      }
+
+      const router = new SwapRouter(swapRouterAddress, chainConfig);
+
+      // Set up the swap options
+      const options = {
+        recipient: userAccount.address,
+        slippageTolerance: slippageTolerance,
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
+      };
+
+      const tx = await router.executeSwap(
+        trade,
+        options,
+        walletClient,
+        publicClient,
+      );
+      setTxnHash(tx);
+      console.log("Transaction hash:", tx);
+    } catch (error) {
+      console.error("Error executing swap:", error);
+    }
+  }, [
+    trade,
+    userAccount,
+    selectedChain,
+    walletClient,
+    publicClient,
+    slippageTolerance,
+  ]);
 
   const validSwapInputs =
-    inputOne.token &&
-    inputTwo.token &&
-    inputOne.value !== undefined &&
-    inputTwo.value !== undefined &&
-    parseFloat(inputOne.value) > 0 &&
-    parseFloat(inputTwo.value) > 0 &&
-    parseFloat(inputOne.value) <= parseFloat(tokenOneBalance);
+    !loading &&
+    tokenOne?.token &&
+    tokenTwo?.token &&
+    tokenOne?.value !== undefined &&
+    parseFloat(tokenOne?.value) > 0 &&
+    parseFloat(tokenOne?.value) <= parseFloat(tokenOneBalance);
 
-  const handleButtonAction = () => {
+  const onSubmitCallback = () => {
     if (!userAccount.address) {
       return connectEvmWallet();
-    } else if (
-      inputOne.token?.coinDenom === "WTIA" ||
-      inputTwo.token?.coinDenom === "TIA"
-    ) {
+    } else if (unwrapTia) {
       return handleWrap("unwrap");
-    } else if (
-      inputOne.token?.coinDenom === "TIA" ||
-      inputTwo.token?.coinDenom === "WTIA"
-    ) {
+    } else if (wrapTia) {
       return handleWrap("wrap");
     } else if (validSwapInputs) {
       return handleSwap();
@@ -75,29 +200,57 @@ export function useSwapButton(
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
-      case !inputOne.token || !inputTwo.token:
+      case !tokenOne?.token || !tokenTwo?.token:
         return "Select a token";
-      case inputOne.value === undefined || inputTwo.value === undefined:
+      case tokenOne?.value === undefined:
         return "Enter an amount";
-      case parseFloat(inputOne.value) === 0 || parseFloat(inputTwo.value) === 0:
+      case parseFloat(tokenOne?.value) === 0 || parseFloat(tokenOne?.value) < 0:
         return "Amount must be greater than 0";
-      case isNaN(parseFloat(inputOne.value)) ||
-        isNaN(parseFloat(inputTwo.value)):
-        return "Amount must be a number";
+      case loading:
+        return "loading...";
+      case isNaN(parseFloat(tokenOne?.value)):
+        return "Enter an amount";
       case tokenOneBalance === "0" ||
-        parseFloat(tokenOneBalance) < parseFloat(inputOne.value):
+        parseFloat(tokenOneBalance) < parseFloat(tokenOne?.value):
         return "Insufficient funds";
-      case inputOne.token?.coinDenom === "TIA" &&
-        inputTwo.token?.coinDenom === "WTIA":
+      case wrapTia:
         return "Wrap";
-      case inputOne.token?.coinDenom === "WTIA" &&
-        inputTwo.token?.coinDenom === "TIA":
+      case unwrapTia:
         return "Unwrap";
       default:
         return "Swap";
     }
   };
-  const buttonText = getButtonText();
 
-  return { handleButtonAction, buttonText, validSwapInputs };
+  const getActionButtonText = () => {
+    switch (true) {
+      case txnStatus === TXN_STATUS.PENDING:
+        return "Close";
+      case txnStatus === TXN_STATUS.SUCCESS:
+        return "Close";
+      case txnStatus === TXN_STATUS.FAILED:
+        return "Dismiss";
+      case wrapTia:
+        return "Confirm Wrap";
+      case unwrapTia:
+        return "Confirm Unwrap";
+      default:
+        return "Confirm Swap";
+    }
+  };
+
+  const isCloseModalAction =
+    txnStatus === TXN_STATUS.SUCCESS ||
+    txnStatus === TXN_STATUS.FAILED ||
+    txnStatus === TXN_STATUS.PENDING;
+
+  return {
+    onSubmitCallback,
+    buttonText: getButtonText(),
+    actionButtonText: getActionButtonText(),
+    validSwapInputs,
+    txnStatus,
+    setTxnStatus,
+    isCloseModalAction,
+  };
 }

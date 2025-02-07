@@ -1,4 +1,4 @@
-import { IconProps } from "../types";
+import { IconProps } from "@repo/flame-types";
 
 export const PowerIcon: React.FC<IconProps> = ({
   className = "",

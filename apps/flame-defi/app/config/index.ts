@@ -1,25 +1,12 @@
 import {
-  type FlameNetwork,
   getAllChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
 } from "./chainConfigs";
-import {
-  type CosmosChainInfo,
-  type CosmosChains,
-  type EvmChainInfo,
-  type EvmChains,
-  type IbcCurrency,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
-  evmCurrencyBelongsToChain,
-  ibcCurrencyBelongsToChain,
-} from "./chainConfigs/types";
 import { ConfigContextProvider } from "./contexts/ConfigContext";
 import { getEnvVariable } from "./env";
-import { useConfig } from "./hooks/useConfig";
+import { useConfig, useEvmChainData } from "./hooks/useConfig";
+import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 /**
  * Represents the configuration object for the application.
@@ -51,21 +38,10 @@ export interface AppConfig {
 
 export {
   ConfigContextProvider,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
-  evmCurrencyBelongsToChain,
   getAllChainConfigs,
   getEnvVariable,
   getFlameChainId,
   getFlameNetworkByChainId,
-  ibcCurrencyBelongsToChain,
   useConfig,
-  type CosmosChainInfo,
-  type CosmosChains,
-  type EvmChainInfo,
-  type EvmChains,
-  type FlameNetwork,
-  type IbcCurrency,
+  useEvmChainData,
 };

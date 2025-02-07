@@ -3,6 +3,20 @@ export enum TOKEN_INPUTS {
   TOKEN_TWO = "token_two",
 }
 
+export enum TRADE_TYPE {
+  EXACT_IN = "exactIn",
+  EXACT_OUT = "exactOut",
+}
+
+export enum TXN_STATUS {
+  IDLE = "idle",
+  PENDING = "pending",
+  SUCCESS = "success",
+  FAILED = "failed",
+}
+
+export const defaultSlippageTolerance = 0.1;
+
 export const feeData = [
   {
     id: 0,

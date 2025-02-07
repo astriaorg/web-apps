@@ -10,6 +10,7 @@
     "test": "turbo test"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "prettier": "^3.4.2",
     "turbo": "^2.3.3",
     "typescript": "5.5.4"
@@ -21,8 +22,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "dependencies": {
-    "eslint-plugin-react-hooks": "^5.1.0"
-  }
+  ]
 }

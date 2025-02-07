@@ -1,2 +1,3 @@
 # Ignore codegen files:
 apps/flame-defi/**/gql/*
+apps/flame-defi/codebase.md
