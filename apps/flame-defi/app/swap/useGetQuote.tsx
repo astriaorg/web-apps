@@ -15,8 +15,7 @@ export function useGetQuote() {
 
   const getQuote = useCallback(
     async (type: TRADE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
-
-      if(tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom){
+      if (tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom) {
         return;
       }
 
@@ -90,6 +89,6 @@ export function useGetQuote() {
     },
     [chainId],
   );
-  
+
   return { quote, loading, error, getQuote, setQuote };
 }

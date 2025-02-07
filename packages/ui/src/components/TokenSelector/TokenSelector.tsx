@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react"; 
-import { twMerge } from 'tailwind-merge';
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { EvmCurrency } from "@repo/flame-types";
 import {
   Dialog,
@@ -112,10 +112,15 @@ export const TokenSelector = ({
                 erc20ContractAddress,
                 nativeTokenWithdrawerContractAddress,
               }) => {
-                const isUnavailableOrSelected = unavailableToken?.coinDenom === coinDenom || selectedToken?.coinDenom === coinDenom;
-                const baseClasses = "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
-                const conditionalClasses = isUnavailableOrSelected ? "cursor-not-allowed" : "";
-                
+                const isUnavailableOrSelected =
+                  unavailableToken?.coinDenom === coinDenom ||
+                  selectedToken?.coinDenom === coinDenom;
+                const baseClasses =
+                  "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
+                const conditionalClasses = isUnavailableOrSelected
+                  ? "cursor-not-allowed"
+                  : "";
+
                 return (
                   <div
                     onClick={() =>
@@ -132,7 +137,7 @@ export const TokenSelector = ({
                     }
                     key={coinDenom}
                     className={twMerge(baseClasses, conditionalClasses)}
-                    style={{ position: 'relative' }}
+                    style={{ position: "relative" }}
                   >
                     {isUnavailableOrSelected && (
                       <div className="absolute inset-0 bg-black opacity-40 z-10 cursor-not-allowed rounded-md"></div>

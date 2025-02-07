@@ -3,7 +3,7 @@ import { useGetQuote } from "./useGetQuote";
 import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { formatDecimalValues } from "utils/utils";
 import { TRADE_TYPE } from "../constants";
-import debounce from 'lodash.debounce';
+import debounce from "lodash.debounce";
 
 function useOneToOneQuote(inputOne?: TokenState, inputTwo?: TokenState) {
   const [flipDirection, setFlipDirection] = useState(true);

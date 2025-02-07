@@ -112,17 +112,11 @@ export default function SwapPage(): React.ReactElement {
       }
 
       if (value === "" || value === "0") {
-        setInputOne((prev) => ({ ...prev, value: value, }));
-        setInputTwo((prev) => ({ ...prev, value: value, }));
+        setInputOne((prev) => ({ ...prev, value: value }));
+        setInputTwo((prev) => ({ ...prev, value: value }));
       }
     },
-    [
-      tokenOne,
-      tokenTwo,
-      getQuote,
-      handleQuoteType,
-      isTiaWtia,
-    ],
+    [tokenOne, tokenTwo, getQuote, handleQuoteType, isTiaWtia],
   );
 
   useEffect(() => {
