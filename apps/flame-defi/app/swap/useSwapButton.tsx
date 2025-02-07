@@ -161,6 +161,7 @@ export function useSwapButton({
         publicClient,
       );
       setTxnHash(tx);
+      console.log("Transaction hash:", tx);
     } catch (error) {
       console.error("Error executing swap:", error);
     }

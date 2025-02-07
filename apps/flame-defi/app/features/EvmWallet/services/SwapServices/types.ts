@@ -8,6 +8,7 @@ export interface ExactInputSingleParams {
   amountIn: bigint;
   amountOutMinimum: bigint;
   sqrtPriceLimitX96: bigint;
+  deadline: bigint;
 }
 
 export interface ExactInputParams {
@@ -15,6 +16,7 @@ export interface ExactInputParams {
   recipient: `0x${string}`;
   amountIn: bigint;
   amountOutMinimum: bigint;
+  deadline: bigint;
 }
 
 export interface ExactOutputSingleParams {
@@ -25,6 +27,7 @@ export interface ExactOutputSingleParams {
   amountOut: bigint;
   amountInMaximum: bigint;
   sqrtPriceLimitX96: bigint;
+  deadline: bigint;
 }
 
 export interface ExactOutputParams {
@@ -32,6 +35,7 @@ export interface ExactOutputParams {
   recipient: `0x${string}`;
   amountOut: bigint;
   amountInMaximum: bigint;
+  deadline: bigint;
 }
 
 export enum TradeType {

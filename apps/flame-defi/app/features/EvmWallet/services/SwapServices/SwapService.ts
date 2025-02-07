@@ -56,7 +56,7 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerance: number,
   ): JSBI {
-    // slippageTolerance is in basis points (1 = 0.01%)
+    slippageTolerance = slippageTolerance * 100;
     const slippagePercent = JSBI.BigInt(10000 - slippageTolerance);
     const minimumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
@@ -76,7 +76,7 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerance: number,
   ): JSBI {
-    // slippageTolerance is in basis points (1 = 0.01%)
+    slippageTolerance = slippageTolerance * 100;
     const slippagePercent = JSBI.BigInt(10000 + slippageTolerance);
     const maximumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
@@ -165,8 +165,23 @@ export class SwapRouter {
     const isMultiHop = trade.route.pools.length > 1;
 
     if (isMultiHop) {
-      // TODO - implement multihop
-      throw new Error("Multihop not implemented yet");
+      return {
+        functionName: "exactInput",
+        args: [
+          {
+            path: this.encodePath(trade.route),
+            recipient: isETHOut ? this.routerAddress : recipient,
+            amountIn: BigInt(trade.inputAmount.raw.toString()),
+            amountOutMinimum: BigInt(
+              this.calculateMinimumOut(
+                trade.outputAmount,
+                slippageTolerance,
+              ).toString(),
+            ),
+            deadline,
+          },
+        ],
+      };
     }
 
     const tokenIn = trade.route.path[0]?.address as `0x${string}`;
@@ -187,13 +202,13 @@ export class SwapRouter {
           recipient: isETHOut ? this.routerAddress : recipient,
           amountIn: BigInt(trade.inputAmount.raw.toString()),
           amountOutMinimum: BigInt(
-            this.calculateSlippage(
-              trade.outputAmount.raw,
+            this.calculateMinimumOut(
+              trade.outputAmount,
               slippageTolerance,
-              true,
             ).toString(),
           ),
           sqrtPriceLimitX96: 0n,
+          deadline,
         },
       ],
     };
@@ -212,8 +227,23 @@ export class SwapRouter {
     const isMultiHop = trade.route.pools.length > 1;
 
     if (isMultiHop) {
-      // TODO - implement multihop
-      throw new Error("Multihop not implemented yet");
+      return {
+        functionName: "exactOutput",
+        args: [
+          {
+            path: this.encodePathReversed(trade.route),
+            recipient: isETHOut ? this.routerAddress : recipient,
+            amountOut: BigInt(trade.outputAmount.raw.toString()),
+            amountInMaximum: BigInt(
+              this.calculateMaximumIn(
+                trade.inputAmount,
+                slippageTolerance,
+              ).toString(),
+            ),
+            deadline,
+          },
+        ],
+      };
     }
 
     const tokenIn = trade.route.path[0]?.address as `0x${string}`;
@@ -234,16 +264,52 @@ export class SwapRouter {
           recipient: isETHOut ? this.routerAddress : recipient,
           amountOut: BigInt(trade.outputAmount.raw.toString()),
           amountInMaximum: BigInt(
-            this.calculateSlippage(
-              trade.inputAmount.raw,
+            this.calculateMaximumIn(
+              trade.inputAmount,
               slippageTolerance,
-              false,
             ).toString(),
           ),
           sqrtPriceLimitX96: 0n,
+          deadline,
         },
       ],
     };
+  }
+
+  private encodePath(route: Route): `0x${string}` {
+    const encoded = route.pools
+      .map((pool, i) => {
+        const tokenIn = route.path[i];
+        const tokenOut = route.path[i + 1];
+        const fee = pool.fee.toString(16).padStart(6, "0");
+
+        if (i === route.pools.length - 1) {
+          return `${tokenIn?.address.toLowerCase().slice(2)}${fee}${tokenOut?.address.toLowerCase().slice(2)}`;
+        }
+        return `${tokenIn?.address.toLowerCase().slice(2)}${fee}`;
+      })
+      .join("");
+
+    return `0x${encoded}`;
+  }
+
+  private encodePathReversed(route: Route): `0x${string}` {
+    const encoded = [...route.pools]
+      .reverse()
+      .map((pool, i, reversedPools) => {
+        const pathLength = route.path.length;
+        const tokenIn = route.path[pathLength - 1 - i];
+        const tokenOut = route.path[pathLength - 2 - i];
+        const fee = pool.fee.toString(16).padStart(6, "0");
+
+        if (i === reversedPools.length - 1) {
+          return `${tokenIn?.address.toLowerCase().slice(2)}${fee}${tokenOut?.address.toLowerCase().slice(2)}`;
+        }
+        return `${tokenIn?.address.toLowerCase().slice(2)}${fee}`;
+      })
+      .join("");
+
+    return `0x${encoded}`;
   }
 
   /**
@@ -373,6 +439,7 @@ export class SwapRouter {
       functionName: "multicall",
       args: [calls],
       value,
+      // gas: DEFAULT_GAS_LIMIT,
       chain: this.chainConfig,
       account: signerAddress,
     });
