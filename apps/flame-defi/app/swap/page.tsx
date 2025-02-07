@@ -62,7 +62,6 @@ export default function SwapPage(): React.ReactElement {
     tokenOne,
     tokenTwo,
     tokenOneBalance: tokenOneBalance,
-    selectedChain,
     quote,
     loading,
     error,

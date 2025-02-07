@@ -238,9 +238,8 @@ function TxnSuccess({
   );
 }
 
-// FIXME - commented out to get around lint
-// function TxnFailed(_props: TxnStepsProps) {
-function TxnFailed() {
+function TxnFailed(props: TxnStepsProps) {
+  console.log("TxnFailed props", props);
   return <div>TxnFailed</div>;
 }
 
