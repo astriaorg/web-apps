@@ -187,11 +187,13 @@ export default function EarnPage(): React.ReactElement {
       </div>
 
       {isError ? (
-        <TableCard className="h-[250px] text-lg">
+        <TableCard className="h-[250px] text-lg flex items-center justify-center">
           {`We couldn't fetch vault data. Please try again later.`}
         </TableCard>
       ) : isEmptyState ? (
-        <TableCard className="h-[250px] text-lg">{`No vaults found.`}</TableCard>
+        <TableCard className="h-[250px] text-lg flex items-center justify-center">
+          {`No vaults found.`}
+        </TableCard>
       ) : (
         <>
           <TableCard>
