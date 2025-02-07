@@ -1,8 +1,9 @@
 "use client";
 
-import { ArrowDownIcon } from "@repo/ui/icons";
+import { ArrowDownIcon, SearchIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
 import {
+  Input,
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -32,6 +33,7 @@ import {
 export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [search, setSearch] = useState(""); // TODO: Add debounce.
 
   const { orderBy, orderDirection } = useMemo(() => {
     return {
@@ -51,6 +53,7 @@ export default function EarnPage(): React.ReactElement {
       skip: (currentPage - 1) * PAGE_SIZE,
       orderBy,
       orderDirection,
+      where: { search: search || null, totalAssets_gte: 1 },
     },
   });
 
@@ -159,7 +162,19 @@ export default function EarnPage(): React.ReactElement {
 
   return (
     <section className="flex flex-col p-20">
-      <div className="rounded-lg overflow-x-auto bg-semi-white">
+      <div className="flex justify-end w-full">
+        <Skeleton isLoading={isPending} className=" w-[200px]">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            type="text"
+            placeholder="Search vaults"
+            startAdornment={<SearchIcon size={16} />}
+          />
+        </Skeleton>
+      </div>
+
+      <div className="mt-6 rounded-lg overflow-x-auto bg-semi-white">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

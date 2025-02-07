@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/useConfig";
 import { graphql } from "earn/gql";
-import { OrderDirection, VaultOrderBy, VaultsQuery } from "earn/gql/graphql";
+import {
+  OrderDirection,
+  VaultFilters,
+  VaultOrderBy,
+  VaultsQuery,
+} from "earn/gql/graphql";
 import request from "graphql-request";
 
 export const PAGE_SIZE = 25;
@@ -54,13 +59,14 @@ const query = graphql(`
     $skip: Int
     $orderBy: VaultOrderBy
     $orderDirection: OrderDirection
+    $where: VaultFilters
   ) {
     vaults(
       first: $first
       skip: $skip
       orderBy: $orderBy
       orderDirection: $orderDirection
-      where: { totalAssets_gte: 1 }
+      where: $where
     ) {
       items {
         address
@@ -109,6 +115,7 @@ export const useFetchVaults = ({
     skip: number;
     orderBy: VaultOrderBy;
     orderDirection: OrderDirection;
+    where: VaultFilters;
   };
 }) => {
   const { earnAPIURL } = useConfig();
