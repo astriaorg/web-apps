@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowDownIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/lib";
 import {
   Pagination,
   PaginationContent,
@@ -14,7 +15,6 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -22,7 +22,7 @@ import Big from "big.js";
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
-import { Vault } from "./gql/graphql";
+import { OrderDirection, Vault, VaultOrderBy } from "./gql/graphql";
 import {
   PAGE_SIZE,
   PLACEHOLDER_DATA,
@@ -37,6 +37,13 @@ export default function EarnPage(): React.ReactElement {
     variables: {
       first: PAGE_SIZE,
       skip: (currentPage - 1) * PAGE_SIZE,
+      orderBy:
+        (sorting.map((it) => it.id).join(",") as VaultOrderBy) ||
+        VaultOrderBy.TotalAssets,
+      orderDirection:
+        (sorting
+          .map((it) => (it.desc ? OrderDirection.Desc : OrderDirection.Asc))
+          .join(",") as OrderDirection) || OrderDirection.Desc,
     },
   });
 
@@ -47,8 +54,10 @@ export default function EarnPage(): React.ReactElement {
   const columnHelper = createColumnHelper<Vault>();
 
   const columns = React.useMemo(() => {
+    // Use `VaultOrderBy` as ID for sorting.
     return [
       columnHelper.accessor("name", {
+        id: "name",
         header: "Vault Name",
         cell: ({ row }) => {
           return (
@@ -70,6 +79,7 @@ export default function EarnPage(): React.ReactElement {
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.totalAssets", {
+        id: "TotalAssets",
         header: "Total Assets",
         cell: ({ row }) => {
           return (
@@ -101,6 +111,7 @@ export default function EarnPage(): React.ReactElement {
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.apy", {
+        id: "Apy",
         header: "APY",
         cell: (info) => {
           return (
@@ -114,11 +125,6 @@ export default function EarnPage(): React.ReactElement {
           );
         },
         enableSorting: true,
-        sortingFn: (a, b) => {
-          return new Big(a.original.state?.apy ?? 0)
-            .sub(b.original.state?.apy ?? 0)
-            .toNumber();
-        },
         footer: (info) => info.column.id,
       }),
     ];
@@ -136,7 +142,7 @@ export default function EarnPage(): React.ReactElement {
     columns,
     data: formattedData,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    manualSorting: true,
     state: {
       sorting,
     },
@@ -166,7 +172,11 @@ export default function EarnPage(): React.ReactElement {
                       {header.column.getCanSort() && (
                         <ArrowDownIcon
                           aria-label="Sort"
-                          className={`text-grey-light`}
+                          className={cn(
+                            "text-grey-light",
+                            header.column.getNextSortingOrder() === "desc" &&
+                              "rotate-180",
+                          )}
                           size={16}
                         />
                       )}
