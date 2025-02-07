@@ -17,7 +17,7 @@ import {
 } from "features/EvmWallet";
 import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { getSlippageTolerance } from "utils/utils";
-import { QUOTE_TYPE, TXN_STATUS } from "../constants";
+import { TRADE_TYPE, TXN_STATUS } from "../constants";
 
 interface SwapButtonProps {
   tokenOne: TokenState;
@@ -26,7 +26,7 @@ interface SwapButtonProps {
   quote: GetQuoteResult | null;
   loading: boolean;
   error: string | null;
-  quoteType: QUOTE_TYPE;
+  quoteType: TRADE_TYPE;
 }
 
 export function useSwapButton({

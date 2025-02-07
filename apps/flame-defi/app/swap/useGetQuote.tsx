@@ -3,7 +3,7 @@ import { parseUnits } from "viem";
 
 import { useEvmChainData } from "config";
 import { GetQuoteResult, TokenState } from "@repo/flame-types";
-import { QUOTE_TYPE } from "../constants";
+import { TRADE_TYPE } from "../constants";
 
 export function useGetQuote() {
   const {
@@ -14,7 +14,12 @@ export function useGetQuote() {
   const [error, setError] = useState<string | null>(null);
 
   const getQuote = useCallback(
-    async (type: QUOTE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
+    async (type: TRADE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
+
+      if(tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom){
+        return;
+      }
+
       const amount = tokenOne?.value
         ? parseUnits(
             tokenOne.value,
@@ -85,6 +90,6 @@ export function useGetQuote() {
     },
     [chainId],
   );
-
+  
   return { quote, loading, error, getQuote, setQuote };
 }

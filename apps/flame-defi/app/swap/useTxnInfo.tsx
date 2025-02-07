@@ -1,5 +1,5 @@
 import { GetQuoteResult } from "@repo/flame-types";
-import { formatDecimalValues } from "utils/utils";
+import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
 import { formatUnits } from "viem";
 import { TxnInfoProps } from "./components/TxnInfo";
 
@@ -26,6 +26,7 @@ export function useTxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
   const inputTokenOne = swapPairs[0]?.inputToken;
   const inputTokenTwo = swapPairs[1]?.inputToken;
   const txnQuoteData = swapPairs[0]?.txnQuoteData;
+  const slippageTolerance = getSlippageTolerance();
 
   return {
     gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
@@ -43,7 +44,7 @@ export function useTxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
     ),
     priceImpact: txnQuoteData ? calculatePriceImpact(txnQuoteData) : "0.00",
     minimumReceived: txnQuoteData
-      ? calculateMinimumReceived(txnQuoteData, 0.01)
+      ? calculateMinimumReceived(txnQuoteData, slippageTolerance)
       : "0.00",
     txnQuoteLoading: swapPairs[0]?.txnQuoteLoading,
     inputTokenOne,

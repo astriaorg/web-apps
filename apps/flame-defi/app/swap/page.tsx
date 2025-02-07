@@ -8,7 +8,7 @@ import { useEvmChainData } from "config";
 import { DownArrowIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { EvmCurrency, TokenState } from "@repo/flame-types";
-import { QUOTE_TYPE, TOKEN_INPUTS } from "../constants";
+import { TRADE_TYPE, TOKEN_INPUTS } from "../constants";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
 
 import { useSwapButton } from "./useSwapButton";
@@ -43,7 +43,7 @@ export default function SwapPage(): React.ReactElement {
   }, [inputOne, inputTwo]);
 
   const [flipTokens, setFlipTokens] = useState(false);
-  const [quoteType, setQuoteType] = useState<QUOTE_TYPE>(QUOTE_TYPE.EXACT_IN);
+  const [quoteType, setQuoteType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
   const { quote, loading, error, getQuote, setQuote } = useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
@@ -70,9 +70,9 @@ export default function SwapPage(): React.ReactElement {
 
   const handleQuoteType = useCallback((index: number) => {
     if (index === 0) {
-      setQuoteType(QUOTE_TYPE.EXACT_IN);
+      setQuoteType(TRADE_TYPE.EXACT_IN);
     } else if (index === 1) {
-      setQuoteType(QUOTE_TYPE.EXACT_OUT);
+      setQuoteType(TRADE_TYPE.EXACT_OUT);
     }
   }, []);
 
@@ -97,7 +97,7 @@ export default function SwapPage(): React.ReactElement {
 
       handleQuoteType(index);
       const quoteType =
-        index === 0 ? QUOTE_TYPE.EXACT_IN : QUOTE_TYPE.EXACT_OUT;
+        index === 0 ? TRADE_TYPE.EXACT_IN : TRADE_TYPE.EXACT_OUT;
 
       if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
         setInputOne((prev) => ({ ...prev, value: value, isQuoteValue: false }));
@@ -112,17 +112,14 @@ export default function SwapPage(): React.ReactElement {
       }
 
       if (value === "" || value === "0") {
-        // FIXME - this is resetting tokens when you clear the input.
-        //  i actually type "0.1" usually, and there is some sort of mask that won't let you begin with 0,
-        //  and this also clears out the selected tokens
-        handleResetInputs();
+        setInputOne((prev) => ({ ...prev, value: value, }));
+        setInputTwo((prev) => ({ ...prev, value: value, }));
       }
     },
     [
       tokenOne,
       tokenTwo,
       getQuote,
-      handleResetInputs,
       handleQuoteType,
       isTiaWtia,
     ],
@@ -198,7 +195,7 @@ export default function SwapPage(): React.ReactElement {
 
     const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
     const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
-    getQuote(QUOTE_TYPE.EXACT_IN, preFlipTokenOne, preFlipTokenTwo);
+    getQuote(TRADE_TYPE.EXACT_IN, preFlipTokenOne, preFlipTokenTwo);
   };
 
   const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;

@@ -3,7 +3,7 @@ export enum TOKEN_INPUTS {
   TOKEN_TWO = "token_two",
 }
 
-export enum QUOTE_TYPE {
+export enum TRADE_TYPE {
   EXACT_IN = "exactIn",
   EXACT_OUT = "exactOut",
 }

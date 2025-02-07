@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useGetQuote } from "./useGetQuote";
 import { GetQuoteResult, TokenState } from "@repo/flame-types";
 import { formatDecimalValues } from "utils/utils";
-import { QUOTE_TYPE } from "../constants";
+import { TRADE_TYPE } from "../constants";
+import debounce from 'lodash.debounce';
 
 function useOneToOneQuote(inputOne?: TokenState, inputTwo?: TokenState) {
   const [flipDirection, setFlipDirection] = useState(true);
@@ -24,21 +25,26 @@ function useOneToOneQuote(inputOne?: TokenState, inputTwo?: TokenState) {
   useEffect(() => {
     const fetchQuotes = async () => {
       const quote1 = await getQuote(
-        QUOTE_TYPE.EXACT_IN,
+        TRADE_TYPE.EXACT_IN,
         { token: inputOne?.token, value: "1" },
         { token: inputTwo?.token, value: "0" },
       );
       setQuoteOne({ ...quote1 });
 
       const quote2 = await getQuote(
-        QUOTE_TYPE.EXACT_IN,
+        TRADE_TYPE.EXACT_IN,
         { token: inputTwo?.token, value: "1" },
         { token: inputOne?.token, value: "0" },
       );
       setQuoteTwo({ ...quote2 });
     };
 
-    fetchQuotes();
+    const debouncedFetchQuotes = debounce(fetchQuotes, 300);
+    debouncedFetchQuotes();
+
+    return () => {
+      debouncedFetchQuotes.cancel();
+    };
   }, [inputOne, inputTwo, getQuote]);
 
   return {
