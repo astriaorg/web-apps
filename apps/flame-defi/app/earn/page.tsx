@@ -32,7 +32,7 @@ import {
   useFetchVaults,
 } from "./hooks/useFetchVaults";
 
-type State = "loading" | "error" | "empty" | "success";
+type State = "error" | "empty" | "success";
 
 export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
