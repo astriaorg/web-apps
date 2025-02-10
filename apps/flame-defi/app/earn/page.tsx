@@ -32,6 +32,8 @@ import {
   useFetchVaults,
 } from "./hooks/useFetchVaults";
 
+type State = "loading" | "error" | "empty" | "success";
+
 export default function EarnPage(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -64,10 +66,6 @@ export default function EarnPage(): React.ReactElement {
   const totalPages = useMemo(() => {
     return Math.ceil((data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE);
   }, [data?.vaults?.pageInfo?.countTotal]);
-
-  const isEmptyState = useMemo(() => {
-    return !isPending && !data?.vaults?.items?.length;
-  }, [isPending, data?.vaults?.items?.length]);
 
   const columnHelper = createColumnHelper<Vault>();
 
@@ -168,6 +166,18 @@ export default function EarnPage(): React.ReactElement {
     enableSortingRemoval: false,
   });
 
+  const state = useMemo<State>(() => {
+    if (isError) {
+      return "error";
+    }
+
+    if (!isPending && !data?.vaults?.items?.length) {
+      return "empty";
+    }
+
+    return "success";
+  }, [isError, isPending, data?.vaults?.items?.length]);
+
   return (
     <section className="flex flex-col p-20">
       <div className="flex justify-end w-full mb-6">
@@ -186,15 +196,17 @@ export default function EarnPage(): React.ReactElement {
         </Skeleton>
       </div>
 
-      {isError ? (
+      {state === "error" && (
         <TableCard className="h-[250px] text-lg text-grey-light flex items-center justify-center">
           {`We couldn't fetch vault data. Please try again later.`}
         </TableCard>
-      ) : isEmptyState ? (
+      )}
+      {state === "empty" && (
         <TableCard className="h-[250px] text-lg text-grey-light flex items-center justify-center">
           {`No vaults found.`}
         </TableCard>
-      ) : (
+      )}
+      {state === "success" && (
         <>
           <TableCard>
             <table className="w-full text-left whitespace-nowrap">
