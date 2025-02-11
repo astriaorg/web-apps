@@ -83,12 +83,6 @@ export default {
       transitionTimingFunction: {
         DEFAULT: "ease", // Optional: Sets the default easing
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xs: "calc(var(--radius) - 8px)",
-      },
       keyframes: {
         "fade-in": {
           "0%": {
@@ -154,8 +148,10 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "success-tick": "success-tick 450ms ease 500ms forwards",
-        "success-circle-outline": "success-circle-outline 300ms ease-in-out 300ms forwards",
-        "success-circle-fill": "success-circle-fill 300ms ease-out 500ms forwards",
+        "success-circle-outline":
+          "success-circle-outline 300ms ease-in-out 300ms forwards",
+        "success-circle-fill":
+          "success-circle-fill 300ms ease-out 500ms forwards",
       },
       backgroundImage: {
         "astria-gradient":
