@@ -12,7 +12,6 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "env": [
         "NEXT_PUBLIC_VERSION",
-        "NEXT_PUBLIC_SHOW_LOCAL_NETWORK",
         "NEXT_PUBLIC_BRAND_URL",
         "NEXT_PUBLIC_BRIDGE_URL",
         "NEXT_PUBLIC_SWAP_URL",
@@ -21,7 +20,7 @@
         "NEXT_PUBLIC_GA_TRACKING_ID",
         "NEXT_PUBLIC_FEEDBACK_FORM_URL",
         "NEXT_PUBLIC_WALLET_CONNECT_DOMAIN_VERIFICATION_CODE",
-        "NEXT_APP_NETWORK_LIST_OPTIONS"
+        "NEXT_PUBLIC_NETWORK_LIST_OPTIONS"
       ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
