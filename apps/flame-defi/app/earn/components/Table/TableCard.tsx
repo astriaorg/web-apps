@@ -7,7 +7,7 @@ export const TableCard = ({
   return (
     <div
       className={cn(
-        "rounded-lg bg-semi-white overflow-x-auto bg-semi-white",
+        "rounded-lg bg-semi-white overflow-x-hidden md:overflow-x-auto bg-semi-white",
         className,
       )}
       {...props}

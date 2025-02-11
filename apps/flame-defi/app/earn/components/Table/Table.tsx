@@ -19,7 +19,13 @@ export const Table = () => {
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id} className="h-16 px-3 first:pl-6 last:pr-6">
+              <th
+                key={header.id}
+                className={cn(
+                  "h-12 px-3 first:pl-6 last:hidden",
+                  "md:last:table-cell",
+                )}
+              >
                 <div className="flex items-center space-x-2">
                   <div className="text-xs/3 text-grey-light font-mono font-medium uppercase">
                     {flexRender(
@@ -52,9 +58,12 @@ export const Table = () => {
             {row.getVisibleCells().map((cell) => (
               <td
                 key={cell.id}
-                className="h-14 px-3 first:pl-6 last:pr-6 border-t border-dark text-sm"
+                className={cn(
+                  "h-[72px] px-3 first:pl-6 last:hidden border-t border-dark text-sm",
+                  "md:last:table-cell",
+                )}
               >
-                <Skeleton isLoading={isPending}>
+                <Skeleton isLoading={isPending} className="h-8">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Skeleton>
               </td>

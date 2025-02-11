@@ -86,8 +86,8 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
                   className="rounded-full"
                 />
               )}
-              <div className="flex flex-col space-y-1 truncate">
-                <span className="text-base/4 truncate">
+              <div className="flex flex-col space-y-1 overflow-hidden">
+                <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
                   {row.original.name}
                 </span>
                 <span className="md:hidden text-xs/3">
@@ -107,35 +107,47 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
       }),
       columnHelper.accessor("state.totalAssets", {
         id: "TotalAssets",
-        header: "Total Assets",
+        header: "Supply",
         cell: ({ row }) => {
           return (
-            <div
-              className={cn(
-                "flex flex-col items-start space-x-0 space-y-1",
-                "md:flex-row md:items-center md:space-x-3 md:space-y-0",
-              )}
-            >
-              <span className={cn("text-xs/3", "md:text-base/4")}>
-                <FormattedNumber
-                  value={
-                    +new Big(row.original.state?.totalAssets ?? 0)
-                      .div(10 ** row.original.asset.decimals)
-                      .toFixed(2)
-                  }
-                />
-                &nbsp;
-                {row.original.symbol}
-              </span>
-              <span className="text-xs text-secondary font-medium bg-muted-foreground px-1 py-0.5 rounded-sm opacity-75">
-                <FormattedNumber
-                  value={
-                    +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(2)
-                  }
-                  style="currency"
-                  currency="USD"
-                />
-              </span>
+            <div className="flex items-center justify-between space-x-4">
+              <div
+                className={cn(
+                  "flex flex-col items-start space-x-0 space-y-1",
+                  "md:flex-row md:items-center md:space-x-3 md:space-y-0",
+                )}
+              >
+                <span
+                  className={cn(
+                    "text-xs/3 truncate max-w-[35vw]",
+                    "md:text-base/4 md:max-w-auto",
+                  )}
+                >
+                  <FormattedNumber
+                    value={
+                      +new Big(row.original.state?.totalAssets ?? 0)
+                        .div(10 ** row.original.asset.decimals)
+                        .toFixed(2)
+                    }
+                  />
+                  &nbsp;
+                  {row.original.symbol}
+                </span>
+                <span className="text-xs text-secondary font-medium bg-muted-foreground px-1 py-0.5 rounded-sm opacity-75">
+                  <FormattedNumber
+                    value={
+                      +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
+                        2,
+                      )
+                    }
+                    style="currency"
+                    currency="USD"
+                  />
+                </span>
+              </div>
+              <div className="md:hidden flex justify-end pr-3">
+                <CaretRightIcon className="text-grey-light" size={16} />
+              </div>
             </div>
           );
         },
@@ -160,9 +172,6 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
                   style="percent"
                   minimumFractionDigits={2}
                 />
-              </div>
-              <div className="block md:hidden">
-                <CaretRightIcon className="text-grey-light" size={16} />
               </div>
             </>
           );
