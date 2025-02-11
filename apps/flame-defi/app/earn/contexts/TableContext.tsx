@@ -1,4 +1,6 @@
 import { useDebounce } from "@repo/ui/hooks";
+import { CaretRightIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/lib";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -74,17 +76,29 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
         header: "Vault Name",
         cell: ({ row }) => {
           return (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 md:space-x-4">
               {row.original.asset.logoURI && (
                 <Image
                   src={row.original.asset.logoURI}
                   alt={row.original.name}
-                  width={24}
-                  height={24}
+                  width={30}
+                  height={30}
                   className="rounded-full"
                 />
               )}
-              <span>{row.original.name}</span>
+              <div className="flex flex-col space-y-1 truncate">
+                <span className="text-base/4 truncate">
+                  {row.original.name}
+                </span>
+                <span className="md:hidden text-xs/3">
+                  <FormattedNumber
+                    value={row.original.state?.apy ?? 0}
+                    style="percent"
+                    minimumFractionDigits={2}
+                  />
+                  &nbsp;APY
+                </span>
+              </div>
             </div>
           );
         },
@@ -96,8 +110,13 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
         header: "Total Assets",
         cell: ({ row }) => {
           return (
-            <div className="flex items-center space-x-4">
-              <span>
+            <div
+              className={cn(
+                "flex flex-col items-start space-x-0 space-y-1",
+                "md:flex-row md:items-center md:space-x-3 md:space-y-0",
+              )}
+            >
+              <span className={cn("text-xs/3", "md:text-base/4")}>
                 <FormattedNumber
                   value={
                     +new Big(row.original.state?.totalAssets ?? 0)
@@ -108,7 +127,7 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
                 &nbsp;
                 {row.original.symbol}
               </span>
-              <span className="text-xs text-secondary bg-muted-foreground px-2 py-0.5 rounded-sm opacity-75">
+              <span className="text-xs text-secondary font-medium bg-muted-foreground px-1 py-0.5 rounded-sm opacity-75">
                 <FormattedNumber
                   value={
                     +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(2)
@@ -125,16 +144,27 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
       }),
       columnHelper.accessor("state.apy", {
         id: "Apy",
-        header: "APY",
+        header: () => {
+          return (
+            <div className="hidden md:block">
+              <span>APY</span>
+            </div>
+          );
+        },
         cell: (info) => {
           return (
-            <div>
-              <FormattedNumber
-                value={info.getValue()}
-                style="percent"
-                minimumFractionDigits={2}
-              />
-            </div>
+            <>
+              <div className="hidden md:block">
+                <FormattedNumber
+                  value={info.getValue()}
+                  style="percent"
+                  minimumFractionDigits={2}
+                />
+              </div>
+              <div className="block md:hidden">
+                <CaretRightIcon className="text-grey-light" size={16} />
+              </div>
+            </>
           );
         },
         enableSorting: true,

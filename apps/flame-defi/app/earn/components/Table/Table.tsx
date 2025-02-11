@@ -19,9 +19,9 @@ export const Table = () => {
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id} className="h-16 px-5 first:pl-8 last:pr-8">
+              <th key={header.id} className="h-16 px-3 first:pl-6 last:pr-6">
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm text-grey-light font-mono font-medium uppercase">
+                  <div className="text-xs/3 text-grey-light font-mono font-medium uppercase">
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext(),
@@ -52,7 +52,7 @@ export const Table = () => {
             {row.getVisibleCells().map((cell) => (
               <td
                 key={cell.id}
-                className="h-14 px-5 first:pl-8 last:pr-8 border-t border-dark text-sm"
+                className="h-14 px-3 first:pl-6 last:pr-6 border-t border-dark text-sm"
               >
                 <Skeleton isLoading={isPending}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}

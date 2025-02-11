@@ -10,7 +10,7 @@ export const TableSection = () => {
   const { status } = useTable();
 
   return (
-    <section className="flex flex-col p-20">
+    <section className="flex flex-col p-4 md:p-20">
       <div className="flex justify-end w-full mb-6">
         <TableSearch />
       </div>
