@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["NB Akademie", "sans-serif"],
+        sans: ["Switzer", "sans-serif"],
         mono: ["NB Akademie Mono", "monospace"],
+        dot: ["LED Dot-Matrix", "monospace"],
       },
       colors: {
         white: "hsl(var(--color-white))",
