@@ -42,7 +42,7 @@ export const TableSearch = () => {
           }
           className={cn(
             "transition-all duration-300 ease-in-out",
-            search ? "w-full md:w-52" : "w-0 border-transparent outline-none",
+            search ? "w-full md:w-52" : "w-0 border-transparent",
             "focus-visible:w-full md:focus-visible:w-52 focus-visible:border-orange-soft",
           )}
         />
