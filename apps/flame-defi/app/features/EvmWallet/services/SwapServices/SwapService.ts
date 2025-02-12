@@ -413,7 +413,7 @@ export class SwapRouter {
 
     // add wrapETH call if needed
     if (isNativeIn) {
-      calls.push(this.encodeWrapETHCall(trade.inputAmount.raw.toString()));
+      // NOTE - we don't need to explicitly wrap ETH, the router's callback will do it for us
       value = BigInt(trade.inputAmount.raw.toString());
     }
 
