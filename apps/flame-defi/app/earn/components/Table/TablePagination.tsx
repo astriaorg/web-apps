@@ -23,7 +23,7 @@ export const TablePagination = () => {
   }, [data?.vaults?.pageInfo?.countTotal]);
 
   return (
-    <Skeleton isLoading={isPending} className="w-[200px]">
+    <Skeleton isLoading={isPending} className="w-52">
       <Pagination>
         <PaginationContent>
           <PaginationItem>
