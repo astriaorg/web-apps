@@ -411,8 +411,8 @@ export class SwapRouter {
     const calls: string[] = [];
     let value = 0n;
 
-    // if isNativeIn then we need to sent TIA to the contract, so set the value accordingly
     if (isNativeIn) {
+      // if isNativeIn then we need to send TIA to the contract, so set the value accordingly
       // NOTE - we don't need to explicitly wrap ETH, the router's callback will do it for us
       value = BigInt(trade.inputAmount.raw.toString());
     }
