@@ -13,6 +13,16 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  async redirects() {
+    const destination = `/well-known-${process.env.NODE_ENV ?? "develop"}/walletconnect.txt`;
+    return [
+      {
+        source: "/.well-known/walletconnect.txt",
+        destination,
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
