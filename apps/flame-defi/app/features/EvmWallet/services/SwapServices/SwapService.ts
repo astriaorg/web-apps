@@ -56,7 +56,6 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerance: number,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
     const slippagePercent = JSBI.BigInt(10000 - slippageTolerance);
     const minimumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
@@ -76,7 +75,6 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerance: number,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
     const slippagePercent = JSBI.BigInt(10000 + slippageTolerance);
     const maximumAmount = JSBI.divide(
       JSBI.multiply(amount.raw, slippagePercent),
@@ -97,7 +95,6 @@ export class SwapRouter {
     slippageTolerance: number,
     isMinimum: boolean,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
     const basisPoints = JSBI.BigInt(10000);
     let adjustedBasisPoints: JSBI;
 
