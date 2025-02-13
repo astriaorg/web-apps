@@ -77,14 +77,16 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center space-x-2 md:space-x-4">
-              {row.original.asset.logoURI && (
+              {row.original.asset.logoURI ? (
                 <Image
                   src={row.original.asset.logoURI}
                   alt={row.original.name}
                   width={30}
                   height={30}
-                  className="rounded-full"
+                  className="rounded-full shrink-0"
                 />
+              ) : (
+                <div className="rounded-full shrink-0 w-[30px] h-[30px] bg-grey-dark" />
               )}
               <div className="flex flex-col space-y-1 overflow-hidden">
                 <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
@@ -119,7 +121,7 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
               >
                 <span
                   className={cn(
-                    "text-xs/3 truncate max-w-[35vw]",
+                    "text-xs/3 truncate max-w-[25vw]",
                     "md:text-base/4 md:max-w-auto",
                   )}
                 >

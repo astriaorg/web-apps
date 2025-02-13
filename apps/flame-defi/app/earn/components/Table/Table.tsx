@@ -26,8 +26,8 @@ export const Table = () => {
                   "md:last:table-cell",
                 )}
               >
-                <div className="flex items-center space-x-2">
-                  <div className="text-xs/3 text-grey-light font-mono font-medium uppercase">
+                <div className="flex items-end space-x-2">
+                  <div className="text-xs/3 text-grey-light font-semibold tracking-widest uppercase">
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext(),
