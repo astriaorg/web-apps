@@ -4,10 +4,11 @@ import { InfoTooltip, BlockLoader, SuccessCheck } from "@repo/ui/components";
 import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
 import { OneToOneQuoteProps, TokenState } from "@repo/flame-types";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
-import { flameExplorerUrl, TXN_STATUS } from "../../constants";
+import { TXN_STATUS } from "@repo/flame-types";
 import { TxnInfoProps } from "./TxnInfo";
 import { useTxnInfo } from "../useTxnInfo";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { useEvmChainData } from "config";
 
 interface TxnStepsProps {
   expectedOutputFormatted: string | undefined;
@@ -173,6 +174,7 @@ function TxnSuccess({
   isTiaWtia,
   txnHash,
 }: TxnStepsProps) {
+  const { selectedChain } = useEvmChainData();
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
@@ -194,7 +196,7 @@ function TxnSuccess({
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
-            href={`${flameExplorerUrl}/tx/${txnHash}`}
+            href={`${selectedChain.blockExplorerUrl}/tx/${txnHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-orange-soft hover:text-orange-soft/80 transition"

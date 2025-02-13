@@ -15,8 +15,12 @@ import {
   GetQuoteResult,
   OneToOneQuoteProps,
 } from "@repo/flame-types";
-import { TOKEN_INPUTS } from "../../constants";
 import { useTxnInfo } from "swap/useTxnInfo";
+
+enum TOKEN_INPUTS {
+  TOKEN_ONE = "token_one",
+  TOKEN_TWO = "token_two",
+}
 
 export interface TxnInfoProps {
   id: TOKEN_INPUTS;

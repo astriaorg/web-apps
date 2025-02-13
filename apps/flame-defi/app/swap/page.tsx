@@ -2,13 +2,11 @@
 
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-
 import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
-import { EvmCurrency, TokenState } from "@repo/flame-types";
-import { TRADE_TYPE, TOKEN_INPUTS } from "../constants";
+import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
 import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
 import { useSwapButton } from "./useSwapButton";
 import { SwapInput } from "./components/SwapInput";
@@ -18,6 +16,11 @@ import { SwapTxnSteps } from "./components/SwapTxnSteps";
 import { useGetQuote } from "./useGetQuote";
 import debounce from "lodash.debounce";
 import useOneToOneQuote from "./useOneToOneQuote";
+
+enum TOKEN_INPUTS {
+  TOKEN_ONE = "token_one",
+  TOKEN_TWO = "token_two",
+}
 
 export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();

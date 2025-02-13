@@ -14,10 +14,16 @@ import {
   createWrapService,
   SwapRouter,
 } from "features/EvmWallet";
-import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
+import {
+  evmChainToRainbowKitChain,
+  EvmCurrency,
+  GetQuoteResult,
+  TokenState,
+} from "@repo/flame-types";
 import { getSlippageTolerance, parseToBigInt } from "utils/utils";
-import { TRADE_TYPE, TXN_STATUS } from "../constants";
+import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import JSBI from "jsbi";
+import { Chain } from "viem";
 
 interface SwapButtonProps {
   tokenOne: TokenState;
@@ -76,7 +82,7 @@ export function useSwapButton({
   // error,
   tradeType,
 }: SwapButtonProps) {
-  const { selectedChain, evmChainConfig } = useEvmChainData();
+  const { selectedChain } = useEvmChainData();
   const { approveToken } = useEvmWallet();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
@@ -187,7 +193,10 @@ export function useSwapButton({
         console.warn("Swap router address is not defined. Cannot swap.");
         return;
       }
-      const router = new SwapRouter(swapRouterAddress, evmChainConfig);
+      const router = new SwapRouter(
+        swapRouterAddress,
+        evmChainToRainbowKitChain(selectedChain) as Chain,
+      );
       const options = {
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
@@ -209,7 +218,6 @@ export function useSwapButton({
     }
   }, [
     trade,
-    evmChainConfig,
     userAccount,
     selectedChain,
     walletClient,

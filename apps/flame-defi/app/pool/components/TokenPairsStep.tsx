@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useEvmChainData } from "config";
+import { useConfig, useEvmChainData } from "config";
 import { EvmCurrency } from "@repo/flame-types";
 import { ActionButton, TokenSelector } from "@repo/ui/components";
 import { Button, DialogTrigger } from "@repo/ui/shadcn-primitives";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
 import { FeeData, TokenPair } from "./NewPoolPosition";
-import { feeData } from "../../constants";
 
 export interface TokenPairsStepProps {
   step: number;
@@ -48,6 +47,7 @@ export default function TokenPairsStep({
   selectedFeeTier,
   setSelectedFeeTier,
 }: TokenPairsStepProps): React.ReactElement {
+  const { feeData } = useConfig();
   const {
     selectedChain: { currencies },
   } = useEvmChainData();

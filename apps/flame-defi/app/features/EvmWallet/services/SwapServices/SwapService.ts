@@ -1,8 +1,6 @@
 import JSBI from "jsbi";
 import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
-
 import { GetQuoteResult } from "@repo/flame-types";
-import ERC_20_ABI from "./contracts/erc20.json";
 import SWAP_ROUTER_ABI from "./contracts/swaprouter02.json";
 import {
   ExactInputParams,
@@ -32,24 +30,12 @@ export class SwapRouter {
     outputs: Array<{ name: string; type: string }>;
     stateMutability: string;
   }>;
-  private readonly erc20Abi: Array<{
-    name: string;
-    type: string;
-    inputs: Array<{
-      name: string;
-      type: string;
-      components?: Array<{ name: string; type: string }>;
-    }>;
-    outputs: Array<{ name: string; type: string }>;
-    stateMutability: string;
-  }>;
 
   constructor(routerAddress: string, chainConfig: Chain) {
     this.routerAddress = routerAddress as `0x${string}`;
     this.chainConfig = chainConfig;
     // Minimal ABI for the swap functions.
     this.routerAbi = SWAP_ROUTER_ABI;
-    this.erc20Abi = ERC_20_ABI;
   }
 
   private calculateMinimumOut(

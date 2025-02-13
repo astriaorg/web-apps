@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { flameExplorerUrl } from "../../../../constants";
+import { useEvmChainData } from "config";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
@@ -25,6 +25,7 @@ interface ConnectEvmWalletButtonProps {
 export default function ConnectEvmWalletButton({
   labelBeforeConnected,
 }: ConnectEvmWalletButtonProps) {
+  const { selectedChain } = useEvmChainData();
   const {
     connectEvmWallet,
     disconnectEvmWallet,
@@ -63,7 +64,7 @@ export default function ConnectEvmWalletButton({
           <div className="flex items-center gap-3">
             <CopyToClipboardButton textToCopy={userAccount.address} />
             <a
-              href={`${flameExplorerUrl}/address/${userAccount.address}`}
+              href={`${selectedChain.blockExplorerUrl}/address/${userAccount.address}`}
               target="_blank"
               rel="noreferrer"
             >

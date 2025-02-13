@@ -1,6 +1,6 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { erc20Abi, formatUnits } from "viem";
+import { Chain, erc20Abi, formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
@@ -26,11 +26,11 @@ import {
 import { formatBalance } from "../../../utils/utils";
 import {
   EvmChainInfo,
+  evmChainToRainbowKitChain,
   EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "@repo/flame-types";
 import JSBI from "jsbi";
-import { defaultApprovalAmount } from "../../../constants";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -69,15 +69,19 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { evmChains, selectedFlameNetwork, selectFlameNetwork } =
-    useAppConfig();
+  const {
+    evmChains,
+    selectedFlameNetwork,
+    selectFlameNetwork,
+    TokenDefaultApprovalAmount,
+  } = useAppConfig();
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
-  const { selectedChain, evmChainConfig } = useEvmChainData();
+  const { selectedChain } = useEvmChainData();
   const publicClient = getPublicClient(wagmiConfig, {
     chainId: selectedChain?.chainId,
   });
@@ -315,7 +319,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       ) {
         return null;
       }
-      const amountAsBigInt = BigInt(defaultApprovalAmount);
+      const amountAsBigInt = BigInt(TokenDefaultApprovalAmount);
       // NOTE: Reset this to 0 whenever we want to reset the approval
       // const amountAsBigInt = BigInt('0');
 
@@ -325,7 +329,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
           abi: erc20Abi,
           functionName: "approve",
           args: [contracts.swapRouter.address, amountAsBigInt],
-          chain: evmChainConfig,
+          chain: evmChainToRainbowKitChain(selectedChain) as Chain,
           account: userAccount?.address as `0x${string}`,
         });
 
@@ -333,7 +337,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
           if (data.symbol === token?.coinDenom) {
             return {
               symbol: token?.coinDenom,
-              allowance: JSBI.BigInt(defaultApprovalAmount),
+              allowance: JSBI.BigInt(TokenDefaultApprovalAmount),
             };
           }
           return data;
@@ -350,8 +354,9 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       userAccount.address,
       walletClient,
       contracts?.swapRouter?.address,
-      evmChainConfig,
       tokenAllowances,
+      TokenDefaultApprovalAmount,
+      selectedChain,
     ],
   );
 

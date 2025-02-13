@@ -1,9 +1,7 @@
 import { useState, useCallback } from "react";
 import { parseUnits } from "viem";
-
 import { useEvmChainData } from "config";
-import { GetQuoteResult, TokenState } from "@repo/flame-types";
-import { TRADE_TYPE } from "../constants";
+import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
 
 export function useGetQuote() {
   const {

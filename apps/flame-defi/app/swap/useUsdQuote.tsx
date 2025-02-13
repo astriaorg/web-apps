@@ -2,9 +2,8 @@ import { useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 
 import { useEvmChainData } from "config";
-import { EvmCurrency, TokenState } from "@repo/flame-types";
+import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
 import { useGetQuote } from "./useGetQuote";
-import { TRADE_TYPE } from "../constants";
 
 function useUsdQuote(inputToken?: TokenState) {
   const { selectedChain } = useEvmChainData();

@@ -414,3 +414,15 @@ export enum FlameNetwork {
   DAWN = "dawn",
   MAINNET = "mainnet",
 }
+
+export enum TRADE_TYPE {
+  EXACT_IN = "exactIn",
+  EXACT_OUT = "exactOut",
+}
+
+export enum TXN_STATUS {
+  IDLE = "idle",
+  PENDING = "pending",
+  SUCCESS = "success",
+  FAILED = "failed",
+}

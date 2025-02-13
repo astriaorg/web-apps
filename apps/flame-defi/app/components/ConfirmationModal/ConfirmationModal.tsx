@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { CloseIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
-import { TXN_STATUS } from "../../constants";
+import { TXN_STATUS } from "@repo/flame-types";
 
 interface ConfirmationModalProps {
   onSubmitCallback: () => void;

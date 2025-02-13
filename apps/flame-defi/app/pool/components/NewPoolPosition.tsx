@@ -10,10 +10,9 @@ import { useState } from "react";
 import TokenPairsStep from "./TokenPairsStep";
 import PriceRangeStep from "./PriceRangeStep";
 import DepositAmountsStep from "./DepositAmountsStep";
-import { feeData } from "../../constants";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
-import { useEvmChainData } from "config";
+import { useEvmChainData, useConfig } from "config";
 import React from "react";
 import { EvmCurrency } from "@repo/flame-types";
 
@@ -44,6 +43,7 @@ export default function NewPoolPosition({
   newPositionPage: boolean;
   setNewPositionPage: (newPositionPage: boolean) => void;
 }): React.ReactElement {
+  const { feeData } = useConfig();
   const userAccount = useAccount();
   const {
     selectedChain: { currencies },

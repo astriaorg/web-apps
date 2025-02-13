@@ -18,13 +18,14 @@ import { GearIcon } from "@repo/ui/icons";
 import { InfoTooltip } from "@repo/ui/components";
 import { useState } from "react";
 import { getFromLocalStorage, setInLocalStorage } from "utils/utils";
-import { defaultSlippageTolerance } from "../../constants";
+import { useConfig } from "config";
 
 export const SettingsPopover = () => {
+  const { SwapDefaultSlippageTolerance } = useConfig();
   const currentSettings = getFromLocalStorage("settings") || {};
   const [customSlippage, setCustomSlippage] = useState<string>(
     currentSettings?.slippageTolerance?.toString() ||
-      defaultSlippageTolerance.toString(),
+      SwapDefaultSlippageTolerance.toString(),
   );
   const [expertMode, setExpertMode] = useState(
     currentSettings?.expertMode || false,

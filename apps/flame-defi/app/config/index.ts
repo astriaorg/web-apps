@@ -34,6 +34,18 @@ export interface AppConfig {
   feedbackFormURL: string | null;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
+  // The default approval amount for tokens.
+  TokenDefaultApprovalAmount: string;
+  // The default slippage tolerance for swaps.
+  SwapDefaultSlippageTolerance: number;
+  // The data for the fee options.
+  feeData: {
+    id: number;
+    feePercent: string;
+    text: string;
+    tvl: string;
+    selectPercent: string;
+  }[];
 }
 
 export {

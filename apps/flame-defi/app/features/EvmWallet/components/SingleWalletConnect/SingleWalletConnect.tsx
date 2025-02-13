@@ -9,8 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { flameExplorerUrl } from "../../../../constants";
-
+import { useEvmChainData } from "config";
 export function SingleWalletContent({
   address,
   handleClose,
@@ -19,6 +18,7 @@ export function SingleWalletContent({
   handleClose?: () => void;
 }) {
   //   const [showTransactions, setShowTransactions] = useState(false);
+  const { selectedChain } = useEvmChainData();
   const {
     disconnectEvmWallet,
     evmNativeTokenBalance,
@@ -45,7 +45,7 @@ export function SingleWalletContent({
         <div className="flex items-center gap-3 text-grey-light">
           <CopyToClipboardButton textToCopy={address} />
           <a
-            href={`${flameExplorerUrl}/address/${address}`}
+            href={`${selectedChain.blockExplorerUrl}/address/${address}`}
             target="_blank"
             rel="noreferrer"
           >

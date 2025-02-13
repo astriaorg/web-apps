@@ -1,5 +1,4 @@
 import JSBI from "jsbi";
-import { defaultSlippageTolerance } from "../constants";
 
 export function getFromLocalStorage(item: string) {
   const retrievedItem = window.localStorage.getItem(item);
@@ -16,7 +15,10 @@ export function setInLocalStorage(key: string, item: unknown) {
 
 export function getSlippageTolerance() {
   const settings = getFromLocalStorage("settings");
-  return settings?.slippageTolerance || defaultSlippageTolerance;
+  return (
+    settings?.slippageTolerance ||
+    "115792089237316195423570985008687907853269984665640564039457"
+  );
 }
 
 /**
