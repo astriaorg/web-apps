@@ -15,6 +15,11 @@ export enum TXN_STATUS {
   FAILED = "failed",
 }
 
+export const flameExplorerUrl = "https://explorer.flame.astria.org";
+
+export const defaultApprovalAmount =
+  "115792089237316195423570985008687907853269984665640564039457";
+
 export const defaultSlippageTolerance = 0.1;
 
 export const feeData = [

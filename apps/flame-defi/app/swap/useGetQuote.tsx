@@ -14,11 +14,22 @@ export function useGetQuote() {
   const [error, setError] = useState<string | null>(null);
 
   const getQuote = useCallback(
-    async (type: TRADE_TYPE, tokenOne: TokenState, tokenTwo: TokenState) => {
+    async (
+      type: TRADE_TYPE,
+      tokenOne: TokenState,
+      tokenTwo: TokenState,
+    ): Promise<GetQuoteResult | undefined> => {
+      if (
+        (tokenOne.token?.coinDenom === "TIA" &&
+          tokenTwo.token?.coinDenom === "WTIA") ||
+        (tokenOne.token?.coinDenom === "WTIA" &&
+          tokenTwo.token?.coinDenom === "TIA")
+      ) {
+        return;
+      }
       if (tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom) {
         return;
       }
-
       const amount = tokenOne?.value
         ? parseUnits(
             tokenOne.value,
@@ -26,6 +37,7 @@ export function useGetQuote() {
           ).toString()
         : "";
 
+      // This is a fix for TIA not having a ERC20 contract address
       const tokenInAddress =
         tokenOne?.token?.erc20ContractAddress ||
         "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
@@ -38,53 +50,60 @@ export function useGetQuote() {
       const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
 
       if (
-        chainId &&
-        tokenInAddress &&
-        tokenInDecimals !== undefined &&
-        tokenInSymbol &&
-        tokenOutAddress &&
-        tokenOutDecimals !== undefined &&
-        tokenOutSymbol &&
-        amount &&
-        parseFloat(amount) > 0 &&
-        type
+        !(
+          chainId &&
+          tokenInAddress &&
+          tokenInDecimals !== undefined &&
+          tokenInSymbol &&
+          tokenOutAddress &&
+          tokenOutDecimals !== undefined &&
+          tokenOutSymbol &&
+          amount &&
+          parseFloat(amount) > 0 &&
+          type
+        )
       ) {
-        try {
-          setLoading(true);
-          setError(null);
+        return;
+      }
 
-          const url =
-            `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
-            `chainId=${chainId}` +
-            `&tokenInAddress=${tokenInAddress}` +
-            `&tokenInDecimals=${tokenInDecimals}` +
-            `&tokenInSymbol=${tokenInSymbol}` +
-            `&tokenOutAddress=${tokenOutAddress}` +
-            `&tokenOutDecimals=${tokenOutDecimals}` +
-            `&tokenOutSymbol=${tokenOutSymbol}` +
-            `&amount=${amount}` +
-            `&type=${type}`;
+      try {
+        setLoading(true);
+        setError(null);
 
-          const response = await fetch(url, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+        const url =
+          `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
+          `chainId=${chainId}` +
+          `&tokenInAddress=${tokenInAddress}` +
+          `&tokenInDecimals=${tokenInDecimals}` +
+          `&tokenInSymbol=${tokenInSymbol}` +
+          `&tokenOutAddress=${tokenOutAddress}` +
+          `&tokenOutDecimals=${tokenOutDecimals}` +
+          `&tokenOutSymbol=${tokenOutSymbol}` +
+          `&amount=${amount}` +
+          `&type=${type}`;
 
-          if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-          }
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-          const { data } = await response.json();
-          setQuote({ ...data });
-          return data;
-        } catch (err) {
-          console.warn(err);
-          setError("error message");
-        } finally {
-          setLoading(false);
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
         }
+
+        const { data } = await response.json();
+        setQuote({ ...data });
+
+        return data;
+      } catch (err) {
+        console.warn(err);
+        setError("error message");
+
+        throw err;
+      } finally {
+        setLoading(false);
       }
     },
     [chainId],

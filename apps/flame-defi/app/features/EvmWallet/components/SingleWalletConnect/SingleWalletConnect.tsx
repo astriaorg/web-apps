@@ -9,6 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { flameExplorerUrl } from "../../../../constants";
 
 export function SingleWalletContent({
   address,
@@ -32,7 +33,7 @@ export function SingleWalletContent({
   };
 
   return (
-    <div className="">
+    <div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FlameIcon />
@@ -43,10 +44,16 @@ export function SingleWalletContent({
         </div>
         <div className="flex items-center gap-3 text-grey-light">
           <CopyToClipboardButton textToCopy={address} />
-          <UpRightSquareIcon
-            className="cursor-pointer hover:text-white transition"
-            size={21}
-          />
+          <a
+            href={`${flameExplorerUrl}/address/${address}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <UpRightSquareIcon
+              className="cursor-pointer hover:text-white transition"
+              size={21}
+            />
+          </a>
           <button type="button" onClick={() => handleDisconnect()}>
             <PowerIcon
               className="cursor-pointer hover:text-white transition"
@@ -109,7 +116,7 @@ export default function SingleWalletConnect() {
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
-        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark"
+        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark w-full md:w-[300px]"
       >
         <SingleWalletContent address={userAccount.address} />
       </PopoverContent>

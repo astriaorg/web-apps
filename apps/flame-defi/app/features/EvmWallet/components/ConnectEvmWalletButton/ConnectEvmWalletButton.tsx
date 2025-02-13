@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { flameExplorerUrl } from "../../../../constants";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
@@ -61,10 +62,16 @@ export default function ConnectEvmWalletButton({
           </AccordionTrigger>
           <div className="flex items-center gap-3">
             <CopyToClipboardButton textToCopy={userAccount.address} />
-            <UpRightSquareIcon
-              className="cursor-pointer hover:text-white transition"
-              size={21}
-            />
+            <a
+              href={`${flameExplorerUrl}/address/${userAccount.address}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <UpRightSquareIcon
+                className="cursor-pointer hover:text-white transition"
+                size={21}
+              />
+            </a>
             <button type="button" onClick={() => disconnectEvmWallet()}>
               <PowerIcon
                 className="cursor-pointer hover:text-white transition"

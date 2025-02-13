@@ -344,6 +344,15 @@ export enum ChainId {
   FLAME_TESTNET = 16604737732183,
 }
 
+export interface OneToOneQuoteProps {
+  tokenOneSymbol: string | undefined;
+  tokenTwoSymbol: string | undefined;
+  tokenTwoValue: string | undefined;
+  oneToOneLoading: boolean;
+  flipDirection: boolean;
+  setFlipDirection: (flipDirection: boolean) => void;
+}
+
 export interface GetQuoteParams {
   // no cross chain swaps yet, so we only need to specify one chain right now,
   // which will be one of the Flame networks

@@ -1,19 +1,21 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { formatUnits } from "viem";
+import { erc20Abi, formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
   useConfig,
   useDisconnect,
   useSwitchChain,
+  useWalletClient,
 } from "wagmi";
-
+import { getPublicClient } from "@wagmi/core";
 import { DropdownOption } from "@repo/ui/components";
 import {
   getFlameChainId,
   getFlameNetworkByChainId,
   useConfig as useAppConfig,
+  useEvmChainData,
 } from "config";
 import { useBalancePolling } from "features/GetBalancePolling";
 
@@ -27,6 +29,8 @@ import {
   EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "@repo/flame-types";
+import JSBI from "jsbi";
+import { defaultApprovalAmount } from "../../../constants";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -47,6 +51,11 @@ export interface EvmWalletContextProps {
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   selectEvmCurrency: (currency: EvmCurrency) => void;
   withdrawFeeDisplay: string;
+  tokenAllowances: { symbol: string; allowance: JSBI }[];
+  getTokenAllowances: () => void;
+  approveToken: (
+    token: EvmCurrency | null | undefined,
+  ) => Promise<`0x${string}` | null>;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -68,6 +77,12 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
+  const { selectedChain, evmChainConfig } = useEvmChainData();
+  const publicClient = getPublicClient(wagmiConfig, {
+    chainId: selectedChain?.chainId,
+  });
+  const { data: walletClient } = useWalletClient();
+  const { currencies, contracts } = selectedChain;
 
   const {
     status: nativeBalanceStatus,
@@ -102,6 +117,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
     null,
   );
+
+  const [tokenAllowances, setTokenAllowances] = useState<
+    { symbol: string; allowance: JSBI }[]
+  >([]);
 
   // set the address when the address, chain, or currency changes
   useEffect(() => {
@@ -287,6 +306,91 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     resetState();
   }, [disconnect, resetState]);
 
+  const approveToken = useCallback(
+    async (token: EvmCurrency | null | undefined) => {
+      if (
+        !userAccount.address ||
+        !walletClient ||
+        !contracts?.swapRouter?.address
+      ) {
+        return null;
+      }
+      const amountAsBigInt = BigInt(defaultApprovalAmount);
+      // NOTE: Reset this to 0 whenever we want to reset the approval
+      // const amountAsBigInt = BigInt('0');
+
+      try {
+        const txHash = await walletClient.writeContract({
+          address: token?.erc20ContractAddress as `0x${string}`,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [contracts.swapRouter.address, amountAsBigInt],
+          chain: evmChainConfig,
+          account: userAccount?.address as `0x${string}`,
+        });
+
+        const newTokenAllowance = tokenAllowances.map((data) => {
+          if (data.symbol === token?.coinDenom) {
+            return {
+              symbol: token?.coinDenom,
+              allowance: JSBI.BigInt(defaultApprovalAmount),
+            };
+          }
+          return data;
+        });
+        setTokenAllowances(newTokenAllowance);
+
+        return txHash;
+      } catch (error) {
+        console.warn("Failed to approve token:", error);
+        return null;
+      }
+    },
+    [
+      userAccount.address,
+      walletClient,
+      contracts?.swapRouter?.address,
+      evmChainConfig,
+      tokenAllowances,
+    ],
+  );
+
+  const getTokenAllowances = useCallback(async () => {
+    if (
+      !userAccount.address ||
+      !publicClient ||
+      !contracts?.swapRouter?.address
+    ) {
+      return;
+    }
+    const newTokenAllowances: { symbol: string; allowance: JSBI }[] = [];
+
+    for (const currency of currencies) {
+      if (currency.erc20ContractAddress) {
+        const tokenAddress = currency.erc20ContractAddress;
+        const currentAllowance = await publicClient.readContract({
+          address: tokenAddress,
+          abi: erc20Abi,
+          functionName: "allowance",
+          args: [userAccount.address, contracts.swapRouter.address],
+        });
+
+        newTokenAllowances.push({
+          symbol: currency.coinDenom,
+          allowance: JSBI.BigInt(currentAllowance.toString()),
+        });
+      }
+    }
+
+    setTokenAllowances(newTokenAllowances);
+  }, [userAccount.address, publicClient, contracts, currencies]);
+
+  useEffect(() => {
+    if (userAccount.address && tokenAllowances.length === 0) {
+      getTokenAllowances();
+    }
+  }, [getTokenAllowances, userAccount.address, tokenAllowances]);
+
   const value = {
     connectEvmWallet,
     defaultEvmCurrencyOption,
@@ -306,6 +410,9 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectEvmChain,
     selectEvmCurrency,
     withdrawFeeDisplay,
+    getTokenAllowances,
+    approveToken,
+    tokenAllowances,
   };
 
   return (

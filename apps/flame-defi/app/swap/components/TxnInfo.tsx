@@ -10,8 +10,11 @@ import {
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "utils/utils";
-import { TokenState, GetQuoteResult } from "@repo/flame-types";
-import useOneToOneQuote from "swap/useOneToOneQuote";
+import {
+  TokenState,
+  GetQuoteResult,
+  OneToOneQuoteProps,
+} from "@repo/flame-types";
 import { TOKEN_INPUTS } from "../../constants";
 import { useTxnInfo } from "swap/useTxnInfo";
 
@@ -23,10 +26,16 @@ export interface TxnInfoProps {
   txnQuoteError: string | null;
 }
 
-export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
-  const inputTokenOne = swapPairs[0]?.inputToken;
+export function TxnInfo({
+  swapPairs,
+  oneToOneQuote,
+}: {
+  swapPairs: TxnInfoProps[];
+  oneToOneQuote: OneToOneQuoteProps;
+}) {
   const inputTokenTwo = swapPairs[1]?.inputToken;
   const slippageTolerance = getSlippageTolerance();
+
   const {
     gasUseEstimateUSD,
     formattedGasUseEstimateUSD,
@@ -34,15 +43,6 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
     priceImpact,
     minimumReceived,
   } = useTxnInfo({ swapPairs });
-  const {
-    tokenOneSymbol,
-    tokenTwoSymbol,
-    tokenTwoValue,
-    oneToOneLoading,
-    // error,
-    setFlipDirection,
-    flipDirection,
-  } = useOneToOneQuote(inputTokenOne, inputTokenTwo);
 
   if (swapPairs[0]?.txnQuoteLoading) {
     return <div></div>;
@@ -55,19 +55,24 @@ export function TxnInfo({ swapPairs }: { swapPairs: TxnInfoProps[] }) {
         className="text-grey-light text-sm border-b-0"
       >
         <div className="flex items-center justify-between">
-          <Skeleton className="rounded" isLoading={oneToOneLoading}>
+          <Skeleton
+            className="rounded"
+            isLoading={oneToOneQuote?.oneToOneLoading}
+          >
             <div
               className="flex items-center cursor-pointer text-white font-medium gap-1"
-              onClick={() => setFlipDirection(!flipDirection)}
+              onClick={() =>
+                oneToOneQuote?.setFlipDirection(!oneToOneQuote?.flipDirection)
+              }
             >
               <div className="flex items-center gap-1">
                 <span>{formatDecimalValues("1", 0)}</span>
-                <span>{tokenOneSymbol}</span>
+                <span>{oneToOneQuote?.tokenOneSymbol}</span>
               </div>
               <div>=</div>
               <div className="flex items-center gap-1">
-                <span>{tokenTwoValue}</span>
-                <span>{tokenTwoSymbol}</span>
+                <span>{oneToOneQuote?.tokenTwoValue}</span>
+                <span>{oneToOneQuote?.tokenTwoSymbol}</span>
               </div>
             </div>
           </Skeleton>

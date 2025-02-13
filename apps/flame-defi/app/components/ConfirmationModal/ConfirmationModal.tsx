@@ -27,15 +27,15 @@ interface ConfirmationModalProps {
 
 export default function ConfirmationModal({
   onSubmitCallback,
-  setTxnStatus,
-  txnStatus,
-  handleResetInputs,
   buttonText,
   children,
-  title,
-  actionButtonText,
+  handleResetInputs,
   isCloseModalAction,
+  setTxnStatus,
   skipIdleTxnStatus,
+  title,
+  txnStatus,
+  actionButtonText,
 }: ConfirmationModalProps): React.ReactElement {
   const [open, setOpen] = useState(false);
 

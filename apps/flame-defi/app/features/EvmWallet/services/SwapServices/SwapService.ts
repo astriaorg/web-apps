@@ -110,48 +110,6 @@ export class SwapRouter {
     return JSBI.divide(JSBI.multiply(amount, adjustedBasisPoints), basisPoints);
   }
 
-  /**
-   * Checks the token allowance and, if needed, sends an approval transaction.
-   *
-   * @param token - The ERC20 token to approve.
-   * @param amount - The required amount (as a JSBI).
-   * @param walletClient - The connected wallet client (from wagmi/viem).
-   * @param publicClient - The public client for reading blockchain data.
-   */
-  private async approveTokenIfNeeded(
-    token: Token,
-    amount: JSBI,
-    walletClient: WalletClient,
-    publicClient: PublicClient,
-  ): Promise<void> {
-    const signerAddress = walletClient?.account?.address as `0x${string}`;
-    // Use the public client to read the allowance.
-    const currentAllowance = (await publicClient.readContract({
-      address: token.address as `0x${string}`,
-      abi: this.erc20Abi,
-      functionName: "allowance",
-      args: [signerAddress, this.routerAddress],
-    })) as bigint;
-
-    if (JSBI.GT(amount, JSBI.BigInt(currentAllowance.toString()))) {
-      console.log("Approving token...");
-      // Use the wallet client to send the approval transaction.
-      const txHash = await walletClient.writeContract({
-        address: token.address as `0x${string}`,
-        abi: this.erc20Abi,
-        functionName: "approve",
-        args: [this.routerAddress, amount.toString()],
-        value: 0n,
-        chain: this.chainConfig,
-        account: walletClient?.account?.address as `0x${string}`,
-      });
-      // Optionally wait for confirmation.
-      console.log("Token approved. Tx hash:", txHash);
-    } else {
-      console.log("Token already approved");
-    }
-  }
-
   private getExactInputParams(
     trade: Trade,
     recipient: `0x${string}`,
@@ -337,24 +295,6 @@ export class SwapRouter {
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
     const signerAddress = walletClient?.account?.address as `0x${string}`;
-
-    if (!isNativeIn) {
-      if (trade.type === TradeType.EXACT_INPUT) {
-        await this.approveTokenIfNeeded(
-          trade.inputAmount.token,
-          trade.inputAmount.raw,
-          walletClient,
-          publicClient,
-        );
-      } else {
-        await this.approveTokenIfNeeded(
-          trade.inputAmount.token,
-          this.calculateMaximumIn(trade.inputAmount, options.slippageTolerance),
-          walletClient,
-          publicClient,
-        );
-      }
-    }
 
     // get swap parameters based on trade type
     const swapParams =
