@@ -21,7 +21,7 @@ import { FormattedNumber } from "react-intl";
 
 type Status = "error" | "empty" | "success";
 
-export interface TableContextProps extends PropsWithChildren {
+export interface PageContextProps extends PropsWithChildren {
   table: Table<Vault>;
   currentPage: number;
   setCurrentPage: (value: number) => void;
@@ -33,11 +33,11 @@ export interface TableContextProps extends PropsWithChildren {
   query: ReturnType<typeof useFetchVaults>;
 }
 
-export const TableContext = createContext<TableContextProps | undefined>(
+export const PageContext = createContext<PageContextProps | undefined>(
   undefined,
 );
 
-export const TableContextProvider = ({ children }: PropsWithChildren) => {
+export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -217,7 +217,7 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
   }, [query.isError, query.isPending, query.data?.vaults?.items?.length]);
 
   return (
-    <TableContext.Provider
+    <PageContext.Provider
       value={{
         table,
         currentPage,
@@ -231,6 +231,6 @@ export const TableContextProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-    </TableContext.Provider>
+    </PageContext.Provider>
   );
 };

@@ -4,10 +4,10 @@ import {
   TablePagination,
   TableSearch,
 } from "earn/pages/vault-list/components/table";
-import { useTable } from "earn/pages/vault-list/hooks/useTable";
+import { usePageContext } from "earn/pages/vault-list/hooks/usePageContext";
 
 export const TableSection = () => {
-  const { status } = useTable();
+  const { status } = usePageContext();
 
   return (
     <section className="flex flex-col px-4 md:px-20">
