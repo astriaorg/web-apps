@@ -1,8 +1,8 @@
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import Big from "big.js";
+import { Card } from "earn/components/card";
 import React, { useEffect } from "react";
 import { FormattedNumber } from "react-intl";
-import { Card } from "../Card";
 
 interface MarketSummaryCardProps {
   label: React.ReactNode;

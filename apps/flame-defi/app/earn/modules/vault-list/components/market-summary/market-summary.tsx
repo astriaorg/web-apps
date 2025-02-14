@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MarketSummaryCard } from "./MarketSummaryCard";
+import { MarketSummaryCard } from "./market-summary-card";
 
 // TODO: Use fetched values.
 const VALUE_DEPOSIT = 1000000;

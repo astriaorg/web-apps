@@ -7,8 +7,8 @@ import {
   renderPaginationItems,
   Skeleton,
 } from "@repo/ui/shadcn-primitives";
-import { PAGE_SIZE } from "earn/hooks/useFetchVaults";
-import { useTable } from "earn/hooks/useTable";
+import { PAGE_SIZE } from "earn/modules/vault-list/hooks/useFetchVaults";
+import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
 import { useMemo } from "react";
 
 export const TablePagination = () => {
@@ -16,7 +16,7 @@ export const TablePagination = () => {
     currentPage,
     setCurrentPage,
     query: { data, isPending },
-  } = useTable();
+  } = usePageContext();
 
   const totalPages = useMemo(() => {
     return Math.ceil((data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE);

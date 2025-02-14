@@ -3,7 +3,7 @@ import { cn } from "@repo/ui/lib";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { flexRender } from "@tanstack/react-table";
 import { OrderDirection } from "earn/gql/graphql";
-import { useTable } from "earn/hooks/useTable";
+import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
 
 export const Table = () => {
   const {
@@ -11,7 +11,7 @@ export const Table = () => {
     orderBy,
     orderDirection,
     query: { isPending },
-  } = useTable();
+  } = usePageContext();
 
   return (
     <table className="w-full text-left whitespace-nowrap">

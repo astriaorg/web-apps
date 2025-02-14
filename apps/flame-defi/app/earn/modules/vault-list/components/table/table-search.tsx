@@ -1,7 +1,7 @@
 import { SearchIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
 import { Input, Skeleton } from "@repo/ui/shadcn-primitives";
-import { useTable } from "earn/hooks/useTable";
+import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
 import { useRef, useState } from "react";
 
 export const TableSearch = () => {
@@ -13,7 +13,7 @@ export const TableSearch = () => {
     search,
     setSearch,
     query: { data, isRefetching },
-  } = useTable();
+  } = usePageContext();
 
   return (
     <Skeleton
