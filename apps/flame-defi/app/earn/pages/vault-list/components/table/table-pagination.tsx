@@ -7,8 +7,8 @@ import {
   renderPaginationItems,
   Skeleton,
 } from "@repo/ui/shadcn-primitives";
-import { PAGE_SIZE } from "earn/hooks/useFetchVaults";
-import { useTable } from "earn/hooks/useTable";
+import { PAGE_SIZE } from "earn/pages/vault-list/hooks/useFetchVaults";
+import { useTable } from "earn/pages/vault-list/hooks/useTable";
 import { useMemo } from "react";
 
 export const TablePagination = () => {

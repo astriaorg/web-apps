@@ -3,7 +3,7 @@ import { cn } from "@repo/ui/lib";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { flexRender } from "@tanstack/react-table";
 import { OrderDirection } from "earn/gql/graphql";
-import { useTable } from "earn/hooks/useTable";
+import { useTable } from "earn/pages/vault-list/hooks/useTable";
 
 export const Table = () => {
   const {

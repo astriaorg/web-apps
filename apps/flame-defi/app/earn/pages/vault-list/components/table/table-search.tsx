@@ -1,7 +1,7 @@
 import { SearchIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
 import { Input, Skeleton } from "@repo/ui/shadcn-primitives";
-import { useTable } from "earn/hooks/useTable";
+import { useTable } from "earn/pages/vault-list/hooks/useTable";
 import { useRef, useState } from "react";
 
 export const TableSearch = () => {

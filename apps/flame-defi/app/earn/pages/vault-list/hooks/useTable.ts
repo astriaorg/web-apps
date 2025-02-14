@@ -1,4 +1,4 @@
-import { TableContext } from "earn/contexts/TableContext";
+import { TableContext } from "earn/pages/vault-list/contexts/table-context";
 import { useContext } from "react";
 
 export const useTable = () => {
