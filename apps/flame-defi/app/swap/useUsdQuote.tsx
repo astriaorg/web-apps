@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import debounce from "lodash.debounce";
 
 import { useEvmChainData } from "config";
-import { TokenState } from "@repo/flame-types";
+import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
 import { useGetQuote } from "./useGetQuote";
-import { TRADE_TYPE } from "../constants";
 
 function useUsdQuote(inputToken?: TokenState) {
   const { selectedChain } = useEvmChainData();
@@ -12,15 +12,28 @@ function useUsdQuote(inputToken?: TokenState) {
   );
   const { quote, loading, error, getQuote } = useGetQuote();
 
+  const debouncedGetQuoteRef = useRef(
+    debounce(
+      (
+        tradeType: TRADE_TYPE,
+        tokenData: { token: EvmCurrency; value: string },
+        usdcToken: EvmCurrency,
+      ) => {
+        getQuote(tradeType, tokenData, { token: usdcToken, value: "" });
+      },
+      500,
+    ),
+  );
+
   useEffect(() => {
-    if (inputToken && inputToken.value) {
-      getQuote(
+    if (inputToken && inputToken.token && inputToken.value && usdcToken) {
+      debouncedGetQuoteRef.current(
         TRADE_TYPE.EXACT_IN,
         { token: inputToken.token, value: inputToken.value },
-        { token: usdcToken, value: "" },
+        usdcToken,
       );
     }
-  }, [inputToken, getQuote, usdcToken]);
+  }, [inputToken, usdcToken]);
 
   return { quote, loading, error };
 }

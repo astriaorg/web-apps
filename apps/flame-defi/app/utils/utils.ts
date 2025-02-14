@@ -1,4 +1,4 @@
-import { defaultSlippageTolerance } from "../constants";
+import JSBI from "jsbi";
 
 export function getFromLocalStorage(item: string) {
   const retrievedItem = window.localStorage.getItem(item);
@@ -15,7 +15,10 @@ export function setInLocalStorage(key: string, item: unknown) {
 
 export function getSlippageTolerance() {
   const settings = getFromLocalStorage("settings");
-  return settings?.slippageTolerance || defaultSlippageTolerance;
+  return (
+    settings?.slippageTolerance ||
+    "115792089237316195423570985008687907853269984665640564039457"
+  );
 }
 
 /**
@@ -75,3 +78,18 @@ export function isDustAmount(
 
   return Math.abs(amountNumber) < threshold;
 }
+
+/**
+ * Parses a string value into a JSBI BigInt
+ * @param value - The string value to parse
+ * @param decimals - The number of decimal places in the value
+ * @returns The parsed JSBI BigInt
+ */
+export const parseToBigInt = (value: string, decimals: number): JSBI => {
+  const [integerPart, fractionalPart = ""] = value.split(".");
+  const fractionalPartPadded = fractionalPart
+    .padEnd(decimals, "0")
+    .slice(0, decimals);
+  const wholeNumberString = `${integerPart}${fractionalPartPadded}`;
+  return JSBI.BigInt(wholeNumberString);
+};
