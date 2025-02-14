@@ -147,6 +147,6 @@ export class Trade {
 
 export interface SwapOptions {
   recipient: `0x${string}`;
-  slippageTolerance: number; // in basis points (e.g. 50 = 0.5%)
+  slippageTolerance: number; // as a percent i.e. 0.1
   deadline: bigint;
 }

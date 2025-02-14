@@ -36,7 +36,27 @@ export const SettingsPopover = () => {
   const handleCustomSlippageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const value = e.target.value;
+    let value = e.target.value;
+    // remove any non-numeric and multiple decimal points
+    value = value.replace(/[^0-9.]/g, "");
+
+    // can't have more than 4 numbers total i.e. 99.99
+    const numericChars = value.replace(".", "");
+    if (numericChars.length > 4) {
+      return;
+    }
+
+    // limit whole number part to 2 digits (max 99)
+    const parts = value.split(".");
+    if (parts[0]?.length !== undefined && parts[0].length > 2) {
+      return;
+    }
+
+    // limit decimal places to 2 (max .99)
+    if (parts.length === 2 && parts[1] !== undefined) {
+      value = `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
+
     setCustomSlippage(value);
     const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue > 0) {
@@ -52,6 +72,7 @@ export const SettingsPopover = () => {
       setShowExpertModeDialog(true);
     } else {
       setExpertMode(false);
+      // FIXME - these default slippage values should come from config
       setCustomSlippage("0.10");
       setInLocalStorage("settings", {
         ...currentSettings,

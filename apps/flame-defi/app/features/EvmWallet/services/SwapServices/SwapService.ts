@@ -16,6 +16,27 @@ import {
   TradeType,
 } from "./types";
 
+// 100% in basis points
+const BASIS_POINTS_DIVISOR = JSBI.BigInt(10000);
+
+/**
+ * Converts a slippage tolerance percentage to basis points.
+ * Ensures that the slippage tolerance is less than 99.99% and has no more than 2 decimal points of precision.
+ * @param slippageTolerancePercent
+ */
+function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
+  if (parseFloat(slippageTolerancePercent.toString()) > 99.99) {
+    throw new Error("Slippage tolerance must be less than 99.99 or less");
+  }
+  const parts = slippageTolerancePercent.toString().split(".");
+  if (parts[1]?.length !== undefined && parts[1].length > 2) {
+    throw new Error(
+      "Slippage tolerance must not have more than 2 decimal points of precision.",
+    );
+  }
+  return JSBI.BigInt(slippageTolerancePercent * 100);
+}
+
 export class SwapRouter {
   private readonly routerAddress: `0x${string}`;
   private readonly chainConfig: Chain;
@@ -34,66 +55,92 @@ export class SwapRouter {
   constructor(routerAddress: string, chainConfig: Chain) {
     this.routerAddress = routerAddress as `0x${string}`;
     this.chainConfig = chainConfig;
-    // Minimal ABI for the swap functions.
+    // minimal ABI for the swap functions.
     this.routerAbi = SWAP_ROUTER_ABI;
   }
 
+  /**
+   * Calculates the minimum amount out based on the slippage tolerance.
+   * @param amount
+   * @param slippageTolerancePercent
+   * @private
+   */
   private calculateMinimumOut(
     amount: TokenAmount,
-    slippageTolerance: number,
+    slippageTolerancePercent: number,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
-    const slippagePercent = JSBI.BigInt(10000 - slippageTolerance);
-    const minimumAmount = JSBI.divide(
-      JSBI.multiply(amount.raw, slippagePercent),
-      JSBI.BigInt(10000),
+    const minimumAmount = this.calculateSlippage(
+      amount.raw,
+      slippageTolerancePercent,
+      true,
     );
 
     console.log("MinimumOut calculation:", {
       amount: amount.raw.toString(),
-      slippageTolerance,
+      slippageTolerancePercent,
       minimumAmount: minimumAmount.toString(),
     });
 
     return minimumAmount;
   }
 
+  /**
+   * Calculates the maximum amount in based on the slippage tolerance.
+   * @param amount
+   * @param slippageTolerancePercent
+   * @private
+   */
   private calculateMaximumIn(
     amount: TokenAmount,
-    slippageTolerance: number,
+    slippageTolerancePercent: number,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
-    const slippagePercent = JSBI.BigInt(10000 + slippageTolerance);
-    const maximumAmount = JSBI.divide(
-      JSBI.multiply(amount.raw, slippagePercent),
-      JSBI.BigInt(10000),
+    const maximumAmount = this.calculateSlippage(
+      amount.raw,
+      slippageTolerancePercent,
+      false,
     );
-
     console.log("MaximumIn calculation:", {
       amount: amount.raw.toString(),
-      slippageTolerance,
+      slippageTolerancePercent,
       maximumAmount: maximumAmount.toString(),
     });
 
     return maximumAmount;
   }
 
+  /**
+   * Calculates the slippage based on the amount and tolerance.
+   * @param amount
+   * @param slippageTolerancePercent
+   * @param isMinimum
+   * @private
+   */
   private calculateSlippage(
     amount: JSBI,
-    slippageTolerance: number,
+    slippageTolerancePercent: number,
     isMinimum: boolean,
   ): JSBI {
-    slippageTolerance = slippageTolerance * 100;
-    const basisPoints = JSBI.BigInt(10000);
-    let adjustedBasisPoints: JSBI;
+    // convert % -> basis points
+    const slippageBasisPoints = convertSlippageToBasisPoints(
+      slippageTolerancePercent,
+    );
 
+    // adjust basis points based on if we want minimum or maximum
+    let adjustedBasisPoints: JSBI;
     if (isMinimum) {
-      adjustedBasisPoints = JSBI.BigInt(10000 - slippageTolerance);
+      adjustedBasisPoints = JSBI.subtract(
+        BASIS_POINTS_DIVISOR,
+        slippageBasisPoints,
+      );
     } else {
-      adjustedBasisPoints = JSBI.BigInt(10000 + slippageTolerance);
+      adjustedBasisPoints = JSBI.add(BASIS_POINTS_DIVISOR, slippageBasisPoints);
     }
 
-    return JSBI.divide(JSBI.multiply(amount, adjustedBasisPoints), basisPoints);
+    // scale result back down
+    return JSBI.divide(
+      JSBI.multiply(amount, adjustedBasisPoints),
+      BASIS_POINTS_DIVISOR,
+    );
   }
 
   private getExactInputParams(
@@ -278,6 +325,7 @@ export class SwapRouter {
     const isNativeOut =
       trade.outputAmount.token.symbol.toLocaleLowerCase() === "tia";
 
+    debugger;
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
     const signerAddress = walletClient?.account?.address as `0x${string}`;
@@ -301,9 +349,9 @@ export class SwapRouter {
           );
 
     // for simple erc20 token swaps
+    // FIXME - isNativeOut is incorrectly false when we want to get TIA out
     if (!isNativeIn && !isNativeOut) {
       console.log("Executing simple erc20 swap...");
-      const amount = trade.inputAmount.raw.toString();
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
@@ -312,12 +360,13 @@ export class SwapRouter {
           functionName: swapParams.functionName,
           args: swapParams.args,
           account: signerAddress,
-          value: BigInt(amount),
+          value: BigInt(0),
         });
       } catch (err) {
         console.error("Gas estimation failed, using default limit", err);
         gasLimit = DEFAULT_GAS_LIMIT;
       }
+      // FIXME - is this necessary?
       // Increase the estimated gas by 20%
       gasLimit = (gasLimit * 120n) / 100n;
 
@@ -327,7 +376,8 @@ export class SwapRouter {
         abi: this.routerAbi,
         functionName: swapParams.functionName,
         args: swapParams.args,
-        value: BigInt(amount),
+        // NOTE - we don't need to send any TIA when we're doing an ERC20 swap
+        value: BigInt(0),
         gas: gasLimit,
         chain: this.chainConfig,
         account: signerAddress,
@@ -348,17 +398,22 @@ export class SwapRouter {
 
     // add unwrapWETH if needed
     if (isNativeOut) {
+      // FIXME - output vs input based on EXACT_INPUT
       const minimumAmount = this.calculateSlippage(
         trade.type === TradeType.EXACT_INPUT
           ? trade.outputAmount.raw
-          : trade.outputAmount.raw,
+          : trade.inputAmount.raw,
         options.slippageTolerance,
         true,
       ).toString();
 
+      debugger;
       calls.push(this.encodeUnwrapWETHCall(minimumAmount));
     }
 
+    if (!window.confirm("go on?")) {
+      return;
+    }
     return await walletClient.writeContract({
       address: this.routerAddress,
       abi: this.routerAbi,
@@ -368,14 +423,6 @@ export class SwapRouter {
       // gas: DEFAULT_GAS_LIMIT,
       chain: this.chainConfig,
       account: signerAddress,
-    });
-  }
-
-  private encodeWrapETHCall(value: string): string {
-    return encodeFunctionData({
-      abi: this.routerAbi,
-      functionName: "wrapETH",
-      args: [BigInt(value)],
     });
   }
 
