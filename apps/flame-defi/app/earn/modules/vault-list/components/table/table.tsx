@@ -2,10 +2,13 @@ import { ArrowDownIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { flexRender } from "@tanstack/react-table";
+import { ROUTES } from "earn/constants/routes";
 import { OrderDirection } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
+import { useRouter } from "next/navigation";
 
 export const Table = () => {
+  const router = useRouter();
   const {
     table,
     orderBy,
@@ -54,7 +57,15 @@ export const Table = () => {
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className="hover:bg-white/5">
+          <tr
+            key={row.id}
+            className={cn(
+              isPending ? "select-none" : "cursor-pointer hover:bg-white/5",
+            )}
+            onClick={() =>
+              router.push(ROUTES.VAULT_DETAILS + row.original.address)
+            }
+          >
             {row.getVisibleCells().map((cell) => (
               <td
                 key={cell.id}
