@@ -21,11 +21,11 @@ import { getFromLocalStorage, setInLocalStorage } from "utils/utils";
 import { useConfig } from "config";
 
 export const SettingsPopover = () => {
-  const { SwapDefaultSlippageTolerance } = useConfig();
+  const { swapDefaultSlippageTolerance } = useConfig();
   const currentSettings = getFromLocalStorage("settings") || {};
   const [customSlippage, setCustomSlippage] = useState<string>(
     currentSettings?.slippageTolerance?.toString() ||
-      SwapDefaultSlippageTolerance.toString(),
+      swapDefaultSlippageTolerance.toString(),
   );
   const [expertMode, setExpertMode] = useState(
     currentSettings?.expertMode || false,

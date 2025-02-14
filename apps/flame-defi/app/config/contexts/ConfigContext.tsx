@@ -25,10 +25,10 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
 
-  const TokenDefaultApprovalAmount =
+  const tokenDefaultApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
 
-  const SwapDefaultSlippageTolerance = 0.1;
+  const swapDefaultSlippageTolerance = 0.1;
 
   const feeData = [
     {
@@ -104,8 +104,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         earnAPIURL,
         feedbackFormURL,
         networksList,
-        TokenDefaultApprovalAmount,
-        SwapDefaultSlippageTolerance,
+        tokenDefaultApprovalAmount,
+        swapDefaultSlippageTolerance,
         feeData,
       }}
     >

@@ -73,7 +73,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     evmChains,
     selectedFlameNetwork,
     selectFlameNetwork,
-    TokenDefaultApprovalAmount,
+    tokenDefaultApprovalAmount,
   } = useAppConfig();
 
   const { openConnectModal } = useConnectModal();
@@ -319,7 +319,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       ) {
         return null;
       }
-      const amountAsBigInt = BigInt(TokenDefaultApprovalAmount);
+      const amountAsBigInt = BigInt(tokenDefaultApprovalAmount);
       // NOTE: Reset this to 0 whenever we want to reset the approval
       // const amountAsBigInt = BigInt('0');
 
@@ -337,7 +337,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
           if (data.symbol === token?.coinDenom) {
             return {
               symbol: token?.coinDenom,
-              allowance: JSBI.BigInt(TokenDefaultApprovalAmount),
+              allowance: JSBI.BigInt(tokenDefaultApprovalAmount),
             };
           }
           return data;
@@ -355,7 +355,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       walletClient,
       contracts?.swapRouter?.address,
       tokenAllowances,
-      TokenDefaultApprovalAmount,
+      tokenDefaultApprovalAmount,
       selectedChain,
     ],
   );
