@@ -1,4 +1,4 @@
-import { MarketSummary } from "earn/pages/vault-list/components/market-summary";
+import { MarketSummary } from "earn/modules/vault-list/components/market-summary";
 
 export const HeaderSection = () => {
   return (

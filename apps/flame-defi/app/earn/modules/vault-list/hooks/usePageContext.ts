@@ -1,4 +1,4 @@
-import { PageContext } from "earn/pages/vault-list/contexts/page-context";
+import { PageContext } from "earn/modules/vault-list/contexts/page-context";
 import { useContext } from "react";
 
 export const usePageContext = () => {

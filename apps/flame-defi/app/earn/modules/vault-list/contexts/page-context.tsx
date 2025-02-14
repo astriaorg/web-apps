@@ -14,7 +14,7 @@ import {
   PAGE_SIZE,
   PLACEHOLDER_DATA,
   useFetchVaults,
-} from "earn/pages/vault-list/hooks/useFetchVaults";
+} from "earn/modules/vault-list/hooks/useFetchVaults";
 import Image from "next/image";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";

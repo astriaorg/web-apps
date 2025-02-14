@@ -3,8 +3,8 @@ import {
   Table,
   TablePagination,
   TableSearch,
-} from "earn/pages/vault-list/components/table";
-import { usePageContext } from "earn/pages/vault-list/hooks/usePageContext";
+} from "earn/modules/vault-list/components/table";
+import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
 
 export const TableSection = () => {
   const { status } = usePageContext();
