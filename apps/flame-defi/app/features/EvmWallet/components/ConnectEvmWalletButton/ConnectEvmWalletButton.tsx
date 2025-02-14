@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { useEvmChainData } from "config";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
@@ -24,6 +25,7 @@ interface ConnectEvmWalletButtonProps {
 export default function ConnectEvmWalletButton({
   labelBeforeConnected,
 }: ConnectEvmWalletButtonProps) {
+  const { selectedChain } = useEvmChainData();
   const {
     connectEvmWallet,
     disconnectEvmWallet,
@@ -61,10 +63,16 @@ export default function ConnectEvmWalletButton({
           </AccordionTrigger>
           <div className="flex items-center gap-3">
             <CopyToClipboardButton textToCopy={userAccount.address} />
-            <UpRightSquareIcon
-              className="cursor-pointer hover:text-white transition"
-              size={21}
-            />
+            <a
+              href={`${selectedChain.blockExplorerUrl}/address/${userAccount.address}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <UpRightSquareIcon
+                className="cursor-pointer hover:text-white transition"
+                size={21}
+              />
+            </a>
             <button type="button" onClick={() => disconnectEvmWallet()}>
               <PowerIcon
                 className="cursor-pointer hover:text-white transition"
