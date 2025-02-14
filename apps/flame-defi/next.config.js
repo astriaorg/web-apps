@@ -14,7 +14,7 @@ const nextConfig = {
     return config;
   },
   async redirects() {
-    const destination = `/well-known-${process.env.NEXT_PUBLIC_ENV ?? "develop"}/walletconnect.txt`;
+    const destination = `/well-known-${process.env.NEXT_ENV ?? "develop"}/walletconnect.txt`;
     return [
       {
         source: "/.well-known/walletconnect.txt",
