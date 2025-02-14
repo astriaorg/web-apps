@@ -325,7 +325,6 @@ export class SwapRouter {
     const isNativeOut =
       trade.outputAmount.token.symbol.toLocaleLowerCase() === "tia";
 
-    debugger;
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
     const signerAddress = walletClient?.account?.address as `0x${string}`;
@@ -407,7 +406,6 @@ export class SwapRouter {
         true,
       ).toString();
 
-      debugger;
       calls.push(this.encodeUnwrapWETHCall(minimumAmount));
     }
 
