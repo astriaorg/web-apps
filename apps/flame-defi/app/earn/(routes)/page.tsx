@@ -1,6 +1,6 @@
 "use client";
 
-import { VaultListPage } from "earn/pages/vault-list";
+import { Page as VaultListPage } from "earn/pages/vault-list";
 
 export default function Page() {
   return <VaultListPage />;

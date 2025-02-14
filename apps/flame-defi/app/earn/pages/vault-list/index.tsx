@@ -2,7 +2,7 @@ import { TableContextProvider } from "earn/pages/vault-list/contexts/table-conte
 import { TableSection } from "earn/pages/vault-list/sections/table-section";
 import { HeaderSection } from "./sections/header-section";
 
-export const VaultListPage = () => {
+export const Page = () => {
   return (
     <TableContextProvider>
       <HeaderSection />
