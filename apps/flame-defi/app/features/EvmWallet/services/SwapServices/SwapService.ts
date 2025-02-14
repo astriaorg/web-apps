@@ -409,9 +409,6 @@ export class SwapRouter {
       calls.push(this.encodeUnwrapWETHCall(minimumAmount));
     }
 
-    if (!window.confirm("go on?")) {
-      return;
-    }
     return await walletClient.writeContract({
       address: this.routerAddress,
       abi: this.routerAbi,
