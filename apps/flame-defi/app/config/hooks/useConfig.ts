@@ -1,7 +1,6 @@
 "use client";
 
 import { useContext } from "react";
-
 import { ConfigContext } from "../contexts/ConfigContext";
 import { EvmChainInfo } from "@repo/flame-types";
 

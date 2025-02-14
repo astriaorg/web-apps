@@ -129,18 +129,18 @@ export default {
             height: "0",
           },
         },
-      },
-      "success-tick": {
-        "0%": { "stroke-dashoffset": "16px", opacity: "1" },
-        "100%": { "stroke-dashoffset": "31px", opacity: "1" },
-      },
-      "success-circle-outline": {
-        "0%": { "stroke-dashoffset": "72px", opacity: "1" },
-        "100%": { "stroke-dashoffset": "0px", opacity: "1" },
-      },
-      "success-circle-fill": {
-        "0%": { opacity: "0" },
-        "100%": { opacity: "1" },
+        "success-tick": {
+          "0%": { "stroke-dashoffset": "16px", opacity: "1" },
+          "100%": { "stroke-dashoffset": "31px", opacity: "1" },
+        },
+        "success-circle-outline": {
+          "0%": { "stroke-dashoffset": "72px", opacity: "1" },
+          "100%": { "stroke-dashoffset": "0px", opacity: "1" },
+        },
+        "success-circle-fill": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-in-out",

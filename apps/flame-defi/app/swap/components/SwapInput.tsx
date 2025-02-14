@@ -10,7 +10,7 @@ interface SwapInputProps {
   oppositeToken: TokenState;
   onInputChange: (value: string, index: number) => void;
   availableTokens?: EvmCurrency[];
-  onTokenSelect: (token: EvmCurrency) => void;
+  onTokenSelect: (token: EvmCurrency, index: number) => void;
   label: string;
   txnQuoteData: GetQuoteResult | null;
   txnQuoteLoading: boolean;
@@ -73,7 +73,7 @@ export function SwapInput({
             tokens={availableTokens}
             selectedToken={inputToken.token}
             unavailableToken={oppositeToken?.token}
-            setSelectedToken={onTokenSelect}
+            setSelectedToken={(token) => onTokenSelect(token, index)}
           />
           {inputToken.token &&
           balance?.value &&
