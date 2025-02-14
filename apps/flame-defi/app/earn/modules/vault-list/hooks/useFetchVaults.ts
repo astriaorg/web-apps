@@ -17,29 +17,13 @@ export const PLACEHOLDER_DATA: VaultsQuery = {
       address: `0x${index}`,
       symbol: "ETH",
       name: "Ethereum",
-      creationTimestamp: 0,
       asset: {
-        id: `0x${index}`,
         address: `0x${index}`,
         decimals: 18,
         logoURI: "",
       },
-      chain: {
-        id: 0,
-        network: "",
-      },
-      metadata: {
-        curators: [
-          {
-            name: "",
-            image: "",
-          },
-        ],
-      },
       state: {
-        id: `0x${index}`,
         apy: 0,
-        netApy: 0,
         totalAssets: 0,
         totalAssetsUsd: 0,
       },
@@ -72,27 +56,13 @@ const query = graphql(`
         address
         symbol
         name
-        creationTimestamp
         asset {
-          id
           address
           decimals
           logoURI
         }
-        chain {
-          id
-          network
-        }
-        metadata {
-          curators {
-            name
-            image
-          }
-        }
         state {
-          id
           apy
-          netApy
           totalAssets
           totalAssetsUsd
         }
