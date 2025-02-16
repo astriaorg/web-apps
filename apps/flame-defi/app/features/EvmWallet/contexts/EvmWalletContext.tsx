@@ -23,7 +23,7 @@ import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { formatBalance } from "../../../utils/utils";
+import { formatBalance } from "@repo/ui/utils";
 import {
   EvmChainInfo,
   evmChainToRainbowKitChain,
