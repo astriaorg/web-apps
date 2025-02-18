@@ -16,12 +16,12 @@ export const TableSection = () => {
       </div>
 
       {status === "error" && (
-        <Card className="h-[250px] text-lg text-grey-light flex items-center justify-center">
+        <Card className="h-[250px] text-lg text-text-subdued flex items-center justify-center">
           {`We couldn't fetch vault data. Please try again later.`}
         </Card>
       )}
       {status === "empty" && (
-        <Card className="h-[250px] text-lg text-grey-light flex items-center justify-center">
+        <Card className="h-[250px] text-lg text-text-subdued flex items-center justify-center">
           {`No vaults found.`}
         </Card>
       )}
