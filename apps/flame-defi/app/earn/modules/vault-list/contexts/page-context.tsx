@@ -1,6 +1,7 @@
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
+import { Badge } from "@repo/ui/shadcn-primitives";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -135,7 +136,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                   &nbsp;
                   {row.original.symbol}
                 </span>
-                <span className="text-xs text-text-subdued font-medium bg-surface-3 px-1.5 py-0.5 rounded-lg">
+                <Badge variant="secondary" className="bg-surface-3">
                   <FormattedNumber
                     value={
                       +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
@@ -145,7 +146,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                     style="currency"
                     currency="USD"
                   />
-                </span>
+                </Badge>
               </div>
               <div className="md:hidden flex justify-end pr-3">
                 <CaretRightIcon className="text-text-subdued" size={16} />
