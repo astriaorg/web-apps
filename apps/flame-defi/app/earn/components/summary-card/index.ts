@@ -1,5 +1,5 @@
 export { SummaryCard } from "./summary-card";
-export { SummaryCardContent } from "./summary-card-content";
+export { SummaryCardFigureText } from "./summary-card-figure-text";
 export { SummaryCardLabel } from "./summary-card-label";
 export {
   SummaryCardContext,

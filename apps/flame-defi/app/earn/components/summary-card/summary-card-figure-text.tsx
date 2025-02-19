@@ -3,7 +3,7 @@ import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { useSummaryCardContext } from "earn/components/summary-card";
 import React from "react";
 
-export const SummaryCardContent = ({
+export const SummaryCardFigureText = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) => {
