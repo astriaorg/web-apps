@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { CopyToClipboardButton } from "@repo/ui/components";
 import { useCosmosWallet } from "../../hooks/useCosmosWallet";
-import { formatDecimalValues, shortenAddress } from "../../../../utils/utils";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { CosmosIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,

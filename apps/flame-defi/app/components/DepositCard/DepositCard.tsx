@@ -14,7 +14,7 @@ import {
   PlusIcon,
   WalletIcon,
 } from "@repo/ui/icons";
-import { formatDecimalValues, shortenAddress } from "utils/utils";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();
