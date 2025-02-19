@@ -16,6 +16,7 @@ import { SwapTxnSteps } from "./components/SwapTxnSteps";
 import { useGetQuote } from "./useGetQuote";
 import debounce from "lodash.debounce";
 import useOneToOneQuote from "./useOneToOneQuote";
+import { useTxnInfo } from "./useTxnInfo";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
@@ -47,13 +48,13 @@ export default function SwapPage(): React.ReactElement {
 
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
-  const { quote, loading, error, getQuote, setQuote } = useGetQuote();
+  const { quote, loading, error, getQuote, setQuote, cancelGetQuote } =
+    useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
   const tokenOneBalance =
     useTokenBalance(tokenOne.token, selectedChain).balance?.value || "0";
   const oneToOneQuote = useOneToOneQuote(tokenOne.token, tokenTwo.token);
-
   const {
     titleText,
     txnHash,
@@ -74,6 +75,13 @@ export default function SwapPage(): React.ReactElement {
     loading,
     error,
     tradeType,
+  });
+  const txnInfo = useTxnInfo({
+    quote,
+    tokenOne,
+    tokenTwo,
+    tradeType,
+    validSwapInputs: validSwapInputs || false,
   });
 
   const debouncedGetQuoteRef = useRef(
@@ -161,9 +169,17 @@ export default function SwapPage(): React.ReactElement {
       if (value === "" || value === "0") {
         setInputOne((prev) => ({ ...prev, value: value }));
         setInputTwo((prev) => ({ ...prev, value: value }));
+        cancelGetQuote();
       }
     },
-    [tokenOne, tokenTwo, handleTradeType, isTiaWtia, debouncedGetQuoteRef],
+    [
+      tokenOne,
+      tokenTwo,
+      handleTradeType,
+      isTiaWtia,
+      debouncedGetQuoteRef,
+      cancelGetQuote,
+    ],
   );
 
   const handleTokenSelect = useCallback(
@@ -286,7 +302,7 @@ export default function SwapPage(): React.ReactElement {
             {buttonText}
           </div>
         )}
-        {validSwapInputs && !tokenApprovalNeeded && (
+        {validSwapInputs && !tokenApprovalNeeded && quote && (
           <ConfirmationModal
             onSubmitCallback={onSubmitCallback}
             buttonText={buttonText}
@@ -300,7 +316,9 @@ export default function SwapPage(): React.ReactElement {
           >
             <SwapTxnSteps
               txnStatus={txnStatus}
-              swapPairs={swapPairs}
+              txnInfo={txnInfo}
+              tokenOne={tokenOne}
+              tokenTwo={tokenTwo}
               isTiaWtia={isTiaWtia}
               oneToOneQuote={oneToOneQuote}
               txnHash={txnHash}
@@ -315,9 +333,17 @@ export default function SwapPage(): React.ReactElement {
             className="w-full mt-2"
           />
         )}
-        {inputOne.token && inputTwo.token && !isTiaWtia && validSwapInputs && (
-          <TxnInfo swapPairs={swapPairs} oneToOneQuote={oneToOneQuote} />
-        )}
+        {inputOne.token &&
+          inputTwo.token &&
+          !isTiaWtia &&
+          validSwapInputs &&
+          quote && (
+            <TxnInfo
+              txnInfo={txnInfo}
+              tokenTwo={tokenTwo}
+              oneToOneQuote={oneToOneQuote}
+            />
+          )}
       </div>
     </section>
   );

@@ -21,7 +21,7 @@ import { ConnectEvmWalletButton } from "features/EvmWallet";
 import { useConfig } from "config";
 import { CheckMarkIcon, FlameIcon } from "@repo/ui/icons";
 import { FlameNetwork } from "@repo/flame-types";
-import { shortenAddress } from "../../utils/utils";
+import { shortenAddress } from "@repo/ui/utils";
 
 const MobileNetworkSelector = () => {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =

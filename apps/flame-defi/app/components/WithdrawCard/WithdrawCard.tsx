@@ -13,7 +13,7 @@ import {
 import { NotificationType, useNotifications } from "features/Notifications";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
-import { formatDecimalValues, shortenAddress } from "utils/utils";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();

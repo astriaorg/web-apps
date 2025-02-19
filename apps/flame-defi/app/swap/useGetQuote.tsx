@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { parseUnits } from "viem";
 import { useEvmChainData } from "config";
 import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
@@ -11,12 +11,16 @@ export function useGetQuote() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const getQuote = useCallback(
     async (
       type: TRADE_TYPE,
       tokenOne: TokenState,
       tokenTwo: TokenState,
     ): Promise<GetQuoteResult | undefined> => {
+      abortControllerRef.current = new AbortController();
+
       if (
         (tokenOne.token?.coinDenom === "TIA" &&
           tokenTwo.token?.coinDenom === "WTIA") ||
@@ -88,6 +92,7 @@ export function useGetQuote() {
           headers: {
             "Content-Type": "application/json",
           },
+          signal: abortControllerRef.current.signal,
         });
 
         if (!response.ok) {
@@ -99,10 +104,13 @@ export function useGetQuote() {
 
         return data;
       } catch (err) {
-        console.warn(err);
-        setError("error message");
-
-        throw err;
+        if (err instanceof Error && err.name === "AbortError") {
+          console.warn("Fetch aborted");
+        } else {
+          console.warn(err);
+          setError("error message");
+          throw err;
+        }
       } finally {
         setLoading(false);
       }
@@ -110,5 +118,11 @@ export function useGetQuote() {
     [chainId],
   );
 
-  return { quote, loading, error, getQuote, setQuote };
+  const cancelGetQuote = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  }, []);
+
+  return { quote, loading, error, getQuote, setQuote, cancelGetQuote };
 }

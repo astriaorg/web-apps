@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { CopyToClipboardButton } from "@repo/ui/components";
 
 import { useEvmWallet } from "../../hooks/useEvmWallet";
-import { formatDecimalValues, shortenAddress } from "../../../../utils/utils";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,

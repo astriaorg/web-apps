@@ -1,7 +1,7 @@
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { TokenSelector } from "@repo/ui/components";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
-import { formatDecimalValues, isDustAmount } from "utils/utils";
+import { formatNumber, formatNumberAsAbbr, isDustAmount } from "@repo/ui/utils";
 
 import useUsdQuote from "../useUsdQuote";
 
@@ -38,15 +38,22 @@ export function SwapInput({
 }: SwapInputProps) {
   const usdQuote = useUsdQuote(inputToken);
 
-  const handleUsdValue = () => {
+  const handleFiatValue = () => {
     if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
-      return `$${formatDecimalValues(inputToken.value, 2)}`;
+      return formatNumberAsAbbr(inputToken.value, { removeKAbbr: true });
     } else if (usdQuote?.quote) {
-      return `$${formatDecimalValues(usdQuote?.quote?.quoteDecimals, 2)}`;
+      return formatNumberAsAbbr(usdQuote?.quote?.quoteDecimals, {
+        removeKAbbr: true,
+      });
     } else {
       return "-";
     }
   };
+
+  const fiatValue =
+    inputToken.value !== "" && inputToken.value !== "0"
+      ? handleFiatValue()
+      : "-";
 
   return (
     <div
@@ -80,7 +87,7 @@ export function SwapInput({
           !isDustAmount(balance.value) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
               <span className="flex items-center gap-2">
-                {formatDecimalValues(balance?.value)} {balance?.symbol}
+                {formatNumber(balance?.value)} {balance?.symbol}
               </span>
               {
                 <span
@@ -104,7 +111,7 @@ export function SwapInput({
           className="rounded w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">
-            {handleUsdValue()}
+            {fiatValue}
           </span>
         </Skeleton>
       </div>
