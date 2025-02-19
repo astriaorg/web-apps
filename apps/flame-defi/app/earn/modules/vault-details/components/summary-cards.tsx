@@ -1,3 +1,4 @@
+import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
 import {
   SummaryCard,
@@ -6,7 +7,6 @@ import {
 } from "earn/components/summary-card";
 import { usePageContext } from "earn/modules/vault-details/hooks/usePageContext";
 import { FormattedNumber } from "react-intl";
-import { formatAbbreviatedNumber } from "utils";
 
 export const SummaryCards = () => {
   const {
