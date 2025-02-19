@@ -3,6 +3,7 @@ import { getChainConfigs } from "../chainConfigs";
 import { getEnvVariable } from "../env";
 import type { AppConfig } from "../index";
 import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
+import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,
@@ -28,7 +29,16 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const tokenDefaultApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
 
-  const swapDefaultSlippageTolerance = 0.1;
+  const swapSlippageTolerance = 0.1;
+
+  const currentSettings = getFromLocalStorage("settings") || {};
+
+  if (!currentSettings.slippageTolerance) {
+    setInLocalStorage("settings", {
+      ...currentSettings,
+      slippageTolerance: swapSlippageTolerance,
+    });
+  }
 
   const feeData = [
     {
@@ -105,7 +115,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         feedbackFormURL,
         networksList,
         tokenDefaultApprovalAmount,
-        swapDefaultSlippageTolerance,
+        swapSlippageTolerance,
         feeData,
       }}
     >

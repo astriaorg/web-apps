@@ -20,7 +20,8 @@ import {
   GetQuoteResult,
   TokenState,
 } from "@repo/flame-types";
-import { getSlippageTolerance, parseToBigInt } from "utils/utils";
+import { getSwapSlippageTolerance } from "@repo/ui/utils";
+import { parseToBigInt } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import JSBI from "jsbi";
 import { Chain } from "viem";
@@ -86,7 +87,7 @@ export function useSwapButton({
   const { approveToken } = useEvmWallet();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
-  const slippageTolerance = getSlippageTolerance();
+  const slippageTolerance = getSwapSlippageTolerance();
   const publicClient = getPublicClient(wagmiConfig, {
     chainId: selectedChain?.chainId,
   });

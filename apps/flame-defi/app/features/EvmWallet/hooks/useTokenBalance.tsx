@@ -3,7 +3,7 @@ import { createWithdrawerService } from "features/EvmWallet";
 import type { AstriaErc20WithdrawerService } from "features/EvmWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { useBalancePolling } from "features/GetBalancePolling";
 import { useCallback, useMemo } from "react";
-import { formatBalance } from "utils/utils";
+import { formatBalance } from "@repo/ui/utils";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 

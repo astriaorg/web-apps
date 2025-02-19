@@ -37,7 +37,7 @@ export interface AppConfig {
   // The default approval amount for tokens.
   tokenDefaultApprovalAmount: string;
   // The default slippage tolerance for swaps.
-  swapDefaultSlippageTolerance: number;
+  swapSlippageTolerance: number;
   // The data for the fee options.
   feeData: {
     id: number;
