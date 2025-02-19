@@ -10,6 +10,7 @@ const query = graphql(`
       asset {
         logoURI
         name
+        symbol
       }
       name
       symbol
@@ -17,6 +18,13 @@ const query = graphql(`
         netApy
         guardian
         fee
+      }
+      metadata {
+        curators {
+          image
+          name
+        }
+        description
       }
     }
   }

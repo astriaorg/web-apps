@@ -202,6 +202,9 @@ export default {
       borderColor: {
         dark: "hsl(var(--border))",
       },
+      spacing: {
+        18: "4.5rem",
+      },
     },
   },
   plugins: [tailwindcss_animate],
