@@ -202,6 +202,9 @@ export default {
       borderColor: {
         dark: "hsl(var(--border))",
       },
+      lineHeight: {
+        12: "3rem",
+      },
       spacing: {
         18: "4.5rem",
       },

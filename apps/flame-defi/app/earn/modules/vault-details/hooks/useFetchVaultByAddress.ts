@@ -8,16 +8,14 @@ const query = graphql(`
     vaultByAddress(address: $address, chainId: $chainId) {
       address
       asset {
+        decimals
         logoURI
         name
         symbol
       }
-      name
-      symbol
-      state {
-        netApy
-        guardian
-        fee
+      liquidity {
+        underlying
+        usd
       }
       metadata {
         curators {
@@ -26,6 +24,15 @@ const query = graphql(`
         }
         description
       }
+      name
+      state {
+        apy
+        fee
+        guardian
+        totalAssets
+        totalAssetsUsd
+      }
+      symbol
     }
   }
 `);

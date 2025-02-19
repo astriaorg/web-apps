@@ -22,7 +22,7 @@ export const HeaderSection = () => {
           </div>
 
           <div className="flex flex-col space-y-3">
-            <Skeleton isLoading={isPending} className="w-64 h-6">
+            <Skeleton isLoading={isPending} className="w-64 h-8">
               <div className="flex items-center space-x-2">
                 <span className="text-3xl/8">{data?.vaultByAddress.name}</span>
                 {data?.vaultByAddress.metadata?.description && (
