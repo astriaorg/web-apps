@@ -137,7 +137,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                   {NON_BREAKING_SPACE}
                   {row.original.symbol}
                 </span>
-                <Badge variant="secondary" className="bg-surface-3">
+                <Badge>
                   <FormattedNumber
                     value={
                       +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
