@@ -2,9 +2,12 @@ import { InfoTooltip } from "@repo/ui/components";
 import { ArrowLeftIcon } from "@repo/ui/icons";
 import { Badge, Skeleton } from "@repo/ui/shadcn-primitives";
 import { Image } from "earn/components/image";
+import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/vault-details/hooks/usePageContext";
+import { useRouter } from "next/navigation";
 
 export const HeaderSection = () => {
+  const router = useRouter();
   const {
     query: { isPending, data },
   } = usePageContext();
@@ -12,12 +15,15 @@ export const HeaderSection = () => {
   return (
     <section className="flex flex-col px-4 md:px-20">
       <div className="mt-18">
-        <div className="relative flex">
-          <div className="absolute -left-10 mt-2">
+        <div className="relative flex flex-col md:flex-row">
+          <div
+            className="mb-10 md:absolute md:-left-10 md:mt-2 md:mb-0"
+            onClick={() => router.push(ROUTES.VAULT_LIST)}
+          >
             <ArrowLeftIcon
               aria-label="Back"
               size={16}
-              className="text-icon-light"
+              className="cursor-pointer text-icon-light hover:text-text"
             />
           </div>
 

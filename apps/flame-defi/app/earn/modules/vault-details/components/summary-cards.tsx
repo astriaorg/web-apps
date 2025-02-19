@@ -30,7 +30,7 @@ export const SummaryCards = () => {
     });
 
   return (
-    <div className="col-span-2 grid grid-cols-3 gap-2">
+    <div className="grid lg:grid-cols-3 gap-2">
       <SummaryCard isLoading={isPending} className="bg-orange">
         <SummaryCardLabel className="text-text">APY</SummaryCardLabel>
         <SummaryCardFigureText>
