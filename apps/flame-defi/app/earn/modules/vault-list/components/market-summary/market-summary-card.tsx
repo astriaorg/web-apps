@@ -63,7 +63,7 @@ export const MarketSummaryCard = ({
 
   return (
     <Card className="flex flex-col rounded-xl p-5 space-y-1">
-      <span className="text-xs/3 text-grey-light">{label}</span>
+      <span className="text-xs/3 text-text-light">{label}</span>
 
       <div className="relative">
         {/* Reserve space for animation to prevent card size increasing with counter value. */}

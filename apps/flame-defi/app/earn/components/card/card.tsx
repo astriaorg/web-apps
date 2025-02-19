@@ -5,6 +5,6 @@ export const Card = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cn("rounded-lg bg-semi-white", className)} {...props} />
+    <div className={cn("rounded-lg bg-surface-1", className)} {...props} />
   );
 };

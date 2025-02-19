@@ -86,7 +86,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                   className="rounded-full shrink-0"
                 />
               ) : (
-                <div className="rounded-full shrink-0 w-[30px] h-[30px] bg-grey-dark" />
+                <div className="rounded-full shrink-0 w-[30px] h-[30px] bg-icon-light" />
               )}
               <div className="flex flex-col space-y-1 overflow-hidden">
                 <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
@@ -135,7 +135,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                   &nbsp;
                   {row.original.symbol}
                 </span>
-                <span className="text-xs text-secondary font-medium bg-muted-foreground px-1 py-0.5 rounded-sm opacity-75">
+                <span className="text-xs text-text-subdued font-medium bg-surface-3 px-1.5 py-0.5 rounded-lg">
                   <FormattedNumber
                     value={
                       +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
@@ -148,7 +148,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 </span>
               </div>
               <div className="md:hidden flex justify-end pr-3">
-                <CaretRightIcon className="text-grey-light" size={16} />
+                <CaretRightIcon className="text-text-subdued" size={16} />
               </div>
             </div>
           );
