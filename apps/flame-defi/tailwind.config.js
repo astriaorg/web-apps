@@ -80,31 +80,31 @@ export default {
 
         // Tokens.
         icon: {
-          DEFAULT: "var(--color-icon-default)",
-          light: "var(--color-icon-light)",
-          subdued: "var(--color-icon-subdued)",
+          DEFAULT: "hsl(var(--color-icon-default))",
+          light: "hsl(var(--color-icon-light))",
+          subdued: "hsl(var(--color-icon-subdued))",
         },
         stroke: {
-          DEFAULT: "var(--color-stroke-default)",
-          active: "var(--color-stroke-active)",
+          DEFAULT: "hsl(var(--color-stroke-default))",
+          active: "hsl(var(--color-stroke-active))",
         },
         text: {
-          DEFAULT: "var(--color-text-default)",
-          secondary: "var(--color-text-secondary)",
-          inverted: "var(--color-text-inverted)",
-          light: "var(--color-text-light)",
-          subdued: "var(--color-text-subdued)",
-          black: "var(--color-text-black)",
+          DEFAULT: "hsl(var(--color-text-default))",
+          secondary: "hsl(var(--color-text-secondary))",
+          inverted: "hsl(var(--color-text-inverted))",
+          light: "hsl(var(--color-text-light))",
+          subdued: "hsl(var(--color-text-subdued))",
+          black: "hsl(var(--color-text-black))",
         },
         background: {
-          DEFAULT: "var(--color-background-default)",
+          DEFAULT: "hsl(var(--color-background-default))",
         },
         surface: {
-          1: "var(--color-surface-1)",
-          2: "var(--color-surface-2)",
-          3: "var(--color-surface-3)",
+          1: "hsl(var(--color-surface-1))",
+          2: "hsl(var(--color-surface-2))",
+          3: "hsl(var(--color-surface-3))",
         },
-        orange: "var(--color-orange)",
+        orange: "hsl(var(--color-orange))",
       },
       transitionDuration: {
         DEFAULT: "300ms", // Sets the default duration to 300ms
