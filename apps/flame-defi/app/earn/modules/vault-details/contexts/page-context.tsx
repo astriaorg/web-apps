@@ -1,12 +1,15 @@
+import { TimeseriesOptions } from "earn/gql/graphql";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/useFetchVaultByAddress";
 import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren, useMemo } from "react";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 
 export interface PageContextProps extends PropsWithChildren {
   address: string;
   status: Status;
+  dailyAPYOptions: TimeseriesOptions;
+  setDailyAPYOptions: (value: TimeseriesOptions) => void;
   query: ReturnType<typeof useFetchVaultByAddress>;
 }
 
@@ -21,9 +24,15 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     throw new Error(`Route missing param 'address'.`);
   }
 
+  const [dailyAPYOptions, setDailyAPYOptions] = useState<TimeseriesOptions>({
+    startTimestamp: null,
+    endTimestamp: null,
+  });
+
   const query = useFetchVaultByAddress({
     variables: {
       address: params.address,
+      dailyAPYOptions,
     },
   });
 
@@ -44,6 +53,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       value={{
         address: params.address,
         status,
+        dailyAPYOptions,
+        setDailyAPYOptions,
         query,
       }}
     >

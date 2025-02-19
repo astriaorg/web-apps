@@ -138,6 +138,27 @@
   .normalize-input {
     @apply flex-1 bg-transparent focus:outline-none placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
   }
+
+  .earn-chart {
+    @apply overflow-visible;
+
+    > g {
+      @apply text-text-light;
+      text-anchor: start;
+
+      line {
+        @apply hidden;
+      }
+
+      text {
+        @apply uppercase text-xs/3 font-medium tracking-wider;
+      }
+    }
+
+    > rect {
+      @apply text-orange;
+    }
+  }
 }
 
 @layer utilities {
