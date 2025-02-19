@@ -7,6 +7,7 @@ import type {
 import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract } from "viem";
 import React from "react";
+import JSBI from "jsbi";
 
 // FIXME - i manually recreated types from keplr here as a stop gap.
 //  this will get refactored further when i update the config logic
@@ -386,17 +387,55 @@ export interface GetQuoteResult {
   routeString: string;
 }
 
-export interface TokenInRoute {
-  address: string;
-  chainId: number;
-  symbol: string;
-  decimals: number;
+export class Token {
+  readonly chainId: number;
+  readonly address: string;
+  readonly decimals: number;
+  readonly symbol: string;
+
+  constructor(
+    chainId: number,
+    address: string,
+    decimals: number,
+    symbol: string,
+  ) {
+    this.chainId = chainId;
+    this.address = address;
+    this.decimals = decimals;
+    this.symbol = symbol;
+  }
+
+  equals(other: Token): boolean {
+    return (
+      this.chainId === other.chainId &&
+      this.address.toLowerCase() === other.address.toLowerCase()
+    );
+  }
+}
+
+/**
+ * A token amount represents an amount of a token.
+ * TODO - consolidate this type with `TokenState` type
+ */
+export class TokenAmount {
+  readonly token: Token;
+  readonly raw: JSBI;
+  readonly decimalScale: JSBI;
+
+  constructor(token: Token, amount: string | JSBI) {
+    this.token = token;
+    this.decimalScale = JSBI.exponentiate(
+      JSBI.BigInt(10),
+      JSBI.BigInt(token.decimals),
+    );
+    this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
+  }
 }
 
 export type V3PoolInRoute = {
   type: "v3-pool";
-  tokenIn: TokenInRoute;
-  tokenOut: TokenInRoute;
+  tokenIn: Token;
+  tokenOut: Token;
   sqrtRatioX96: string;
   liquidity: string;
   tickCurrent: string;

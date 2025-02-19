@@ -1,6 +1,11 @@
 import JSBI from "jsbi";
 import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
-import { GetQuoteResult } from "@repo/flame-types";
+import {
+  GetQuoteResult,
+  TokenAmount,
+  Token,
+  TRADE_TYPE,
+} from "@repo/flame-types";
 import SWAP_ROUTER_ABI from "./contracts/swaprouter02.json";
 import {
   ExactInputParams,
@@ -10,10 +15,7 @@ import {
   Pool,
   Route,
   SwapOptions,
-  Token,
-  TokenAmount,
   Trade,
-  TradeType,
 } from "./types";
 
 // 100% in basis points
@@ -331,7 +333,7 @@ export class SwapRouter {
 
     // get swap parameters based on trade type
     const swapParams =
-      trade.type === TradeType.EXACT_INPUT
+      trade.type === TRADE_TYPE.EXACT_IN
         ? this.getExactInputParams(
             trade,
             options.recipient,
@@ -399,7 +401,7 @@ export class SwapRouter {
     if (isNativeOut) {
       // FIXME - output vs input based on EXACT_INPUT
       const minimumAmount = this.calculateSlippage(
-        trade.type === TradeType.EXACT_INPUT
+        trade.type === TRADE_TYPE.EXACT_IN
           ? trade.outputAmount.raw
           : trade.inputAmount.raw,
         options.slippageTolerance,
@@ -496,11 +498,11 @@ export function createTradeFromQuote(
     const inputAmount = new TokenAmount(inputToken, quoteResult.amount);
     const outputAmount = new TokenAmount(outputToken, quoteResult.quote);
 
-    return new Trade(route, inputAmount, outputAmount, TradeType.EXACT_INPUT);
+    return new Trade(route, inputAmount, outputAmount, TRADE_TYPE.EXACT_IN);
   } else {
     const inputAmount = new TokenAmount(inputToken, quoteResult.quote);
     const outputAmount = new TokenAmount(outputToken, quoteResult.amount);
 
-    return new Trade(route, inputAmount, outputAmount, TradeType.EXACT_OUTPUT);
+    return new Trade(route, inputAmount, outputAmount, TRADE_TYPE.EXACT_OUT);
   }
 }

@@ -1,7 +1,7 @@
 import {
   GetQuoteResult,
   TRADE_TYPE,
-  TokenInRoute,
+  Token,
   TokenState,
 } from "@repo/flame-types";
 import {
@@ -58,7 +58,7 @@ export function calculatePriceImpact(
 
   for (const hop of hops) {
     // Determine token0 and token1 by lexicographic ordering of addresses.
-    let token0: TokenInRoute, token1: TokenInRoute;
+    let token0: Token, token1: Token;
     if (
       hop.tokenIn.address.toLowerCase() < hop.tokenOut.address.toLowerCase()
     ) {
