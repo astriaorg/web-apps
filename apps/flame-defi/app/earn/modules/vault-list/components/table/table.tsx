@@ -60,7 +60,7 @@ export const Table = () => {
           <tr
             key={row.id}
             className={cn(
-              isPending ? "select-none" : "cursor-pointer hover:bg-white/5",
+              isPending ? "select-none" : "cursor-pointer hover:surface-2",
             )}
             onClick={() =>
               router.push(ROUTES.VAULT_DETAILS + row.original.address)

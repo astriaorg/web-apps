@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
+import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";
 import {
   PAGE_SIZE,
@@ -99,7 +100,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                     style="percent"
                     minimumFractionDigits={2}
                   />
-                  &nbsp;APY
+                  {NON_BREAKING_SPACE}APY
                 </span>
               </div>
             </div>
@@ -133,7 +134,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                         .toFixed(2)
                     }
                   />
-                  &nbsp;
+                  {NON_BREAKING_SPACE}
                   {row.original.symbol}
                 </span>
                 <Badge variant="secondary" className="bg-surface-3">
