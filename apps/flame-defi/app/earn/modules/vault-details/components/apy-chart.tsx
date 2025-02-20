@@ -21,6 +21,8 @@ import { FormattedNumber, useIntl } from "react-intl";
 
 // Threshold for the maximum number of data points to display.
 const MAX_DATA_POINTS = 1000;
+const CHART_HEIGHT = 52;
+const CHART_HEIGHT_CLASS_NAME = `h-${CHART_HEIGHT}`;
 
 interface DataItem {
   x: number;
@@ -68,7 +70,7 @@ export const APYChart = () => {
 
     const container = svg.node()?.parentElement;
     const width = container?.clientWidth || 0; // Fill chart to container width.
-    const height = 52 * 4;
+    const height = CHART_HEIGHT * 4;
     const margin = { top: 0, right: 0, bottom: 16, left: 0 };
 
     svg
@@ -205,7 +207,7 @@ export const APYChart = () => {
 
       <div className="mt-4" />
       <Skeleton isLoading={isPending} className="w-full">
-        <svg ref={svgRef} className={cn(`earn-chart h-52`)} />
+        <svg ref={svgRef} className={`earn-chart ${CHART_HEIGHT_CLASS_NAME}`} />
         <div
           ref={tooltipRef}
           className={cn(
