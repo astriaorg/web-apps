@@ -22,7 +22,7 @@ import { useGetQuote } from "./useGetQuote";
 import debounce from "lodash.debounce";
 import useOneToOneQuote from "./useOneToOneQuote";
 import { useTxnInfo } from "./useTxnInfo";
-import { useTokenBalances } from "features/EvmWallet/hooks/useTokenBalances";
+import { useTokenBalances } from "features/EvmWallet";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
