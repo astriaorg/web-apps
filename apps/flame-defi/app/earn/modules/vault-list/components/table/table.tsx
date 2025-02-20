@@ -27,7 +27,7 @@ export const Table = () => {
                 )}
               >
                 <div className="flex items-end space-x-2">
-                  <div className="text-xs/3 text-grey-light font-semibold tracking-widest uppercase">
+                  <div className="text-xs/3 text-text-subdued font-medium tracking-wider uppercase">
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext(),
@@ -36,7 +36,7 @@ export const Table = () => {
                   {header.column.getCanSort() && (
                     <div
                       className={cn(
-                        "cursor-pointer text-grey-light hover:text-white hover:opacity-100",
+                        "cursor-pointer text-text-subdued hover:text-text hover:opacity-100",
                         "transform transition-transform duration-200",
                         header.id === orderBy ? "opacity-100" : "opacity-0",
                         orderDirection === OrderDirection.Asc && "rotate-180",
@@ -59,7 +59,7 @@ export const Table = () => {
               <td
                 key={cell.id}
                 className={cn(
-                  "h-[72px] px-3 first:pl-6 last:hidden border-t border-dark text-sm",
+                  "h-[72px] px-3 first:pl-6 last:hidden border-t border-stroke text-sm",
                   "md:last:table-cell",
                 )}
               >
