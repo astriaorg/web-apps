@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Dropdown } from "./Dropdown"; // Adjust the import path as needed
+import { fireEvent, render, screen } from "@testing-library/react";
+import { Dropdown } from "./dropdown"; // Adjust the import path as needed
 
 describe("Dropdown Component", () => {
   test("renders with placeholder text", () => {
