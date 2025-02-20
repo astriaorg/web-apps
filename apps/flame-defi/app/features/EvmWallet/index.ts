@@ -4,6 +4,7 @@ import SingleWalletConnect from "./components/SingleWalletConnect/SingleWalletCo
 import { SingleWalletContent } from "./components/SingleWalletConnect/SingleWalletConnect";
 import { EvmWalletProvider } from "./contexts/EvmWalletContext";
 import { useEvmWallet } from "./hooks/useEvmWallet";
+import { useTokenBalances } from "./hooks/useTokenBalances";
 import { createWithdrawerService } from "./services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { createWrapService } from "./services/SwapServices/WrapService";
 import {
@@ -22,4 +23,5 @@ export {
   createWithdrawerService,
   createWrapService,
   createTradeFromQuote,
+  useTokenBalances,
 };

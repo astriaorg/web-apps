@@ -15,28 +15,32 @@ import JSBI from "jsbi";
 import { useState, useCallback, useEffect } from "react";
 import { useGetQuote } from "./useGetQuote";
 
-function useExactInQuote(inputOne: TokenState, inputTwo: TokenState) {
-  const { error, getQuote } = useGetQuote();
-  const [exactInQuote, setExactInQuote] = useState<GetQuoteResult | null>(null);
-  const [exactInQuoteLoading, setExactInQuoteLoading] = useState(false);
+// NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
+// quoteGas values are the values we display in top token input field.
+// They are not the calculated output values we need
 
-  const fetchExactInQuote = useCallback(async () => {
-    setExactInQuoteLoading(true);
-    const exactInQuoteData = await getQuote(
+function useTxnQuote(inputOne: TokenState, inputTwo: TokenState) {
+  const { error, getQuote } = useGetQuote();
+  const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
+  const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
+
+  const fetchTxnQuote = useCallback(async () => {
+    setTxnQuoteLoading(true);
+    const txnQuoteData = await getQuote(
       TRADE_TYPE.EXACT_IN,
       inputOne,
       inputTwo,
     );
-    if (exactInQuoteData) {
-      setExactInQuote({ ...exactInQuoteData });
+    if (txnQuoteData) {
+      setTxnQuote(txnQuoteData);
     }
-    setExactInQuoteLoading(false);
+    setTxnQuoteLoading(false);
   }, [inputOne, inputTwo, getQuote]);
 
   return {
-    exactInQuote,
-    exactInQuoteLoading,
-    fetchExactInQuote,
+    txnQuote,
+    txnQuoteLoading,
+    fetchTxnQuote,
     error,
   };
 }
@@ -143,21 +147,23 @@ export function useTxnInfo({
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }) {
-  const { exactInQuote, exactInQuoteLoading, fetchExactInQuote } =
-    useExactInQuote(tokenOne, tokenTwo);
+  const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
+    tokenOne,
+    tokenTwo,
+  );
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
   useEffect(() => {
     if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
-      fetchExactInQuote();
+      fetchTxnQuote();
     }
-  }, [tradeType, fetchExactInQuote, validSwapInputs]);
+  }, [tradeType, fetchTxnQuote, validSwapInputs]);
 
-  const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : exactInQuote;
+  const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
   const priceImpact = calculatePriceImpact(txnQuoteData);
 
   return {
-    txnQuoteDataLoading: exactInQuoteLoading,
+    txnQuoteDataLoading: txnQuoteLoading,
     gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
     formattedGasUseEstimateUSD: formatDecimalValues(
       txnQuoteData?.gasUseEstimateUSD,
