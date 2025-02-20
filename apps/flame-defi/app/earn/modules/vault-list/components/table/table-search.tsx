@@ -1,6 +1,6 @@
 import { SearchIcon } from "@repo/ui/icons";
-import { cn } from "@repo/ui/lib";
 import { Input, Skeleton } from "@repo/ui/shadcn-primitives";
+import { cn } from "@repo/ui/utils";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useRef, useState } from "react";
 

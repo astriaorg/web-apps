@@ -1,6 +1,6 @@
 import { ArrowDownIcon } from "@repo/ui/icons";
-import { cn } from "@repo/ui/lib";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { cn } from "@repo/ui/utils";
 import { flexRender } from "@tanstack/react-table";
 import { ROUTES } from "earn/constants/routes";
 import { OrderDirection } from "earn/gql/graphql";

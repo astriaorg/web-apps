@@ -1,10 +1,10 @@
-import { cn } from "@repo/ui/lib";
 import {
   Skeleton,
   Tabs,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { cn } from "@repo/ui/utils";
 import * as d3 from "d3";
 import {
   SummaryCard,
