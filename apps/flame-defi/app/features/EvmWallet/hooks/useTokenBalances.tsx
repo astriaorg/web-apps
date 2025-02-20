@@ -2,7 +2,6 @@ import { EvmCurrency, EvmChainInfo } from "@repo/flame-types";
 import { createWithdrawerService } from "features/EvmWallet";
 import type { AstriaErc20WithdrawerService } from "features/EvmWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { useCallback, useState } from "react";
-import { formatBalance } from "@repo/ui/utils";
 import { formatUnits } from "viem";
 import { useConfig, useBalance } from "wagmi";
 
@@ -59,8 +58,8 @@ export const useTokenBalances = (
                 userAddress as string,
               );
 
-              const balanceStr = formatBalance(
-                balanceRes.toString(),
+              const balanceStr = formatUnits(
+                balanceRes,
                 selectedToken.coinDecimals,
               );
               updateBalance(
