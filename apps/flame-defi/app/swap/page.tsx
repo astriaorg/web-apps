@@ -138,7 +138,6 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleResetInputs = useCallback(() => {
-    console.log("RESET INPUTS");
     setInputOne({ token: currencies?.[0], value: "", isQuoteValue: false });
     setInputTwo({ token: null, value: "", isQuoteValue: true });
     setQuote(null);

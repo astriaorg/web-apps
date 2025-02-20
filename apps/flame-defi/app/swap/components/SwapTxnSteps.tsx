@@ -232,7 +232,7 @@ export function SwapTxnSteps({
   txnMsg,
   oneToOneQuote,
 }: SwapTxnStepsProps) {
-  console.log("TXN STATUS", txnStatus);
+
   return (
     <div className="h-[320px]">
       {txnStatus === TXN_STATUS.IDLE && !isTiaWtia && (
