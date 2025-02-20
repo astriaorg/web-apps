@@ -1,4 +1,3 @@
-import JSBI from "jsbi";
 import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
 import {
   GetQuoteResult,
