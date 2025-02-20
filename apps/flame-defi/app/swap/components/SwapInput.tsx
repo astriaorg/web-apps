@@ -47,7 +47,7 @@ export function SwapInput({
 
   const handleFiatValue = () => {
     const formatNumber = (value: string) => {
-      let { value: formattedValue, suffix } = formatAbbreviatedNumber(value);
+      const { value: formattedValue, suffix } = formatAbbreviatedNumber(value);
 
       const localeString = (+formattedValue).toLocaleString(locale, {
         minimumFractionDigits: 2,
