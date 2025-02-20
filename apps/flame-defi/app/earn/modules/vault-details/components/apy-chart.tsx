@@ -38,10 +38,10 @@ export const APYChart = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
-  const [tooltipContent, setTooltipContent] = useState({
-    timestamp: -1,
-    apy: -1,
-  });
+  const [tooltipContent, setTooltipContent] = useState<{
+    timestamp: number;
+    apy: number;
+  }>();
 
   useEffect(() => {
     let dailyAPYs = data?.vaultByAddress.historicalState.dailyApy;
@@ -208,16 +208,23 @@ export const APYChart = () => {
         <svg ref={svgRef} className={cn(`earn-chart h-52`)} />
         <div
           ref={tooltipRef}
-          className="absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm"
+          className={cn(
+            "absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm",
+            tooltipContent ? "block" : "hidden",
+          )}
         >
           <div className="flex flex-col space-y-1">
-            <div>{formatDate(tooltipContent.timestamp * 1000)}</div>
-            <div>
-              {formatNumber(tooltipContent.apy, {
-                style: "percent",
-                minimumFractionDigits: 2,
-              })}
-            </div>
+            {tooltipContent && (
+              <>
+                <div>{formatDate(tooltipContent.timestamp * 1000)}</div>
+                <div>
+                  {formatNumber(tooltipContent.apy, {
+                    style: "percent",
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </Skeleton>
