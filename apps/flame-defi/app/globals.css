@@ -87,6 +87,7 @@
     --color-surface-1: var(--color-gray-50);
     --color-surface-2: var(--color-gray-100);
     --color-surface-3: var(--color-gray-150);
+    --color-surface-inverted: var(--color-gray-1000);
 
     --color-orange: var(--color-orange-100);
   }
@@ -110,6 +111,7 @@
     --color-surface-1: var(--color-gray-900);
     --color-surface-2: var(--color-gray-850);
     --color-surface-3: var(--color-gray-800);
+    --color-surface-inverted: var(--color-gray-0);
 
     --color-orange: var(--color-orange-100);
   }
@@ -158,6 +160,14 @@
     > path,
     > rect {
       @apply text-orange;
+    }
+  }
+
+  .earn-chart-tooltip {
+    @apply absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm;
+
+    > * {
+      @apply flex flex-col space-y-1;
     }
   }
 }

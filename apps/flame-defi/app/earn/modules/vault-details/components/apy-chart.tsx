@@ -17,7 +17,7 @@ import {
   APYChartInterval,
 } from "earn/modules/vault-details/types";
 import { useEffect, useRef } from "react";
-import { FormattedNumber } from "react-intl";
+import { FormattedNumber, useIntl } from "react-intl";
 
 interface DataItem {
   x: number;
@@ -30,6 +30,7 @@ export const APYChart = () => {
     setSelectedAPYChartInterval,
     query: { isPending, data },
   } = usePageContext();
+  const { formatDate, formatNumber } = useIntl();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -99,7 +100,7 @@ export const APYChart = () => {
     const line = d3
       .line<DataItem>()
       .x((it) => (x(it.x.toString()) ?? 0) + x.bandwidth() / 2)
-      .y((it) => y(it.y || 0))
+      .y((it) => y(it.y ?? 0))
       .curve(d3.curveMonotoneX);
 
     const path = svg
@@ -116,10 +117,51 @@ export const APYChart = () => {
       .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
       .attr("stroke-dashoffset", totalLength)
       .transition()
-      .duration(400)
+      .duration(800)
       .ease(d3.easeLinear)
       .attr("stroke-dashoffset", 0);
-  }, [data]);
+
+    // Tooltip on line hover.
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "earn-chart-tooltip")
+      .style("display", "none");
+
+    // Add event listeners for tooltip.
+    svg
+      .selectAll(".line")
+      .data(dailyAPYs)
+      .enter()
+      .append("circle")
+      .attr("cx", (it) => (x(it.x.toString()) ?? 0) + x.bandwidth() / 2)
+      .attr("cy", (it) => y(it.y ?? 0))
+      .attr("r", 5)
+      .style("fill", "transparent")
+      .on("mouseover", (_, it) => {
+        tooltip.style("display", "block").html(
+          `<div>
+          <span>
+          ${formatDate(it.x * 1000)}
+          </span>
+          <span>
+          ${formatNumber(it.y ?? 0, {
+            style: "percent",
+            minimumFractionDigits: 2,
+          })}
+          </span>
+          </div>`,
+        );
+      })
+      .on("mousemove", (event) => {
+        tooltip
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 20 + "px");
+      })
+      .on("mouseout", () => {
+        tooltip.style("display", "none");
+      });
+  }, [data, formatDate, formatNumber]);
 
   return (
     <SummaryCard isLoading={isPending}>
