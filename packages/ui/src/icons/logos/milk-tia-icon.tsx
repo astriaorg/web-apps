@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const KeplrIcon: React.FC<IconProps> = ({
+export const MilkTiaIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -12,7 +12,7 @@ export const KeplrIcon: React.FC<IconProps> = ({
       style={{
         width: size,
         height: size,
-        backgroundImage: "url(/assets/icons/logos/keplr-logo-color.png)",
+        backgroundImage: "url(/assets/icons/logos/milk-tia-logo-color.png)",
       }}
     />
   );

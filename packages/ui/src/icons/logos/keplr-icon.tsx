@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const WrappedTiaIcon: React.FC<IconProps> = ({
+export const KeplrIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -12,10 +12,8 @@ export const WrappedTiaIcon: React.FC<IconProps> = ({
       style={{
         width: size,
         height: size,
-        backgroundImage: "url(/assets/icons/logos/wrapped-celestia-icon.png)",
+        backgroundImage: "url(/assets/icons/logos/keplr-logo-color.png)",
       }}
     />
   );
 };
-
-export default WrappedTiaIcon;

@@ -1,9 +1,11 @@
-import React from "react";
+import type { IconProps } from "@repo/flame-types";
 
-export const ErrorIcon: React.FC<{ className?: string; size?: number }> = ({
+import { DEFAULT_ICON_SIZE } from "./constants";
+
+export const ErrorIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
-}) => {
+}: IconProps) => {
   return (
     <svg
       width={size}

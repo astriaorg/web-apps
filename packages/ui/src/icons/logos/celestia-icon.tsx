@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const StrideTiaIcon: React.FC<IconProps> = ({
+export const CelestiaIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -12,7 +12,7 @@ export const StrideTiaIcon: React.FC<IconProps> = ({
       style={{
         width: size,
         height: size,
-        backgroundImage: "url(/assets/icons/logos/stride-tia-logo-color.png)",
+        backgroundImage: "url(/assets/icons/logos/celestia-logo-color.png)",
       }}
     />
   );
