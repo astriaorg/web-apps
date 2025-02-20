@@ -320,7 +320,6 @@ export class SwapRouter {
           );
 
     // for simple erc20 token swaps
-    // FIXME - isNativeOut is incorrectly false when we want to get TIA out
     if (!options.isNativeIn && !options.isNativeOut) {
       let gasLimit: bigint;
       try {
