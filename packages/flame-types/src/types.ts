@@ -333,7 +333,9 @@ export type EvmChains = {
   [label: string]: EvmChainInfo;
 };
 
+// TODO - consolidate with `TokenAmount` type
 export interface TokenState {
+  // FIXME - why is this ever null?
   token?: EvmCurrency | null;
   value: string;
   isQuoteValue?: boolean;
