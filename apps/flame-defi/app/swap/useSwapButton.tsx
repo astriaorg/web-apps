@@ -25,6 +25,7 @@ import { parseToBigInt } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import JSBI from "jsbi";
 import { Chain } from "viem";
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface SwapButtonProps {
   tokenOne: TokenState;
@@ -91,6 +92,7 @@ export function useSwapButton({
   const publicClient = getPublicClient(wagmiConfig, {
     chainId: selectedChain?.chainId,
   });
+  const addRecentTransaction = useAddRecentTransaction();
   const { connectEvmWallet } = useEvmWallet();
   const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
@@ -119,6 +121,10 @@ export function useSwapButton({
   useEffect(() => {
     if (result.data?.status === "success") {
       setTxnStatus(TXN_STATUS.SUCCESS);
+      addRecentTransaction({
+        hash: txnHash || "",
+        description: "Successful transaction",
+      });
     } else if (result.data?.status === "reverted") {
       setTxnStatus(TXN_STATUS.FAILED);
       handleErrorMsgs("", "Transaction reverted");
@@ -126,7 +132,7 @@ export function useSwapButton({
       setTxnStatus(TXN_STATUS.FAILED);
       handleErrorMsgs("", "Transaction failed");
     }
-  }, [result.data]);
+  }, [result.data, txnHash, addRecentTransaction]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wtiaAddress = selectedChain.contracts?.wrappedCelestia?.address;

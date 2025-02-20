@@ -10,8 +10,9 @@ import {
 import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { TokenState, OneToOneQuoteProps } from "@repo/flame-types";
+import { TokenState } from "@repo/flame-types";
 import { useTxnInfo } from "swap/useTxnInfo";
+import { OneToOneQuoteProps } from "./types";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",

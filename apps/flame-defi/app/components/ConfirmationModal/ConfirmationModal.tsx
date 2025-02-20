@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CloseIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { TXN_STATUS } from "@repo/flame-types";
@@ -46,10 +46,10 @@ export default function ConfirmationModal({
   }, [open, setTxnStatus]);
 
   const handleClose = () => {
-    setOpen(false);
-    if (txnStatus === TXN_STATUS.SUCCESS) {
-      handleResetInputs();
-    }
+      setOpen(false);
+      if (txnStatus === TXN_STATUS.SUCCESS || txnStatus === undefined) {
+        handleResetInputs();
+      }
   };
 
   const handleOpen = () => {
@@ -62,8 +62,9 @@ export default function ConfirmationModal({
     }
   };
 
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={() => handleClose()}>
       <DialogTrigger asChild className="w-full">
         <ActionButton
           callback={handleOpen}
