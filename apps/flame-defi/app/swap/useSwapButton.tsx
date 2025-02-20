@@ -221,6 +221,8 @@ export function useSwapButton({
     }
   }, [
     trade,
+    tokenOne.token?.coinDenom,
+    tokenTwo.token?.coinDenom,
     userAccount,
     selectedChain,
     walletClient,
