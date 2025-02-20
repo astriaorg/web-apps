@@ -19,8 +19,6 @@ import {
 import { useEffect, useRef } from "react";
 import { FormattedNumber } from "react-intl";
 
-const CHART_HEIGHT = 52 * 4;
-
 interface DataItem {
   x: number;
   y?: number | null;
@@ -49,7 +47,7 @@ export const APYChart = () => {
 
     const container = svg.node()?.parentElement;
     const width = container?.clientWidth || 0; // Fill chart to container width.
-    const height = CHART_HEIGHT;
+    const height = 52 * 4;
     const margin = { top: 0, right: 0, bottom: 16, left: 0 };
 
     svg
@@ -154,7 +152,7 @@ export const APYChart = () => {
 
       <div className="mt-4" />
       <Skeleton isLoading={isPending} className="w-full">
-        <svg ref={svgRef} className={cn(`earn-chart h-${CHART_HEIGHT / 4}`)} />
+        <svg ref={svgRef} className={cn(`earn-chart h-52`)} />
       </Skeleton>
     </SummaryCard>
   );
