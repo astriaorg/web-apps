@@ -14,20 +14,24 @@ export const SummaryCards = () => {
   } = usePageContext();
 
   const { value: formattedLiquidity, suffix: formattedLiquiditySuffix } =
-    formatAbbreviatedNumber({
-      value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
+    formatAbbreviatedNumber(
+      new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
         .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
         .toFixed(),
-      dp: 2,
-    });
+      {
+        minimumFractionDigits: 2,
+      },
+    );
 
   const { value: formattedTotalAssets, suffix: formattedTotalAssetsSuffix } =
-    formatAbbreviatedNumber({
-      value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+    formatAbbreviatedNumber(
+      new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
         .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
         .toFixed(),
-      dp: 2,
-    });
+      {
+        minimumFractionDigits: 2,
+      },
+    );
 
   return (
     <div className="grid lg:grid-cols-3 gap-2">
