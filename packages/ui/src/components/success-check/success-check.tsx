@@ -1,5 +1,3 @@
-import React from "react";
-
 export function SuccessCheck() {
   return (
     <div className="w-[100px] my-[50px] mx-auto">
