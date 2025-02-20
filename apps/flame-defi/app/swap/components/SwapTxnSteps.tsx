@@ -232,7 +232,6 @@ export function SwapTxnSteps({
   txnMsg,
   oneToOneQuote,
 }: SwapTxnStepsProps) {
-
   return (
     <div className="h-[320px]">
       {txnStatus === TXN_STATUS.IDLE && !isTiaWtia && (

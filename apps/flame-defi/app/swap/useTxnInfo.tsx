@@ -14,9 +14,8 @@ import JSBI from "jsbi";
 import { useState, useCallback, useEffect } from "react";
 import { useGetQuote } from "./useGetQuote";
 
-
-// NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the 
-// quoteGas values are the values we display in top token input field. 
+// NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
+// quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
 function useTxnQuote(inputOne: TokenState, inputTwo: TokenState) {
@@ -104,8 +103,8 @@ export function calculatePriceImpact(
   // Compute the overall execution price:
   // - txnQuoteData.amountDecimals: initial input amount
   // - txnQuoteData.quoteDecimals: final output amount
-  const overallInput = parseFloat(txnQuoteData?.amountDecimals)
-  const overallOutput = parseFloat(txnQuoteData?.quoteDecimals)
+  const overallInput = parseFloat(txnQuoteData?.amountDecimals);
+  const overallOutput = parseFloat(txnQuoteData?.quoteDecimals);
   const overallExecutionPrice = overallOutput / overallInput;
 
   // Price impact is defined as:
@@ -138,8 +137,10 @@ export function useTxnInfo({
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }) {
-  const { txnQuote, txnQuoteLoading, fetchTxnQuote } =
-    useTxnQuote(tokenOne, tokenTwo);
+  const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
+    tokenOne,
+    tokenTwo,
+  );
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
   useEffect(() => {

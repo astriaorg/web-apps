@@ -76,9 +76,7 @@ export function SwapInput({
             unavailableToken={oppositeToken?.token}
             setSelectedToken={(token) => onTokenSelect(token, index)}
           />
-          {inputToken.token &&
-          balance &&
-          !isDustAmount(balance) ? (
+          {inputToken.token && balance && !isDustAmount(balance) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
               <span className="flex items-center gap-2">
                 {formatNumber(balance)} {inputToken?.token?.coinDenom}

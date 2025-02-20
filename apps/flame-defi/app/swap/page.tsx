@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
 import { useEvmChainData } from "config";
@@ -65,7 +71,9 @@ export default function SwapPage(): React.ReactElement {
   }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
 
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
-  const tokenOneBalance = balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)?.value || "0";
+  const tokenOneBalance =
+    balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)
+      ?.value || "0";
 
   const {
     titleText,
@@ -251,7 +259,6 @@ export default function SwapPage(): React.ReactElement {
     }
   };
 
-
   const swapInputs = [
     {
       id: TOKEN_INPUTS.TOKEN_ONE,
@@ -284,7 +291,6 @@ export default function SwapPage(): React.ReactElement {
       txnQuoteError: error,
     },
   ];
-
 
   const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;
 
