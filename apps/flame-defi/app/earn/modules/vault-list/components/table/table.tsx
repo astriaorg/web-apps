@@ -4,7 +4,7 @@ import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { flexRender } from "@tanstack/react-table";
 import { ROUTES } from "earn/constants/routes";
 import { OrderDirection } from "earn/gql/graphql";
-import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
+import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useRouter } from "next/navigation";
 
 export const Table = () => {

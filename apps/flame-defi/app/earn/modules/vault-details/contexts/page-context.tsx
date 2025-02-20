@@ -1,5 +1,5 @@
 import { TimeseriesOptions } from "earn/gql/graphql";
-import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/useFetchVaultByAddress";
+import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { APYChartInterval } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";

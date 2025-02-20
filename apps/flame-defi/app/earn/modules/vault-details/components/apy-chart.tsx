@@ -11,7 +11,7 @@ import {
   SummaryCardFigureText,
   SummaryCardLabel,
 } from "earn/components/summary-card";
-import { usePageContext } from "earn/modules/vault-details/hooks/usePageContext";
+import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import {
   APY_CHART_INTERVALS,
   APYChartInterval,
