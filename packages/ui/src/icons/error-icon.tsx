@@ -2,7 +2,7 @@ import React from "react";
 
 export const ErrorIcon: React.FC<{ className?: string; size?: number }> = ({
   className = "",
-  size = 24,
+  size = DEFAULT_ICON_SIZE,
 }) => {
   return (
     <svg

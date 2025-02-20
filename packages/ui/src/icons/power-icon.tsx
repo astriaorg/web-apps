@@ -2,7 +2,7 @@ import { IconProps } from "@repo/flame-types";
 
 export const PowerIcon: React.FC<IconProps> = ({
   className = "",
-  size = 24,
+  size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
   return (
     <svg
