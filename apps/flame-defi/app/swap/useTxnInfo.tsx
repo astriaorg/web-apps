@@ -148,8 +148,7 @@ export function useTxnInfo({
     }
   }, [tradeType, fetchTxnQuote, validSwapInputs]);
 
-  // const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
-  const txnQuoteData = quote
+  const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
   const priceImpact = calculatePriceImpact(txnQuoteData);
 
   return {
