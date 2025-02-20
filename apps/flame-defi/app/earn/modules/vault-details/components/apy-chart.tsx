@@ -1,3 +1,9 @@
+import {
+  Skeleton,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/shadcn-primitives";
 import * as d3 from "d3";
 import {
   SummaryCard,
@@ -5,8 +11,14 @@ import {
   SummaryCardLabel,
 } from "earn/components/summary-card";
 import { usePageContext } from "earn/modules/vault-details/hooks/usePageContext";
+import {
+  APY_CHART_INTERVALS,
+  APYChartInterval,
+} from "earn/modules/vault-details/types";
 import { useEffect, useRef } from "react";
 import { FormattedNumber } from "react-intl";
+
+const CHART_HEIGHT = 52 * 4;
 
 interface DataItem {
   x: number;
@@ -15,6 +27,8 @@ interface DataItem {
 
 export const APYChart = () => {
   const {
+    selectedAPYChartInterval,
+    setSelectedAPYChartInterval,
     query: { isPending, data },
   } = usePageContext();
 
@@ -28,9 +42,13 @@ export const APYChart = () => {
     }
 
     const svg = d3.select(svgRef.current);
+
+    // Remove any old content.
+    svg.selectAll("*").remove();
+
     const container = svg.node()?.parentElement;
     const width = container?.clientWidth || 0; // Fill chart to container width.
-    const height = 300;
+    const height = CHART_HEIGHT;
     const margin = { top: 0, right: 0, bottom: 16, left: 0 };
 
     svg
@@ -93,7 +111,25 @@ export const APYChart = () => {
 
   return (
     <SummaryCard isLoading={isPending} className="mt-4">
-      <SummaryCardLabel>APY</SummaryCardLabel>
+      <SummaryCardLabel>
+        <span>APY</span>
+        <span>
+          <Tabs
+            defaultValue={selectedAPYChartInterval}
+            onValueChange={(value) =>
+              setSelectedAPYChartInterval(value as APYChartInterval)
+            }
+          >
+            <TabsList>
+              {APY_CHART_INTERVALS.map((it) => (
+                <TabsTrigger key={it} value={it}>
+                  {it}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </span>
+      </SummaryCardLabel>
       <SummaryCardFigureText>
         <FormattedNumber
           value={data?.vaultByAddress.state?.apy ?? 0}
@@ -102,7 +138,12 @@ export const APYChart = () => {
         />
       </SummaryCardFigureText>
 
-      <svg ref={svgRef} className="earn-chart" />
+      <Skeleton
+        isLoading={isPending}
+        className={`w-full h-${CHART_HEIGHT / 4}`}
+      >
+        <svg ref={svgRef} className="earn-chart" />
+      </Skeleton>
     </SummaryCard>
   );
 };

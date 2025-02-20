@@ -11,4 +11,5 @@ export * from "./popover";
 export * from "./select";
 export * from "./skeleton";
 export * from "./switch";
+export * from "./tabs";
 export * from "./tooltip";
