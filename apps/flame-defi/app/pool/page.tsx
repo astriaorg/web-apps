@@ -2,7 +2,7 @@
 
 import { ActionButton } from "@repo/ui/components";
 import { InboxIcon, PlusIcon } from "@repo/ui/icons";
-import { useEvmWallet } from "features/EvmWallet/hooks/useEvmWallet";
+import { useEvmWallet } from "features/EvmWallet";
 import type React from "react";
 import { useAccount } from "wagmi";
 import NewPoolPosition from "./components/NewPoolPosition";

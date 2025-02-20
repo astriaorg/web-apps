@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
-import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
 import { useSwapButton } from "./useSwapButton";
 import { SwapInput } from "./components/SwapInput";
 import { TxnInfo } from "./components/TxnInfo";
@@ -17,6 +22,7 @@ import { useGetQuote } from "./useGetQuote";
 import debounce from "lodash.debounce";
 import useOneToOneQuote from "./useOneToOneQuote";
 import { useTxnInfo } from "./useTxnInfo";
+import { useTokenBalances } from "features/EvmWallet";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
@@ -52,9 +58,23 @@ export default function SwapPage(): React.ReactElement {
     useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
+
+  const { balances, fetchBalances } = useTokenBalances(
+    userAccount.address,
+    selectedChain,
+  );
+
+  useEffect(() => {
+    if (userAccount.address && (inputOne.token || inputTwo.token)) {
+      fetchBalances([inputOne.token, inputTwo.token]);
+    }
+  }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
+
+  const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
   const tokenOneBalance =
-    useTokenBalance(tokenOne.token, selectedChain).balance?.value || "0";
-  const oneToOneQuote = useOneToOneQuote(tokenOne.token, tokenTwo.token);
+    balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)
+      ?.value || "0";
+
   const {
     titleText,
     txnHash,
@@ -70,7 +90,7 @@ export default function SwapPage(): React.ReactElement {
   } = useSwapButton({
     tokenOne,
     tokenTwo,
-    tokenOneBalance: tokenOneBalance,
+    tokenOneBalance,
     quote,
     loading,
     error,
@@ -247,7 +267,7 @@ export default function SwapPage(): React.ReactElement {
         handleInputChange(value, TOKEN_INPUTS.TOKEN_ONE, index),
       availableTokens: currencies,
       oppositeToken: inputTwo,
-      balance: useTokenBalance(inputOne.token, selectedChain).balance,
+      balance: balances[0]?.value || "0",
       onTokenSelect: (token: EvmCurrency, index: number) =>
         handleTokenSelect(token, TOKEN_INPUTS.TOKEN_ONE, index),
       label: flipTokens ? "Buy" : "Sell",
@@ -262,7 +282,7 @@ export default function SwapPage(): React.ReactElement {
         handleInputChange(value, TOKEN_INPUTS.TOKEN_TWO, index),
       availableTokens: currencies,
       oppositeToken: inputOne,
-      balance: useTokenBalance(inputTwo.token, selectedChain).balance,
+      balance: balances[1]?.value || "0",
       onTokenSelect: (token: EvmCurrency, index: number) =>
         handleTokenSelect(token, TOKEN_INPUTS.TOKEN_TWO, index),
       label: flipTokens ? "Sell" : "Buy",
@@ -302,7 +322,7 @@ export default function SwapPage(): React.ReactElement {
             {buttonText}
           </div>
         )}
-        {validSwapInputs && !tokenApprovalNeeded && quote && (
+        {validSwapInputs && !tokenApprovalNeeded && (
           <ConfirmationModal
             onSubmitCallback={onSubmitCallback}
             buttonText={buttonText}

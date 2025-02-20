@@ -22,13 +22,7 @@ interface SwapInputProps {
   txnQuoteLoading: boolean;
   txnQuoteError: string | null;
   index: number;
-  balance:
-    | {
-        value: string;
-        symbol: string;
-      }
-    | null
-    | undefined;
+  balance: string;
 }
 
 export function SwapInput({
@@ -105,17 +99,15 @@ export function SwapInput({
             unavailableToken={oppositeToken?.token}
             setSelectedToken={(token) => onTokenSelect(token, index)}
           />
-          {inputToken.token &&
-          balance?.value &&
-          !isDustAmount(balance.value) ? (
+          {inputToken.token && balance && !isDustAmount(balance) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
               <span className="flex items-center gap-2">
-                {formatNumber(balance?.value)} {balance?.symbol}
+                {formatNumber(balance)} {inputToken?.token?.coinDenom}
               </span>
               {
                 <span
                   onClick={() => {
-                    onInputChange(balance?.value || "0", index);
+                    onInputChange(balance, index);
                   }}
                   className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
                 >

@@ -47,7 +47,7 @@ export default function ConfirmationModal({
 
   const handleClose = () => {
     setOpen(false);
-    if (txnStatus === TXN_STATUS.SUCCESS) {
+    if (txnStatus === TXN_STATUS.SUCCESS || txnStatus === undefined) {
       handleResetInputs();
     }
   };
@@ -63,7 +63,7 @@ export default function ConfirmationModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={() => handleClose()}>
       <DialogTrigger asChild className="w-full">
         <ActionButton
           callback={handleOpen}
