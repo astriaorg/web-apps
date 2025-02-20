@@ -42,12 +42,12 @@ export function useGetQuote() {
       // This is a fix for TIA not having a ERC20 contract address
       const tokenInAddress =
         tokenOne?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
       const tokenInDecimals = tokenOne?.token?.coinDecimals;
       const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
       const tokenOutAddress =
         tokenTwo?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
       const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
       const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
 

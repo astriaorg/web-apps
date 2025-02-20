@@ -1,4 +1,4 @@
-import JSBI from "jsbi";
+import { Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 
 export interface ExactInputSingleParams {
   tokenIn: `0x${string}`;
@@ -38,52 +38,9 @@ export interface ExactOutputParams {
   deadline: bigint;
 }
 
-export enum TradeType {
-  EXACT_INPUT,
-  EXACT_OUTPUT,
-}
-
-export class Token {
-  readonly chainId: number;
-  readonly address: string;
-  readonly decimals: number;
-  readonly symbol: string;
-
-  constructor(
-    chainId: number,
-    address: string,
-    decimals: number,
-    symbol: string,
-  ) {
-    this.chainId = chainId;
-    this.address = address;
-    this.decimals = decimals;
-    this.symbol = symbol;
-  }
-
-  equals(other: Token): boolean {
-    return (
-      this.chainId === other.chainId &&
-      this.address.toLowerCase() === other.address.toLowerCase()
-    );
-  }
-}
-
-export class TokenAmount {
-  readonly token: Token;
-  readonly raw: JSBI;
-  readonly decimalScale: JSBI;
-
-  constructor(token: Token, amount: string | JSBI) {
-    this.token = token;
-    this.decimalScale = JSBI.exponentiate(
-      JSBI.BigInt(10),
-      JSBI.BigInt(token.decimals),
-    );
-    this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
-  }
-}
-
+/**
+ * A pool represents a liquidity pool for a pair of tokens.
+ */
 export interface Pool {
   token0: Token;
   token1: Token;
@@ -93,6 +50,9 @@ export interface Pool {
   tickCurrent?: number;
 }
 
+/**
+ * A route represents a path of pools through which a swap can occur.
+ */
 export class Route {
   readonly pools: Pool[];
   readonly path: Token[];
@@ -126,9 +86,12 @@ export class Route {
   }
 }
 
+/**
+ * A trade represents a swap of one token for another.
+ */
 export class Trade {
   readonly route: Route;
-  readonly type: TradeType;
+  readonly type: TRADE_TYPE;
   readonly inputAmount: TokenAmount;
   readonly outputAmount: TokenAmount;
 
@@ -136,7 +99,7 @@ export class Trade {
     route: Route,
     inputAmount: TokenAmount,
     outputAmount: TokenAmount,
-    type: TradeType,
+    type: TRADE_TYPE,
   ) {
     this.route = route;
     this.type = type;
@@ -145,8 +108,29 @@ export class Trade {
   }
 }
 
+/**
+ * Options for a swap.
+ */
 export interface SwapOptions {
+  /**
+   * The address of the recipient of the swap.
+   */
   recipient: `0x${string}`;
-  slippageTolerance: number; // in basis points (e.g. 50 = 0.5%)
+  /**
+   * The maximum acceptable slippage tolerance for the swap, expressed as a percentage.
+   * For example, a value of 0.1 means a 0.1% slippage tolerance.
+   */
+  slippageTolerance: number;
+  /**
+   * The deadline for the swap, expressed as a timestamp.
+   */
   deadline: bigint;
+  /**
+   * True when input token is native.
+   */
+  isNativeIn: boolean;
+  /**
+   * True when output token is native.
+   */
+  isNativeOut: boolean;
 }

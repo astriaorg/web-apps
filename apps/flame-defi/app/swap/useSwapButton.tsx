@@ -208,6 +208,8 @@ export function useSwapButton({
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
+        isNativeIn: tokenOne.token?.coinDenom.toLocaleLowerCase() === "tia",
+        isNativeOut: tokenTwo.token?.coinDenom.toLocaleLowerCase() === "tia",
       };
 
       const tx = await router.executeSwap(
@@ -225,6 +227,8 @@ export function useSwapButton({
     }
   }, [
     trade,
+    tokenOne.token?.coinDenom,
+    tokenTwo.token?.coinDenom,
     userAccount,
     selectedChain,
     walletClient,
