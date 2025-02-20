@@ -18,27 +18,6 @@ import {
   Trade,
 } from "./types";
 
-// 100% in basis points
-const BASIS_POINTS_DIVISOR = JSBI.BigInt(10000);
-
-/**
- * Converts a slippage tolerance percentage to basis points.
- * Ensures that the slippage tolerance is less than 99.99% and has no more than 2 decimal points of precision.
- * @param slippageTolerancePercent
- */
-function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
-  if (parseFloat(slippageTolerancePercent.toString()) > 99.99) {
-    throw new Error("Slippage tolerance must be less than 99.99 or less");
-  }
-  const parts = slippageTolerancePercent.toString().split(".");
-  if (parts[1]?.length !== undefined && parts[1].length > 2) {
-    throw new Error(
-      "Slippage tolerance must not have more than 2 decimal points of precision.",
-    );
-  }
-  return JSBI.BigInt(slippageTolerancePercent * 100);
-}
-
 export class SwapRouter {
   private readonly routerAddress: `0x${string}`;
   private readonly chainConfig: Chain;
@@ -59,67 +38,6 @@ export class SwapRouter {
     this.chainConfig = chainConfig;
     // minimal ABI for the swap functions.
     this.routerAbi = SWAP_ROUTER_ABI;
-  }
-
-  /**
-   * Calculates the minimum amount out based on the slippage tolerance.
-   * @param amount
-   * @param slippageTolerancePercent
-   * @private
-   */
-  private calculateMinimumOut(
-    amount: TokenAmount,
-    slippageTolerancePercent: number,
-  ): JSBI {
-    return this.calculateSlippage(amount.raw, slippageTolerancePercent, true);
-  }
-
-  /**
-   * Calculates the maximum amount in based on the slippage tolerance.
-   * @param amount
-   * @param slippageTolerancePercent
-   * @private
-   */
-  private calculateMaximumIn(
-    amount: TokenAmount,
-    slippageTolerancePercent: number,
-  ): JSBI {
-    return this.calculateSlippage(amount.raw, slippageTolerancePercent, false);
-  }
-
-  /**
-   * Calculates the slippage based on the amount and tolerance.
-   * @param amount
-   * @param slippageTolerancePercent
-   * @param isMinimum
-   * @private
-   */
-  private calculateSlippage(
-    amount: JSBI,
-    slippageTolerancePercent: number,
-    isMinimum: boolean,
-  ): JSBI {
-    // convert % -> basis points
-    const slippageBasisPoints = convertSlippageToBasisPoints(
-      slippageTolerancePercent,
-    );
-
-    // adjust basis points based on if we want minimum or maximum
-    let adjustedBasisPoints: JSBI;
-    if (isMinimum) {
-      adjustedBasisPoints = JSBI.subtract(
-        BASIS_POINTS_DIVISOR,
-        slippageBasisPoints,
-      );
-    } else {
-      adjustedBasisPoints = JSBI.add(BASIS_POINTS_DIVISOR, slippageBasisPoints);
-    }
-
-    // scale result back down
-    return JSBI.divide(
-      JSBI.multiply(amount, adjustedBasisPoints),
-      BASIS_POINTS_DIVISOR,
-    );
   }
 
   private getExactInputParams(
@@ -143,10 +61,9 @@ export class SwapRouter {
             recipient: isNativeOut ? this.routerAddress : recipient,
             amountIn: BigInt(trade.inputAmount.raw.toString()),
             amountOutMinimum: BigInt(
-              this.calculateMinimumOut(
-                trade.outputAmount,
-                slippageTolerance,
-              ).toString(),
+              trade.outputAmount
+                .withSlippage(slippageTolerance, true)
+                .raw.toString(),
             ),
             deadline,
           },
@@ -172,10 +89,9 @@ export class SwapRouter {
           recipient: isNativeOut ? this.routerAddress : recipient,
           amountIn: BigInt(trade.inputAmount.raw.toString()),
           amountOutMinimum: BigInt(
-            this.calculateMinimumOut(
-              trade.outputAmount,
-              slippageTolerance,
-            ).toString(),
+            trade.outputAmount
+              .withSlippage(slippageTolerance, true)
+              .raw.toString(),
           ),
           sqrtPriceLimitX96: 0n,
           deadline,
@@ -205,10 +121,9 @@ export class SwapRouter {
             recipient: isNativeOut ? this.routerAddress : recipient,
             amountOut: BigInt(trade.outputAmount.raw.toString()),
             amountInMaximum: BigInt(
-              this.calculateMaximumIn(
-                trade.inputAmount,
-                slippageTolerance,
-              ).toString(),
+              trade.inputAmount
+                .withSlippage(slippageTolerance, false)
+                .raw.toString(),
             ),
             deadline,
           },
@@ -234,10 +149,9 @@ export class SwapRouter {
           recipient: isNativeOut ? this.routerAddress : recipient,
           amountOut: BigInt(trade.outputAmount.raw.toString()),
           amountInMaximum: BigInt(
-            this.calculateMaximumIn(
-              trade.inputAmount,
-              slippageTolerance,
-            ).toString(),
+            trade.inputAmount
+              .withSlippage(slippageTolerance, false)
+              .raw.toString(),
           ),
           sqrtPriceLimitX96: 0n,
           deadline,
@@ -335,7 +249,6 @@ export class SwapRouter {
         console.error("Gas estimation failed, using default limit", err);
         gasLimit = DEFAULT_GAS_LIMIT;
       }
-      // FIXME - is this necessary?
       // Increase the estimated gas by 20%
       gasLimit = (gasLimit * 120n) / 100n;
 
@@ -358,7 +271,8 @@ export class SwapRouter {
 
     if (options.isNativeIn) {
       // if isNativeIn then we need to send TIA to the contract, so set the value accordingly
-      // NOTE - we don't need to explicitly wrap ETH, the router's callback will do it for us
+      // NOTE - we don't need to explicitly wrap ETH for native input like we do for native output,
+      //  the router's callback will do it for us
       value = BigInt(trade.inputAmount.raw.toString());
     }
 
@@ -367,13 +281,9 @@ export class SwapRouter {
 
     // add unwrapWETH if needed
     if (options.isNativeOut) {
-      const minimumAmount = this.calculateSlippage(
-        trade.type === TRADE_TYPE.EXACT_IN
-          ? trade.outputAmount.raw
-          : trade.inputAmount.raw,
-        options.slippageTolerance,
-        true,
-      ).toString();
+      const minimumAmount = trade.outputAmount
+        .withSlippage(options.slippageTolerance, true)
+        .raw.toString();
 
       calls.push(this.encodeUnwrapWETHCall(minimumAmount));
     }

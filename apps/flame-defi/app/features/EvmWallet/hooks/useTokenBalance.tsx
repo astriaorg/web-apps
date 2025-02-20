@@ -3,7 +3,6 @@ import { createWithdrawerService } from "features/EvmWallet";
 import type { AstriaErc20WithdrawerService } from "features/EvmWallet/services/AstriaWithdrawerService/AstriaWithdrawerService";
 import { useBalancePolling } from "features/GetBalancePolling";
 import { useCallback, useMemo } from "react";
-import { formatBalance } from "@repo/ui/utils";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
@@ -40,10 +39,7 @@ export const useTokenBalance = (
         userAccount.address,
       );
 
-      const balanceStr = formatBalance(
-        balanceRes.toString(),
-        selectedToken.coinDecimals,
-      );
+      const balanceStr = formatUnits(balanceRes, selectedToken.coinDecimals);
       return {
         value: balanceStr.toString() || "0",
         symbol: selectedToken.coinDenom,

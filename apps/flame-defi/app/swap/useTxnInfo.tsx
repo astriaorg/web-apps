@@ -3,6 +3,7 @@ import {
   TRADE_TYPE,
   Token,
   TokenState,
+  TokenAmount,
 } from "@repo/flame-types";
 import {
   formatNumberAsPercent,
@@ -114,10 +115,19 @@ function calculateMinimumReceived(
   data: GetQuoteResult,
   slippageTolerance: number,
 ): string {
-  const adjustedQuote = parseFloat(data.quoteGasAdjustedDecimals);
-  const minimumReceived = adjustedQuote * (1 - slippageTolerance);
+  if (!data.route[0] || !data.route[0][0]?.tokenOut) {
+    return "0.00";
+  }
+  const tokenAmount = new TokenAmount(
+    data.route[0][0].tokenOut,
+    data.quoteGasAdjusted,
+  );
+  const minimumReceived = tokenAmount.withSlippage(slippageTolerance, true).raw;
 
-  return formatDecimalValues(`${minimumReceived}`, 6);
+  return formatDecimalValues(
+    formatUnits(BigInt(minimumReceived.toString()), tokenAmount.token.decimals),
+    6,
+  );
 }
 
 export function useTxnInfo({

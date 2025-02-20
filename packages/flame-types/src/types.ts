@@ -413,6 +413,27 @@ export class Token {
   }
 }
 
+// 100% in basis points
+const BASIS_POINTS_DIVISOR = JSBI.BigInt(10000);
+
+/**
+ * Converts a slippage tolerance percentage to basis points.
+ * Ensures that the slippage tolerance is less than 99.99% and has no more than 2 decimal points of precision.
+ * @param slippageTolerancePercent
+ */
+function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
+  if (parseFloat(slippageTolerancePercent.toString()) > 99.99) {
+    throw new Error("Slippage tolerance must be less than 99.99 or less");
+  }
+  const parts = slippageTolerancePercent.toString().split(".");
+  if (parts[1]?.length !== undefined && parts[1].length > 2) {
+    throw new Error(
+      "Slippage tolerance must not have more than 2 decimal points of precision.",
+    );
+  }
+  return JSBI.BigInt(slippageTolerancePercent * 100);
+}
+
 /**
  * A token amount represents an amount of a token.
  * TODO - consolidate this type with `TokenState` type
@@ -429,6 +450,35 @@ export class TokenAmount {
       JSBI.BigInt(token.decimals),
     );
     this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
+  }
+
+  withSlippage(
+    slippageTolerancePercent: number,
+    isMinimum: boolean,
+  ): TokenAmount {
+    // convert % -> basis points
+    const slippageBasisPoints = convertSlippageToBasisPoints(
+      slippageTolerancePercent,
+    );
+
+    // adjust basis points based on if we want minimum or maximum
+    let adjustedBasisPoints: JSBI;
+    if (isMinimum) {
+      adjustedBasisPoints = JSBI.subtract(
+        BASIS_POINTS_DIVISOR,
+        slippageBasisPoints,
+      );
+    } else {
+      adjustedBasisPoints = JSBI.add(BASIS_POINTS_DIVISOR, slippageBasisPoints);
+    }
+
+    // scale result back down
+    const adjustedAmount = JSBI.divide(
+      JSBI.multiply(this.raw, adjustedBasisPoints),
+      BASIS_POINTS_DIVISOR,
+    );
+
+    return new TokenAmount(this.token, adjustedAmount);
   }
 }
 

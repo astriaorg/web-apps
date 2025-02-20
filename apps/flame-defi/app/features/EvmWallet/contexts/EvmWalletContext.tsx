@@ -23,7 +23,6 @@ import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/AstriaWithdrawerService/AstriaWithdrawerService";
-import { formatBalance } from "@repo/ui/utils";
 import {
   EvmChainInfo,
   evmChainToRainbowKitChain,
@@ -182,8 +181,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         selectedEvmChain.chainId,
         evmAccountAddress,
       );
-      const balanceStr = formatBalance(
-        balanceRes.toString(),
+      const balanceStr = formatUnits(
+        balanceRes,
         selectedEvmCurrency.coinDecimals,
       );
       return {
