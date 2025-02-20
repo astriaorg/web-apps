@@ -162,14 +162,6 @@
       @apply text-orange;
     }
   }
-
-  .earn-chart-tooltip {
-    @apply absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm;
-
-    > * {
-      @apply flex flex-col space-y-1;
-    }
-  }
 }
 
 @layer utilities {

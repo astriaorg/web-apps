@@ -16,8 +16,11 @@ import {
   APY_CHART_INTERVALS,
   APYChartInterval,
 } from "earn/modules/vault-details/types";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
+
+// Threshold for the maximum number of data points to display.
+const MAX_DATA_POINTS = 1000;
 
 interface DataItem {
   x: number;
@@ -33,12 +36,29 @@ export const APYChart = () => {
   const { formatDate, formatNumber } = useIntl();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+
+  const [tooltipContent, setTooltipContent] = useState({
+    timestamp: -1,
+    apy: -1,
+  });
 
   useEffect(() => {
-    const dailyAPYs = data?.vaultByAddress.historicalState.dailyApy;
+    let dailyAPYs = data?.vaultByAddress.historicalState.dailyApy;
 
     if (!dailyAPYs) {
       return;
+    }
+
+    if (dailyAPYs.length > MAX_DATA_POINTS) {
+      const downsampled: DataItem[] = [];
+      const interval = Math.ceil(dailyAPYs.length / MAX_DATA_POINTS);
+
+      for (let i = 0; i < dailyAPYs.length; i += interval) {
+        downsampled.push(dailyAPYs[i] as DataItem);
+      }
+
+      dailyAPYs = downsampled;
     }
 
     const svg = d3.select(svgRef.current);
@@ -117,18 +137,11 @@ export const APYChart = () => {
       .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
       .attr("stroke-dashoffset", totalLength)
       .transition()
-      .duration(800)
+      .duration(400)
       .ease(d3.easeLinear)
       .attr("stroke-dashoffset", 0);
 
     // Tooltip on line hover.
-    const tooltip = d3
-      .select("body")
-      .append("div")
-      .attr("class", "earn-chart-tooltip")
-      .style("display", "none");
-
-    // Add event listeners for tooltip.
     svg
       .selectAll(".line")
       .data(dailyAPYs)
@@ -139,27 +152,25 @@ export const APYChart = () => {
       .attr("r", 5)
       .style("fill", "transparent")
       .on("mouseover", (_, it) => {
-        tooltip.style("display", "block").html(
-          `<div>
-          <span>
-          ${formatDate(it.x * 1000)}
-          </span>
-          <span>
-          ${formatNumber(it.y ?? 0, {
-            style: "percent",
-            minimumFractionDigits: 2,
-          })}
-          </span>
-          </div>`,
-        );
+        if (tooltipRef.current) {
+          setTooltipContent({
+            timestamp: it.x,
+            apy: it.y ?? 0,
+          });
+
+          tooltipRef.current.style.display = "block";
+        }
       })
       .on("mousemove", (event) => {
-        tooltip
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY - 20 + "px");
+        if (tooltipRef.current) {
+          tooltipRef.current.style.left = event.pageX + 10 + "px";
+          tooltipRef.current.style.top = event.pageY - 20 + "px";
+        }
       })
       .on("mouseout", () => {
-        tooltip.style("display", "none");
+        if (tooltipRef.current) {
+          tooltipRef.current.style.display = "none";
+        }
       });
   }, [data, formatDate, formatNumber]);
 
@@ -195,6 +206,20 @@ export const APYChart = () => {
       <div className="mt-4" />
       <Skeleton isLoading={isPending} className="w-full">
         <svg ref={svgRef} className={cn(`earn-chart h-52`)} />
+        <div
+          ref={tooltipRef}
+          className="absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm"
+        >
+          <div className="flex flex-col space-y-1">
+            <div>{formatDate(tooltipContent.timestamp * 1000)}</div>
+            <div>
+              {formatNumber(tooltipContent.apy, {
+                style: "percent",
+                minimumFractionDigits: 2,
+              })}
+            </div>
+          </div>
+        </div>
       </Skeleton>
     </SummaryCard>
   );
