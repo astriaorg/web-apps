@@ -1,6 +1,11 @@
 import JSBI from "jsbi";
 import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
-import { GetQuoteResult, Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
+import {
+  GetQuoteResult,
+  Token,
+  TokenAmount,
+  TRADE_TYPE,
+} from "@repo/flame-types";
 import SWAP_ROUTER_ABI from "./contracts/swaprouter02.json";
 import {
   ExactInputParams,
@@ -66,11 +71,7 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerancePercent: number,
   ): JSBI {
-    return this.calculateSlippage(
-      amount.raw,
-      slippageTolerancePercent,
-      true,
-    );
+    return this.calculateSlippage(amount.raw, slippageTolerancePercent, true);
   }
 
   /**
@@ -83,11 +84,7 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerancePercent: number,
   ): JSBI {
-    return this.calculateSlippage(
-      amount.raw,
-      slippageTolerancePercent,
-      false,
-    );
+    return this.calculateSlippage(amount.raw, slippageTolerancePercent, false);
   }
 
   /**
