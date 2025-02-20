@@ -1,5 +1,6 @@
 export * from "./accordion";
 export * from "./alert-dialog";
+export * from "./badge";
 export * from "./breadcrumbs";
 export * from "./button";
 export * from "./dialog";
@@ -10,4 +11,5 @@ export * from "./popover";
 export * from "./select";
 export * from "./skeleton";
 export * from "./switch";
+export * from "./tabs";
 export * from "./tooltip";

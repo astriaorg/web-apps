@@ -103,6 +103,7 @@ export default {
           1: "hsl(var(--color-surface-1))",
           2: "hsl(var(--color-surface-2))",
           3: "hsl(var(--color-surface-3))",
+          inverted: "hsl(var(--color-surface-inverted))",
         },
         orange: "hsl(var(--color-orange))",
       },
@@ -201,6 +202,12 @@ export default {
       },
       borderColor: {
         dark: "hsl(var(--border))",
+      },
+      lineHeight: {
+        12: "3rem",
+      },
+      spacing: {
+        18: "4.5rem",
       },
     },
   },

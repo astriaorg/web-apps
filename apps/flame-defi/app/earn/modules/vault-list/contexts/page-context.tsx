@@ -1,6 +1,7 @@
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/lib";
+import { Badge } from "@repo/ui/shadcn-primitives";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -9,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
+import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";
 import {
   PAGE_SIZE,
@@ -98,7 +100,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                     style="percent"
                     minimumFractionDigits={2}
                   />
-                  &nbsp;APY
+                  {NON_BREAKING_SPACE}APY
                 </span>
               </div>
             </div>
@@ -132,10 +134,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                         .toFixed(2)
                     }
                   />
-                  &nbsp;
+                  {NON_BREAKING_SPACE}
                   {row.original.symbol}
                 </span>
-                <span className="text-xs text-text-subdued font-medium bg-surface-3 px-1.5 py-0.5 rounded-lg">
+                <Badge>
                   <FormattedNumber
                     value={
                       +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
@@ -145,7 +147,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                     style="currency"
                     currency="USD"
                   />
-                </span>
+                </Badge>
               </div>
               <div className="md:hidden flex justify-end pr-3">
                 <CaretRightIcon className="text-text-subdued" size={16} />

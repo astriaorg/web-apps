@@ -1,8 +1,14 @@
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { TokenSelector } from "@repo/ui/components";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
-import { formatNumber, formatNumberAsAbbr, isDustAmount } from "@repo/ui/utils";
+import {
+  FORMAT_ABBREVIATED_NUMBER_SUFFIX,
+  formatAbbreviatedNumber,
+  formatNumber,
+  isDustAmount,
+} from "@repo/ui/utils";
 
+import { useIntl } from "react-intl";
 import useUsdQuote from "../useUsdQuote";
 
 interface SwapInputProps {
@@ -30,15 +36,32 @@ export function SwapInput({
   index,
   balance,
 }: SwapInputProps) {
+  const { locale } = useIntl();
   const usdQuote = useUsdQuote(inputToken);
 
   const handleFiatValue = () => {
-    if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
-      return formatNumberAsAbbr(inputToken.value, { removeKAbbr: true });
-    } else if (usdQuote?.quote) {
-      return formatNumberAsAbbr(usdQuote?.quote?.quoteDecimals, {
-        removeKAbbr: true,
+    const formatNumber = (value: string) => {
+      const { value: formattedValue, suffix } = formatAbbreviatedNumber(value);
+
+      const localeString = (+formattedValue).toLocaleString(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        style: "currency",
+        currency: "USD",
       });
+
+      // If the return string is -0.00 or some variant, strip the negative
+      if (localeString.match(/-0\.?[0]*$/)) {
+        return localeString.replace("-", "");
+      }
+
+      return `${formattedValue}${suffix === FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND ? "" : suffix}`;
+    };
+
+    if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
+      return formatNumber(inputToken.value);
+    } else if (usdQuote?.quote) {
+      return formatNumber(usdQuote?.quote?.quoteDecimals);
     } else {
       return "-";
     }

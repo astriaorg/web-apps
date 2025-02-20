@@ -1,3 +1,3 @@
-export * from "./numberHelpers";
-export * from "./walletHelpers";
-export * from "./storageHelpers";
+export * from "./number-helpers";
+export * from "./storage-helpers";
+export * from "./wallet-helpers";
