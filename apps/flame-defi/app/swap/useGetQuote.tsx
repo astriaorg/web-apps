@@ -42,16 +42,13 @@ export function useGetQuote() {
       // This is a fix for TIA not having a ERC20 contract address
       const tokenInAddress =
         tokenOne?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
       const tokenInDecimals = tokenOne?.token?.coinDecimals;
       const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
       const tokenOutAddress =
         tokenTwo?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071";
+        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
       const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
-      // FIXME - i think we need to set the symbol as "tia" here if it's "wtia"
-      //  so that our code in the SwapRouter works, but i need to find a better
-      //  way to do this. probably need to add `EvmCurrency.isNative` or something
       const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
 
       if (

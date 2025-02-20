@@ -1,11 +1,6 @@
 import JSBI from "jsbi";
 import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
-import {
-  GetQuoteResult,
-  TokenAmount,
-  Token,
-  TRADE_TYPE,
-} from "@repo/flame-types";
+import { GetQuoteResult, Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 import SWAP_ROUTER_ABI from "./contracts/swaprouter02.json";
 import {
   ExactInputParams,
@@ -71,19 +66,11 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerancePercent: number,
   ): JSBI {
-    const minimumAmount = this.calculateSlippage(
+    return this.calculateSlippage(
       amount.raw,
       slippageTolerancePercent,
       true,
     );
-
-    console.log("MinimumOut calculation:", {
-      amount: amount.raw.toString(),
-      slippageTolerancePercent,
-      minimumAmount: minimumAmount.toString(),
-    });
-
-    return minimumAmount;
   }
 
   /**
@@ -96,18 +83,11 @@ export class SwapRouter {
     amount: TokenAmount,
     slippageTolerancePercent: number,
   ): JSBI {
-    const maximumAmount = this.calculateSlippage(
+    return this.calculateSlippage(
       amount.raw,
       slippageTolerancePercent,
       false,
     );
-    console.log("MaximumIn calculation:", {
-      amount: amount.raw.toString(),
-      slippageTolerancePercent,
-      maximumAmount: maximumAmount.toString(),
-    });
-
-    return maximumAmount;
   }
 
   /**
@@ -150,7 +130,7 @@ export class SwapRouter {
     recipient: `0x${string}`,
     slippageTolerance: number,
     deadline: bigint,
-    isETHOut: boolean,
+    isNativeOut: boolean,
   ): {
     functionName: "exactInputSingle" | "exactInput";
     args: readonly [ExactInputSingleParams] | readonly [ExactInputParams];
@@ -163,7 +143,7 @@ export class SwapRouter {
         args: [
           {
             path: this.encodePath(trade.route),
-            recipient: isETHOut ? this.routerAddress : recipient,
+            recipient: isNativeOut ? this.routerAddress : recipient,
             amountIn: BigInt(trade.inputAmount.raw.toString()),
             amountOutMinimum: BigInt(
               this.calculateMinimumOut(
@@ -192,7 +172,7 @@ export class SwapRouter {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isETHOut ? this.routerAddress : recipient,
+          recipient: isNativeOut ? this.routerAddress : recipient,
           amountIn: BigInt(trade.inputAmount.raw.toString()),
           amountOutMinimum: BigInt(
             this.calculateMinimumOut(
@@ -212,7 +192,7 @@ export class SwapRouter {
     recipient: `0x${string}`,
     slippageTolerance: number,
     deadline: bigint,
-    isETHOut: boolean,
+    isNativeOut: boolean,
   ): {
     functionName: "exactOutputSingle" | "exactOutput";
     args: readonly [ExactOutputSingleParams] | readonly [ExactOutputParams];
@@ -225,7 +205,7 @@ export class SwapRouter {
         args: [
           {
             path: this.encodePathReversed(trade.route),
-            recipient: isETHOut ? this.routerAddress : recipient,
+            recipient: isNativeOut ? this.routerAddress : recipient,
             amountOut: BigInt(trade.outputAmount.raw.toString()),
             amountInMaximum: BigInt(
               this.calculateMaximumIn(
@@ -254,7 +234,7 @@ export class SwapRouter {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isETHOut ? this.routerAddress : recipient,
+          recipient: isNativeOut ? this.routerAddress : recipient,
           amountOut: BigInt(trade.outputAmount.raw.toString()),
           amountInMaximum: BigInt(
             this.calculateMaximumIn(
@@ -320,13 +300,6 @@ export class SwapRouter {
     walletClient: WalletClient,
     publicClient: PublicClient,
   ): Promise<`0x${string}` | undefined> {
-    // FIXME - we're depending on the fact that the usage of `getQuote` doesn't change the symbol
-    //  to wtia when getting an estimate for wtia to show in the ui
-    const isNativeIn =
-      trade.inputAmount.token.symbol.toLocaleLowerCase() === "tia";
-    const isNativeOut =
-      trade.outputAmount.token.symbol.toLocaleLowerCase() === "tia";
-
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
     const signerAddress = walletClient?.account?.address as `0x${string}`;
@@ -339,20 +312,19 @@ export class SwapRouter {
             options.recipient,
             options.slippageTolerance,
             options.deadline,
-            isNativeOut,
+            options.isNativeOut,
           )
         : this.getExactOutputParams(
             trade,
             options.recipient,
             options.slippageTolerance,
             options.deadline,
-            isNativeOut,
+            options.isNativeOut,
           );
 
     // for simple erc20 token swaps
     // FIXME - isNativeOut is incorrectly false when we want to get TIA out
-    if (!isNativeIn && !isNativeOut) {
-      console.log("Executing simple erc20 swap...");
+    if (!options.isNativeIn && !options.isNativeOut) {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
@@ -388,7 +360,7 @@ export class SwapRouter {
     const calls: string[] = [];
     let value = 0n;
 
-    if (isNativeIn) {
+    if (options.isNativeIn) {
       // if isNativeIn then we need to send TIA to the contract, so set the value accordingly
       // NOTE - we don't need to explicitly wrap ETH, the router's callback will do it for us
       value = BigInt(trade.inputAmount.raw.toString());
@@ -398,8 +370,7 @@ export class SwapRouter {
     calls.push(this.encodeSwapCall(swapParams.functionName, swapParams.args));
 
     // add unwrapWETH if needed
-    if (isNativeOut) {
-      // FIXME - output vs input based on EXACT_INPUT
+    if (options.isNativeOut) {
       const minimumAmount = this.calculateSlippage(
         trade.type === TRADE_TYPE.EXACT_IN
           ? trade.outputAmount.raw
@@ -460,7 +431,6 @@ export function createTradeFromQuote(
   quoteResult: GetQuoteResult,
   type: "exactIn" | "exactOut",
 ): Trade {
-  console.log("quoteResult", quoteResult);
   // Convert the first route from the quote.
   // TODO - find best route
   const routePools: Pool[] = (quoteResult.route[0] || []).map((poolRoute) => {

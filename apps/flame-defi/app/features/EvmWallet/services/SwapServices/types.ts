@@ -125,4 +125,12 @@ export interface SwapOptions {
    * The deadline for the swap, expressed as a timestamp.
    */
   deadline: bigint;
+  /**
+   * True when input token is native.
+   */
+  isNativeIn: boolean;
+  /**
+   * True when output token is native.
+   */
+  isNativeOut: boolean;
 }
