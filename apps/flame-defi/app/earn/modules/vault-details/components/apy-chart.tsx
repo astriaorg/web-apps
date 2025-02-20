@@ -96,17 +96,21 @@ export const APYChart = () => {
           .tickSize(0),
       );
 
-    // Render bar chart.
+    // Add bars with transition.
     svg
       .selectAll(".bar")
       .data(dailyAPYs)
       .enter()
       .append("rect")
-      .attr("x", (it) => x(it.x.toString()) as number)
-      .attr("y", (it) => y(it.y ?? 0))
+      .attr("x", (it) => x(it.x.toString())!)
+      .attr("y", y(0)) // Start y from 0 to animate to the actual value.
       .attr("width", x.bandwidth())
-      .attr("height", (it) => y(0) - y(it.y ?? 0))
-      .attr("fill", "currentColor");
+      .attr("height", 0)
+      .attr("fill", "currentColor")
+      .transition()
+      .duration(1000)
+      .attr("y", (it) => y(it.y || 0))
+      .attr("height", (it) => height - margin.bottom - y(it.y || 0));
   }, [data]);
 
   return (
