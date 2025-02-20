@@ -66,13 +66,13 @@ export type Asset = {
 
 /** Asset */
 export type AssetHistoricalPriceUsdArgs = {
-  options: TimeseriesOptions;
+  options?: InputMaybe<TimeseriesOptions>;
 };
 
 
 /** Asset */
 export type AssetHistoricalSpotPriceEthArgs = {
-  options: TimeseriesOptions;
+  options?: InputMaybe<TimeseriesOptions>;
 };
 
 
@@ -151,6 +151,31 @@ export type CollateralAtRiskDataPoint = {
   collateralAssets: Scalars['BigInt']['output'];
   collateralPriceRatio: Scalars['Float']['output'];
   collateralUsd: Scalars['Float']['output'];
+};
+
+/** Vault curator */
+export type Curator = {
+  __typename?: 'Curator';
+  id: Scalars['ID']['output'];
+  /** Curator logo URI, for display purpose */
+  image?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  /** Current state */
+  state?: Maybe<CuratorState>;
+  /** Link to curator website */
+  url?: Maybe<Scalars['String']['output']>;
+  verified: Scalars['Boolean']['output'];
+};
+
+/** Vault curator state */
+export type CuratorState = {
+  __typename?: 'CuratorState';
+  /**
+   * Assets Under Management. Total assets managed by the curator, in USD for display purpose.
+   * @deprecated Work in progress
+   */
+  aum: Scalars['Float']['output'];
+  curatorId: Scalars['ID']['output'];
 };
 
 /** Custom Warning Metadata */
@@ -1019,9 +1044,15 @@ export type MarketPositionState = {
   /** The latest collateral assets indexed for this position, in loan assets. */
   collateralValue?: Maybe<Scalars['BigInt']['output']>;
   id: Scalars['ID']['output'];
-  /** Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in loan assets. */
+  /**
+   * Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in loan assets.
+   * @deprecated unstable
+   */
   pnl?: Maybe<Scalars['BigInt']['output']>;
-  /** Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in USD for display purpose. */
+  /**
+   * Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in USD for display purpose.
+   * @deprecated unstable
+   */
   pnlUsd?: Maybe<Scalars['Float']['output']>;
   position: MarketPosition;
   /** The latest supply assets indexed for this position. */
@@ -2763,9 +2794,15 @@ export type VaultPositionState = {
   /** The latest supply assets indexed for this position, in USD. */
   assetsUsd?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
-  /** Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in loan assets. */
+  /**
+   * Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in loan assets.
+   * @deprecated unstable
+   */
   pnl?: Maybe<Scalars['BigInt']['output']>;
-  /** Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in USD for display purpose */
+  /**
+   * Profit (from the collateral's price variation) & Loss (from the loan interest) of the position since its inception, in USD for display purpose
+   * @deprecated unstable
+   */
   pnlUsd?: Maybe<Scalars['Float']['output']>;
   position: VaultPosition;
   /** The latest supply shares indexed for this position. */
@@ -2842,6 +2879,11 @@ export type VaultState = {
   apy: Scalars['Float']['output'];
   /** Vault curator address. */
   curator: Scalars['Address']['output'];
+  /**
+   * Curators operating on this vault
+   * @deprecated Work in progress
+   */
+  curators?: Maybe<Array<Curator>>;
   /** Daily Vault APY excluding rewards, before deducting the performance fee. */
   dailyApy?: Maybe<Scalars['Float']['output']>;
   /** Daily Vault APY including rewards, after deducting the performance fee. */
@@ -2932,6 +2974,7 @@ export type VaultTransactionData = {
 export type VaultWarning = {
   __typename?: 'VaultWarning';
   level: WarningLevel;
+  metadata?: Maybe<CustomMetadata>;
   type: Scalars['String']['output'];
 };
 
@@ -2939,6 +2982,15 @@ export enum WarningLevel {
   Red = 'RED',
   Yellow = 'YELLOW'
 }
+
+export type VaultByAddressQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  chainId?: InputMaybe<Scalars['Int']['input']>;
+  dailyAPYOptions?: InputMaybe<TimeseriesOptions>;
+}>;
+
+
+export type VaultByAddressQuery = { __typename?: 'Query', vaultByAddress: { __typename?: 'Vault', address: any, name: string, symbol: string, asset: { __typename?: 'Asset', decimals: number, logoURI?: string | null, name: string, symbol: string }, historicalState: { __typename?: 'VaultHistory', dailyApy?: Array<{ __typename?: 'FloatDataPoint', x: number, y?: number | null }> | null }, liquidity?: { __typename?: 'VaultLiquidity', underlying: any, usd: number } | null, metadata?: { __typename?: 'VaultMetadata', description: string, curators: Array<{ __typename?: 'VaultMetadataCurator', image: string, name: string }> } | null, state?: { __typename?: 'VaultState', apy: number, fee: number, guardian: any, totalAssets: any, totalAssetsUsd?: number | null } | null } };
 
 export type VaultsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -2949,7 +3001,8 @@ export type VaultsQueryVariables = Exact<{
 }>;
 
 
-export type VaultsQuery = { __typename?: 'Query', vaults: { __typename?: 'PaginatedMetaMorphos', items?: Array<{ __typename?: 'Vault', address: any, symbol: string, name: string, creationTimestamp: any, asset: { __typename?: 'Asset', id: string, address: any, decimals: number, logoURI?: string | null }, chain: { __typename?: 'Chain', id: number, network: string }, metadata?: { __typename?: 'VaultMetadata', curators: Array<{ __typename?: 'VaultMetadataCurator', name: string, image: string }> } | null, state?: { __typename?: 'VaultState', id: string, apy: number, netApy?: number | null, totalAssets: any, totalAssetsUsd?: number | null } | null }> | null, pageInfo?: { __typename?: 'PageInfo', countTotal: number, count: number, limit: number, skip: number } | null } };
+export type VaultsQuery = { __typename?: 'Query', vaults: { __typename?: 'PaginatedMetaMorphos', items?: Array<{ __typename?: 'Vault', address: any, symbol: string, name: string, asset: { __typename?: 'Asset', address: any, decimals: number, logoURI?: string | null }, state?: { __typename?: 'VaultState', apy: number, totalAssets: any, totalAssetsUsd?: number | null } | null }> | null, pageInfo?: { __typename?: 'PageInfo', countTotal: number, count: number, limit: number, skip: number } | null } };
 
 
-export const VaultsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Vaults"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VaultOrderBy"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderDirection"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VaultFilters"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vaults"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"creationTimestamp"}},{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}},{"kind":"Field","name":{"kind":"Name","value":"logoURI"}}]}},{"kind":"Field","name":{"kind":"Name","value":"chain"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"network"}}]}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"curators"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"image"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"state"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"apy"}},{"kind":"Field","name":{"kind":"Name","value":"netApy"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssets"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssetsUsd"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countTotal"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"skip"}}]}}]}}]}}]} as unknown as DocumentNode<VaultsQuery, VaultsQueryVariables>;
+export const VaultByAddressDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"VaultByAddress"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"address"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dailyAPYOptions"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"TimeseriesOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vaultByAddress"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"address"},"value":{"kind":"Variable","name":{"kind":"Name","value":"address"}}},{"kind":"Argument","name":{"kind":"Name","value":"chainId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"chainId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"decimals"}},{"kind":"Field","name":{"kind":"Name","value":"logoURI"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}},{"kind":"Field","name":{"kind":"Name","value":"historicalState"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dailyApy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"options"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dailyAPYOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"liquidity"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"underlying"}},{"kind":"Field","name":{"kind":"Name","value":"usd"}}]}},{"kind":"Field","name":{"kind":"Name","value":"metadata"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"curators"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"state"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"apy"}},{"kind":"Field","name":{"kind":"Name","value":"fee"}},{"kind":"Field","name":{"kind":"Name","value":"guardian"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssets"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssetsUsd"}}]}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}}]}}]} as unknown as DocumentNode<VaultByAddressQuery, VaultByAddressQueryVariables>;
+export const VaultsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Vaults"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VaultOrderBy"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrderDirection"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"VaultFilters"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"vaults"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderDirection"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"asset"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}},{"kind":"Field","name":{"kind":"Name","value":"logoURI"}}]}},{"kind":"Field","name":{"kind":"Name","value":"state"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"apy"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssets"}},{"kind":"Field","name":{"kind":"Name","value":"totalAssetsUsd"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countTotal"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"skip"}}]}}]}}]}}]} as unknown as DocumentNode<VaultsQuery, VaultsQueryVariables>;

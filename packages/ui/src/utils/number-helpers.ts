@@ -1,3 +1,4 @@
+import Big from "big.js";
 import JSBI from "jsbi";
 const allCommas = /,/g;
 
@@ -25,65 +26,6 @@ export function formatNumber(num: string | number, decimals = 4) {
  */
 export function formatNumberAsPercent(num: number | string, decimals = 2) {
   return `${formatNumber(num, decimals)}%`;
-}
-
-interface NumberAsAbbrOptions {
-  hideSymbol?: boolean;
-  removeKAbbr?: boolean;
-  decimalPlaces?: number;
-}
-
-/**
- * Formats a number into an abbreviated string with a suffix (e.g., k, m, b) and optional currency symbol.
- * @param num - The number to format
- * @param opts - Options to hide currency symbol or remove 'k' abbreviation and set decimal places
- * @param locale - The locale to use for formatting (default is "en-US")
- * @returns The formatted abbreviated string
- */
-export function formatNumberAsAbbr(
-  value: number | string,
-  opts: NumberAsAbbrOptions = {},
-  locale = "en-US",
-) {
-  let num = typeof value === "string" ? Number(value) : value;
-  let suffix = "";
-
-  if (Math.abs(num) < 1_000) {
-    suffix = "";
-  } else if (Math.abs(num) < 1_000_000) {
-    if (opts.removeKAbbr) {
-      return num;
-    } else {
-      suffix = "K";
-      num = num / 1_000;
-    }
-  } else if (Math.abs(num) < 1_000_000_000) {
-    suffix = "M";
-    num = num / 1_000_000;
-  } else if (Math.abs(num) < 1_000_000_000_000) {
-    suffix = "B";
-    num = num / 1_000_000_000;
-  }
-
-  // In the future we can extend this to use any currency symbol
-  const symbol = opts.hideSymbol ? "" : "$";
-
-  if (opts.decimalPlaces === undefined) {
-    // Use 2 decimals for fiat and 4 for non fiat
-    opts.decimalPlaces = symbol ? 2 : 4;
-  }
-
-  const localeString = num.toLocaleString(locale, {
-    minimumFractionDigits: opts.decimalPlaces,
-    maximumFractionDigits: opts.decimalPlaces,
-  });
-
-  // If the return string is -0.00 or some variant, strip the negative
-  if (localeString.match(/-0\.?[0]*$/)) {
-    return localeString.replace("-", "");
-  }
-
-  return `${symbol}${localeString}${suffix}`;
 }
 
 /**
@@ -120,3 +62,52 @@ export function formatDecimalValues(value?: string, decimals?: number): string {
   const decimalVal = decimals === undefined ? 4 : decimals;
   return value ? parseFloat(value).toFixed(decimalVal) : "0";
 }
+
+const BILLION = "1000000000";
+const MILLION = "1000000";
+const THOUSAND = "1000";
+
+export const FORMAT_ABBREVIATED_NUMBER_SUFFIX = {
+  BILLION: "B",
+  MILLION: "M",
+  THOUSAND: "K",
+};
+
+/**
+ * @param value A numeric string to format.
+ * @returns The formatted numeric string and the suffix (K, M, B) to make large numbers more readable.
+ */
+export const formatAbbreviatedNumber = (
+  value: string,
+  {
+    minimumFractionDigits,
+  }: {
+    minimumFractionDigits?: number;
+  } = {},
+) => {
+  const big = new Big(value);
+  const absolute = big.abs();
+
+  if (absolute.gte(BILLION)) {
+    return {
+      value: big.div(BILLION).toFixed(minimumFractionDigits),
+      suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.BILLION,
+    };
+  }
+
+  if (absolute.gte(MILLION)) {
+    return {
+      value: big.div(MILLION).toFixed(minimumFractionDigits),
+      suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.MILLION,
+    };
+  }
+
+  if (absolute.gte(THOUSAND)) {
+    return {
+      value: big.div(THOUSAND).toFixed(minimumFractionDigits),
+      suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND,
+    };
+  }
+
+  return { value, suffix: "" };
+};
