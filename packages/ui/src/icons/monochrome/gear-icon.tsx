@@ -1,6 +1,6 @@
 import { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
 export const GearIcon: React.FC<IconProps> = ({
   className = "",

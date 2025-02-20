@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const WalletIcon: React.FC<IconProps> = ({
+export const NeutronIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -12,7 +12,7 @@ export const WalletIcon: React.FC<IconProps> = ({
       style={{
         width: size,
         height: size,
-        backgroundImage: "url(/assets/icons/wallet.png)",
+        backgroundImage: "url(/assets/icons/logos/neutron-logo-color.png)",
       }}
     />
   );

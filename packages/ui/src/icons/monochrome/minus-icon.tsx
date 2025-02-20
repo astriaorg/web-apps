@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const ChevronDownIcon: React.FC<IconProps> = ({
+export const MinusIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -18,11 +18,7 @@ export const ChevronDownIcon: React.FC<IconProps> = ({
       stroke="currentColor"
       strokeWidth="1.5"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m19.5 8.25-7.5 7.5-7.5-7.5"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
     </svg>
   );
 };

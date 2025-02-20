@@ -1,8 +1,8 @@
 import type { IconProps } from "@repo/flame-types";
 
-import { DEFAULT_ICON_SIZE } from "./constants";
+import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const CloseIcon: React.FC<IconProps> = ({
+export const SearchIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -13,7 +13,7 @@ export const CloseIcon: React.FC<IconProps> = ({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
@@ -22,7 +22,7 @@ export const CloseIcon: React.FC<IconProps> = ({
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M6 18 18 6M6 6l12 12"
+        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
       />
     </svg>
   );
