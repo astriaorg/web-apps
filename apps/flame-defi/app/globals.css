@@ -155,6 +155,7 @@
       }
     }
 
+    > path,
     > rect {
       @apply text-orange;
     }

@@ -1,3 +1,4 @@
+import { cn } from "@repo/ui/lib";
 import {
   Skeleton,
   Tabs,
@@ -96,28 +97,37 @@ export const APYChart = () => {
           .tickSize(0),
       );
 
-    // Add bars with transition.
-    svg
-      .selectAll(".bar")
-      .data(dailyAPYs)
-      .enter()
-      .append("rect")
-      .attr("x", (it) => x(it.x.toString())!)
-      .attr("y", y(0)) // Start y from 0 to animate to the actual value.
-      .attr("width", x.bandwidth())
-      .attr("height", 0)
-      .attr("fill", "currentColor")
+    // Line chart.
+    const line = d3
+      .line<DataItem>()
+      .x((it) => (x(it.x.toString()) ?? 0) + x.bandwidth() / 2)
+      .y((it) => y(it.y || 0))
+      .curve(d3.curveMonotoneX);
+
+    const path = svg
+      .append("path")
+      .datum(dailyAPYs)
+      .attr("fill", "none")
+      .attr("stroke", "currentColor")
+      .attr("stroke-width", 1.5)
+      .attr("d", line);
+
+    const totalLength = path.node()?.getTotalLength() || 0;
+
+    path
+      .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
+      .attr("stroke-dashoffset", totalLength)
       .transition()
-      .duration(1000)
-      .attr("y", (it) => y(it.y || 0))
-      .attr("height", (it) => height - margin.bottom - y(it.y || 0));
+      .duration(400)
+      .ease(d3.easeLinear)
+      .attr("stroke-dashoffset", 0);
   }, [data]);
 
   return (
-    <SummaryCard isLoading={isPending} className="mt-4">
-      <SummaryCardLabel>
+    <SummaryCard isLoading={isPending}>
+      <SummaryCardLabel className="relative">
         <span>APY</span>
-        <span>
+        <span className="absolute right-0">
           <Tabs
             defaultValue={selectedAPYChartInterval}
             onValueChange={(value) =>
@@ -142,11 +152,9 @@ export const APYChart = () => {
         />
       </SummaryCardFigureText>
 
-      <Skeleton
-        isLoading={isPending}
-        className={`w-full h-${CHART_HEIGHT / 4}`}
-      >
-        <svg ref={svgRef} className="earn-chart" />
+      <div className="mt-4" />
+      <Skeleton isLoading={isPending} className="w-full">
+        <svg ref={svgRef} className={cn(`earn-chart h-${CHART_HEIGHT / 4}`)} />
       </Skeleton>
     </SummaryCard>
   );
