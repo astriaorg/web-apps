@@ -8,21 +8,21 @@ import React, {
   useState,
 } from "react";
 import { useAccount } from "wagmi";
-import { SettingsPopover } from "components/SettingsPopover/SettingsPopover";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
-import { useSwapButton } from "./useSwapButton";
-import { SwapInput } from "./components/SwapInput";
-import { TxnInfo } from "./components/TxnInfo";
-import ConfirmationModal from "components/ConfirmationModal/ConfirmationModal";
-import { SwapTxnSteps } from "./components/SwapTxnSteps";
-import { useGetQuote } from "./useGetQuote";
+import { useSwapButton } from "./use-swap-button";
+import { SwapInput } from "./components/swap-input";
+import { TxnInfo } from "./components/txn-info";
+import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
+import { SwapTxnSteps } from "./components/swap-txn-steps";
+import { useGetQuote } from "./use-get-quote";
 import debounce from "lodash.debounce";
-import useOneToOneQuote from "./useOneToOneQuote";
-import { useTxnInfo } from "./useTxnInfo";
-import { useTokenBalances } from "features/EvmWallet";
+import useOneToOneQuote from "./use-one-to-one-quote";
+import { useTxnInfo } from "./use-txn-info";
+import { useTokenBalances } from "features/evm-wallet";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",

@@ -2,10 +2,10 @@ import {
   getAllChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
-} from "./chainConfigs";
-import { ConfigContextProvider } from "./contexts/ConfigContext";
+} from "./chain-configs";
+import { ConfigContextProvider } from "./contexts/config-context";
 import { getEnvVariable } from "./env";
-import { useConfig, useEvmChainData } from "./hooks/useConfig";
+import { useConfig, useEvmChainData } from "./hooks/use-config";
 import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 /**

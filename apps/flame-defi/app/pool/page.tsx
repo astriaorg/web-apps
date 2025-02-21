@@ -2,10 +2,10 @@
 
 import { ActionButton } from "@repo/ui/components";
 import { InboxIcon, PlusIcon } from "@repo/ui/icons";
-import { useEvmWallet } from "features/EvmWallet";
+import { useEvmWallet } from "features/evm-wallet";
 import type React from "react";
 import { useAccount } from "wagmi";
-import NewPoolPosition from "./components/NewPoolPosition";
+import NewPoolPosition from "./components/new-pool-position";
 import { useState } from "react";
 
 export default function PoolPage(): React.ReactElement {
@@ -17,7 +17,7 @@ export default function PoolPage(): React.ReactElement {
   // TODO: Actually think through how the your positions, connect and new position pages should be displayed
 
   return (
-    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
+    <section className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
       <div className="max-w-[700px] w-full mx-auto">
         {userAccount.address && !newPositionPage && (
           <div className="flex items-center justify-end mb-8">
