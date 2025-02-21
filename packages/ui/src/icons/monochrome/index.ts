@@ -1,5 +1,6 @@
 export * from "./arrow-down-icon";
 export * from "./arrow-left-icon";
+export * from "./arrow-right-icon";
 export * from "./arrow-up-down-icon";
 export * from "./caret-right-icon";
 export * from "./check-mark-icon";

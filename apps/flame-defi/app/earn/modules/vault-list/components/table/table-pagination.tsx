@@ -1,12 +1,4 @@
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-  renderPaginationItems,
-  Skeleton,
-} from "@repo/ui/shadcn-primitives";
+import { Pagination, Skeleton } from "@repo/ui/shadcn-primitives";
 import { PAGE_SIZE } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
@@ -24,29 +16,11 @@ export const TablePagination = () => {
 
   return (
     <Skeleton isLoading={isPending} className="w-52">
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              isDisabled={currentPage === 1}
-            />
-          </PaginationItem>
-          {renderPaginationItems({
-            totalPages,
-            currentPage,
-            setCurrentPage,
-          })}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              isDisabled={currentPage === totalPages}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Pagination
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </Skeleton>
   );
 };
