@@ -3,10 +3,8 @@ import JSBI from "jsbi";
 const allCommas = /,/g;
 
 /**
- * Formats a number to a string with a specified number of decimal places and adds commas as thousand separators.
- * @param num - The number or string to format
- * @param decimals - The number of decimal places to include (default is 4)
- * @returns The formatted number as a string
+ * @deprecated Use `formatNumber` from `react-intl` instead.
+ * Specify `minimumFractionDigits`/`maximumFractionDigits` in the `options` parameter to format decimal places.
  */
 export function formatNumber(num: string | number, decimals = 4) {
   const cleanedNumber =
@@ -19,10 +17,8 @@ export function formatNumber(num: string | number, decimals = 4) {
 }
 
 /**
- * Formats a number as a percentage string.
- * @param num - The number or string to format
- * @param decimals - The number of decimal places to include (default is 2)
- * @returns The formatted percentage string
+ * @deprecated Use `formatNumber` from `react-intl` instead.
+ * Specify `style: "percent"` in the `options` parameter to format as a percentage.
  */
 export function formatNumberAsPercent(num: number | string, decimals = 2) {
   return `${formatNumber(num, decimals)}%`;
@@ -48,6 +44,7 @@ export function isDustAmount(
  * @param value - The string value to parse
  * @param decimals - The number of decimal places in the value
  * @returns The parsed JSBI BigInt
+ * @deprecated Use native BigInt.
  */
 export const parseToBigInt = (value: string, decimals: number): JSBI => {
   const [integerPart, fractionalPart = ""] = value.split(".");
@@ -58,6 +55,10 @@ export const parseToBigInt = (value: string, decimals: number): JSBI => {
   return JSBI.BigInt(wholeNumberString);
 };
 
+/**
+ * @deprecated Use `formatNumber` from `react-intl` instead.
+ * Specify `minimumFractionDigits`/`maximumFractionDigits` in the `options` parameter to format decimal places.
+ */
 export function formatDecimalValues(value?: string, decimals?: number): string {
   const decimalVal = decimals === undefined ? 4 : decimals;
   return value ? parseFloat(value).toFixed(decimalVal) : "0";
