@@ -13,8 +13,8 @@ export const CardsSection = () => {
       <div className="mt-12">
         <SummaryCards />
         <div className="mt-10 flex flex-col space-y-4">
-          <Skeleton isLoading={isPending} className="w-24">
-            <span className="text-base/4 font-semibold">Overview</span>
+          <Skeleton isLoading={isPending}>
+            <div className="text-base/4 font-semibold">Overview</div>
           </Skeleton>
           <APYChart />
         </div>
