@@ -1,7 +1,7 @@
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
-import { cn } from "@repo/ui/lib";
 import { Badge } from "@repo/ui/shadcn-primitives";
+import { cn } from "@repo/ui/utils";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import {
   PAGE_SIZE,
   PLACEHOLDER_DATA,
   useFetchVaults,
-} from "earn/modules/vault-list/hooks/useFetchVaults";
+} from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import Image from "next/image";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";

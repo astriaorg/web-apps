@@ -9,7 +9,6 @@
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",
     "./icons": "./src/icons/index.ts",
-    "./lib": "./src/lib/index.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {

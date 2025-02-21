@@ -1,4 +1,4 @@
-import { cn } from "@repo/ui/lib";
+import { cn } from "@repo/ui/utils";
 import { Card } from "earn/components/card";
 import { SummaryCardContext } from "earn/components/summary-card";
 import React from "react";

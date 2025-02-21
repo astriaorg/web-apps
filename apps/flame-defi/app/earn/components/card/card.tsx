@@ -1,4 +1,4 @@
-import { cn } from "@repo/ui/lib";
+import { cn } from "@repo/ui/utils";
 
 export const Card = ({
   className,

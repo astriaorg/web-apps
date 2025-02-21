@@ -4,7 +4,7 @@ import {
   TablePagination,
   TableSearch,
 } from "earn/modules/vault-list/components/table";
-import { usePageContext } from "earn/modules/vault-list/hooks/usePageContext";
+import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 
 export const TableSection = () => {
   const { status } = usePageContext();
