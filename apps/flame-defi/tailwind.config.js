@@ -185,7 +185,7 @@ export default {
         "light-up-orange": "lightUpOrange 1s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 8000ms linear infinite",
+        shimmer: "shimmer 6000ms ease-in-out infinite",
         "success-tick": "success-tick 450ms ease 500ms forwards",
         "success-circle-outline":
           "success-circle-outline 300ms ease-in-out 300ms forwards",
