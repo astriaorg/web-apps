@@ -10,9 +10,9 @@ import { IntlProvider } from "react-intl";
 import { WagmiProvider } from "wagmi";
 
 import { ConfigContextProvider, getAllChainConfigs } from "./config";
-import { CosmosWalletProvider } from "./features/CosmosWallet";
-import { EvmWalletProvider } from "./features/EvmWallet";
-import { NotificationsContextProvider } from "./features/Notifications";
+import { CosmosWalletProvider } from "./features/cosmos-wallet";
+import { EvmWalletProvider } from "./features/evm-wallet";
+import { NotificationsContextProvider } from "./features/notifications";
 import {
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
