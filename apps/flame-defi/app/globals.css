@@ -142,7 +142,7 @@
   }
 
   .earn-chart {
-    @apply overflow-visible;
+    @apply overflow-visible h-52;
 
     > g {
       @apply text-text-light;
