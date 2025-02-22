@@ -23,7 +23,7 @@ const buttonVariants = cva(
         destructive: "",
         outline: `border border-stroke ${buttonStyles.hover} ${buttonStyles.active}`,
         secondary: `${buttonStyles.secondary} ${buttonStyles.hover} ${buttonStyles.active}`,
-        ghost: `${buttonStyles.hover} ${buttonStyles.active}`,
+        ghost: "",
         link: "",
       },
       size: {
