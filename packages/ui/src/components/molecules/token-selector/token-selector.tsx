@@ -1,8 +1,14 @@
 "use client";
 
+import { EvmCurrency } from "@repo/flame-types";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { EvmCurrency } from "@repo/flame-types";
+import {
+  CheckMarkIcon,
+  ChevronDownIcon,
+  CloseIcon,
+  SearchIcon,
+} from "../../../icons";
 import {
   Dialog,
   DialogContent,
@@ -10,13 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
-} from "../../shadcn-primitives";
-import {
-  CheckMarkIcon,
-  ChevronDownIcon,
-  CloseIcon,
-  SearchIcon,
-} from "../../icons";
+} from "../../../shadcn-primitives";
 
 interface TokenSelectorProps {
   tokens: EvmCurrency[] | undefined;

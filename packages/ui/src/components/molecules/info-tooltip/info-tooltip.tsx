@@ -1,13 +1,13 @@
 "use client";
 
+import { useState } from "react";
+import { InfoIcon } from "../../../icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../shadcn-primitives";
-import { InfoIcon } from "../../icons";
-import { useState } from "react";
+} from "../../../shadcn-primitives";
 
 interface InfoTooltipProps {
   content: string;
@@ -31,13 +31,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
             />
           </span>
         </TooltipTrigger>
-        <TooltipContent
-          className="bg-black text-white border border-border rounded-md px-3 py-2 max-w-[200px] text-[14px]"
-          sideOffset={5}
-          side={side || "left"}
-        >
-          {content}
-        </TooltipContent>
+        <TooltipContent side={side}>{content}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

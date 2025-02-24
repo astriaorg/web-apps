@@ -1,9 +1,4 @@
-import {
-  Skeleton,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/shadcn-primitives";
+import { Skeleton, Tabs, TabsList, TabsTrigger } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import * as d3 from "d3";
 import {
@@ -211,11 +206,11 @@ export const APYChart = () => {
         <div
           ref={tooltipRef}
           className={cn(
-            "absolute bg-surface-inverted text-text-inverted text-xs/3 font-medium p-1.5 rounded-sm shadow-sm",
+            "absolute bg-surface-inverted text-text-inverted text-xs/4 font-medium p-1.5 rounded-sm shadow-sm",
             tooltipContent ? "block" : "hidden",
           )}
         >
-          <div className="flex flex-col space-y-1">
+          <div className="flex flex-col">
             {tooltipContent && (
               <>
                 <div>{formatDate(tooltipContent.timestamp * 1000)}</div>
