@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ClipboardIcon } from "../../icons";
+import { ClipboardIcon } from "../../../icons";
 
 export const CopyToClipboardButton = ({
   textToCopy,

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { InfoIcon } from "../../icons";
+import { InfoIcon } from "../../../icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../shadcn-primitives";
+} from "../../../shadcn-primitives";
 
 interface InfoTooltipProps {
   content: string;
