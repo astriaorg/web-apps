@@ -1,4 +1,4 @@
-import { Pagination, Skeleton } from "@repo/ui/shadcn-primitives";
+import { Pagination, Skeleton } from "@repo/ui/components";
 import { PAGE_SIZE } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";

@@ -1,4 +1,4 @@
-import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { Skeleton } from "@repo/ui/components";
 import Big from "big.js";
 import { Card } from "earn/components/card";
 import React, { useEffect } from "react";

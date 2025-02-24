@@ -1,9 +1,4 @@
-import {
-  Skeleton,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/shadcn-primitives";
+import { Skeleton, Tabs, TabsList, TabsTrigger } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import * as d3 from "d3";
 import {

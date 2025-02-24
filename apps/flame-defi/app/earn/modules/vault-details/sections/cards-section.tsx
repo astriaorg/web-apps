@@ -1,4 +1,4 @@
-import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { Skeleton } from "@repo/ui/components";
 import { APYChart } from "earn/modules/vault-details/components/apy-chart";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";

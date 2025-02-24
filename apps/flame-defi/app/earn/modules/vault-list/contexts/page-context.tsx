@@ -1,6 +1,6 @@
+import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
-import { Badge } from "@repo/ui/shadcn-primitives";
 import { cn } from "@repo/ui/utils";
 import {
   createColumnHelper,
