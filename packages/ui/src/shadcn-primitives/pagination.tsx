@@ -1,20 +1,10 @@
-import { MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import * as React from "react";
 
-import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
 import { cn } from "../utils";
 import { ButtonProps, buttonVariants } from "./button";
 
-interface PaginationProps {
-  totalPages: number;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-}
-
-const PaginationGroup = ({
-  className,
-  ...props
-}: React.ComponentProps<"nav">) => (
+const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
     aria-label="pagination"
@@ -22,7 +12,7 @@ const PaginationGroup = ({
     {...props}
   />
 );
-PaginationGroup.displayName = "PaginationGroup";
+Pagination.displayName = "Pagination";
 
 const PaginationContent = React.forwardRef<
   HTMLUListElement,
@@ -30,7 +20,7 @@ const PaginationContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ul
     ref={ref}
-    className={cn("flex flex-row items-center", className)}
+    className={cn("flex flex-row items-center gap-1", className)}
     {...props}
   />
 ));
@@ -61,10 +51,10 @@ const PaginationLink = ({
     aria-current={isActive ? "page" : undefined}
     className={cn(
       buttonVariants({
-        variant: isActive ? "outline" : "secondary",
+        variant: isActive ? "outline" : "ghost",
         size,
       }),
-      isDisabled && ["pointer-events-none opacity-50 shadow-none"],
+      isDisabled && ["pointer-events-none opacity-50"],
       className,
     )}
     {...props}
@@ -79,10 +69,10 @@ const PaginationPrevious = ({
   <PaginationLink
     aria-label="Go to previous page"
     size="default"
-    className={cn("h-10 w-12", className)}
+    className={cn("h-9 w-9", className)}
     {...props}
   >
-    <ArrowLeftIcon className="h-4 w-4" />
+    <ChevronLeft className="h-4 w-4" />
     <span className="sr-only">Previous</span>
   </PaginationLink>
 );
@@ -95,11 +85,11 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn("h-10 w-12", className)}
+    className={cn("h-9 w-9", className)}
     {...props}
   >
     <span className="sr-only">Next</span>
-    <ArrowRightIcon className="h-4 w-4" />
+    <ChevronRight className="h-4 w-4" />
   </PaginationLink>
 );
 PaginationNext.displayName = "PaginationNext";
@@ -119,11 +109,15 @@ const PaginationEllipsis = ({
 );
 PaginationEllipsis.displayName = "PaginationEllipsis";
 
-const EllipsisPagination = ({
+const renderPaginationItems = ({
   totalPages,
   currentPage,
   setCurrentPage,
-}: PaginationProps) => {
+}: {
+  totalPages: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+}) => {
   const paginationItems = [];
   const maxVisiblePages = 5;
 
@@ -192,57 +186,16 @@ const EllipsisPagination = ({
     );
   }
 
-  return (
-    <PaginationGroup>
-      <PaginationContent className="gap-1">
-        <PaginationItem>
-          <PaginationPrevious
-            href="#"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            isDisabled={currentPage === 1}
-          />
-        </PaginationItem>
-        {paginationItems}
-        <PaginationItem>
-          <PaginationNext
-            href="#"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            isDisabled={currentPage === totalPages}
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </PaginationGroup>
-  );
+  return paginationItems;
 };
 
-const Pagination = ({
-  totalPages,
-  currentPage,
-  setCurrentPage,
-}: PaginationProps) => {
-  return (
-    <PaginationGroup>
-      <PaginationContent className="gap-4">
-        <PaginationItem>
-          <PaginationPrevious
-            href="#"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            isDisabled={currentPage === 1}
-          />
-        </PaginationItem>
-        <span className="text-base/4">
-          {currentPage} of {totalPages}
-        </span>
-        <PaginationItem>
-          <PaginationNext
-            href="#"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            isDisabled={currentPage === totalPages}
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </PaginationGroup>
-  );
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  renderPaginationItems,
 };
-
-export { EllipsisPagination, Pagination };
