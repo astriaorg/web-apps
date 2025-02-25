@@ -188,6 +188,16 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
+  contracts: {
+    wrappedNativeToken: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+    swapRouter: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+  },
   currencies: [
     new EvmCurrency({
       title: "RIA",
