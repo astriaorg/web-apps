@@ -1,5 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Chain, erc20Abi, formatUnits } from "viem";
 import {
   useAccount,
@@ -132,13 +132,23 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
 
+  // set the selectedFlameNetwork if user switches from their wallet
   useEffect(() => {
     if (!userAccount?.chainId) {
       return;
     }
-    const network = getFlameNetworkByChainId(userAccount.chainId);
-    selectFlameNetwork(network);
-  }, [selectFlameNetwork, userAccount.chainId]);
+    try {
+      const network = getFlameNetworkByChainId(userAccount.chainId);
+      selectFlameNetwork(network);
+    } catch (error) {
+      console.warn(
+        "User selected non Flame chain. Switching to selected Flame chain.",
+        error,
+      );
+      const chainId = getFlameChainId(selectedFlameNetworkRef.current);
+      switchChain({ chainId });
+    }
+  }, [selectFlameNetwork, userAccount.chainId, switchChain]);
 
   const resetState = useCallback(() => {
     setSelectedEvmChain(null);
@@ -146,12 +156,17 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setEvmAccountAddress(null);
   }, []);
 
+  // creating a ref here to use current selectedFlameNetwork value in useEffects without
+  // its change triggering the useEffect
+  const selectedFlameNetworkRef = useRef(selectedFlameNetwork);
+
   // deselect chain and currency when network is changed and switch chains in wallet
   useEffect(() => {
     if (selectedFlameNetwork) {
       resetState();
       const chainId = getFlameChainId(selectedFlameNetwork);
       switchChain({ chainId });
+      selectedFlameNetworkRef.current = selectedFlameNetwork;
     }
   }, [selectedFlameNetwork, switchChain, resetState]);
 
