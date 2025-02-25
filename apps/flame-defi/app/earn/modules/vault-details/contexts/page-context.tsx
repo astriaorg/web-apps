@@ -1,16 +1,19 @@
 import { TimeseriesOptions } from "earn/gql/graphql";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
-import { APYChartInterval } from "earn/modules/vault-details/types";
+import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
-type Status = "error" | "empty" | "success";
+type Charts = {
+  [key in keyof typeof CHART_TYPE]: {
+    selectedInterval: ChartInterval;
+    setSelectedInterval: (value: ChartInterval) => void;
+  };
+};
 
 export interface PageContextProps extends PropsWithChildren {
   address: string;
-  status: Status;
-  selectedAPYChartInterval: APYChartInterval;
-  setSelectedAPYChartInterval: (value: APYChartInterval) => void;
+  charts: Charts;
   query: ReturnType<typeof useFetchVaultByAddress>;
 }
 
@@ -26,7 +29,11 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   }
 
   const [selectedAPYChartInterval, setSelectedAPYChartInterval] =
-    useState<APYChartInterval>("3m");
+    useState<ChartInterval>("3m");
+  const [
+    selectedTotalSupplyChartInterval,
+    setSelectedTotalSupplyChartInterval,
+  ] = useState<ChartInterval>("3m");
 
   const dailyAPYOptions: TimeseriesOptions = useMemo(() => {
     if (selectedAPYChartInterval === "all") {
@@ -87,25 +94,20 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
-  const status = useMemo<Status>(() => {
-    if (query.isError) {
-      return "error";
-    }
-
-    if (!query.isPending && !query.data?.vaultByAddress) {
-      return "empty";
-    }
-
-    return "success";
-  }, [query.isError, query.isPending, query.data?.vaultByAddress]);
-
   return (
     <PageContext.Provider
       value={{
         address: params.address,
-        status,
-        selectedAPYChartInterval,
-        setSelectedAPYChartInterval,
+        charts: {
+          [CHART_TYPE.APY]: {
+            selectedInterval: selectedAPYChartInterval,
+            setSelectedInterval: setSelectedAPYChartInterval,
+          },
+          [CHART_TYPE.TOTAL_SUPPLY]: {
+            selectedInterval: selectedTotalSupplyChartInterval,
+            setSelectedInterval: setSelectedTotalSupplyChartInterval,
+          },
+        },
         query,
       }}
     >
