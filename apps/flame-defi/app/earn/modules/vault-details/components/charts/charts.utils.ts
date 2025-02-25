@@ -99,7 +99,7 @@ interface GetLineChartParams<T> {
   height: number;
   svg: SVGSVGElement;
   tooltip: HTMLDivElement;
-  onMouseOver: (value: T) => void;
+  onMouseOver: (value: T | null) => void;
 }
 
 export const initializeLineChart = <T extends FloatDataPoint>({
@@ -117,7 +117,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
 
   const container = svg.node()?.parentElement;
   const width = container?.clientWidth || 0; // Fill chart to container width.
-  const margin = { top: 0, right: 0, bottom: 16, left: 0 };
+  const margin = { top: 24, right: 0, bottom: 16, left: 0 };
 
   svg
     .attr("width", "100%")
@@ -131,6 +131,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .domain(data.map((it) => it.x.toString()))
     .range([margin.left, width - margin.right])
     .padding(0.75);
+
   const y = d3
     .scaleLinear()
     .domain([0, d3.max(data, (it) => it.y) as number])
@@ -187,24 +188,50 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .ease(d3.easeLinear)
     .attr("stroke-dashoffset", 0);
 
-  // Tooltip on line hover.
+  // Add a vertical line over current mouse position.
+  const line = svg
+    .append("line")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", 4)
+    .attr("stroke-opacity", 0.2)
+    .style("display", "none");
+
   svg
-    .selectAll(".line")
-    .data(data)
-    .enter()
-    .append("circle")
-    .attr("cx", (it) => (x(it.x.toString()) ?? 0) + x.bandwidth() / 2)
-    .attr("cy", (it) => y(it.y ?? 0))
-    .attr("r", 5)
-    .style("fill", "transparent")
-    .on("mouseover", (event, it) => {
-      onMouseOver(it);
+    .on("mousemove", (event) => {
+      const [mouseX, mouseY] = d3.pointer(event);
+      const closestData = data.reduce((previous, current) => {
+        const previousDistance = Math.hypot(
+          mouseX - (x(previous.x.toString()) ?? 0) - x.bandwidth() / 2,
+          mouseY - y(previous.y ?? 0),
+        );
+        const currentDistance = Math.hypot(
+          mouseX - (x(current.x.toString()) ?? 0) - x.bandwidth() / 2,
+          mouseY - y(current.y ?? 0),
+        );
+        return currentDistance < previousDistance ? current : previous;
+      });
+
+      const closestX = (x(closestData.x.toString()) ?? 0) + x.bandwidth() / 2;
+      const closestY = y(closestData.y ?? 0);
+
+      onMouseOver(closestData);
       tooltip.style.display = "block";
-      tooltip.style.left = event.pageX + 16 + "px";
-      tooltip.style.top = event.pageY - 16 + "px";
+      tooltip.style.left = closestX + "px";
+      tooltip.style.top = closestY - 64 + "px";
+      tooltip.style.transform = "translateX(-50%)";
+
+      line
+        .attr("x1", closestX)
+        .attr("x2", closestX)
+        .attr("y1", 0)
+        .attr("y2", height - margin.bottom)
+        .style("display", "block");
     })
-    .on("mouseout", () => {
+    .on("mouseleave", () => {
+      onMouseOver(null);
       tooltip.style.display = "none";
+      line.style("display", "none");
     });
 };
 

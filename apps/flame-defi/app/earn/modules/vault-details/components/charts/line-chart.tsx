@@ -89,17 +89,19 @@ export const LineChart = ({
 
       <div className="mt-4" />
       <Skeleton isLoading={isLoading} className="w-full">
-        <svg ref={svgRef} className="earn-chart h-52" />
-        <div
-          ref={tooltipRef}
-          className={cn(
-            tooltipVariants(),
-            "absolute",
-            !!tooltipContent ? "block" : "hidden",
-          )}
-        >
-          <div className="flex flex-col">
-            {!!tooltipContent && renderTooltip(tooltipContent)}
+        <div className="relative">
+          <svg ref={svgRef} className="earn-chart h-52" />
+          <div
+            ref={tooltipRef}
+            className={cn(
+              tooltipVariants(),
+              "absolute",
+              !!tooltipContent ? "block" : "hidden",
+            )}
+          >
+            <div className="flex flex-col">
+              {!!tooltipContent && renderTooltip(tooltipContent)}
+            </div>
           </div>
         </div>
       </Skeleton>
