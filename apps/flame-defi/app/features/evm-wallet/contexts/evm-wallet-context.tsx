@@ -1,5 +1,11 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Chain, erc20Abi, formatUnits } from "viem";
 import {
   useAccount,
