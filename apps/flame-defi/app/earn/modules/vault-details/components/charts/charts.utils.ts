@@ -139,13 +139,11 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .attr("cy", (it) => y(it.y ?? 0))
     .attr("r", 5)
     .style("fill", "transparent")
-    .on("mouseover", (_, it) => {
+    .on("mouseover", (event, it) => {
       onMouseOver(it);
       tooltip.style.display = "block";
-    })
-    .on("mousemove", (event) => {
-      tooltip.style.left = event.pageX + 10 + "px";
-      tooltip.style.top = event.pageY - 20 + "px";
+      tooltip.style.left = event.pageX + 16 + "px";
+      tooltip.style.top = event.pageY - 16 + "px";
     })
     .on("mouseout", () => {
       tooltip.style.display = "none";
