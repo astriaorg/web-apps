@@ -238,19 +238,111 @@ export function ibcCurrencyBelongsToChain(
   return chain.currencies?.includes(currency);
 }
 
-export type EvmCurrency = {
-  title: string;
-  coinDenom: string;
-  coinMinimalDenom: string;
-  coinDecimals: number;
-  // contract address if this is a ERC20 token
-  erc20ContractAddress?: `0x${string}`;
-  // contract address if this a native token
-  nativeTokenWithdrawerContractAddress?: `0x${string}`;
-  // fee needed to pay for the ibc withdrawal, 18 decimals
-  ibcWithdrawalFeeWei: string;
-  IconComponent?: React.FC<IconProps>;
-};
+/**
+ * Represents a currency on an EVM chain, which can be either a native token or an ERC-20 token.
+ */
+export class EvmCurrency {
+  /** Display name of the token */
+  public readonly title: string;
+
+  /** Token denomination (e.g., "TIA", "USDC") */
+  public readonly coinDenom: string;
+
+  /** Minimal denomination of the token */
+  public readonly coinMinimalDenom: string;
+
+  /** Number of decimal places the token uses */
+  public readonly coinDecimals: number;
+
+  /** Fee required for IBC withdrawal, in wei (18 decimals) */
+  public readonly ibcWithdrawalFeeWei: string;
+
+  /** ERC-20 contract address if this is a token, undefined for native currencies */
+  public readonly erc20ContractAddress?: `0x${string}`;
+
+  /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
+  public readonly nativeTokenWithdrawerContractAddress?: `0x${string}`;
+
+  /** True if this is a wrapped native token (e.g., wTIA) */
+  public readonly isWrappedNative: boolean;
+
+  /** Component to render the token's icon */
+  public readonly IconComponent?: React.FC<IconProps>;
+
+  /**
+   * Create a new EvmCurrency instance
+   */
+  constructor(params: {
+    title: string;
+    coinDenom: string;
+    coinMinimalDenom: string;
+    coinDecimals: number;
+    ibcWithdrawalFeeWei: string;
+    erc20ContractAddress?: `0x${string}`;
+    nativeTokenWithdrawerContractAddress?: `0x${string}`;
+    isWrappedNative: boolean;
+    IconComponent?: React.FC<IconProps>;
+  }) {
+    this.title = params.title;
+    this.coinDenom = params.coinDenom;
+    this.coinMinimalDenom = params.coinMinimalDenom;
+    this.coinDecimals = params.coinDecimals;
+    this.ibcWithdrawalFeeWei = params.ibcWithdrawalFeeWei;
+    this.erc20ContractAddress = params.erc20ContractAddress;
+    this.nativeTokenWithdrawerContractAddress =
+      params.nativeTokenWithdrawerContractAddress;
+    this.isWrappedNative = params.isWrappedNative;
+    this.IconComponent = params.IconComponent;
+  }
+
+  /**
+   * Determines if this currency is a native token (e.g., TIA, ETH)
+   * @returns true if this is a native token, false if it's an ERC-20 token
+   */
+  public get isNative(): boolean {
+    return (
+      this.nativeTokenWithdrawerContractAddress !== undefined &&
+      !this.erc20ContractAddress
+    );
+  }
+
+  /**
+   * Checks if this currency is equal to another currency.
+   *
+   * Two currencies are considered equal if they have the same coin denom and either:
+   * - Both are native currencies
+   * - Both are ERC-20 tokens with the same contract address
+   *
+   * @param other The other currency to compare with
+   * @returns true if the currencies are equal, false otherwise
+   */
+  public equals(other: EvmCurrency | null | undefined): boolean {
+    if (!other) {
+      return false;
+    }
+
+    // compare basic properties
+    if (this.coinDenom !== other.coinDenom) {
+      return false;
+    }
+
+    // for ERC-20 tokens, compare contract addresses
+    if (this.erc20ContractAddress && other.erc20ContractAddress) {
+      return (
+        this.erc20ContractAddress.toLowerCase() ===
+        other.erc20ContractAddress.toLowerCase()
+      );
+    }
+
+    // for native tokens, compare by coinMinimalDenom
+    if (this.isNative && other.isNative) {
+      return this.coinMinimalDenom === other.coinMinimalDenom;
+    }
+
+    // if one is native and the other is an ERC-20 token, they are not equal
+    return false;
+  }
+}
 
 /**
  * Represents information about an EVM chain.
@@ -262,8 +354,10 @@ export type EvmChainInfo = {
   rpcUrls: string[];
   IconComponent?: React.FC;
   blockExplorerUrl?: string;
-  contracts?: {
+  contracts: {
     [label: string]: ChainContract;
+    wrappedNativeToken: ChainContract;
+    swapRouter: ChainContract;
   };
 };
 

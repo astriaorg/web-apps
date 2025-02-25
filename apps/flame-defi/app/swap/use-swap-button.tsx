@@ -101,12 +101,9 @@ export function useSwapButton({
   const result = useWaitForTransactionReceipt({ hash: txnHash });
   const tokenApprovalNeeded = useTokenApproval(tokenOne, tokenTwo);
 
-  const wrapTia =
-    tokenOne?.token?.coinDenom === "TIA" &&
-    tokenTwo?.token?.coinDenom === "WTIA";
+  const wrapTia = tokenOne?.token?.isNative && tokenTwo?.token?.isWrappedNative;
   const unwrapTia =
-    tokenOne?.token?.coinDenom === "WTIA" &&
-    tokenTwo?.token?.coinDenom === "TIA";
+    tokenOne?.token?.isWrappedNative && tokenTwo?.token?.isNative;
 
   const handleErrorMsgs = (error?: string, defaultMsg?: string) => {
     if (error?.includes("rejected")) {
@@ -135,7 +132,7 @@ export function useSwapButton({
   }, [result.data, txnHash, addRecentTransaction]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wtiaAddress = selectedChain.contracts?.wrappedCelestia?.address;
+    const wtiaAddress = selectedChain.contracts?.wrappedNativeToken.address;
     if (!selectedChain?.chainId || !wtiaAddress) {
       return;
     }
@@ -195,7 +192,7 @@ export function useSwapButton({
 
     setTxnStatus(TXN_STATUS.PENDING);
     try {
-      const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
+      const swapRouterAddress = selectedChain.contracts?.swapRouter.address;
       if (!swapRouterAddress) {
         console.warn("Swap router address is not defined. Cannot swap.");
         return;

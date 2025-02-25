@@ -314,7 +314,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       if (
         !userAccount.address ||
         !walletClient ||
-        !contracts?.swapRouter?.address
+        !contracts?.swapRouter.address
       ) {
         return null;
       }
@@ -352,7 +352,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     [
       userAccount.address,
       walletClient,
-      contracts?.swapRouter?.address,
+      contracts?.swapRouter.address,
       tokenAllowances,
       tokenDefaultApprovalAmount,
       selectedChain,
@@ -363,7 +363,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     if (
       !userAccount.address ||
       !publicClient ||
-      !contracts?.swapRouter?.address
+      !contracts?.swapRouter.address
     ) {
       return;
     }

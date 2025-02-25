@@ -1,9 +1,10 @@
 import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
-import type {
+import {
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
   EvmChains,
+  EvmCurrency,
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
@@ -188,24 +189,26 @@ const FlameChainInfo: EvmChainInfo = {
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
   currencies: [
-    {
+    new EvmCurrency({
       title: "RIA",
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       title: "TIA",
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
+    }),
   ],
   IconComponent: FlameIcon,
 };
@@ -214,16 +217,27 @@ const FakeChainInfo: EvmChainInfo = {
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
+  contracts: {
+    wrappedNativeToken: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+    swapRouter: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+  },
   currencies: [
-    {
+    new EvmCurrency({
       title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
@@ -231,9 +245,10 @@ const FakeChainInfo: EvmChainInfo = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: FlameIcon,
-    },
+    }),
   ],
   IconComponent: FlameIcon,
 };

@@ -5,7 +5,7 @@ import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
 
 export function useGetQuote() {
   const {
-    selectedChain: { chainId },
+    selectedChain: { chainId, contracts: chainContracts },
   } = useEvmChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -20,16 +20,15 @@ export function useGetQuote() {
       tokenTwo: TokenState,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
-
+      // can't swap between native and wrapped native tokens.
       if (
-        (tokenOne.token?.coinDenom === "TIA" &&
-          tokenTwo.token?.coinDenom === "WTIA") ||
-        (tokenOne.token?.coinDenom === "WTIA" &&
-          tokenTwo.token?.coinDenom === "TIA")
+        (tokenOne.token?.isNative && tokenTwo.token?.isWrappedNative) ||
+        (tokenOne.token?.isWrappedNative && tokenTwo.token?.isNative)
       ) {
         return;
       }
-      if (tokenOne.token?.coinDenom === tokenTwo.token?.coinDenom) {
+      // can't swap for the same token
+      if (tokenOne.token?.equals(tokenTwo.token)) {
         return;
       }
       const amount = tokenOne?.value
@@ -40,14 +39,15 @@ export function useGetQuote() {
         : "";
 
       // This is a fix for TIA not having a ERC20 contract address
-      const tokenInAddress =
-        tokenOne?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
+      const tokenInAddress = tokenOne?.token?.isNative
+        ? chainContracts?.wrappedNativeToken.address
+        : tokenOne?.token?.erc20ContractAddress;
       const tokenInDecimals = tokenOne?.token?.coinDecimals;
       const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
-      const tokenOutAddress =
-        tokenTwo?.token?.erc20ContractAddress ||
-        "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071"; // WTIA address
+
+      const tokenOutAddress = tokenOne?.token?.isNative
+        ? chainContracts?.wrappedNativeToken.address
+        : tokenTwo?.token?.erc20ContractAddress;
       const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
       const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
 
@@ -112,7 +112,7 @@ export function useGetQuote() {
         setLoading(false);
       }
     },
-    [chainId],
+    [chainId, chainContracts?.wrappedNativeToken.address],
   );
 
   const cancelGetQuote = useCallback(() => {

@@ -5,11 +5,12 @@ import {
   NobleIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons";
-import type {
+import {
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
   EvmChains,
+  EvmCurrency,
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
@@ -285,45 +286,59 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
+  contracts: {
+    wrappedNativeToken: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+    swapRouter: {
+      address: "0x",
+      blockCreated: 42069,
+    },
+  },
   currencies: [
-    {
+    new EvmCurrency({
       coinDenom: "TIA",
       title: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "WTIA",
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
       coinDecimals: 18,
       erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: WrappedTiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: NobleIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "dTIA",
       title: "Drop Staked TIA",
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 18,
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
+    }),
   ],
   IconComponent: FlameIcon,
 };

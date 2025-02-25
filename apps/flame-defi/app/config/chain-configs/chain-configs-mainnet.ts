@@ -9,11 +9,12 @@ import {
   UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons";
-import type {
+import {
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
   EvmChains,
+  EvmCurrency,
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
@@ -254,7 +255,7 @@ const FlameChainInfo: EvmChainInfo = {
   blockExplorerUrl: "https://explorer.flame.astria.org",
   contracts: {
     // from https://explorer.flame.astria.org/tx/0x4d1be5b490199ae1350d6ac47070def19eab35a7b1a08ba7d35244ad10c781fe
-    wrappedCelestia: {
+    wrappedNativeToken: {
       address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
       blockCreated: 42997,
     },
@@ -265,53 +266,58 @@ const FlameChainInfo: EvmChainInfo = {
     },
   },
   currencies: [
-    {
+    new EvmCurrency({
       coinDenom: "TIA",
       title: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0xB086557f9B5F6fAe5081CC5850BE94e62B1dDE57",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "WTIA",
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
       coinDecimals: 18,
       erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: WrappedTiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
       erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: UsdcIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "milkTIA",
       title: "Milk TIA",
       coinMinimalDenom:
         "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 18,
       erc20ContractAddress: "0xcbb93e854AA4EF5Db51c3b094F28952eF0dC67bE",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: MilkTiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "stTIA",
       title: "Stride TIA",
       coinMinimalDenom: "stutia",
       coinDecimals: 18,
       erc20ContractAddress: "0xdf941D092b10FF07eAb44bD174dEe915c13FECcd",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: StrideTiaIcon,
-    },
+    }),
   ],
   IconComponent: FlameIcon,
 };
