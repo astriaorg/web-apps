@@ -9,7 +9,11 @@ import { assets, chains } from "chain-registry";
 import { IntlProvider } from "react-intl";
 import { WagmiProvider } from "wagmi";
 
-import { ConfigContextProvider, getAllChainConfigs } from "./config";
+import {
+  ConfigContextProvider,
+  getAllChainConfigs,
+  getEnvVariable,
+} from "./config";
 import { CosmosWalletProvider } from "./features/cosmos-wallet";
 import { EvmWalletProvider } from "./features/evm-wallet";
 import { NotificationsContextProvider } from "./features/notifications";
@@ -19,8 +23,9 @@ import {
   evmChainsToRainbowKitChains,
 } from "@repo/flame-types";
 
-// TODO - move to envar
-const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
+const WALLET_CONNECT_PROJECT_ID = getEnvVariable(
+  "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID",
+);
 
 const queryClient = new QueryClient();
 
