@@ -19,7 +19,7 @@ import { useEffect, useRef, useState } from "react";
 const CHART_HEIGHT = 52;
 
 interface LineChartProps {
-  data: FloatDataPoint[];
+  data?: FloatDataPoint[] | null;
   isLoading: boolean;
   intervals: ChartInterval[];
   selectedInterval: ChartInterval;
@@ -47,7 +47,7 @@ export const LineChart = ({
   );
 
   useEffect(() => {
-    if (!svgRef.current || !tooltipRef.current) {
+    if (!data || !svgRef.current || !tooltipRef.current) {
       return;
     }
 
@@ -94,11 +94,11 @@ export const LineChart = ({
           className={cn(
             tooltipVariants(),
             "absolute",
-            tooltipContent ? "block" : "hidden",
+            !!tooltipContent ? "block" : "hidden",
           )}
         >
           <div className="flex flex-col">
-            {tooltipContent && renderTooltip(tooltipContent)}
+            {!!tooltipContent && renderTooltip(tooltipContent)}
           </div>
         </div>
       </Skeleton>
