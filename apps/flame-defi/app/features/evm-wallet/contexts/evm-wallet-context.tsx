@@ -80,6 +80,9 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectFlameNetwork,
     tokenDefaultApprovalAmount,
   } = useAppConfig();
+  // creating a ref here to use current selectedFlameNetwork value in useEffects without
+  // its change triggering the useEffect
+  const selectedFlameNetworkRef = useRef(selectedFlameNetwork);
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
@@ -161,10 +164,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setSelectedEvmCurrency(null);
     setEvmAccountAddress(null);
   }, []);
-
-  // creating a ref here to use current selectedFlameNetwork value in useEffects without
-  // its change triggering the useEffect
-  const selectedFlameNetworkRef = useRef(selectedFlameNetwork);
 
   // deselect chain and currency when network is changed and switch chains in wallet
   useEffect(() => {
