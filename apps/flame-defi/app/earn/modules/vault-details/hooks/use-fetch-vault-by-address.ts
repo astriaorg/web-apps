@@ -1,15 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/use-config";
 import { graphql } from "earn/gql";
-import { TimeseriesOptions } from "earn/gql/graphql";
 import request from "graphql-request";
 
 const query = graphql(`
-  query VaultByAddress(
-    $address: String!
-    $chainId: Int
-    $dailyAPYOptions: TimeseriesOptions
-  ) {
+  query VaultByAddress($address: String!, $chainId: Int) {
     vaultByAddress(address: $address, chainId: $chainId) {
       address
       asset {
@@ -17,12 +12,6 @@ const query = graphql(`
         logoURI
         name
         symbol
-      }
-      historicalState {
-        dailyApy(options: $dailyAPYOptions) {
-          x
-          y
-        }
       }
       liquidity {
         underlying
@@ -53,13 +42,12 @@ export const useFetchVaultByAddress = ({
 }: {
   variables: {
     address: string;
-    dailyAPYOptions: TimeseriesOptions;
   };
 }) => {
   const { earnAPIURL } = useConfig();
 
   return useQuery({
-    queryKey: ["useFetchVaults", variables],
+    queryKey: ["useFetchVaultsByAddress", variables],
     queryFn: async () => {
       return request(earnAPIURL, query, {
         ...variables,
@@ -67,7 +55,5 @@ export const useFetchVaultByAddress = ({
         chainId: 1,
       });
     },
-    gcTime: 1000 * 60 * 5, // 5 minutes.
-    staleTime: 1000 * 60 * 5,
   });
 };

@@ -1,5 +1,9 @@
 import * as d3 from "d3";
-import { FloatDataPoint } from "earn/gql/graphql";
+import type { FloatDataPoint, TimeseriesOptions } from "earn/gql/graphql";
+import {
+  CHART_CACHE_TIME_MILLISECONDS,
+  ChartInterval,
+} from "earn/modules/vault-details/types";
 
 // Threshold for the maximum number of data points to display.
 const MAX_DATA_POINTS = 1000;
@@ -24,7 +28,7 @@ const getDownsampledData = <T>(data: T[]) => {
 };
 
 /**
- * Returns an array of data points representing the first data point of each month.
+ *  @returns An array of data points representing the first data point of each month.
  */
 const getDataFirstOfMonthArray = <T extends FloatDataPoint>(data: T[]) => {
   const firstOfMonthArray: T[] = [];
@@ -49,7 +53,6 @@ interface GetLineChartParams<T> {
   svg: SVGSVGElement;
   tooltip: HTMLDivElement;
   onMouseOver: (value: T) => void;
-  //   onMouseOut: (value: T) => void;
 }
 
 export const initializeLineChart = <T extends FloatDataPoint>({
@@ -147,4 +150,61 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .on("mouseout", () => {
       tooltip.style.display = "none";
     });
+};
+
+/**
+ * @returns The start and end timestamps for the given chart interval.
+ */
+export const getTimeseriesOptions = (
+  chartInterval: ChartInterval,
+): TimeseriesOptions => {
+  if (chartInterval === "all") {
+    return {
+      startTimestamp: null,
+      endTimestamp: null,
+    };
+  }
+
+  // Timestamps change every second, so query is never cached.
+  // Round down to the nearest 5 minutes to avoid this.
+  const roundDownToNearest5Minutes = (timestamp: number) => {
+    const secondsIn5Minutes = CHART_CACHE_TIME_MILLISECONDS / 1000;
+    return Math.floor(timestamp / secondsIn5Minutes) * secondsIn5Minutes;
+  };
+
+  const now = Date.now();
+  const date = new Date();
+
+  const { startTimestamp, endTimestamp } = (() => {
+    switch (chartInterval) {
+      case "1w": {
+        date.setDate(date.getDate() - 7);
+        return {
+          startTimestamp: date.getTime(),
+          endTimestamp: now,
+        };
+      }
+      case "1m": {
+        date.setMonth(date.getMonth() - 1);
+        return {
+          startTimestamp: date.getTime(),
+          endTimestamp: now,
+        };
+      }
+      case "3m": {
+        date.setMonth(date.getMonth() - 3);
+        return {
+          startTimestamp: date.getTime(),
+          endTimestamp: now,
+        };
+      }
+    }
+  })();
+
+  return {
+    startTimestamp: Math.floor(
+      roundDownToNearest5Minutes(startTimestamp / 1000),
+    ),
+    endTimestamp: Math.floor(roundDownToNearest5Minutes(endTimestamp / 1000)),
+  };
 };

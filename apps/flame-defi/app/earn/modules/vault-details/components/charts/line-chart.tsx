@@ -15,7 +15,6 @@ import { FloatDataPoint } from "earn/gql/graphql";
 import { initializeLineChart } from "earn/modules/vault-details/components/charts/charts.utils";
 import { ChartInterval } from "earn/modules/vault-details/types";
 import { useEffect, useRef, useState } from "react";
-import { useIntl } from "react-intl";
 
 const CHART_HEIGHT = 52;
 
@@ -27,6 +26,7 @@ interface LineChartProps {
   setSelectedInterval: (value: ChartInterval) => void;
   title: React.ReactNode;
   figure: React.ReactNode;
+  renderTooltip: (value: FloatDataPoint) => React.ReactNode;
 }
 
 export const LineChart = ({
@@ -37,16 +37,14 @@ export const LineChart = ({
   setSelectedInterval,
   title,
   figure,
+  renderTooltip,
 }: LineChartProps) => {
-  const { formatDate, formatNumber } = useIntl();
-
   const svgRef = useRef<SVGSVGElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
 
-  const [tooltipContent, setTooltipContent] = useState<{
-    timestamp: number;
-    apy: number;
-  }>();
+  const [tooltipContent, setTooltipContent] = useState<FloatDataPoint | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!svgRef.current || !tooltipRef.current) {
@@ -59,10 +57,7 @@ export const LineChart = ({
       svg: svgRef.current,
       tooltip: tooltipRef.current,
       onMouseOver: (value) => {
-        setTooltipContent({
-          timestamp: value.x,
-          apy: value.y ?? 0,
-        });
+        setTooltipContent(value);
       },
     });
   }, [data]);
@@ -74,9 +69,10 @@ export const LineChart = ({
         <span className="absolute right-0">
           <Tabs
             defaultValue={selectedInterval}
-            onValueChange={(value) =>
-              setSelectedInterval(value as ChartInterval)
-            }
+            onValueChange={(value) => {
+              setSelectedInterval(value as ChartInterval);
+              setTooltipContent(null);
+            }}
           >
             <TabsList>
               {intervals.map((it) => (
@@ -92,7 +88,7 @@ export const LineChart = ({
 
       <div className="mt-4" />
       <Skeleton isLoading={isLoading} className="w-full">
-        <svg ref={svgRef} className="earn-chart" />
+        <svg ref={svgRef} className="earn-chart h-52" />
         <div
           ref={tooltipRef}
           className={cn(
@@ -102,17 +98,7 @@ export const LineChart = ({
           )}
         >
           <div className="flex flex-col">
-            {tooltipContent && (
-              <>
-                <div>{formatDate(tooltipContent.timestamp * 1000)}</div>
-                <div>
-                  {formatNumber(tooltipContent.apy, {
-                    style: "percent",
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
-              </>
-            )}
+            {tooltipContent && renderTooltip(tooltipContent)}
           </div>
         </div>
       </Skeleton>
