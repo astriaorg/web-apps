@@ -1,4 +1,4 @@
-import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { useSummaryCardContext } from "earn/components/summary-card";
 import React from "react";

@@ -1,11 +1,15 @@
 import { Skeleton } from "@repo/ui/components";
-import { APYChart } from "earn/modules/vault-details/components/charts";
+import { LineChart } from "earn/modules/vault-details/components/charts";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
+import { APY_CHART_INTERVALS } from "earn/modules/vault-details/types";
+import { FormattedNumber } from "react-intl";
 
 export const CardsSection = () => {
   const {
-    query: { isPending },
+    selectedAPYChartInterval,
+    setSelectedAPYChartInterval,
+    query: { data, isPending },
   } = usePageContext();
 
   return (
@@ -16,7 +20,21 @@ export const CardsSection = () => {
           <Skeleton isLoading={isPending}>
             <div className="text-base/4 font-semibold">Overview</div>
           </Skeleton>
-          <APYChart />
+          <LineChart
+            data={data?.vaultByAddress.historicalState.dailyApy ?? []}
+            isLoading={isPending}
+            intervals={APY_CHART_INTERVALS}
+            selectedInterval={selectedAPYChartInterval}
+            setSelectedInterval={setSelectedAPYChartInterval}
+            title="APY"
+            figure={
+              <FormattedNumber
+                value={data?.vaultByAddress.state?.apy ?? 0}
+                style="percent"
+                minimumFractionDigits={2}
+              />
+            }
+          />
         </div>
       </div>
     </section>

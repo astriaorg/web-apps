@@ -1,1 +1,1 @@
-export { APYChart } from "./apy-chart";
+export { LineChart } from "./line-chart";

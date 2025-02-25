@@ -13,22 +13,31 @@ import {
 } from "earn/components/summary-card";
 import { FloatDataPoint } from "earn/gql/graphql";
 import { initializeLineChart } from "earn/modules/vault-details/components/charts/charts.utils";
-import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import {
-  APY_CHART_INTERVALS,
-  APYChartInterval,
-} from "earn/modules/vault-details/types";
+import { ChartInterval } from "earn/modules/vault-details/types";
 import { useEffect, useRef, useState } from "react";
-import { FormattedNumber, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 
 const CHART_HEIGHT = 52;
 
-export const APYChart = () => {
-  const {
-    selectedAPYChartInterval,
-    setSelectedAPYChartInterval,
-    query: { isPending, data },
-  } = usePageContext();
+interface LineChartProps {
+  data: FloatDataPoint[];
+  isLoading: boolean;
+  intervals: ChartInterval[];
+  selectedInterval: ChartInterval;
+  setSelectedInterval: (value: ChartInterval) => void;
+  title: React.ReactNode;
+  figure: React.ReactNode;
+}
+
+export const LineChart = ({
+  data,
+  isLoading,
+  intervals,
+  selectedInterval,
+  setSelectedInterval,
+  title,
+  figure,
+}: LineChartProps) => {
   const { formatDate, formatNumber } = useIntl();
 
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -40,14 +49,12 @@ export const APYChart = () => {
   }>();
 
   useEffect(() => {
-    let dailyAPYs = data?.vaultByAddress.historicalState.dailyApy;
-
-    if (!dailyAPYs || !svgRef.current || !tooltipRef.current) {
+    if (!svgRef.current || !tooltipRef.current) {
       return;
     }
 
     initializeLineChart<FloatDataPoint>({
-      data: dailyAPYs,
+      data,
       height: CHART_HEIGHT * 4,
       svg: svgRef.current,
       tooltip: tooltipRef.current,
@@ -61,18 +68,18 @@ export const APYChart = () => {
   }, [data]);
 
   return (
-    <SummaryCard isLoading={isPending}>
+    <SummaryCard isLoading={isLoading}>
       <SummaryCardLabel className="relative">
-        <span>APY</span>
+        <span>{title}</span>
         <span className="absolute right-0">
           <Tabs
-            defaultValue={selectedAPYChartInterval}
+            defaultValue={selectedInterval}
             onValueChange={(value) =>
-              setSelectedAPYChartInterval(value as APYChartInterval)
+              setSelectedInterval(value as ChartInterval)
             }
           >
             <TabsList>
-              {APY_CHART_INTERVALS.map((it) => (
+              {intervals.map((it) => (
                 <TabsTrigger key={it} value={it}>
                   {it}
                 </TabsTrigger>
@@ -81,16 +88,10 @@ export const APYChart = () => {
           </Tabs>
         </span>
       </SummaryCardLabel>
-      <SummaryCardFigureText>
-        <FormattedNumber
-          value={data?.vaultByAddress.state?.apy ?? 0}
-          style="percent"
-          minimumFractionDigits={2}
-        />
-      </SummaryCardFigureText>
+      <SummaryCardFigureText>{figure}</SummaryCardFigureText>
 
       <div className="mt-4" />
-      <Skeleton isLoading={isPending} className="w-full">
+      <Skeleton isLoading={isLoading} className="w-full">
         <svg ref={svgRef} className="earn-chart" />
         <div
           ref={tooltipRef}
