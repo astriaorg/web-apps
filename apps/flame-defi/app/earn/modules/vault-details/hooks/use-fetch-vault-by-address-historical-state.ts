@@ -46,13 +46,21 @@ export const useFetchVaultByAddressHistoricalState = ({
   return useQuery({
     queryKey: ["useFetchVaultByAddressHistoricalState", type, variables],
     queryFn: async () => {
-      return request(earnAPIURL, query, {
+      const result = await request(earnAPIURL, query, {
         ...variables,
         // TODO: Get chain ID from wallet context.
         chainId: 1,
         includeAPYData: type === CHART_TYPE.APY,
         includeTotalSupplyData: type === CHART_TYPE.TOTAL_SUPPLY,
       });
+
+      // Data doesn't come sorted from the API.
+      result.vaultByAddress.historicalState.dailyApy?.sort((a, b) => a.x - b.x);
+      result.vaultByAddress.historicalState.totalAssetsUsd?.sort(
+        (a, b) => a.x - b.x,
+      );
+
+      return result;
     },
     gcTime: CHART_CACHE_TIME_MILLISECONDS,
     staleTime: CHART_CACHE_TIME_MILLISECONDS,

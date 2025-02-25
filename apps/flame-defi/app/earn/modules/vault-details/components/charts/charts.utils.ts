@@ -27,28 +27,75 @@ const getDownsampledData = <T>(data: T[]) => {
   return data;
 };
 
-/**
- *  @returns An array of data points representing the first data point of each month.
- */
-const getDataFirstOfMonthArray = <T extends FloatDataPoint>(data: T[]) => {
-  const firstOfMonthArray: T[] = [];
-  for (const item of data) {
-    const currentMonth = new Date(item.x * 1000).getMonth(); // Convert to milliseconds.
-    const previousItem = firstOfMonthArray[firstOfMonthArray.length - 1];
-    const previousMonth = previousItem
-      ? new Date(previousItem.x * 1000).getMonth()
-      : -1;
+const MILLISECONDS_3_DAYS = 1000 * 60 * 60 * 24 * 3;
+const MILLISECONDS_1_WEEK = 1000 * 60 * 60 * 24 * 7;
 
-    if (currentMonth !== previousMonth) {
-      firstOfMonthArray.push(item);
+/**
+ *  @returns An array of data points representing the first data point of each interval.
+ */
+export const getDataIntervalArray = <T extends FloatDataPoint>(
+  data: T[],
+  interval: ChartInterval,
+) => {
+  const result: T[] = [];
+
+  if (!data.length) {
+    return result;
+  }
+
+  switch (interval) {
+    case "1w": {
+      let previousDate = data[0] ? new Date(data[0].x * 1000).getTime() : 0;
+      result.push(data[0] as T);
+
+      for (let i = 1; i < data.length; i++) {
+        const currentDate = new Date((data[i] as T).x * 1000).getTime();
+        if (currentDate >= previousDate + MILLISECONDS_3_DAYS) {
+          result.push(data[i] as T);
+          previousDate = currentDate;
+        }
+      }
+
+      break;
+    }
+    case "1m": {
+      let lastDate = data[0] ? new Date(data[0].x * 1000).getTime() : 0;
+      result.push(data[0] as T);
+
+      for (let i = 1; i < data.length; i++) {
+        const currentDate = new Date((data[i] as T).x * 1000).getTime();
+        if (currentDate >= lastDate + MILLISECONDS_1_WEEK) {
+          result.push(data[i] as T);
+          lastDate = currentDate;
+        }
+      }
+
+      break;
+    }
+    // "3m" || "all"
+    default: {
+      for (const item of data) {
+        const currentMonth = new Date(item.x * 1000).getMonth(); // Convert to milliseconds.
+        const previousItem = result[result.length - 1];
+        const previousMonth = previousItem
+          ? new Date(previousItem.x * 1000).getMonth()
+          : -1;
+
+        if (currentMonth !== previousMonth) {
+          result.push(item);
+        }
+      }
+
+      break;
     }
   }
 
-  return firstOfMonthArray;
+  return result;
 };
 
 interface GetLineChartParams<T> {
   data: T[];
+  interval: ChartInterval;
   height: number;
   svg: SVGSVGElement;
   tooltip: HTMLDivElement;
@@ -57,6 +104,7 @@ interface GetLineChartParams<T> {
 
 export const initializeLineChart = <T extends FloatDataPoint>({
   data,
+  interval,
   height,
   tooltip,
   onMouseOver,
@@ -95,9 +143,19 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .y((it) => y(it.y ?? 0))
     .curve(d3.curveMonotoneX);
 
-  const firstOfMonthArray = getDataFirstOfMonthArray(data);
+  const intervals = getDataIntervalArray(data, interval);
 
-  const formatMonthDate = d3.timeFormat("%b"); // Format abbreviated month name.
+  const formatDate = (() => {
+    switch (interval) {
+      case "1w":
+      case "1m": {
+        return d3.timeFormat("%d %b");
+      }
+      default: {
+        return d3.timeFormat("%b %y");
+      }
+    }
+  })();
 
   svg
     .append("g")
@@ -105,8 +163,8 @@ export const initializeLineChart = <T extends FloatDataPoint>({
     .call(
       d3
         .axisBottom(x)
-        .tickValues(firstOfMonthArray.map((it) => it.x.toString()))
-        .tickFormat((it) => formatMonthDate(new Date(+it * 1000)))
+        .tickValues(intervals.map((it) => it.x.toString()))
+        .tickFormat((it) => formatDate(new Date(+it * 1000)))
         .tickPadding(16)
         .tickSize(0),
     );

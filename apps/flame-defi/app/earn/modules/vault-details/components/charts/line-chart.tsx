@@ -56,11 +56,12 @@ export const LineChart = ({
       height: CHART_HEIGHT * 4,
       svg: svgRef.current,
       tooltip: tooltipRef.current,
+      interval: selectedInterval,
       onMouseOver: (value) => {
         setTooltipContent(value);
       },
     });
-  }, [data]);
+  }, [data, selectedInterval]);
 
   return (
     <SummaryCard isLoading={isLoading}>
