@@ -103,15 +103,12 @@ export const TokenSelector = ({
           />
           <div className="h-[380px]">
             {filteredTokens?.map(
-              ({
-                coinDenom,
-                title,
-                IconComponent,
-                coinDecimals,
-                ibcWithdrawalFeeWei,
-                erc20ContractAddress,
-                nativeTokenWithdrawerContractAddress,
-              }) => {
+              (token) => {
+                const {
+                  coinDenom,
+                  title,
+                  IconComponent,
+                } = token;
                 const isUnavailableOrSelected =
                   unavailableToken?.coinDenom === coinDenom ||
                   selectedToken?.coinDenom === coinDenom;
@@ -124,16 +121,7 @@ export const TokenSelector = ({
                 return (
                   <div
                     onClick={() =>
-                      handleSelectToken({
-                        coinDenom,
-                        title,
-                        IconComponent,
-                        coinMinimalDenom: coinDenom,
-                        coinDecimals,
-                        ibcWithdrawalFeeWei,
-                        erc20ContractAddress,
-                        nativeTokenWithdrawerContractAddress,
-                      })
+                      handleSelectToken(token)
                     }
                     key={coinDenom}
                     className={twMerge(baseClasses, conditionalClasses)}
