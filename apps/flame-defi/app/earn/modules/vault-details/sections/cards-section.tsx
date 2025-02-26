@@ -1,22 +1,39 @@
 import { Skeleton } from "@repo/ui/components";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { Card } from "earn/components/card";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
+import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
+import { useMemo } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
+
+type Status = "error" | "empty" | "success";
 
 export const CardsSection = () => {
   const { formatDate, formatNumber } = useIntl();
   const {
     charts,
-    query: { data, isPending },
+    query: { data, isError, isPending },
   } = usePageContext();
 
   const { value: formattedTotalSupply, suffix: formattedTotalSupplySuffix } =
     formatAbbreviatedNumber(
       (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
     );
+
+  const status = useMemo<Status>(() => {
+    if (isError) {
+      return "error";
+    }
+
+    if (!isPending && !data?.vaultByAddress.state?.allocation) {
+      return "empty";
+    }
+
+    return "success";
+  }, [isError, isPending, data?.vaultByAddress.state?.allocation]);
 
   return (
     <section className="flex flex-col px-4 md:px-20">
@@ -96,6 +113,12 @@ export const CardsSection = () => {
               );
             }}
           />
+
+          {status === "success" && (
+            <Card>
+              <Table />
+            </Card>
+          )}
         </div>
       </div>
     </section>

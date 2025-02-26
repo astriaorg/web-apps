@@ -15,7 +15,6 @@ const query = graphql(`
       }
       liquidity {
         underlying
-        usd
       }
       metadata {
         curators {
@@ -26,9 +25,25 @@ const query = graphql(`
       }
       name
       state {
+        allocation {
+          market {
+            collateralAsset {
+              logoURI
+              symbol
+            }
+            loanAsset {
+              logoURI
+              symbol
+            }
+            state {
+              supplyApy
+              supplyAssets
+              supplyAssetsUsd
+            }
+          }
+          supplyCapUsd
+        }
         apy
-        fee
-        guardian
         totalAssets
         totalAssetsUsd
       }
