@@ -1,7 +1,7 @@
 import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { useCardContext } from "earn/components/card/card.context";
 import React from "react";
+import { useCardContext } from "./card.context";
 
 export const CardFigureText = ({
   className,

@@ -1,6 +1,12 @@
+import { type VariantProps } from "class-variance-authority";
 import { createContext, useContext } from "react";
+import { cardVariants } from "./card";
 
-export const CardContext = createContext<{ isLoading: boolean } | undefined>(
+interface CardContextType extends VariantProps<typeof cardVariants> {
+  isLoading: boolean;
+}
+
+export const CardContext = createContext<CardContextType | undefined>(
   undefined,
 );
 

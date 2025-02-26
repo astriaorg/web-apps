@@ -31,8 +31,8 @@ export const SummaryCards = () => {
 
   return (
     <div className="grid lg:grid-cols-3 gap-2">
-      <Card isLoading={isPending} padding="md">
-        <CardLabel className="text-text">APY</CardLabel>
+      <Card isLoading={isPending} padding="md" variant="accent">
+        <CardLabel>APY</CardLabel>
         <CardFigureText>
           <FormattedNumber
             value={data?.vaultByAddress.state?.netApy ?? 0}

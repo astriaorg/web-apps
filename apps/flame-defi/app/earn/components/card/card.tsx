@@ -1,8 +1,8 @@
 import { cn } from "@repo/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { CardContext } from "earn/components/card/card.context";
+import { CardContext } from "./card.context";
 
-const variants = cva("", {
+export const cardVariants = cva("", {
   variants: {
     variant: {
       default: "rounded-xl bg-surface-1",
@@ -20,7 +20,7 @@ const variants = cva("", {
 
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof variants> {
+    VariantProps<typeof cardVariants> {
   isLoading?: boolean;
 }
 
@@ -32,11 +32,11 @@ export const Card = ({
   ...props
 }: CardProps) => {
   return (
-    <CardContext.Provider value={{ isLoading }}>
+    <CardContext.Provider value={{ isLoading, variant }}>
       <div
         className={cn(
           "flex flex-col",
-          variants({ padding, variant }),
+          cardVariants({ padding, variant }),
           className,
         )}
         {...props}
