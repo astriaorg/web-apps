@@ -9,7 +9,7 @@ import { usePageContext } from "earn/modules/vault-details/hooks/use-page-contex
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
 import { FormattedNumber, useIntl } from "react-intl";
 
-export const CardsSection = () => {
+export const ContentSection = () => {
   const { formatDate, formatNumber } = useIntl();
   const {
     charts,
