@@ -101,6 +101,7 @@ const TableSortIcon = React.forwardRef<HTMLDivElement, TableSortIconProps>(
         "transform transition-transform duration-200",
         isActive ? "opacity-100" : "opacity-0",
         isAscending && "rotate-180",
+        className,
       )}
       {...props}
     >
@@ -108,7 +109,7 @@ const TableSortIcon = React.forwardRef<HTMLDivElement, TableSortIconProps>(
     </div>
   ),
 );
-TableCaption.displayName = "TableCaption";
+TableSortIcon.displayName = "TableSortIcon";
 
 export {
   Table,
