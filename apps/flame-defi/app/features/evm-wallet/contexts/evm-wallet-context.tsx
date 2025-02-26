@@ -373,8 +373,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
             contracts.swapRouter.address,
           );
 
-        newTokenAllowances.push({
-          symbol: currency.coinDenom,
+          newTokenAllowances.push({
+            symbol: currency.coinDenom,
             allowance: allowance || BigInt(0),
           });
         } catch (error) {
