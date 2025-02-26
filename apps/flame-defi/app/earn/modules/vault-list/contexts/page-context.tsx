@@ -21,8 +21,6 @@ import Image from "next/image";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
 
-type Status = "error" | "empty" | "success";
-
 export interface PageContextProps extends PropsWithChildren {
   table: Table<Vault>;
   currentPage: number;
@@ -31,7 +29,6 @@ export interface PageContextProps extends PropsWithChildren {
   setSearch: (value: string) => void;
   orderBy: VaultOrderBy;
   orderDirection: OrderDirection;
-  status: Status;
   query: ReturnType<typeof useFetchVaults>;
 }
 
@@ -206,18 +203,6 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     enableSortingRemoval: false,
   });
 
-  const status = useMemo<Status>(() => {
-    if (query.isError) {
-      return "error";
-    }
-
-    if (!query.isPending && !query.data?.vaults?.items?.length) {
-      return "empty";
-    }
-
-    return "success";
-  }, [query.isError, query.isPending, query.data?.vaults?.items?.length]);
-
   return (
     <PageContext.Provider
       value={{
@@ -228,7 +213,6 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         setSearch,
         orderBy,
         orderDirection,
-        status,
         query,
       }}
     >

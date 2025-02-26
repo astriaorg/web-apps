@@ -5,9 +5,24 @@ import {
   TableSearch,
 } from "earn/modules/vault-list/components/table";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
+import { useMemo } from "react";
+
+type Status = "error" | "empty" | "success";
 
 export const TableSection = () => {
-  const { status } = usePageContext();
+  const { query } = usePageContext();
+
+  const status = useMemo<Status>(() => {
+    if (query.isError) {
+      return "error";
+    }
+
+    if (!query.isPending && !query.data?.vaults?.items?.length) {
+      return "empty";
+    }
+
+    return "success";
+  }, [query.isError, query.isPending, query.data?.vaults?.items?.length]);
 
   return (
     <section className="flex flex-col px-4 md:px-20">

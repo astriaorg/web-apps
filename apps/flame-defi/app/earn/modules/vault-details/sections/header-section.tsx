@@ -49,7 +49,7 @@ export const HeaderSection = () => {
                     alt={data?.vaultByAddress.asset.name}
                     width={16}
                     height={16}
-                    className="rounded-full shrink-0"
+                    className="rounded-full"
                   />
                   <span>{data?.vaultByAddress.asset.symbol}</span>
                 </Badge>
@@ -64,7 +64,7 @@ export const HeaderSection = () => {
                       alt={it.name}
                       width={16}
                       height={16}
-                      className="rounded-full shrink-0"
+                      className="rounded-full"
                     />
                     <span>{it.name}</span>
                   </Badge>

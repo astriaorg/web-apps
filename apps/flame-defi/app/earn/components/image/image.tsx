@@ -23,13 +23,13 @@ export const Image = ({
       alt={alt}
       width={width}
       height={height}
-      className={cn("rounded-full shrink-0", className)}
+      className={cn("shrink-0", className)}
       {...props}
     />
   ) : (
     <div
       className={cn(
-        "rounded-full shrink-0 bg-icon-light",
+        "shrink-0 bg-icon-light",
         `w-[${width}px] h-[${height}px]`,
         className,
       )}
