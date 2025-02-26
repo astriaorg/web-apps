@@ -93,7 +93,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 </span>
                 <span className="md:hidden text-xs/3">
                   <FormattedNumber
-                    value={row.original.state?.apy ?? 0}
+                    value={row.original.state?.netApy ?? 0}
                     style="percent"
                     minimumFractionDigits={2}
                   />
@@ -155,8 +155,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         enableSorting: true,
         footer: (info) => info.column.id,
       }),
-      columnHelper.accessor("state.apy", {
-        id: VaultOrderBy.Apy,
+      columnHelper.accessor("state.netApy", {
+        id: VaultOrderBy.NetApy,
         header: () => {
           return (
             <div className="hidden md:block">
@@ -168,7 +168,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
           return (
             <div className="hidden md:block">
               <FormattedNumber
-                value={info.getValue()}
+                value={info.getValue() ?? 0}
                 style="percent"
                 minimumFractionDigits={2}
               />

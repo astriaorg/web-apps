@@ -39,7 +39,7 @@ export const SummaryCards = () => {
         <SummaryCardLabel className="text-text">APY</SummaryCardLabel>
         <SummaryCardFigureText>
           <FormattedNumber
-            value={data?.vaultByAddress.state?.apy ?? 0}
+            value={data?.vaultByAddress.state?.netApy ?? 0}
             style="percent"
             minimumFractionDigits={2}
           />

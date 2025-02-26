@@ -36,14 +36,14 @@ const query = graphql(`
               symbol
             }
             state {
-              supplyApy
+              netSupplyApy
               supplyAssets
               supplyAssetsUsd
             }
           }
           supplyCapUsd
         }
-        apy
+        netApy
         totalAssets
         totalAssetsUsd
       }

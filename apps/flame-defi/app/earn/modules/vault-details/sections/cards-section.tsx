@@ -55,7 +55,7 @@ export const CardsSection = () => {
             title="APY"
             figure={
               <FormattedNumber
-                value={data?.vaultByAddress.state?.apy ?? 0}
+                value={data?.vaultByAddress.state?.netApy ?? 0}
                 style="percent"
                 minimumFractionDigits={2}
               />

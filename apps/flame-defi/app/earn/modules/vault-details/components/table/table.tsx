@@ -162,15 +162,14 @@ export const Table = () => {
         enableSorting: false,
         footer: (info) => info.column.id,
       }),
-      // Note: Morpho uses net supply APY.
-      columnHelper.accessor("market.state.supplyApy", {
-        id: "market.state.supplyApy",
+      columnHelper.accessor("market.state.netSupplyApy", {
+        id: "market.state.netSupplyApy",
         header: "APY",
         cell: ({ row }) => {
           return (
             <div>
               <FormattedNumber
-                value={row.original.market.state?.supplyApy ?? 0}
+                value={row.original.market.state?.netSupplyApy ?? 0}
                 style="percent"
                 minimumFractionDigits={2}
               />
