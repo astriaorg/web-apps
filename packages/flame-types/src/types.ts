@@ -8,6 +8,7 @@ import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract } from "viem";
 import React from "react";
 import JSBI from "jsbi";
+
 import Big from "big.js";
 // FIXME - i manually recreated types from keplr here as a stop gap.
 //  this will get refactored further when i update the config logic

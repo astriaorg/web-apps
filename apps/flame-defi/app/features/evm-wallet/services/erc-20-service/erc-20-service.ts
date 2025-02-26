@@ -13,7 +13,7 @@ export class Erc20Service extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain
    * @param contractAddress - The address of the contract that is granted approval to be a recipient of transfers from this ERC20
    * @param tokenApprovalAmount - The amount of tokens to approve as a string
-   * @returns Object containing transaction hash if successful, null if failed
+   * @returns Object containing transaction hash if successful
    */
   async approveToken(
     chainId: number,
@@ -37,7 +37,7 @@ export class Erc20Service extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain
    * @param userAddress - The address of the user
    * @param contractAddress - The address of the contract to check allowance for
-   * @returns The current allowance of the token as a bigint, or null if failed
+   * @returns The current allowance of the token as a bigint
    */
   async getTokenAllowances(
     chainId: number,
