@@ -199,15 +199,13 @@ export const initializeLineChart = <T extends FloatDataPoint>({
 
   svg
     .on("mousemove", (event) => {
-      const [mouseX, mouseY] = d3.pointer(event);
+      const [mouseX] = d3.pointer(event);
       const closestData = data.reduce((previous, current) => {
         const previousDistance = Math.hypot(
           mouseX - (x(previous.x.toString()) ?? 0) - x.bandwidth() / 2,
-          mouseY - y(previous.y ?? 0),
         );
         const currentDistance = Math.hypot(
           mouseX - (x(current.x.toString()) ?? 0) - x.bandwidth() / 2,
-          mouseY - y(current.y ?? 0),
         );
         return currentDistance < previousDistance ? current : previous;
       });
