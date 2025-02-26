@@ -9,6 +9,7 @@ export const StatusCard = ({
     <Card
       className={cn(
         "h-[250px] text-lg text-text-subdued flex items-center justify-center",
+        className,
       )}
       {...props}
     />
