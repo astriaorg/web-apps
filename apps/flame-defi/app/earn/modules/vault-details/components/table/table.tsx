@@ -32,7 +32,7 @@ export const Table = () => {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "market.loanAsset.name",
+      id: "market.state.supplyAssets",
       desc: true,
     },
   ]);
