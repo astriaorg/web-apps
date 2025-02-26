@@ -57,7 +57,7 @@ export const LineChart = ({
       svg: svgRef.current,
       tooltip: tooltipRef.current,
       interval: selectedInterval,
-      onMouseOver: (value) => {
+      setTooltipContent: (value) => {
         setTooltipContent(value);
       },
     });

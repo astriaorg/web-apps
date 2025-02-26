@@ -99,7 +99,7 @@ interface GetLineChartParams<T> {
   height: number;
   svg: SVGSVGElement;
   tooltip: HTMLDivElement;
-  onMouseOver: (value: T | null) => void;
+  setTooltipContent: (value: T | null) => void;
 }
 
 export const initializeLineChart = <T extends FloatDataPoint>({
@@ -107,7 +107,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
   interval,
   height,
   tooltip,
-  onMouseOver,
+  setTooltipContent,
   ...params
 }: GetLineChartParams<T>) => {
   const svg = d3.select(params.svg);
@@ -215,7 +215,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
       const closestX = (x(closestData.x.toString()) ?? 0) + x.bandwidth() / 2;
       const closestY = y(closestData.y ?? 0);
 
-      onMouseOver(closestData);
+      setTooltipContent(closestData);
       tooltip.style.display = "block";
       tooltip.style.left = closestX + "px";
       tooltip.style.top = closestY - 64 + "px";
@@ -229,7 +229,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
         .style("display", "block");
     })
     .on("mouseleave", () => {
-      onMouseOver(null);
+      setTooltipContent(null);
       tooltip.style.display = "none";
       line.style("display", "none");
     });
