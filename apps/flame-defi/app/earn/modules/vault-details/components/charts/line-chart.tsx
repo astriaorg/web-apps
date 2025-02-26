@@ -96,11 +96,11 @@ export const LineChart = ({
             className={cn(
               tooltipVariants(),
               "absolute",
-              !!tooltipContent ? "block" : "hidden",
+              tooltipContent ? "block" : "hidden",
             )}
           >
             <div className="flex flex-col">
-              {!!tooltipContent && renderTooltip(tooltipContent)}
+              {tooltipContent && renderTooltip(tooltipContent)}
             </div>
           </div>
         </div>
