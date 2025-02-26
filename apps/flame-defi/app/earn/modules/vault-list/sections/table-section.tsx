@@ -1,4 +1,4 @@
-import { Card } from "earn/components/card";
+import { Card, StatusCard } from "earn/components/card";
 import {
   Table,
   TablePagination,
@@ -33,15 +33,11 @@ export const TableSection = () => {
       </div>
 
       {status === "error" && (
-        <Card className="h-[250px] text-lg text-text-subdued flex items-center justify-center">
+        <StatusCard>
           {`We couldn't fetch vault data. Please try again later.`}
-        </Card>
+        </StatusCard>
       )}
-      {status === "empty" && (
-        <Card className="h-[250px] text-lg text-text-subdued flex items-center justify-center">
-          {`No vaults found.`}
-        </Card>
-      )}
+      {status === "empty" && <StatusCard>{`No vaults found.`}</StatusCard>}
       {status === "success" && (
         <>
           <Card className="overflow-x-hidden md:overflow-x-auto">

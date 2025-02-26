@@ -3,7 +3,9 @@ import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fet
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
 import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren, useState } from "react";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
+type Status = "error" | "empty" | "success";
 
 type Charts = {
   [key in keyof typeof CHART_TYPE]: {
@@ -16,6 +18,7 @@ type Charts = {
 export interface PageContextProps extends PropsWithChildren {
   address: string;
   charts: Charts;
+  status: Status;
   query: ReturnType<typeof useFetchVaultByAddress>;
 }
 
@@ -71,6 +74,22 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
+  const status = useMemo<Status>(() => {
+    if (
+      query.isError ||
+      queryAPYChart.isError ||
+      queryTotalSupplyChart.isError
+    ) {
+      return "error";
+    }
+
+    if (!query.isPending && !query.data?.vaultByAddress.state?.allocation) {
+      return "empty";
+    }
+
+    return "success";
+  }, [query, queryAPYChart, queryTotalSupplyChart]);
+
   return (
     <PageContext.Provider
       value={{
@@ -101,6 +120,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
             query: queryTotalSupplyChart,
           },
         },
+        status,
         query,
       }}
     >

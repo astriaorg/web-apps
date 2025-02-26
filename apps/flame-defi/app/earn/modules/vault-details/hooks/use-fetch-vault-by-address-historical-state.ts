@@ -49,7 +49,7 @@ export const useFetchVaultByAddressHistoricalState = ({
       const result = await request(earnAPIURL, query, {
         ...variables,
         // TODO: Get chain ID from wallet context.
-        chainId: 1,
+        chainId: null,
         includeAPYData: type === CHART_TYPE.APY,
         includeTotalSupplyData: type === CHART_TYPE.TOTAL_SUPPLY,
       });

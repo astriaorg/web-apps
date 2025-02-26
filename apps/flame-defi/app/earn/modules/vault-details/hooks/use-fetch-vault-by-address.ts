@@ -67,7 +67,7 @@ export const useFetchVaultByAddress = ({
       return request(earnAPIURL, query, {
         ...variables,
         // TODO: Get chain ID from wallet context.
-        chainId: 1,
+        chainId: null,
       });
     },
   });
