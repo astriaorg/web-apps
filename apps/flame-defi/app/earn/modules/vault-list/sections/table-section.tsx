@@ -10,19 +10,21 @@ import { useMemo } from "react";
 type Status = "error" | "empty" | "success";
 
 export const TableSection = () => {
-  const { query } = usePageContext();
+  const {
+    query: { data, isError, isPending },
+  } = usePageContext();
 
   const status = useMemo<Status>(() => {
-    if (query.isError) {
+    if (isError) {
       return "error";
     }
 
-    if (!query.isPending && !query.data?.vaults?.items?.length) {
+    if (!isPending && !data?.vaults?.items?.length) {
       return "empty";
     }
 
     return "success";
-  }, [query.isError, query.isPending, query.data?.vaults?.items?.length]);
+  }, [isError, isPending, data?.vaults?.items?.length]);
 
   return (
     <section className="flex flex-col px-4 md:px-20">

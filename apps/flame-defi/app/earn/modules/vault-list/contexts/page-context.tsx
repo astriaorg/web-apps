@@ -166,15 +166,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         },
         cell: (info) => {
           return (
-            <>
-              <div className="hidden md:block">
-                <FormattedNumber
-                  value={info.getValue()}
-                  style="percent"
-                  minimumFractionDigits={2}
-                />
-              </div>
-            </>
+            <div className="hidden md:block">
+              <FormattedNumber
+                value={info.getValue()}
+                style="percent"
+                minimumFractionDigits={2}
+              />
+            </div>
           );
         },
         enableSorting: true,
