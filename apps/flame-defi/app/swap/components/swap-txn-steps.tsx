@@ -5,7 +5,7 @@ import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { TokenState } from "@repo/flame-types";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { TXN_STATUS } from "@repo/flame-types";
-import { useTxnInfo } from "../use-txn-info";
+import { useTxnInfo } from "../hooks";
 import { Skeleton } from "@repo/ui/shadcn-primitives";
 import { useEvmChainData } from "config";
 import { OneToOneQuoteProps } from "./types";

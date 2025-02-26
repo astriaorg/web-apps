@@ -39,7 +39,7 @@ export default function DepositAmountsStep({
           </p>
           <div
             onKeyDown={() => null}
-            className={`flex flex-col rounded-md p-transition bg-semi-white border border-solid border-transparent hover:border-grey-medium mt-4 p-4`}
+            className={`flex flex-col rounded-xl p-transition bg-semi-white border border-solid border-transparent hover:border-grey-medium mt-4 p-4`}
           >
             <div className="flex justify-between items-center">
               <div className="flex flex-col items-start">
@@ -72,7 +72,7 @@ export default function DepositAmountsStep({
           </div>
           <div
             onKeyDown={() => null}
-            className={`flex flex-col rounded-md p-transition bg-semi-white border border-solid border-transparent hover:border-grey-medium mt-2 p-4`}
+            className={`flex flex-col rounded-xl p-transition bg-semi-white border border-solid border-transparent hover:border-grey-medium mt-2 p-4`}
           >
             <div className="flex justify-between items-center">
               <div className="flex flex-col items-start">

@@ -11,7 +11,7 @@ import { InfoTooltip } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { TokenState } from "@repo/flame-types";
-import { useTxnInfo } from "swap/use-txn-info";
+import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "./types";
 
 enum TOKEN_INPUTS {
@@ -119,7 +119,8 @@ export function TxnInfo({
             </p>
             <p className="flex justify-between">
               <span className="text-grey-light flex items-center gap-1">
-                Minimum received after slippage ({swapSlippageTolerance}%){" "}
+                Minimum received after slippage ({swapSlippageTolerance}
+                %){" "}
                 <InfoTooltip
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"

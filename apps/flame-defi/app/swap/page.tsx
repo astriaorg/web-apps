@@ -13,16 +13,18 @@ import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
-import { useSwapButton } from "./use-swap-button";
+import {
+  useSwapButton,
+  useGetQuote,
+  useOneToOneQuote,
+  useTxnInfo,
+} from "./hooks";
 import { SwapInput } from "./components/swap-input";
 import { TxnInfo } from "./components/txn-info";
 import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
 import { SwapTxnSteps } from "./components/swap-txn-steps";
-import { useGetQuote } from "./use-get-quote";
-import debounce from "lodash.debounce";
-import useOneToOneQuote from "./use-one-to-one-quote";
-import { useTxnInfo } from "./use-txn-info";
 import { useTokenBalances } from "features/evm-wallet";
+import debounce from "lodash.debounce";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
@@ -54,7 +56,7 @@ export default function SwapPage(): React.ReactElement {
 
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
-  const { quote, loading, error, getQuote, setQuote, cancelGetQuote } =
+  const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
   const tokenOne = !flipTokens ? inputOne : inputTwo;
   const tokenTwo = !flipTokens ? inputTwo : inputOne;
@@ -87,13 +89,15 @@ export default function SwapPage(): React.ReactElement {
     txnMsg,
     isCloseModalAction,
     tokenApprovalNeeded,
+    errorText,
+    setErrorText,
   } = useSwapButton({
     tokenOne,
     tokenTwo,
     tokenOneBalance,
     quote,
     loading,
-    error,
+    quoteError,
     tradeType,
   });
   const txnInfo = useTxnInfo({
@@ -140,7 +144,7 @@ export default function SwapPage(): React.ReactElement {
     }
   }, []);
 
-  const handleTiaWtia = (value: string) => {
+  const handleTiaWtiaInputs = (value: string) => {
     setInputOne((prev) => ({ ...prev, value: value }));
     setInputTwo((prev) => ({ ...prev, value: value }));
   };
@@ -155,10 +159,10 @@ export default function SwapPage(): React.ReactElement {
   const handleInputChange = useCallback(
     (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
       if (isTiaWtia) {
-        handleTiaWtia(value);
+        handleTiaWtiaInputs(value);
         return;
       }
-
+      setErrorText(null);
       handleTradeType(index);
 
       const tradeType =
@@ -199,6 +203,7 @@ export default function SwapPage(): React.ReactElement {
       isTiaWtia,
       debouncedGetQuoteRef,
       cancelGetQuote,
+      setErrorText,
     ],
   );
 
@@ -209,7 +214,7 @@ export default function SwapPage(): React.ReactElement {
       } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
         setInputTwo((prev) => ({ ...prev, token: selectedToken }));
       }
-
+      setErrorText(null);
       const tradeType = tokenTwo.isQuoteValue
         ? TRADE_TYPE.EXACT_IN
         : TRADE_TYPE.EXACT_OUT;
@@ -240,7 +245,7 @@ export default function SwapPage(): React.ReactElement {
         });
       }
     },
-    [getQuote, tokenOne, tokenTwo],
+    [getQuote, tokenOne, tokenTwo, setErrorText],
   );
 
   const handleArrowClick = () => {
@@ -273,7 +278,7 @@ export default function SwapPage(): React.ReactElement {
       label: flipTokens ? "Buy" : "Sell",
       txnQuoteData: quote,
       txnQuoteLoading: loading,
-      txnQuoteError: error,
+      txnQuoteError: quoteError,
     },
     {
       id: TOKEN_INPUTS.TOKEN_TWO,
@@ -288,7 +293,7 @@ export default function SwapPage(): React.ReactElement {
       label: flipTokens ? "Sell" : "Buy",
       txnQuoteData: quote,
       txnQuoteLoading: loading,
-      txnQuoteError: error,
+      txnQuoteError: quoteError,
     },
   ];
 
@@ -352,6 +357,11 @@ export default function SwapPage(): React.ReactElement {
             buttonText={buttonText}
             className="w-full mt-2"
           />
+        )}
+        {errorText && (
+          <div className="flex items-center justify-center text-red text-sm mt-4">
+            {errorText}
+          </div>
         )}
         {inputOne.token &&
           inputTwo.token &&

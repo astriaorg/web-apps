@@ -17,18 +17,16 @@ import {
 import { GearIcon } from "@repo/ui/icons";
 import { InfoTooltip } from "@repo/ui/components";
 import { useState } from "react";
-import {
-  formatNumber,
-  getFromLocalStorage,
-  setInLocalStorage,
-} from "@repo/ui/utils";
+import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { useConfig } from "config";
+import { useIntl } from "react-intl";
 
 export const SettingsPopover = () => {
-  const { swapSlippageTolerance } = useConfig();
+  const { formatNumber } = useIntl();
+  const { swapSlippageToleranceDefault } = useConfig();
   const currentSettings = getFromLocalStorage("settings") || {};
   const [customSlippage, setCustomSlippage] = useState<number>(
-    currentSettings?.slippageTolerance || swapSlippageTolerance,
+    currentSettings?.slippageTolerance || swapSlippageToleranceDefault,
   );
   const [slippageError, setSlippageError] = useState<{
     msg: string;
@@ -81,11 +79,11 @@ export const SettingsPopover = () => {
       setShowExpertModeDialog(true);
     } else {
       setExpertMode(false);
-      setCustomSlippage(swapSlippageTolerance);
+      setCustomSlippage(swapSlippageToleranceDefault);
       setInLocalStorage("settings", {
         ...currentSettings,
         expertMode: false,
-        slippageTolerance: swapSlippageTolerance,
+        slippageTolerance: swapSlippageToleranceDefault,
       });
       setSlippageError(null);
     }
@@ -93,7 +91,7 @@ export const SettingsPopover = () => {
 
   const handlePopoverOpenChange = () => {
     if (slippageError?.error && expertMode) {
-      setCustomSlippage(swapSlippageTolerance);
+      setCustomSlippage(swapSlippageToleranceDefault);
       setSlippageError(null);
     }
   };
@@ -132,7 +130,7 @@ export const SettingsPopover = () => {
               <button
                 disabled={!expertMode}
                 className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2"
-                onClick={() => setCustomSlippage(swapSlippageTolerance)}
+                onClick={() => setCustomSlippage(swapSlippageToleranceDefault)}
               >
                 Auto
               </button>
@@ -142,7 +140,10 @@ export const SettingsPopover = () => {
                   type="number"
                   value={customSlippage}
                   onChange={handleCustomSlippageChange}
-                  placeholder={formatNumber(swapSlippageTolerance, 2)}
+                  placeholder={formatNumber(swapSlippageToleranceDefault, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                   className="w-full px-3 py-1 pr-7 bg-grey-dark rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary normalize-input"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white">

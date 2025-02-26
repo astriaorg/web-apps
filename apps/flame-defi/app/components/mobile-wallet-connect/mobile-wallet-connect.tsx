@@ -103,7 +103,7 @@ export default function MobileWalletConnect({
           {isBridgePage && (
             <Button
               variant="default"
-              className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+              className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
             >
               {isConnected ? "Connected" : "Connect"}
             </Button>
@@ -111,7 +111,7 @@ export default function MobileWalletConnect({
           {!isBridgePage && (
             <div>
               {userAccount.address ? (
-                <div className="flex items-center border border-border rounded-md px-3 py-2 h-[36px] cursor-pointer">
+                <div className="flex items-center border border-border rounded-xl px-3 py-2 h-[36px] cursor-pointer">
                   <div className="flex items-center gap-2">
                     <FlameIcon size={16} />
                     <span className="text-white text-base font-normal">
@@ -123,7 +123,7 @@ export default function MobileWalletConnect({
               ) : (
                 <Button
                   variant="default"
-                  className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+                  className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
                   onClick={() => connectEvmWallet()}
                 >
                   Connect

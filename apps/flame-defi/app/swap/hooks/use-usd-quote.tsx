@@ -5,12 +5,12 @@ import { useEvmChainData } from "config";
 import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
 import { useGetQuote } from "./use-get-quote";
 
-function useUsdQuote(inputToken?: TokenState) {
+export const useUsdQuote = (inputToken?: TokenState) => {
   const { selectedChain } = useEvmChainData();
   const usdcToken = selectedChain.currencies?.find(
     (currency) => currency.coinDenom === "USDC",
   );
-  const { quote, loading, error, getQuote } = useGetQuote();
+  const { quote, loading, quoteError, getQuote } = useGetQuote();
 
   const debouncedGetQuoteRef = useRef(
     debounce(
@@ -35,7 +35,5 @@ function useUsdQuote(inputToken?: TokenState) {
     }
   }, [inputToken, usdcToken]);
 
-  return { quote, loading, error };
-}
-
-export default useUsdQuote;
+  return { quote, loading, quoteError };
+};
