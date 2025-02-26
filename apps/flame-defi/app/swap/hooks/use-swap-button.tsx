@@ -19,11 +19,11 @@ import {
   EvmCurrency,
   GetQuoteResult,
   TokenState,
+  tokenStateToBig,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
-import { parseToBigInt } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
-import JSBI from "jsbi";
+import Big from "big.js";
 import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
@@ -33,7 +33,7 @@ interface SwapButtonProps {
   tokenOneBalance: string;
   quote: GetQuoteResult | null;
   loading: boolean;
-  error: string | null;
+  quoteError: string | null;
   tradeType: TRADE_TYPE;
 }
 
@@ -41,33 +41,35 @@ interface ErrorWithMessage {
   message: string;
 }
 
-const useTokenApproval = (tokenOne: TokenState, tokenTwo: TokenState) => {
+const useCheckTokenApproval = (
+  tokenOne: TokenState,
+  tokenTwo: TokenState,
+): EvmCurrency | null => {
   const { tokenAllowances } = useEvmWallet();
-  // NOTE: this ensures the input token values are in bigInt format
-  const tokenOneValueBigInt = tokenOne?.value
-    ? parseToBigInt(tokenOne.value, tokenOne.token?.coinDecimals || 18)
-    : JSBI.BigInt(0);
-  const tokenTwoValueBigInt = tokenTwo?.value
-    ? parseToBigInt(tokenTwo.value, tokenTwo.token?.coinDecimals || 18)
-    : JSBI.BigInt(0);
+  const tokenOneValueBig = tokenStateToBig(tokenOne);
+  const tokenTwoValueBig = tokenStateToBig(tokenTwo);
 
-  const tokenOneApproval = tokenAllowances.find(
-    (token) => token.symbol === tokenOne?.token?.coinDenom,
-  );
-  const tokenTwoApproval = tokenAllowances.find(
-    (token) => token.symbol === tokenTwo?.token?.coinDenom,
-  );
+  const findApproval = (token: TokenState) =>
+    tokenAllowances.find(
+      (allowanceToken) => allowanceToken.symbol === token?.token?.coinDenom,
+    );
 
-  // NOTE: these check if the tokens input values are greater than the token allowances and returns the token if true
+  const tokenOneNeedingApproval = tokenOne?.token
+    ? findApproval(tokenOne)
+    : null;
+  const tokenTwoNeedingApproval = tokenTwo?.token
+    ? findApproval(tokenTwo)
+    : null;
+
   if (
-    tokenOneApproval &&
-    JSBI.GT(tokenOneValueBigInt, tokenOneApproval?.allowance)
+    tokenOneNeedingApproval &&
+    tokenOneValueBig.gt(new Big(tokenOneNeedingApproval.allowance.toString()))
   ) {
     return tokenOne.token || null;
   }
   if (
-    tokenTwoApproval &&
-    JSBI.GT(tokenTwoValueBigInt, tokenTwoApproval?.allowance)
+    tokenTwoNeedingApproval &&
+    tokenTwoValueBig.gt(new Big(tokenTwoNeedingApproval.allowance.toString()))
   ) {
     return tokenTwo.token || null;
   }
@@ -81,7 +83,7 @@ export function useSwapButton({
   tokenOneBalance,
   quote,
   loading,
-  // error,
+  quoteError,
   tradeType,
 }: SwapButtonProps) {
   const { selectedChain } = useEvmChainData();
@@ -98,8 +100,9 @@ export function useSwapButton({
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
+  const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenApprovalNeeded = useTokenApproval(tokenOne, tokenTwo);
+  const tokenApprovalNeeded = useCheckTokenApproval(tokenOne, tokenTwo);
 
   const wrapTia =
     tokenOne?.token?.coinDenom === "TIA" &&
@@ -108,7 +111,7 @@ export function useSwapButton({
     tokenOne?.token?.coinDenom === "WTIA" &&
     tokenTwo?.token?.coinDenom === "TIA";
 
-  const handleErrorMsgs = (error?: string, defaultMsg?: string) => {
+  const handleTxnModalErrorMsgs = (error?: string, defaultMsg?: string) => {
     if (error?.includes("rejected")) {
       setTxnMsg("Transaction rejected");
     } else if (defaultMsg) {
@@ -119,6 +122,14 @@ export function useSwapButton({
   };
 
   useEffect(() => {
+    if (quoteError) {
+      setErrorText(quoteError);
+    } else {
+      setErrorText(null);
+    }
+  }, [quoteError]);
+
+  useEffect(() => {
     if (result.data?.status === "success") {
       setTxnStatus(TXN_STATUS.SUCCESS);
       addRecentTransaction({
@@ -127,10 +138,10 @@ export function useSwapButton({
       });
     } else if (result.data?.status === "reverted") {
       setTxnStatus(TXN_STATUS.FAILED);
-      handleErrorMsgs("", "Transaction reverted");
+      handleTxnModalErrorMsgs("", "Transaction reverted");
     } else if (result.data?.status === "error") {
       setTxnStatus(TXN_STATUS.FAILED);
-      handleErrorMsgs("", "Transaction failed");
+      handleTxnModalErrorMsgs("", "Transaction failed");
     }
   }, [result.data, txnHash, addRecentTransaction]);
 
@@ -155,7 +166,7 @@ export function useSwapButton({
         const errorMessage =
           (error as ErrorWithMessage).message || "Error unwrapping";
         setTxnStatus(TXN_STATUS.FAILED);
-        handleErrorMsgs(errorMessage);
+        handleTxnModalErrorMsgs(errorMessage);
       }
     } else {
       try {
@@ -169,7 +180,7 @@ export function useSwapButton({
         const errorMessage =
           (error as ErrorWithMessage).message || "Error unwrapping";
         setTxnStatus(TXN_STATUS.FAILED);
-        handleErrorMsgs(errorMessage);
+        handleTxnModalErrorMsgs(errorMessage);
       }
     }
   };
@@ -192,7 +203,6 @@ export function useSwapButton({
     ) {
       return;
     }
-
     setTxnStatus(TXN_STATUS.PENDING);
     try {
       const swapRouterAddress = selectedChain.contracts?.swapRouter?.address;
@@ -223,7 +233,7 @@ export function useSwapButton({
       const errorMessage =
         (error as ErrorWithMessage).message || "Error executing swap";
       setTxnStatus(TXN_STATUS.FAILED);
-      handleErrorMsgs(errorMessage);
+      handleTxnModalErrorMsgs(errorMessage);
     }
   }, [
     trade,
@@ -238,18 +248,24 @@ export function useSwapButton({
 
   const handleTokenApproval = async (token: EvmCurrency | null) => {
     if (!token) {
-      return;
+      return null;
     }
-    const txHash = await approveToken(token);
-
-    if (txHash) {
-      setTxnHash(txHash);
+    try {
+      const txHash = await approveToken(token);
+      if (txHash) {
+        setTxnHash(txHash);
+      }
+      return txHash;
+    } catch (error) {
+      console.warn(error);
+      setErrorText("Problem approving token");
+      return null;
     }
-    return txHash;
   };
 
   const validSwapInputs =
     !loading &&
+    errorText === null &&
     tokenOne?.token &&
     tokenTwo?.token &&
     tokenOne?.value !== undefined &&
@@ -343,6 +359,8 @@ export function useSwapButton({
     titleText: getTitleText(),
     onSubmitCallback,
     buttonText: getButtonText(),
+    errorText,
+    setErrorText,
     actionButtonText: getActionButtonText(),
     validSwapInputs,
     txnStatus,

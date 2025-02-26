@@ -3,7 +3,7 @@ import { parseUnits } from "viem";
 import { useEvmChainData } from "config";
 import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
 
-export function useGetQuote() {
+export const useGetQuote = () => {
   const {
     selectedChain: { chainId },
   } = useEvmChainData();
@@ -121,5 +121,12 @@ export function useGetQuote() {
     }
   }, []);
 
-  return { quote, loading, error, getQuote, setQuote, cancelGetQuote };
-}
+  return {
+    quote,
+    loading,
+    quoteError: error,
+    getQuote,
+    setQuote,
+    cancelGetQuote,
+  };
+};

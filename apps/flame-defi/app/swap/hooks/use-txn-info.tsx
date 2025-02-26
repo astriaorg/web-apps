@@ -5,22 +5,19 @@ import {
   TokenState,
   TokenAmount,
 } from "@repo/flame-types";
-import {
-  formatNumberAsPercent,
-  formatDecimalValues,
-  getSwapSlippageTolerance,
-} from "@repo/ui/utils";
+import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import { formatUnits } from "viem";
 import JSBI from "jsbi";
 import { useState, useCallback, useEffect } from "react";
 import { useGetQuote } from "./use-get-quote";
+import { useIntl } from "react-intl";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
 // quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
-function useTxnQuote(inputOne: TokenState, inputTwo: TokenState) {
-  const { error, getQuote } = useGetQuote();
+const useTxnQuote = (inputOne: TokenState, inputTwo: TokenState) => {
+  const { quoteError, getQuote } = useGetQuote();
   const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
   const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
 
@@ -41,17 +38,17 @@ function useTxnQuote(inputOne: TokenState, inputTwo: TokenState) {
     txnQuote,
     txnQuoteLoading,
     fetchTxnQuote,
-    error,
+    quoteError,
   };
-}
+};
 
 /**
  * Calculates the price impact
  * Returns the price impact as a decimal (e.g. -0.002 means -0.2%).
  */
-export function calculatePriceImpact(
+const calculatePriceImpact = (
   txnQuoteData: GetQuoteResult | null | undefined,
-): number {
+): number => {
   const hops = txnQuoteData?.route?.[0];
 
   if (!hops) {
@@ -113,12 +110,12 @@ export function calculatePriceImpact(
   const priceImpact =
     (overallExecutionPrice - aggregatedMidPrice) / aggregatedMidPrice;
   return priceImpact;
-}
+};
 
-function calculateMinimumReceived(
+const calculateMinimumReceived = (
   data: GetQuoteResult,
   slippageTolerance: number,
-): string {
+): string => {
   if (!data.route[0] || !data.route[0][0]?.tokenOut) {
     return "0.00";
   }
@@ -128,13 +125,13 @@ function calculateMinimumReceived(
   );
   const minimumReceived = tokenAmount.withSlippage(slippageTolerance, true).raw;
 
-  return formatDecimalValues(
-    formatUnits(BigInt(minimumReceived.toString()), tokenAmount.token.decimals),
-    6,
+  return formatUnits(
+    BigInt(minimumReceived.toString()),
+    tokenAmount.token.decimals,
   );
-}
+};
 
-export function useTxnInfo({
+export const useTxnInfo = ({
   quote,
   tokenOne,
   tokenTwo,
@@ -146,7 +143,8 @@ export function useTxnInfo({
   tokenTwo: TokenState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
-}) {
+}) => {
+  const { formatNumber } = useIntl();
   const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
     tokenOne,
     tokenTwo,
@@ -165,24 +163,31 @@ export function useTxnInfo({
   return {
     txnQuoteDataLoading: txnQuoteLoading,
     gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
-    formattedGasUseEstimateUSD: formatDecimalValues(
-      txnQuoteData?.gasUseEstimateUSD,
-      4,
+    formattedGasUseEstimateUSD: formatNumber(
+      parseFloat(txnQuoteData?.gasUseEstimateUSD || "0"),
+      { minimumFractionDigits: 4, maximumFractionDigits: 4 },
     ),
     expectedOutputBigInt: BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-    expectedOutputFormatted: formatDecimalValues(
-      formatUnits(
-        BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-        tokenTwo?.token?.coinDecimals || 18,
+    expectedOutputFormatted: formatNumber(
+      parseFloat(
+        formatUnits(
+          BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
+          tokenTwo?.token?.coinDecimals || 18,
+        ),
       ),
-      6,
+      { minimumFractionDigits: 6, maximumFractionDigits: 6 },
     ),
     priceImpact:
       priceImpact !== 0
-        ? `${formatNumberAsPercent(priceImpact * 100)}`
+        ? `${formatNumber(priceImpact, { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "percent" })}`
         : "0.00",
     minimumReceived: txnQuoteData
-      ? calculateMinimumReceived(txnQuoteData, swapSlippageTolerance)
+      ? formatNumber(
+          parseFloat(
+            calculateMinimumReceived(txnQuoteData, swapSlippageTolerance),
+          ),
+          { minimumFractionDigits: 6, maximumFractionDigits: 6 },
+        )
       : "0.00",
   };
-}
+};
