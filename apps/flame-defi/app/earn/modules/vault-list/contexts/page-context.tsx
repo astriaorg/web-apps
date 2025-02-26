@@ -71,7 +71,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     // Use `VaultOrderBy` as ID for sorting.
     return [
       columnHelper.accessor("name", {
-        id: "name",
+        id: VaultOrderBy.Name,
         header: "Vault Name",
         cell: ({ row }) => {
           return (
@@ -107,7 +107,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.totalAssets", {
-        id: "TotalAssets",
+        id: VaultOrderBy.TotalAssets,
         header: "Supply",
         cell: ({ row }) => {
           return (
@@ -156,7 +156,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.apy", {
-        id: "Apy",
+        id: VaultOrderBy.Apy,
         header: () => {
           return (
             <div className="hidden md:block">
