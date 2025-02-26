@@ -1,4 +1,12 @@
-import { Skeleton } from "@repo/ui/components";
+import {
+  Table as BaseTable,
+  Skeleton,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/ui/components";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { flexRender } from "@tanstack/react-table";
@@ -17,20 +25,17 @@ export const Table = () => {
   } = usePageContext();
 
   return (
-    <table className="w-full text-left whitespace-nowrap">
-      <thead>
+    <BaseTable>
+      <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
+          <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th
+              <TableHead
                 key={header.id}
-                className={cn(
-                  "h-12 px-3 first:pl-6 last:hidden",
-                  "md:last:table-cell",
-                )}
+                className="last:hidden md:last:table-cell"
               >
-                <div className="flex items-end space-x-2">
-                  <div className="text-xs/3 text-text-subdued font-medium tracking-wider uppercase">
+                <div className="flex items-end space-x-2 whitespace-nowrap">
+                  <div>
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext(),
@@ -50,38 +55,36 @@ export const Table = () => {
                     </div>
                   )}
                 </div>
-              </th>
+              </TableHead>
             ))}
-          </tr>
+          </TableRow>
         ))}
-      </thead>
-      <tbody>
+      </TableHeader>
+      <TableBody>
         {table.getRowModel().rows.map((row) => (
-          <tr
+          <TableRow
             key={row.id}
             className={cn(
-              isPending ? "select-none" : "cursor-pointer hover:surface-2",
+              "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
+              isPending && "pointer-events-none",
             )}
             onClick={() =>
               router.push(ROUTES.VAULT_DETAILS + row.original.address)
             }
           >
             {row.getVisibleCells().map((cell) => (
-              <td
+              <TableCell
                 key={cell.id}
-                className={cn(
-                  "h-[72px] px-3 first:pl-6 last:hidden border-t border-stroke text-sm",
-                  "md:last:table-cell",
-                )}
+                className="last:hidden md:last:table-cell"
               >
                 <Skeleton isLoading={isPending} className="h-8">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Skeleton>
-              </td>
+              </TableCell>
             ))}
-          </tr>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </BaseTable>
   );
 };
