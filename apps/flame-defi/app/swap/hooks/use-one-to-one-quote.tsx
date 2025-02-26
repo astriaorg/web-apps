@@ -3,10 +3,10 @@ import { useGetQuote } from "./use-get-quote";
 import { EvmCurrency, GetQuoteResult, TRADE_TYPE } from "@repo/flame-types";
 import { formatDecimalValues } from "@repo/ui/utils";
 
-function useOneToOneQuote(
+export const useOneToOneQuote = (
   inputOne?: EvmCurrency | null,
   inputTwo?: EvmCurrency | null,
-) {
+) => {
   const [flipDirection, setFlipDirection] = useState(true);
   const [quoteOne, setQuoteOne] = useState<GetQuoteResult | null>(null);
   const [quoteTwo, setQuoteTwo] = useState<GetQuoteResult | null>(null);
@@ -17,7 +17,7 @@ function useOneToOneQuote(
     [flipDirection, inputOne, inputTwo],
   );
 
-  const { error, getQuote } = useGetQuote();
+  const { quoteError, getQuote } = useGetQuote();
   const tokenOneSymbol = oneToOneValueTokens[0]?.coinDenom;
   const tokenTwoSymbol = oneToOneValueTokens[1]?.coinDenom;
   const tokenTwoValue = flipDirection
@@ -54,10 +54,8 @@ function useOneToOneQuote(
     tokenTwoSymbol,
     tokenTwoValue,
     oneToOneLoading: quoteLoading,
-    error,
+    quoteError,
     setFlipDirection,
     flipDirection,
   };
-}
-
-export default useOneToOneQuote;
+};
