@@ -2,8 +2,7 @@ import * as React from "react";
 
 import { cn } from "../../utils";
 
-interface SkeletonProps extends React.PropsWithChildren {
-  className?: string;
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
 }
 

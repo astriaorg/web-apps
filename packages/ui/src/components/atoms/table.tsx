@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { ArrowDownIcon } from "../../icons";
 import { cn } from "../../utils";
 
 const Table = React.forwardRef<
@@ -86,6 +87,29 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
+interface TableSortIconProps extends React.HTMLAttributes<HTMLDivElement> {
+  isActive: boolean;
+  isAscending: boolean;
+}
+
+const TableSortIcon = React.forwardRef<HTMLDivElement, TableSortIconProps>(
+  ({ className, isActive, isAscending, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "cursor-pointer text-text-subdued hover:text-text hover:opacity-100",
+        "transform transition-transform duration-200",
+        isActive ? "opacity-100" : "opacity-0",
+        isAscending && "rotate-180",
+      )}
+      {...props}
+    >
+      <ArrowDownIcon aria-label="Sort" size={16} />
+    </div>
+  ),
+);
+TableCaption.displayName = "TableCaption";
+
 export {
   Table,
   TableBody,
@@ -95,4 +119,5 @@ export {
   TableHead,
   TableHeader,
   TableRow,
+  TableSortIcon,
 };

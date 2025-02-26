@@ -6,8 +6,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSortIcon,
 } from "@repo/ui/components";
-import { ArrowDownIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { flexRender } from "@tanstack/react-table";
 import { ROUTES } from "earn/constants/routes";
@@ -42,17 +42,11 @@ export const Table = () => {
                     )}
                   </div>
                   {header.column.getCanSort() && (
-                    <div
-                      className={cn(
-                        "cursor-pointer text-text-subdued hover:text-text hover:opacity-100",
-                        "transform transition-transform duration-200",
-                        header.id === orderBy ? "opacity-100" : "opacity-0",
-                        orderDirection === OrderDirection.Asc && "rotate-180",
-                      )}
+                    <TableSortIcon
+                      isActive={header.id === orderBy}
+                      isAscending={orderDirection === OrderDirection.Asc}
                       onClick={header.column.getToggleSortingHandler()}
-                    >
-                      <ArrowDownIcon aria-label="Sort" size={16} />
-                    </div>
+                    />
                   )}
                 </div>
               </TableHead>
