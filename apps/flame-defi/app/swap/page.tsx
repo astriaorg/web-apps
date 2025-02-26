@@ -44,7 +44,7 @@ export default function SwapPage(): React.ReactElement {
     isQuoteValue: true,
   });
   const isTiaWtia = useMemo(() => {
-    return (
+    return Boolean(
       (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
       (inputOne.token?.isWrappedNative && inputTwo.token?.isNative)
     );
