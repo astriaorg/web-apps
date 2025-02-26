@@ -27,7 +27,7 @@ import { FormattedNumber, useIntl } from "react-intl";
 export const Table = () => {
   const { formatNumber } = useIntl();
   const {
-    query: { data, isPending },
+    query: { data, isError, isPending },
   } = usePageContext();
 
   const [sorting, setSorting] = useState<SortingState>([
@@ -195,6 +195,10 @@ export const Table = () => {
     enableSorting: true,
     enableSortingRemoval: false,
   });
+
+  if (isPending || isError) {
+    return null;
+  }
 
   return (
     <BaseTable>

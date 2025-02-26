@@ -83,12 +83,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       return "error";
     }
 
-    if (!query.isPending && !query.data?.vaultByAddress.state?.allocation) {
-      return "empty";
-    }
-
     return "success";
-  }, [query, queryAPYChart, queryTotalSupplyChart]);
+  }, [query.isError, queryAPYChart.isError, queryTotalSupplyChart.isError]);
 
   return (
     <PageContext.Provider
