@@ -102,54 +102,46 @@ export const TokenSelector = ({
             startAdornment={<SearchIcon size={16} />}
           />
           <div className="h-[380px]">
-            {filteredTokens?.map(
-              (token) => {
-                const {
-                  coinDenom,
-                  title,
-                  IconComponent,
-                } = token;
-                const isUnavailableOrSelected =
-                  unavailableToken?.coinDenom === coinDenom ||
-                  selectedToken?.coinDenom === coinDenom;
-                const baseClasses =
-                  "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
-                const conditionalClasses = isUnavailableOrSelected
-                  ? "cursor-not-allowed"
-                  : "";
+            {filteredTokens?.map((token) => {
+              const { coinDenom, title, IconComponent } = token;
+              const isUnavailableOrSelected =
+                unavailableToken?.coinDenom === coinDenom ||
+                selectedToken?.coinDenom === coinDenom;
+              const baseClasses =
+                "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
+              const conditionalClasses = isUnavailableOrSelected
+                ? "cursor-not-allowed"
+                : "";
 
-                return (
-                  <div
-                    onClick={() =>
-                      handleSelectToken(token)
-                    }
-                    key={coinDenom}
-                    className={twMerge(baseClasses, conditionalClasses)}
-                    style={{ position: "relative" }}
-                  >
-                    {isUnavailableOrSelected && (
-                      <div className="absolute inset-0 bg-black opacity-40 z-10 cursor-not-allowed rounded-md"></div>
+              return (
+                <div
+                  onClick={() => handleSelectToken(token)}
+                  key={coinDenom}
+                  className={twMerge(baseClasses, conditionalClasses)}
+                  style={{ position: "relative" }}
+                >
+                  {isUnavailableOrSelected && (
+                    <div className="absolute inset-0 bg-black opacity-40 z-10 cursor-not-allowed rounded-md"></div>
+                  )}
+                  <div className="flex items-center relative z-1">
+                    {IconComponent && (
+                      <IconComponent size={32} className="mr-3" />
                     )}
-                    <div className="flex items-center relative z-1">
-                      {IconComponent && (
-                        <IconComponent size={32} className="mr-3" />
-                      )}
-                      <div className="flex flex-col">
-                        <span className="text-white text-md font-semibold">
-                          {title}
-                        </span>
-                        <span className="text-grey-light text-sm">
-                          {coinDenom}
-                        </span>
-                      </div>
+                    <div className="flex flex-col">
+                      <span className="text-white text-md font-semibold">
+                        {title}
+                      </span>
+                      <span className="text-grey-light text-sm">
+                        {coinDenom}
+                      </span>
                     </div>
-                    {selectedToken?.coinDenom === coinDenom && (
-                      <CheckMarkIcon className="text-orange-soft relative z-1" />
-                    )}
                   </div>
-                );
-              },
-            )}
+                  {selectedToken?.coinDenom === coinDenom && (
+                    <CheckMarkIcon className="text-orange-soft relative z-1" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </DialogContent>
       </DialogPortal>
