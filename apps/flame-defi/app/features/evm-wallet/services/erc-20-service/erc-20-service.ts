@@ -2,7 +2,7 @@ import type { Config } from "@wagmi/core";
 import { type Address, erc20Abi } from "viem";
 import { GenericContractService } from "../generic-contract-service";
 
-export class TokenApprovalService extends GenericContractService {
+export class Erc20Service extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, erc20Abi);
   }
@@ -11,7 +11,7 @@ export class TokenApprovalService extends GenericContractService {
    * Approve a contract to spend tokens on behalf of the user.
    *
    * @param chainId - The chain ID of the EVM chain
-   * @param contractAddress - The address of the contract to approve
+   * @param contractAddress - The address of the contract that is granted approval to be a recipient of transfers from this ERC20
    * @param tokenApprovalAmount - The amount of tokens to approve as a string
    * @returns Object containing transaction hash if successful, null if failed
    */
@@ -54,9 +54,9 @@ export class TokenApprovalService extends GenericContractService {
   }
 }
 
-export function createTokenApprovalService(
+export function createErc20Service(
   wagmiConfig: Config,
   contractAddress: Address,
-): TokenApprovalService {
-  return new TokenApprovalService(wagmiConfig, contractAddress);
+): Erc20Service {
+  return new Erc20Service(wagmiConfig, contractAddress);
 }

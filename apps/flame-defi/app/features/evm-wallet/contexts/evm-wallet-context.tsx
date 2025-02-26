@@ -26,7 +26,7 @@ import {
   EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "@repo/flame-types";
-import { createTokenApprovalService } from "../services/token-approval-service/token-approval-service";
+import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 interface TokenAllowance {
   symbol: string;
@@ -314,12 +314,12 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       ) {
         return null;
       }
-      const tokenApprovalSvc = createTokenApprovalService(
+      const erc20Service = createErc20Service(
         wagmiConfig,
         token.erc20ContractAddress as `0x${string}`,
       );
 
-      const txHash = await tokenApprovalSvc.approveToken(
+      const txHash = await erc20Service.approveToken(
         selectedChain.chainId,
         contracts.swapRouter.address,
         tokenApprovalAmount,
@@ -362,21 +362,24 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     const newTokenAllowances: TokenAllowance[] = [];
     for (const currency of currencies) {
       if (currency.erc20ContractAddress) {
-        const tokenApprovalSvc = createTokenApprovalService(
+        const erc20Service = createErc20Service(
           wagmiConfig,
           currency.erc20ContractAddress as `0x${string}`,
         );
-
-        const allowance = await tokenApprovalSvc.getTokenAllowances(
-          selectedChain.chainId,
-          userAccount.address,
-          contracts.swapRouter.address,
-        );
+        try {
+          const allowance = await erc20Service.getTokenAllowances(
+            selectedChain.chainId,
+            userAccount.address,
+            contracts.swapRouter.address,
+          );
 
         newTokenAllowances.push({
           symbol: currency.coinDenom,
-          allowance: allowance || BigInt(0),
-        });
+            allowance: allowance || BigInt(0),
+          });
+        } catch (error) {
+          console.warn("Failed to get token allowance:", error);
+        }
       }
     }
 

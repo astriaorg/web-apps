@@ -19,6 +19,7 @@ import {
   EvmCurrency,
   GetQuoteResult,
   TokenState,
+  tokenStateToBig,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
@@ -45,16 +46,8 @@ const useCheckTokenApproval = (
   tokenTwo: TokenState,
 ): EvmCurrency | null => {
   const { tokenAllowances } = useEvmWallet();
-
-  const parseTokenValue = (token: TokenState): Big => {
-    if (!token?.value || !token.token) return new Big(0);
-    const decimals = token.token.coinDecimals || 18;
-    const fixedValue = new Big(token.value).toFixed(decimals);
-    return new Big(fixedValue);
-  };
-
-  const tokenOneValueBig = parseTokenValue(tokenOne);
-  const tokenTwoValueBig = parseTokenValue(tokenTwo);
+  const tokenOneValueBig = tokenStateToBig(tokenOne);
+  const tokenTwoValueBig = tokenStateToBig(tokenTwo);
 
   const findApproval = (token: TokenState) =>
     tokenAllowances.find(
