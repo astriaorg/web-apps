@@ -1,4 +1,5 @@
-import { Card, StatusCard } from "earn/components/card";
+import { Card } from "earn/components/card";
+import { StatusCard } from "earn/components/status-card";
 import {
   Table,
   TablePagination,

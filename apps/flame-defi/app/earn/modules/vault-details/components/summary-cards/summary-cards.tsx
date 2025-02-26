@@ -1,10 +1,6 @@
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
-import {
-  SummaryCard,
-  SummaryCardFigureText,
-  SummaryCardLabel,
-} from "earn/components/summary-card";
+import { Card, CardFigureText, CardLabel } from "earn/components/card";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { FormattedNumber } from "react-intl";
 
@@ -35,36 +31,36 @@ export const SummaryCards = () => {
 
   return (
     <div className="grid lg:grid-cols-3 gap-2">
-      <SummaryCard isLoading={isPending} className="bg-orange">
-        <SummaryCardLabel className="text-text">APY</SummaryCardLabel>
-        <SummaryCardFigureText>
+      <Card isLoading={isPending} padding="md">
+        <CardLabel className="text-text">APY</CardLabel>
+        <CardFigureText>
           <FormattedNumber
             value={data?.vaultByAddress.state?.netApy ?? 0}
             style="percent"
             minimumFractionDigits={2}
           />
-        </SummaryCardFigureText>
-      </SummaryCard>
-      <SummaryCard isLoading={isPending}>
-        <SummaryCardLabel>
+        </CardFigureText>
+      </Card>
+      <Card isLoading={isPending} padding="md">
+        <CardLabel>
           <span>Total Deposits</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
-        </SummaryCardLabel>
-        <SummaryCardFigureText>
+        </CardLabel>
+        <CardFigureText>
           {formattedTotalAssets}
           {formattedTotalAssetsSuffix}
-        </SummaryCardFigureText>
-      </SummaryCard>
-      <SummaryCard isLoading={isPending}>
-        <SummaryCardLabel>
+        </CardFigureText>
+      </Card>
+      <Card isLoading={isPending} padding="md">
+        <CardLabel>
           <span>Liquidity</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
-        </SummaryCardLabel>
-        <SummaryCardFigureText>
+        </CardLabel>
+        <CardFigureText>
           {formattedLiquidity}
           {formattedLiquiditySuffix}
-        </SummaryCardFigureText>
-      </SummaryCard>
+        </CardFigureText>
+      </Card>
     </div>
   );
 };

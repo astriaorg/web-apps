@@ -1,10 +1,9 @@
 import { cn } from "@repo/ui/utils";
-import { Card } from "./card";
+import { Card, CardProps } from "earn/components/card/card";
 
-export const StatusCard = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
+interface StatusCardProps extends CardProps {}
+
+export const StatusCard = ({ className, ...props }: StatusCardProps) => {
   return (
     <Card
       className={cn(

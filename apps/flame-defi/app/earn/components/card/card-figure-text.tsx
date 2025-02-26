@@ -1,13 +1,13 @@
 import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { useSummaryCardContext } from "earn/components/summary-card";
+import { useCardContext } from "earn/components/card/card.context";
 import React from "react";
 
-export const SummaryCardFigureText = ({
+export const CardFigureText = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) => {
-  const { isLoading } = useSummaryCardContext();
+  const { isLoading } = useCardContext();
 
   return (
     <Skeleton isLoading={isLoading}>

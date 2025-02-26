@@ -6,11 +6,7 @@ import {
   tooltipVariants,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import {
-  SummaryCard,
-  SummaryCardFigureText,
-  SummaryCardLabel,
-} from "earn/components/summary-card";
+import { Card, CardFigureText, CardLabel } from "earn/components/card";
 import { FloatDataPoint } from "earn/gql/graphql";
 import { initializeLineChart } from "earn/modules/vault-details/components/charts/charts.utils";
 import { ChartInterval } from "earn/modules/vault-details/types";
@@ -64,8 +60,8 @@ export const LineChart = ({
   }, [data, selectedInterval]);
 
   return (
-    <SummaryCard isLoading={isLoading}>
-      <SummaryCardLabel className="relative">
+    <Card isLoading={isLoading} padding="md">
+      <CardLabel className="relative">
         <span>{title}</span>
         <span className="absolute right-0">
           <Tabs
@@ -84,8 +80,8 @@ export const LineChart = ({
             </TabsList>
           </Tabs>
         </span>
-      </SummaryCardLabel>
-      <SummaryCardFigureText>{figure}</SummaryCardFigureText>
+      </CardLabel>
+      <CardFigureText>{figure}</CardFigureText>
 
       <div className="mt-4" />
       <Skeleton isLoading={isLoading} className="w-full">
@@ -105,6 +101,6 @@ export const LineChart = ({
           </div>
         </div>
       </Skeleton>
-    </SummaryCard>
+    </Card>
   );
 };

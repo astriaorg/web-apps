@@ -1,6 +1,7 @@
 import { Skeleton } from "@repo/ui/components";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
-import { Card, StatusCard } from "earn/components/card";
+import { Card } from "earn/components/card";
+import { StatusCard } from "earn/components/status-card";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
 import { Table } from "earn/modules/vault-details/components/table";
@@ -107,7 +108,7 @@ export const CardsSection = () => {
               }}
             />
 
-            <Card>
+            <Card isLoading={isPending}>
               <Table />
             </Card>
           </div>
