@@ -110,7 +110,7 @@ export const TokenSelector = ({
               const baseClasses =
                 "flex items-center justify-between space-x-2 p-2 rounded-md hover:bg-semi-white transition cursor-pointer";
               const conditionalClasses = isUnavailableOrSelected
-                ? "cursor-not-allowed"
+                ? "bg-black opacity-40 z-10 cursor-not-allowed rounded-md"
                 : "";
 
               return (
@@ -120,9 +120,6 @@ export const TokenSelector = ({
                   className={twMerge(baseClasses, conditionalClasses)}
                   style={{ position: "relative" }}
                 >
-                  {isUnavailableOrSelected && (
-                    <div className="absolute inset-0 bg-black opacity-40 z-10 cursor-not-allowed rounded-md"></div>
-                  )}
                   <div className="flex items-center relative z-1">
                     {IconComponent && (
                       <IconComponent size={32} className="mr-3" />
