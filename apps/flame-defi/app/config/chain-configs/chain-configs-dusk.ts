@@ -201,12 +201,10 @@ const FlameChainInfo: EvmChainInfo = {
   rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
   contracts: {
     wrappedNativeToken: {
-      address: "0x",
-      blockCreated: 42069,
+      address: "0x6D71eb44a65560D1E917861059288200209054b4",
     },
     swapRouter: {
-      address: "0x",
-      blockCreated: 42069,
+      address: "0x9ed37af540E50ddcCD2dd4D71d61BD458e9229c6",
     },
   },
   currencies: [
@@ -224,7 +222,7 @@ const FlameChainInfo: EvmChainInfo = {
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
       coinDecimals: 18,
-      erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      erc20ContractAddress: "0x6D71eb44a65560D1E917861059288200209054b4",
       isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: WrappedTiaIcon,

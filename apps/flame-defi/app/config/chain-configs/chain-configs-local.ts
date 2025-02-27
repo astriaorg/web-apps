@@ -230,11 +230,9 @@ const FakeChainInfo: EvmChainInfo = {
   contracts: {
     wrappedNativeToken: {
       address: "0x",
-      blockCreated: 42069,
     },
     swapRouter: {
       address: "0x",
-      blockCreated: 42069,
     },
   },
   currencies: [
