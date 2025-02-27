@@ -144,7 +144,7 @@ export const SettingsPopover = () => {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                  className="w-full px-3 py-1 pr-7 bg-grey-dark rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary normalize-input"
+                  className="w-full px-3 py-1 pr-7 bg-grey-dark font-sans rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary normalize-input"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white">
                   %
