@@ -43,7 +43,7 @@ export const LineChart = ({
   );
 
   useEffect(() => {
-    if (!data || !svgRef.current || !tooltipRef.current) {
+    if (!data || isLoading || !svgRef.current || !tooltipRef.current) {
       return;
     }
 
@@ -57,7 +57,7 @@ export const LineChart = ({
         setTooltipContent(value);
       },
     });
-  }, [data, selectedInterval]);
+  }, [data, isLoading, selectedInterval]);
 
   return (
     <Card isLoading={isLoading} padding="md">

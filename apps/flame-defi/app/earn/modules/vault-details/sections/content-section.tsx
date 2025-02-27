@@ -41,7 +41,7 @@ export const ContentSection = () => {
               <LineChart
                 data={
                   charts[CHART_TYPE.APY].query.data?.vaultByAddress
-                    .historicalState.dailyApy ?? null
+                    .historicalState.dailyApy
                 }
                 isLoading={isPending || charts[CHART_TYPE.APY].query.isPending}
                 intervals={CHART_INTERVALS}
@@ -70,7 +70,7 @@ export const ContentSection = () => {
               <LineChart
                 data={
                   charts[CHART_TYPE.TOTAL_SUPPLY].query.data?.vaultByAddress
-                    .historicalState.totalAssetsUsd ?? null
+                    .historicalState.totalAssetsUsd
                 }
                 isLoading={
                   isPending || charts[CHART_TYPE.TOTAL_SUPPLY].query.isPending

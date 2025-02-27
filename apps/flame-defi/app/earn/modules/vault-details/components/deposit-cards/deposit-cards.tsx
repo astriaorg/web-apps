@@ -121,7 +121,7 @@ export const DepositCards = () => {
           </div>
         </CardLabel>
         <CardFigureInput placeholder="0.00" />
-        <span className="text-text-light text-sm/3">
+        <CardLabel className="text-text-light text-sm/3">
           <FormattedNumber
             value={0}
             minimumFractionDigits={2}
@@ -129,7 +129,7 @@ export const DepositCards = () => {
             style="currency"
             currency="USD"
           />
-        </span>
+        </CardLabel>
       </Card>
       <Card isLoading={isPending} padding="md" className="space-y-4">
         {items.map((it, index) => (

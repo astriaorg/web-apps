@@ -129,8 +129,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
   const x = d3
     .scaleBand()
     .domain(data.map((it) => it.x.toString()))
-    .range([margin.left, width - margin.right])
-    .padding(0.75);
+    .range([margin.left, width - margin.right]);
 
   const y = d3
     .scaleLinear()
