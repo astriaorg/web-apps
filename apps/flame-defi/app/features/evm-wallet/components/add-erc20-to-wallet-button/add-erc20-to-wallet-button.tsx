@@ -24,7 +24,7 @@ export default function AddErc20ToWalletButton({
     }
     const contractAddress = evmCurrency.erc20ContractAddress?.toString();
     if (!contractAddress) {
-      console.debug("Token is not an ERC20 token");
+      console.debug("Token is not an ERC20 or no contract address provided.");
       return;
     }
     try {

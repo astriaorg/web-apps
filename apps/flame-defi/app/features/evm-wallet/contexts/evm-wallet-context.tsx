@@ -1,21 +1,13 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Chain, erc20Abi, formatUnits } from "viem";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
   useConfig,
   useDisconnect,
   useSwitchChain,
-  useWalletClient,
 } from "wagmi";
-import { getPublicClient } from "@wagmi/core";
 import { DropdownOption } from "@repo/ui/components";
 import {
   getFlameChainId,
@@ -31,11 +23,15 @@ import {
 } from "../services/astria-withdrawer-service/astria-withdrawer-service";
 import {
   EvmChainInfo,
-  evmChainToRainbowKitChain,
   EvmCurrency,
   evmCurrencyBelongsToChain,
 } from "@repo/flame-types";
-import JSBI from "jsbi";
+import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+
+interface TokenAllowance {
+  symbol: string;
+  allowance: bigint;
+}
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -56,11 +52,9 @@ export interface EvmWalletContextProps {
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   selectEvmCurrency: (currency: EvmCurrency) => void;
   withdrawFeeDisplay: string;
-  tokenAllowances: { symbol: string; allowance: JSBI }[];
+  tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
-  approveToken: (
-    token: EvmCurrency | null | undefined,
-  ) => Promise<`0x${string}` | null>;
+  approveToken: (token: EvmCurrency) => Promise<`0x${string}` | null>;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -78,7 +72,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     evmChains,
     selectedFlameNetwork,
     selectFlameNetwork,
-    tokenDefaultApprovalAmount,
+    tokenApprovalAmount,
   } = useAppConfig();
   // creating a ref here to use current selectedFlameNetwork value in useEffects without
   // its change triggering the useEffect
@@ -90,10 +84,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
   const { selectedChain } = useEvmChainData();
-  const publicClient = getPublicClient(wagmiConfig, {
-    chainId: selectedChain?.chainId,
-  });
-  const { data: walletClient } = useWalletClient();
   const { currencies, contracts } = selectedChain;
 
   const {
@@ -130,9 +120,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     null,
   );
 
-  const [tokenAllowances, setTokenAllowances] = useState<
-    { symbol: string; allowance: JSBI }[]
-  >([]);
+  const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
   // set the address when the address, chain, or currency changes
   useEffect(() => {
@@ -330,84 +318,87 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [disconnect, resetState]);
 
   const approveToken = useCallback(
-    async (token: EvmCurrency | null | undefined) => {
+    async (token: EvmCurrency) => {
       if (
-        !userAccount.address ||
-        !walletClient ||
-        !contracts?.swapRouter?.address
+        !wagmiConfig ||
+        !contracts?.swapRouter.address ||
+        !currencies ||
+        !selectedChain.chainId ||
+        !token?.erc20ContractAddress
       ) {
         return null;
       }
-      const amountAsBigInt = BigInt(tokenDefaultApprovalAmount);
-      // NOTE: Reset this to 0 whenever we want to reset the approval
-      // const amountAsBigInt = BigInt('0');
+      const erc20Service = createErc20Service(
+        wagmiConfig,
+        token.erc20ContractAddress as `0x${string}`,
+      );
 
-      try {
-        const txHash = await walletClient.writeContract({
-          address: token?.erc20ContractAddress as `0x${string}`,
-          abi: erc20Abi,
-          functionName: "approve",
-          args: [contracts.swapRouter.address, amountAsBigInt],
-          chain: evmChainToRainbowKitChain(selectedChain) as Chain,
-          account: userAccount?.address as `0x${string}`,
-        });
+      const txHash = await erc20Service.approveToken(
+        selectedChain.chainId,
+        contracts.swapRouter.address,
+        tokenApprovalAmount,
+      );
 
-        const newTokenAllowance = tokenAllowances.map((data) => {
-          if (data.symbol === token?.coinDenom) {
-            return {
-              symbol: token?.coinDenom,
-              allowance: JSBI.BigInt(tokenDefaultApprovalAmount),
-            };
-          }
-          return data;
-        });
-        setTokenAllowances(newTokenAllowance);
+      const newTokenAllowance = tokenAllowances.map((data) => {
+        if (data.symbol === token.coinDenom) {
+          return {
+            symbol: token.coinDenom,
+            allowance: BigInt(tokenApprovalAmount),
+          };
+        }
+        return data;
+      });
 
-        return txHash;
-      } catch (error) {
-        console.warn("Failed to approve token:", error);
-        return null;
-      }
+      setTokenAllowances(newTokenAllowance);
+
+      return txHash;
     },
     [
-      userAccount.address,
-      walletClient,
-      contracts?.swapRouter?.address,
-      tokenAllowances,
-      tokenDefaultApprovalAmount,
+      wagmiConfig,
+      contracts?.swapRouter.address,
+      currencies,
       selectedChain,
+      tokenAllowances,
+      tokenApprovalAmount,
     ],
   );
 
   const getTokenAllowances = useCallback(async () => {
     if (
       !userAccount.address ||
-      !publicClient ||
-      !contracts?.swapRouter?.address
+      !wagmiConfig ||
+      !contracts?.swapRouter.address ||
+      !currencies ||
+      !selectedChain.chainId
     ) {
       return;
     }
-    const newTokenAllowances: { symbol: string; allowance: JSBI }[] = [];
-
+    const newTokenAllowances: TokenAllowance[] = [];
     for (const currency of currencies) {
       if (currency.erc20ContractAddress) {
-        const tokenAddress = currency.erc20ContractAddress;
-        const currentAllowance = await publicClient.readContract({
-          address: tokenAddress,
-          abi: erc20Abi,
-          functionName: "allowance",
-          args: [userAccount.address, contracts.swapRouter.address],
-        });
+        const erc20Service = createErc20Service(
+          wagmiConfig,
+          currency.erc20ContractAddress as `0x${string}`,
+        );
+        try {
+          const allowance = await erc20Service.getTokenAllowances(
+            selectedChain.chainId,
+            userAccount.address,
+            contracts.swapRouter.address,
+          );
 
-        newTokenAllowances.push({
-          symbol: currency.coinDenom,
-          allowance: JSBI.BigInt(currentAllowance.toString()),
-        });
+          newTokenAllowances.push({
+            symbol: currency.coinDenom,
+            allowance: allowance || BigInt(0),
+          });
+        } catch (error) {
+          console.warn("Failed to get token allowance:", error);
+        }
       }
     }
 
     setTokenAllowances(newTokenAllowances);
-  }, [userAccount.address, publicClient, contracts, currencies]);
+  }, [userAccount.address, contracts, currencies, selectedChain, wagmiConfig]);
 
   useEffect(() => {
     if (userAccount.address && tokenAllowances.length === 0) {

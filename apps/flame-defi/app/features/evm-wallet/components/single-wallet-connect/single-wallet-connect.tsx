@@ -106,7 +106,7 @@ export default function SingleWalletConnect() {
 
   return userAccount.address ? (
     <Popover>
-      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-md transition px-3 py-2 h-[36px]">
+      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px]">
         <div className="flex items-center gap-2">
           <FlameIcon size={16} />
           <span className="text-white text-base font-normal">
@@ -125,7 +125,7 @@ export default function SingleWalletConnect() {
     <Button
       variant="default"
       onClick={() => connectEvmWallet()}
-      className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white text-base w-[156px]"
+      className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white text-base w-[156px]"
     >
       <span>Connect</span>
     </Button>

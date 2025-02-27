@@ -4,12 +4,10 @@ import { Skeleton } from "@repo/ui/shadcn-primitives";
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
-  formatNumber,
   isDustAmount,
 } from "@repo/ui/utils";
-
 import { useIntl } from "react-intl";
-import useUsdQuote from "../use-usd-quote";
+import { useUsdQuote } from "../hooks";
 
 interface SwapInputProps {
   inputToken: TokenState;
@@ -36,13 +34,14 @@ export function SwapInput({
   index,
   balance,
 }: SwapInputProps) {
-  const { locale } = useIntl();
+  const { locale, formatNumber } = useIntl();
   const usdQuote = useUsdQuote(inputToken);
 
   const handleFiatValue = () => {
-    const formatNumber = (value: string) => {
-      const { value: formattedValue, suffix } = formatAbbreviatedNumber(value);
-
+    const formatFiat = (value: string) => {
+      const { value: formattedValue, suffix } = formatAbbreviatedNumber(value, {
+        showFullThousandValue: true,
+      });
       const localeString = (+formattedValue).toLocaleString(locale, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -55,13 +54,13 @@ export function SwapInput({
         return localeString.replace("-", "");
       }
 
-      return `${formattedValue}${suffix === FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND ? "" : suffix}`;
+      return `${localeString}${suffix === FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND ? "" : suffix}`;
     };
 
     if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
-      return formatNumber(inputToken.value);
+      return formatFiat(inputToken.value);
     } else if (usdQuote?.quote) {
-      return formatNumber(usdQuote?.quote?.quoteDecimals);
+      return formatFiat(usdQuote?.quote?.quoteDecimals);
     } else {
       return "-";
     }
@@ -74,7 +73,7 @@ export function SwapInput({
 
   return (
     <div
-      className={`flex flex-col rounded-md p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium focus-within:bg-background focus-within:border-grey-medium`}
+      className={`flex flex-col rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium focus-within:bg-background focus-within:border-grey-medium`}
     >
       <div className="text-base font-medium text-grey-light">{label}</div>
       <div className="flex justify-between items-center">
@@ -102,7 +101,11 @@ export function SwapInput({
           {inputToken.token && balance && !isDustAmount(balance) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
               <span className="flex items-center gap-2">
-                {formatNumber(balance)} {inputToken?.token?.coinDenom}
+                {formatNumber(parseFloat(balance), {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 4,
+                })}{" "}
+                {inputToken?.token?.coinDenom}
               </span>
               {
                 <span
