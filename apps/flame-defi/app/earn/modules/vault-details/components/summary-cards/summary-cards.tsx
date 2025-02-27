@@ -43,7 +43,7 @@ export const SummaryCards = () => {
       </Card>
       <Card isLoading={isPending} padding="md">
         <CardLabel>
-          <span>Total Deposits</span>
+          <span className="flex-1">Total Deposits</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
         </CardLabel>
         <CardFigureText>
@@ -53,7 +53,7 @@ export const SummaryCards = () => {
       </Card>
       <Card isLoading={isPending} padding="md">
         <CardLabel>
-          <span>Liquidity</span>
+          <span className="flex-1">Liquidity</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
         </CardLabel>
         <CardFigureText>

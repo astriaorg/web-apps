@@ -26,7 +26,7 @@ export const CardLabel = ({
     <Skeleton isLoading={isLoading}>
       <div
         className={cn(
-          "flex space-x-2 justify-between text-sm/5  whitespace-nowrap",
+          "flex items-center space-x-2 text-sm/5",
           cardLabelVariants({ variant }),
           className,
         )}
