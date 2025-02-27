@@ -4,11 +4,12 @@ import {
   NobleIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons";
-import type {
+import {
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
   EvmChains,
+  EvmCurrency,
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
@@ -198,25 +199,35 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "Flame Dusk-11",
   rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
+  contracts: {
+    wrappedNativeToken: {
+      address: "0x6D71eb44a65560D1E917861059288200209054b4",
+    },
+    swapRouter: {
+      address: "0x9ed37af540E50ddcCD2dd4D71d61BD458e9229c6",
+    },
+  },
   currencies: [
-    {
+    new EvmCurrency({
       coinDenom: "RIA",
       title: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "WTIA",
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
       coinDecimals: 18,
-      erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      erc20ContractAddress: "0x6D71eb44a65560D1E917861059288200209054b4",
+      isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: WrappedTiaIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
@@ -225,10 +236,11 @@ const FlameChainInfo: EvmChainInfo = {
       erc20ContractAddress: "0xa4f59B3E97EC22a2b949cB5b6E8Cd6135437E857",
       // this value would only exist for native tokens
       // nativeTokenWithdrawerContractAddress: "",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: NobleIcon,
-    },
-    {
+    }),
+    new EvmCurrency({
       coinDenom: "fakeTIA",
       title: "fakeTIA",
       coinMinimalDenom: "ufaketia",
@@ -237,9 +249,10 @@ const FlameChainInfo: EvmChainInfo = {
       //  just using this for testing the UI.
       erc20ContractAddress: "0xFc83F6A786728F448481B7D7d5C0659A92a62C4d",
       // nativeTokenWithdrawerContractAddress: "",
+      isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
-    },
+    }),
   ],
   IconComponent: FlameIcon,
 };

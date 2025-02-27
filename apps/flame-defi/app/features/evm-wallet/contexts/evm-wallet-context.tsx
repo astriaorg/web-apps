@@ -307,7 +307,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     async (token: EvmCurrency) => {
       if (
         !wagmiConfig ||
-        !contracts?.swapRouter?.address ||
+        !contracts?.swapRouter.address ||
         !currencies ||
         !selectedChain.chainId ||
         !token?.erc20ContractAddress
@@ -341,7 +341,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     },
     [
       wagmiConfig,
-      contracts?.swapRouter?.address,
+      contracts?.swapRouter.address,
       currencies,
       selectedChain,
       tokenAllowances,
@@ -353,7 +353,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     if (
       !userAccount.address ||
       !wagmiConfig ||
-      !contracts?.swapRouter?.address ||
+      !contracts?.swapRouter.address ||
       !currencies ||
       !selectedChain.chainId
     ) {

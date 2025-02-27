@@ -46,11 +46,9 @@ export default function SwapPage(): React.ReactElement {
     isQuoteValue: true,
   });
   const isTiaWtia = useMemo(() => {
-    return (
-      (inputOne.token?.coinDenom === "TIA" &&
-        inputTwo.token?.coinDenom === "WTIA") ||
-      (inputOne.token?.coinDenom === "WTIA" &&
-        inputTwo.token?.coinDenom === "TIA")
+    return Boolean(
+      (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
+        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative),
     );
   }, [inputOne, inputTwo]);
 
