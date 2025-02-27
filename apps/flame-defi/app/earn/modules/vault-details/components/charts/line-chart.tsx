@@ -17,7 +17,7 @@ const CHART_HEIGHT = 52;
 interface LineChartProps {
   data?: FloatDataPoint[] | null;
   isLoading: boolean;
-  intervals: ChartInterval[];
+  intervals: readonly ChartInterval[];
   selectedInterval: ChartInterval;
   setSelectedInterval: (value: ChartInterval) => void;
   title: React.ReactNode;
