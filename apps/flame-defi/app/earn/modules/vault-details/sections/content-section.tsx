@@ -117,7 +117,7 @@ export const ContentSection = () => {
           </div>
 
           {/* Deposit section. */}
-          <div className="order-1 lg:order-2 lg:basis-1/3">
+          <div className="order-1 lg:order-2 lg:basis-1/3 overflow-hidden">
             <DepositCards />
           </div>
         </div>

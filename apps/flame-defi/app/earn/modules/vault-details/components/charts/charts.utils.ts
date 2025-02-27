@@ -253,11 +253,11 @@ export const getTimeseriesOptions = (
     return Math.floor(timestamp / secondsIn5Minutes) * secondsIn5Minutes;
   };
 
-  const now = Date.now();
-  const date = new Date();
+  const getTimestampsFromInterval = (interval: ChartInterval) => {
+    const now = Date.now();
+    const date = new Date();
 
-  const { startTimestamp, endTimestamp } = (() => {
-    switch (chartInterval) {
+    switch (interval) {
       case "1w": {
         date.setDate(date.getDate() - 7);
         return {
@@ -279,8 +279,14 @@ export const getTimeseriesOptions = (
           endTimestamp: now,
         };
       }
+      default: {
+        throw new Error(`Invalid interval: "${interval}".`);
+      }
     }
-  })();
+  };
+
+  const { startTimestamp, endTimestamp } =
+    getTimestampsFromInterval(chartInterval);
 
   return {
     startTimestamp: Math.floor(

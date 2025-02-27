@@ -1,4 +1,4 @@
-import { Card, CardLabel } from "earn/components/card";
+import { Card, CardFigureInput, CardLabel } from "earn/components/card";
 import { Image } from "earn/components/image";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import React, { useMemo } from "react";
@@ -120,6 +120,16 @@ export const DepositCards = () => {
             />
           </div>
         </CardLabel>
+        <CardFigureInput placeholder="0.00" />
+        <span className="text-text-light text-sm/3">
+          <FormattedNumber
+            value={0}
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+            style="currency"
+            currency="USD"
+          />
+        </span>
       </Card>
       <Card isLoading={isPending} padding="md" className="space-y-4">
         {items.map((it, index) => (
