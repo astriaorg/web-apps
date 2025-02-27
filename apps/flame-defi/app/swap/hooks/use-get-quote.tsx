@@ -45,7 +45,7 @@ export const useGetQuote = () => {
       const tokenInDecimals = tokenOne?.token?.coinDecimals;
       const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
 
-      const tokenOutAddress = tokenOne?.token?.isNative
+      const tokenOutAddress = tokenTwo?.token?.isNative
         ? chainContracts?.wrappedNativeToken.address
         : tokenTwo?.token?.erc20ContractAddress;
       const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
