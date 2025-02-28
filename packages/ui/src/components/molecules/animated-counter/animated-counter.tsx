@@ -19,7 +19,6 @@ export const AnimatedCounter = ({
   className,
   ...props
 }: AnimatedCounterProps) => {
-  console.log(counter, isAnimating);
   return (
     <div className="relative">
       {/* Reserve space for animation to prevent card size increasing with counter value. */}
