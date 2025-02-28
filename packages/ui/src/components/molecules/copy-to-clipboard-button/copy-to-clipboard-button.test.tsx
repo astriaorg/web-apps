@@ -44,7 +44,8 @@ describe("<CopyToClipboardButton />", () => {
       jest.runAllTimers();
       jest.useRealTimers();
     });
-    // status text was removed
-    expect(status).not.toBeInTheDocument();
+
+    // The component changes opacity rather than removing the element
+    expect(status).toHaveClass("opacity-0");
   });
 });
