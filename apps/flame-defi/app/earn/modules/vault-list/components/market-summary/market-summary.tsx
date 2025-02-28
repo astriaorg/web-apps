@@ -1,4 +1,4 @@
-import { useSyncAnimateCounter } from "@repo/ui/hooks";
+import { useSyncAnimateCounter } from "@repo/ui/components";
 import { useState } from "react";
 import { MarketSummaryCard } from "./market-summary-card";
 
@@ -33,14 +33,14 @@ export const MarketSummary = () => {
         value={VALUE_DEPOSIT}
         counter={counterDeposit}
         setCounter={setCounterDeposit}
-        isAnimating={isAnimating}
+        isSyncingAnimation={isAnimating}
       />
       <MarketSummaryCard
         label="Total Borrow"
         value={VALUE_BORROW}
         counter={counterBorrow}
         setCounter={setCounterBorrow}
-        isAnimating={isAnimating}
+        isSyncingAnimation={isAnimating}
       />
     </div>
   );

@@ -1,16 +1,14 @@
-import { AnimatedCounter, Card } from "@repo/ui/components";
-import { useAnimateCounter } from "@repo/ui/hooks";
+import {
+  AnimatedCounter,
+  AnimatedCounterProps,
+  Card,
+  useAnimateCounter,
+} from "@repo/ui/components";
 import React from "react";
 
-interface MarketSummaryCardProps {
+interface MarketSummaryCardProps extends AnimatedCounterProps {
   label: React.ReactNode;
-  value: number;
-  counter: number | null;
   setCounter: (value: number) => void;
-  /**
-   * Sync animation state between multiple cards.
-   */
-  isAnimating: boolean;
 }
 
 export const MarketSummaryCard = ({
@@ -18,7 +16,7 @@ export const MarketSummaryCard = ({
   value,
   counter,
   setCounter,
-  isAnimating,
+  isSyncingAnimation,
 }: MarketSummaryCardProps) => {
   useAnimateCounter({ value, setCounter });
 
@@ -29,8 +27,8 @@ export const MarketSummaryCard = ({
       <AnimatedCounter
         value={value}
         counter={counter}
+        isSyncingAnimation={isSyncingAnimation}
         className="text-3xl/8 font-dot"
-        isAnimating={isAnimating}
         options={{
           style: "currency",
           currency: "USD",

@@ -1,1 +1,2 @@
-export { AnimatedCounter } from "./animated-counter";
+export { AnimatedCounter, type AnimatedCounterProps } from "./animated-counter";
+export * from "./hooks";

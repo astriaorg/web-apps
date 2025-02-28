@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 
 interface Params {
@@ -21,7 +23,6 @@ export function useSyncAnimateCounter({
   useEffect(() => {
     // Not grammatically correct but use `is` prefix for consistency.
     const isAllCountersAboveThreshold = values.every(({ value, counter }) => {
-      console.log(value, counter);
       const counterMinimum = value * multiplier;
       return counter !== null && counter > counterMinimum;
     });

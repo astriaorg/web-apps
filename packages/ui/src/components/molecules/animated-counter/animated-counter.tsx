@@ -4,18 +4,22 @@ import { FormatNumberOptions, FormattedNumber } from "../../../intl";
 import { cn } from "../../../utils";
 import { Skeleton } from "../../atoms";
 
-interface AnimatedCounterProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface AnimatedCounterProps
+  extends React.HTMLAttributes<HTMLSpanElement> {
   value: number;
   counter: number | null;
   options?: FormatNumberOptions;
-  isAnimating: boolean;
+  /**
+   * Used for syncing animation state between multiple cards.
+   */
+  isSyncingAnimation?: boolean;
 }
 
 export const AnimatedCounter = ({
   value,
   counter,
   options,
-  isAnimating,
+  isSyncingAnimation,
   className,
   ...props
 }: AnimatedCounterProps) => {
@@ -29,7 +33,7 @@ export const AnimatedCounter = ({
         className={cn("w-full absolute top-0 left-0", className)}
         {...props}
       >
-        <Skeleton isLoading={!counter || !isAnimating}>
+        <Skeleton isLoading={!counter || !isSyncingAnimation}>
           <span>
             <FormattedNumber value={counter ?? 0} {...options} />
           </span>
