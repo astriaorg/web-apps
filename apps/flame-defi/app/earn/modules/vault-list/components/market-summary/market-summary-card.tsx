@@ -1,7 +1,7 @@
 import { Card, Skeleton } from "@repo/ui/components";
+import { FormattedNumber } from "@repo/ui/intl";
 import Big from "big.js";
 import React, { useEffect } from "react";
-import { FormattedNumber } from "react-intl";
 
 interface MarketSummaryCardProps {
   label: React.ReactNode;

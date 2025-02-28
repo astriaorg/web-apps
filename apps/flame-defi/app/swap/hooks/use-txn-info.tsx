@@ -2,15 +2,15 @@ import {
   GetQuoteResult,
   TRADE_TYPE,
   Token,
-  TokenState,
   TokenAmount,
+  TokenState,
 } from "@repo/flame-types";
+import { useIntl } from "@repo/ui/intl";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
-import { formatUnits } from "viem";
 import JSBI from "jsbi";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { formatUnits } from "viem";
 import { useGetQuote } from "./use-get-quote";
-import { useIntl } from "react-intl";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
 // quoteGas values are the values we display in top token input field.

@@ -1,6 +1,7 @@
 import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
+import { FormattedNumber } from "@repo/ui/intl";
 import { cn } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -19,7 +20,6 @@ import {
 } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import Image from "next/image";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
-import { FormattedNumber } from "react-intl";
 
 type Status = "error" | "empty" | "success";
 

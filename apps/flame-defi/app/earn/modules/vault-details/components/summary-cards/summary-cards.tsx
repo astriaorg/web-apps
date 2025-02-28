@@ -1,8 +1,8 @@
 import { Card, CardFigureText, CardLabel } from "@repo/ui/components";
+import { FormattedNumber } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import { FormattedNumber } from "react-intl";
 
 export const SummaryCards = () => {
   const {
