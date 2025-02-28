@@ -33,14 +33,14 @@ export const MarketSummary = () => {
       <MarketSummaryCard
         label="Total Deposits"
         value={VALUE_DEPOSIT}
-        count={countDeposit}
+        counter={countDeposit}
         setCounter={setCountDeposit}
         isAnimating={isAnimating}
       />
       <MarketSummaryCard
         label="Total Borrow"
         value={VALUE_BORROW}
-        count={countBorrow}
+        counter={countBorrow}
         setCounter={setCountBorrow}
         isAnimating={isAnimating}
       />

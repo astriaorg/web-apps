@@ -1,4 +1,5 @@
 export * from "./action-button";
+export * from "./animated-counter";
 export * from "./animated-down-arrow-spacer";
 export * from "./block-loader";
 export * from "./card";
