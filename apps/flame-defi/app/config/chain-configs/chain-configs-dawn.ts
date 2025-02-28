@@ -286,6 +286,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
+  blockExplorerUrl: "https://explorer.flame.dawn-1.astria.org",
   contracts: {
     wrappedNativeToken: {
       address: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",

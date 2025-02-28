@@ -199,6 +199,7 @@ const FlameChainInfo: EvmChainInfo = {
   chainId: 912559,
   chainName: "Flame Dusk-11",
   rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
+  blockExplorerUrl: "https://explorer.evm.dusk-11.devnet.astria.org",
   contracts: {
     wrappedNativeToken: {
       address: "0x6D71eb44a65560D1E917861059288200209054b4",
