@@ -18,6 +18,12 @@
       "@testing-library/jest-dom"
     ]
   },
-  "include": ["src", "jest.setup.ts", "**/*.test.tsx", "**/*.test.ts"],
+  "include": [
+    "src",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "**/*.test.tsx",
+    "**/*.test.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }
