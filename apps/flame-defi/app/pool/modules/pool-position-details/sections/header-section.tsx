@@ -9,7 +9,7 @@ import { ROUTES } from "../../../constants/routes";
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { tokenData, percent } = usePoolDetailsContext();
+  const { tokenData, feeTier } = usePoolDetailsContext();
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
@@ -46,7 +46,7 @@ export const HeaderSection = () => {
                 <span>In range</span>
               </Badge>
               <Badge variant="default" className="flex items-center space-x-2">
-                {percent}
+                {feeTier}
               </Badge>
             </div>
           </Skeleton>

@@ -1,4 +1,4 @@
-import { Button, Card, CardFigureInput, TokenIcon } from "@repo/ui/components";
+import { Card, CardFigureInput, TokenIcon } from "@repo/ui/components";
 import { usePoolDetailsContext } from "pool/hooks";
 
 export const AddLiquidityInputsBlock = () => {
@@ -42,12 +42,6 @@ export const AddLiquidityInputsBlock = () => {
             </span>
           </div>
         </Card>
-      </div>
-      <div className="flex gap-4 w-full">
-        <div className="w-1/2"></div>
-        <Button variant="default" size="default" className="w-1/2 self-end">
-          Add liquidity
-        </Button>
       </div>
     </>
   );

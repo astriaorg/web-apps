@@ -1,4 +1,4 @@
-import { EvmCurrency } from "@repo/flame-types";
+import { EvmCurrency, TXN_STATUS } from "@repo/flame-types";
 
 export interface StepProps {
   step: number;
@@ -48,7 +48,7 @@ export interface TokenPriceData {
 
 export type Position = {
   tokenData: TokenPriceData[];
-  percent: number;
+  feeTier: number;
   inRange: boolean;
   positionStatus: string;
   min: number;
@@ -67,8 +67,21 @@ export type PoolContextProps = {
 export type PoolDetailsContextProps = {
   positionDetails: Position | undefined;
   tokenData: TokenPriceData[];
-  percent: string;
+  feeTier: string;
   symbols: string[];
   selectedSymbol: string;
   handleReverseTokenData: (symbol: string) => void;
+  collectAsWTIA: boolean;
+  handleCollectAsWTIA: (collectAsWTIA: boolean) => void;
+  txnStatus: TXN_STATUS;
+  setTxnStatus: (txnStatus: TXN_STATUS) => void;
+  modalOpen: boolean;
+  setModalOpen: (modalOpen: boolean) => void;
+};
+
+export type PoolTxnStepsProps = {
+  txnStatus: TXN_STATUS;
+  poolPositionData: TokenPriceData[];
+  txnHash: string;
+  txnMsg: string;
 };

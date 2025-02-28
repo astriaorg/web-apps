@@ -4,7 +4,7 @@ import { TokenInfoCard } from "pool/components";
 import { usePoolDetailsContext } from "pool/hooks";
 
 export const TokenLiquidityBlock = () => {
-  const { tokenData, percent } = usePoolDetailsContext();
+  const { tokenData, feeTier } = usePoolDetailsContext();
 
   return (
     <div className="flex gap-4">
@@ -32,7 +32,7 @@ export const TokenLiquidityBlock = () => {
               <span>In range</span>
             </Badge>
             <Badge variant="default" className="flex items-center space-x-2">
-              {percent}
+              {feeTier}
             </Badge>
           </div>
         </Skeleton>
@@ -42,7 +42,7 @@ export const TokenLiquidityBlock = () => {
         <hr className="border-t border-border mt-2 mb-2" />
         <div className="flex justify-between">
           <span className="text-base text-text-subdued">Fee Tier</span>
-          <span className="text-base text-text-subdued">{percent}</span>
+          <span className="text-base text-text-subdued">{feeTier}</span>
         </div>
       </div>
     </div>

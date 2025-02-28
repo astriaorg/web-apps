@@ -10,6 +10,7 @@ export * from "./pagination";
 export * from "./popover";
 export * from "./select";
 export * from "./skeleton";
+export * from "./slider";
 export * from "./switch";
 export * from "./table";
 export * from "./tabs";

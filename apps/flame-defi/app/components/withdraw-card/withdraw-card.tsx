@@ -155,6 +155,7 @@ export default function WithdrawCard(): React.ReactElement {
   }, [selectedCosmosChain, handleConnectCosmosWallet]);
 
   const handleWithdraw = async () => {
+    console.log("handleWithdraw");
     if (!selectedEvmChain || !selectedEvmCurrency) {
       addNotification({
         toastOpts: {
