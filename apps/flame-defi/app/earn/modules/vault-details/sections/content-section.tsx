@@ -43,6 +43,7 @@ export const ContentSection = () => {
                   charts[CHART_TYPE.APY].query.data?.vaultByAddress
                     .historicalState.dailyApy
                 }
+                isError={charts[CHART_TYPE.APY].query.isError}
                 isLoading={isPending || charts[CHART_TYPE.APY].query.isPending}
                 intervals={CHART_INTERVALS}
                 selectedInterval={charts[CHART_TYPE.APY].selectedInterval}
@@ -72,6 +73,7 @@ export const ContentSection = () => {
                   charts[CHART_TYPE.TOTAL_SUPPLY].query.data?.vaultByAddress
                     .historicalState.totalAssetsUsd
                 }
+                isError={charts[CHART_TYPE.TOTAL_SUPPLY].query.isError}
                 isLoading={
                   isPending || charts[CHART_TYPE.TOTAL_SUPPLY].query.isPending
                 }

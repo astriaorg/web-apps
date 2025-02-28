@@ -16,6 +16,7 @@ const CHART_HEIGHT = 52;
 
 interface LineChartProps {
   data?: FloatDataPoint[] | null;
+  isError: boolean;
   isLoading: boolean;
   intervals: readonly ChartInterval[];
   selectedInterval: ChartInterval;
@@ -27,6 +28,7 @@ interface LineChartProps {
 
 export const LineChart = ({
   data,
+  isError,
   isLoading,
   intervals,
   selectedInterval,
@@ -58,6 +60,10 @@ export const LineChart = ({
       },
     });
   }, [data, isLoading, selectedInterval]);
+
+  if (isError) {
+    return null;
+  }
 
   return (
     <Card isLoading={isLoading} padding="md">
