@@ -1,5 +1,8 @@
 import { Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 
+/**
+ * Parameters for the exactInputSingle method
+ */
 export interface ExactInputSingleParams {
   tokenIn: `0x${string}`;
   tokenOut: `0x${string}`;
@@ -11,6 +14,9 @@ export interface ExactInputSingleParams {
   deadline: bigint;
 }
 
+/**
+ * Parameters for the exactInput method
+ */
 export interface ExactInputParams {
   path: `0x${string}`;
   recipient: `0x${string}`;
@@ -19,6 +25,9 @@ export interface ExactInputParams {
   deadline: bigint;
 }
 
+/**
+ * Parameters for the exactOutputSingle method
+ */
 export interface ExactOutputSingleParams {
   tokenIn: `0x${string}`;
   tokenOut: `0x${string}`;
@@ -30,6 +39,9 @@ export interface ExactOutputSingleParams {
   deadline: bigint;
 }
 
+/**
+ * Parameters for the exactOutput method
+ */
 export interface ExactOutputParams {
   path: `0x${string}`;
   recipient: `0x${string}`;
