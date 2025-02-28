@@ -30,7 +30,7 @@ export class SwapRouterService extends GenericContractService {
   private readonly chainConfig: Chain;
 
   constructor(wagmiConfig: Config, routerAddress: Address, chainConfig: Chain) {
-    super(wagmiConfig, routerAddress, SWAP_ROUTER_ABI as unknown as Abi);
+    super(wagmiConfig, routerAddress, SWAP_ROUTER_ABI as Abi);
     this.chainConfig = chainConfig;
   }
 
