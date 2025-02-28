@@ -20,6 +20,14 @@ export const useTokenBalances = (
     address: userAddress as `0x${string}`,
   });
 
+  const updateBalance = (value: string, symbol: string, index: number) => {
+    setBalances((prev) => {
+      const newBalances = [...prev];
+      newBalances[index] = { value, symbol };
+      return newBalances;
+    });
+  };
+
   const fetchBalances = useCallback(
     async (selectedTokens: (EvmCurrency | null | undefined)[]) => {
       if (
@@ -31,14 +39,6 @@ export const useTokenBalances = (
         return [];
       }
       setIsLoading(true);
-
-      const updateBalance = (value: string, symbol: string, index: number) => {
-        setBalances((prev) => {
-          const newBalances = [...prev];
-          newBalances[index] = { value, symbol };
-          return newBalances;
-        });
-      };
 
       try {
         selectedTokens
