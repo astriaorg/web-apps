@@ -41,43 +41,42 @@ export const useTokenBalances = (
       setIsLoading(true);
 
       try {
-        selectedTokens
-          .map(async (selectedToken, index) => {
-            if (!selectedToken) return null;
+        selectedTokens.map(async (selectedToken, index) => {
+          if (!selectedToken) return null;
 
-            if (selectedToken.erc20ContractAddress) {
-              const withdrawerSvc = createWithdrawerService(
-                wagmiConfig,
-                selectedToken.erc20ContractAddress,
-                true,
-              ) as AstriaErc20WithdrawerService;
+          if (selectedToken.erc20ContractAddress) {
+            const withdrawerSvc = createWithdrawerService(
+              wagmiConfig,
+              selectedToken.erc20ContractAddress,
+              true,
+            ) as AstriaErc20WithdrawerService;
 
-              const balanceRes = await withdrawerSvc.getBalance(
-                evmChain.chainId,
-                userAddress as string,
-              );
+            const balanceRes = await withdrawerSvc.getBalance(
+              evmChain.chainId,
+              userAddress as string,
+            );
 
-              const balanceStr = formatUnits(
-                balanceRes,
-                selectedToken.coinDecimals,
+            const balanceStr = formatUnits(
+              balanceRes,
+              selectedToken.coinDecimals,
+            );
+            updateBalance(
+              balanceStr.toString() || "0",
+              selectedToken.coinDenom,
+              index,
+            );
+          } else {
+            // this is the native token
+            let balance = "0";
+            if (nativeBalance) {
+              balance = formatUnits(
+                nativeBalance.value,
+                nativeBalance.decimals,
               );
-              updateBalance(
-                balanceStr.toString() || "0",
-                selectedToken.coinDenom,
-                index,
-              );
-            } else {
-              // this is the native token
-              let balance = "0";
-              if (nativeBalance) {
-                balance = formatUnits(
-                  nativeBalance.value,
-                  nativeBalance.decimals,
-                );
-              }
-              updateBalance(balance, selectedToken.coinDenom, index);
             }
-          });
+            updateBalance(balance, selectedToken.coinDenom, index);
+          }
+        });
         setError(null);
       } catch (e) {
         const error =
