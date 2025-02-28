@@ -42,7 +42,6 @@ export const useTokenBalances = (
 
       try {
         selectedTokens
-          .filter((data) => data !== null)
           .map(async (selectedToken, index) => {
             if (!selectedToken) return null;
 
@@ -67,20 +66,16 @@ export const useTokenBalances = (
                 selectedToken.coinDenom,
                 index,
               );
-            } else if (
-              selectedToken.nativeTokenWithdrawerContractAddress &&
-              nativeBalance?.value
-            ) {
-              const formattedBalance = formatUnits(
-                nativeBalance.value,
-                nativeBalance.decimals,
-              );
-
-              updateBalance(
-                formattedBalance || "0",
-                selectedToken.coinDenom,
-                index,
-              );
+            } else {
+              // this is the native token
+              let balance = "0";
+              if (nativeBalance) {
+                balance = formatUnits(
+                  nativeBalance.value,
+                  nativeBalance.decimals,
+                );
+              }
+              updateBalance(balance, selectedToken.coinDenom, index);
             }
           });
         setError(null);

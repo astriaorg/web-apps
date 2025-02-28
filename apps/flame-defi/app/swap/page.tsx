@@ -71,7 +71,6 @@ export default function SwapPage(): React.ReactElement {
   }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
 
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
-  // debugger;
   const tokenOneBalance =
     balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)
       ?.value || "0";
