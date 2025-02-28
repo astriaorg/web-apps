@@ -190,20 +190,16 @@ export default function WithdrawCard(): React.ReactElement {
     setIsLoading(true);
     setIsAnimating(true);
     try {
-      // NOTE - use contract address if it exists, otherwise use withdrawer contract address
-      // FIXME - i don't like the implicit logic of using the existence of contractAddress
-      //  to determine if it's an erc20 or not
-      const contractAddress =
-        selectedEvmCurrency.erc20ContractAddress ||
-        selectedEvmCurrency.nativeTokenWithdrawerContractAddress ||
-        "";
+      const contractAddress = selectedEvmCurrency.isNative
+        ? selectedEvmCurrency.nativeTokenWithdrawerContractAddress
+        : selectedEvmCurrency.erc20ContractAddress;
       if (!contractAddress) {
         throw new Error("No contract address found");
       }
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
         contractAddress,
-        Boolean(selectedEvmCurrency.erc20ContractAddress),
+        !selectedEvmCurrency.isNative,
       );
       await withdrawerSvc.withdrawToIbcChain(
         selectedEvmChain.chainId,

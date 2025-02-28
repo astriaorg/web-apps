@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable } from "../env";
 import type { AppConfig } from "../index";
@@ -26,17 +26,17 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
 
-  const tokenDefaultApprovalAmount =
+  const tokenApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
 
-  const swapSlippageTolerance = 0.1;
+  const swapSlippageToleranceDefault = 0.1;
 
   const currentSettings = getFromLocalStorage("settings") || {};
 
   if (!currentSettings.slippageTolerance) {
     setInLocalStorage("settings", {
       ...currentSettings,
-      slippageTolerance: swapSlippageTolerance,
+      slippageTolerance: swapSlippageToleranceDefault,
     });
   }
 
@@ -88,9 +88,11 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
-  const networksList = (
-    process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
-  ).split(",") as FlameNetwork[];
+  const networksList = useMemo(() => {
+    return (
+      process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+    ).split(",") as FlameNetwork[];
+  }, []);
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
@@ -114,8 +116,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         earnAPIURL,
         feedbackFormURL,
         networksList,
-        tokenDefaultApprovalAmount,
-        swapSlippageTolerance,
+        tokenApprovalAmount,
+        swapSlippageToleranceDefault,
         feeData,
       }}
     >

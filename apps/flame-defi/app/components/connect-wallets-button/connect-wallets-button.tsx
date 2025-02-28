@@ -32,7 +32,7 @@ export default function ConnectWalletsButton() {
           <PopoverTrigger asChild>
             <Button
               variant="default"
-              className="rounded-md bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+              className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
             >
               <span>{isConnected ? "Connected" : "Connect"}</span>
             </Button>
