@@ -7,10 +7,11 @@ import { useEvmWallet } from "./hooks/use-evm-wallet";
 import { useTokenBalances } from "./hooks/use-token-balances";
 import { createWithdrawerService } from "./services/astria-withdrawer-service/astria-withdrawer-service";
 import { createWrapService } from "./services/swap-services/wrap-service";
+import { createTradeFromQuote } from "./services/swap-router-service";
 import {
-  SwapRouter,
-  createTradeFromQuote,
-} from "./services/swap-services/swap-service";
+  SwapRouterService,
+  createSwapRouterService,
+} from "./services/swap-router-service";
 
 export {
   AddErc20ToWalletButton,
@@ -18,7 +19,8 @@ export {
   EvmWalletProvider,
   SingleWalletConnect,
   SingleWalletContent,
-  SwapRouter,
+  SwapRouterService,
+  createSwapRouterService,
   useEvmWallet,
   createWithdrawerService,
   createWrapService,

@@ -12,7 +12,7 @@ import {
   useEvmWallet,
   createTradeFromQuote,
   createWrapService,
-  SwapRouter,
+  createSwapRouterService,
 } from "features/evm-wallet";
 import {
   evmChainToRainbowKitChain,
@@ -195,8 +195,7 @@ export function useSwapButton({
       !userAccount.address ||
       !selectedChain?.chainId ||
       !walletClient ||
-      !walletClient.account ||
-      !publicClient
+      !walletClient.account
     ) {
       return;
     }
@@ -207,10 +206,13 @@ export function useSwapButton({
         console.warn("Swap router address is not defined. Cannot swap.");
         return;
       }
-      const router = new SwapRouter(
-        swapRouterAddress,
+
+      const swapRouterService = createSwapRouterService(
+        wagmiConfig,
+        swapRouterAddress as `0x${string}`,
         evmChainToRainbowKitChain(selectedChain) as Chain,
       );
+
       const options = {
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
@@ -219,11 +221,10 @@ export function useSwapButton({
         isNativeOut: tokenTwo.token?.coinDenom.toLocaleLowerCase() === "tia",
       };
 
-      const tx = await router.executeSwap(
+      const tx = await swapRouterService.executeSwap(
+        selectedChain.chainId,
         trade,
         options,
-        walletClient,
-        publicClient,
       );
       setTxnHash(tx);
     } catch (error) {
@@ -238,8 +239,7 @@ export function useSwapButton({
     tokenTwo.token?.coinDenom,
     userAccount,
     selectedChain,
-    walletClient,
-    publicClient,
+    wagmiConfig,
     slippageTolerance,
   ]);
 
