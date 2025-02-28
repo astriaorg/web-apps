@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@repo/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { CardContext } from "./card.context";
