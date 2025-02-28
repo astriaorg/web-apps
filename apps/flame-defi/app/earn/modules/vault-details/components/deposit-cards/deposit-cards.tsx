@@ -1,5 +1,5 @@
+import { Image } from "components/image";
 import { Card, CardFigureInput, CardLabel } from "earn/components/card";
-import { Image } from "earn/components/image";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import React, { useMemo } from "react";
 import { FormattedNumber } from "react-intl";

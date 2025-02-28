@@ -1,6 +1,6 @@
 import { Badge, InfoTooltip, Skeleton } from "@repo/ui/components";
 import { ArrowLeftIcon } from "@repo/ui/icons";
-import { Image } from "earn/components/image";
+import { Image } from "components/image";
 import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
