@@ -1,15 +1,15 @@
 "use client";
 
-import { StepProps } from "./new-pool-position";
-import { ActionButton } from "@repo/ui/components";
+import { StepProps } from "../../../types";
+import { Button } from "@repo/ui/components";
 import { TokenInputState } from "@repo/flame-types";
 import { useState } from "react";
-import { useDepositTxn } from "../use-deposit-txn";
+import { useDepositTxn } from "../../../hooks/use-deposit-txn";
 
-export default function DepositAmountsStep({
+export const DepositAmountsStep = ({
   step,
   tokenPair,
-}: StepProps): React.ReactElement {
+}: StepProps): React.ReactElement => {
   const { tokenOne, tokenTwo } = tokenPair;
   const [inputOne, setInputOne] = useState<TokenInputState>({
     token: tokenOne,
@@ -111,14 +111,16 @@ export default function DepositAmountsStep({
           )}
           {/* TODO: This is a temp example of how we might conditionally render the action button */}
           {actionText === "Deposit" && (
-            <ActionButton
-              callback={() => console.log("DO A DEPOSIT")}
-              buttonText="Deposit"
+            <Button
+              onClick={() => console.log("DO A DEPOSIT")}
+              disabled={inputOne.value === "" || inputTwo.value === ""}
               className="w-full mt-5"
-            />
+            >
+              Deposit
+            </Button>
           )}
         </div>
       )}
     </div>
   );
-}
+};

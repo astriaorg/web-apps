@@ -3,11 +3,11 @@
 import { Decimal } from "@cosmjs/math";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Dropdown } from "@repo/ui/components";
+import { Button, Dropdown } from "@repo/ui/components";
 import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
 import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
-import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
   EditIcon,
@@ -525,12 +525,9 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <ActionButton
-          callback={handleDeposit}
-          disabled={isDepositDisabled}
-          isLoading={isLoading}
-          buttonText={"Deposit"}
-        />
+        <Button onClick={handleDeposit} disabled={isDepositDisabled}>
+          {isLoading ? "Processing..." : "Deposit"}
+        </Button>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
-import { ActionButton } from "@repo/ui/components";
+import { Button } from "@repo/ui/components";
 import {
   EvmCurrency,
   TokenInputState,
@@ -316,7 +316,7 @@ export default function SwapPage(): React.ReactElement {
     }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setModalOpen(false);
     if (
       txnStatus === TXN_STATUS.SUCCESS ||
@@ -325,24 +325,24 @@ export default function SwapPage(): React.ReactElement {
     ) {
       handleResetInputs();
     }
-  };
+  }, [handleResetInputs, txnStatus]);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = useCallback(() => {
     setModalOpen(true);
     if (isTiaWtia) {
       onSubmitCallback();
     } else {
       setTxnStatus(TXN_STATUS.IDLE);
     }
-  };
+  }, [isTiaWtia, onSubmitCallback, setTxnStatus]);
 
-  const handleModalActionButton = () => {
+  const handleModalActionButton = useCallback(() => {
     if (txnStatus !== TXN_STATUS.IDLE) {
       handleCloseModal();
     } else {
       onSubmitCallback();
     }
-  };
+  }, [handleCloseModal, onSubmitCallback, txnStatus]);
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -408,11 +408,9 @@ export default function SwapPage(): React.ReactElement {
           />
         </ConfirmationModal>
         {(!userAccount.address || tokenApprovalNeeded) && (
-          <ActionButton
-            callback={onSubmitCallback}
-            buttonText={buttonText}
-            className="w-full mt-2"
-          />
+          <Button onClick={onSubmitCallback} className="w-full mt-2">
+            {buttonText}
+          </Button>
         )}
         {errorText && (
           <div className="flex items-center justify-center text-red text-sm mt-4">

@@ -32,15 +32,6 @@ export interface AppConfig {
   tokenApprovalAmount: string;
   // The default slippage tolerance for swaps.
   swapSlippageToleranceDefault: number;
-  // The data for the fee options.
-  // TODO - replace with FeeData type after it's moved to flame-types package
-  feeData: {
-    id: number;
-    feePercent: string;
-    text: string;
-    tvl: string;
-    selectPercent: string;
-  }[];
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;

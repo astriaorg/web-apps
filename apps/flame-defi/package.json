@@ -23,6 +23,7 @@
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
     "ethers": "^6.13.2",
+    "framer-motion": "^12.5.0",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
     "jsbi": "^4.3.0",

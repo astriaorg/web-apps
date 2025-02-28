@@ -19,7 +19,7 @@ type ECOption = echarts.ComposeOption<
   LineSeriesOption | ScatterSeriesOption | GridComponentOption
 >;
 
-const MiniAreaChart: React.FC = () => {
+export const MiniAreaChart: React.FC = () => {
   // Sample data (use your real data here)
   const data: number[] = [
     20, 18, 19, 17, 18, 16, 14, 15, 14, 16, 15, 18, 20, 22, 21, 23,

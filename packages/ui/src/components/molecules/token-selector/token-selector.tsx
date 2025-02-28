@@ -17,6 +17,7 @@ import {
   DialogTrigger,
   Input,
 } from "../../../shadcn-primitives";
+import { TokenIcon } from "../token-icon";
 
 interface TokenSelectorProps {
   tokens: EvmCurrency[] | undefined;
@@ -75,11 +76,15 @@ export const TokenSelector = ({
           <div
             className={`flex items-center bg-radial-dark px-1 rounded-2xl border border-solid border-border`}
           >
-            {selectedToken?.IconComponent && (
-              <selectedToken.IconComponent size={20} />
+            {selectedToken && (
+              <TokenIcon
+                symbol={selectedToken.coinDenom}
+                size={20}
+                className="mr-3"
+              />
             )}
             <h2 className="text-lg font-medium mx-2 whitespace-nowrap">
-              {selectedToken?.coinDenom || defaultTitle}
+              {selectedToken?.coinDenom ?? defaultTitle}
             </h2>
             <ChevronDownIcon size={20} />
           </div>
@@ -103,7 +108,7 @@ export const TokenSelector = ({
           />
           <div className="h-[380px]">
             {filteredTokens?.map((token) => {
-              const { coinDenom, title, IconComponent } = token;
+              const { coinDenom, title } = token;
               const isUnavailableOrSelected =
                 unavailableToken?.coinDenom === coinDenom ||
                 selectedToken?.coinDenom === coinDenom;
@@ -121,8 +126,12 @@ export const TokenSelector = ({
                   style={{ position: "relative" }}
                 >
                   <div className="flex items-center relative z-1">
-                    {IconComponent && (
-                      <IconComponent size={32} className="mr-3" />
+                    {coinDenom && (
+                      <TokenIcon
+                        symbol={coinDenom}
+                        size={32}
+                        className="mr-3"
+                      />
                     )}
                     <div className="flex flex-col">
                       <span className="text-white text-md font-semibold">

@@ -1,0 +1,92 @@
+import {
+  Table as BaseTable,
+  Skeleton,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { usePositionsTable } from "pool/hooks";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "pool/constants/routes";
+
+export const PositionsTable = () => {
+  const router = useRouter();
+  const { tableData, columns, hideClosedPositions, setHideClosedPositions } =
+    usePositionsTable();
+  const table = useReactTable({
+    columns,
+    data: tableData,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  return (
+    <BaseTable className="w-full text-left whitespace-nowrap">
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead
+                key={header.id}
+                className={cn("h-12 px-3 first:pl-6 last:pr-6")}
+                onClick={() =>
+                  header.column.id === "positionStatus" &&
+                  setHideClosedPositions(!hideClosedPositions)
+                }
+              >
+                <div
+                  className={cn(
+                    "flex items-end space-x-2",
+                    header.column.id === "positionStatus" &&
+                      "justify-end cursor-pointer underline",
+                  )}
+                >
+                  <div className="text-xs/3 text-text-subdued font-medium tracking-wider uppercase">
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                  </div>
+                </div>
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow
+            key={row.id}
+            className="group cursor-pointer"
+            onClick={() => router.push(`${ROUTES.POOL}${row.id}`)}
+          >
+            {row.getVisibleCells().map((cell) => (
+              <TableCell
+                key={cell.id}
+                className={cn(
+                  "h-[72px] px-3 first:pl-6 last:pr-6 text-sm group-hover:bg-surface-2 transition",
+                  Number(row.id) === table.getRowModel().rows.length - 1 &&
+                    "last:rounded-b-xl first:rounded-bl-xl",
+                )}
+              >
+                {/* TODO: Add loading state when ready */}
+                <Skeleton className="h-8" isLoading={false}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </Skeleton>
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </BaseTable>
+  );
+};
+
+export default PositionsTable;
