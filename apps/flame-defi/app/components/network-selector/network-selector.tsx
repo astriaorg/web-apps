@@ -34,7 +34,7 @@ export default function NetworkSelector(): React.ReactElement {
 
   return (
     <Select
-      defaultValue={selectedFlameNetwork}
+      value={selectedFlameNetwork}
       onValueChange={(value) => handleNetworkSelect(value as FlameNetwork)}
     >
       <SelectTrigger className="w-[140px] capitalize border-border hover:border-orange-soft rounded-xl text-white transition text-base">

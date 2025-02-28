@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable } from "../env";
 import type { AppConfig } from "../index";
@@ -88,9 +88,11 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
-  const networksList = (
-    process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
-  ).split(",") as FlameNetwork[];
+  const networksList = useMemo(() => {
+    return (
+      process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+    ).split(",") as FlameNetwork[];
+  }, []);
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
