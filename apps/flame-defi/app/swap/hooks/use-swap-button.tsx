@@ -9,7 +9,7 @@ import { useEvmChainData } from "config";
 import {
   useEvmWallet,
   createTradeFromQuote,
-  createWrapService,
+  createWethService,
   createSwapRouterService,
 } from "features/evm-wallet";
 import {
@@ -143,11 +143,11 @@ export function useSwapButton({
     }
     setTxnStatus(TXN_STATUS.PENDING);
 
-    const wrapService = createWrapService(wagmiConfig, wtiaAddress);
+    const wethService = createWethService(wagmiConfig, wtiaAddress);
 
     if (type === "wrap") {
       try {
-        const tx = await wrapService.deposit(
+        const tx = await wethService.deposit(
           selectedChain.chainId,
           tokenOne.value,
           tokenOne.token?.coinDecimals || 18,
@@ -161,7 +161,7 @@ export function useSwapButton({
       }
     } else {
       try {
-        const tx = await wrapService.withdraw(
+        const tx = await wethService.withdraw(
           selectedChain.chainId,
           tokenOne.value,
           tokenOne.token?.coinDecimals || 18,

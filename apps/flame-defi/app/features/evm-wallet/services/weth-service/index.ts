@@ -1,14 +1,12 @@
 import { type Abi, type Address, parseUnits } from "viem";
 import type { Config } from "wagmi";
 
-import WETH_ABI from "./contracts/weth.json";
+import WETH_ABI from "./weth.json";
 import { GenericContractService } from "../generic-contract-service";
 
-export class AstriaErc20WrapService extends GenericContractService {
-  private static readonly ABI = WETH_ABI as unknown as Abi;
-
+export class WethService extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, AstriaErc20WrapService.ABI);
+    super(wagmiConfig, contractAddress, WETH_ABI as Abi);
   }
 
   /**
@@ -45,9 +43,9 @@ export class AstriaErc20WrapService extends GenericContractService {
   }
 }
 
-export function createWrapService(
+export function createWethService(
   wagmiConfig: Config,
   contractAddress: Address,
-): AstriaErc20WrapService {
-  return new AstriaErc20WrapService(wagmiConfig, contractAddress);
+): WethService {
+  return new WethService(wagmiConfig, contractAddress);
 }
