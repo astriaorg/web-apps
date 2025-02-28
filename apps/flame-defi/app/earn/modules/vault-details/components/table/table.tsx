@@ -18,6 +18,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
+import { Card } from "earn/components/card";
 import { Image } from "earn/components/image";
 import { VaultAllocationHistory } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
@@ -47,7 +48,7 @@ export const Table = () => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center space-x-2">
-              <div className="flex items-center -space-x-2">
+              <div className="flex items-center -space-x-2 shrink-0">
                 {row.original.market.collateralAsset && (
                   <Image
                     src={row.original.market.collateralAsset.logoURI}
@@ -65,7 +66,7 @@ export const Table = () => {
                   className="rounded-full"
                 />
               </div>
-              <span>
+              <span className="truncate">
                 {row.original.market.collateralAsset?.symbol}
                 {row.original.market.collateralAsset?.symbol ? " / " : ""}
                 {row.original.market.loanAsset.symbol}
@@ -196,58 +197,68 @@ export const Table = () => {
     enableSortingRemoval: false,
   });
 
-  if (isPending || isError) {
+  if (isPending) {
+    return (
+      <Card padding="md">
+        <Skeleton className="w-full h-12" />
+      </Card>
+    );
+  }
+
+  if (isError) {
     return null;
   }
 
   return (
-    <BaseTable>
-      <TableHeader>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <TableHead key={header.id}>
-                <div className="flex items-end space-x-2 whitespace-nowrap">
-                  <div>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+    <Card isLoading={isPending}>
+      <BaseTable>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  <div className="flex items-end space-x-2 whitespace-nowrap">
+                    <div>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </div>
+                    {header.column.getCanSort() && (
+                      <TableSortIcon
+                        isActive={header.id === sorting[0]?.id}
+                        isAscending={
+                          header.column.getNextSortingOrder() === "desc"
+                        }
+                        onClick={header.column.getToggleSortingHandler()}
+                      />
                     )}
                   </div>
-                  {header.column.getCanSort() && (
-                    <TableSortIcon
-                      isActive={header.id === sorting[0]?.id}
-                      isAscending={
-                        header.column.getNextSortingOrder() === "desc"
-                      }
-                      onClick={header.column.getToggleSortingHandler()}
-                    />
-                  )}
-                </div>
-              </TableHead>
-            ))}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {table.getRowModel().rows.map((row) => (
-          <TableRow
-            key={row.id}
-            className={cn(
-              "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
-              isPending && "pointer-events-none",
-            )}
-          >
-            {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id}>
-                <Skeleton isLoading={isPending} className="h-8">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </Skeleton>
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </BaseTable>
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow
+              key={row.id}
+              className={cn(
+                "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
+                isPending && "pointer-events-none",
+              )}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  <Skeleton isLoading={isPending} className="h-8">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Skeleton>
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </BaseTable>
+    </Card>
   );
 };

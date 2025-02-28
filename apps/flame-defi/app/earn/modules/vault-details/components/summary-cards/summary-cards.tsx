@@ -46,7 +46,7 @@ export const SummaryCards = () => {
           <span className="flex-1">Total Deposits</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
         </CardLabel>
-        <CardFigureText>
+        <CardFigureText className="truncate">
           {formattedTotalAssets}
           {formattedTotalAssetsSuffix}
         </CardFigureText>
@@ -56,7 +56,7 @@ export const SummaryCards = () => {
           <span className="flex-1">Liquidity</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
         </CardLabel>
-        <CardFigureText>
+        <CardFigureText className="truncate">
           {formattedLiquidity}
           {formattedLiquiditySuffix}
         </CardFigureText>

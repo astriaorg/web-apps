@@ -7,7 +7,7 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ children, className, isLoading }, forwardedRef) => {
+  ({ children, className, isLoading = true }, forwardedRef) => {
     if (!isLoading) {
       return children;
     }

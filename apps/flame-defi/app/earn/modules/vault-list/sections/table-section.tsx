@@ -1,4 +1,3 @@
-import { Card } from "earn/components/card";
 import { StatusCard } from "earn/components/status-card";
 import {
   Table,
@@ -41,9 +40,7 @@ export const TableSection = () => {
       {status === "empty" && <StatusCard>{`No vaults found.`}</StatusCard>}
       {status === "success" && (
         <>
-          <Card className="overflow-x-hidden md:overflow-x-auto">
-            <Table />
-          </Card>
+          <Table />
 
           <div className="flex justify-center mt-10">
             <TablePagination />

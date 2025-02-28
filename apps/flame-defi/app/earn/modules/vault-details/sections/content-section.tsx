@@ -1,6 +1,5 @@
 import { Skeleton } from "@repo/ui/components";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
-import { Card } from "earn/components/card";
 import { StatusCard } from "earn/components/status-card";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
@@ -112,9 +111,7 @@ export const ContentSection = () => {
                 }}
               />
 
-              <Card isLoading={isPending}>
-                <Table />
-              </Card>
+              <Table />
             </div>
           </div>
 
