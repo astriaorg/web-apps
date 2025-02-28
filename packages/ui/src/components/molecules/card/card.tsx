@@ -15,6 +15,7 @@ export const cardVariants = cva("", {
   },
   defaultVariants: {
     variant: "default",
+    padding: "default",
   },
 });
 

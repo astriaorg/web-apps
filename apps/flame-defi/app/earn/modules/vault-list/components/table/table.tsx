@@ -1,5 +1,6 @@
 import {
   Table as BaseTable,
+  Card,
   Skeleton,
   TableBody,
   TableCell,
@@ -10,7 +11,6 @@ import {
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { flexRender } from "@tanstack/react-table";
-import { Card } from "earn/components/card";
 import { ROUTES } from "earn/constants/routes";
 import { OrderDirection } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";

@@ -1,5 +1,6 @@
 import {
   Table as BaseTable,
+  Card,
   Skeleton,
   TableBody,
   TableCell,
@@ -19,7 +20,6 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import { Image } from "components/image";
-import { Card } from "earn/components/card";
 import { VaultAllocationHistory } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useMemo, useState } from "react";

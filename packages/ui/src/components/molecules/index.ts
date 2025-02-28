@@ -1,6 +1,7 @@
 export * from "./action-button";
 export * from "./animated-down-arrow-spacer";
 export * from "./block-loader";
+export * from "./card";
 export * from "./copy-to-clipboard-button";
 export * from "./dropdown";
 export * from "./info-tooltip";

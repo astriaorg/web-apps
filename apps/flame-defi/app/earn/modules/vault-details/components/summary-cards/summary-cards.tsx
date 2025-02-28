@@ -1,6 +1,6 @@
+import { Card, CardFigureText, CardLabel } from "@repo/ui/components";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
-import { Card, CardFigureText, CardLabel } from "earn/components/card";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { FormattedNumber } from "react-intl";
 

@@ -1,4 +1,7 @@
 import {
+  Card,
+  CardFigureText,
+  CardLabel,
   Skeleton,
   Tabs,
   TabsList,
@@ -6,7 +9,6 @@ import {
   tooltipVariants,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { Card, CardFigureText, CardLabel } from "earn/components/card";
 import { FloatDataPoint } from "earn/gql/graphql";
 import { initializeLineChart } from "earn/modules/vault-details/components/charts/charts.utils";
 import { ChartInterval } from "earn/modules/vault-details/types";
