@@ -1,13 +1,14 @@
 import { Card, Skeleton } from "@repo/ui/components";
+import { useAnimateCounter } from "@repo/ui/hooks";
 import { FormattedNumber } from "@repo/ui/intl";
 import Big from "big.js";
-import React, { useEffect } from "react";
+import React from "react";
 
 interface MarketSummaryCardProps {
   label: React.ReactNode;
   value: number;
   count: number | null;
-  setCount: (value: number) => void;
+  setCounter: (value: number) => void;
   /**
    * Sync animation state between multiple cards.
    */
@@ -18,47 +19,10 @@ export const MarketSummaryCard = ({
   label,
   value,
   count,
-  setCount,
+  setCounter,
   isAnimating,
 }: MarketSummaryCardProps) => {
-  useEffect(() => {
-    let isMounted = true;
-
-    const counter = (minimum: number, maximum: number) => {
-      let i = minimum;
-
-      const updateCount = () => {
-        if (isMounted && i <= maximum) {
-          setCount(i);
-
-          // Increment counter based on proximity to maximum so multiple cards have synced animations.
-          const range = maximum - minimum;
-          const progress = (i - minimum) / range;
-          const step = Math.max(1, (Math.log10(1 + 9 * progress) * range) / 10);
-
-          i += Math.ceil(step);
-
-          setTimeout(updateCount, 10);
-        }
-
-        if (isMounted && i > maximum) {
-          setCount(maximum);
-        }
-      };
-
-      updateCount();
-
-      return () => {
-        isMounted = false;
-      };
-    };
-
-    counter(0, value);
-
-    return () => {
-      isMounted = false;
-    };
-  }, [value, setCount]);
+  useAnimateCounter({ value, setCounter });
 
   return (
     <Card padding="md">

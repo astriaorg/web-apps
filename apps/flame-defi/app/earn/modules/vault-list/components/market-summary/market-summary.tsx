@@ -34,14 +34,14 @@ export const MarketSummary = () => {
         label="Total Deposits"
         value={VALUE_DEPOSIT}
         count={countDeposit}
-        setCount={setCountDeposit}
+        setCounter={setCountDeposit}
         isAnimating={isAnimating}
       />
       <MarketSummaryCard
         label="Total Borrow"
         value={VALUE_BORROW}
         count={countBorrow}
-        setCount={setCountBorrow}
+        setCounter={setCountBorrow}
         isAnimating={isAnimating}
       />
     </div>
