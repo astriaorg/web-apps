@@ -23,7 +23,7 @@ import {
   Route,
   SwapOptions,
   Trade,
-} from "../swap-services/types";
+} from "./types";
 import { GenericContractService } from "../generic-contract-service";
 
 export class SwapRouterService extends GenericContractService {

@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getPublicClient } from "@wagmi/core";
 import {
   useAccount,
   useConfig as useWagmiConfig,
   useWaitForTransactionReceipt,
-  useWalletClient,
 } from "wagmi";
 
 import { useEvmChainData } from "config";
@@ -91,12 +89,8 @@ export function useSwapButton({
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSwapSlippageTolerance();
-  const publicClient = getPublicClient(wagmiConfig, {
-    chainId: selectedChain?.chainId,
-  });
   const addRecentTransaction = useAddRecentTransaction();
   const { connectEvmWallet } = useEvmWallet();
-  const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
@@ -190,13 +184,7 @@ export function useSwapButton({
   }, [quote, tradeType]);
 
   const handleSwap = useCallback(async () => {
-    if (
-      !trade ||
-      !userAccount.address ||
-      !selectedChain?.chainId ||
-      !walletClient ||
-      !walletClient.account
-    ) {
+    if (!trade || !userAccount.address || !selectedChain?.chainId) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
