@@ -1,16 +1,24 @@
-import { TimeseriesOptions } from "earn/gql/graphql";
+import { getTimeseriesOptions } from "earn/modules/vault-details/components/charts/charts.utils";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
-import { APYChartInterval } from "earn/modules/vault-details/types";
+import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
+import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 
+type Charts = {
+  [key in keyof typeof CHART_TYPE]: {
+    selectedInterval: ChartInterval;
+    setSelectedInterval: (value: ChartInterval) => void;
+    query: ReturnType<typeof useFetchVaultByAddressHistoricalState>;
+  };
+};
+
 export interface PageContextProps extends PropsWithChildren {
   address: string;
+  charts: Charts;
   status: Status;
-  selectedAPYChartInterval: APYChartInterval;
-  setSelectedAPYChartInterval: (value: APYChartInterval) => void;
   query: ReturnType<typeof useFetchVaultByAddress>;
 }
 
@@ -25,87 +33,90 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     throw new Error(`Route missing param 'address'.`);
   }
 
-  const [selectedAPYChartInterval, setSelectedAPYChartInterval] =
-    useState<APYChartInterval>("3m");
-
-  const dailyAPYOptions: TimeseriesOptions = useMemo(() => {
-    if (selectedAPYChartInterval === "all") {
-      return {
-        startTimestamp: null,
-        endTimestamp: null,
-      };
-    }
-
-    // Timestamps change every second, so query is never cached.
-    // Round down to the nearest 5 minutes to avoid this.
-    const roundDownToNearest5Minutes = (timestamp: number) => {
-      const msIn5Minutes = 5 * 60;
-      return Math.floor(timestamp / msIn5Minutes) * msIn5Minutes;
+  const [charts, setCharts] = useState<{
+    [CHART_TYPE.APY]: {
+      selectedInterval: ChartInterval;
     };
-
-    const now = Date.now();
-    const date = new Date();
-
-    const { startTimestamp, endTimestamp } = (() => {
-      switch (selectedAPYChartInterval) {
-        case "1w": {
-          date.setDate(date.getDate() - 7);
-          return {
-            startTimestamp: date.getTime(),
-            endTimestamp: now,
-          };
-        }
-        case "1m": {
-          date.setMonth(date.getMonth() - 1);
-          return {
-            startTimestamp: date.getTime(),
-            endTimestamp: now,
-          };
-        }
-        case "3m": {
-          date.setMonth(date.getMonth() - 3);
-          return {
-            startTimestamp: date.getTime(),
-            endTimestamp: now,
-          };
-        }
-      }
-    })();
-
-    return {
-      startTimestamp: Math.floor(
-        roundDownToNearest5Minutes(startTimestamp / 1000),
-      ),
-      endTimestamp: Math.floor(roundDownToNearest5Minutes(endTimestamp / 1000)),
+    [CHART_TYPE.TOTAL_SUPPLY]: {
+      // TODO: Add currency selector when we support more currencies.
+      selectedInterval: ChartInterval;
     };
-  }, [selectedAPYChartInterval]);
+  }>({
+    [CHART_TYPE.APY]: {
+      selectedInterval: "3m",
+    },
+    [CHART_TYPE.TOTAL_SUPPLY]: {
+      selectedInterval: "3m",
+    },
+  });
 
   const query = useFetchVaultByAddress({
     variables: {
       address: params.address,
-      dailyAPYOptions,
+    },
+  });
+
+  const queryAPYChart = useFetchVaultByAddressHistoricalState({
+    variables: {
+      address: params.address,
+      type: CHART_TYPE.APY,
+      options: getTimeseriesOptions(charts[CHART_TYPE.APY].selectedInterval),
+    },
+  });
+
+  const queryTotalSupplyChart = useFetchVaultByAddressHistoricalState({
+    variables: {
+      address: params.address,
+      type: CHART_TYPE.TOTAL_SUPPLY,
+      options: getTimeseriesOptions(
+        charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+      ),
     },
   });
 
   const status = useMemo<Status>(() => {
-    if (query.isError) {
+    if (
+      query.isError ||
+      queryAPYChart.isError ||
+      queryTotalSupplyChart.isError
+    ) {
       return "error";
     }
 
-    if (!query.isPending && !query.data?.vaultByAddress) {
-      return "empty";
-    }
-
     return "success";
-  }, [query.isError, query.isPending, query.data?.vaultByAddress]);
+  }, [query.isError, queryAPYChart.isError, queryTotalSupplyChart.isError]);
 
   return (
     <PageContext.Provider
       value={{
         address: params.address,
+        charts: {
+          [CHART_TYPE.APY]: {
+            selectedInterval: charts[CHART_TYPE.APY].selectedInterval,
+            setSelectedInterval: (value: ChartInterval) => {
+              setCharts({
+                ...charts,
+                [CHART_TYPE.APY]: {
+                  selectedInterval: value,
+                },
+              });
+            },
+            query: queryAPYChart,
+          },
+          [CHART_TYPE.TOTAL_SUPPLY]: {
+            selectedInterval: charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+            setSelectedInterval: (value: ChartInterval) => {
+              setCharts({
+                ...charts,
+                [CHART_TYPE.TOTAL_SUPPLY]: {
+                  selectedInterval: value,
+                },
+              });
+            },
+            query: queryTotalSupplyChart,
+          },
+        },
         status,
-        selectedAPYChartInterval,
-        setSelectedAPYChartInterval,
         query,
       }}
     >

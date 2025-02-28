@@ -23,7 +23,7 @@ export const PLACEHOLDER_DATA: VaultsQuery = {
         logoURI: "",
       },
       state: {
-        apy: 0,
+        netApy: 0,
         totalAssets: 0,
         totalAssetsUsd: 0,
       },
@@ -62,7 +62,7 @@ const query = graphql(`
           logoURI
         }
         state {
-          apy
+          netApy
           totalAssets
           totalAssetsUsd
         }

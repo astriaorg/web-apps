@@ -1,7 +1,16 @@
-import { Skeleton } from "@repo/ui/components";
-import { ArrowDownIcon } from "@repo/ui/icons";
+import {
+  Table as BaseTable,
+  Skeleton,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSortIcon,
+} from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { flexRender } from "@tanstack/react-table";
+import { Card } from "earn/components/card";
 import { ROUTES } from "earn/constants/routes";
 import { OrderDirection } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
@@ -17,71 +26,62 @@ export const Table = () => {
   } = usePageContext();
 
   return (
-    <table className="w-full text-left whitespace-nowrap">
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                className={cn(
-                  "h-12 px-3 first:pl-6 last:hidden",
-                  "md:last:table-cell",
-                )}
-              >
-                <div className="flex items-end space-x-2">
-                  <div className="text-xs/3 text-text-subdued font-medium tracking-wider uppercase">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+    <Card className="overflow-x-hidden md:overflow-x-auto">
+      <BaseTable>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead
+                  key={header.id}
+                  className="last:hidden md:last:table-cell"
+                >
+                  <div className="flex items-end space-x-2 whitespace-nowrap">
+                    <div>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </div>
+                    {header.column.getCanSort() && (
+                      <TableSortIcon
+                        isActive={header.id === orderBy}
+                        isAscending={orderDirection === OrderDirection.Asc}
+                        onClick={header.column.getToggleSortingHandler()}
+                      />
                     )}
                   </div>
-                  {header.column.getCanSort() && (
-                    <div
-                      className={cn(
-                        "cursor-pointer text-text-subdued hover:text-text hover:opacity-100",
-                        "transform transition-transform duration-200",
-                        header.id === orderBy ? "opacity-100" : "opacity-0",
-                        orderDirection === OrderDirection.Asc && "rotate-180",
-                      )}
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      <ArrowDownIcon aria-label="Sort" size={16} />
-                    </div>
-                  )}
-                </div>
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className={cn(
-              isPending ? "select-none" : "cursor-pointer hover:surface-2",
-            )}
-            onClick={() =>
-              router.push(ROUTES.VAULT_DETAILS + row.original.address)
-            }
-          >
-            {row.getVisibleCells().map((cell) => (
-              <td
-                key={cell.id}
-                className={cn(
-                  "h-[72px] px-3 first:pl-6 last:hidden border-t border-stroke text-sm",
-                  "md:last:table-cell",
-                )}
-              >
-                <Skeleton isLoading={isPending} className="h-8">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </Skeleton>
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow
+              key={row.id}
+              className={cn(
+                "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
+                isPending && "pointer-events-none",
+              )}
+              onClick={() =>
+                router.push(ROUTES.VAULT_DETAILS + row.original.address)
+              }
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell
+                  key={cell.id}
+                  className="last:hidden md:last:table-cell"
+                >
+                  <Skeleton isLoading={isPending} className="h-8">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Skeleton>
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </BaseTable>
+    </Card>
   );
 };

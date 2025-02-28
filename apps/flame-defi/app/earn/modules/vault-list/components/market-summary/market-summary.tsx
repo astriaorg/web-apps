@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { MarketSummaryCard } from "./market-summary-card";
 
-// TODO: Use fetched values.
+// TODO: Use fetched values, handle error state.
 const VALUE_DEPOSIT = 1000000;
 const VALUE_BORROW = 75000;
 

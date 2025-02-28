@@ -74,7 +74,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     // Use `VaultOrderBy` as ID for sorting.
     return [
       columnHelper.accessor("name", {
-        id: "name",
+        id: VaultOrderBy.Name,
         header: "Vault Name",
         cell: ({ row }) => {
           return (
@@ -96,7 +96,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 </span>
                 <span className="md:hidden text-xs/3">
                   <FormattedNumber
-                    value={row.original.state?.apy ?? 0}
+                    value={row.original.state?.netApy ?? 0}
                     style="percent"
                     minimumFractionDigits={2}
                   />
@@ -110,7 +110,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("state.totalAssets", {
-        id: "TotalAssets",
+        id: VaultOrderBy.TotalAssets,
         header: "Supply",
         cell: ({ row }) => {
           return (
@@ -158,8 +158,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         enableSorting: true,
         footer: (info) => info.column.id,
       }),
-      columnHelper.accessor("state.apy", {
-        id: "Apy",
+      columnHelper.accessor("state.netApy", {
+        id: VaultOrderBy.NetApy,
         header: () => {
           return (
             <div className="hidden md:block">
@@ -169,15 +169,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         },
         cell: (info) => {
           return (
-            <>
-              <div className="hidden md:block">
-                <FormattedNumber
-                  value={info.getValue()}
-                  style="percent"
-                  minimumFractionDigits={2}
-                />
-              </div>
-            </>
+            <div className="hidden md:block">
+              <FormattedNumber
+                value={info.getValue() ?? 0}
+                style="percent"
+                minimumFractionDigits={2}
+              />
+            </div>
           );
         },
         enableSorting: true,

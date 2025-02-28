@@ -62,7 +62,7 @@ export const MarketSummaryCard = ({
   }, [value, setCount]);
 
   return (
-    <Card className="flex flex-col rounded-xl p-5 space-y-1">
+    <Card padding="md">
       <span className="text-xs/3 text-text-light">{label}</span>
 
       <div className="relative">
