@@ -7,7 +7,11 @@ describe("cn utility", () => {
 
   it("should handle conditional classes", () => {
     const condition = true;
-    const result = cn("base", condition && "conditional", !condition && "not-applied");
+    const result = cn(
+      "base",
+      condition && "conditional",
+      !condition && "not-applied",
+    );
     expect(result).toBe("base conditional");
   });
 
@@ -33,7 +37,7 @@ describe("cn utility", () => {
     const result = cn(
       "text-red-500 p-2 rounded-lg",
       "text-blue-500 p-4",
-      "hover:text-green-500"
+      "hover:text-green-500",
     );
     // Check for presence of correctly merged classes rather than exact order
     expect(result).toContain("rounded-lg");

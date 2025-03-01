@@ -6,7 +6,7 @@ export function getFromLocalStorage(item: string) {
         return JSON.parse(retrievedItem);
       } catch (error) {
         // If JSON parsing fails, log the error and return empty object
-        console.error('Failed to parse item from localStorage:', error);
+        console.error("Failed to parse item from localStorage:", error);
         return {};
       }
     }

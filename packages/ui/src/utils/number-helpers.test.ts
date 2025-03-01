@@ -4,7 +4,7 @@ import {
   formatNumber,
   formatNumberAsPercent,
   formatDecimalValues,
-  isDustAmount
+  isDustAmount,
 } from "./number-helpers";
 
 describe("formatAbbreviatedNumber", () => {
@@ -60,7 +60,7 @@ describe("formatAbbreviatedNumber", () => {
 
   it("should show full thousand value when showFullThousandValue is true", () => {
     const result = formatAbbreviatedNumber("7500", {
-      showFullThousandValue: true
+      showFullThousandValue: true,
     });
     expect(result).toEqual({
       value: "7500",
