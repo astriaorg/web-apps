@@ -1,25 +1,25 @@
 "use client";
 
+import { InfoTooltip } from "@repo/ui/components";
+import { GearIcon } from "@repo/ui/icons";
+import { useIntl } from "@repo/ui/intl";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Switch,
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogCancel,
-  AlertDialogAction,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Switch,
 } from "@repo/ui/shadcn-primitives";
-import { GearIcon } from "@repo/ui/icons";
-import { InfoTooltip } from "@repo/ui/components";
-import { useState } from "react";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { useConfig } from "config";
-import { useIntl } from "react-intl";
+import { useState } from "react";
 
 export const SettingsPopover = () => {
   const { formatNumber } = useIntl();

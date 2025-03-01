@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useSyncAnimateCounter } from "@repo/ui/components";
+import { useState } from "react";
 import { MarketSummaryCard } from "./market-summary-card";
 
 // TODO: Use fetched values, handle error state.
@@ -6,43 +7,40 @@ const VALUE_DEPOSIT = 1000000;
 const VALUE_BORROW = 75000;
 
 export const MarketSummary = () => {
-  const [countDeposit, setCountDeposit] = useState<number | null>(null);
-  const [countBorrow, setCountBorrow] = useState<number | null>(null);
-
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    // Prevent counter animation when number is too low.
-    // May need to adjust based on the expected maximum value.
-    const multiplier = 0.1;
-    const countDepositMinimum = VALUE_DEPOSIT * multiplier;
-    const countBorrowMinimum = VALUE_BORROW * multiplier;
+  const [counterDeposit, setCounterDeposit] = useState<number | null>(null);
+  const [counterBorrow, setCounterBorrow] = useState<number | null>(null);
 
-    if (
-      countDeposit !== null &&
-      countBorrow !== null &&
-      countDeposit > countDepositMinimum &&
-      countBorrow > countBorrowMinimum
-    ) {
-      setIsAnimating(true);
-    }
-  }, [countDeposit, countBorrow]);
+  useSyncAnimateCounter({
+    values: [
+      {
+        value: VALUE_DEPOSIT,
+        counter: counterDeposit,
+      },
+      {
+        value: VALUE_BORROW,
+        counter: counterBorrow,
+      },
+    ],
+    setIsAnimating,
+  });
 
   return (
     <div className="flex flex-col gap-2 md:flex-row">
       <MarketSummaryCard
         label="Total Deposits"
         value={VALUE_DEPOSIT}
-        count={countDeposit}
-        setCount={setCountDeposit}
-        isAnimating={isAnimating}
+        counter={counterDeposit}
+        setCounter={setCounterDeposit}
+        isSyncingAnimation={isAnimating}
       />
       <MarketSummaryCard
         label="Total Borrow"
         value={VALUE_BORROW}
-        count={countBorrow}
-        setCount={setCountBorrow}
-        isAnimating={isAnimating}
+        counter={counterBorrow}
+        setCounter={setCounterBorrow}
+        isSyncingAnimation={isAnimating}
       />
     </div>
   );

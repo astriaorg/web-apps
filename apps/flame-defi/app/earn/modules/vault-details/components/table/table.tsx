@@ -1,5 +1,6 @@
 import {
   Table as BaseTable,
+  Card,
   Skeleton,
   TableBody,
   TableCell,
@@ -8,6 +9,7 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
+import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -18,12 +20,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
-import { Card } from "earn/components/card";
-import { Image } from "earn/components/image";
+import { Image } from "components/image";
 import { VaultAllocationHistory } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useMemo, useState } from "react";
-import { FormattedNumber, useIntl } from "react-intl";
 
 export const Table = () => {
   const { formatNumber } = useIntl();

@@ -9,6 +9,9 @@ interface ImageProps
   alt?: string | null;
 }
 
+/**
+ * @returns A Next `Image` component with a fallback placeholder.
+ */
 export const Image = ({
   className,
   src,
