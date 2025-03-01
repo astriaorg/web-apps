@@ -44,7 +44,7 @@ export const HeaderSection = () => {
               <Skeleton isLoading={isPending} className="w-12 h-5">
                 <div className="flex space-x-2">
                   <Badge
-                    variant="subdued"
+                    variant="secondary"
                     className="flex items-center space-x-2"
                   >
                     <Image
@@ -59,7 +59,7 @@ export const HeaderSection = () => {
                   {data?.vaultByAddress.metadata?.curators.map((it, index) => (
                     <Badge
                       key={`curator_${index}`}
-                      variant="subdued"
+                      variant="secondary"
                       className="flex items-center space-x-2"
                     >
                       <Image
