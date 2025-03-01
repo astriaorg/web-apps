@@ -2,7 +2,13 @@ export function getFromLocalStorage(item: string) {
   if (typeof window !== "undefined") {
     const retrievedItem = window.localStorage.getItem(item);
     if (retrievedItem) {
-      return JSON.parse(retrievedItem);
+      try {
+        return JSON.parse(retrievedItem);
+      } catch (error) {
+        // If JSON parsing fails, log the error and return empty object
+        console.error('Failed to parse item from localStorage:', error);
+        return {};
+      }
     }
   }
   return {};
