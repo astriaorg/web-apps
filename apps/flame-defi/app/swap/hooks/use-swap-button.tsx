@@ -1,18 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { getPublicClient } from "@wagmi/core";
 import {
   useAccount,
   useConfig as useWagmiConfig,
   useWaitForTransactionReceipt,
-  useWalletClient,
 } from "wagmi";
 
 import { useEvmChainData } from "config";
 import {
   useEvmWallet,
   createTradeFromQuote,
-  createWrapService,
-  SwapRouter,
+  createWethService,
+  createSwapRouterService,
 } from "features/evm-wallet";
 import {
   evmChainToRainbowKitChain,
@@ -91,12 +89,8 @@ export function useSwapButton({
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSwapSlippageTolerance();
-  const publicClient = getPublicClient(wagmiConfig, {
-    chainId: selectedChain?.chainId,
-  });
   const addRecentTransaction = useAddRecentTransaction();
   const { connectEvmWallet } = useEvmWallet();
-  const { data: walletClient } = useWalletClient();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
@@ -149,11 +143,11 @@ export function useSwapButton({
     }
     setTxnStatus(TXN_STATUS.PENDING);
 
-    const wrapService = createWrapService(wagmiConfig, wtiaAddress);
+    const wethService = createWethService(wagmiConfig, wtiaAddress);
 
     if (type === "wrap") {
       try {
-        const tx = await wrapService.deposit(
+        const tx = await wethService.deposit(
           selectedChain.chainId,
           tokenOne.value,
           tokenOne.token?.coinDecimals || 18,
@@ -167,7 +161,7 @@ export function useSwapButton({
       }
     } else {
       try {
-        const tx = await wrapService.withdraw(
+        const tx = await wethService.withdraw(
           selectedChain.chainId,
           tokenOne.value,
           tokenOne.token?.coinDecimals || 18,
@@ -190,14 +184,7 @@ export function useSwapButton({
   }, [quote, tradeType]);
 
   const handleSwap = useCallback(async () => {
-    if (
-      !trade ||
-      !userAccount.address ||
-      !selectedChain?.chainId ||
-      !walletClient ||
-      !walletClient.account ||
-      !publicClient
-    ) {
+    if (!trade || !userAccount.address || !selectedChain?.chainId) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
@@ -207,10 +194,13 @@ export function useSwapButton({
         console.warn("Swap router address is not defined. Cannot swap.");
         return;
       }
-      const router = new SwapRouter(
-        swapRouterAddress,
+
+      const swapRouterService = createSwapRouterService(
+        wagmiConfig,
+        swapRouterAddress as `0x${string}`,
         evmChainToRainbowKitChain(selectedChain) as Chain,
       );
+
       const options = {
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
@@ -219,11 +209,10 @@ export function useSwapButton({
         isNativeOut: tokenTwo.token?.coinDenom.toLocaleLowerCase() === "tia",
       };
 
-      const tx = await router.executeSwap(
+      const tx = await swapRouterService.executeSwap(
+        selectedChain.chainId,
         trade,
         options,
-        walletClient,
-        publicClient,
       );
       setTxnHash(tx);
     } catch (error) {
@@ -238,8 +227,7 @@ export function useSwapButton({
     tokenTwo.token?.coinDenom,
     userAccount,
     selectedChain,
-    walletClient,
-    publicClient,
+    wagmiConfig,
     slippageTolerance,
   ]);
 

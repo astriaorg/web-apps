@@ -1,11 +1,19 @@
-import { Chain, encodeFunctionData, PublicClient, WalletClient } from "viem";
+import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
+import {
+  Chain,
+  encodeFunctionData,
+  type Address,
+  type PublicClient,
+  type WalletClient,
+  Abi,
+} from "viem";
 import {
   GetQuoteResult,
   Token,
   TokenAmount,
   TRADE_TYPE,
 } from "@repo/flame-types";
-import SWAP_ROUTER_ABI from "./contracts/swaprouter02.json";
+import SWAP_ROUTER_ABI from "./swaprouter02.json";
 import {
   ExactInputParams,
   ExactInputSingleParams,
@@ -16,27 +24,14 @@ import {
   SwapOptions,
   Trade,
 } from "./types";
+import { GenericContractService } from "../generic-contract-service";
 
-export class SwapRouter {
-  private readonly routerAddress: `0x${string}`;
+export class SwapRouterService extends GenericContractService {
   private readonly chainConfig: Chain;
-  private readonly routerAbi: Array<{
-    name: string;
-    type: string;
-    inputs: Array<{
-      name: string;
-      type: string;
-      components?: Array<{ name: string; type: string }>;
-    }>;
-    outputs: Array<{ name: string; type: string }>;
-    stateMutability: string;
-  }>;
 
-  constructor(routerAddress: string, chainConfig: Chain) {
-    this.routerAddress = routerAddress as `0x${string}`;
+  constructor(wagmiConfig: Config, routerAddress: Address, chainConfig: Chain) {
+    super(wagmiConfig, routerAddress, SWAP_ROUTER_ABI as Abi);
     this.chainConfig = chainConfig;
-    // minimal ABI for the swap functions.
-    this.routerAbi = SWAP_ROUTER_ABI;
   }
 
   private getExactInputParams(
@@ -57,7 +52,7 @@ export class SwapRouter {
         args: [
           {
             path: this.encodePath(trade.route),
-            recipient: isNativeOut ? this.routerAddress : recipient,
+            recipient: isNativeOut ? this.contractAddress : recipient,
             amountIn: BigInt(trade.inputAmount.raw.toString()),
             amountOutMinimum: BigInt(
               trade.outputAmount
@@ -85,7 +80,7 @@ export class SwapRouter {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isNativeOut ? this.routerAddress : recipient,
+          recipient: isNativeOut ? this.contractAddress : recipient,
           amountIn: BigInt(trade.inputAmount.raw.toString()),
           amountOutMinimum: BigInt(
             trade.outputAmount
@@ -117,7 +112,7 @@ export class SwapRouter {
         args: [
           {
             path: this.encodePathReversed(trade.route),
-            recipient: isNativeOut ? this.routerAddress : recipient,
+            recipient: isNativeOut ? this.contractAddress : recipient,
             amountOut: BigInt(trade.outputAmount.raw.toString()),
             amountInMaximum: BigInt(
               trade.inputAmount
@@ -145,7 +140,7 @@ export class SwapRouter {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isNativeOut ? this.routerAddress : recipient,
+          recipient: isNativeOut ? this.contractAddress : recipient,
           amountOut: BigInt(trade.outputAmount.raw.toString()),
           amountInMaximum: BigInt(
             trade.inputAmount
@@ -198,21 +193,22 @@ export class SwapRouter {
   /**
    * Executes a swap using the connected wallet (via viem).
    *
+   * @param chainId - The chain ID of the network
    * @param trade - The trade details.
    * @param options - Swap options such as recipient, slippage, and deadline.
-   * @param walletClient - The connected wallet client (from wagmi/viem).
-   * @param publicClient - The public client for reading blockchain data.
    * @returns The transaction hash if successful.
    */
   async executeSwap(
+    chainId: number,
     trade: Trade,
     options: SwapOptions,
-    walletClient: WalletClient,
-    publicClient: PublicClient,
-  ): Promise<`0x${string}` | undefined> {
+  ): Promise<`0x${string}`> {
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
-    const signerAddress = walletClient?.account?.address as `0x${string}`;
+
+    const walletClient = await this.getWalletClient(chainId);
+    const publicClient = await this.getPublicClient(chainId);
+    const signerAddress = walletClient.account?.address as `0x${string}`;
 
     // get swap parameters based on trade type
     const swapParams =
@@ -237,8 +233,8 @@ export class SwapRouter {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
-          address: this.routerAddress,
-          abi: this.routerAbi,
+          address: this.contractAddress,
+          abi: this.abi,
           functionName: swapParams.functionName,
           args: swapParams.args,
           account: signerAddress,
@@ -252,17 +248,13 @@ export class SwapRouter {
       gasLimit = (gasLimit * 120n) / 100n;
 
       // Send the transaction via the connected wallet's writeContract method.
-      return await walletClient.writeContract({
-        address: this.routerAddress,
-        abi: this.routerAbi,
-        functionName: swapParams.functionName,
-        args: swapParams.args,
-        // NOTE - we don't need to send any TIA when we're doing an ERC20 swap
-        value: BigInt(0),
-        gas: gasLimit,
-        chain: this.chainConfig,
-        account: signerAddress,
-      });
+      return await this.writeContractMethodWithGas(
+        chainId,
+        swapParams.functionName,
+        swapParams.args,
+        BigInt(0),
+        gasLimit,
+      );
     }
 
     const calls: string[] = [];
@@ -287,21 +279,12 @@ export class SwapRouter {
       calls.push(this.encodeUnwrapWETHCall(minimumAmount));
     }
 
-    return await walletClient.writeContract({
-      address: this.routerAddress,
-      abi: this.routerAbi,
-      functionName: "multicall",
-      args: [calls],
-      value,
-      // gas: DEFAULT_GAS_LIMIT,
-      chain: this.chainConfig,
-      account: signerAddress,
-    });
+    return await this.writeContractMethod(chainId, "multicall", [calls], value);
   }
 
   private encodeUnwrapWETHCall(minimumAmount: string): string {
     return encodeFunctionData({
-      abi: this.routerAbi,
+      abi: this.abi,
       functionName: "unwrapWETH9",
       args: [BigInt(minimumAmount)],
     });
@@ -320,11 +303,77 @@ export class SwapRouter {
       | readonly [ExactOutputParams],
   ): `0x${string}` {
     return encodeFunctionData({
-      abi: this.routerAbi,
+      abi: this.abi,
       functionName,
       args,
     });
   }
+
+  /**
+   * Helper to get the wallet client
+   */
+  private async getWalletClient(chainId: number): Promise<WalletClient> {
+    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
+    if (!walletClient) {
+      throw new Error("No wallet client available");
+    }
+    return walletClient;
+  }
+
+  /**
+   * Helper to get the public client
+   */
+  private async getPublicClient(chainId: number): Promise<PublicClient> {
+    const publicClient = getPublicClient(this.wagmiConfig, { chainId });
+    if (!publicClient) {
+      throw new Error("No public client available");
+    }
+    return publicClient;
+  }
+
+  /**
+   * Extended write contract method that allows specifying gas
+   */
+  private async writeContractMethodWithGas(
+    chainId: number,
+    methodName: string,
+    args:
+      | readonly [ExactInputSingleParams]
+      | readonly [ExactInputParams]
+      | readonly [ExactOutputSingleParams]
+      | readonly [ExactOutputParams],
+    value?: bigint,
+    gas?: bigint,
+  ): Promise<`0x${string}`> {
+    const walletClient = await this.getWalletClient(chainId);
+
+    try {
+      return await walletClient.writeContract({
+        address: this.contractAddress,
+        abi: this.abi,
+        functionName: methodName,
+        args,
+        value,
+        gas,
+        chain: this.chainConfig,
+        account: walletClient.account?.address ?? null,
+      });
+    } catch (e) {
+      console.error(`Error in ${methodName}:`, e);
+      throw e;
+    }
+  }
+}
+
+/**
+ * Factory function to create a SwapRouterService
+ */
+export function createSwapRouterService(
+  wagmiConfig: Config,
+  routerAddress: Address,
+  chainConfig: Chain,
+): SwapRouterService {
+  return new SwapRouterService(wagmiConfig, routerAddress, chainConfig);
 }
 
 /**
