@@ -31,7 +31,12 @@ export const SummaryCards = () => {
 
   return (
     <div className="grid lg:grid-cols-3 gap-2">
-      <Card isLoading={isPending} padding="md" variant="accent">
+      <Card
+        isLoading={isPending}
+        padding="md"
+        variant="accent"
+        className="space-y-2"
+      >
         <CardLabel>APY</CardLabel>
         <CardFigureText>
           <FormattedNumber
@@ -41,7 +46,7 @@ export const SummaryCards = () => {
           />
         </CardFigureText>
       </Card>
-      <Card isLoading={isPending} padding="md">
+      <Card isLoading={isPending} padding="md" className="space-y-2">
         <CardLabel>
           <span className="flex-1">Total Deposits</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>
@@ -51,7 +56,7 @@ export const SummaryCards = () => {
           {formattedTotalAssetsSuffix}
         </CardFigureText>
       </Card>
-      <Card isLoading={isPending} padding="md">
+      <Card isLoading={isPending} padding="md" className="space-y-2">
         <CardLabel>
           <span className="flex-1">Liquidity</span>
           <span>{data?.vaultByAddress.asset.symbol}</span>

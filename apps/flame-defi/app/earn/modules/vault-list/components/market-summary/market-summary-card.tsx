@@ -21,7 +21,7 @@ export const MarketSummaryCard = ({
   useAnimateCounter({ value, setCounter });
 
   return (
-    <Card padding="md">
+    <Card padding="md" className="space-y-2">
       <span className="text-xs/3 text-text-light">{label}</span>
 
       <AnimatedCounter

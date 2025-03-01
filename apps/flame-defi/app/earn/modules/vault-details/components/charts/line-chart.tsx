@@ -68,7 +68,7 @@ export const LineChart = ({
   }
 
   return (
-    <Card isLoading={isLoading} padding="md">
+    <Card isLoading={isLoading} padding="md" className="space-y-2">
       <CardLabel className="relative">
         <span>{title}</span>
         <span className="absolute right-0">

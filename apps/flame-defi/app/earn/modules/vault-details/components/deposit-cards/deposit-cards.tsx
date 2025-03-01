@@ -105,7 +105,7 @@ export const DepositCards = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card isLoading={isPending} padding="md">
+      <Card isLoading={isPending} padding="md" className="space-y-2">
         <CardLabel>
           <span className="flex-1">
             Deposit {data?.vaultByAddress.asset.symbol}
