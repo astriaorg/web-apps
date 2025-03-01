@@ -29,7 +29,7 @@ export const HeaderSection = () => {
           {status !== "error" && (
             <div className="flex flex-col space-y-3">
               <Skeleton isLoading={isPending} className="w-64 h-8">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <span className="text-3xl/8">
                     {data?.vaultByAddress.name}
                   </span>
