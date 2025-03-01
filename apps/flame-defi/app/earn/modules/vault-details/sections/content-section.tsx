@@ -1,7 +1,6 @@
-import { Skeleton } from "@repo/ui/components";
+import { Skeleton, StatusCard } from "@repo/ui/components";
 import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
-import { StatusCard } from "earn/components/status-card";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";

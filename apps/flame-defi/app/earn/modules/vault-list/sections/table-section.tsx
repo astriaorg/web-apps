@@ -1,4 +1,4 @@
-import { StatusCard } from "earn/components/status-card";
+import { StatusCard } from "@repo/ui/components";
 import {
   Table,
   TablePagination,
