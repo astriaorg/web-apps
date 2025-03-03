@@ -10,20 +10,7 @@
     "flame-defi#build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": [
-        "NEXT_ENV",
-        "NEXT_PUBLIC_VERSION",
-        "NEXT_PUBLIC_BRAND_URL",
-        "NEXT_PUBLIC_BRIDGE_URL",
-        "NEXT_PUBLIC_SWAP_URL",
-        "NEXT_PUBLIC_POOL_URL",
-        "NEXT_PUBLIC_EARN_API_URL",
-        "NEXT_PUBLIC_GA_TRACKING_ID",
-        "NEXT_PUBLIC_FEEDBACK_FORM_URL",
-        "NEXT_PUBLIC_WALLET_CONNECT_DOMAIN_VERIFICATION_CODE",
-        "NEXT_PUBLIC_NETWORK_LIST_OPTIONS",
-        "NEXT_PUBLIC_FEATURE_EARN_ENABLED"
-      ],
+      "env": ["NEXT_ENV"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
