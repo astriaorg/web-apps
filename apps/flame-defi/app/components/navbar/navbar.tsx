@@ -11,7 +11,7 @@ import NetworkSelector from "../network-selector/network-selector";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { brandURL } = useConfig();
+  const { brandURL, featureFlags } = useConfig();
 
   const navLinkClasses = (path: string) => `
     relative px-4 py-2 text-grey-light hover:text-white
@@ -65,9 +65,11 @@ const Navbar = () => {
           <Link href="/pool" className={navLinkClasses("/pool")}>
             POOL
           </Link>
-          <Link href="/earn" className={navLinkClasses("/earn")}>
-            EARN
-          </Link>
+          {featureFlags.earnEnabled && (
+            <Link href="/earn" className={navLinkClasses("/earn")}>
+              EARN
+            </Link>
+          )}
         </div>
       </div>
       <div className="hidden md:flex gap-6 items-center">
