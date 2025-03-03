@@ -9,8 +9,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["NB Akademie", "sans-serif"],
-        mono: ["NB Akademie Mono", "monospace"],
+        sans: ["var(--font-switzer)", "sans-serif"],
+        mono: ["var(--font-nb-akademie-mono)", "monospace"],
+        dot: ["var(--font-dot-matrix)", "monospace"],
       },
       colors: {
         white: "hsl(var(--color-white))",
@@ -76,18 +77,41 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
+        // Tokens.
+        icon: {
+          DEFAULT: "hsl(var(--color-icon-default))",
+          light: "hsl(var(--color-icon-light))",
+          subdued: "hsl(var(--color-icon-subdued))",
+        },
+        stroke: {
+          DEFAULT: "hsl(var(--color-stroke-default))",
+          active: "hsl(var(--color-stroke-active))",
+        },
+        text: {
+          DEFAULT: "hsl(var(--color-text-default))",
+          secondary: "hsl(var(--color-text-secondary))",
+          inverted: "hsl(var(--color-text-inverted))",
+          light: "hsl(var(--color-text-light))",
+          subdued: "hsl(var(--color-text-subdued))",
+          black: "hsl(var(--color-text-black))",
+        },
+        background: {
+          DEFAULT: "hsl(var(--color-background-default))",
+        },
+        surface: {
+          1: "hsl(var(--color-surface-1))",
+          2: "hsl(var(--color-surface-2))",
+          3: "hsl(var(--color-surface-3))",
+          inverted: "hsl(var(--color-surface-inverted))",
+        },
+        orange: "hsl(var(--color-orange))",
       },
       transitionDuration: {
         DEFAULT: "300ms", // Sets the default duration to 300ms
       },
       transitionTimingFunction: {
         DEFAULT: "ease", // Optional: Sets the default easing
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xs: "calc(var(--radius) - 8px)",
       },
       keyframes: {
         "fade-in": {
@@ -134,6 +158,26 @@ export default {
             height: "0",
           },
         },
+        shimmer: {
+          from: {
+            backgroundPosition: "200% 0",
+          },
+          to: {
+            backgroundPosition: "-200% 0",
+          },
+        },
+        "success-tick": {
+          "0%": { "stroke-dashoffset": "16px", opacity: "1" },
+          "100%": { "stroke-dashoffset": "31px", opacity: "1" },
+        },
+        "success-circle-outline": {
+          "0%": { "stroke-dashoffset": "72px", opacity: "1" },
+          "100%": { "stroke-dashoffset": "0px", opacity: "1" },
+        },
+        "success-circle-fill": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.3s ease-in-out",
@@ -141,6 +185,12 @@ export default {
         "light-up-orange": "lightUpOrange 1s ease-in-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 6000ms ease-in-out infinite",
+        "success-tick": "success-tick 450ms ease 500ms forwards",
+        "success-circle-outline":
+          "success-circle-outline 300ms ease-in-out 300ms forwards",
+        "success-circle-fill":
+          "success-circle-fill 300ms ease-out 500ms forwards",
       },
       backgroundImage: {
         "astria-gradient":
@@ -161,6 +211,12 @@ export default {
       },
       borderColor: {
         dark: "hsl(var(--border))",
+      },
+      lineHeight: {
+        12: "3rem",
+      },
+      spacing: {
+        18: "4.5rem",
       },
     },
   },

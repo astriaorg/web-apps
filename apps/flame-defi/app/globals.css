@@ -41,7 +41,79 @@
     --destructive-foreground: 210 40% 98%;
     --ring: 216 34% 17%;
 
-    --radius: 16px;
+    /* Primitives. */
+    --color-gray-0: 0 0% 100%;
+    --color-gray-50: 0 0% 96%;
+    --color-gray-100: 0 0% 90%;
+    --color-gray-150: 0 0% 85%;
+    --color-gray-200: 0 0% 80%;
+    --color-gray-250: 0 0% 75%;
+    --color-gray-300: 0 0% 70%;
+    --color-gray-350: 0 0% 65%;
+    --color-gray-400: 0 0% 60%;
+    --color-gray-450: 0 0% 55%;
+    --color-gray-500: 0 0% 50%;
+    --color-gray-550: 0 0% 45%;
+    --color-gray-600: 0 0% 40%;
+    --color-gray-650: 0 0% 35%;
+    --color-gray-700: 0 0% 30%;
+    --color-gray-750: 0 0% 25%;
+    --color-gray-800: 0 0% 20%;
+    --color-gray-850: 0 0% 15%;
+    --color-gray-900: 0 0% 10%;
+    --color-gray-950: 0 0% 5%;
+    --color-gray-1000: 0 0% 0%;
+
+    --color-orange-100: 20 100% 54%;
+    --color-chartreuse-100: 72 100% 72%;
+  }
+
+  html[data-theme="light"] {
+    --color-icon-default: var(--color-gray-850);
+    --color-icon-light: var(--color-gray-350);
+    --color-icon-subdued: var(--color-gray-500);
+
+    --color-stroke-default: var(--color-gray-200);
+    --color-stroke-active: var(--color-gray-750);
+
+    --color-text-default: var(--color-gray-1000);
+    --color-text-secondary: var(--color-gray-850);
+    --color-text-inverted: var(--color-gray-0);
+    --color-text-light: var(--color-gray-400);
+    --color-text-subdued: var(--color-gray-700);
+    --color-text-black: var(--color-gray-1000);
+
+    --color-background-default: var(--color-gray-0);
+    --color-surface-1: var(--color-gray-50);
+    --color-surface-2: var(--color-gray-100);
+    --color-surface-3: var(--color-gray-150);
+    --color-surface-inverted: var(--color-gray-1000);
+
+    --color-orange: var(--color-orange-100);
+  }
+
+  html[data-theme="dark"] {
+    --color-icon-default: var(--color-gray-150);
+    --color-icon-light: var(--color-gray-650);
+    --color-icon-subdued: var(--color-gray-500);
+
+    --color-stroke-default: var(--color-gray-800);
+    --color-stroke-active: var(--color-gray-250);
+
+    --color-text-default: var(--color-gray-0);
+    --color-text-secondary: var(--color-gray-150);
+    --color-text-inverted: var(--color-gray-1000);
+    --color-text-light: var(--color-gray-600);
+    --color-text-subdued: var(--color-gray-300);
+    --color-text-black: var(--color-gray-1000);
+
+    --color-background-default: var(--color-gray-1000);
+    --color-surface-1: var(--color-gray-900);
+    --color-surface-2: var(--color-gray-850);
+    --color-surface-3: var(--color-gray-800);
+    --color-surface-inverted: var(--color-gray-0);
+
+    --color-orange: var(--color-orange-100);
   }
 }
 
@@ -54,16 +126,41 @@
     @apply h-screen;
   }
   body {
-    @apply m-0 p-0 bg-body font-sans antialiased text-white;
+    @apply m-0 p-0 bg-background font-sans antialiased text-text;
   }
 }
 
 @layer components {
+  .gradient-background {
+    @apply border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)];
+  }
   .gradient-container {
-    @apply p-4 sm:p-4 md:p-8 lg:p-12 border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)] rounded-2xl;
+    @apply gradient-background p-4 sm:p-4 md:p-8 lg:p-12 rounded-2xl;
   }
   .normalize-input {
-    @apply flex-1 bg-transparent focus:outline-none text-[36px] placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+    @apply flex-1 bg-transparent focus:outline-none placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+  }
+
+  .earn-chart {
+    @apply overflow-visible;
+
+    > g {
+      @apply text-text-light;
+      text-anchor: start;
+
+      line {
+        @apply hidden;
+      }
+
+      text {
+        @apply uppercase text-xs/3 font-medium tracking-wider;
+      }
+    }
+
+    > path,
+    > rect {
+      @apply text-orange;
+    }
   }
 }
 
@@ -79,367 +176,4 @@
   .is-text-overflow {
     @apply overflow-hidden text-ellipsis whitespace-nowrap;
   }
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_900-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_900-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_900-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_900-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_900-webfont.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_800-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_800-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_800-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_800-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_800-webfont.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_700-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_700-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_700-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_700-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_700-webfont.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_600-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_600-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_600-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_600-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_600-webfont.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_500-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_500-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_500-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_500-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_500-webfont.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_400-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_400-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_400-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_400-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_400-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_300-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_300-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_300-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_300-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_300-webfont.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_200-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_200-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_200-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_200-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_200-webfont.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_200_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_200_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_200_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_200_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_200_italic-webfont.ttf") format("truetype");
-  font-weight: normal;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_900_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_900_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_900_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_900_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_900_italic-webfont.ttf") format("truetype");
-  font-weight: 900;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_800_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_800_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_800_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_800_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_800_italic-webfont.ttf") format("truetype");
-  font-weight: 800;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_700_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_700_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_700_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_700_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_700_italic-webfont.ttf") format("truetype");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_600_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_600_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_600_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_600_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_600_italic-webfont.ttf") format("truetype");
-  font-weight: 600;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_500_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_500_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_500_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_500_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_500_italic-webfont.ttf") format("truetype");
-  font-weight: 500;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_400_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_400_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_400_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_400_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_400_italic-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "NB Akademie Mono";
-  src: url("fonts/nb_akademie_mono_300_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_mono_300_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_mono_300_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_mono_300_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_mono_300_italic-webfont.ttf") format("truetype");
-  font-weight: 300;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Nb Akademie Pro Book";
-  src: url("fonts/nb_akademie_pro_book-webfont.eot");
-  src:
-    url("fonts/nb_akademie_pro_book-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_pro_book-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_pro_book-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_pro_book-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_semibold-webfont.eot");
-  src:
-    url("fonts/nb_akademie_semibold-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_semibold-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_semibold-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_semibold-webfont.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_regular-webfont.eot");
-  src:
-    url("fonts/nb_akademie_regular-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_regular-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_regular-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_regular-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_medium-webfont.eot");
-  src:
-    url("fonts/nb_akademie_medium-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_medium-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_medium-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_medium-webfont.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_light-webfont.eot");
-  src:
-    url("fonts/nb_akademie_light-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_light-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_light-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_light-webfont.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_extrabold-webfont.eot");
-  src:
-    url("fonts/nb_akademie_extrabold-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_extrabold-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_extrabold-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_extrabold-webfont.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_bold-webfont.eot");
-  src:
-    url("fonts/nb_akademie_bold-webfont.eot?#iefix") format("embedded-opentype"),
-    url("fonts/nb_akademie_bold-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_bold-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_bold-webfont.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_medium_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_medium_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_medium_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_medium_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_medium_italic-webfont.ttf") format("truetype");
-  font-weight: 500;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_semibold_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_semibold_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_semibold_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_semibold_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_semibold_italic-webfont.ttf") format("truetype");
-  font-weight: 600;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_bold_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_bold_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_bold_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_bold_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_bold_italic-webfont.ttf") format("truetype");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Nb Akademie Book";
-  src: url("fonts/nb_akademie_book_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_book_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_book_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_book_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_book_italic-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Nb Akademie";
-  src: url("fonts/nb_akademie_italic-webfont.eot");
-  src:
-    url("fonts/nb_akademie_italic-webfont.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/nb_akademie_italic-webfont.woff2") format("woff2"),
-    url("fonts/nb_akademie_italic-webfont.woff") format("woff"),
-    url("fonts/nb_akademie_italic-webfont.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
 }

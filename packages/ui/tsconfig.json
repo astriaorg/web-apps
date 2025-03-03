@@ -2,6 +2,7 @@
   "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "moduleResolution": "bundler",
     "module": "ESNext",
     "types": [
@@ -12,9 +13,16 @@
       "@radix-ui/react-slot",
       "@radix-ui/react-alert-dialog",
       "@radix-ui/react-accordion",
-      "@radix-ui/react-select"
+      "@radix-ui/react-select",
+      "@testing-library/jest-dom"
     ]
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "**/*.test.tsx",
+    "**/*.test.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

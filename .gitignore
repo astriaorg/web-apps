@@ -30,6 +30,9 @@ out/
 build
 dist
 
+# artifacts from ai tooling
+CLAUDE.md
+codebase.md
 
 # Debug
 npm-debug.log*

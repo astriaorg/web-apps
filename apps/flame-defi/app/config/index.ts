@@ -1,25 +1,12 @@
 import {
-  type FlameNetwork,
   getAllChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
-} from "./chainConfigs";
-import {
-  type CosmosChainInfo,
-  type CosmosChains,
-  type EvmChainInfo,
-  type EvmChains,
-  type IbcCurrency,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
-  evmCurrencyBelongsToChain,
-  ibcCurrencyBelongsToChain,
-} from "./chainConfigs/types";
-import { ConfigContextProvider } from "./contexts/ConfigContext";
+} from "./chain-configs";
+import { ConfigContextProvider } from "./contexts/config-context";
 import { getEnvVariable } from "./env";
-import { useConfig } from "./hooks/useConfig";
+import { useConfig, useEvmChainData } from "./hooks/use-config";
+import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 /**
  * Represents the configuration object for the application.
@@ -47,25 +34,30 @@ export interface AppConfig {
   feedbackFormURL: string | null;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
+  // The default approval amount for tokens.
+  tokenApprovalAmount: string;
+  // The default slippage tolerance for swaps.
+  swapSlippageToleranceDefault: number;
+  // The data for the fee options.
+  feeData: {
+    id: number;
+    feePercent: string;
+    text: string;
+    tvl: string;
+    selectPercent: string;
+  }[];
+  // Feature flags
+  featureFlags: {
+    earnEnabled: boolean;
+  };
 }
 
 export {
   ConfigContextProvider,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  cosmosChainNameFromId,
-  evmChainsToRainbowKitChains,
-  evmCurrencyBelongsToChain,
   getAllChainConfigs,
   getEnvVariable,
   getFlameChainId,
   getFlameNetworkByChainId,
-  ibcCurrencyBelongsToChain,
   useConfig,
-  type CosmosChainInfo,
-  type CosmosChains,
-  type EvmChainInfo,
-  type EvmChains,
-  type FlameNetwork,
-  type IbcCurrency,
+  useEvmChainData,
 };

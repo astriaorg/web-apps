@@ -1,78 +1,301 @@
 "use client";
 
-import React from "react";
-import { DownArrowIcon } from "@repo/ui/icons";
-import {
-  ActionButton,
-  TokenSelector,
-  SettingsPopover,
-} from "@repo/ui/components";
-import { useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
-import { TOKEN_INPUTS } from "../constants";
-import { TokenState } from "@repo/ui/types";
-import { useConfig } from "config";
-import { formatBalanceValues } from "utils/utils";
-import { useTokenBalance } from "features/EvmWallet/hooks/useTokenBalance";
-import { useSwapButton } from "./useSwapButton";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { useEvmChainData } from "config";
+import { ArrowDownIcon } from "@repo/ui/icons";
+import { ActionButton } from "@repo/ui/components";
+import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
+import {
+  useSwapButton,
+  useGetQuote,
+  useOneToOneQuote,
+  useTxnInfo,
+} from "./hooks";
+import { SwapInput } from "./components/swap-input";
+import { TxnInfo } from "./components/txn-info";
+import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
+import { SwapTxnSteps } from "./components/swap-txn-steps";
+import { useTokenBalances } from "features/evm-wallet";
+import debounce from "lodash.debounce";
+
+enum TOKEN_INPUTS {
+  TOKEN_ONE = "token_one",
+  TOKEN_TWO = "token_two",
+}
 
 export default function SwapPage(): React.ReactElement {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const currencies = evmChainsData[0]?.currencies;
+  const { selectedChain } = useEvmChainData();
+  const { currencies } = selectedChain;
   const userAccount = useAccount();
-  const [inputSelected, setInputSelected] = useState(TOKEN_INPUTS.TOKEN_ONE);
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
     value: "",
+    isQuoteValue: false,
   });
-  // TODO: update this inputs values based on the quote service when ready
   const [inputTwo, setInputTwo] = useState<TokenState>({
     token: null,
     value: "",
+    isQuoteValue: true,
   });
-  const tokenOneBalance = useTokenBalance(inputOne.token, evmChainsData[0]);
-  const tokenTwoBalance = useTokenBalance(inputTwo.token, evmChainsData[0]);
+  const isTiaWtia = useMemo(() => {
+    return Boolean(
+      (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
+        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative),
+    );
+  }, [inputOne, inputTwo]);
 
-  const { handleButtonAction, buttonText, validSwapInputs } = useSwapButton(
-    inputOne,
-    inputTwo,
-    tokenOneBalance.balance?.value || "0",
-    evmChainsData,
+  const [flipTokens, setFlipTokens] = useState(false);
+  const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
+  const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
+    useGetQuote();
+  const tokenOne = !flipTokens ? inputOne : inputTwo;
+  const tokenTwo = !flipTokens ? inputTwo : inputOne;
+
+  const { balances, fetchBalances } = useTokenBalances(
+    userAccount.address,
+    selectedChain,
   );
 
-  // TODO: Add this back in when the quote service is ready
-  // const { quote, loading, error } = useGetQuote({
+  useEffect(() => {
+    if (userAccount.address && (inputOne.token || inputTwo.token)) {
+      fetchBalances([inputOne.token, inputTwo.token]);
+    }
+  }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
 
-  //   chainId: evmChainsData[0]?.chainId,
-  //   amount: inputOne.value ? parseUnits(inputOne.value, inputOne.token?.coinDecimals || 18).toString() : "1",
-  //   tokenInAddress: inputOne.token?.erc20ContractAddress || inputOne.token?.nativeTokenWithdrawerContractAddress,
-  //   tokenInDecimals: inputOne.token?.coinDecimals,
-  //   tokenInSymbol: inputOne.token?.coinDenom,
-  //   tokenOutAddress: inputTwo.token?.erc20ContractAddress || inputTwo.token?.nativeTokenWithdrawerContractAddress,
-  //   tokenOutDecimals: inputTwo.token?.coinDecimals,
-  //   tokenOutSymbol: inputTwo.token?.coinDenom,
-  //   type: 'exactIn',
-  // });
+  const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
+  const tokenOneBalance =
+    balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)
+      ?.value || "0";
 
-  const handleInputChange = (value: string, isInputOne: boolean) => {
-    if (isInputOne) {
-      setInputOne((prev) => ({ ...prev, value: value }));
-    } else {
-      setInputTwo((prev) => ({ ...prev, value: value }));
+  const {
+    titleText,
+    txnHash,
+    onSubmitCallback,
+    buttonText,
+    actionButtonText,
+    validSwapInputs,
+    txnStatus,
+    setTxnStatus,
+    txnMsg,
+    isCloseModalAction,
+    tokenApprovalNeeded,
+    errorText,
+    setErrorText,
+  } = useSwapButton({
+    tokenOne,
+    tokenTwo,
+    tokenOneBalance,
+    quote,
+    loading,
+    quoteError,
+    tradeType,
+  });
+  const txnInfo = useTxnInfo({
+    quote,
+    tokenOne,
+    tokenTwo,
+    tradeType,
+    validSwapInputs: validSwapInputs || false,
+  });
+
+  const debouncedGetQuoteRef = useRef(
+    debounce(
+      (
+        tradeType: TRADE_TYPE,
+        tokenData: { token: EvmCurrency; value: string },
+        token: TokenState,
+        tokenInput: TOKEN_INPUTS,
+      ) => {
+        getQuote(tradeType, tokenData, token).then((res) => {
+          if (tokenInput === TOKEN_INPUTS.TOKEN_ONE && res) {
+            setInputTwo((prev) => ({
+              ...prev,
+              value: res.quoteDecimals,
+              isQuoteValue: true,
+            }));
+          } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO && res) {
+            setInputOne((prev) => ({
+              ...prev,
+              value: res.quoteDecimals,
+              isQuoteValue: true,
+            }));
+          }
+        });
+      },
+      500,
+    ),
+  );
+
+  const handleTradeType = useCallback((index: number) => {
+    if (index === 0) {
+      setTradeType(TRADE_TYPE.EXACT_IN);
+    } else if (index === 1) {
+      setTradeType(TRADE_TYPE.EXACT_OUT);
+    }
+  }, []);
+
+  const handleTiaWtiaInputs = (value: string) => {
+    setInputOne((prev) => ({ ...prev, value: value }));
+    setInputTwo((prev) => ({ ...prev, value: value }));
+  };
+
+  const handleResetInputs = useCallback(() => {
+    setInputOne({ token: currencies?.[0], value: "", isQuoteValue: false });
+    setInputTwo({ token: null, value: "", isQuoteValue: true });
+    setQuote(null);
+    setFlipTokens(false);
+  }, [currencies, setQuote]);
+
+  const handleInputChange = useCallback(
+    (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
+      if (isTiaWtia) {
+        handleTiaWtiaInputs(value);
+        return;
+      }
+      setErrorText(null);
+      handleTradeType(index);
+
+      const tradeType =
+        index === 0 ? TRADE_TYPE.EXACT_IN : TRADE_TYPE.EXACT_OUT;
+
+      if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
+        setInputOne((prev) => ({ ...prev, value: value, isQuoteValue: false }));
+        setInputTwo((prev) => ({ ...prev, value: "", isQuoteValue: true }));
+      } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
+        setInputTwo((prev) => ({ ...prev, value: value, isQuoteValue: false }));
+        setInputOne((prev) => ({ ...prev, value: "", isQuoteValue: true }));
+      }
+
+      if (
+        value !== "" &&
+        parseFloat(value) > 0 &&
+        tokenOne.token &&
+        tokenTwo.token
+      ) {
+        debouncedGetQuoteRef.current(
+          tradeType,
+          { token: tokenOne.token, value },
+          tokenTwo,
+          tokenInput,
+        );
+      }
+
+      if (value === "" || value === "0") {
+        setInputOne((prev) => ({ ...prev, value: value }));
+        setInputTwo((prev) => ({ ...prev, value: value }));
+        cancelGetQuote();
+      }
+    },
+    [
+      tokenOne,
+      tokenTwo,
+      handleTradeType,
+      isTiaWtia,
+      debouncedGetQuoteRef,
+      cancelGetQuote,
+      setErrorText,
+    ],
+  );
+
+  const handleTokenSelect = useCallback(
+    (selectedToken: EvmCurrency, tokenInput: TOKEN_INPUTS, index: number) => {
+      if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
+        setInputOne((prev) => ({ ...prev, token: selectedToken }));
+      } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
+        setInputTwo((prev) => ({ ...prev, token: selectedToken }));
+      }
+      setErrorText(null);
+      const tradeType = tokenTwo.isQuoteValue
+        ? TRADE_TYPE.EXACT_IN
+        : TRADE_TYPE.EXACT_OUT;
+      const exactInToken = index === 0 ? selectedToken : tokenOne.token;
+      const userInputAmount = !tokenOne.isQuoteValue
+        ? tokenOne.value
+        : tokenTwo.value;
+      const exactOutToken =
+        index === 0 && tokenTwo.token ? tokenTwo.token : selectedToken;
+
+      if (
+        userInputAmount !== "" &&
+        parseFloat(userInputAmount) > 0 &&
+        tokenOne.token &&
+        exactInToken &&
+        exactOutToken
+      ) {
+        getQuote(
+          tradeType,
+          { token: exactInToken, value: userInputAmount },
+          { token: exactOutToken, value: "" },
+        ).then((res) => {
+          if (tokenOne.isQuoteValue && res) {
+            setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
+          } else if (tokenTwo.isQuoteValue && res) {
+            setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
+          }
+        });
+      }
+    },
+    [getQuote, tokenOne, tokenTwo, setErrorText],
+  );
+
+  const handleArrowClick = () => {
+    const newTradeType =
+      tradeType === TRADE_TYPE.EXACT_IN
+        ? TRADE_TYPE.EXACT_OUT
+        : TRADE_TYPE.EXACT_IN;
+    setFlipTokens((prev) => !prev);
+    setTradeType(newTradeType);
+
+    const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
+    const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
+
+    if (preFlipTokenOne.value !== "" || preFlipTokenTwo.value !== "") {
+      getQuote(newTradeType, preFlipTokenOne, preFlipTokenTwo);
     }
   };
 
-  const handleArrowClick = () => {
-    setInputSelected(
-      inputSelected === TOKEN_INPUTS.TOKEN_ONE
-        ? TOKEN_INPUTS.TOKEN_TWO
-        : TOKEN_INPUTS.TOKEN_ONE,
-    );
+  const swapInputs = [
+    {
+      id: TOKEN_INPUTS.TOKEN_ONE,
+      inputToken: inputOne,
+      onInputChange: (value: string, index: number) =>
+        handleInputChange(value, TOKEN_INPUTS.TOKEN_ONE, index),
+      availableTokens: currencies,
+      oppositeToken: inputTwo,
+      balance: balances[0]?.value || "0",
+      onTokenSelect: (token: EvmCurrency, index: number) =>
+        handleTokenSelect(token, TOKEN_INPUTS.TOKEN_ONE, index),
+      label: flipTokens ? "Buy" : "Sell",
+      txnQuoteData: quote,
+      txnQuoteLoading: loading,
+      txnQuoteError: quoteError,
+    },
+    {
+      id: TOKEN_INPUTS.TOKEN_TWO,
+      inputToken: inputTwo,
+      onInputChange: (value: string, index: number) =>
+        handleInputChange(value, TOKEN_INPUTS.TOKEN_TWO, index),
+      availableTokens: currencies,
+      oppositeToken: inputOne,
+      balance: balances[1]?.value || "0",
+      onTokenSelect: (token: EvmCurrency, index: number) =>
+        handleTokenSelect(token, TOKEN_INPUTS.TOKEN_TWO, index),
+      label: flipTokens ? "Sell" : "Buy",
+      txnQuoteData: quote,
+      txnQuoteLoading: loading,
+      txnQuoteError: quoteError,
+    },
+  ];
 
-    setInputOne(() => ({ value: inputTwo.value || "", token: inputTwo.token }));
-    setInputTwo(() => ({ value: inputOne.value || "", token: inputOne.token }));
-  };
+  const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -81,127 +304,74 @@ export default function SwapPage(): React.ReactElement {
           <h2 className="text-lg md:text-2xl font-medium">Swap</h2>
           <SettingsPopover />
         </div>
-        <div
-          onKeyDown={() => null}
-          onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_ONE)}
-          className={`flex flex-col rounded-md p-4 transition border border-solid border-transparent hover:border-grey-medium ${
-            inputSelected === TOKEN_INPUTS.TOKEN_ONE
-              ? "bg-background border-grey-medium"
-              : "bg-semi-white"
-          }`}
-        >
-          <div className="text-base font-medium text-grey-light">Sell</div>
-          <div className="flex justify-between items-center">
-            <input
-              type="number"
-              value={inputOne.value}
-              onChange={(e) => handleInputChange(e.target.value, true)}
-              className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden"
-              placeholder="0"
-            />
-            <div className="flex flex-col items-end">
-              <TokenSelector
-                tokens={currencies}
-                selectedToken={inputOne.token}
-                setSelectedToken={(token) =>
-                  setInputOne((prev) => ({ ...prev, token }))
-                }
-              />
-              {inputOne.token ? (
-                <div className="text-sm font-medium text-grey-light flex items-center mt-3">
-                  <span className="flex items-center gap-2">
-                    {formatBalanceValues(tokenOneBalance.balance?.value)}{" "}
-                    {tokenOneBalance.balance?.symbol}
-                  </span>
-                  <span
-                    onClick={() =>
-                      handleInputChange(
-                        tokenOneBalance.balance?.value || "0",
-                        true,
-                      )
-                    }
-                    className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
-                  >
-                    Max
-                  </span>
-                </div>
-              ) : (
-                <div className="h-[20px] mt-3 w-[100%]"></div>
-              )}
-            </div>
+        <div className="relative flex flex-col items-center">
+          <div className="flex flex-col gap-1 w-full">
+            {swapPairs.map((props, index) => (
+              <SwapInput key={index} {...props} index={index} />
+            ))}
           </div>
-          <div>
-            <span className="text-sm font-medium text-grey-light">$0</span>
+          <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
+            <button
+              type="button"
+              className="z-10 cursor-pointer p-1 bg-grey-dark hover:bg-black transition rounded-xl border-4 border-black"
+              onClick={handleArrowClick}
+            >
+              <ArrowDownIcon aria-label="Swap" size={28} />
+            </button>
           </div>
         </div>
-        <div
-          className="relative flex justify-center"
-          style={{ margin: "-20px 0" }}
-        >
-          <button
-            type="button"
-            className="z-10 cursor-pointer p-1 bg-grey-dark hover:bg-black transition rounded-xl border-4 border-black"
-            onClick={() => handleArrowClick()}
-          >
-            <DownArrowIcon aria-label="Swap" size={28} />
-          </button>
-        </div>
-        <div
-          onKeyDown={() => null}
-          onClick={() => setInputSelected(TOKEN_INPUTS.TOKEN_TWO)}
-          className={`flex flex-col rounded-md p-4 transition border border-solid border-transparent hover:border-grey-medium ${
-            inputSelected === TOKEN_INPUTS.TOKEN_TWO
-              ? "bg-background border-grey-medium"
-              : "bg-semi-white"
-          }`}
-        >
-          <div className="text-base font-medium text-grey-light">Buy</div>
-          <div className="flex justify-between items-center">
-            <input
-              type="number"
-              value={inputTwo.value}
-              onChange={(e) => handleInputChange(e.target.value, false)}
-              className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden"
-              placeholder="0"
-            />
-            <div className="flex flex-col items-end">
-              <TokenSelector
-                tokens={currencies}
-                selectedToken={inputTwo.token}
-                setSelectedToken={(token) =>
-                  setInputTwo((prev) => ({ ...prev, token }))
-                }
-              />
-              {inputTwo.token ? (
-                <div className="text-sm font-medium text-grey-light flex items-center mt-3">
-                  <span className="flex items-center gap-2">
-                    {formatBalanceValues(tokenTwoBalance.balance?.value)}{" "}
-                    {tokenTwoBalance.balance?.symbol}
-                  </span>
-                </div>
-              ) : (
-                <div className="h-[20px] mt-3 w-[100%]"></div>
-              )}
-            </div>
-          </div>
-          <div>
-            <span className="text-sm font-medium text-grey-light">$0</span>
-          </div>
-        </div>
-        {userAccount.address && !validSwapInputs && (
+        {userAccount.address && !validSwapInputs && !tokenApprovalNeeded && (
           <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
             {buttonText}
           </div>
         )}
-        {handleButtonAction && validSwapInputs && (
+        {validSwapInputs && !tokenApprovalNeeded && (
+          <ConfirmationModal
+            onSubmitCallback={onSubmitCallback}
+            buttonText={buttonText}
+            actionButtonText={actionButtonText}
+            txnStatus={txnStatus}
+            setTxnStatus={setTxnStatus}
+            isCloseModalAction={isCloseModalAction}
+            handleResetInputs={handleResetInputs}
+            skipIdleTxnStatus={isTiaWtia}
+            title={titleText}
+          >
+            <SwapTxnSteps
+              txnStatus={txnStatus}
+              txnInfo={txnInfo}
+              tokenOne={tokenOne}
+              tokenTwo={tokenTwo}
+              isTiaWtia={isTiaWtia}
+              oneToOneQuote={oneToOneQuote}
+              txnHash={txnHash}
+              txnMsg={txnMsg}
+            />
+          </ConfirmationModal>
+        )}
+        {(!userAccount.address || tokenApprovalNeeded) && (
           <ActionButton
-            callback={handleButtonAction}
+            callback={onSubmitCallback}
             buttonText={buttonText}
             className="w-full mt-2"
           />
         )}
-        {/* TODO: ADD THIS IN WHEN WE HAVE THE TXN INFO */}
-        {/* <TxnInfo /> */}
+        {errorText && (
+          <div className="flex items-center justify-center text-red text-sm mt-4">
+            {errorText}
+          </div>
+        )}
+        {inputOne.token &&
+          inputTwo.token &&
+          !isTiaWtia &&
+          validSwapInputs &&
+          quote && (
+            <TxnInfo
+              txnInfo={txnInfo}
+              tokenTwo={tokenTwo}
+              oneToOneQuote={oneToOneQuote}
+            />
+          )}
       </div>
     </section>
   );

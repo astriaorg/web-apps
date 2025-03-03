@@ -3,8 +3,8 @@
 import type React from "react";
 import { useState } from "react";
 
-import DepositCard from "components/DepositCard/DepositCard";
-import WithdrawCard from "components/WithdrawCard/WithdrawCard";
+import DepositCard from "components/deposit-card/deposit-card";
+import WithdrawCard from "components/withdraw-card/withdraw-card";
 
 type TabType = "DEPOSIT" | "WITHDRAW";
 
@@ -43,9 +43,9 @@ export default function BridgePage(): React.ReactElement {
   const tabs: TabType[] = ["DEPOSIT", "WITHDRAW"];
 
   return (
-    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col items-center mt-[100px]">
-      <div className="w-full px-0 md:px-4 lg:px-4 md:w-2/3 lg:w-2/3 xl:w-1/2 max-w-[676px]">
-        <div className="p-4 sm:p-4 md:p-8 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+    <section className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center mt-[100px]">
+      <div className="w-full px-0 md:w-[675px] lg:px-4">
+        <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div className="flex items-center justify-center p-1 w-full bg-semi-white border-[1px] border-white/20 rounded-xl border-b-0 border-r-0 mb-5">
             <ul className="flex w-full text-center">
               {tabs.map((tab) => (

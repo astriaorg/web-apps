@@ -4,24 +4,28 @@ import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
 import { ChainProvider } from "@cosmos-kit/react";
 import { RainbowKitProvider, getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { IntlProvider } from "@repo/ui/intl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { assets, chains } from "chain-registry";
-import { IntlProvider } from "react-intl";
 import { WagmiProvider } from "wagmi";
 
 import {
-  ConfigContextProvider,
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
+} from "@repo/flame-types";
+import {
+  ConfigContextProvider,
   getAllChainConfigs,
+  getEnvVariable,
 } from "./config";
-import { CosmosWalletProvider } from "./features/CosmosWallet";
-import { EvmWalletProvider } from "./features/EvmWallet";
-import { NotificationsContextProvider } from "./features/Notifications";
+import { CosmosWalletProvider } from "./features/cosmos-wallet";
+import { EvmWalletProvider } from "./features/evm-wallet";
+import { NotificationsContextProvider } from "./features/notifications";
 
-// TODO - move to envar
-const WALLET_CONNECT_PROJECT_ID = "b1a4f5a9bc91120e74a7df1dd785b336";
+const WALLET_CONNECT_PROJECT_ID = getEnvVariable(
+  "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID",
+);
 
 const queryClient = new QueryClient();
 
