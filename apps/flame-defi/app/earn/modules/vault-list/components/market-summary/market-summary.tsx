@@ -27,7 +27,7 @@ export const MarketSummary = () => {
   });
 
   return (
-    <div className="flex flex-col gap-2 md:flex-row">
+    <div className="grid gap-2 md:grid-cols-2">
       <MarketSummaryCard
         label="Total Deposits"
         value={VALUE_DEPOSIT}

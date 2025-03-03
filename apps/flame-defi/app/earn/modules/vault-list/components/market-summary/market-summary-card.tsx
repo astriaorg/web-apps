@@ -34,6 +34,7 @@ export const MarketSummaryCard = ({
           currency: "USD",
           maximumFractionDigits: 0,
         }}
+        showAbbreviatedNumber
       />
     </Card>
   );

@@ -97,12 +97,8 @@ export const formatAbbreviatedNumber = (
     };
   }
 
-  if (absolute.lt(THOUSAND)) {
-    return {
-      value: big.toFixed(minimumFractionDigits),
-      suffix: "",
-    };
-  }
-
-  return { value, suffix: "" };
+  return {
+    value: big.toFixed(minimumFractionDigits),
+    suffix: "",
+  };
 };
