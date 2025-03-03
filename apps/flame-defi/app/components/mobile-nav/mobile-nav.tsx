@@ -9,6 +9,7 @@ import {
   DrawerTrigger,
 } from "@repo/ui/shadcn-primitives";
 import MobileWalletConnect from "components/mobile-wallet-connect/mobile-wallet-connect";
+import { useConfig } from "config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -16,6 +17,7 @@ import { useCallback, useEffect, useState } from "react";
 function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { featureFlags } = useConfig();
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -77,12 +79,14 @@ function MobileNav() {
               >
                 Pool
               </Link>
-              <Link
-                href="/earn"
-                className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
-              >
-                Earn
-              </Link>
+              {featureFlags.earnEnabled && (
+                <Link
+                  href="/earn"
+                  className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
+                >
+                  Earn
+                </Link>
+              )}
             </div>
           </div>
           <div className="pt-4 pb-0 px-8 flex flex-col items-start">
