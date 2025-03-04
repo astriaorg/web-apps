@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../../shadcn-primitives";
+} from "../../atoms";
 
 interface InfoTooltipProps {
   content: string;

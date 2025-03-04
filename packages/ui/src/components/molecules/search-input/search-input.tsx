@@ -37,8 +37,10 @@ export const SearchInput = ({
         }
         className={cn(
           "transition-all duration-300 ease-in-out",
-          value ? "w-full md:w-52" : "w-0 border-transparent",
-          "focus-visible:w-full md:focus-visible:w-52 focus-visible:border-orange",
+          value
+            ? "w-full md:w-52"
+            : "w-0 border-transparent bg-transparent shadow-none",
+          "focus-visible:w-full md:focus-visible:w-52",
           className,
         )}
         {...props}

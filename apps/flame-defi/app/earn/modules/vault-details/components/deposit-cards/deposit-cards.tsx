@@ -1,4 +1,4 @@
-import { Card, CardFigureInput, CardLabel } from "@repo/ui/components";
+import { Button, Card, CardFigureInput, CardLabel } from "@repo/ui/components";
 import { FormattedNumber } from "@repo/ui/intl";
 import { Image } from "components/image";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
@@ -105,7 +105,7 @@ export const DepositCards = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card isLoading={isPending} padding="md">
+      <Card isLoading={isPending} padding="md" className="space-y-2">
         <CardLabel>
           <span className="flex-1">
             Deposit {data?.vaultByAddress.asset.symbol}
@@ -145,6 +145,7 @@ export const DepositCards = () => {
           </div>
         ))}
       </Card>
+      <Button>Connect Wallet</Button>
     </div>
   );
 };

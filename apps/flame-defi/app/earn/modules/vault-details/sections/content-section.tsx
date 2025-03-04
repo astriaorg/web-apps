@@ -1,7 +1,6 @@
-import { Skeleton } from "@repo/ui/components";
+import { Skeleton, StatusCard } from "@repo/ui/components";
 import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
-import { StatusCard } from "earn/components/status-card";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
@@ -22,14 +21,14 @@ export const ContentSection = () => {
     );
 
   return (
-    <section className="flex flex-col px-4 md:px-20">
+    <section className="flex flex-col px-4">
       {status === "error" && (
         <StatusCard>
           {`We couldn't fetch this vault. Please try again later.`}
         </StatusCard>
       )}
       {status !== "error" && (
-        <div className="mt-12 flex flex-col gap-2 lg:flex-row">
+        <div className="mt-12 flex flex-col gap-10 lg:gap-2 lg:flex-row">
           {/* Summary section. */}
           <div className="order-2 lg:order-1 lg:basis-2/3">
             <SummaryCards />

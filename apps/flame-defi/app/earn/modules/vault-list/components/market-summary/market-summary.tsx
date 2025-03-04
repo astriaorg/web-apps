@@ -1,47 +1,65 @@
-import { useSyncAnimateCounter } from "@repo/ui/components";
-import { useState } from "react";
-import { MarketSummaryCard } from "./market-summary-card";
+import { AnimatedCounter, Card, Skeleton } from "@repo/ui/components";
+import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
+import { useMemo } from "react";
 
 // TODO: Use fetched values, handle error state.
 const VALUE_DEPOSIT = 1000000;
 const VALUE_BORROW = 75000;
 
 export const MarketSummary = () => {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const {
+    query: { isPending },
+  } = usePageContext();
 
-  const [counterDeposit, setCounterDeposit] = useState<number | null>(null);
-  const [counterBorrow, setCounterBorrow] = useState<number | null>(null);
-
-  useSyncAnimateCounter({
-    values: [
+  const items = useMemo<
+    {
+      label: {
+        left: React.ReactNode;
+        right?: React.ReactNode;
+      };
+      value: number;
+    }[]
+  >(() => {
+    return [
       {
+        label: {
+          left: "Total Deposits",
+        },
         value: VALUE_DEPOSIT,
-        counter: counterDeposit,
       },
       {
+        label: {
+          left: "Total Borrow",
+        },
         value: VALUE_BORROW,
-        counter: counterBorrow,
       },
-    ],
-    setIsAnimating,
-  });
+    ];
+  }, []);
 
   return (
-    <div className="flex flex-col gap-2 md:flex-row">
-      <MarketSummaryCard
-        label="Total Deposits"
-        value={VALUE_DEPOSIT}
-        counter={counterDeposit}
-        setCounter={setCounterDeposit}
-        isSyncingAnimation={isAnimating}
-      />
-      <MarketSummaryCard
-        label="Total Borrow"
-        value={VALUE_BORROW}
-        counter={counterBorrow}
-        setCounter={setCounterBorrow}
-        isSyncingAnimation={isAnimating}
-      />
+    <div className="grid gap-2 md:grid-cols-2">
+      {items.map((it, index) => (
+        <Card
+          key={`market-summary_card_${index}`}
+          padding="md"
+          className="space-y-2"
+        >
+          <span className="text-xs/3 text-text-light">{it.label.left}</span>
+
+          <Skeleton isLoading={isPending}>
+            <AnimatedCounter
+              value={it.value}
+              className="text-3xl/8 font-dot"
+              options={{
+                style: "currency",
+                currency: "USD",
+                maximumFractionDigits: 0,
+              }}
+              useAbbreviatedNumberFormat
+            />
+          </Skeleton>
+        </Card>
+      ))}
     </div>
   );
 };

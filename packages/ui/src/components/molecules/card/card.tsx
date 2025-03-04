@@ -12,7 +12,7 @@ export const cardVariants = cva("", {
     },
     padding: {
       default: "",
-      md: "space-y-2 p-6",
+      md: "p-6",
     },
   },
   defaultVariants: {

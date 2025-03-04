@@ -79,7 +79,7 @@ const PaginationPrevious = ({
   <PaginationLink
     aria-label="Go to previous page"
     size="default"
-    className={cn("h-10 w-12", className)}
+    className={cn("h-10 w-12 text-icon-subdued", className)}
     {...props}
   >
     <ArrowLeftIcon className="h-4 w-4" />
@@ -95,7 +95,7 @@ const PaginationNext = ({
   <PaginationLink
     aria-label="Go to next page"
     size="default"
-    className={cn("h-10 w-12", className)}
+    className={cn("h-10 w-12 text-icon-subdued", className)}
     {...props}
   >
     <span className="sr-only">Next</span>

@@ -2,7 +2,7 @@ import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
 import { FormattedNumber } from "@repo/ui/intl";
-import { cn } from "@repo/ui/utils";
+import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -113,6 +113,28 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         id: VaultOrderBy.TotalAssets,
         header: "Supply",
         cell: ({ row }) => {
+          const {
+            value: formattedTotalAssets,
+            suffix: formattedTotalAssetsSuffix,
+          } = formatAbbreviatedNumber(
+            new Big(row.original.state?.totalAssets ?? 0)
+              .div(10 ** row.original.asset.decimals)
+              .toFixed(),
+            {
+              minimumFractionDigits: 2,
+            },
+          );
+
+          const {
+            value: formattedTotalAssetsUSD,
+            suffix: formattedTotalAssetsUSDSuffix,
+          } = formatAbbreviatedNumber(
+            new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(),
+            {
+              minimumFractionDigits: 2,
+            },
+          );
+
           return (
             <div className="flex items-center justify-between space-x-4">
               <div
@@ -127,26 +149,18 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                     "md:text-base/4 md:max-w-auto",
                   )}
                 >
-                  <FormattedNumber
-                    value={
-                      +new Big(row.original.state?.totalAssets ?? 0)
-                        .div(10 ** row.original.asset.decimals)
-                        .toFixed(2)
-                    }
-                  />
+                  {formattedTotalAssets}
+                  {formattedTotalAssetsSuffix}
                   {NON_BREAKING_SPACE}
                   {row.original.symbol}
                 </span>
                 <Badge>
                   <FormattedNumber
-                    value={
-                      +new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(
-                        2,
-                      )
-                    }
+                    value={+formattedTotalAssetsUSD}
                     style="currency"
                     currency="USD"
                   />
+                  {formattedTotalAssetsUSDSuffix}
                 </Badge>
               </div>
               <div className="md:hidden flex justify-end pr-3">

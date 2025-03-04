@@ -13,7 +13,7 @@ export const CardFigureInput = ({
     <Skeleton isLoading={isLoading}>
       <input
         className={cn(
-          "bg-transparent border-none outline-none text-5xl/12 font-dot text-text placeholder:text-text-light",
+          "bg-transparent border-none outline-none text-5xl/12 h-12 font-dot text-text placeholder:text-text-light",
           className,
         )}
         {...props}
