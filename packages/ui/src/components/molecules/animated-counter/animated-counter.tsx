@@ -1,7 +1,7 @@
 "use client";
 
 import { animate } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormatNumberOptions, useIntl } from "../../../intl";
 import { cn, formatAbbreviatedNumber } from "../../../utils";
 import { Skeleton } from "../../atoms";
@@ -20,6 +20,8 @@ export const AnimatedCounter = ({
   ...props
 }: AnimatedCounterProps) => {
   const { formatNumber } = useIntl();
+
+  const [hasStartedAnimating, setHasStartedAnimating] = useState(false);
 
   const counterRef = useRef<HTMLSpanElement>(null);
 
@@ -45,6 +47,9 @@ export const AnimatedCounter = ({
     animate(0, value, {
       duration: 0.5,
       ease: [0, 1, 0, 1],
+      onPlay: () => {
+        setHasStartedAnimating(true);
+      },
       onUpdate: (latest) => {
         if (counterRef.current) {
           counterRef.current.innerHTML = formatAnimatedCounterNumber(
@@ -58,7 +63,8 @@ export const AnimatedCounter = ({
   }, [value, formatAnimatedCounterNumber, options, useAbbreviatedNumberFormat]);
 
   return (
-    <Skeleton isLoading={!counterRef.current?.innerHTML}>
+    // Show skeleton when the counter hasn't started animating.
+    <Skeleton isLoading={!hasStartedAnimating}>
       <div className="relative">
         {/* Reserve space for the maximum value to prevent card size increasing with the animation. */}
         <span className={cn("opacity-0", className)} {...props}>

@@ -81,7 +81,7 @@ export const SummaryCards = () => {
           </CardLabel>
           <AnimatedCounter
             value={it.value}
-            className="text-5xl/12 font-dot"
+            className="text-5xl/12 font-dot truncate"
             options={it.options}
             useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
           />
