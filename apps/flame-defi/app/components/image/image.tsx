@@ -31,11 +31,8 @@ export const Image = ({
     />
   ) : (
     <div
-      className={cn(
-        "shrink-0 bg-icon-light",
-        `w-[${width}px] h-[${height}px]`,
-        className,
-      )}
+      style={{ width: `${width}px`, height: `${height}px` }}
+      className={cn("shrink-0 bg-icon-light", className)}
     />
   );
 };
