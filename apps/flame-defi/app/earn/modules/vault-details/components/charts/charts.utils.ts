@@ -220,7 +220,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
       };
       const svgRect = params.svg.getBoundingClientRect();
       let tooltipX = closestX - tooltipRect.width / 2;
-      let tooltipY = closestY - 64;
+      const tooltipY = closestY - 64;
 
       if (tooltipX + tooltipRect.width >= svgRect.right) {
         tooltipX = svgRect.right - tooltipRect.width;
