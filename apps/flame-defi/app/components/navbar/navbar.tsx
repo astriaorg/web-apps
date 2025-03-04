@@ -24,7 +24,7 @@ const Navbar = () => {
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
       after:left-1/2 after:transform after:-translate-x-1/2
-      after:w-[85%] after:h-1 after:bg-gradient-to-r
+      after:w-[85%] after:h-1 after:bg-linear-to-r
       after:from-[#EA9B57] after:to-[#CB513F]
     `
         : ""

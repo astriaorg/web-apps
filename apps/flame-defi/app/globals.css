@@ -1,6 +1,70 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@config '../tailwind.config.js';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility gradient-background {
+  @apply border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)];
+}
+
+@utility gradient-container {
+  @apply gradient-background p-4 sm:p-4 md:p-8 lg:p-12 rounded-2xl;
+}
+
+@utility normalize-input {
+  @apply flex-1 bg-transparent focus:outline-hidden placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+}
+
+@utility earn-chart {
+  @apply overflow-visible;
+
+  > g {
+    @apply text-text-light;
+    text-anchor: start;
+
+    line {
+      @apply hidden;
+    }
+
+    text {
+      @apply uppercase text-xs/3 font-medium tracking-wider;
+    }
+  }
+
+  > path,
+  > rect {
+    @apply text-orange;
+  }
+}
+
+@utility fade-out {
+  @apply animate-fade-out;
+}
+
+@utility fade-in {
+  @apply animate-fade-in;
+}
+
+@utility is-text-overflow {
+  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
 
 @layer base {
   :root {
@@ -127,53 +191,5 @@
   }
   body {
     @apply m-0 p-0 bg-background font-sans antialiased text-text;
-  }
-}
-
-@layer components {
-  .gradient-background {
-    @apply border border-solid border-transparent bg-radial-dark shadow-[inset_1px_1px_1px_-1px_hsla(0,0%,100%,0.5)];
-  }
-  .gradient-container {
-    @apply gradient-background p-4 sm:p-4 md:p-8 lg:p-12 rounded-2xl;
-  }
-  .normalize-input {
-    @apply flex-1 bg-transparent focus:outline-none placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
-  }
-
-  .earn-chart {
-    @apply overflow-visible;
-
-    > g {
-      @apply text-text-light;
-      text-anchor: start;
-
-      line {
-        @apply hidden;
-      }
-
-      text {
-        @apply uppercase text-xs/3 font-medium tracking-wider;
-      }
-    }
-
-    > path,
-    > rect {
-      @apply text-orange;
-    }
-  }
-}
-
-@layer utilities {
-  .fade-out {
-    @apply animate-fade-out;
-  }
-
-  .fade-in {
-    @apply animate-fade-in;
-  }
-
-  .is-text-overflow {
-    @apply overflow-hidden text-ellipsis whitespace-nowrap;
   }
 }

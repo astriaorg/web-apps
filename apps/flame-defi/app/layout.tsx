@@ -219,7 +219,7 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <SideTag label="Get Help" />
-            <main className="flex flex-col flex-grow items-center w-full">
+            <main className="flex flex-col grow items-center w-full">
               {children}
             </main>
             <Footer />

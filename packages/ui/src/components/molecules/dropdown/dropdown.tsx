@@ -180,7 +180,7 @@ export const Dropdown = <T,>({
                         <option.LeftIcon />
                       </span>
                     )}
-                    <span className="truncate flex-grow">{option.label}</span>
+                    <span className="truncate grow">{option.label}</span>
                   </span>
                   {option.RightIcon && (
                     <span className="text-white flex">

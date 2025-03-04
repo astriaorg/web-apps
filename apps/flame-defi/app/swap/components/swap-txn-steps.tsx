@@ -79,7 +79,7 @@ export function TxnDetails({
         </div>
       </div>
       <div className="flex items-center justify-between mb-4">
-        <Skeleton className="rounded" isLoading={oneToOneLoading}>
+        <Skeleton className="rounded-sm" isLoading={oneToOneLoading}>
           <div
             className="flex items-center cursor-pointer text-white font-medium gap-1"
             onClick={() => setFlipDirection(!flipDirection)}

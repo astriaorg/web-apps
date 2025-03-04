@@ -44,7 +44,7 @@ export function TxnInfo({
       >
         <div className="flex items-center justify-between">
           <Skeleton
-            className="rounded"
+            className="rounded-sm"
             isLoading={oneToOneQuote?.oneToOneLoading}
           >
             <div
@@ -65,12 +65,12 @@ export function TxnInfo({
             </div>
           </Skeleton>
           <Skeleton
-            className="rounded w-[100px] h-[25px] mt-3"
+            className="rounded-sm w-[100px] h-[25px] mt-3"
             isLoading={txnInfo.txnQuoteDataLoading}
           >
             <AccordionTrigger>
               {txnInfo.gasUseEstimateUSD && (
-                <div className="[&>svg]:!transform-none flex items-center gap-1 width: 100%">
+                <div className="[&>svg]:transform-none! flex items-center gap-1 width: 100%">
                   <GasIcon size={20} />
                   <span className="mr-1">
                     ${txnInfo.formattedGasUseEstimateUSD}

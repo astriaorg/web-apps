@@ -79,7 +79,7 @@ export function SwapInput({
       <div className="flex justify-between items-center">
         <Skeleton
           isLoading={txnQuoteLoading && inputToken.isQuoteValue}
-          className="rounded w-[45%] sm:max-w-[62%] h-[40px] mt-3"
+          className="rounded-sm w-[45%] sm:max-w-[62%] h-[40px] mt-3"
         >
           <input
             type="number"
@@ -126,7 +126,7 @@ export function SwapInput({
       <div>
         <Skeleton
           isLoading={usdQuote?.loading || txnQuoteLoading}
-          className="rounded w-[70px]"
+          className="rounded-sm w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">
             {fiatValue}

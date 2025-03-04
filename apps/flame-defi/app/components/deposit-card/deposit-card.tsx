@@ -315,7 +315,7 @@ export default function DepositCard(): React.ReactElement {
           <div className="flex flex-col sm:flex-row sm:items-center">
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">From</div>
             <div className="flex flex-col sm:flex-row w-full gap-3">
-              <div className="flex-grow">
+              <div className="grow">
                 <Dropdown
                   placeholder="Select..."
                   options={cosmosChainsOptions}
@@ -380,7 +380,7 @@ export default function DepositCard(): React.ReactElement {
           <div className="flex flex-col sm:flex-row sm:items-center">
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">To</div>
             <div className="flex flex-col sm:flex-row w-full gap-3">
-              <div className="flex-grow">
+              <div className="grow">
                 <Dropdown
                   placeholder="Connect EVM Wallet or enter address"
                   options={evmChainsOptions}
@@ -503,9 +503,9 @@ export default function DepositCard(): React.ReactElement {
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
               Amount
             </div>
-            <div className="flex-grow">
+            <div className="grow">
               <input
-                className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-none rounded-xl text-white text-[20px]"
+                className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white text-[20px]"
                 type="text"
                 placeholder="0.00"
                 onChange={updateAmount}

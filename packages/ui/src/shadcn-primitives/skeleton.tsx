@@ -18,7 +18,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         ref={forwardedRef}
         aria-hidden
         className={cn(
-          "animate-pulse rounded-sm bg-surface-3 *:invisible",
+          "animate-pulse rounded-xs bg-surface-3 *:invisible",
           className,
         )}
       >
