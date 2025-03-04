@@ -112,7 +112,10 @@ export const SettingsPopover = () => {
             <div className="flex justify-between">
               <div className="flex items-center gap-1">
                 <label className="text-sm text-white">Expert Mode</label>
-                <InfoTooltip content="Allow high price impact trades and skip the confirm screen. Use at your own risk." />
+                <InfoTooltip
+                  className="max-w-[250px]"
+                  content="Allow high price impact trades and skip the confirm screen. Use at your own risk."
+                />
               </div>
               <Switch
                 checked={expertMode}
@@ -124,7 +127,10 @@ export const SettingsPopover = () => {
           <div className="space-y-2 mb-2">
             <div className="flex items-center gap-1">
               <label className="text-sm text-white">Slippage Tolerance</label>
-              <InfoTooltip content="Your transaction will revert if the price changes unfavorably by more than this percentage." />
+              <InfoTooltip
+                className="max-w-[250px]"
+                content="Your transaction will revert if the price changes unfavorably by more than this percentage."
+              />
             </div>
             <div className="flex justify-between">
               <button

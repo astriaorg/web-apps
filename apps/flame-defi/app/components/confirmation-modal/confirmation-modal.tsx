@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { CloseIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import { TXN_STATUS } from "@repo/flame-types";
+import { cn } from "@repo/ui/utils";
 
 interface ConfirmationModalProps {
   onSubmitCallback: () => void;
@@ -23,6 +24,7 @@ interface ConfirmationModalProps {
   actionButtonText?: string;
   isCloseModalAction?: boolean;
   skipIdleTxnStatus?: boolean;
+  showOpenButton?: boolean;
 }
 
 export default function ConfirmationModal({
@@ -36,6 +38,7 @@ export default function ConfirmationModal({
   title,
   txnStatus,
   actionButtonText,
+  showOpenButton,
 }: ConfirmationModalProps): React.ReactElement {
   const [open, setOpen] = useState(false);
 
@@ -64,7 +67,10 @@ export default function ConfirmationModal({
 
   return (
     <Dialog open={open} onOpenChange={() => handleClose()}>
-      <DialogTrigger asChild className="w-full">
+      <DialogTrigger
+        asChild
+        className={cn("w-full", !showOpenButton && "hidden")}
+      >
         <ActionButton
           callback={handleOpen}
           buttonText={buttonText}

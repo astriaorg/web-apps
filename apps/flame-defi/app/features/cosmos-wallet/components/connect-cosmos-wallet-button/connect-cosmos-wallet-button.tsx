@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { CopyToClipboardButton } from "@repo/ui/components";
+import { CopyToClipboardButton, Skeleton } from "@repo/ui/components";
 import { useCosmosWallet } from "../../hooks/use-cosmos-wallet";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { CosmosIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
@@ -33,6 +33,7 @@ export default function ConnectCosmosWalletButton({
     cosmosBalance,
     disconnectCosmosWallet,
     isLoadingCosmosBalance,
+    usdcTiaQuote,
   } = useCosmosWallet();
   const formattedCosmosBalanceValue = formatDecimalValues(cosmosBalance?.value);
 
@@ -108,15 +109,21 @@ export default function ConnectCosmosWalletButton({
         <AccordionContent>
           <div className="text-white ml-8">
             <div>
-              {isLoadingCosmosBalance && <div>Loading...</div>}
-              {!isLoadingCosmosBalance && cosmosBalance && (
+              <Skeleton
+                className="w-[150px] h-[20px] mb-2"
+                isLoading={isLoadingCosmosBalance || !cosmosBalance}
+              >
                 <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
-                  {formattedCosmosBalanceValue}
-                  {cosmosBalance.symbol}
+                  <span>{formattedCosmosBalanceValue}</span>
+                  <span>{cosmosBalance?.symbol}</span>
                 </div>
-              )}
-              {/* TODO - price in USD */}
-              <div>$0.00 USD</div>
+              </Skeleton>
+              <Skeleton
+                className="w-[100px] h-[20px]"
+                isLoading={usdcTiaQuote === null}
+              >
+                <div className="text-base font-normal">${usdcTiaQuote} USD</div>
+              </Skeleton>
             </div>
 
             {/* Transactions Section - TODO */}

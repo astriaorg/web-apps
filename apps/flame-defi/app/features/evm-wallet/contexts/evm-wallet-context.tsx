@@ -31,8 +31,11 @@ import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
+  TRADE_TYPE,
 } from "@repo/flame-types";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+import { useGetQuote } from "../../../hooks";
+import { useIntl } from "react-intl";
 
 interface TokenAllowance {
   symbol: string;
@@ -61,6 +64,7 @@ export interface EvmWalletContextProps {
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
   approveToken: (token: EvmCurrency) => Promise<`0x${string}` | null>;
+  usdcTiaQuote: string | null;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -91,6 +95,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const { switchChain } = useSwitchChain();
   const { selectedChain } = useEvmChainData();
   const { currencies, contracts } = selectedChain;
+  const { quote, getQuote } = useGetQuote();
+  const { formatNumber } = useIntl();
 
   const {
     status: nativeBalanceStatus,
@@ -116,6 +122,26 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
 
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
+
+  useEffect(() => {
+    if (userAccount.address && evmNativeTokenBalance) {
+      const usdcToken = currencies?.find(
+        (currency) => currency.coinDenom.toLowerCase() === "usdc",
+      );
+      getQuote(
+        TRADE_TYPE.EXACT_IN,
+        { token: currencies[0], value: evmNativeTokenBalance.value },
+        { token: usdcToken, value: "" },
+      );
+    }
+  }, [userAccount.address, evmNativeTokenBalance, getQuote, currencies]);
+
+  const usdcTiaQuote = quote
+    ? formatNumber(parseFloat(quote.quoteDecimals), {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    : null;
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -434,6 +460,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     getTokenAllowances,
     approveToken,
     tokenAllowances,
+    usdcTiaQuote,
   };
 
   return (

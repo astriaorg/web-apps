@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useGetQuote } from "./use-get-quote";
+import { useGetQuote } from "../../hooks";
 import { EvmCurrency, GetQuoteResult, TRADE_TYPE } from "@repo/flame-types";
 import { formatDecimalValues } from "@repo/ui/utils";
 

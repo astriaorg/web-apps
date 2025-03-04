@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 
-import { CopyToClipboardButton } from "@repo/ui/components";
+import { CopyToClipboardButton, Skeleton } from "@repo/ui/components";
 
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
@@ -31,6 +31,7 @@ export default function ConnectEvmWalletButton({
     disconnectEvmWallet,
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
+    usdcTiaQuote,
   } = useEvmWallet();
   const userAccount = useAccount();
   const formattedEvmBalanceValue = formatDecimalValues(
@@ -84,15 +85,23 @@ export default function ConnectEvmWalletButton({
         <AccordionContent>
           <div className="text-white ml-8 flex justify-between">
             <div>
-              {isLoadingEvmNativeTokenBalance && <div>Loading...</div>}
-              {!isLoadingEvmNativeTokenBalance && evmNativeTokenBalance && (
+              <Skeleton
+                className="w-[150px] h-[20px] mb-2"
+                isLoading={
+                  isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance
+                }
+              >
                 <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
-                  {formattedEvmBalanceValue}
-                  {evmNativeTokenBalance.symbol}
+                  <span>{formattedEvmBalanceValue}</span>
+                  <span>{evmNativeTokenBalance?.symbol}</span>
                 </div>
-              )}
-              {/* TODO - price in USD */}
-              <div>$0.00 USD</div>
+              </Skeleton>
+              <Skeleton
+                className="w-[100px] h-[20px]"
+                isLoading={usdcTiaQuote === null}
+              >
+                <div className="text-base font-normal">${usdcTiaQuote} USD</div>
+              </Skeleton>
             </div>
 
             {/* Transactions Section - TODO */}
