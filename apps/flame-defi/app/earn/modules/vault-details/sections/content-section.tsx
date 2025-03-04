@@ -21,7 +21,7 @@ export const ContentSection = () => {
     );
 
   return (
-    <section className="flex flex-col px-4 md:px-20">
+    <section className="flex flex-col px-4">
       {status === "error" && (
         <StatusCard>
           {`We couldn't fetch this vault. Please try again later.`}
