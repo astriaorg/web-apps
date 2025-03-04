@@ -213,10 +213,22 @@ export const initializeLineChart = <T extends FloatDataPoint>({
       const closestY = y(closestData.y ?? 0);
 
       setTooltipContent(closestData);
+
+      // Handle tooltip position if it's off the screen.
+      const tooltipRect = {
+        width: tooltip.clientWidth || 64, // Fix edge case where tooltip width is 0.
+      };
+      const svgRect = params.svg.getBoundingClientRect();
+      let tooltipX = closestX - tooltipRect.width / 2;
+      let tooltipY = closestY - 64;
+
+      if (tooltipX + tooltipRect.width >= svgRect.right) {
+        tooltipX = svgRect.right - tooltipRect.width;
+      }
+
       tooltip.style.display = "block";
-      tooltip.style.left = closestX + "px";
-      tooltip.style.top = closestY - 64 + "px";
-      tooltip.style.transform = "translateX(-50%)";
+      tooltip.style.left = tooltipX + "px";
+      tooltip.style.top = tooltipY + "px";
 
       line
         .attr("x1", closestX)

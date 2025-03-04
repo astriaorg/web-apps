@@ -21,14 +21,14 @@ export const ArrowLeftIcon: React.FC<IconProps> = ({
         stroke="currentColor"
         strokeWidth="1.5"
         strokeMiterlimit="10"
-        stroke-linecap="square"
+        strokeLinecap="square"
       />
       <path
         d="M10.25 19.25L3.25 12.25L10.25 5.25"
         stroke="currentColor"
         strokeWidth="1.5"
         strokeMiterlimit="10"
-        stroke-linecap="square"
+        strokeLinecap="square"
       />
     </svg>
   );
