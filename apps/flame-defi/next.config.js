@@ -15,13 +15,31 @@ const nextConfig = {
   },
   async redirects() {
     const destination = `/well-known-${process.env.NEXT_ENV ?? "develop"}/walletconnect.txt`;
-    return [
+    const redirects = [
       {
         source: "/.well-known/walletconnect.txt",
         destination,
         permanent: true,
       },
     ];
+
+    // If EARN feature is disabled, redirect all earn pages to home
+    if (process.env.NEXT_PUBLIC_FEATURE_EARN_ENABLED !== "true") {
+      redirects.push(
+        {
+          source: "/earn",
+          destination: "/",
+          permanent: false,
+        },
+        {
+          source: "/earn/:path*",
+          destination: "/",
+          permanent: false,
+        }
+      );
+    }
+
+    return redirects;
   },
 };
 

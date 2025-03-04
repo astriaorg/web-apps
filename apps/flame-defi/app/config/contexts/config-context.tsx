@@ -102,6 +102,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     setSelectedFlameNetwork(network);
   };
 
+  // Parse feature flags - explicitly check for "true"
+  const earnEnabled = process.env.NEXT_PUBLIC_FEATURE_EARN_ENABLED === "true";
+
   return (
     <ConfigContext.Provider
       value={{
@@ -119,6 +122,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         tokenApprovalAmount,
         swapSlippageToleranceDefault,
         feeData,
+        featureFlags: {
+          earnEnabled,
+        },
       }}
     >
       {children}

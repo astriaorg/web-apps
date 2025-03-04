@@ -46,6 +46,10 @@ export interface AppConfig {
     tvl: string;
     selectPercent: string;
   }[];
+  // Feature flags
+  featureFlags: {
+    earnEnabled: boolean;
+  };
 }
 
 export {
