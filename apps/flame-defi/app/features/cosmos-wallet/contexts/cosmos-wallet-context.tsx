@@ -64,7 +64,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     throw new Error("No cosmos chains provided!");
   }
   const chainName = cosmosChainNameFromId(
-    selectedCosmosChain?.chainId || defaultChainId
+    selectedCosmosChain?.chainId || defaultChainId,
   );
   const {
     address: cosmosAddressFromWallet,
@@ -104,7 +104,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     const balance = await getBalanceFromChain(
       selectedCosmosChain,
       selectedIbcCurrency,
-      cosmosAccountAddress
+      cosmosAccountAddress,
     );
 
     return { value: balance.toString(), symbol: selectedIbcCurrency.coinDenom };
@@ -118,18 +118,17 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         console.error("Failed to get balance from Keplr", error);
       },
     }),
-    [selectedCosmosChain, selectedIbcCurrency]
+    [selectedCosmosChain, selectedIbcCurrency],
   );
   const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
 
   useEffect(() => {
-    if (!cosmosBalance) {
-      console.error("No cosmos balance found");
+    if (!cosmosBalance || !currencies.length) {
       return;
     }
     const usdcToken = currencies.find(
-      (currency) => currency.coinDenom.toLowerCase() === "usdc"
+      (currency) => currency.coinDenom.toLowerCase() === "usdc",
     );
 
     if (!usdcToken) {
@@ -139,10 +138,15 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
 
     const nativeToken = currencies.find((currency) => currency.isNative);
 
+    if (!nativeToken) {
+      console.error("No native token found in currencies");
+      return;
+    }
+
     getQuote(
       TRADE_TYPE.EXACT_IN,
       { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
-      { token: usdcToken, value: "" }
+      { token: usdcToken, value: "" },
     );
   }, [cosmosBalance, getQuote, currencies]);
 
@@ -165,7 +169,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         label: chainLabel,
         value: chain,
         LeftIcon: chain.IconComponent,
-      })
+      }),
     );
   }, [cosmosChains]);
 
@@ -190,7 +194,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         label: currency.coinDenom,
         value: currency,
         LeftIcon: currency.IconComponent,
-      })
+      }),
     );
   }, [selectedCosmosChain]);
 

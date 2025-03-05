@@ -97,10 +97,7 @@ export default function ConnectEvmWalletButton({
                   <span>{evmNativeTokenBalance?.symbol}</span>
                 </div>
               </Skeleton>
-              <Skeleton
-                className="w-[100px] h-[20px]"
-                isLoading={quoteLoading}
-              >
+              <Skeleton className="w-[100px] h-[20px]" isLoading={quoteLoading}>
                 <div className="text-base font-normal">
                   ${usdcToNativeQuote?.value} USD
                 </div>
