@@ -116,7 +116,7 @@ export const Dropdown = <T,>({
       <div className="w-full">
         <button
           type="button"
-          className="w-full flex items-center justify-between bg-transparent text-grey-light px-4 py-2 disabled:opacity-50 border border-dark rounded-xl h-14"
+          className="w-full flex items-center justify-between bg-transparent text-grey-light px-4 py-2 disabled:opacity-50 border border-stroke-default rounded-xl h-14"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
@@ -180,7 +180,7 @@ export const Dropdown = <T,>({
                         <option.LeftIcon />
                       </span>
                     )}
-                    <span className="truncate flex-grow">{option.label}</span>
+                    <span className="truncate grow">{option.label}</span>
                   </span>
                   {option.RightIcon && (
                     <span className="text-white flex">

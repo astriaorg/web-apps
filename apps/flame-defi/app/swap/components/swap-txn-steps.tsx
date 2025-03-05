@@ -1,13 +1,16 @@
 "use client";
 
-import { InfoTooltip, BlockLoader, SuccessCheck } from "@repo/ui/components";
-import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { TokenState } from "@repo/flame-types";
+import { TokenState, TXN_STATUS } from "@repo/flame-types";
+import {
+  BlockLoader,
+  InfoTooltip,
+  Skeleton,
+  SuccessCheck,
+} from "@repo/ui/components";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
-import { TXN_STATUS } from "@repo/flame-types";
-import { useTxnInfo } from "../hooks";
-import { Skeleton } from "@repo/ui/shadcn-primitives";
+import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
+import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "./types";
 interface TxnStepsProps {
   expectedOutputFormatted?: string;
@@ -79,7 +82,7 @@ export function TxnDetails({
         </div>
       </div>
       <div className="flex items-center justify-between mb-4">
-        <Skeleton className="rounded" isLoading={oneToOneLoading}>
+        <Skeleton className="rounded-sm" isLoading={oneToOneLoading}>
           <div
             className="flex items-center cursor-pointer text-white font-medium gap-1"
             onClick={() => setFlipDirection(!flipDirection)}

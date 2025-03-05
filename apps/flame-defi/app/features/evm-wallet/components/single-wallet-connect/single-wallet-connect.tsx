@@ -1,7 +1,4 @@
-import { useAccount } from "wagmi";
 import { CopyToClipboardButton } from "@repo/ui/components";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Button,
@@ -9,7 +6,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
+import { useAccount } from "wagmi";
+import { useEvmWallet } from "../../hooks/use-evm-wallet";
 export function SingleWalletContent({
   address,
   handleClose,
@@ -125,7 +125,7 @@ export default function SingleWalletConnect() {
     <Button
       variant="default"
       onClick={() => connectEvmWallet()}
-      className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white text-base w-[156px]"
+      className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white text-base w-[156px]"
     >
       <span>Connect</span>
     </Button>

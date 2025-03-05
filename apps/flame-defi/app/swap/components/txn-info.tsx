@@ -1,16 +1,15 @@
 "use client";
 
+import { TokenState } from "@repo/flame-types";
+import { InfoTooltip, Skeleton } from "@repo/ui/components";
+import { GasIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Skeleton,
 } from "@repo/ui/shadcn-primitives";
-import { InfoTooltip } from "@repo/ui/components";
-import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { TokenState } from "@repo/flame-types";
 import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "./types";
 
@@ -44,7 +43,7 @@ export function TxnInfo({
       >
         <div className="flex items-center justify-between">
           <Skeleton
-            className="rounded"
+            className="rounded-sm"
             isLoading={oneToOneQuote?.oneToOneLoading}
           >
             <div
@@ -65,12 +64,12 @@ export function TxnInfo({
             </div>
           </Skeleton>
           <Skeleton
-            className="rounded w-[100px] h-[25px] mt-3"
+            className="rounded-sm w-[100px] h-[25px] mt-3"
             isLoading={txnInfo.txnQuoteDataLoading}
           >
             <AccordionTrigger>
               {txnInfo.gasUseEstimateUSD && (
-                <div className="[&>svg]:!transform-none flex items-center gap-1 width: 100%">
+                <div className="[&>svg]:transform-none! flex items-center gap-1 width: 100%">
                   <GasIcon size={20} />
                   <span className="mr-1">
                     ${txnInfo.formattedGasUseEstimateUSD}

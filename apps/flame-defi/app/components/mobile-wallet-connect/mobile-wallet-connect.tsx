@@ -1,27 +1,30 @@
-import { useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 
+import { FlameNetwork } from "@repo/flame-types";
+import { CheckMarkIcon, FlameIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
   Button,
+  Drawer,
   DrawerContent,
   DrawerTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { Drawer } from "@repo/ui/shadcn-primitives";
-import { SingleWalletContent, useEvmWallet } from "features/evm-wallet";
+import { shortenAddress } from "@repo/ui/utils";
+import { useConfig } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
-import { ConnectEvmWalletButton } from "features/evm-wallet";
-import { useConfig } from "config";
-import { CheckMarkIcon, FlameIcon } from "@repo/ui/icons";
-import { FlameNetwork } from "@repo/flame-types";
-import { shortenAddress } from "@repo/ui/utils";
+import {
+  ConnectEvmWalletButton,
+  SingleWalletContent,
+  useEvmWallet,
+} from "features/evm-wallet";
 
 const MobileNetworkSelector = () => {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =
@@ -103,7 +106,7 @@ export default function MobileWalletConnect({
           {isBridgePage && (
             <Button
               variant="default"
-              className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+              className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white w-[156px] text-base"
             >
               {isConnected ? "Connected" : "Connect"}
             </Button>
@@ -123,7 +126,7 @@ export default function MobileWalletConnect({
               ) : (
                 <Button
                   variant="default"
-                  className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+                  className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white w-[156px] text-base"
                   onClick={() => connectEvmWallet()}
                 >
                   Connect

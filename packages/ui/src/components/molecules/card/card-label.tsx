@@ -7,8 +7,8 @@ import { useCardContext } from "./card.context";
 const cardLabelVariants = cva("", {
   variants: {
     variant: {
-      default: "text-text-subdued",
-      accent: "text-text",
+      default: "text-typography-subdued",
+      accent: "text-typography-default",
     },
   },
   defaultVariants: {

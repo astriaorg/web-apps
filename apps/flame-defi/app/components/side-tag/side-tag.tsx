@@ -1,7 +1,7 @@
 "use client";
 
-import { useConfig } from "config";
 import { UpRightSquareIcon } from "@repo/ui/icons";
+import { useConfig } from "config";
 
 interface SideTagProps {
   label: string;
@@ -15,7 +15,7 @@ export const SideTag = ({ label }: SideTagProps) => {
   const { feedbackFormURL } = useConfig();
 
   return (
-    <div className="hidden md:inline-flex items-center absolute top-1/2 right-0 bg-orange-soft text-white text-xs font-bold translate-x-10 -rotate-90 overflow-hidden">
+    <div className="hidden md:inline-flex items-center absolute top-1/2 right-0 bg-orange-soft text-white text-xs font-bold  origin-bottom-right rotate-270 overflow-hidden">
       <a
         href={feedbackFormURL || ""}
         target="_blank"

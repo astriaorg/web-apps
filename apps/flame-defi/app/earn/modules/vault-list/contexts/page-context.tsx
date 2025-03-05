@@ -11,6 +11,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
+import { Image } from "components/image";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";
 import {
@@ -18,7 +19,6 @@ import {
   PLACEHOLDER_DATA,
   useFetchVaults,
 } from "earn/modules/vault-list/hooks/use-fetch-vaults";
-import Image from "next/image";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
@@ -79,17 +79,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center space-x-2 md:space-x-4">
-              {row.original.asset.logoURI ? (
-                <Image
-                  src={row.original.asset.logoURI}
-                  alt={row.original.name}
-                  width={30}
-                  height={30}
-                  className="rounded-full shrink-0"
-                />
-              ) : (
-                <div className="rounded-full shrink-0 w-[30px] h-[30px] bg-icon-light" />
-              )}
+              <Image
+                src={row.original.asset.logoURI}
+                alt={row.original.name}
+                width={30}
+                height={30}
+                className="rounded-full"
+              />
               <div className="flex flex-col space-y-1 overflow-hidden">
                 <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
                   {row.original.name}
@@ -164,7 +160,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 </Badge>
               </div>
               <div className="md:hidden flex justify-end pr-3">
-                <CaretRightIcon className="text-text-subdued" size={16} />
+                <CaretRightIcon className="text-typography-subdued" size={16} />
               </div>
             </div>
           );

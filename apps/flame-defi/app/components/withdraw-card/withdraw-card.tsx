@@ -301,7 +301,7 @@ export default function WithdrawCard(): React.ReactElement {
           <div className="flex flex-col sm:flex-row sm:items-center">
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">From</div>
             <div className="flex flex-col sm:flex-row w-full gap-3">
-              <div className="flex-grow">
+              <div className="grow">
                 <Dropdown
                   placeholder="Connect EVM Wallet"
                   options={evmChainsOptions}
@@ -368,7 +368,7 @@ export default function WithdrawCard(): React.ReactElement {
           <div className="flex flex-col sm:flex-row sm:items-center">
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">To</div>
             <div className="flex flex-col sm:flex-row w-full gap-3">
-              <div className="flex-grow">
+              <div className="grow">
                 <Dropdown
                   placeholder="Connect Keplr Wallet or enter address"
                   options={cosmosChainsOptions}
@@ -455,7 +455,7 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
               <div className="text-grey-light font-semibold">
                 <input
-                  className="w-full p-2 bg-transparent border border-white rounded text-white"
+                  className="w-full p-2 bg-transparent border border-white rounded-sm text-white"
                   type="text"
                   placeholder="Enter address"
                   onChange={updateRecipientAddressOverride}
@@ -492,9 +492,9 @@ export default function WithdrawCard(): React.ReactElement {
             <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
               Amount
             </div>
-            <div className="flex-grow">
+            <div className="grow">
               <input
-                className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-none rounded-xl text-white text-[20px]"
+                className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white text-[20px]"
                 type="text"
                 placeholder="0.00"
                 onChange={updateAmount}
