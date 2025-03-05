@@ -6,22 +6,21 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { GetQuoteResult, V3PoolInRoute } from "@repo/flame-types";
+import { V3PoolInRoute } from "@repo/flame-types";
 import { MultiTokenIcon, Skeleton, TokenIcon } from "@repo/ui/components";
 import { useIntl } from "react-intl";
 import { PathIcon } from "@repo/ui/icons";
 
 interface RoutePathProps {
-  quote?: GetQuoteResult;
+  quoteRoute: Array<V3PoolInRoute[]>;
   loading?: boolean;
   symbolIn?: string;
   symbolOut?: string;
   networkFee?: string;
 }
 
-export function parseRouteData(route: Array<V3PoolInRoute[]> | undefined) {
+export function parseRouteData(route: Array<V3PoolInRoute[]>) {
   const result = [];
-  if (!route) return;
 
   for (const subRoute of route) {
     for (const step of subRoute) {
@@ -38,13 +37,13 @@ export function parseRouteData(route: Array<V3PoolInRoute[]> | undefined) {
 }
 
 export const RoutePath = ({
-  quote,
+  quoteRoute,
   loading,
   symbolIn,
   symbolOut,
   networkFee,
 }: RoutePathProps) => {
-  const routeData = parseRouteData(quote?.route);
+  const routeData = parseRouteData(quoteRoute);
   const { formatNumber } = useIntl();
 
   return (
@@ -65,40 +64,30 @@ export const RoutePath = ({
           </Skeleton>
         </div>
         <AccordionContent className="relative">
-          {routeData ? (
-            <>
-              <div className="relative flex items-center gap-1 md:gap-2 justify-between w-full px-0 py-4 md:p-4">
-                <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-b-[5px] border-dotted border-border overflow-hidden" />
-                <div className="flex items-center gap-2">
-                  {symbolIn && <TokenIcon symbol={symbolIn} className="z-10" />}
-                  <div className="text-xs md:text-sm z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white">
-                    100%
-                  </div>
-                </div>
-                {routeData.map((item) => (
-                  <div
-                    key={item.symbolOne}
-                    className="text-xs md:text-sm flex items-center gap-2 z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white"
-                  >
-                    {item.symbolOne && item.symbolTwo && (
-                      <MultiTokenIcon
-                        symbols={[item.symbolOne, item.symbolTwo]}
-                      />
-                    )}
-                    {formatNumber(parseFloat(item.percent))}%
-                  </div>
-                ))}
-                {symbolOut && <TokenIcon symbol={symbolOut} className="z-10" />}
+          <div className="relative flex items-center gap-1 md:gap-2 justify-between w-full px-0 py-4 md:p-4">
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-b-[5px] border-dotted border-border overflow-hidden" />
+            <div className="flex items-center gap-2">
+              {symbolIn && <TokenIcon symbol={symbolIn} className="z-10" />}
+              <div className="text-xs md:text-sm z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white">
+                100%
               </div>
-              <div className="flex items-center gap-2 w-full px-4">
-                <span>{`Best price route costs <$ ${networkFee} in gas. This route optimizes your total output by considering split routes, multiple hops, and the gas cost of each step.`}</span>
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center gap-2 w-full px-4">
-              <span>Error fetching route data</span>
             </div>
-          )}
+            {routeData.map((item) => (
+              <div
+                key={item.symbolOne}
+                className="text-xs md:text-sm flex items-center gap-2 z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white"
+              >
+                {item.symbolOne && item.symbolTwo && (
+                  <MultiTokenIcon symbols={[item.symbolOne, item.symbolTwo]} />
+                )}
+                {formatNumber(parseFloat(item.percent))}%
+              </div>
+            ))}
+            {symbolOut && <TokenIcon symbol={symbolOut} className="z-10" />}
+          </div>
+          <div className="flex items-center gap-2 w-full px-4">
+            <span>{`Best price route costs <$ ${networkFee} in gas. This route optimizes your total output by considering split routes, multiple hops, and the gas cost of each step.`}</span>
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

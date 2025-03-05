@@ -8,45 +8,69 @@ import {
   WrappedTiaIcon,
   DotIcon,
 } from "../../../icons";
+import { type ComponentType } from "react";
+
+export enum TokenSymbol {
+  TIA = "tia",
+  WTIA = "wtia",
+  STTIA = "sttia",
+  USDC = "usdc",
+  MILKTIA = "milktia",
+  STRIDE = "stride",
+}
+
+type IconComponentProps = {
+  size?: number;
+  className?: string;
+};
+
+type TokenIconMap = {
+  [key in TokenSymbol]: {
+    Icon: ComponentType<IconComponentProps>;
+  };
+};
+
+const tokenIcons: TokenIconMap = {
+  [TokenSymbol.TIA]: {
+    Icon: CelestiaIcon,
+  },
+  [TokenSymbol.WTIA]: {
+    Icon: WrappedTiaIcon,
+  },
+  [TokenSymbol.STTIA]: {
+    Icon: StrideTiaIcon,
+  },
+  [TokenSymbol.USDC]: {
+    Icon: UsdcIcon,
+  },
+  [TokenSymbol.MILKTIA]: {
+    Icon: MilkTiaIcon,
+  },
+  [TokenSymbol.STRIDE]: {
+    Icon: StrideIcon,
+  },
+};
 
 export const TokenIcon = ({
   symbol,
   size = DEFAULT_ICON_SIZE,
   className = "",
 }: {
-  symbol: string | null;
+  symbol: string;
   size?: number;
   className?: string;
 }) => {
-  const tokenKey = symbol?.toLowerCase() || "unknown";
+  const normalizedSymbol = symbol.toLowerCase();
+  const FallbackIcon = DotIcon;
 
-  const tokenIcons = {
-    tia: {
-      Icon: CelestiaIcon,
-    },
-    wtia: {
-      Icon: WrappedTiaIcon,
-    },
-    sttia: {
-      Icon: StrideTiaIcon,
-    },
-    usdc: {
-      Icon: UsdcIcon,
-    },
-    milktia: {
-      Icon: MilkTiaIcon,
-    },
-    stride: {
-      Icon: StrideIcon,
-    },
-    unknown: {
-      Icon: DotIcon,
-    },
-  };
+  // Check if the symbol exists in our map
+  const isKnownToken = Object.values(TokenSymbol).includes(
+    normalizedSymbol as TokenSymbol,
+  );
 
-  const IconComponent = Object.keys(tokenIcons).includes(tokenKey)
-    ? tokenIcons[tokenKey as keyof typeof tokenIcons].Icon
-    : tokenIcons["unknown"].Icon;
+  const IconComponent = isKnownToken
+    ? tokenIcons[normalizedSymbol as TokenSymbol].Icon
+    : FallbackIcon;
 
   return <IconComponent size={size} className={className} />;
 };

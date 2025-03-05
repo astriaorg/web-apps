@@ -140,9 +140,9 @@ export function TxnInfo({
             </p>
           </div>
           <div className="h-[1px] border border-border w-full my-4"></div>
-          {quote && (
+          {quote && quote.route && (
             <RoutePath
-              quote={quote}
+              quoteRoute={quote.route}
               loading={txnInfo.txnQuoteDataLoading}
               symbolIn={tokenOne?.token?.coinDenom}
               symbolOut={tokenTwo?.token?.coinDenom}
