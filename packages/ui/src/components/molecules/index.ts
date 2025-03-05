@@ -10,4 +10,5 @@ export * from "./search-input";
 export * from "./status-card";
 export * from "./success-check";
 export * from "./toggle-switch";
+export * from "./token-icon/token-icon";
 export * from "./token-selector";
