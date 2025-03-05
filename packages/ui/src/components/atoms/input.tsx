@@ -7,7 +7,7 @@ export const inputVariants = cva("", {
   variants: {
     variant: {
       default:
-        "border border-stroke bg-surface-1 text-typography shadow-[2px_2px_4px_0px_#00000014_inset] focus-visible:border-stroke-active focus-visible:bg-transparent",
+        "border border-stroke-default bg-surface-1 text-typography shadow-[2px_2px_4px_0px_#00000014_inset] focus-visible:border-stroke-active focus-visible:bg-transparent",
     },
   },
   defaultVariants: {

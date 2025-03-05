@@ -10,20 +10,20 @@
 
 @theme {
   /* [Deprecated] Base Colors */
-  --color-white: 0 0% 96%;
-  --color-whitest: 0 0% 100%;
-  --color-semi-white: 0 0% 96% / 0.06;
-  --color-black: 203 45% 4%;
-  --color-grey-dark: 0 0% 20%;
-  --color-grey-medium: 0 0% 40%;
-  --color-grey-light: 0 0% 60%;
-  --color-grey-lighter: 0 0% 80%;
-  --color-red: 2 58% 46%;
-  --color-orange: 24 96% 51%;
-  --color-orange-soft: 35 87% 54%;
-  --color-green: 140 35% 36%;
-  --color-blue-light: 203 35% 60%;
-  --color-yellow: 43 71% 58%;
+  --color-white: hsl(0, 0%, 96%);
+  --color-whitest: hsl(0, 0%, 100%);
+  --color-semi-white: hsla(0, 0%, 96%, 0.06);
+  --color-black: hsl(203, 45%, 4%);
+  --color-grey-dark: hsl(0, 0%, 20%);
+  --color-grey-medium: hsl(0, 0%, 40%);
+  --color-grey-light: hsl(0, 0%, 60%);
+  --color-grey-lighter: hsl(0, 0%, 80%);
+  --color-red: hsl(2, 58%, 46%);
+  --color-orange: hsl(24, 96%, 51%);
+  --color-orange-soft: hsl(35, 87%, 54%);
+  --color-green: hsl(140, 35%, 36%);
+  --color-blue-light: hsl(203, 35%, 60%);
+  --color-yellow: hsl(43, 71%, 58%);
 
   /* [Deprecated] Semantic Colors */
   --background: var(--color-black);
@@ -240,7 +240,7 @@ html[data-theme="dark"] {
     @apply h-screen;
   }
   body {
-    @apply m-0 p-0 bg-background font-sans antialiased text-typography-default;
+    @apply m-0 p-0 bg-background-default font-sans antialiased text-typography-default;
   }
 }
 
