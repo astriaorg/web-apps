@@ -1,6 +1,4 @@
 import { Badge, Skeleton } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
-import Big from "big.js";
 import { Image } from "components/image";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 
@@ -11,7 +9,7 @@ export const HeaderSection = () => {
 
   return (
     <section className="flex flex-col px-4">
-      <div className="mt-10 flex flex-col">
+      <div className="mt-18 flex flex-col">
         {status !== "error" && (
           <div className="flex flex-col space-y-3">
             <Skeleton isLoading={isPending}>
@@ -41,21 +39,8 @@ export const HeaderSection = () => {
                 </span>
               </div>
             </Skeleton>
-            <Skeleton isLoading={isPending} className="w-52">
-              <div className="flex space-x-2">
-                <Badge variant="secondary">
-                  <FormattedNumber
-                    value={new Big(data?.marketByUniqueKey.lltv ?? 0)
-                      .div(
-                        10 **
-                          (data?.marketByUniqueKey.collateralAsset?.decimals ??
-                            18),
-                      )
-                      .toNumber()}
-                    style="percent"
-                    minimumFractionDigits={2}
-                  />
-                </Badge>
+            <Skeleton isLoading={isPending} className="w-40">
+              <div>
                 <Badge variant="secondary">
                   {data?.marketByUniqueKey.collateralAsset?.name}
                 </Badge>

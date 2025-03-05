@@ -2,6 +2,7 @@ import { StatusCard } from "@repo/ui/components";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
+import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
 
@@ -14,7 +15,7 @@ export const ContentSection = () => {
     return [
       {
         label: {
-          left: "Rate",
+          left: "APY",
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
         value: data?.marketByUniqueKey.state?.netBorrowApy ?? 0,
@@ -50,6 +51,18 @@ export const ContentSection = () => {
         },
         useAbbreviatedNumberFormat: true,
       },
+      {
+        label: {
+          left: "LLTV",
+        },
+        value: new Big(data?.marketByUniqueKey.lltv ?? 0)
+          .div(10 ** (data?.marketByUniqueKey.collateralAsset?.decimals ?? 18))
+          .toNumber(),
+        options: {
+          style: "percent",
+          minimumFractionDigits: 2,
+        },
+      },
     ];
   }, [data]);
 
@@ -64,7 +77,14 @@ export const ContentSection = () => {
         <div className="mt-12 flex flex-col gap-10 lg:gap-2 lg:flex-row">
           {/* Summary section. */}
           <div className="order-2 lg:order-1 lg:basis-2/3">
-            <SummaryCards items={items} isLoading={isPending} />
+            <div className="flex flex-col gap-2">
+              <SummaryCards
+                items={items}
+                isLoading={isPending}
+                className="grid grid-cols-2 gap-2"
+              />
+              <OverviewCards />
+            </div>
           </div>
 
           {/* Borrow section. */}

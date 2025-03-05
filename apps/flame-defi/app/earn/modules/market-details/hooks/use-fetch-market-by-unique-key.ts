@@ -4,14 +4,15 @@ import { graphql } from "earn/gql";
 import request from "graphql-request";
 
 const query = graphql(`
-  query MarketByUniqueKey($key: String!) {
-    marketByUniqueKey(uniqueKey: $key) {
+  query MarketByUniqueKey($key: String!, $chainId: Int) {
+    marketByUniqueKey(uniqueKey: $key, chainId: $chainId) {
       collateralAsset {
         decimals
         logoURI
         name
         symbol
       }
+      creationTimestamp
       lltv
       loanAsset {
         decimals
@@ -39,7 +40,11 @@ export const useFetchMarketByUniqueKey = ({
   return useQuery({
     queryKey: ["useFetchMarketByUniqueKey", variables],
     queryFn: async () => {
-      return request(earnAPIURL, query, variables);
+      return request(earnAPIURL, query, {
+        ...variables,
+        // TODO: Get chain ID from wallet context.
+        chainId: 1,
+      });
     },
   });
 };

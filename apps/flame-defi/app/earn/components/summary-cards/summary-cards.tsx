@@ -1,7 +1,8 @@
 import { AnimatedCounter, Card, CardLabel } from "@repo/ui/components";
 import { FormatNumberOptions } from "@repo/ui/intl";
 
-export interface SummaryCardsProps {
+export interface SummaryCardsProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
   items: {
     label: {
@@ -15,15 +16,13 @@ export interface SummaryCardsProps {
   }[];
 }
 
-export const SummaryCards = ({ items, isLoading }: SummaryCardsProps) => {
-  if (items.length !== 3) {
-    throw new Error(
-      "`SummaryCards` requires exactly 3 items. Adjust component to handle more items if needed.",
-    );
-  }
-
+export const SummaryCards = ({
+  items,
+  isLoading,
+  ...props
+}: SummaryCardsProps) => {
   return (
-    <div className="grid lg:grid-cols-3 gap-2">
+    <div {...props}>
       {items.map((it, index) => (
         <Card
           key={`summary-cards_item_${index}`}
