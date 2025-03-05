@@ -99,7 +99,10 @@ export const SettingsPopover = () => {
   return (
     <Popover onOpenChange={handlePopoverOpenChange}>
       <PopoverTrigger>
-        <a className="text-grey-light hover:text-white cursor-pointer" aria-label="Settings">
+        <a
+          className="text-grey-light hover:text-white cursor-pointer"
+          aria-label="Settings"
+        >
           <GearIcon
             className={`transition ${expertMode ? "stroke-orange-soft" : ""}`}
           />
