@@ -124,7 +124,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     useBalancePolling(getBalanceCallback, pollingConfig);
 
   useEffect(() => {
-    if (!cosmosBalance || !currencies.length) {
+    if (!cosmosBalance) {
       return;
     }
     const usdcToken = currencies.find(

@@ -9,10 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/shadcn-primitives";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
-import { useAccount } from "wagmi";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
 export function SingleWalletContent({
   address,
   handleClose,
@@ -121,7 +118,7 @@ export default function SingleWalletConnect() {
 
   return userAccount.address ? (
     <Popover>
-      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px]">
+      <PopoverTrigger className="flex items-center gap-2 transition border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px] cursor-pointer ">
         <div className="flex items-center gap-2">
           <FlameIcon size={16} />
           <span className="text-white text-base font-normal">
@@ -131,7 +128,7 @@ export default function SingleWalletConnect() {
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
-        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark w-full md:w-[300px]"
+        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark w-full md:w-[300px] border border-border"
       >
         <SingleWalletContent address={userAccount.address} />
       </PopoverContent>

@@ -129,7 +129,7 @@ export default function ConnectEvmWalletButton({
       type="button"
       key="connect-evm-wallet-button"
       onClick={handleConnectWallet}
-      className="flex items-center gap-2 py-4 w-full md:w-[300px] text-base"
+      className="flex items-center gap-2 py-4 w-full md:w-[300px] text-base cursor-pointer"
     >
       <FlameIcon />
       <span>{label}</span>

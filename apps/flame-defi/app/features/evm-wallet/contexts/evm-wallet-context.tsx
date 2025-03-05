@@ -125,7 +125,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [nativeBalance, nativeBalanceStatus]);
 
   useEffect(() => {
-    if (!evmNativeTokenBalance || !currencies.length) {
+    if (!evmNativeTokenBalance) {
       return;
     }
 

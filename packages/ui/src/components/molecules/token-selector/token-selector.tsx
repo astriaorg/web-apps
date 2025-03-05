@@ -71,7 +71,7 @@ export const TokenSelector = ({
           defaultTitle="Select token"
         />
       ) : (
-        <DialogTrigger>
+        <DialogTrigger className="cursor-pointer">
           <div
             className={`flex items-center bg-radial-dark px-1 rounded-2xl border border-solid border-border`}
           >
@@ -89,7 +89,7 @@ export const TokenSelector = ({
         <DialogContent className="bg-radial-dark w-[90%] md:w-[90%] lg:w-[450px] [&>button]:hidden fixed top-[440px] left-[50%] -translate-x-[50%] transition rounded-xl">
           <div className="flex items-center justify-between">
             <DialogTitle>Select a token</DialogTitle>
-            <button onClick={() => setOpen(false)}>
+            <button onClick={() => setOpen(false)} className="cursor-pointer">
               <CloseIcon className="text-grey-light hover:text-white transition" />
             </button>
           </div>

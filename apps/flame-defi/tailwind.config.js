@@ -1,4 +1,4 @@
-import tailwindcss_animate from "tailwindcss-animate";
+// import tailwindcss_animate from "tailwindcss-animate";
 
 export default {
   content: [
@@ -81,7 +81,6 @@ export default {
       },
     },
   },
-  plugins: [tailwindcss_animate],
   compilerOptions: {
     baseUrl: ".",
     paths: {

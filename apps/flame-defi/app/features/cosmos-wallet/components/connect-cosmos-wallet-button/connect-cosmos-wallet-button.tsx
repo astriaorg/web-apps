@@ -151,7 +151,7 @@ export default function ConnectCosmosWalletButton({
       type="button"
       key="connect-cosmos-wallet-button"
       onClick={handleConnectWallet}
-      className="flex items-center gap-2 py-4 w-full md:w-[300px]"
+      className="flex items-center gap-2 py-4 w-full md:w-[300px] cursor-pointer"
     >
       <CosmosIcon />
       <span>{label}</span>
