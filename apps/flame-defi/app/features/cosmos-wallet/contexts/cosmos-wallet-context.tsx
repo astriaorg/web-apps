@@ -124,23 +124,26 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     useBalancePolling(getBalanceCallback, pollingConfig);
 
   useEffect(() => {
-    if (cosmosBalance) {
-      const usdcToken = currencies.find(
-        (currency) => currency.coinDenom.toLowerCase() === "usdc"
-      );
-
-      if (!usdcToken) {
-        console.warn("No USDC token found in currencies");
-      } else {
-        const nativeToken = currencies.find((currency) => currency.isNative);
-
-        getQuote(
-          TRADE_TYPE.EXACT_IN,
-          { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
-          { token: usdcToken, value: "" }
-        );
-      }
+    if (!cosmosBalance) {
+      console.error("No cosmos balance found");
+      return;
     }
+    const usdcToken = currencies.find(
+      (currency) => currency.coinDenom.toLowerCase() === "usdc"
+    );
+
+    if (!usdcToken) {
+      console.error("No USDC token found in currencies");
+      return;
+    }
+
+    const nativeToken = currencies.find((currency) => currency.isNative);
+
+    getQuote(
+      TRADE_TYPE.EXACT_IN,
+      { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
+      { token: usdcToken, value: "" }
+    );
   }, [cosmosBalance, getQuote, currencies]);
 
   const usdcToNativeQuote = quote

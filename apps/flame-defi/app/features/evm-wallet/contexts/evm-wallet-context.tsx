@@ -69,7 +69,7 @@ export interface EvmWalletContextProps {
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
-  {} as EvmWalletContextProps,
+  {} as EvmWalletContextProps
 );
 
 interface EvmWalletProviderProps {
@@ -118,31 +118,34 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
     const formattedBalance = formatUnits(
       nativeBalance.value,
-      nativeBalance.decimals,
+      nativeBalance.decimals
     );
 
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
 
   useEffect(() => {
-    if (userAccount.address && evmNativeTokenBalance) {
-      const usdcToken = currencies.find(
-        (currency) => currency.coinDenom.toLowerCase() === "usdc",
-      );
-
-      if (!usdcToken) {
-        console.warn("No USDC token found in currencies");
-      } else {
-      const nativeToken = currencies.find((currency) => currency.isNative);
-
-      getQuote(
-        TRADE_TYPE.EXACT_IN,
-        { token: nativeToken, value: evmNativeTokenBalance.value },
-          { token: usdcToken, value: "" },
-        );
-      }
+    if (!evmNativeTokenBalance) {
+      console.error("No evm native token balance found");
+      return;
     }
-  }, [userAccount.address, evmNativeTokenBalance, getQuote, currencies]);
+    const usdcToken = currencies.find(
+      (currency) => currency.coinDenom.toLowerCase() === "usdc"
+    );
+
+    if (!usdcToken) {
+      console.error("No USDC token found in currencies");
+      return;
+    }
+
+    const nativeToken = currencies.find((currency) => currency.isNative);
+
+    getQuote(
+      TRADE_TYPE.EXACT_IN,
+      { token: nativeToken, value: evmNativeTokenBalance.value },
+      { token: usdcToken, value: "" }
+    );
+  }, [evmNativeTokenBalance, getQuote, currencies]);
 
   const usdcToNativeQuote = quote
     ? {
@@ -152,18 +155,18 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         }),
         symbol: "usdc",
       }
-      : {
+    : {
         value: "0",
         symbol: "usdc",
       };
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
-    null,
+    null
   );
   const [selectedEvmCurrency, setSelectedEvmCurrency] =
     useState<EvmCurrency | null>(null);
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
-    null,
+    null
   );
 
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
@@ -186,7 +189,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     } catch (error) {
       console.warn(
         "User selected non Flame chain. Switching to selected Flame chain.",
-        error,
+        error
       );
       const chainId = getFlameChainId(selectedFlameNetworkRef.current);
       switchChain({ chainId });
@@ -228,16 +231,16 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
         selectedEvmCurrency.erc20ContractAddress,
-        true,
+        true
       ) as AstriaErc20WithdrawerService;
 
       const balanceRes = await withdrawerSvc.getBalance(
         selectedEvmChain.chainId,
-        evmAccountAddress,
+        evmAccountAddress
       );
       const balanceStr = formatUnits(
         balanceRes,
-        selectedEvmCurrency.coinDecimals,
+        selectedEvmCurrency.coinDecimals
       );
       return {
         value: balanceStr.toString(),
@@ -248,7 +251,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     if (!nativeBalance?.value) return null;
     const formattedBalance = formatUnits(
       nativeBalance.value,
-      nativeBalance.decimals,
+      nativeBalance.decimals
     );
     return { value: formattedBalance, symbol: selectedEvmCurrency.coinDenom };
   }, [
@@ -267,7 +270,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         console.error("Failed to get balance:", error);
       },
     }),
-    [selectedEvmChain, selectedEvmCurrency],
+    [selectedEvmChain, selectedEvmCurrency]
   );
 
   const {
@@ -286,7 +289,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
 
     const fee = formatUnits(
       BigInt(selectedEvmCurrency.ibcWithdrawalFeeWei),
-      18,
+      18
     );
     return `${fee} ${selectedEvmChainNativeToken.coinDenom}`;
   }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
@@ -297,7 +300,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         label: chainLabel,
         value: chain,
         LeftIcon: chain.IconComponent,
-      }),
+      })
     );
   }, [evmChains]);
 
@@ -324,7 +327,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     const withdrawableTokens = selectedEvmChain.currencies?.filter(
       (currency) =>
         currency.erc20ContractAddress ||
-        currency.nativeTokenWithdrawerContractAddress,
+        currency.nativeTokenWithdrawerContractAddress
     );
 
     return withdrawableTokens.map(
@@ -332,7 +335,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         label: currency.coinDenom,
         value: currency,
         LeftIcon: currency.IconComponent,
-      }),
+      })
     );
   }, [selectedEvmChain]);
 
@@ -376,13 +379,13 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       }
       const erc20Service = createErc20Service(
         wagmiConfig,
-        token.erc20ContractAddress as `0x${string}`,
+        token.erc20ContractAddress as `0x${string}`
       );
 
       const txHash = await erc20Service.approveToken(
         selectedChain.chainId,
         contracts.swapRouter.address,
-        tokenApprovalAmount,
+        tokenApprovalAmount
       );
 
       const newTokenAllowance = tokenAllowances.map((data) => {
@@ -406,7 +409,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       selectedChain,
       tokenAllowances,
       tokenApprovalAmount,
-    ],
+    ]
   );
 
   const getTokenAllowances = useCallback(async () => {
@@ -424,13 +427,13 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       if (currency.erc20ContractAddress) {
         const erc20Service = createErc20Service(
           wagmiConfig,
-          currency.erc20ContractAddress as `0x${string}`,
+          currency.erc20ContractAddress as `0x${string}`
         );
         try {
           const allowance = await erc20Service.getTokenAllowances(
             selectedChain.chainId,
             userAccount.address,
-            contracts.swapRouter.address,
+            contracts.swapRouter.address
           );
 
           newTokenAllowances.push({
