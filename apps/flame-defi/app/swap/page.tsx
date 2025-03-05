@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
+import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
@@ -22,7 +23,6 @@ import { useGetQuote } from "../hooks";
 import { useSwapButton, useOneToOneQuote, useTxnInfo } from "./hooks";
 import { SwapInput } from "./components/swap-input";
 import { TxnInfo } from "./components/txn-info";
-import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
 import { SwapTxnSteps } from "./components/swap-txn-steps";
 import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
@@ -407,8 +407,10 @@ export default function SwapPage(): React.ReactElement {
           quote && (
             <TxnInfo
               txnInfo={txnInfo}
+              tokenOne={tokenOne}
               tokenTwo={tokenTwo}
               oneToOneQuote={oneToOneQuote}
+              quote={quote}
             />
           )}
       </div>

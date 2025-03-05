@@ -10,8 +10,10 @@ import {
   AccordionTrigger,
 } from "@repo/ui/shadcn-primitives";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
+import { GetQuoteResult } from "@repo/flame-types";
 import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "./types";
+import { RoutePath } from "./route-path";
 
 enum TOKEN_INPUTS {
   TOKEN_ONE = "token_one",
@@ -26,12 +28,16 @@ export interface TxnInfoProps {
 
 export function TxnInfo({
   txnInfo,
+  tokenOne,
   tokenTwo,
   oneToOneQuote,
+  quote,
 }: {
   txnInfo: ReturnType<typeof useTxnInfo>;
+  tokenOne: TokenState;
   tokenTwo: TokenState;
   oneToOneQuote: OneToOneQuoteProps;
+  quote: GetQuoteResult;
 }) {
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
@@ -41,7 +47,7 @@ export function TxnInfo({
         value="transaction-details"
         className="text-grey-light text-sm border-b-0"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pb-2">
           <Skeleton
             className="rounded-sm"
             isLoading={oneToOneQuote?.oneToOneLoading}
@@ -133,6 +139,16 @@ export function TxnInfo({
               </span>
             </p>
           </div>
+          <div className="h-[1px] border border-border w-full my-4"></div>
+          {quote && quote.route && (
+            <RoutePath
+              quoteRoute={quote.route}
+              loading={txnInfo.txnQuoteDataLoading}
+              symbolIn={tokenOne?.token?.coinDenom}
+              symbolOut={tokenTwo?.token?.coinDenom}
+              networkFee={txnInfo.formattedGasUseEstimateUSD}
+            />
+          )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
