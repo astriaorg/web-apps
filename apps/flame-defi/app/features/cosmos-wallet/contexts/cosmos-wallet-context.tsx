@@ -33,7 +33,7 @@ export interface CosmosWalletContextProps {
   selectedIbcCurrency: IbcCurrency | null;
   selectCosmosChain: (chain: CosmosChainInfo | null) => void;
   selectIbcCurrency: (currency: IbcCurrency) => void;
-  usdcTiaQuote: string | null;
+  usdcToNativeQuote: { value: string; symbol: string } | null;
 }
 
 export const CosmosWalletContext =
@@ -124,22 +124,27 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
 
   useEffect(() => {
     if (cosmosBalance) {
-      const usdcToken = currencies?.find(
+      const usdcToken = currencies.find(
         (currency) => currency.coinDenom.toLowerCase() === "usdc",
       );
+      const nativeToken = currencies.find((currency) => currency.isNative);
+      console.log("cosmosBalance.value", cosmosBalance.value);
       getQuote(
         TRADE_TYPE.EXACT_IN,
-        { token: currencies[0], value: removeNonNumeric(cosmosBalance.value) },
+        { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
         { token: usdcToken, value: "" },
       );
     }
   }, [cosmosBalance, getQuote, currencies]);
 
-  const usdcTiaQuote = quote
-    ? formatNumber(parseFloat(quote.quoteDecimals), {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
+  const usdcToNativeQuote = quote
+    ? {
+        value: formatNumber(parseFloat(quote.quoteDecimals), {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        symbol: "usdc",
+      }
     : null;
 
   const cosmosChainsOptions = useMemo(() => {
@@ -244,7 +249,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     selectedIbcCurrency,
     selectCosmosChain,
     selectIbcCurrency,
-    usdcTiaQuote,
+    usdcToNativeQuote,
   };
 
   return (

@@ -26,7 +26,7 @@ export function SingleWalletContent({
     disconnectEvmWallet,
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
-    usdcTiaQuote,
+    usdcToNativeQuote,
   } = useEvmWallet();
   const formattedEvmBalanceValue = formatDecimalValues(
     evmNativeTokenBalance?.value,
@@ -74,7 +74,9 @@ export function SingleWalletContent({
         <div>
           <Skeleton
             className="w-[100px] h-[20px]"
-            isLoading={isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance}
+            isLoading={Boolean(
+              isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance,
+            )}
           >
             <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
               <span>{formattedEvmBalanceValue}</span>
@@ -83,9 +85,11 @@ export function SingleWalletContent({
           </Skeleton>
           <Skeleton
             className="w-[100px] h-[20px]"
-            isLoading={usdcTiaQuote === null}
+            isLoading={usdcToNativeQuote === null}
           >
-            <div className="text-base font-normal">${usdcTiaQuote} USD</div>
+            <div className="text-base font-normal">
+              ${usdcToNativeQuote?.value} USD
+            </div>
           </Skeleton>
         </div>
 

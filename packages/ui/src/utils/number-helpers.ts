@@ -2,7 +2,7 @@ import Big from "big.js";
 const allCommas = /,/g;
 
 /**
- * Use `removeNonNumeric` to remove non-numeric characters from a string that you desire to be a numbers.
+ * Use `removeNonNumeric` to remove non-numeric characters from a string that you desire to be all numbers or decimals.
  */
 export const removeNonNumeric = (str: string) => str.replace(/[^0-9.]/g, "");
 

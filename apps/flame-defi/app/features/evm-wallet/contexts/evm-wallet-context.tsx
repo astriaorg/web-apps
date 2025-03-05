@@ -64,7 +64,7 @@ export interface EvmWalletContextProps {
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
   approveToken: (token: EvmCurrency) => Promise<`0x${string}` | null>;
-  usdcTiaQuote: string | null;
+  usdcToNativeQuote: { value: string; symbol: string } | null;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -125,22 +125,27 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
 
   useEffect(() => {
     if (userAccount.address && evmNativeTokenBalance) {
-      const usdcToken = currencies?.find(
+      const usdcToken = currencies.find(
         (currency) => currency.coinDenom.toLowerCase() === "usdc",
       );
+      const nativeToken = currencies.find((currency) => currency.isNative);
+
       getQuote(
         TRADE_TYPE.EXACT_IN,
-        { token: currencies[0], value: evmNativeTokenBalance.value },
+        { token: nativeToken, value: evmNativeTokenBalance.value },
         { token: usdcToken, value: "" },
       );
     }
   }, [userAccount.address, evmNativeTokenBalance, getQuote, currencies]);
 
-  const usdcTiaQuote = quote
-    ? formatNumber(parseFloat(quote.quoteDecimals), {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })
+  const usdcToNativeQuote = quote
+    ? {
+        value: formatNumber(parseFloat(quote.quoteDecimals), {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        symbol: "usdc",
+      }
     : null;
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
@@ -460,7 +465,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     getTokenAllowances,
     approveToken,
     tokenAllowances,
-    usdcTiaQuote,
+    usdcToNativeQuote,
   };
 
   return (

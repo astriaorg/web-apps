@@ -5,6 +5,7 @@ import {
   formatNumberAsPercent,
   formatDecimalValues,
   isDustAmount,
+  removeNonNumeric,
 } from "./number-helpers";
 
 describe("formatAbbreviatedNumber", () => {
@@ -165,5 +166,27 @@ describe("formatDecimalValues", () => {
 
   it("should handle integers", () => {
     expect(formatDecimalValues("123")).toBe("123.0000");
+  });
+});
+
+describe("removeNonNumeric", () => {
+  it("should remove all non-numeric characters except decimal points", () => {
+    expect(removeNonNumeric("123.456 TIA")).toBe("123.456");
+  });
+
+  it("should handle multiple decimal points", () => {
+    expect(removeNonNumeric("123.456.789")).toBe("123.456.789");
+  });
+
+  it("should handle strings with special characters", () => {
+    expect(removeNonNumeric("$1,234.56%")).toBe("1234.56");
+  });
+
+  it("should handle strings with letters", () => {
+    expect(removeNonNumeric("abc123.45def")).toBe("123.45");
+  });
+
+  it("should return empty string for non-numeric input", () => {
+    expect(removeNonNumeric("abc")).toBe("");
   });
 });

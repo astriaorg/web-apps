@@ -31,7 +31,7 @@ export default function ConnectEvmWalletButton({
     disconnectEvmWallet,
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
-    usdcTiaQuote,
+    usdcToNativeQuote,
   } = useEvmWallet();
   const userAccount = useAccount();
   const formattedEvmBalanceValue = formatDecimalValues(
@@ -87,9 +87,9 @@ export default function ConnectEvmWalletButton({
             <div>
               <Skeleton
                 className="w-[150px] h-[20px] mb-2"
-                isLoading={
-                  isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance
-                }
+                isLoading={Boolean(
+                  isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance,
+                )}
               >
                 <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
                   <span>{formattedEvmBalanceValue}</span>
@@ -98,9 +98,11 @@ export default function ConnectEvmWalletButton({
               </Skeleton>
               <Skeleton
                 className="w-[100px] h-[20px]"
-                isLoading={usdcTiaQuote === null}
+                isLoading={usdcToNativeQuote === null}
               >
-                <div className="text-base font-normal">${usdcTiaQuote} USD</div>
+                <div className="text-base font-normal">
+                  ${usdcToNativeQuote?.value} USD
+                </div>
               </Skeleton>
             </div>
 

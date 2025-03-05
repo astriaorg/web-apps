@@ -12,7 +12,12 @@ import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
-import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  TokenState,
+  TRADE_TYPE,
+  TXN_STATUS,
+} from "@repo/flame-types";
 import { useGetQuote } from "../hooks";
 import { useSwapButton, useOneToOneQuote, useTxnInfo } from "./hooks";
 import { SwapInput } from "./components/swap-input";
@@ -31,6 +36,7 @@ export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
   const userAccount = useAccount();
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputOne, setInputOne] = useState<TokenState>({
     token: currencies?.[0],
     value: "",
@@ -81,7 +87,6 @@ export default function SwapPage(): React.ReactElement {
     txnStatus,
     setTxnStatus,
     txnMsg,
-    isCloseModalAction,
     tokenApprovalNeeded,
     errorText,
     setErrorText,
@@ -148,7 +153,8 @@ export default function SwapPage(): React.ReactElement {
     setInputTwo({ token: null, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
-  }, [currencies, setQuote]);
+    setTxnStatus(undefined);
+  }, [currencies, setQuote, setTxnStatus]);
 
   const handleInputChange = useCallback(
     (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
@@ -270,6 +276,34 @@ export default function SwapPage(): React.ReactElement {
     }
   };
 
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    if (
+      txnStatus === TXN_STATUS.SUCCESS ||
+      txnStatus === undefined ||
+      txnStatus === TXN_STATUS.FAILED
+    ) {
+      handleResetInputs();
+    }
+  };
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+    if (isTiaWtia) {
+      onSubmitCallback();
+    } else {
+      setTxnStatus(TXN_STATUS.IDLE);
+    }
+  };
+
+  const handleModalActionButton = () => {
+    if (txnStatus !== TXN_STATUS.IDLE) {
+      handleCloseModal();
+    } else {
+      onSubmitCallback();
+    }
+  };
+
   const swapInputs = [
     {
       id: TOKEN_INPUTS.TOKEN_ONE,
@@ -334,17 +368,13 @@ export default function SwapPage(): React.ReactElement {
           </div>
         )}
         <ConfirmationModal
-          onSubmitCallback={onSubmitCallback}
+          open={modalOpen}
           buttonText={buttonText}
           actionButtonText={actionButtonText}
-          txnStatus={txnStatus}
-          setTxnStatus={setTxnStatus}
-          isCloseModalAction={isCloseModalAction}
-          handleResetInputs={handleResetInputs}
-          skipIdleTxnStatus={isTiaWtia}
-          showOpenButton={
-            validSwapInputs && !tokenApprovalNeeded ? true : false
-          }
+          showOpenButton={Boolean(validSwapInputs && !tokenApprovalNeeded)}
+          handleOpenModal={handleOpenModal}
+          handleModalActionButton={handleModalActionButton}
+          handleCloseModal={handleCloseModal}
           title={titleText}
         >
           <SwapTxnSteps
