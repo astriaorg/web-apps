@@ -126,17 +126,20 @@ export function TxnDetails({
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-grey-light flex items-center text-sm gap-1">
-            Minimum received after slippage ({swapSlippageTolerance}%){" "}
+          <div className="flex gap-1 items-center">
+            <span className="w-[116px] md:w-full text-sm text-grey-light">
+              Min received after slippage ({swapSlippageTolerance}%)
+            </span>
             <InfoTooltip
               className="max-w-[250px]"
               content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
               side="right"
             />
-          </span>
-          <span className="text-grey-light text-sm font-medium">
-            {minimumReceived} <span>{tokenTwo?.token?.coinDenom}</span>
-          </span>
+          </div>
+          <div className="text-grey-light flex items-center gap-1 text-sm font-medium">
+            <span>{minimumReceived}</span>
+            <span>{tokenTwo?.token?.coinDenom}</span>
+          </div>
         </div>
       </div>
     </>
@@ -153,8 +156,10 @@ function TxnLoader({
     <div className="flex flex-col items-center justify-center h-full mt-20">
       <BlockLoader className="mb-20" />
       <div className="text-white font-medium mt-6 text-center">
-        <span className="text-lg mb-2">Confirm Transaction in wallet</span>
-        <div className="flex items-center gap-1 justify-center text-sm">
+        <span className="text-base md:text-lg mb-2">
+          Confirm Transaction in wallet
+        </span>
+        <div className="flex items-center gap-1 justify-center text-sm md:text-base">
           <span>
             {formatDecimalValues(tokenOne?.value || "0", 6)}{" "}
             <span>{tokenOne?.token?.coinDenom}</span>
@@ -184,27 +189,29 @@ function TxnSuccess({
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
       <div className="text-white font-medium mt-6 text-center">
-        <span className="text-lg mb-2">Success</span>
-        <div className="flex items-center gap-1 justify-center text-base">
-          <span>Swapped</span>
-          <span>
-            {formatDecimalValues(tokenOne?.value || "0", 6)}{" "}
-            <span>{tokenOne?.token?.coinDenom}</span>
-          </span>
+        <span className="mb-2 text-base md:text-lg">Success</span>
+        <div className="flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
+          <div className="flex items-center gap-1">
+            <span>Swapped</span>
+            <span>
+              {formatDecimalValues(tokenOne?.value || "0", 6)}{" "}
+              <span>{tokenOne?.token?.coinDenom}</span>
+            </span>
+          </div>
           <span>for</span>
-          <span>
+          <div className="flex items-center gap-1">
             {isTiaWtia
               ? formatDecimalValues(tokenTwo?.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span> {tokenTwo?.token?.coinDenom}</span>
-          </span>
+            <span>{tokenTwo?.token?.coinDenom}</span>
+          </div>
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
             href={`${selectedChain.blockExplorerUrl}/tx/${txnHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 text-orange-soft hover:text-orange-soft/80 transition"
+            className="mt-2 text-orange-soft hover:text-orange-soft/80 transition text-base md:text-lg underline"
           >
             View on Explorer
           </a>
