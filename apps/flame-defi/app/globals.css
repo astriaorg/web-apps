@@ -3,6 +3,12 @@
 @config '../tailwind.config.js';
 
 @theme {
+  --font-sans: var(--font-switzer), "sans-serif";
+  --font-mono: var(--font-nb-akademie-mono), "monospace";
+  --font-dot: var(--font-dot-matrix), "monospace";
+}
+
+@theme {
   /* [Deprecated] Base Colors */
   --color-white: 0 0% 96%;
   --color-whitest: 0 0% 100%;
@@ -137,6 +143,95 @@ html[data-theme="dark"] {
   --color-surface-inverted: hsl(var(--color-gray-0));
 
   --color-orange: hsl(var(--color-orange-100));
+}
+
+@theme {
+  --animate-fade-in: fade-in 0.3s ease-in-out;
+  --animate-fade-out: fade-out 0.3s ease-in-out;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shimmer: shimmer 6000ms ease-in-out infinite;
+  --animate-success-tick: success-tick 450ms ease 500ms forwards;
+  --animate-success-circle-outline: success-circle-outline 300ms ease-in-out
+    300ms forwards;
+  --animate-success-circle-fill: success-circle-fill 300ms ease-out 500ms
+    forwards;
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes success-tick {
+    0% {
+      stroke-dashoffset: 16px;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 31px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes success-circle-outline {
+    0% {
+      stroke-dashoffset: 72px;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes success-circle-fill {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {
