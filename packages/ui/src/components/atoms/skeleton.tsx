@@ -17,7 +17,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         ref={forwardedRef}
         aria-hidden
         className={cn(
-          "animate-shimmer rounded-lg opacity-5 bg-text-default/40 bg-[linear-gradient(270deg,transparent_20%,transparent_40%,var(--color-text-default)_50%,var(--color-text-default)_55%,transparent_70%,transparent_100%)] bg-[length:300%_100%] transition-colors *:invisible",
+          "animate-shimmer rounded-lg opacity-5 bg-typography-default/40 bg-[linear-gradient(270deg,transparent_20%,transparent_40%,var(--color-typography-default)_50%,var(--color-typography-default)_55%,transparent_70%,transparent_100%)] bg-[length:300%_100%] transition-colors *:invisible",
           className,
         )}
       >

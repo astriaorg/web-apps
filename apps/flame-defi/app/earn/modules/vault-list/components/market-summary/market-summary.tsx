@@ -44,7 +44,9 @@ export const MarketSummary = () => {
           padding="md"
           className="space-y-2"
         >
-          <span className="text-xs/3 text-text-light">{it.label.left}</span>
+          <span className="text-xs/3 text-typography-light">
+            {it.label.left}
+          </span>
 
           <Skeleton isLoading={isPending}>
             <AnimatedCounter

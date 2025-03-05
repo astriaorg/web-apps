@@ -160,7 +160,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 </Badge>
               </div>
               <div className="md:hidden flex justify-end pr-3">
-                <CaretRightIcon className="text-text-subdued" size={16} />
+                <CaretRightIcon className="text-typography-subdued" size={16} />
               </div>
             </div>
           );

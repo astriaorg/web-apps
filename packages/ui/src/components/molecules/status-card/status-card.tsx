@@ -5,7 +5,7 @@ import { Card, type CardProps } from "../card";
 export const statusCardVariants = cva("", {
   variants: {
     variant: {
-      default: "text-text-secondary",
+      default: "text-typography-secondary",
     },
   },
   defaultVariants: {

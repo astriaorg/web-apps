@@ -121,7 +121,7 @@ export const DepositCards = () => {
           </div>
         </CardLabel>
         <CardFigureInput placeholder="0.00" />
-        <CardLabel className="text-text-light text-sm/3">
+        <CardLabel className="text-typography-light text-sm/3">
           <FormattedNumber
             value={0}
             minimumFractionDigits={2}
@@ -141,7 +141,9 @@ export const DepositCards = () => {
               <span className="flex-1">{it.label.left}</span>
               <div>{it.label.right}</div>
             </CardLabel>
-            <CardLabel className="text-2xl/6 text-text">{it.value}</CardLabel>
+            <CardLabel className="text-2xl/6 text-typography-default">
+              {it.value}
+            </CardLabel>
           </div>
         ))}
       </Card>

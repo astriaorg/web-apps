@@ -11,7 +11,7 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-text-light",
+        default: "text-typography-light",
       },
     },
     defaultVariants: {
@@ -21,7 +21,7 @@ const tabsListVariants = cva(
 );
 
 const tabsTriggerVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap transition-all focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-surface-3 data-[state=active]:text-text data-[state=active]:shadow-xs",
+  "inline-flex items-center justify-center whitespace-nowrap transition-all focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-surface-3 data-[state=active]:text-typography-default data-[state=active]:shadow-xs",
   {
     variants: {
       variant: {
