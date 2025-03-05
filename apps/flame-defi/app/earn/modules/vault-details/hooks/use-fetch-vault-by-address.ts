@@ -40,6 +40,7 @@ const query = graphql(`
               supplyAssets
               supplyAssetsUsd
             }
+            uniqueKey
           }
           supplyCapUsd
         }

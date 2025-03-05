@@ -21,12 +21,15 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import { Image } from "components/image";
+import { ROUTES } from "earn/constants/routes";
 import { VaultAllocationHistory } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 export const Table = () => {
   const { formatNumber } = useIntl();
+  const router = useRouter();
   const {
     query: { data, isError, isPending },
   } = usePageContext();
@@ -247,6 +250,11 @@ export const Table = () => {
                 "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
                 isPending && "pointer-events-none",
               )}
+              onClick={() =>
+                router.push(
+                  ROUTES.MARKET_DETAILS + row.original.market.uniqueKey,
+                )
+              }
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>
