@@ -14,8 +14,14 @@ const query = graphql(`
       }
       lltv
       loanAsset {
+        decimals
         logoURI
         symbol
+      }
+      state {
+        collateralAssets
+        liquidityAssets
+        netBorrowApy
       }
     }
   }

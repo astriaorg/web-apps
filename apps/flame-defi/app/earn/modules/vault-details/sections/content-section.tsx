@@ -78,7 +78,7 @@ export const ContentSection = () => {
         <div className="mt-12 flex flex-col gap-10 lg:gap-2 lg:flex-row">
           {/* Summary section. */}
           <div className="order-2 lg:order-1 lg:basis-2/3">
-            <SummaryCards items={items} />
+            <SummaryCards items={items} isLoading={isPending} />
 
             <div className="mt-10 flex flex-col space-y-4">
               <Skeleton isLoading={isPending}>
