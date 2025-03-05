@@ -2,6 +2,176 @@
 
 @config '../tailwind.config.js';
 
+@theme {
+  /* [Deprecated] Base Colors */
+  --color-white: 0 0% 96%;
+  --color-whitest: 0 0% 100%;
+  --color-semi-white: 0 0% 96% / 0.06;
+  --color-black: 203 45% 4%;
+  --color-grey-dark: 0 0% 20%;
+  --color-grey-medium: 0 0% 40%;
+  --color-grey-light: 0 0% 60%;
+  --color-grey-lighter: 0 0% 80%;
+  --color-red: 2 58% 46%;
+  --color-orange: 24 96% 51%;
+  --color-orange-soft: 35 87% 54%;
+  --color-green: 140 35% 36%;
+  --color-blue-light: 203 35% 60%;
+  --color-yellow: 43 71% 58%;
+
+  /* [Deprecated] Semantic Colors */
+  --background: var(--color-black);
+  --foreground: var(--color-black);
+  --muted: var(--color-grey-dark);
+  --muted-foreground: var(--color-grey-light);
+  --accent: var(--color-orange-soft);
+  --accent-foreground: 210 40% 98%;
+  --popover: 224 71% 4%;
+  --popover-foreground: 215 20.2% 65.1%;
+  --border: 0, 0%, 20%;
+  --input: 216 34% 17%;
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 1.2%;
+  --secondary: 222.2 47.4% 11.2%;
+  --secondary-foreground: 210 40% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 216 34% 17%;
+
+  /* Primitives */
+  --color-gray-0: #ffffff;
+  --color-gray-50: #f5f5f5;
+  --color-gray-100: #e6e6e6;
+  --color-gray-150: #d9d9d9;
+  --color-gray-200: #cccccc;
+  --color-gray-250: #bfbfbf;
+  --color-gray-300: #b3b3b3;
+  --color-gray-350: #a6a6a6;
+  --color-gray-400: #999999;
+  --color-gray-450: #8c8c8c;
+  --color-gray-500: #808080;
+  --color-gray-550: #737373;
+  --color-gray-600: #666666;
+  --color-gray-650: #595959;
+  --color-gray-700: #4d4d4d;
+  --color-gray-750: #404040;
+  --color-gray-800: #333333;
+  --color-gray-850: #262626;
+  --color-gray-900: #1a1a1a;
+  --color-gray-950: #0d0d0d;
+  --color-gray-1000: #000000;
+
+  --color-orange-100: #ff7f00;
+  --color-chartreuse-100: #dfff00;
+
+  /* html[data-theme="light"] */
+  --color-icon-default: var(--color-gray-150);
+  --color-icon-light: var(--color-gray-650);
+  --color-icon-subdued: var(--color-gray-500);
+
+  --color-stroke-default: var(--color-gray-800);
+  --color-stroke-active: var(--color-gray-250);
+
+  --color-text-default: var(--color-gray-0);
+  --color-text-secondary: var(--color-gray-150);
+  --color-text-inverted: var(--color-gray-1000);
+  --color-text-light: var(--color-gray-600);
+  --color-text-subdued: var(--color-gray-300);
+  --color-text-black: var(--color-gray-1000);
+
+  --color-background-default: var(--color-gray-1000);
+  --color-surface-1: var(--color-gray-900);
+  --color-surface-2: var(--color-gray-850);
+  --color-surface-3: var(--color-gray-800);
+  --color-surface-inverted: var(--color-gray-0);
+
+  --color-orange: var(--color-orange-100);
+
+  /* Tokens */
+  --color-icon-default: ;
+  --color-icon-light: ;
+  --color-icon-subdued: ;
+
+  --color-stroke-default: ;
+  --color-stroke-active: ;
+
+  --color-text-default: ;
+  --color-text-secondary: ;
+  --color-text-inverted: ;
+  --color-text-light: ;
+  --color-text-subdued: ;
+  --color-text-black: ;
+
+  --color-background-default: ;
+  --color-surface-1: ;
+  --color-surface-2: ;
+  --color-surface-3: ;
+  --color-surface-inverted: ;
+
+  --color-orange: ;
+  --color-orange: ;
+}
+
+html[data-theme="light"] {
+  --color-icon-default: var(--color-gray-150);
+  --color-icon-light: var(--color-gray-650);
+  --color-icon-subdued: var(--color-gray-500);
+
+  --color-stroke-default: var(--color-gray-800);
+  --color-stroke-active: var(--color-gray-250);
+
+  --color-text-default: var(--color-gray-0);
+  --color-text-secondary: var(--color-gray-150);
+  --color-text-inverted: var(--color-gray-1000);
+  --color-text-light: var(--color-gray-600);
+  --color-text-subdued: var(--color-gray-300);
+  --color-text-black: var(--color-gray-1000);
+
+  --color-background-default: var(--color-gray-1000);
+  --color-surface-1: var(--color-gray-900);
+  --color-surface-2: var(--color-gray-850);
+  --color-surface-3: var(--color-gray-800);
+  --color-surface-inverted: var(--color-gray-0);
+
+  --color-orange: var(--color-orange-100);
+}
+
+html[data-theme="dark"] {
+  --color-icon-default: var(--color-gray-150);
+  --color-icon-light: var(--color-gray-650);
+  --color-icon-subdued: var(--color-gray-500);
+
+  --color-stroke-default: var(--color-gray-800);
+  --color-stroke-active: var(--color-gray-250);
+
+  --color-text-default: var(--color-gray-0);
+  --color-text-secondary: var(--color-gray-150);
+  --color-text-inverted: var(--color-gray-1000);
+  --color-text-light: var(--color-gray-600);
+  --color-text-subdued: var(--color-gray-300);
+  --color-text-black: var(--color-gray-1000);
+
+  --color-background-default: var(--color-gray-1000);
+  --color-surface-1: var(--color-gray-900);
+  --color-surface-2: var(--color-gray-850);
+  --color-surface-3: var(--color-gray-800);
+  --color-surface-inverted: var(--color-gray-0);
+
+  --color-orange: var(--color-orange-100);
+}
+
+@layer base {
+  html,
+  body {
+    @apply h-screen;
+  }
+  body {
+    @apply m-0 p-0 bg-background font-sans antialiased text-text-default;
+  }
+}
+
 @utility gradient-background {
   @apply border border-solid border-transparent bg-radial-dark;
   box-shadow: inset 1px 1px 1px -1px hsla(0, 0%, 100%, 0.5);
@@ -47,132 +217,4 @@
 
 @utility is-text-overflow {
   @apply overflow-hidden text-ellipsis whitespace-nowrap;
-}
-
-@layer base {
-  :root {
-    /* Base Colors */
-    --color-white: 0 0% 96%;
-    --color-whitest: 0 0% 100%;
-    --color-semi-white: 0 0% 96% / 0.06;
-    --color-black: 203 45% 4%;
-    --color-grey-dark: 0 0% 20%;
-    --color-grey-medium: 0 0% 40%;
-    --color-grey-light: 0 0% 60%;
-    --color-grey-lighter: 0 0% 80%;
-    --color-red: 2 58% 46%;
-    --color-orange: 24 96% 51%;
-    --color-orange-soft: 35 87% 54%;
-    --color-green: 140 35% 36%;
-    --color-blue-light: 203 35% 60%;
-    --color-yellow: 43 71% 58%;
-
-    /* Semantic Colors */
-    --background: var(--color-black);
-    --foreground: var(--color-black);
-    --muted: var(--color-grey-dark);
-    --muted-foreground: var(--color-grey-light);
-    --accent: var(--color-orange-soft);
-    --accent-foreground: 210 40% 98%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
-    --border: 0, 0%, 20%;
-    --input: 216 34% 17%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 1.2%;
-    --secondary: 222.2 47.4% 11.2%;
-    --secondary-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --ring: 216 34% 17%;
-
-    /* Primitives. */
-    --color-gray-0: 0 0% 100%;
-    --color-gray-50: 0 0% 96%;
-    --color-gray-100: 0 0% 90%;
-    --color-gray-150: 0 0% 85%;
-    --color-gray-200: 0 0% 80%;
-    --color-gray-250: 0 0% 75%;
-    --color-gray-300: 0 0% 70%;
-    --color-gray-350: 0 0% 65%;
-    --color-gray-400: 0 0% 60%;
-    --color-gray-450: 0 0% 55%;
-    --color-gray-500: 0 0% 50%;
-    --color-gray-550: 0 0% 45%;
-    --color-gray-600: 0 0% 40%;
-    --color-gray-650: 0 0% 35%;
-    --color-gray-700: 0 0% 30%;
-    --color-gray-750: 0 0% 25%;
-    --color-gray-800: 0 0% 20%;
-    --color-gray-850: 0 0% 15%;
-    --color-gray-900: 0 0% 10%;
-    --color-gray-950: 0 0% 5%;
-    --color-gray-1000: 0 0% 0%;
-
-    --color-orange-100: 20 100% 54%;
-    --color-chartreuse-100: 72 100% 72%;
-  }
-
-  html[data-theme="light"] {
-    --color-icon-default: var(--color-gray-850);
-    --color-icon-light: var(--color-gray-350);
-    --color-icon-subdued: var(--color-gray-500);
-
-    --color-stroke-default: var(--color-gray-200);
-    --color-stroke-active: var(--color-gray-750);
-
-    --color-text-default: var(--color-gray-1000);
-    --color-text-secondary: var(--color-gray-850);
-    --color-text-inverted: var(--color-gray-0);
-    --color-text-light: var(--color-gray-400);
-    --color-text-subdued: var(--color-gray-700);
-    --color-text-black: var(--color-gray-1000);
-
-    --color-background-default: var(--color-gray-0);
-    --color-surface-1: var(--color-gray-50);
-    --color-surface-2: var(--color-gray-100);
-    --color-surface-3: var(--color-gray-150);
-    --color-surface-inverted: var(--color-gray-1000);
-
-    --color-orange: var(--color-orange-100);
-  }
-
-  html[data-theme="dark"] {
-    --color-icon-default: var(--color-gray-150);
-    --color-icon-light: var(--color-gray-650);
-    --color-icon-subdued: var(--color-gray-500);
-
-    --color-stroke-default: var(--color-gray-800);
-    --color-stroke-active: var(--color-gray-250);
-
-    --color-text-default: var(--color-gray-0);
-    --color-text-secondary: var(--color-gray-150);
-    --color-text-inverted: var(--color-gray-1000);
-    --color-text-light: var(--color-gray-600);
-    --color-text-subdued: var(--color-gray-300);
-    --color-text-black: var(--color-gray-1000);
-
-    --color-background-default: var(--color-gray-1000);
-    --color-surface-1: var(--color-gray-900);
-    --color-surface-2: var(--color-gray-850);
-    --color-surface-3: var(--color-gray-800);
-    --color-surface-inverted: var(--color-gray-0);
-
-    --color-orange: var(--color-orange-100);
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  html,
-  body {
-    @apply h-screen;
-  }
-  body {
-    @apply m-0 p-0 bg-background font-sans antialiased text-text;
-  }
 }

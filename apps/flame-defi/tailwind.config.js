@@ -77,35 +77,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-
-        // Tokens.
-        icon: {
-          DEFAULT: "hsl(var(--color-icon-default))",
-          light: "hsl(var(--color-icon-light))",
-          subdued: "hsl(var(--color-icon-subdued))",
-        },
-        stroke: {
-          DEFAULT: "hsl(var(--color-stroke-default))",
-          active: "hsl(var(--color-stroke-active))",
-        },
-        text: {
-          DEFAULT: "hsl(var(--color-text-default))",
-          secondary: "hsl(var(--color-text-secondary))",
-          inverted: "hsl(var(--color-text-inverted))",
-          light: "hsl(var(--color-text-light))",
-          subdued: "hsl(var(--color-text-subdued))",
-          black: "hsl(var(--color-text-black))",
-        },
-        background: {
-          DEFAULT: "hsl(var(--color-background-default))",
-        },
-        surface: {
-          1: "hsl(var(--color-surface-1))",
-          2: "hsl(var(--color-surface-2))",
-          3: "hsl(var(--color-surface-3))",
-          inverted: "hsl(var(--color-surface-inverted))",
-        },
-        orange: "hsl(var(--color-orange))",
       },
       transitionDuration: {
         DEFAULT: "300ms", // Sets the default duration to 300ms
