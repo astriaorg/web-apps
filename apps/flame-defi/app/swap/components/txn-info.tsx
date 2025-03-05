@@ -1,16 +1,15 @@
 "use client";
 
+import { TokenState } from "@repo/flame-types";
+import { InfoTooltip, Skeleton } from "@repo/ui/components";
+import { GasIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Skeleton,
 } from "@repo/ui/shadcn-primitives";
-import { InfoTooltip } from "@repo/ui/components";
-import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { TokenState } from "@repo/flame-types";
 import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "./types";
 

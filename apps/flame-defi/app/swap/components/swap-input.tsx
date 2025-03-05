@@ -1,7 +1,6 @@
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
-import { TokenSelector } from "@repo/ui/components";
+import { Skeleton, TokenSelector } from "@repo/ui/components";
 import { useIntl } from "@repo/ui/intl";
-import { Skeleton } from "@repo/ui/shadcn-primitives";
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
