@@ -33,14 +33,14 @@ const Navbar = () => {
 
   return (
     <nav
-      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full bg-black"
+      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full h-[85px] bg-black"
       aria-label="main navigation"
     >
-      <div className="flex items-center">
+      <div className="flex flex-1 items-center">
         <a
           target="_blank"
           href={brandURL}
-          className="flex flex-1 items-center pl-0 p-2 px-3 md:w-[290px]"
+          className="flex items-center pl-0 p-2 px-3"
           rel="noreferrer"
         >
           <Image
@@ -54,7 +54,7 @@ const Navbar = () => {
           <FlameIcon size={36} className="block lg:hidden" />
         </a>
       </div>
-      <div id="topNavbar" className="flex-1 hidden md:block">
+      <div id="topNavbar" className="flex-1 hidden md:flex">
         <div className="flex justify-center items-center font-mono font-medium">
           <Link href="/" className={navLinkClasses("/")}>
             BRIDGE
