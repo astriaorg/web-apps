@@ -3,7 +3,7 @@ import debounce from "lodash.debounce";
 
 import { useEvmChainData } from "config";
 import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
-import { useGetQuote } from "./use-get-quote";
+import { useGetQuote } from "../../hooks";
 
 export const useUsdQuote = (inputToken?: TokenState) => {
   const { selectedChain } = useEvmChainData();

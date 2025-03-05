@@ -31,8 +31,11 @@ import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
+  TRADE_TYPE,
 } from "@repo/flame-types";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+import { useGetQuote } from "../../../hooks";
+import { useIntl } from "react-intl";
 
 interface TokenAllowance {
   symbol: string;
@@ -61,6 +64,8 @@ export interface EvmWalletContextProps {
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
   approveToken: (token: EvmCurrency) => Promise<`0x${string}` | null>;
+  usdcToNativeQuote: { value: string; symbol: string };
+  quoteLoading: boolean;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -91,6 +96,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const { switchChain } = useSwitchChain();
   const { selectedChain } = useEvmChainData();
   const { currencies, contracts } = selectedChain;
+  const { quote, loading: quoteLoading, getQuote } = useGetQuote();
+  const { formatNumber } = useIntl();
 
   const {
     status: nativeBalanceStatus,
@@ -116,6 +123,47 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
 
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
+
+  useEffect(() => {
+    if (!evmNativeTokenBalance) {
+      return;
+    }
+
+    const usdcToken = currencies.find(
+      (currency) => currency.coinDenom.toLowerCase() === "usdc",
+    );
+
+    if (!usdcToken) {
+      console.error("No USDC token found in currencies");
+      return;
+    }
+
+    const nativeToken = currencies.find((currency) => currency.isNative);
+
+    if (!nativeToken) {
+      console.error("No native token found in currencies");
+      return;
+    }
+
+    getQuote(
+      TRADE_TYPE.EXACT_IN,
+      { token: nativeToken, value: evmNativeTokenBalance.value },
+      { token: usdcToken, value: "" },
+    );
+  }, [evmNativeTokenBalance, getQuote, currencies]);
+
+  const usdcToNativeQuote = quote
+    ? {
+        value: formatNumber(parseFloat(quote.quoteDecimals), {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        symbol: "usdc",
+      }
+    : {
+        value: "0",
+        symbol: "usdc",
+      };
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -434,6 +482,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     getTokenAllowances,
     approveToken,
     tokenAllowances,
+    usdcToNativeQuote,
+    quoteLoading,
   };
 
   return (

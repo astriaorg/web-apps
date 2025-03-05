@@ -87,6 +87,7 @@ export function TxnInfo({
                 <InfoTooltip
                   content="The amount you expect to receive at the current market price. You may receive less or more if the market price changes while your transaction is pending."
                   side="right"
+                  className="max-w-[250px]"
                 />
               </span>
               <span className="text-grey-light">
@@ -121,6 +122,7 @@ export function TxnInfo({
                 Minimum received after slippage ({swapSlippageTolerance}
                 %){" "}
                 <InfoTooltip
+                  className="max-w-[250px]"
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"
                 />

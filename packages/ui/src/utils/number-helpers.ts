@@ -2,6 +2,11 @@ import Big from "big.js";
 const allCommas = /,/g;
 
 /**
+ * Use `removeNonNumeric` to remove non-numeric characters from a string that you desire to be all numbers or decimals.
+ */
+export const removeNonNumeric = (str: string) => str.replace(/[^0-9.]/g, "");
+
+/**
  * @deprecated Use `formatNumber` from `react-intl` instead.
  * Specify `minimumFractionDigits`/`maximumFractionDigits` in the `options` parameter to format decimal places.
  */

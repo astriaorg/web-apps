@@ -334,11 +334,6 @@ export function useSwapButton({
     }
   };
 
-  const isCloseModalAction =
-    txnStatus === TXN_STATUS.SUCCESS ||
-    txnStatus === TXN_STATUS.FAILED ||
-    txnStatus === TXN_STATUS.PENDING;
-
   return {
     txnHash,
     titleText: getTitleText(),
@@ -351,7 +346,6 @@ export function useSwapButton({
     txnStatus,
     setTxnStatus,
     txnMsg,
-    isCloseModalAction,
     tokenApprovalNeeded: tokenApprovalNeeded !== null,
   };
 }

@@ -10,7 +10,7 @@ import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
 import { formatUnits } from "viem";
-import { useGetQuote } from "./use-get-quote";
+import { useGetQuote } from "../../hooks";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
 // quoteGas values are the values we display in top token input field.
