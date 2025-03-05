@@ -116,7 +116,7 @@ const calculateMinimumReceived = (
   data: GetQuoteResult,
   slippageTolerance: number,
 ): string => {
-  if (!data.route?.[0] || !data.route[0][data.route[0].length - 1]) {
+  if (!data.route[0] || !data.route[0][data.route[0].length - 1]) {
     return "0.00";
   }
   const outputToken = data.route[0][data.route[0].length - 1]?.tokenOut;
