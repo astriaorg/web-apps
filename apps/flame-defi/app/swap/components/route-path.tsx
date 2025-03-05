@@ -53,15 +53,10 @@ export const RoutePath = ({
         className="text-grey-light text-sm border-b-0"
       >
         <div className="flex items-center justify-between">
-          <Skeleton
-            className="rounded w-[100px] h-[25px] mt-3"
-            isLoading={loading}
-          >
-            <AccordionTrigger className="cursor-pointer text-orange-soft p-2 bg-semi-white text-white border border-border hover:border-orange-soft cursor-pointer transition rounded-xl hover:no-underline">
-              <PathIcon size={20} />
-              <span className="text-sm px-2">Auto Router</span>
-            </AccordionTrigger>
-          </Skeleton>
+          <AccordionTrigger className="cursor-pointer text-orange-soft p-2 bg-semi-white text-white border border-border hover:border-orange-soft cursor-pointer transition rounded-xl hover:no-underline">
+            <PathIcon size={20} />
+            <span className="text-sm px-2">Auto Router</span>
+          </AccordionTrigger>
         </div>
         <AccordionContent className="relative">
           <div className="relative flex items-center gap-1 md:gap-2 justify-between w-full px-0 py-4 md:p-4">

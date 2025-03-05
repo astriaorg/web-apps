@@ -116,13 +116,16 @@ const calculateMinimumReceived = (
   data: GetQuoteResult,
   slippageTolerance: number,
 ): string => {
-  if (!data.route[0] || !data.route[0][0]?.tokenOut) {
+  if (!data.route?.[0] || !data.route[0][data.route[0].length - 1]) {
     return "0.00";
   }
-  const tokenAmount = new TokenAmount(
-    data.route[0][0].tokenOut,
-    data.quoteGasAdjusted,
-  );
+  const outputToken = data.route[0][data.route[0].length - 1]?.tokenOut;
+
+  if (!outputToken) {
+    return "0.00";
+  }
+
+  const tokenAmount = new TokenAmount(outputToken, data.quoteGasAdjusted);
   const minimumReceived = tokenAmount.withSlippage(slippageTolerance, true).raw;
 
   return formatUnits(
