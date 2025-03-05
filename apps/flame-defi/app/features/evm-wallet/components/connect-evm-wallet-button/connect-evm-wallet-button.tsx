@@ -32,6 +32,7 @@ export default function ConnectEvmWalletButton({
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
     usdcToNativeQuote,
+    quoteLoading,
   } = useEvmWallet();
   const userAccount = useAccount();
   const formattedEvmBalanceValue = formatDecimalValues(
@@ -98,7 +99,7 @@ export default function ConnectEvmWalletButton({
               </Skeleton>
               <Skeleton
                 className="w-[100px] h-[20px]"
-                isLoading={usdcToNativeQuote === null}
+                isLoading={quoteLoading}
               >
                 <div className="text-base font-normal">
                   ${usdcToNativeQuote?.value} USD

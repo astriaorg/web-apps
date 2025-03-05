@@ -33,7 +33,8 @@ export interface CosmosWalletContextProps {
   selectedIbcCurrency: IbcCurrency | null;
   selectCosmosChain: (chain: CosmosChainInfo | null) => void;
   selectIbcCurrency: (currency: IbcCurrency) => void;
-  usdcToNativeQuote: { value: string; symbol: string } | null;
+  usdcToNativeQuote: { value: string; symbol: string };
+  quoteLoading: boolean;
 }
 
 export const CosmosWalletContext =
@@ -55,7 +56,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   const {
     selectedChain: { currencies },
   } = useEvmChainData();
-  const { quote, getQuote } = useGetQuote();
+  const { quote, loading: quoteLoading, getQuote } = useGetQuote();
 
   // use first chain as default chain
   const defaultChainId = Object.values(cosmosChains)[0]?.chainId;
@@ -63,7 +64,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     throw new Error("No cosmos chains provided!");
   }
   const chainName = cosmosChainNameFromId(
-    selectedCosmosChain?.chainId || defaultChainId,
+    selectedCosmosChain?.chainId || defaultChainId
   );
   const {
     address: cosmosAddressFromWallet,
@@ -103,7 +104,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     const balance = await getBalanceFromChain(
       selectedCosmosChain,
       selectedIbcCurrency,
-      cosmosAccountAddress,
+      cosmosAccountAddress
     );
 
     return { value: balance.toString(), symbol: selectedIbcCurrency.coinDenom };
@@ -117,7 +118,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         console.error("Failed to get balance from Keplr", error);
       },
     }),
-    [selectedCosmosChain, selectedIbcCurrency],
+    [selectedCosmosChain, selectedIbcCurrency]
   );
   const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
     useBalancePolling(getBalanceCallback, pollingConfig);
@@ -125,15 +126,20 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   useEffect(() => {
     if (cosmosBalance) {
       const usdcToken = currencies.find(
-        (currency) => currency.coinDenom.toLowerCase() === "usdc",
+        (currency) => currency.coinDenom.toLowerCase() === "usdc"
       );
-      const nativeToken = currencies.find((currency) => currency.isNative);
-      console.log("cosmosBalance.value", cosmosBalance.value);
-      getQuote(
-        TRADE_TYPE.EXACT_IN,
-        { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
-        { token: usdcToken, value: "" },
-      );
+
+      if (!usdcToken) {
+        console.warn("No USDC token found in currencies");
+      } else {
+        const nativeToken = currencies.find((currency) => currency.isNative);
+
+        getQuote(
+          TRADE_TYPE.EXACT_IN,
+          { token: nativeToken, value: removeNonNumeric(cosmosBalance.value) },
+          { token: usdcToken, value: "" }
+        );
+      }
     }
   }, [cosmosBalance, getQuote, currencies]);
 
@@ -145,7 +151,10 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         }),
         symbol: "usdc",
       }
-    : null;
+    : {
+        value: "0",
+        symbol: "usdc",
+      };
 
   const cosmosChainsOptions = useMemo(() => {
     return Object.entries(cosmosChains).map(
@@ -153,7 +162,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         label: chainLabel,
         value: chain,
         LeftIcon: chain.IconComponent,
-      }),
+      })
     );
   }, [cosmosChains]);
 
@@ -178,7 +187,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
         label: currency.coinDenom,
         value: currency,
         LeftIcon: currency.IconComponent,
-      }),
+      })
     );
   }, [selectedCosmosChain]);
 
@@ -250,6 +259,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     selectCosmosChain,
     selectIbcCurrency,
     usdcToNativeQuote,
+    quoteLoading,
   };
 
   return (

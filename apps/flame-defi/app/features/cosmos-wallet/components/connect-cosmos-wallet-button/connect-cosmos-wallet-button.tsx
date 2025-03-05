@@ -34,6 +34,7 @@ export default function ConnectCosmosWalletButton({
     disconnectCosmosWallet,
     isLoadingCosmosBalance,
     usdcToNativeQuote,
+    quoteLoading,
   } = useCosmosWallet();
   const formattedCosmosBalanceValue = formatDecimalValues(cosmosBalance?.value);
 
@@ -120,7 +121,7 @@ export default function ConnectCosmosWalletButton({
               </Skeleton>
               <Skeleton
                 className="w-[100px] h-[20px]"
-                isLoading={usdcToNativeQuote === null}
+                isLoading={quoteLoading}
               >
                 <div className="text-base font-normal">
                   ${usdcToNativeQuote?.value} USD

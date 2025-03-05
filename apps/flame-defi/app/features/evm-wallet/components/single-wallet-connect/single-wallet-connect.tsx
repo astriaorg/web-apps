@@ -27,6 +27,7 @@ export function SingleWalletContent({
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
     usdcToNativeQuote,
+    quoteLoading,
   } = useEvmWallet();
   const formattedEvmBalanceValue = formatDecimalValues(
     evmNativeTokenBalance?.value,
@@ -85,7 +86,7 @@ export function SingleWalletContent({
           </Skeleton>
           <Skeleton
             className="w-[100px] h-[20px]"
-            isLoading={usdcToNativeQuote === null}
+            isLoading={quoteLoading}
           >
             <div className="text-base font-normal">
               ${usdcToNativeQuote?.value} USD

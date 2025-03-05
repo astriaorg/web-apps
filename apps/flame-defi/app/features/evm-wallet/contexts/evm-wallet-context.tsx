@@ -64,7 +64,8 @@ export interface EvmWalletContextProps {
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
   approveToken: (token: EvmCurrency) => Promise<`0x${string}` | null>;
-  usdcToNativeQuote: { value: string; symbol: string } | null;
+  usdcToNativeQuote: { value: string; symbol: string };
+  quoteLoading: boolean;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -95,7 +96,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const { switchChain } = useSwitchChain();
   const { selectedChain } = useEvmChainData();
   const { currencies, contracts } = selectedChain;
-  const { quote, getQuote } = useGetQuote();
+  const { quote, loading: quoteLoading, getQuote } = useGetQuote();
   const { formatNumber } = useIntl();
 
   const {
@@ -128,13 +129,18 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       const usdcToken = currencies.find(
         (currency) => currency.coinDenom.toLowerCase() === "usdc",
       );
+
+      if (!usdcToken) {
+        console.warn("No USDC token found in currencies");
+      } else {
       const nativeToken = currencies.find((currency) => currency.isNative);
 
       getQuote(
         TRADE_TYPE.EXACT_IN,
         { token: nativeToken, value: evmNativeTokenBalance.value },
-        { token: usdcToken, value: "" },
-      );
+          { token: usdcToken, value: "" },
+        );
+      }
     }
   }, [userAccount.address, evmNativeTokenBalance, getQuote, currencies]);
 
@@ -146,7 +152,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         }),
         symbol: "usdc",
       }
-    : null;
+      : {
+        value: "0",
+        symbol: "usdc",
+      };
 
   const [selectedEvmChain, setSelectedEvmChain] = useState<EvmChainInfo | null>(
     null,
@@ -466,6 +475,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     approveToken,
     tokenAllowances,
     usdcToNativeQuote,
+    quoteLoading,
   };
 
   return (
