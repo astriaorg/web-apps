@@ -17,6 +17,7 @@ const query = graphql(`
       loanAsset {
         decimals
         logoURI
+        name
         symbol
       }
       state {
