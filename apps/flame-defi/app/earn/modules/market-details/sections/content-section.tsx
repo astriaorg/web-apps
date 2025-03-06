@@ -3,6 +3,7 @@ import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
+import { Table } from "earn/modules/market-details/components/table";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
 
@@ -84,6 +85,7 @@ export const ContentSection = () => {
                 className="grid grid-cols-2 gap-2"
               />
               <OverviewCards />
+              <Table />
             </div>
           </div>
 

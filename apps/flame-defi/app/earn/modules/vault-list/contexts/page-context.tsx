@@ -85,10 +85,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 className="rounded-full"
               />
               <div className="flex flex-col space-y-1 overflow-hidden">
-                <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
+                <span className="truncate max-w-[25vw] md:max-w-auto">
                   {row.original.name}
                 </span>
-                <span className="md:hidden text-xs/3">
+                <span className="md:hidden">
                   <FormattedNumber
                     value={row.original.state?.netApy ?? 0}
                     style="percent"
@@ -109,7 +109,11 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         cell: ({ row }) => {
           return (
             <div className="flex items-center justify-between space-x-4">
-              <VaultTotalSupply vault={row.original} />
+              <VaultTotalSupply
+                state={row.original.state}
+                decimals={row.original.asset.decimals}
+                symbol={row.original.symbol}
+              />
               <div className="md:hidden flex justify-end pr-3">
                 <CaretRightIcon className="text-typography-subdued" size={16} />
               </div>

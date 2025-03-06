@@ -1,17 +1,23 @@
-import { Badge } from "@repo/ui/components";
+import { Badge, BadgeProps } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import { Image } from "components/image";
 import { VaultMetadataCurator } from "earn/gql/graphql";
 
-interface VaultCuratorsProps {
+interface VaultCuratorsProps extends BadgeProps {
   curators?: Pick<VaultMetadataCurator, "name" | "image">[];
 }
 
-export const VaultCurators = ({ curators }: VaultCuratorsProps) => {
+export const VaultCurators = ({
+  curators,
+  className,
+  ...props
+}: VaultCuratorsProps) => {
   return curators?.map((it, index) => (
     <Badge
       key={`curator_${index}`}
       variant="secondary"
-      className="flex items-center space-x-2"
+      className={cn("flex items-center space-x-2", className)}
+      {...props}
     >
       <Image
         src={it.image}

@@ -24,6 +24,27 @@ const query = graphql(`
         liquidityAssets
         netBorrowApy
       }
+      supplyingVaults {
+        address
+        asset {
+          decimals
+          logoURI
+          name
+          symbol
+        }
+        metadata {
+          curators {
+            image
+            name
+          }
+        }
+        name
+        state {
+          totalAssets
+          totalAssetsUsd
+          totalSupply
+        }
+      }
     }
   }
 `);

@@ -36,6 +36,9 @@ export const OverviewCards = () => {
         value: (
           <FormattedDate
             value={data?.marketByUniqueKey.creationTimestamp * 1000}
+            year="numeric"
+            month="long"
+            day="numeric"
           />
         ),
       },
