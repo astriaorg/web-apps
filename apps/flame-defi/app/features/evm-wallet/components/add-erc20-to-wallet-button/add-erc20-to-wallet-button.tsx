@@ -51,7 +51,7 @@ export default function AddErc20ToWalletButton({
         type="button"
         key={evmCurrency.coinMinimalDenom}
         onClick={() => addCoinToWallet()}
-        className={`button is-underlined ${buttonClassName}`}
+        className={`underline cursor-pointer text-sm/3 ${buttonClassName}`}
       >
         Add ERC20 to wallet
       </button>
