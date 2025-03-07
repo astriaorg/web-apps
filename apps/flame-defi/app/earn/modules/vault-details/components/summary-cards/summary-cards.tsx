@@ -1,6 +1,6 @@
+import { Big } from "@repo/libs/big.js";
+import { FormatNumberOptions } from "@repo/libs/react-intl";
 import { AnimatedCounter, Card, CardLabel } from "@repo/ui/components";
-import { FormatNumberOptions } from "@repo/ui/intl";
-import Big from "big.js";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useMemo } from "react";
 

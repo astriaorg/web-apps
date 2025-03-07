@@ -5,11 +5,11 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
-import { ChainContract } from "viem";
-import React from "react";
+import { Big } from "@repo/libs/big.js";
 import JSBI from "jsbi";
+import React from "react";
+import { ChainContract } from "viem";
 
-import Big from "big.js";
 // FIXME - i manually recreated types from keplr here as a stop gap.
 //  this will get refactored further when i update the config logic
 //  to support network switching

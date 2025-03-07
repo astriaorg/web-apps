@@ -1,3 +1,4 @@
+import { Big } from "@repo/libs/big.js";
 import { FormattedNumber } from "@repo/libs/react-intl";
 import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
@@ -10,7 +11,6 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import Big from "big.js";
 import { Image } from "components/image";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";

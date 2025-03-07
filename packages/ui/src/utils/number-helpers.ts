@@ -1,4 +1,5 @@
-import Big from "big.js";
+import { Big } from "@repo/libs/big.js";
+
 const allCommas = /,/g;
 
 /**

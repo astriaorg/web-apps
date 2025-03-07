@@ -13,6 +13,7 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@repo/libs": "*",
     "typescript": "5.5.4"
   },
   "dependencies": {

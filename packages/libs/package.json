@@ -13,9 +13,11 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@types/big.js": "^6.2.2",
     "typescript": "5.5.4"
   },
   "dependencies": {
+    "big.js": "^6.2.2",
     "react-intl": "^7.1.6"
   }
 }

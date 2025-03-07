@@ -1,3 +1,4 @@
+import { Big } from "@repo/libs/big.js";
 import { FormattedNumber, useIntl } from "@repo/libs/react-intl";
 import {
   Table as BaseTable,
@@ -19,7 +20,6 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import Big from "big.js";
 import { Image } from "components/image";
 import { VaultAllocationHistory } from "earn/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
