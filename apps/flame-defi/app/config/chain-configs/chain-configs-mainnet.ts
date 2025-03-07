@@ -1,7 +1,8 @@
 import {
   CelestiaIcon,
   FlameIcon,
-  MilkTiaIcon, NeutronIcon,
+  MilkTiaIcon,
+  NeutronIcon,
   NobleIcon,
   OsmosisIcon,
   StrideIcon,
@@ -36,7 +37,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
     coinDecimals: 6,
     // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
     // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-    coinGeckoId: "celestia"
+    coinGeckoId: "celestia",
   },
   // (Optional) If you have a wallet webpage used to stake the coin then provide the url to the website in `walletUrlForStaking`.
   // The 'stake' button in Keplr extension will link to the webpage.
