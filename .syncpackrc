@@ -1,0 +1,33 @@
+{
+  "dependencyTypes": [
+    "prod"
+  ],
+  "semverGroups": [
+    {
+      "label": "use caret ranges in production",
+      "packages": [
+        "**"
+      ],
+      "dependencyTypes": [
+        "prod"
+      ],
+      "dependencies": [
+        "**"
+      ],
+      "range": "^"
+    },
+    {
+      "label": "use exact version numbers in production",
+      "packages": [
+        "react-intl"
+      ],
+      "dependencyTypes": [
+        "prod"
+      ],
+      "dependencies": [
+        "**"
+      ],
+      "range": ""
+    }
+  ]
+}

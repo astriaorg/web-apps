@@ -8,9 +8,7 @@
     "./components": "./src/components/index.ts",
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./icons": "./src/icons/index.ts",
-    "./intl": "./src/intl/index.ts",
-    "./types": "./src/types.ts"
+    "./icons": "./src/icons/index.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

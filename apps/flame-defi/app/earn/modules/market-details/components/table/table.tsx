@@ -9,7 +9,6 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
 import { cn } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -27,6 +26,7 @@ import { Vault } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { FormattedNumber } from "react-intl";
 
 export const Table = () => {
   const router = useRouter();

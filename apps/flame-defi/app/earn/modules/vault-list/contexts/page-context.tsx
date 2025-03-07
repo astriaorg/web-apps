@@ -1,6 +1,5 @@
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
-import { FormattedNumber } from "@repo/ui/intl";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -22,6 +21,7 @@ import {
   useFetchVaults,
 } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
+import { FormattedNumber } from "react-intl";
 
 type Status = "error" | "empty" | "success";
 

@@ -5,10 +5,10 @@ import {
   TokenAmount,
   TokenState,
 } from "@repo/flame-types";
-import { useIntl } from "@repo/ui/intl";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useGetQuote } from "../../hooks";
 

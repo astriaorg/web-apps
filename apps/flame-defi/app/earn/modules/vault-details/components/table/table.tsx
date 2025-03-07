@@ -9,7 +9,6 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
-import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -26,6 +25,7 @@ import { VaultAllocationHistory } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { FormattedNumber, useIntl } from "react-intl";
 
 export const Table = () => {
   const { formatNumber } = useIntl();
