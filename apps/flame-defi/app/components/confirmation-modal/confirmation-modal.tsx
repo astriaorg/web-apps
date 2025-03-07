@@ -48,7 +48,7 @@ export default function ConfirmationModal({
       </DialogTrigger>
 
       <DialogPortal>
-        <DialogContent className="p-12 bg-radial-dark w-[90%] md:w-[90%] lg:w-[500px] [&>button]:hidden fixed top-[440px] left-[50%] -translate-x-[50%] transition rounded-xl">
+        <DialogContent className="p-4 md:p-12 bg-radial-dark w-[90%] md:w-[90%] lg:w-[500px] [&>button]:hidden fixed top-[350px] md:top-[440px] left-[50%] -translate-x-[50%] transition rounded-xl">
           <div className="flex items-center justify-between">
             <DialogTitle>{title}</DialogTitle>
             <button onClick={handleCloseModal}>

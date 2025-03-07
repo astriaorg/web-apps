@@ -123,21 +123,22 @@ export function TxnInfo({
                 ${txnInfo.formattedGasUseEstimateUSD}
               </span>
             </p>
-            <p className="flex justify-between">
-              <span className="text-grey-light flex items-center gap-1">
-                Minimum received after slippage ({swapSlippageTolerance}
-                %){" "}
+            <div className="flex justify-between">
+              <div className="flex gap-1 items-center">
+                <span className="w-[116px] md:w-full text-sm text-grey-light">
+                  Min received after slippage ({swapSlippageTolerance}%)
+                </span>
                 <InfoTooltip
                   className="max-w-[250px]"
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"
                 />
-              </span>
+              </div>
               <span className="text-grey-light">
                 {txnInfo.minimumReceived}{" "}
                 <span>{tokenTwo?.token?.coinDenom}</span>
               </span>
-            </p>
+            </div>
           </div>
           <div className="h-[1px] border border-border w-full my-4"></div>
           {quote && quote.route && (
