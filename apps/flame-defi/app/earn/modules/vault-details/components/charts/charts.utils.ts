@@ -1,5 +1,8 @@
 import * as d3 from "d3";
-import type { FloatDataPoint, TimeseriesOptions } from "earn/gql/graphql";
+import type {
+  FloatDataPoint,
+  TimeseriesOptions,
+} from "earn/generated/gql/graphql";
 import {
   CHART_CACHE_TIME_MILLISECONDS,
   ChartInterval,

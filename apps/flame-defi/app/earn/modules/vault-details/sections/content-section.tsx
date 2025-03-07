@@ -1,12 +1,14 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
 import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import Big from "big.js";
+import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
-import { SummaryCards } from "earn/modules/vault-details/components/summary-cards";
 import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
+import { useMemo } from "react";
 
 export const ContentSection = () => {
   const { formatDate, formatNumber } = useIntl();
@@ -20,6 +22,51 @@ export const ContentSection = () => {
       (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
     );
 
+  const items = useMemo<SummaryCardsProps["items"]>(() => {
+    return [
+      {
+        label: { left: "APY" },
+        value: data?.vaultByAddress.state?.netApy ?? 0,
+        variant: "accent",
+        options: {
+          style: "percent",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      },
+      {
+        label: {
+          left: "Total Deposits",
+          right: data?.vaultByAddress.asset.symbol,
+        },
+        value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+          .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+          .toNumber(),
+        options: {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+        },
+        useAbbreviatedNumberFormat: true,
+      },
+      {
+        label: {
+          left: "Liquidity",
+          right: data?.vaultByAddress.asset.symbol,
+        },
+        value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
+          .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+          .toNumber(),
+        options: {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+        },
+        useAbbreviatedNumberFormat: true,
+      },
+    ];
+  }, [data]);
+
   return (
     <section className="flex flex-col px-4">
       {status === "error" && (
@@ -31,7 +78,12 @@ export const ContentSection = () => {
         <div className="mt-12 flex flex-col gap-10 lg:gap-2 lg:flex-row">
           {/* Summary section. */}
           <div className="order-2 lg:order-1 lg:basis-2/3">
-            <SummaryCards />
+            <SummaryCards
+              items={items}
+              isLoading={isPending}
+              className="grid lg:grid-cols-3 gap-2"
+            />
+
             <div className="mt-10 flex flex-col space-y-4">
               <Skeleton isLoading={isPending}>
                 <div className="text-base/4 font-semibold">Overview</div>

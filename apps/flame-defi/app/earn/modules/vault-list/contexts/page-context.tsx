@@ -1,8 +1,6 @@
-import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
 import { FormattedNumber } from "@repo/ui/intl";
-import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -10,10 +8,14 @@ import {
   Table,
   useReactTable,
 } from "@tanstack/react-table";
-import Big from "big.js";
 import { Image } from "components/image";
+import { VaultTotalSupply } from "earn/components/vault";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
-import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";
+import {
+  OrderDirection,
+  Vault,
+  VaultOrderBy,
+} from "earn/generated/gql/graphql";
 import {
   PAGE_SIZE,
   PLACEHOLDER_DATA,
@@ -87,10 +89,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 className="rounded-full"
               />
               <div className="flex flex-col space-y-1 overflow-hidden">
-                <span className="text-base/4 truncate max-w-[25vw] md:max-w-auto">
+                <span className="truncate max-w-[25vw] md:max-w-auto">
                   {row.original.name}
                 </span>
-                <span className="md:hidden text-xs/3">
+                <span className="md:hidden">
                   <FormattedNumber
                     value={row.original.state?.netApy ?? 0}
                     style="percent"
@@ -107,58 +109,15 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       }),
       columnHelper.accessor("state.totalAssets", {
         id: VaultOrderBy.TotalAssets,
-        header: "Supply",
+        header: "Total Supply",
         cell: ({ row }) => {
-          const {
-            value: formattedTotalAssets,
-            suffix: formattedTotalAssetsSuffix,
-          } = formatAbbreviatedNumber(
-            new Big(row.original.state?.totalAssets ?? 0)
-              .div(10 ** row.original.asset.decimals)
-              .toFixed(),
-            {
-              minimumFractionDigits: 2,
-            },
-          );
-
-          const {
-            value: formattedTotalAssetsUSD,
-            suffix: formattedTotalAssetsUSDSuffix,
-          } = formatAbbreviatedNumber(
-            new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(),
-            {
-              minimumFractionDigits: 2,
-            },
-          );
-
           return (
             <div className="flex items-center justify-between space-x-4">
-              <div
-                className={cn(
-                  "flex flex-col items-start space-x-0 space-y-1",
-                  "md:flex-row md:items-center md:space-x-3 md:space-y-0",
-                )}
-              >
-                <span
-                  className={cn(
-                    "text-xs/3 truncate max-w-[25vw]",
-                    "md:text-base/4 md:max-w-auto",
-                  )}
-                >
-                  {formattedTotalAssets}
-                  {formattedTotalAssetsSuffix}
-                  {NON_BREAKING_SPACE}
-                  {row.original.symbol}
-                </span>
-                <Badge>
-                  <FormattedNumber
-                    value={+formattedTotalAssetsUSD}
-                    style="currency"
-                    currency="USD"
-                  />
-                  {formattedTotalAssetsUSDSuffix}
-                </Badge>
-              </div>
+              <VaultTotalSupply
+                state={row.original.state}
+                decimals={row.original.asset.decimals}
+                symbol={row.original.symbol}
+              />
               <div className="md:hidden flex justify-end pr-3">
                 <CaretRightIcon className="text-typography-subdued" size={16} />
               </div>

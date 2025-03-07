@@ -4,9 +4,9 @@ const { loadEnvConfig } = require("@next/env");
 loadEnvConfig(process.cwd());
 
 const earnAPIConfig: CodegenConfig = {
-  documents: ["app/earn/**/*.ts", "!app/earn/gql/**/*"],
+  documents: ["app/earn/**/*.ts", "!app/earn/generated/gql/**/*"],
   generates: {
-    "./app/earn/gql/": {
+    "./app/earn/generated/gql/": {
       schema: process.env.NEXT_PUBLIC_EARN_API_URL,
       preset: "client",
     },
