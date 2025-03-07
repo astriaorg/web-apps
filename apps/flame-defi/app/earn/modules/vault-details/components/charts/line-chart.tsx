@@ -9,7 +9,7 @@ import {
   tooltipVariants,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { FloatDataPoint } from "earn/gql/graphql";
+import { FloatDataPoint } from "earn/generated/gql/graphql";
 import { initializeLineChart } from "earn/modules/vault-details/components/charts/charts.utils";
 import { ChartInterval } from "earn/modules/vault-details/types";
 import { useEffect, useRef, useState } from "react";

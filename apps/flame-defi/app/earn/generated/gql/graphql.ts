@@ -159,6 +159,15 @@ export type ChainSynchronizationState = {
   key: Scalars['String']['output'];
 };
 
+/** Oracle creation tx */
+export type ChainlinkOracleV2Event = {
+  __typename?: 'ChainlinkOracleV2Event';
+  blockNumber: Scalars['BigInt']['output'];
+  chainId: Scalars['Int']['output'];
+  timestamp: Scalars['BigInt']['output'];
+  txHash: Scalars['HexString']['output'];
+};
+
 /** Amount of collateral at risk of liquidation at collateralPriceRatio * oracle price */
 export type CollateralAtRiskDataPoint = {
   __typename?: 'CollateralAtRiskDataPoint';
@@ -1389,6 +1398,7 @@ export type Oracle = {
   /** Oracle contract address */
   address: Scalars['Address']['output'];
   chain: Chain;
+  creationEvent?: Maybe<ChainlinkOracleV2Event>;
   data?: Maybe<OracleData>;
   id: Scalars['ID']['output'];
   markets: Array<Market>;
@@ -1404,6 +1414,7 @@ export type OracleFeed = {
   /** Feed contract address */
   address: Scalars['Address']['output'];
   chain: Chain;
+  decimals?: Maybe<Scalars['Int']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   historicalPrice?: Maybe<Array<BigIntDataPoint>>;
   id: Scalars['ID']['output'];
@@ -2250,6 +2261,8 @@ export type UserHistory = {
   marketsBorrowAssetsUsd?: Maybe<Array<FloatDataPoint>>;
   /** Total collateral of all the user's market positions, in USD. */
   marketsCollateralUsd?: Maybe<Array<FloatDataPoint>>;
+  /** Total margin of all the user's market positions, in USD. */
+  marketsMarginUsd?: Maybe<Array<FloatDataPoint>>;
   /**
    * Profit (from the underlying asset's price variation) & Loss (from bad debt socialization) of all the user's market positions, in USD.
    * @deprecated unstable
@@ -2275,6 +2288,12 @@ export type UserHistoryMarketsBorrowAssetsUsdArgs = {
 
 /** User state history */
 export type UserHistoryMarketsCollateralUsdArgs = {
+  options?: InputMaybe<TimeseriesOptions>;
+};
+
+
+/** User state history */
+export type UserHistoryMarketsMarginUsdArgs = {
   options?: InputMaybe<TimeseriesOptions>;
 };
 

@@ -3,7 +3,7 @@ import { FormattedNumber } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
-import { Maybe, VaultState } from "earn/gql/graphql";
+import { Maybe, VaultState } from "earn/generated/gql/graphql";
 
 interface VaultTotalSupplyProps {
   state?: Maybe<Pick<VaultState, "totalAssets" | "totalAssetsUsd">>;

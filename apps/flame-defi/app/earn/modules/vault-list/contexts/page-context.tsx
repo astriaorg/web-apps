@@ -11,7 +11,11 @@ import {
 import { Image } from "components/image";
 import { VaultTotalSupply } from "earn/components/vault";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
-import { OrderDirection, Vault, VaultOrderBy } from "earn/gql/graphql";
+import {
+  OrderDirection,
+  Vault,
+  VaultOrderBy,
+} from "earn/generated/gql/graphql";
 import {
   PAGE_SIZE,
   PLACEHOLDER_DATA,

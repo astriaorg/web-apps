@@ -1,7 +1,7 @@
 import { Badge, BadgeProps } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { Image } from "components/image";
-import { VaultMetadataCurator } from "earn/gql/graphql";
+import { VaultMetadataCurator } from "earn/generated/gql/graphql";
 
 interface VaultCuratorsProps extends BadgeProps {
   curators?: Pick<VaultMetadataCurator, "name" | "image">[];

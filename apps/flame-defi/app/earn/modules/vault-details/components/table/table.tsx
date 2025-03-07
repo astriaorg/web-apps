@@ -22,7 +22,7 @@ import {
 import Big from "big.js";
 import { Image } from "components/image";
 import { ROUTES } from "earn/constants/routes";
-import { VaultAllocationHistory } from "earn/gql/graphql";
+import { VaultAllocationHistory } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
