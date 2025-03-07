@@ -1,8 +1,8 @@
 "use client";
 
+import { FormatNumberOptions, useIntl } from "@repo/libs/react-intl";
 import { animate } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FormatNumberOptions, useIntl } from "../../../intl";
 import { cn, formatAbbreviatedNumber } from "../../../utils";
 import { Skeleton } from "../../atoms";
 

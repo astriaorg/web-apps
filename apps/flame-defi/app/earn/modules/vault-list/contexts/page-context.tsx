@@ -1,7 +1,7 @@
+import { FormattedNumber } from "@repo/libs/react-intl";
 import { Badge } from "@repo/ui/components";
 import { useDebounce } from "@repo/ui/hooks";
 import { CaretRightIcon } from "@repo/ui/icons";
-import { FormattedNumber } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,

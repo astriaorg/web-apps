@@ -5,7 +5,7 @@ import {
   TokenAmount,
   TokenState,
 } from "@repo/flame-types";
-import { useIntl } from "@repo/ui/intl";
+import { useIntl } from "@repo/libs/react-intl";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";

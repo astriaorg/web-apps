@@ -1,6 +1,6 @@
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
+import { useIntl } from "@repo/libs/react-intl";
 import { Skeleton, TokenSelector } from "@repo/ui/components";
-import { useIntl } from "@repo/ui/intl";
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,

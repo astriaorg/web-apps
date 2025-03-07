@@ -6,7 +6,6 @@ import { DropdownOption } from "@repo/ui/components";
 import { useConfig, useEvmChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 
-import { getBalanceFromChain } from "../services/cosmos";
 import {
   CosmosChainInfo,
   cosmosChainNameFromId,
@@ -14,9 +13,10 @@ import {
   ibcCurrencyBelongsToChain,
   TRADE_TYPE,
 } from "@repo/flame-types";
-import { useGetQuote } from "../../../hooks";
-import { useIntl } from "react-intl";
+import { useIntl } from "@repo/libs/react-intl";
 import { removeNonNumeric } from "@repo/ui/utils";
+import { useGetQuote } from "../../../hooks";
+import { getBalanceFromChain } from "../services/cosmos";
 export interface CosmosWalletContextProps {
   connectCosmosWallet: () => void;
   cosmosAccountAddress: string | null;

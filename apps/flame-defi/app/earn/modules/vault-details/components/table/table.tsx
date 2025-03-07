@@ -1,3 +1,4 @@
+import { FormattedNumber, useIntl } from "@repo/libs/react-intl";
 import {
   Table as BaseTable,
   Card,
@@ -9,7 +10,6 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
-import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,

@@ -1,4 +1,12 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { DropdownOption } from "@repo/ui/components";
+import {
+  getFlameChainId,
+  getFlameNetworkByChainId,
+  useConfig as useAppConfig,
+  useEvmChainData,
+} from "config";
+import { useBalancePolling } from "features/get-balance-polling";
 import React, {
   useCallback,
   useEffect,
@@ -14,28 +22,20 @@ import {
   useDisconnect,
   useSwitchChain,
 } from "wagmi";
-import { DropdownOption } from "@repo/ui/components";
-import {
-  getFlameChainId,
-  getFlameNetworkByChainId,
-  useConfig as useAppConfig,
-  useEvmChainData,
-} from "config";
-import { useBalancePolling } from "features/get-balance-polling";
 
-import {
-  type AstriaErc20WithdrawerService,
-  createWithdrawerService,
-} from "../services/astria-withdrawer-service/astria-withdrawer-service";
 import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
   TRADE_TYPE,
 } from "@repo/flame-types";
-import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+import { useIntl } from "@repo/libs/react-intl";
 import { useGetQuote } from "../../../hooks";
-import { useIntl } from "react-intl";
+import {
+  type AstriaErc20WithdrawerService,
+  createWithdrawerService,
+} from "../services/astria-withdrawer-service/astria-withdrawer-service";
+import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 interface TokenAllowance {
   symbol: string;

@@ -1,5 +1,5 @@
+import { FormattedNumber, useIntl } from "@repo/libs/react-intl";
 import { Skeleton, StatusCard } from "@repo/ui/components";
-import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";

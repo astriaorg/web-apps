@@ -1,8 +1,8 @@
 "use client";
 
+import { useIntl } from "@repo/libs/react-intl";
 import { InfoTooltip } from "@repo/ui/components";
 import { GearIcon } from "@repo/ui/icons";
-import { useIntl } from "@repo/ui/intl";
 import {
   AlertDialog,
   AlertDialogAction,

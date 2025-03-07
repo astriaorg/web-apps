@@ -1,5 +1,5 @@
+import { FormattedNumber } from "@repo/libs/react-intl";
 import { Button, Card, CardFigureInput, CardLabel } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
 import { Image } from "components/image";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import React, { useMemo } from "react";
