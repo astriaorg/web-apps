@@ -26,10 +26,8 @@ export function Observability() {
       url: faroUrl,
       app: {
         name: getEnvVariable("NEXT_PUBLIC_FARO_APP_NAME", "flame-defi-local"),
-        // use the vercel branch url if a namespace isn't set, like for preview deployments
         namespace:
           getOptionalEnvVariable("NEXT_PUBLIC_FARO_APP_NAMESPACE") ??
-          getOptionalEnvVariable("VERCEL_BRANCH_URL") ??
           undefined,
         version: getEnvVariable("VERCEL_DEPLOYMENT_ID", "local"),
         environment: getEnvVariable("NEXT_PUBLIC_ENV"),
