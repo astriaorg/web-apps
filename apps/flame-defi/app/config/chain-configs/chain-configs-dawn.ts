@@ -1,5 +1,6 @@
 import {
   CelestiaIcon,
+  DropTiaIcon,
   FlameIcon,
   NeutronIcon,
   NobleIcon,
@@ -232,7 +233,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -322,7 +323,7 @@ const FlameChainInfo: EvmChainInfo = {
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     }),
   ],
   IconComponent: FlameIcon,
