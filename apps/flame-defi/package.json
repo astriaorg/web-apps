@@ -1,17 +1,6 @@
 {
   "name": "flame-defi",
   "version": "0.1.0",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "codegen": "graphql-codegen",
-    "lint": "next lint --max-warnings 0",
-    "check-types": "tsc --noEmit",
-    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
-  },
   "dependencies": {
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/math": "^0.32.4",
@@ -74,5 +63,16 @@
     "postcss": "^8.4.49",
     "ts-node": "^10.9.2",
     "typescript": "5.5.4"
-  }
+  },
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "check-types": "tsc --noEmit",
+    "codegen": "graphql-codegen",
+    "dev": "next dev --turbopack",
+    "lint": "next lint --max-warnings 0",
+    "start": "next start",
+    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
+  },
+  "type": "module"
 }

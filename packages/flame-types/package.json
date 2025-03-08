@@ -1,21 +1,21 @@
 {
   "name": "@repo/flame-types",
   "version": "0.0.0",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "check-types": "tsc --noEmit"
-  },
-  "exports": {
-    "default": "./src/types.ts"
+  "dependencies": {
+    "jsbi": "^4.3.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "typescript": "5.5.4"
   },
-  "dependencies": {
-    "jsbi": "^4.3.0"
-  }
+  "exports": {
+    "default": "./src/types.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0"
+  },
+  "type": "module"
 }
