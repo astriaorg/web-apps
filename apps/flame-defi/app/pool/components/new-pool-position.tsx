@@ -28,6 +28,7 @@ export interface TokenPair {
   tokenTwo: EvmCurrency | undefined;
 }
 
+// TODO - move to flame-types
 export interface FeeData {
   id: number;
   feePercent: string;

@@ -10,7 +10,7 @@
     "flame-defi#build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["NEXT_ENV"],
+      "env": ["VERCEL_DEPLOYMENT_ID", "VERCEL_BRANCH_URL"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {

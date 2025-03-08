@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 import Navbar from "components/navbar/navbar";
 import localFont from "next/font/local";
+import { Observability } from "./features/observability";
 
 export const metadata = {
   title: "Flame App",
@@ -216,6 +217,7 @@ export default function RootLayout({
     >
       <body>
         <Providers>
+          <Observability />
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <SideTag label="Get Help" />
