@@ -27,11 +27,12 @@ const query = graphql(`
       }
       supplyingVaults {
         address
+        symbol
+        name
         asset {
+          address
           decimals
           logoURI
-          name
-          symbol
         }
         metadata {
           curators {
@@ -39,11 +40,10 @@ const query = graphql(`
             name
           }
         }
-        name
         state {
+          netApy
           totalAssets
           totalAssetsUsd
-          totalSupply
         }
       }
     }

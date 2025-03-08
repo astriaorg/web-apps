@@ -1,6 +1,6 @@
 import { StatusCard } from "@repo/ui/components";
 import { VaultListTable } from "earn/components/vault";
-import { Vault } from "earn/generated/gql/graphql";
+import { OrderDirection, Vault } from "earn/generated/gql/graphql";
 import {
   TablePagination,
   TableSearch,
@@ -42,9 +42,12 @@ export const TableSection = () => {
         <>
           <VaultListTable
             data={formattedData}
-            ordering={ordering}
             sorting={sorting}
             onSortingChange={setSorting}
+            getHeaderIsActive={(header) => header.id === ordering.orderBy}
+            getHeaderIsAscending={() =>
+              ordering.orderDirection === OrderDirection.Asc
+            }
             isLoading={isPending}
           />
 

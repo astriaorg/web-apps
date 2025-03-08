@@ -1,16 +1,25 @@
 import { StatusCard } from "@repo/ui/components";
+import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
+import { VaultListTable } from "earn/components/vault";
+import { Vault, VaultOrderBy } from "earn/generated/gql/graphql";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
-import { Table } from "earn/modules/market-details/components/table";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export const ContentSection = () => {
   const {
     query: { data, isPending, status },
   } = usePageContext();
+
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: VaultOrderBy.TotalAssets,
+      desc: true,
+    },
+  ]);
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
     return [
@@ -85,7 +94,18 @@ export const ContentSection = () => {
                 className="grid grid-cols-2 gap-2"
               />
               <OverviewCards />
-              <Table />
+              <VaultListTable
+                data={
+                  (data?.marketByUniqueKey.supplyingVaults ?? []) as Vault[]
+                }
+                sorting={sorting}
+                onSortingChange={setSorting}
+                getHeaderIsActive={(header) => header.id === sorting[0]?.id}
+                getHeaderIsAscending={(header) =>
+                  header.column.getNextSortingOrder() === "desc"
+                }
+                isLoading={isPending}
+              />
             </div>
           </div>
 

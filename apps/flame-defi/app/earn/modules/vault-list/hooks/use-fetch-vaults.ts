@@ -61,6 +61,12 @@ const query = graphql(`
           decimals
           logoURI
         }
+        metadata {
+          curators {
+            image
+            name
+          }
+        }
         state {
           netApy
           totalAssets
