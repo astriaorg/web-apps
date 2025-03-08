@@ -28,14 +28,23 @@ const query = graphql(`
         allocation {
           market {
             collateralAsset {
+              decimals
               logoURI
+              name
               symbol
             }
+            creationTimestamp
+            lltv
             loanAsset {
+              decimals
               logoURI
+              name
               symbol
             }
             state {
+              collateralAssets
+              liquidityAssets
+              netBorrowApy
               netSupplyApy
               supplyAssets
               supplyAssetsUsd

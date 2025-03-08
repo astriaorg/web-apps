@@ -1,0 +1,318 @@
+import {
+  Badge,
+  Table as BaseTable,
+  Card,
+  Skeleton,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSortIcon,
+} from "@repo/ui/components";
+import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  Header,
+  OnChangeFn,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import Big from "big.js";
+import { Image } from "components/image";
+import { ROUTES } from "earn/constants/routes";
+import { NON_BREAKING_SPACE } from "earn/constants/utils";
+import { Market } from "earn/generated/gql/graphql";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { FormattedNumber } from "react-intl";
+
+interface MarketListTableProps {
+  data?: Market[];
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
+  getHeaderIsActive: (header: Header<Market, unknown>) => boolean;
+  getHeaderIsAscending: (header: Header<Market, unknown>) => boolean;
+  isLoading: boolean;
+}
+
+export const MarketListTable = ({
+  data,
+  sorting,
+  onSortingChange,
+  getHeaderIsActive,
+  getHeaderIsAscending,
+  isLoading,
+}: MarketListTableProps) => {
+  const router = useRouter();
+
+  const columnHelper = createColumnHelper<Market>();
+
+  const columns = useMemo(() => {
+    return [
+      columnHelper.accessor("collateralAsset.name", {
+        id: "collateralAsset.name",
+        header: "Collateral",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center space-x-2">
+              <Image
+                src={row.original.collateralAsset?.logoURI}
+                alt={row.original.collateralAsset?.symbol}
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="truncate">
+                {row.original.collateralAsset?.symbol}
+              </span>
+            </div>
+          );
+        },
+        enableSorting: false,
+        footer: (info) => info.column.id,
+      }),
+      columnHelper.accessor("loanAsset.name", {
+        id: "loanAsset.name",
+        header: "Loan",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center space-x-2">
+              <Image
+                src={row.original.loanAsset.logoURI}
+                alt={row.original.loanAsset.symbol}
+                width={24}
+                height={24}
+                className="rounded-full"
+              />
+              <span className="truncate">{row.original.loanAsset.symbol}</span>
+            </div>
+          );
+        },
+        enableSorting: false,
+        footer: (info) => info.column.id,
+      }),
+      columnHelper.accessor("lltv", {
+        id: "lltv",
+        header: "LLTV",
+        cell: ({ row }) => {
+          return (
+            <FormattedNumber
+              value={new Big(row.original.lltv ?? 0)
+                .div(10 ** (row.original.collateralAsset?.decimals ?? 18))
+                .toNumber()}
+              style="percent"
+              minimumFractionDigits={2}
+            />
+          );
+        },
+        enableSorting: false,
+        footer: (info) => info.column.id,
+      }),
+      //   columnHelper.accessor("state.supplyAssets", {
+      //     id: "market.state.supplyAssets",
+      //     header: "Allocation %",
+      //     cell: ({ row }) => {
+      //       return (
+      //         <div>
+      //           <FormattedNumber
+      //             value={
+      //               +new Big(row.original.state?.supplyAssets ?? 0)
+      //                 .div(data?.vaultByAddress.state?.totalAssets ?? 1)
+      //                 .toFixed()
+      //             }
+      //             style="percent"
+      //             minimumFractionDigits={2}
+      //           />
+      //         </div>
+      //       );
+      //     },
+      //     enableSorting: true,
+      //     sortingFn: (a, b) => {
+      //       return new Big(a.original.state?.supplyAssets ?? 0)
+      //         .sub(b.original.state?.supplyAssets ?? 0)
+      //         .gt(0)
+      //         ? 1
+      //         : -1;
+      //     },
+      //     footer: (info) => info.column.id,
+      //   }),
+      columnHelper.accessor("state.supplyAssets", {
+        id: "market.state.supplyAssets",
+        header: "Total Supply",
+        cell: ({ row }) => {
+          const {
+            value: formattedTotalAssets,
+            suffix: formattedTotalAssetsSuffix,
+          } = formatAbbreviatedNumber(
+            new Big(row.original.state?.supplyAssets ?? 0)
+              .div(10 ** row.original.loanAsset.decimals)
+              .toFixed(),
+            {
+              minimumFractionDigits: 2,
+            },
+          );
+
+          const {
+            value: formattedTotalAssetsUSD,
+            suffix: formattedTotalAssetsUSDSuffix,
+          } = formatAbbreviatedNumber(
+            new Big(row.original.state?.supplyAssetsUsd ?? 0).toFixed(),
+            {
+              minimumFractionDigits: 2,
+            },
+          );
+
+          return (
+            <div
+              className={cn(
+                "flex flex-col items-start space-x-0 space-y-1",
+                "md:flex-row md:items-center md:space-x-3 md:space-y-0",
+              )}
+            >
+              <span className={cn("truncate max-w-[25vw]", "md:max-w-auto")}>
+                {formattedTotalAssets}
+                {formattedTotalAssetsSuffix}
+                {NON_BREAKING_SPACE}
+                {row.original.loanAsset.symbol}
+              </span>
+              <Badge>
+                <FormattedNumber
+                  value={+formattedTotalAssetsUSD}
+                  style="currency"
+                  currency="USD"
+                />
+                {formattedTotalAssetsUSDSuffix}
+              </Badge>
+            </div>
+          );
+        },
+        enableSorting: true,
+        footer: (info) => info.column.id,
+      }),
+      //   columnHelper.accessor("supplyCapUsd", {
+      //     id: "supplyCapUsd",
+      //     header: "Cap",
+      //     cell: ({ row }) => {
+      //       // TODO: Generated type seems wrong? typeof row.original.supplyCapUsd === "number".
+      //       // Carefully force conversion for now.
+      //       try {
+      //         // Display abnormal numbers with a "-" like Morpho.
+      //         if (
+      //           (row.original.supplyCapUsd as unknown as number) >
+      //           Number.MAX_SAFE_INTEGER
+      //         ) {
+      //           return "-";
+      //         }
+
+      //         const { value, suffix } = formatAbbreviatedNumber(
+      //           (row.original.supplyCapUsd as unknown as number).toString(),
+      //           {
+      //             minimumFractionDigits: 2,
+      //           },
+      //         );
+
+      //         return (
+      //           formatNumber(+value, {
+      //             style: "currency",
+      //             currency: "USD",
+      //             minimumFractionDigits: 2,
+      //           }) + suffix
+      //         );
+      //       } catch {} // eslint-disable-line no-empty
+
+      //       return "-";
+      //     },
+      //     enableSorting: false,
+      //     footer: (info) => info.column.id,
+      //   }),
+      columnHelper.accessor("state.netSupplyApy", {
+        id: "market.state.netSupplyApy",
+        header: "APY",
+        cell: ({ row }) => {
+          return (
+            <div>
+              <FormattedNumber
+                value={row.original.state?.netSupplyApy ?? 0}
+                style="percent"
+                minimumFractionDigits={2}
+              />
+            </div>
+          );
+        },
+        enableSorting: false,
+        footer: (info) => info.column.id,
+      }),
+    ];
+  }, [columnHelper]);
+
+  const table = useReactTable<Market>({
+    columns,
+    data: (data ?? []) as Market[],
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange,
+    enableSorting: true,
+    enableSortingRemoval: false,
+  });
+
+  return (
+    <Card>
+      <BaseTable>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  <div className="flex items-end space-x-2 whitespace-nowrap">
+                    <div>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </div>
+                    {header.column.getCanSort() && (
+                      <TableSortIcon
+                        isActive={getHeaderIsActive(header)}
+                        isAscending={getHeaderIsAscending(header)}
+                        onClick={header.column.getToggleSortingHandler()}
+                      />
+                    )}
+                  </div>
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow
+              key={row.id}
+              className={cn(
+                "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
+                isLoading && "pointer-events-none",
+              )}
+              onClick={() =>
+                router.push(ROUTES.MARKET_DETAILS + row.original.uniqueKey)
+              }
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  <Skeleton isLoading={isLoading} className="h-8">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Skeleton>
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </BaseTable>
+    </Card>
+  );
+};

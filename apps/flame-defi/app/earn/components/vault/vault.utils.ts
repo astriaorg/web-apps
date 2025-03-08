@@ -11,6 +11,7 @@ export const getPlaceholderData = (length: number): Vault[] =>
           address: `0x${index}`,
           decimals: 18,
           logoURI: "",
+          symbol: "ETH",
         },
         state: {
           netApy: 0,

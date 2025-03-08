@@ -1,13 +1,15 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
+import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
+import { Market } from "earn/generated/gql/graphql";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
-import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 
 export const ContentSection = () => {
@@ -16,6 +18,22 @@ export const ContentSection = () => {
     charts,
     query: { data, isPending, status },
   } = usePageContext();
+
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "market.state.supplyAssets",
+      desc: true,
+    },
+  ]);
+
+  const formattedData = useMemo(() => {
+    if (isPending) {
+      return getPlaceholderData(3);
+    }
+
+    return (data?.vaultByAddress.state?.allocation?.map((it) => it.market) ??
+      []) as Market[];
+  }, [data, isPending]);
 
   const { value: formattedTotalSupply, suffix: formattedTotalSupplySuffix } =
     formatAbbreviatedNumber(
@@ -162,7 +180,16 @@ export const ContentSection = () => {
                 }}
               />
 
-              <Table />
+              <MarketListTable
+                data={formattedData}
+                sorting={sorting}
+                onSortingChange={setSorting}
+                getHeaderIsActive={(header) => header.id === sorting[0]?.id}
+                getHeaderIsAscending={(header) =>
+                  header.column.getNextSortingOrder() === "desc"
+                }
+                isLoading={isPending}
+              />
             </div>
           </div>
 

@@ -24,15 +24,19 @@ const query = graphql(`
         collateralAssets
         liquidityAssets
         netBorrowApy
+        netSupplyApy
+        supplyAssets
+        supplyAssetsUsd
       }
       supplyingVaults {
         address
         symbol
         name
         asset {
-          address
           decimals
           logoURI
+          name
+          symbol
         }
         metadata {
           curators {
@@ -46,6 +50,7 @@ const query = graphql(`
           totalAssetsUsd
         }
       }
+      uniqueKey
     }
   }
 `);
