@@ -2,7 +2,7 @@ import { StatusCard } from "@repo/ui/components";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
-import { VaultListTable } from "earn/components/vault";
+import { getPlaceholderData, VaultListTable } from "earn/components/vault";
 import { Vault, VaultOrderBy } from "earn/generated/gql/graphql";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
@@ -20,6 +20,16 @@ export const ContentSection = () => {
       desc: true,
     },
   ]);
+
+  const formattedData = useMemo(() => {
+    if (isPending) {
+      return getPlaceholderData(3);
+    }
+
+    return data?.marketByUniqueKey.supplyingVaults
+      ? (data.marketByUniqueKey.supplyingVaults as Vault[])
+      : [];
+  }, [data, isPending]);
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
     return [
@@ -95,9 +105,7 @@ export const ContentSection = () => {
               />
               <OverviewCards />
               <VaultListTable
-                data={
-                  (data?.marketByUniqueKey.supplyingVaults ?? []) as Vault[]
-                }
+                data={formattedData}
                 sorting={sorting}
                 onSortingChange={setSorting}
                 getHeaderIsActive={(header) => header.id === sorting[0]?.id}

@@ -1,15 +1,15 @@
 import { StatusCard } from "@repo/ui/components";
-import { VaultListTable } from "earn/components/vault";
+import { getPlaceholderData, VaultListTable } from "earn/components/vault";
 import { OrderDirection, Vault } from "earn/generated/gql/graphql";
 import {
   TablePagination,
   TableSearch,
 } from "earn/modules/vault-list/components/table";
-import { PLACEHOLDER_DATA } from "earn/modules/vault-list/hooks/use-fetch-vaults";
+import { PAGE_SIZE } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
 
-export const TableSection = () => {
+export const ContentSection = () => {
   const {
     ordering,
     sorting,
@@ -20,7 +20,7 @@ export const TableSection = () => {
 
   const formattedData = useMemo(() => {
     if (isPending) {
-      return PLACEHOLDER_DATA.vaults.items as Vault[];
+      return getPlaceholderData(PAGE_SIZE);
     }
 
     return data?.vaults.items ? (data.vaults.items as Vault[]) : [];
