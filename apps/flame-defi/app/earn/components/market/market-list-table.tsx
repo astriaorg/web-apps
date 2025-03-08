@@ -10,6 +10,7 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
+import { CaretRightIcon } from "@repo/ui/icons";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -29,6 +30,9 @@ import { Market } from "earn/generated/gql/graphql";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { FormattedNumber } from "react-intl";
+
+const HIDE_COLUMNS_CLASS_NAME =
+  "data-[column-id=th-loanAsset.name]:hidden data-[column-id=th-lltv]:hidden data-[column-id=th-market.state.netSupplyApy]:hidden lg:data-[column-id=th-loanAsset.name]:table-cell lg:data-[column-id=th-lltv]:table-cell lg:data-[column-id=th-market.state.netSupplyApy]:table-cell";
 
 interface MarketListTableProps {
   data?: Market[];
@@ -55,21 +59,55 @@ export const MarketListTable = ({
     return [
       columnHelper.accessor("collateralAsset.name", {
         id: "collateralAsset.name",
-        header: "Collateral",
+        header: () => {
+          return (
+            <>
+              <span className="hidden lg:block">Collateral</span>
+              <span className="block lg:hidden">Collateral / Loan</span>
+            </>
+          );
+        },
         cell: ({ row }) => {
           return (
-            <div className="flex items-center space-x-2">
-              <Image
-                src={row.original.collateralAsset?.logoURI}
-                alt={row.original.collateralAsset?.symbol}
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-              <span className="truncate">
-                {row.original.collateralAsset?.symbol}
-              </span>
-            </div>
+            <>
+              <div className="hidden items-center space-x-2 lg:flex">
+                <Image
+                  src={row.original.collateralAsset?.logoURI}
+                  alt={row.original.collateralAsset?.symbol}
+                  width={24}
+                  height={24}
+                  className="rounded-full"
+                />
+                <span className="truncate">
+                  {row.original.collateralAsset?.symbol}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 lg:hidden">
+                <div className="flex items-center -space-x-2 shrink-0">
+                  {row.original.collateralAsset && (
+                    <Image
+                      src={row.original.collateralAsset.logoURI}
+                      alt={row.original.collateralAsset.symbol}
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  )}
+                  <Image
+                    src={row.original.loanAsset.logoURI}
+                    alt={row.original.loanAsset.symbol}
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                </div>
+                <span className="truncate">
+                  {row.original.collateralAsset?.symbol}
+                  {` / `}
+                  {row.original.loanAsset.symbol}
+                </span>
+              </div>
+            </>
           );
         },
         enableSorting: false,
@@ -167,26 +205,31 @@ export const MarketListTable = ({
           );
 
           return (
-            <div
-              className={cn(
-                "flex flex-col items-start space-x-0 space-y-1",
-                "md:flex-row md:items-center md:space-x-3 md:space-y-0",
-              )}
-            >
-              <span className={cn("truncate max-w-[25vw]", "md:max-w-auto")}>
-                {formattedTotalAssets}
-                {formattedTotalAssetsSuffix}
-                {NON_BREAKING_SPACE}
-                {row.original.loanAsset.symbol}
-              </span>
-              <Badge>
-                <FormattedNumber
-                  value={+formattedTotalAssetsUSD}
-                  style="currency"
-                  currency="USD"
-                />
-                {formattedTotalAssetsUSDSuffix}
-              </Badge>
+            <div className="flex items-center justify-between space-x-4">
+              <div
+                className={cn(
+                  "flex flex-col items-start space-x-0 space-y-1",
+                  "md:flex-row md:items-center md:space-x-3 md:space-y-0",
+                )}
+              >
+                <span className={cn("truncate max-w-[25vw]", "md:max-w-auto")}>
+                  {formattedTotalAssets}
+                  {formattedTotalAssetsSuffix}
+                  {NON_BREAKING_SPACE}
+                  {row.original.loanAsset.symbol}
+                </span>
+                <Badge>
+                  <FormattedNumber
+                    value={+formattedTotalAssetsUSD}
+                    style="currency"
+                    currency="USD"
+                  />
+                  {formattedTotalAssetsUSDSuffix}
+                </Badge>
+              </div>
+              <div className="lg:hidden flex justify-end pr-3">
+                <CaretRightIcon className="text-typography-subdued" size={16} />
+              </div>
             </div>
           );
         },
@@ -269,7 +312,11 @@ export const MarketListTable = ({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                  key={header.id}
+                  className={HIDE_COLUMNS_CLASS_NAME}
+                  data-column-id={`th-${header.column.id}`}
+                >
                   <div className="flex items-end space-x-2 whitespace-nowrap">
                     <div>
                       {flexRender(
@@ -303,7 +350,11 @@ export const MarketListTable = ({
               }
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell
+                  key={cell.id}
+                  className={HIDE_COLUMNS_CLASS_NAME}
+                  data-column-id={`th-${cell.column.id}`}
+                >
                   <Skeleton isLoading={isLoading} className="h-8">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Skeleton>

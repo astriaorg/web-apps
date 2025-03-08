@@ -32,7 +32,7 @@ import { useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 
 const HIDE_COLUMNS_CLASS_NAME =
-  "last:hidden [&:nth-last-child(2)]:hidden lg:last:table-cell lg:[&:nth-last-child(2)]:table-cell";
+  "data-[column-id=th-metadata.curators]:hidden data-[column-id=th-NetApy]:hidden lg:data-[column-id=th-metadata.curators]:table-cell lg:data-[column-id=th-NetApy]:table-cell";
 
 interface VaultListTableProps {
   data?: Vault[];
@@ -217,7 +217,11 @@ export const VaultListTable = ({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className={HIDE_COLUMNS_CLASS_NAME}>
+                <TableHead
+                  key={header.id}
+                  className={HIDE_COLUMNS_CLASS_NAME}
+                  data-column-id={`th-${header.column.id}`}
+                >
                   <div className="flex items-end space-x-2 whitespace-nowrap">
                     <div>
                       {flexRender(
@@ -251,7 +255,11 @@ export const VaultListTable = ({
               }
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className={HIDE_COLUMNS_CLASS_NAME}>
+                <TableCell
+                  key={cell.id}
+                  className={HIDE_COLUMNS_CLASS_NAME}
+                  data-column-id={`th-${cell.column.id}`}
+                >
                   <Skeleton isLoading={isLoading} className="h-8">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Skeleton>
