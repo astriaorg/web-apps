@@ -154,7 +154,6 @@ const NeutronChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-6236",
       sequencerBridgeAccount: "astria15juwcclg07xs38757q257evltequawcejzzs4l",
-      // TODO - get actual dTIA icon? probably different color?
       IconComponent: DropTiaIcon,
     },
   ],
