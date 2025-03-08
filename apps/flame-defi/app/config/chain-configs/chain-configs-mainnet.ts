@@ -1,5 +1,6 @@
 import {
   CelestiaIcon,
+  DropTiaIcon,
   FlameIcon,
   MilkTiaIcon,
   NeutronIcon,
@@ -153,8 +154,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-6236",
       sequencerBridgeAccount: "astria15juwcclg07xs38757q257evltequawcejzzs4l",
-      // TODO - get actual dTIA icon? probably different color?
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -363,14 +363,14 @@ const FlameChainInfo: EvmChainInfo = {
     }),
     new EvmCurrency({
       coinDenom: "dTIA",
-      title: "Drop TIA",
+      title: "Drop Staked TIA",
       coinMinimalDenom:
         "factory/neutron1ut4c6pv4u6vyu97yw48y8g7mle0cat54848v6m97k977022lzxtsaqsgmq/udtia",
       coinDecimals: 18,
       erc20ContractAddress: "0x1E3b0f82d049379FEd8C0b67D915Ea925067e5f2",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     }),
     new EvmCurrency({
       coinDenom: "WTIA",
