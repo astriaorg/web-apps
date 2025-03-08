@@ -27,8 +27,7 @@ export function Observability() {
       app: {
         name: getEnvVariable("NEXT_PUBLIC_FARO_APP_NAME", "flame-defi-local"),
         namespace:
-          getOptionalEnvVariable("NEXT_PUBLIC_FARO_APP_NAMESPACE") ??
-          undefined,
+          getOptionalEnvVariable("NEXT_PUBLIC_FARO_APP_NAMESPACE") ?? undefined,
         version: getEnvVariable("VERCEL_DEPLOYMENT_ID", "local"),
         environment: getEnvVariable("NEXT_PUBLIC_ENV"),
       },
