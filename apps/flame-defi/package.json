@@ -9,6 +9,8 @@
     "@cosmos-kit/leap": "^2.14.3",
     "@cosmos-kit/react": "^2.20.1",
     "@creativebulma/bulma-tooltip": "^1.2.0",
+    "@grafana/faro-web-sdk": "^1.14.1",
+    "@grafana/faro-web-tracing": "^1.14.1",
     "@metamask/jazzicon": "^2.0.0",
     "@rainbow-me/rainbowkit": "^2.2.2",
     "@repo/flame-types": "*",
@@ -42,6 +44,7 @@
     "wagmi": "^2.13.0"
   },
   "devDependencies": {
+    "@grafana/faro-webpack-plugin": "^0.1.2",
     "@graphql-codegen/cli": "^5.0.4",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
