@@ -1,6 +1,6 @@
 import { Badge, InfoTooltip, Skeleton } from "@repo/ui/components";
 import { Image } from "components/image";
-import { BackButton } from "earn/components/back-button/back-button";
+import { BackButton } from "earn/components/back-button";
 import { VaultCurators } from "earn/components/vault";
 import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
