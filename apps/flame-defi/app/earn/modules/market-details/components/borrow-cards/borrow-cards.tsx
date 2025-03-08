@@ -1,8 +1,8 @@
 import { Button, Card, CardFigureInput, CardLabel } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
 import { Image } from "components/image";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
+import { FormattedNumber } from "react-intl";
 
 export const BorrowCards = () => {
   const {

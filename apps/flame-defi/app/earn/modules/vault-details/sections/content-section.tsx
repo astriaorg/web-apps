@@ -1,5 +1,4 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
-import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
@@ -9,6 +8,7 @@ import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
 import { useMemo } from "react";
+import { FormattedNumber, useIntl } from "react-intl";
 
 export const ContentSection = () => {
   const { formatDate, formatNumber } = useIntl();

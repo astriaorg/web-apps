@@ -1,7 +1,7 @@
 import { Card, CardLabel } from "@repo/ui/components";
-import { FormattedDate } from "@repo/ui/intl";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
+import { FormattedDate } from "react-intl";
 
 export const OverviewCards = () => {
   const {

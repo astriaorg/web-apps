@@ -1,11 +1,11 @@
 import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { Skeleton, TokenSelector } from "@repo/ui/components";
-import { useIntl } from "@repo/ui/intl";
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
   isDustAmount,
 } from "@repo/ui/utils";
+import { useIntl } from "react-intl";
 import { useUsdQuote } from "../hooks";
 
 interface SwapInputProps {
