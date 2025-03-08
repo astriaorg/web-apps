@@ -15,8 +15,13 @@ export function Observability() {
   }
 
   try {
+    const faroUrl = getOptionalEnvVariable("NEXT_PUBLIC_FARO_URL");
+    if (!faroUrl) {
+      console.warn("Skipping Faro initialization: NEXT_PUBLIC_FARO_URL is not set");
+      return null;
+    }
     initializeFaro({
-      url: getEnvVariable("NEXT_PUBLIC_FARO_URL"),
+      url: faroUrl,
       app: {
         name: getEnvVariable("NEXT_PUBLIC_FARO_APP_NAME", "flame-defi-local"),
         // use the vercel branch url if a namespace isn't set, like for preview deployments
