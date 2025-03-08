@@ -2,7 +2,7 @@
 
 import { animate } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FormatNumberOptions, useIntl } from "../../../intl";
+import { FormatNumberOptions, useIntl } from "react-intl";
 import { cn, formatAbbreviatedNumber } from "../../../utils";
 import { Skeleton } from "../../atoms";
 

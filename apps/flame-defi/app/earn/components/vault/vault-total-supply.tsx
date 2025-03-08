@@ -1,9 +1,9 @@
 import { Badge } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import Big from "big.js";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { Maybe, VaultState } from "earn/generated/gql/graphql";
+import { FormattedNumber } from "react-intl";
 
 interface VaultTotalSupplyProps {
   state?: Maybe<Pick<VaultState, "totalAssets" | "totalAssetsUsd">>;
