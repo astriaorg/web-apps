@@ -29,7 +29,8 @@ export const SummaryCards = ({
           isLoading={isLoading}
           padding="md"
           variant={it.variant}
-          className="space-y-2"
+          // Don't overflow the card on smaller screens after animation completes.
+          className="space-y-2 overflow-hidden max-w-[calc(100vw - 32px)]"
         >
           <CardLabel>
             <span className="flex-1">{it.label.left}</span>
