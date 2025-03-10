@@ -240,7 +240,7 @@ export function useSwapButton({
       const txHash = await approveToken(token);
       if (txHash) {
         setTxnHash(txHash);
-      } 
+      }
       return txHash;
     } catch (error) {
       console.warn(error);
@@ -353,6 +353,7 @@ export function useSwapButton({
     txnStatus,
     setTxnStatus,
     txnMsg,
-    tokenApprovalNeeded: tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING,
+    tokenApprovalNeeded:
+      tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING,
   };
 }
