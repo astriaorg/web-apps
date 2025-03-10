@@ -10,7 +10,7 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
-import { CaretRightIcon } from "@repo/ui/icons";
+import { ChevronRightSmallIcon } from "@repo/ui/icons";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -140,7 +140,10 @@ export const VaultListTable = ({
                 </Badge>
               </div>
               <div className="lg:hidden flex justify-end pr-3">
-                <CaretRightIcon className="text-typography-subdued" size={16} />
+                <ChevronRightSmallIcon
+                  className="text-typography-subdued"
+                  size={16}
+                />
               </div>
             </div>
           );
@@ -222,7 +225,7 @@ export const VaultListTable = ({
                   className={HIDE_COLUMNS_CLASS_NAME}
                   data-column-id={`th-${header.column.id}`}
                 >
-                  <div className="flex items-end space-x-2 whitespace-nowrap">
+                  <div className="flex items-center space-x-2 whitespace-nowrap">
                     <div>
                       {flexRender(
                         header.column.columnDef.header,
