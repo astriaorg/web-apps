@@ -104,7 +104,7 @@ export default function SwapPage(): React.ReactElement {
     tokenOne,
     tokenTwo,
     tradeType,
-    validSwapInputs: validSwapInputs || false,
+    validSwapInputs: validSwapInputs,
   });
 
   const debouncedGetQuoteRef = useRef(
@@ -278,13 +278,7 @@ export default function SwapPage(): React.ReactElement {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    if (
-      txnStatus === TXN_STATUS.SUCCESS ||
-      txnStatus === undefined ||
-      txnStatus === TXN_STATUS.FAILED
-    ) {
-      handleResetInputs();
-    }
+    handleResetInputs();
   };
 
   const handleOpenModal = () => {

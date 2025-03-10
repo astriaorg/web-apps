@@ -96,7 +96,7 @@ export function useSwapButton({
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenApprovalNeeded = useCheckTokenApproval(tokenOne, tokenTwo);
+  const tokenNeedingApproval = useCheckTokenApproval(tokenOne, tokenTwo);
 
   const wrapTia = tokenOne?.token?.isNative && tokenTwo?.token?.isWrappedNative;
   const unwrapTia =
@@ -250,24 +250,25 @@ export function useSwapButton({
     }
   };
 
-  const validSwapInputs =
+  const validSwapInputs = Boolean(
     !loading &&
-    txnStatus !== TXN_STATUS.PENDING &&
-    errorText === null &&
-    tokenOne?.token &&
-    tokenTwo?.token &&
-    tokenOne?.value !== undefined &&
-    tokenTwo?.value !== undefined &&
-    parseFloat(tokenOne?.value) > 0 &&
-    parseFloat(tokenTwo?.value) > 0 &&
-    parseFloat(tokenOne?.value) <= parseFloat(tokenOneBalance);
+      txnStatus !== TXN_STATUS.PENDING &&
+      errorText === null &&
+      tokenOne?.token &&
+      tokenTwo?.token &&
+      tokenOne?.value !== undefined &&
+      tokenTwo?.value !== undefined &&
+      parseFloat(tokenOne?.value) > 0 &&
+      parseFloat(tokenTwo?.value) > 0 &&
+      parseFloat(tokenOne?.value) <= parseFloat(tokenOneBalance),
+  );
 
   const onSubmitCallback = () => {
     switch (true) {
       case !userAccount.address:
         return connectEvmWallet();
-      case tokenApprovalNeeded !== null:
-        return handleTokenApproval(tokenApprovalNeeded);
+      case tokenNeedingApproval !== null:
+        return handleTokenApproval(tokenNeedingApproval);
       case unwrapTia:
         return handleWrap("unwrap");
       case wrapTia:
@@ -285,9 +286,9 @@ export function useSwapButton({
         return "Connect Wallet";
       case !tokenOne?.token || !tokenTwo?.token:
         return "Select a token";
-      case tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING:
-        return `Approve ${tokenApprovalNeeded?.coinDenom}`;
-      case tokenApprovalNeeded !== null && txnStatus === TXN_STATUS.PENDING:
+      case tokenNeedingApproval !== null && txnStatus !== TXN_STATUS.PENDING:
+        return `Approve ${tokenNeedingApproval?.coinDenom}`;
+      case tokenNeedingApproval !== null && txnStatus === TXN_STATUS.PENDING:
         return "Pending wallet approval...";
       case txnStatus === TXN_STATUS.PENDING:
         return "Pending...";
@@ -354,6 +355,6 @@ export function useSwapButton({
     setTxnStatus,
     txnMsg,
     tokenApprovalNeeded:
-      tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING,
+      tokenNeedingApproval !== null && txnStatus !== TXN_STATUS.PENDING,
   };
 }
