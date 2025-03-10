@@ -278,7 +278,13 @@ export default function SwapPage(): React.ReactElement {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-    handleResetInputs();
+    if (
+      txnStatus === TXN_STATUS.SUCCESS ||
+      txnStatus === undefined ||
+      txnStatus === TXN_STATUS.FAILED
+    ) {
+      handleResetInputs();
+    }
   };
 
   const handleOpenModal = () => {

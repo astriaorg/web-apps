@@ -243,9 +243,16 @@ export function useSwapButton({
       }
       return txHash;
     } catch (error) {
-      console.warn(error);
-      setErrorText("Problem approving token");
-      setTxnStatus(TXN_STATUS.FAILED);
+      if ((error as ErrorWithMessage).message.includes("User rejected")) {
+        console.warn(error);
+        setTxnStatus(TXN_STATUS.FAILED);
+        return null;
+      } else {
+        console.warn(error);
+        setErrorText("Error approving token");
+        setTxnStatus(TXN_STATUS.FAILED);
+      }
+
       return null;
     }
   };
