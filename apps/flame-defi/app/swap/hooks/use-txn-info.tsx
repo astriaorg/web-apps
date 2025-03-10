@@ -136,21 +136,21 @@ const calculateMinimumReceived = (
 
 export const useTxnInfo = ({
   quote,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   tradeType,
   validSwapInputs,
 }: {
   quote: GetQuoteResult | null;
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
+  topToken: TokenState;
+  bottomToken: TokenState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }) => {
   const { formatNumber } = useIntl();
   const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
-    tokenOne,
-    tokenTwo,
+    topToken,
+    bottomToken,
   );
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
@@ -175,7 +175,7 @@ export const useTxnInfo = ({
       parseFloat(
         formatUnits(
           BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-          tokenTwo?.token?.coinDecimals || 18,
+          bottomToken?.token?.coinDecimals || 18,
         ),
       ),
       { minimumFractionDigits: 6, maximumFractionDigits: 6 },

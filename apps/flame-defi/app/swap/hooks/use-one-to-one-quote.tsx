@@ -18,9 +18,9 @@ export const useOneToOneQuote = (
   );
 
   const { quoteError, getQuote } = useGetQuote();
-  const tokenOneSymbol = oneToOneValueTokens[0]?.coinDenom;
-  const tokenTwoSymbol = oneToOneValueTokens[1]?.coinDenom;
-  const tokenTwoValue = flipDirection
+  const topTokenSymbol = oneToOneValueTokens[0]?.coinDenom;
+  const bottomTokenSymbol = oneToOneValueTokens[1]?.coinDenom;
+  const bottomTokenValue = flipDirection
     ? formatDecimalValues(quoteOne?.quoteDecimals, 6)
     : formatDecimalValues(quoteTwo?.quoteDecimals, 6);
 
@@ -50,9 +50,9 @@ export const useOneToOneQuote = (
   }, [inputOne, inputTwo, getQuote]);
 
   return {
-    tokenOneSymbol,
-    tokenTwoSymbol,
-    tokenTwoValue,
+    topTokenSymbol,
+    bottomTokenSymbol,
+    bottomTokenValue,
     oneToOneLoading: quoteLoading,
     quoteError,
     setFlipDirection,

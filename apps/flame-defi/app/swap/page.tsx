@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
-import ConfirmationModal from "components/confirmation-modal/confirmation-modal";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { useEvmChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
@@ -21,17 +21,10 @@ import {
 } from "@repo/flame-types";
 import { useGetQuote } from "../hooks";
 import { useSwapButton, useOneToOneQuote, useTxnInfo } from "./hooks";
-import { SwapInput } from "./components/swap-input";
-import { TxnInfo } from "./components/txn-info";
-import { SwapTxnSteps } from "./components/swap-txn-steps";
+import { SwapTxnSteps, SwapInput, TxnInfo } from "./components";
 import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
-
-enum TOKEN_INPUTS {
-  TOKEN_ONE = "token_one",
-  TOKEN_TWO = "token_two",
-}
-
+import { TOKEN_INPUTS, SwapPairProps } from "./types";
 export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
@@ -47,10 +40,11 @@ export default function SwapPage(): React.ReactElement {
     value: "",
     isQuoteValue: true,
   });
+  
   const isTiaWtia = useMemo(() => {
     return Boolean(
       (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
-        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative),
+        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative)
     );
   }, [inputOne, inputTwo]);
 
@@ -58,13 +52,37 @@ export default function SwapPage(): React.ReactElement {
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
   const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
-  const tokenOne = !flipTokens ? inputOne : inputTwo;
-  const tokenTwo = !flipTokens ? inputTwo : inputOne;
+  
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
-    selectedChain,
+    selectedChain
   );
+
+  const swapInputs: SwapPairProps[] = [
+    {
+      id: TOKEN_INPUTS.INPUT_ONE,
+      inputToken: inputOne,
+      oppositeToken: inputTwo,
+      balance: balances[0]?.value || "0",
+      label: flipTokens ? "Sell" : "Buy",
+    },
+    {
+      id: TOKEN_INPUTS.INPUT_TWO,
+      inputToken: inputTwo,
+      oppositeToken: inputOne,
+      balance: balances[1]?.value || "0",
+      label: flipTokens ? "Buy" : "Sell",
+    },
+  ];
+
+  const swapPairs = (flipTokens ? swapInputs.reverse() : swapInputs) as [
+    SwapPairProps,
+    SwapPairProps,
+  ];
+  const topToken = swapPairs[0].inputToken;
+  const bottomToken = swapPairs[1].inputToken;
+  const userInputToken = !topToken.isQuoteValue ? topToken : bottomToken;
 
   useEffect(() => {
     if (userAccount.address && (inputOne.token || inputTwo.token)) {
@@ -73,8 +91,8 @@ export default function SwapPage(): React.ReactElement {
   }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
 
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
-  const tokenOneBalance =
-    balances.find((balance) => balance.symbol === tokenOne.token?.coinDenom)
+  const topTokenBalance =
+    balances.find((balance) => balance.symbol === topToken.token?.coinDenom)
       ?.value || "0";
 
   const {
@@ -91,9 +109,9 @@ export default function SwapPage(): React.ReactElement {
     errorText,
     setErrorText,
   } = useSwapButton({
-    tokenOne,
-    tokenTwo,
-    tokenOneBalance,
+    topToken,
+    bottomToken,
+    topTokenBalance,
     quote,
     loading,
     quoteError,
@@ -101,8 +119,8 @@ export default function SwapPage(): React.ReactElement {
   });
   const txnInfo = useTxnInfo({
     quote,
-    tokenOne,
-    tokenTwo,
+    topToken,
+    bottomToken,
     tradeType,
     validSwapInputs: validSwapInputs,
   });
@@ -113,16 +131,16 @@ export default function SwapPage(): React.ReactElement {
         tradeType: TRADE_TYPE,
         tokenData: { token: EvmCurrency; value: string },
         token: TokenState,
-        tokenInput: TOKEN_INPUTS,
+        tokenInput: TOKEN_INPUTS
       ) => {
         getQuote(tradeType, tokenData, token).then((res) => {
-          if (tokenInput === TOKEN_INPUTS.TOKEN_ONE && res) {
+          if (tokenInput === TOKEN_INPUTS.INPUT_ONE && res) {
             setInputTwo((prev) => ({
               ...prev,
               value: res.quoteDecimals,
               isQuoteValue: true,
             }));
-          } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO && res) {
+          } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO && res) {
             setInputOne((prev) => ({
               ...prev,
               value: res.quoteDecimals,
@@ -131,8 +149,8 @@ export default function SwapPage(): React.ReactElement {
           }
         });
       },
-      500,
-    ),
+      500
+    )
   );
 
   const handleTradeType = useCallback((index: number) => {
@@ -149,12 +167,12 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleResetInputs = useCallback(() => {
-    setInputOne({ token: tokenOne.token, value: "", isQuoteValue: false });
-    setInputTwo({ token: tokenTwo.token, value: "", isQuoteValue: true });
+    setInputOne({ token: topToken.token, value: "", isQuoteValue: false });
+    setInputTwo({ token: bottomToken.token, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
     setTxnStatus(undefined);
-  }, [setQuote, setTxnStatus, tokenOne.token, tokenTwo.token]);
+  }, [setQuote, setTxnStatus, topToken, bottomToken]);
 
   const handleInputChange = useCallback(
     (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
@@ -168,10 +186,10 @@ export default function SwapPage(): React.ReactElement {
       const tradeType =
         index === 0 ? TRADE_TYPE.EXACT_IN : TRADE_TYPE.EXACT_OUT;
 
-      if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
+      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
         setInputOne((prev) => ({ ...prev, value: value, isQuoteValue: false }));
         setInputTwo((prev) => ({ ...prev, value: "", isQuoteValue: true }));
-      } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
+      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
         setInputTwo((prev) => ({ ...prev, value: value, isQuoteValue: false }));
         setInputOne((prev) => ({ ...prev, value: "", isQuoteValue: true }));
       }
@@ -179,14 +197,14 @@ export default function SwapPage(): React.ReactElement {
       if (
         value !== "" &&
         parseFloat(value) > 0 &&
-        tokenOne.token &&
-        tokenTwo.token
+        topToken.token &&
+        bottomToken.token
       ) {
         debouncedGetQuoteRef.current(
           tradeType,
-          { token: tokenOne.token, value },
-          tokenTwo,
-          tokenInput,
+          { token: topToken.token, value },
+          bottomToken,
+          tokenInput
         );
       }
 
@@ -197,67 +215,64 @@ export default function SwapPage(): React.ReactElement {
       }
     },
     [
-      tokenOne,
-      tokenTwo,
+      topToken,
+      bottomToken,
       handleTradeType,
       isTiaWtia,
       debouncedGetQuoteRef,
       cancelGetQuote,
       setErrorText,
-    ],
+    ]
   );
 
   const handleTokenSelect = useCallback(
     (selectedToken: EvmCurrency, tokenInput: TOKEN_INPUTS, index: number) => {
       const oppositeInputToken =
-        tokenInput === TOKEN_INPUTS.TOKEN_ONE ? tokenTwo : tokenOne;
+        tokenInput === TOKEN_INPUTS.INPUT_ONE ? bottomToken : topToken;
       if (
         (selectedToken.isNative && oppositeInputToken.token?.isWrappedNative) ||
         (selectedToken.isWrappedNative && oppositeInputToken.token?.isNative)
       ) {
-        const value = tokenOne.isQuoteValue ? tokenTwo.value : tokenOne.value;
+        const value =
+          tokenInput === TOKEN_INPUTS.INPUT_ONE
+            ? bottomToken.value
+            : topToken.value;
         handleTiaWtiaInputs(value);
       }
 
-      if (tokenInput === TOKEN_INPUTS.TOKEN_ONE) {
+      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
         setInputOne((prev) => ({ ...prev, token: selectedToken }));
-      } else if (tokenInput === TOKEN_INPUTS.TOKEN_TWO) {
+      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
         setInputTwo((prev) => ({ ...prev, token: selectedToken }));
       }
 
       setErrorText(null);
 
-      const tradeType = tokenTwo.isQuoteValue
-        ? TRADE_TYPE.EXACT_IN
-        : TRADE_TYPE.EXACT_OUT;
-      const exactInToken = index === 0 ? selectedToken : tokenOne.token;
-      const userInputAmount = !tokenOne.isQuoteValue
-        ? tokenOne.value
-        : tokenTwo.value;
-      const exactOutToken =
-        index === 0 && tokenTwo.token ? tokenTwo.token : selectedToken;
+      const tradeType = topToken.isQuoteValue ? TRADE_TYPE.EXACT_OUT : TRADE_TYPE.EXACT_IN;
+      const exactInToken = index === 0 ? selectedToken : topToken.token;
+      const exactOutToken = index === 0 && bottomToken.token ? bottomToken.token : selectedToken;
 
       if (
-        userInputAmount !== "" &&
-        parseFloat(userInputAmount) > 0 &&
-        tokenOne.token &&
+        userInputToken.value !== "" &&
+        parseFloat(userInputToken.value) > 0 &&
+        topToken.token &&
         exactInToken &&
         exactOutToken
       ) {
         getQuote(
           tradeType,
-          { token: exactInToken, value: userInputAmount },
-          { token: exactOutToken, value: "" },
+          { token: exactInToken, value: userInputToken.value },
+          { token: exactOutToken, value: "" }
         ).then((res) => {
-          if (tokenOne.isQuoteValue && res) {
+          if (exactInToken.coinDenom === topToken.token?.coinDenom && res) {
             setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
-          } else if (tokenTwo.isQuoteValue && res) {
+          } else if (exactInToken.coinDenom === bottomToken.token?.coinDenom && res) {
             setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
           }
         });
       }
     },
-    [getQuote, tokenOne, tokenTwo, setErrorText],
+    [getQuote, topToken, bottomToken, setErrorText, userInputToken]
   );
 
   const handleArrowClick = () => {
@@ -267,12 +282,12 @@ export default function SwapPage(): React.ReactElement {
         : TRADE_TYPE.EXACT_IN;
     setFlipTokens((prev) => !prev);
     setTradeType(newTradeType);
-
+    
     const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
     const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
 
     if (preFlipTokenOne.value !== "" || preFlipTokenTwo.value !== "") {
-      getQuote(newTradeType, preFlipTokenOne, preFlipTokenTwo);
+      getQuote(newTradeType, {token: preFlipTokenOne.token, value: userInputToken.value}, preFlipTokenTwo);
     }
   };
 
@@ -304,40 +319,8 @@ export default function SwapPage(): React.ReactElement {
     }
   };
 
-  const swapInputs = [
-    {
-      id: TOKEN_INPUTS.TOKEN_ONE,
-      inputToken: inputOne,
-      onInputChange: (value: string, index: number) =>
-        handleInputChange(value, TOKEN_INPUTS.TOKEN_ONE, index),
-      availableTokens: currencies,
-      oppositeToken: inputTwo,
-      balance: balances[0]?.value || "0",
-      onTokenSelect: (token: EvmCurrency, index: number) =>
-        handleTokenSelect(token, TOKEN_INPUTS.TOKEN_ONE, index),
-      label: flipTokens ? "Buy" : "Sell",
-      txnQuoteData: quote,
-      txnQuoteLoading: loading,
-      txnQuoteError: quoteError,
-    },
-    {
-      id: TOKEN_INPUTS.TOKEN_TWO,
-      inputToken: inputTwo,
-      onInputChange: (value: string, index: number) =>
-        handleInputChange(value, TOKEN_INPUTS.TOKEN_TWO, index),
-      availableTokens: currencies,
-      oppositeToken: inputOne,
-      balance: balances[1]?.value || "0",
-      onTokenSelect: (token: EvmCurrency, index: number) =>
-        handleTokenSelect(token, TOKEN_INPUTS.TOKEN_TWO, index),
-      label: flipTokens ? "Sell" : "Buy",
-      txnQuoteData: quote,
-      txnQuoteLoading: loading,
-      txnQuoteError: quoteError,
-    },
-  ];
-
-  const swapPairs = flipTokens ? swapInputs.reverse() : swapInputs;
+  console.log({topToken})
+  console.log({bottomToken})
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -348,8 +331,20 @@ export default function SwapPage(): React.ReactElement {
         </div>
         <div className="relative flex flex-col items-center">
           <div className="flex flex-col gap-1 w-full">
-            {swapPairs.map((props, index) => (
-              <SwapInput key={index} {...props} index={index} />
+            {swapPairs.map(({id, inputToken, oppositeToken, balance, label}, index) => (
+              <SwapInput
+                availableTokens={currencies}
+                balance={balance}
+                id={id}
+                index={index}
+                inputToken={inputToken}
+                key={index}
+                label={label}
+                onInputChange={handleInputChange}
+                onTokenSelect={handleTokenSelect}
+                oppositeToken={oppositeToken}
+                txnQuoteLoading={loading}
+              />
             ))}
           </div>
           <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
@@ -380,8 +375,8 @@ export default function SwapPage(): React.ReactElement {
           <SwapTxnSteps
             txnStatus={txnStatus}
             txnInfo={txnInfo}
-            tokenOne={tokenOne}
-            tokenTwo={tokenTwo}
+            topToken={topToken}
+            bottomToken={bottomToken}
             isTiaWtia={isTiaWtia}
             oneToOneQuote={oneToOneQuote}
             txnHash={txnHash}
@@ -407,8 +402,8 @@ export default function SwapPage(): React.ReactElement {
           quote && (
             <TxnInfo
               txnInfo={txnInfo}
-              tokenOne={tokenOne}
-              tokenTwo={tokenTwo}
+              topToken={topToken}
+              bottomToken={bottomToken}
               oneToOneQuote={oneToOneQuote}
               quote={quote}
             />

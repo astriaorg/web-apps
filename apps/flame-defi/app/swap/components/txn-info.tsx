@@ -12,7 +12,7 @@ import {
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { GetQuoteResult } from "@repo/flame-types";
 import { useTxnInfo } from "../hooks";
-import { OneToOneQuoteProps } from "./types";
+import { OneToOneQuoteProps } from "../types";
 import { RoutePath } from "./route-path";
 
 enum TOKEN_INPUTS {
@@ -28,14 +28,14 @@ export interface TxnInfoProps {
 
 export function TxnInfo({
   txnInfo,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   oneToOneQuote,
   quote,
 }: {
   txnInfo: ReturnType<typeof useTxnInfo>;
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
+  topToken: TokenState;
+  bottomToken: TokenState;
   oneToOneQuote: OneToOneQuoteProps;
   quote: GetQuoteResult;
 }) {
@@ -60,12 +60,12 @@ export function TxnInfo({
             >
               <div className="flex items-center gap-1">
                 <span>{formatDecimalValues("1", 0)}</span>
-                <span>{oneToOneQuote?.tokenOneSymbol}</span>
+                <span>{oneToOneQuote?.topTokenSymbol}</span>
               </div>
               <div>=</div>
               <div className="flex items-center gap-1">
-                <span>{oneToOneQuote?.tokenTwoValue}</span>
-                <span>{oneToOneQuote?.tokenTwoSymbol}</span>
+                <span>{oneToOneQuote?.bottomTokenValue}</span>
+                <span>{oneToOneQuote?.bottomTokenSymbol}</span>
               </div>
             </div>
           </Skeleton>
@@ -98,7 +98,7 @@ export function TxnInfo({
               </span>
               <span className="text-grey-light">
                 {txnInfo.expectedOutputFormatted}{" "}
-                <span>{tokenTwo?.token?.coinDenom}</span>
+                <span>{bottomToken?.token?.coinDenom}</span>
               </span>
             </p>
             <p className="flex justify-between">
@@ -136,7 +136,7 @@ export function TxnInfo({
               </div>
               <span className="text-grey-light">
                 {txnInfo.minimumReceived}{" "}
-                <span>{tokenTwo?.token?.coinDenom}</span>
+                <span>{bottomToken?.token?.coinDenom}</span>
               </span>
             </div>
           </div>
@@ -145,8 +145,8 @@ export function TxnInfo({
             <RoutePath
               quoteRoute={quote.route}
               loading={txnInfo.txnQuoteDataLoading}
-              symbolIn={tokenOne?.token?.coinDenom}
-              symbolOut={tokenTwo?.token?.coinDenom}
+              symbolIn={topToken?.token?.coinDenom}
+              symbolOut={bottomToken?.token?.coinDenom}
               networkFee={txnInfo.formattedGasUseEstimateUSD}
             />
           )}
