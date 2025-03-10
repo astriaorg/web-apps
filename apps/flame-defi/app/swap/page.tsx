@@ -26,8 +26,7 @@ import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { TOKEN_INPUTS, SwapPairProps } from "./types";
 
-
-export const SwapPage = (): React.ReactElement => {
+export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
   const userAccount = useAccount();
@@ -42,11 +41,11 @@ export const SwapPage = (): React.ReactElement => {
     value: "",
     isQuoteValue: true,
   });
-  
+
   const isTiaWtia = useMemo(() => {
     return Boolean(
       (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
-        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative)
+        (inputOne.token?.isWrappedNative && inputTwo.token?.isNative),
     );
   }, [inputOne, inputTwo]);
 
@@ -57,7 +56,7 @@ export const SwapPage = (): React.ReactElement => {
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
-    selectedChain
+    selectedChain,
   );
 
   const swapInputs: SwapPairProps[] = [
@@ -132,7 +131,7 @@ export const SwapPage = (): React.ReactElement => {
         tradeType: TRADE_TYPE,
         tokenData: { token: EvmCurrency; value: string },
         token: TokenState,
-        tokenInput: TOKEN_INPUTS
+        tokenInput: TOKEN_INPUTS,
       ) => {
         getQuote(tradeType, tokenData, token).then((res) => {
           if (tokenInput === TOKEN_INPUTS.INPUT_ONE && res) {
@@ -150,8 +149,8 @@ export const SwapPage = (): React.ReactElement => {
           }
         });
       },
-      500
-    )
+      500,
+    ),
   );
 
   const handleTradeType = useCallback((index: number) => {
@@ -205,7 +204,7 @@ export const SwapPage = (): React.ReactElement => {
           tradeType,
           { token: topToken.token, value },
           bottomToken,
-          tokenInput
+          tokenInput,
         );
       }
 
@@ -223,7 +222,7 @@ export const SwapPage = (): React.ReactElement => {
       debouncedGetQuoteRef,
       cancelGetQuote,
       setErrorText,
-    ]
+    ],
   );
 
   const handleTokenSelect = useCallback(
@@ -249,9 +248,12 @@ export const SwapPage = (): React.ReactElement => {
 
       setErrorText(null);
 
-      const tradeType = topToken.isQuoteValue ? TRADE_TYPE.EXACT_OUT : TRADE_TYPE.EXACT_IN;
+      const tradeType = topToken.isQuoteValue
+        ? TRADE_TYPE.EXACT_OUT
+        : TRADE_TYPE.EXACT_IN;
       const exactInToken = index === 0 ? selectedToken : topToken.token;
-      const exactOutToken = index === 0 && bottomToken.token ? bottomToken.token : selectedToken;
+      const exactOutToken =
+        index === 0 && bottomToken.token ? bottomToken.token : selectedToken;
 
       if (
         userInputToken.value !== "" &&
@@ -262,7 +264,7 @@ export const SwapPage = (): React.ReactElement => {
         getQuote(
           tradeType,
           { token: exactInToken, value: userInputToken.value },
-          { token: exactOutToken, value: "" }
+          { token: exactOutToken, value: "" },
         ).then((res) => {
           if (inputOne.isQuoteValue && res) {
             setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
@@ -272,7 +274,15 @@ export const SwapPage = (): React.ReactElement => {
         });
       }
     },
-    [getQuote, topToken, bottomToken, setErrorText, userInputToken, inputOne, inputTwo]
+    [
+      getQuote,
+      topToken,
+      bottomToken,
+      setErrorText,
+      userInputToken,
+      inputOne,
+      inputTwo,
+    ],
   );
 
   const handleArrowClick = () => {
@@ -282,12 +292,16 @@ export const SwapPage = (): React.ReactElement => {
         : TRADE_TYPE.EXACT_IN;
     setFlipTokens((prev) => !prev);
     setTradeType(newTradeType);
-    
+
     const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
     const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
 
     if (preFlipTokenOne.value !== "" || preFlipTokenTwo.value !== "") {
-      getQuote(newTradeType, {token: preFlipTokenOne.token, value: userInputToken.value}, preFlipTokenTwo);
+      getQuote(
+        newTradeType,
+        { token: preFlipTokenOne.token, value: userInputToken.value },
+        preFlipTokenTwo,
+      );
     }
   };
 
@@ -328,21 +342,23 @@ export const SwapPage = (): React.ReactElement => {
         </div>
         <div className="relative flex flex-col items-center">
           <div className="flex flex-col gap-1 w-full">
-            {swapPairs.map(({id, inputToken, oppositeToken, balance, label}, index) => (
-              <SwapInput
-                availableTokens={currencies}
-                balance={balance}
-                id={id}
-                index={index}
-                inputToken={inputToken}
-                key={index}
-                label={label}
-                onInputChange={handleInputChange}
-                onTokenSelect={handleTokenSelect}
-                oppositeToken={oppositeToken}
-                txnQuoteLoading={loading}
-              />
-            ))}
+            {swapPairs.map(
+              ({ id, inputToken, oppositeToken, balance, label }, index) => (
+                <SwapInput
+                  availableTokens={currencies}
+                  balance={balance}
+                  id={id}
+                  index={index}
+                  inputToken={inputToken}
+                  key={index}
+                  label={label}
+                  onInputChange={handleInputChange}
+                  onTokenSelect={handleTokenSelect}
+                  oppositeToken={oppositeToken}
+                  txnQuoteLoading={loading}
+                />
+              ),
+            )}
           </div>
           <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
             <button
@@ -408,6 +424,4 @@ export const SwapPage = (): React.ReactElement => {
       </div>
     </section>
   );
-}
-
-export default SwapPage;
+};

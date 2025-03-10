@@ -67,7 +67,9 @@ const useCheckTokenApproval = (
   }
   if (
     bottomTokenNeedingApproval &&
-    bottomTokenValueBig.gt(new Big(bottomTokenNeedingApproval.allowance.toString()))
+    bottomTokenValueBig.gt(
+      new Big(bottomTokenNeedingApproval.allowance.toString()),
+    )
   ) {
     return bottomToken.token || null;
   }
@@ -98,7 +100,8 @@ export function useSwapButton({
   const result = useWaitForTransactionReceipt({ hash: txnHash });
   const tokenNeedingApproval = useCheckTokenApproval(topToken, bottomToken);
 
-  const wrapTia = topToken?.token?.isNative && bottomToken?.token?.isWrappedNative;
+  const wrapTia =
+    topToken?.token?.isNative && bottomToken?.token?.isWrappedNative;
   const unwrapTia =
     topToken?.token?.isWrappedNative && bottomToken?.token?.isNative;
 

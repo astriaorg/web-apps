@@ -84,7 +84,8 @@ export function TxnDetails({
             />
           </span>
           <span className="text-grey-light text-sm font-medium">
-            {expectedOutputFormatted} <span>{bottomToken?.token?.coinDenom}</span>
+            {expectedOutputFormatted}{" "}
+            <span>{bottomToken?.token?.coinDenom}</span>
           </span>
         </div>
         <div className="flex justify-between">

@@ -50,8 +50,16 @@ export interface SwapTxnStepsProps {
 }
 
 export interface SwapInputProps extends SwapPairProps {
-  onInputChange: (value: string, tokenInput: TOKEN_INPUTS, index: number) => void;
-  onTokenSelect: (token: EvmCurrency, tokenInput: TOKEN_INPUTS, index: number) => void;
+  onInputChange: (
+    value: string,
+    tokenInput: TOKEN_INPUTS,
+    index: number,
+  ) => void;
+  onTokenSelect: (
+    token: EvmCurrency,
+    tokenInput: TOKEN_INPUTS,
+    index: number,
+  ) => void;
   availableTokens: EvmCurrency[];
   index: number;
   label: string;
