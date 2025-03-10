@@ -24,6 +24,7 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import { Image } from "components/image";
+import { MarketAssets } from "earn/components/market";
 import { ROUTES } from "earn/constants/routes";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { Market } from "earn/generated/gql/graphql";
@@ -83,29 +84,11 @@ export const MarketListTable = ({
                 </span>
               </div>
               <div className="flex items-center space-x-2 lg:hidden">
-                <div className="flex items-center -space-x-2 shrink-0">
-                  {row.original.collateralAsset && (
-                    <Image
-                      src={row.original.collateralAsset.logoURI}
-                      alt={row.original.collateralAsset.symbol}
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  )}
-                  <Image
-                    src={row.original.loanAsset.logoURI}
-                    alt={row.original.loanAsset.symbol}
-                    width={24}
-                    height={24}
-                    className="rounded-full"
-                  />
-                </div>
-                <span className="truncate">
-                  {row.original.collateralAsset?.symbol}
-                  {` / `}
-                  {row.original.loanAsset.symbol}
-                </span>
+                <MarketAssets
+                  assetA={row.original.collateralAsset}
+                  assetB={row.original.loanAsset}
+                  size={24}
+                />
               </div>
             </>
           );

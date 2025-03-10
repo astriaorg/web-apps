@@ -1,5 +1,6 @@
 import { Badge, Skeleton } from "@repo/ui/components";
-import { Image } from "components/image";
+import { MarketAssets } from "earn/components/market";
+import { Asset, Maybe } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 
 export const HeaderSection = () => {
@@ -13,39 +14,19 @@ export const HeaderSection = () => {
         {status !== "error" && (
           <div className="flex flex-col space-y-3">
             <Skeleton isLoading={isPending}>
-              <div className="flex space-x-2">
-                <div className="flex items-center -space-x-2 shrink-0">
-                  {data?.marketByUniqueKey.collateralAsset && (
-                    <Image
-                      src={data?.marketByUniqueKey.collateralAsset.logoURI}
-                      alt={data?.marketByUniqueKey.collateralAsset.symbol}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                  )}
-                  <Image
-                    src={data?.marketByUniqueKey.loanAsset.logoURI}
-                    alt={data?.marketByUniqueKey.loanAsset.symbol}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                </div>
-                <span className="text-3xl/8">
-                  {data?.marketByUniqueKey.collateralAsset?.symbol}
-                  {` / `}
-                  {data?.marketByUniqueKey.loanAsset?.symbol}
-                </span>
-              </div>
+              <MarketAssets
+                assetA={data?.marketByUniqueKey.collateralAsset as Maybe<Asset>}
+                assetB={data?.marketByUniqueKey.loanAsset as Maybe<Asset>}
+                size={40}
+              />
             </Skeleton>
-            <Skeleton isLoading={isPending} className="w-40">
-              <div>
+            {data?.marketByUniqueKey.collateralAsset && (
+              <Skeleton isLoading={isPending} className="w-40">
                 <Badge variant="secondary">
                   {data?.marketByUniqueKey.collateralAsset?.name}
                 </Badge>
-              </div>
-            </Skeleton>
+              </Skeleton>
+            )}
           </div>
         )}
       </div>
