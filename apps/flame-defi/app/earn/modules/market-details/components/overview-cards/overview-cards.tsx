@@ -21,7 +21,7 @@ export const OverviewCards = () => {
         label: {
           left: "Collateral Token",
         },
-        value: data?.marketByUniqueKey.collateralAsset?.symbol,
+        value: data?.marketByUniqueKey.collateralAsset?.symbol ?? "-",
       },
       {
         label: {
