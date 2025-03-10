@@ -424,4 +424,4 @@ export default function SwapPage(): React.ReactElement {
       </div>
     </section>
   );
-};
+}
