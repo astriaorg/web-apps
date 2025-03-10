@@ -141,7 +141,7 @@ export const Dropdown = <T,>({
         </button>
       </div>
       {isActive && (
-        <div className="absolute w-full mt-2" id="dropdown-menu" role="menu">
+        <div className="absolute w-auto mt-2" id="dropdown-menu" role="menu">
           <div className="bg-radial-dark border border-white/10 shadow-inner rounded-2xl p-2">
             {options?.map((option) => (
               <button

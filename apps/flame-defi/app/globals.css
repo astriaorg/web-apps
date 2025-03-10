@@ -242,6 +242,9 @@ html[data-theme="dark"] {
   body {
     @apply m-0 p-0 bg-background-default font-sans antialiased text-typography-default;
   }
+  button {
+    @apply cursor-pointer;
+  }
 }
 
 @utility gradient-background {

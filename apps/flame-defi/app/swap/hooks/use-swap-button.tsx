@@ -236,20 +236,23 @@ export function useSwapButton({
       return null;
     }
     try {
+      setTxnStatus(TXN_STATUS.PENDING);
       const txHash = await approveToken(token);
       if (txHash) {
         setTxnHash(txHash);
-      }
+      } 
       return txHash;
     } catch (error) {
       console.warn(error);
       setErrorText("Problem approving token");
+      setTxnStatus(TXN_STATUS.FAILED);
       return null;
     }
   };
 
   const validSwapInputs =
     !loading &&
+    txnStatus !== TXN_STATUS.PENDING &&
     errorText === null &&
     tokenOne?.token &&
     tokenTwo?.token &&
@@ -282,8 +285,12 @@ export function useSwapButton({
         return "Connect Wallet";
       case !tokenOne?.token || !tokenTwo?.token:
         return "Select a token";
-      case tokenApprovalNeeded !== null:
+      case tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING:
         return `Approve ${tokenApprovalNeeded?.coinDenom}`;
+      case tokenApprovalNeeded !== null && txnStatus === TXN_STATUS.PENDING:
+        return "Pending wallet approval...";
+      case txnStatus === TXN_STATUS.PENDING:
+        return "Pending...";
       case tokenOne?.value === undefined:
         return "Enter an amount";
       case parseFloat(tokenOne?.value) === 0 || parseFloat(tokenOne?.value) < 0:
@@ -346,6 +353,6 @@ export function useSwapButton({
     txnStatus,
     setTxnStatus,
     txnMsg,
-    tokenApprovalNeeded: tokenApprovalNeeded !== null,
+    tokenApprovalNeeded: tokenApprovalNeeded !== null && txnStatus !== TXN_STATUS.PENDING,
   };
 }

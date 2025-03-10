@@ -149,12 +149,12 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleResetInputs = useCallback(() => {
-    setInputOne({ token: currencies?.[0], value: "", isQuoteValue: false });
-    setInputTwo({ token: null, value: "", isQuoteValue: true });
+    setInputOne({ token: tokenOne.token, value: "", isQuoteValue: false });
+    setInputTwo({ token: tokenTwo.token, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
     setTxnStatus(undefined);
-  }, [currencies, setQuote, setTxnStatus]);
+  }, [setQuote, setTxnStatus, tokenOne.token, tokenTwo.token]);
 
   const handleInputChange = useCallback(
     (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
