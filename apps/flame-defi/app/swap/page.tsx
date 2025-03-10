@@ -25,7 +25,9 @@ import { SwapTxnSteps, SwapInput, TxnInfo } from "./components";
 import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { TOKEN_INPUTS, SwapPairProps } from "./types";
-export default function SwapPage(): React.ReactElement {
+
+
+export const SwapPage = (): React.ReactElement => {
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
   const userAccount = useAccount();
@@ -52,7 +54,6 @@ export default function SwapPage(): React.ReactElement {
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
   const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
-  
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
@@ -255,7 +256,6 @@ export default function SwapPage(): React.ReactElement {
       if (
         userInputToken.value !== "" &&
         parseFloat(userInputToken.value) > 0 &&
-        topToken.token &&
         exactInToken &&
         exactOutToken
       ) {
@@ -264,15 +264,15 @@ export default function SwapPage(): React.ReactElement {
           { token: exactInToken, value: userInputToken.value },
           { token: exactOutToken, value: "" }
         ).then((res) => {
-          if (exactInToken.coinDenom === topToken.token?.coinDenom && res) {
+          if (inputOne.isQuoteValue && res) {
             setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
-          } else if (exactInToken.coinDenom === bottomToken.token?.coinDenom && res) {
+          } else if (inputTwo.isQuoteValue && res) {
             setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
           }
         });
       }
     },
-    [getQuote, topToken, bottomToken, setErrorText, userInputToken]
+    [getQuote, topToken, bottomToken, setErrorText, userInputToken, inputOne, inputTwo]
   );
 
   const handleArrowClick = () => {
@@ -318,9 +318,6 @@ export default function SwapPage(): React.ReactElement {
       onSubmitCallback();
     }
   };
-
-  console.log({topToken})
-  console.log({bottomToken})
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -412,3 +409,5 @@ export default function SwapPage(): React.ReactElement {
     </section>
   );
 }
+
+export default SwapPage;
