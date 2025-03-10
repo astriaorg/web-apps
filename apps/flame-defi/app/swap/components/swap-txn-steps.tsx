@@ -188,9 +188,9 @@ function TxnSuccess({
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
-      <div className="text-white font-medium mt-6 text-center">
+      <div className="text-white font-medium mt-6 mb-6 text-center w-full">
         <span className="mb-2 text-base md:text-lg">Success</span>
-        <div className="flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
+        <div className="flex flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
           <div className="flex items-center gap-1">
             <span>Swapped</span>
             <span>
