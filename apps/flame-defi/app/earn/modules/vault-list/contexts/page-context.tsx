@@ -30,20 +30,22 @@ export const PageContext = createContext<PageContextProps | undefined>(
 
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: VaultOrderBy.TotalAssetsUsd,
+      desc: true,
+    },
+  ]);
 
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
 
   const { orderBy, orderDirection } = useMemo(() => {
     return {
-      orderBy:
-        (sorting.map((it) => it.id).join(",") as VaultOrderBy) ||
-        VaultOrderBy.TotalAssets,
-      orderDirection:
-        (sorting
-          .map((it) => (it.desc ? OrderDirection.Desc : OrderDirection.Asc))
-          .join(",") as OrderDirection) || OrderDirection.Desc,
+      orderBy: sorting.map((it) => it.id).join(",") as VaultOrderBy,
+      orderDirection: sorting
+        .map((it) => (it.desc ? OrderDirection.Desc : OrderDirection.Asc))
+        .join(",") as OrderDirection,
     };
   }, [sorting]);
 

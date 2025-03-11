@@ -16,7 +16,7 @@ export const ContentSection = () => {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: VaultOrderBy.TotalAssets,
+      id: VaultOrderBy.TotalAssetsUsd,
       desc: true,
     },
   ]);

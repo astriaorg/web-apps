@@ -60,7 +60,7 @@ export const VaultListTable = ({
     return [
       columnHelper.accessor("name", {
         id: VaultOrderBy.Name,
-        header: "Vault Name",
+        header: "Vault",
         cell: ({ row }) => {
           return (
             <div className="flex items-center space-x-2 lg:space-x-4">
@@ -90,9 +90,9 @@ export const VaultListTable = ({
         enableSorting: false,
         footer: (info) => info.column.id,
       }),
-      columnHelper.accessor("state.totalAssets", {
-        id: VaultOrderBy.TotalAssets,
-        header: "Total Supply",
+      columnHelper.accessor("state.totalAssetsUsd", {
+        id: VaultOrderBy.TotalAssetsUsd,
+        header: "Deposits",
         cell: ({ row }) => {
           const {
             value: formattedTotalAssets,

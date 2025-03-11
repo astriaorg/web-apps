@@ -59,7 +59,7 @@ export const MarketListTable = ({
   const columns = useMemo(() => {
     // Use `MarketOrderBy` as ID for server-side sorting.
     return [
-      columnHelper.accessor("collateralAsset.name", {
+      columnHelper.accessor("collateralAsset.symbol", {
         id: MarketOrderBy.CollateralAssetSymbol,
         header: () => {
           return (
@@ -98,7 +98,7 @@ export const MarketListTable = ({
         enableSorting: true,
         footer: (info) => info.column.id,
       }),
-      columnHelper.accessor("loanAsset.name", {
+      columnHelper.accessor("loanAsset.symbol", {
         id: MarketOrderBy.LoanAssetSymbol,
         header: "Loan",
         cell: ({ row }) => {
@@ -161,7 +161,7 @@ export const MarketListTable = ({
       //     },
       //     footer: (info) => info.column.id,
       //   }),
-      columnHelper.accessor("state.supplyAssets", {
+      columnHelper.accessor("state.liquidityAssetsUsd", {
         id: MarketOrderBy.TotalLiquidityUsd,
         header: "Liquidity",
         cell: ({ row }) => {
