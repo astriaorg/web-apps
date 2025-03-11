@@ -46,11 +46,13 @@ export const ContentSection = () => {
       </div>
 
       {status === "error" && (
-        <StatusCard>
-          {`We couldn't fetch vault data. Please try again later.`}
+        <StatusCard status="error">
+          {`We couldn't fetch markets data. Please try again later.`}
         </StatusCard>
       )}
-      {status === "empty" && <StatusCard>{`No vaults found.`}</StatusCard>}
+      {status === "empty" && (
+        <StatusCard status="empty">{`No markets found.`}</StatusCard>
+      )}
       {status === "success" && (
         <>
           <MarketListTable

@@ -15,7 +15,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: `bg-orange text-typography-black ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
+        default: `bg-brand text-typography-black ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
         destructive: "",
         outline: "",
         secondary: `bg-surface-3 text-typography-default ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
