@@ -130,7 +130,7 @@ export const MarketListTable = ({
             />
           );
         },
-        enableSorting: false,
+        enableSorting: true,
         footer: (info) => info.column.id,
       }),
       //   columnHelper.accessor("state.supplyAssets", {
