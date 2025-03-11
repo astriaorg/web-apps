@@ -50,7 +50,7 @@ export const ContentSection = () => {
           left: "Total Supply",
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
-        value: new Big(data?.marketByUniqueKey.state?.collateralAssets ?? 0)
+        value: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
           .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
           .toNumber(),
         options: {
@@ -76,7 +76,7 @@ export const ContentSection = () => {
           left: "LLTV",
         },
         value: new Big(data?.marketByUniqueKey.lltv ?? 0)
-          .div(10 ** (data?.marketByUniqueKey.collateralAsset?.decimals ?? 18))
+          .div(10 ** 18)
           .toNumber(),
         options: {
           style: "percent",

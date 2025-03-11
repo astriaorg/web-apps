@@ -46,6 +46,8 @@ const query = graphql(`
           liquidityAssetsUsd
           netBorrowApy
           netSupplyApy
+          supplyAssets
+          supplyAssetsUsd
         }
         uniqueKey
       }
