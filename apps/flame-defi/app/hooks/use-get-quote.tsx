@@ -16,8 +16,8 @@ export const useGetQuote = () => {
   const getQuote = useCallback(
     async (
       type: TRADE_TYPE,
-      tokenOne: Omit<TokenState, "isQuoteValue">,
-      tokenTwo: Omit<TokenState, "isQuoteValue">,
+      tokenOne: TokenState,
+      tokenTwo: TokenState,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
       // can't swap between native and wrapped native tokens.
