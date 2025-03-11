@@ -33,7 +33,7 @@ import { useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 
 const HIDE_COLUMNS_CLASS_NAME =
-  "data-[column-id=th-loanAsset.name]:hidden data-[column-id=th-lltv]:hidden data-[column-id=th-market.state.netSupplyApy]:hidden lg:data-[column-id=th-loanAsset.name]:table-cell lg:data-[column-id=th-lltv]:table-cell lg:data-[column-id=th-market.state.netSupplyApy]:table-cell";
+  "data-[column-id=th-LoanAssetSymbol]:hidden data-[column-id=th-Lltv]:hidden data-[column-id=th-NetSupplyApy]:hidden lg:data-[column-id=th-LoanAssetSymbol]:table-cell lg:data-[column-id=th-Lltv]:table-cell lg:data-[column-id=th-NetSupplyApy]:table-cell";
 
 interface MarketListTableProps {
   data?: Market[];
