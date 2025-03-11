@@ -1,22 +1,27 @@
-import { StatusCard } from "@repo/ui/components";
+import { Pagination, Skeleton, StatusCard } from "@repo/ui/components";
+import { SearchInput } from "earn/components/search-input";
 import { getPlaceholderData, VaultListTable } from "earn/components/vault";
 import { OrderDirection, Vault } from "earn/generated/gql/graphql";
-import {
-  TablePagination,
-  TableSearch,
-} from "earn/modules/vault-list/components/table";
 import { PAGE_SIZE } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
 
 export const ContentSection = () => {
   const {
+    currentPage,
+    setCurrentPage,
     ordering,
     sorting,
     setSorting,
-    query: { data, isPending },
+    search,
+    setSearch,
+    query: { data, isPending, isRefetching },
     status,
   } = usePageContext();
+
+  const totalPages = useMemo(() => {
+    return Math.ceil((data?.vaults?.pageInfo?.countTotal ?? 0) / PAGE_SIZE);
+  }, [data?.vaults?.pageInfo?.countTotal]);
 
   const formattedData = useMemo(() => {
     if (isPending) {
@@ -29,7 +34,15 @@ export const ContentSection = () => {
   return (
     <section className="flex flex-col px-4 md:px-20">
       <div className="flex w-full mb-4">
-        <TableSearch />
+        <Skeleton
+          isLoading={isRefetching && !data?.vaults.items?.length}
+          className="w-full md:w-52"
+        >
+          <SearchInput
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </Skeleton>
       </div>
 
       {status === "error" && (
@@ -52,7 +65,13 @@ export const ContentSection = () => {
           />
 
           <div className="flex justify-center mt-10">
-            <TablePagination />
+            <Skeleton isLoading={isPending} className="w-52">
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            </Skeleton>
           </div>
         </>
       )}
