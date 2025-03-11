@@ -1,3 +1,3 @@
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <div className="w-full max-w-(--breakpoint-xl)">{children}</div>;
-}
+import Layout from "earn/(routes)/layout";
+
+export default Layout;
