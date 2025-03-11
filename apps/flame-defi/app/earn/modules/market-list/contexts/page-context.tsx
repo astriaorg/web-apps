@@ -55,7 +55,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       skip: (currentPage - 1) * PAGE_SIZE,
       orderBy,
       orderDirection,
-      where: { search: debouncedSearch || null },
+      where: { search: debouncedSearch || null, lltv_gte: 1 },
     },
   });
 
