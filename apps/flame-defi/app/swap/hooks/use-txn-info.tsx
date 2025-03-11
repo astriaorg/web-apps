@@ -3,7 +3,7 @@ import {
   TRADE_TYPE,
   Token,
   TokenAmount,
-  TokenState,
+  TokenInputState,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
@@ -16,7 +16,7 @@ import { useGetQuote } from "../../hooks";
 // quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
-const useTxnQuote = (inputOne: TokenState, inputTwo: TokenState) => {
+const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
   const { quoteError, getQuote } = useGetQuote();
   const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
   const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
@@ -136,21 +136,21 @@ const calculateMinimumReceived = (
 
 export const useTxnInfo = ({
   quote,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   tradeType,
   validSwapInputs,
 }: {
   quote: GetQuoteResult | null;
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }) => {
   const { formatNumber } = useIntl();
   const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
-    tokenOne,
-    tokenTwo,
+    topToken,
+    bottomToken,
   );
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
@@ -175,7 +175,7 @@ export const useTxnInfo = ({
       parseFloat(
         formatUnits(
           BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-          tokenTwo?.token?.coinDecimals || 18,
+          bottomToken?.token?.coinDecimals || 18,
         ),
       ),
       { minimumFractionDigits: 6, maximumFractionDigits: 6 },

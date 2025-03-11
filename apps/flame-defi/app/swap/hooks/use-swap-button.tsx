@@ -16,7 +16,7 @@ import {
   evmChainToRainbowKitChain,
   EvmCurrency,
   GetQuoteResult,
-  TokenState,
+  TokenInputState,
   tokenStateToBig,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
@@ -26,9 +26,9 @@ import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface SwapButtonProps {
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
-  tokenOneBalance: string;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
+  topTokenBalance: string;
   quote: GetQuoteResult | null;
   loading: boolean;
   quoteError: string | null;
@@ -40,45 +40,47 @@ interface ErrorWithMessage {
 }
 
 const useCheckTokenApproval = (
-  tokenOne: TokenState,
-  tokenTwo: TokenState,
+  topToken: TokenInputState,
+  bottomToken: TokenInputState,
 ): EvmCurrency | null => {
   const { tokenAllowances } = useEvmWallet();
-  const tokenOneValueBig = tokenStateToBig(tokenOne);
-  const tokenTwoValueBig = tokenStateToBig(tokenTwo);
+  const topTokenValueBig = tokenStateToBig(topToken);
+  const bottomTokenValueBig = tokenStateToBig(bottomToken);
 
-  const findApproval = (token: TokenState) =>
+  const findApproval = (token: TokenInputState) =>
     tokenAllowances.find(
       (allowanceToken) => allowanceToken.symbol === token?.token?.coinDenom,
     );
 
-  const tokenOneNeedingApproval = tokenOne?.token
-    ? findApproval(tokenOne)
+  const topTokenNeedingApproval = topToken?.token
+    ? findApproval(topToken)
     : null;
-  const tokenTwoNeedingApproval = tokenTwo?.token
-    ? findApproval(tokenTwo)
+  const bottomTokenNeedingApproval = bottomToken?.token
+    ? findApproval(bottomToken)
     : null;
 
   if (
-    tokenOneNeedingApproval &&
-    tokenOneValueBig.gt(new Big(tokenOneNeedingApproval.allowance.toString()))
+    topTokenNeedingApproval &&
+    topTokenValueBig.gt(new Big(topTokenNeedingApproval.allowance.toString()))
   ) {
-    return tokenOne.token || null;
+    return topToken.token || null;
   }
   if (
-    tokenTwoNeedingApproval &&
-    tokenTwoValueBig.gt(new Big(tokenTwoNeedingApproval.allowance.toString()))
+    bottomTokenNeedingApproval &&
+    bottomTokenValueBig.gt(
+      new Big(bottomTokenNeedingApproval.allowance.toString()),
+    )
   ) {
-    return tokenTwo.token || null;
+    return bottomToken.token || null;
   }
 
   return null;
 };
 
 export function useSwapButton({
-  tokenOne,
-  tokenTwo,
-  tokenOneBalance,
+  topToken,
+  bottomToken,
+  topTokenBalance,
   quote,
   loading,
   quoteError,
@@ -96,11 +98,12 @@ export function useSwapButton({
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenNeedingApproval = useCheckTokenApproval(tokenOne, tokenTwo);
+  const tokenNeedingApproval = useCheckTokenApproval(topToken, bottomToken);
 
-  const wrapTia = tokenOne?.token?.isNative && tokenTwo?.token?.isWrappedNative;
+  const wrapTia =
+    topToken?.token?.isNative && bottomToken?.token?.isWrappedNative;
   const unwrapTia =
-    tokenOne?.token?.isWrappedNative && tokenTwo?.token?.isNative;
+    topToken?.token?.isWrappedNative && bottomToken?.token?.isNative;
 
   const handleTxnModalErrorMsgs = (error?: string, defaultMsg?: string) => {
     if (error?.includes("rejected")) {
@@ -149,8 +152,8 @@ export function useSwapButton({
       try {
         const tx = await wethService.deposit(
           selectedChain.chainId,
-          tokenOne.value,
-          tokenOne.token?.coinDecimals || 18,
+          topToken.value,
+          topToken.token?.coinDecimals || 18,
         );
         setTxnHash(tx);
       } catch (error) {
@@ -163,8 +166,8 @@ export function useSwapButton({
       try {
         const tx = await wethService.withdraw(
           selectedChain.chainId,
-          tokenOne.value,
-          tokenOne.token?.coinDecimals || 18,
+          bottomToken.value,
+          bottomToken.token?.coinDecimals || 18,
         );
         setTxnHash(tx);
       } catch (error) {
@@ -205,8 +208,8 @@ export function useSwapButton({
         recipient: userAccount.address,
         slippageTolerance: slippageTolerance,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
-        isNativeIn: tokenOne.token?.coinDenom.toLocaleLowerCase() === "tia",
-        isNativeOut: tokenTwo.token?.coinDenom.toLocaleLowerCase() === "tia",
+        isNativeIn: topToken.token?.coinDenom.toLocaleLowerCase() === "tia",
+        isNativeOut: bottomToken.token?.coinDenom.toLocaleLowerCase() === "tia",
       };
 
       const tx = await swapRouterService.executeSwap(
@@ -223,8 +226,8 @@ export function useSwapButton({
     }
   }, [
     trade,
-    tokenOne.token?.coinDenom,
-    tokenTwo.token?.coinDenom,
+    topToken.token?.coinDenom,
+    bottomToken.token?.coinDenom,
     userAccount,
     selectedChain,
     wagmiConfig,
@@ -261,13 +264,13 @@ export function useSwapButton({
     !loading &&
       txnStatus !== TXN_STATUS.PENDING &&
       errorText === null &&
-      tokenOne?.token &&
-      tokenTwo?.token &&
-      tokenOne?.value !== undefined &&
-      tokenTwo?.value !== undefined &&
-      parseFloat(tokenOne?.value) > 0 &&
-      parseFloat(tokenTwo?.value) > 0 &&
-      parseFloat(tokenOne?.value) <= parseFloat(tokenOneBalance),
+      topToken?.token &&
+      bottomToken?.token &&
+      topToken?.value !== undefined &&
+      bottomToken?.value !== undefined &&
+      parseFloat(topToken?.value) > 0 &&
+      parseFloat(bottomToken?.value) > 0 &&
+      parseFloat(topToken?.value) <= parseFloat(topTokenBalance),
   );
 
   const onSubmitCallback = () => {
@@ -291,7 +294,7 @@ export function useSwapButton({
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
-      case !tokenOne?.token || !tokenTwo?.token:
+      case !topToken?.token || !bottomToken?.token:
         return "Select a token";
       case tokenNeedingApproval !== null && txnStatus !== TXN_STATUS.PENDING:
         return `Approve ${tokenNeedingApproval?.coinDenom}`;
@@ -299,16 +302,16 @@ export function useSwapButton({
         return "Pending wallet approval...";
       case txnStatus === TXN_STATUS.PENDING:
         return "Pending...";
-      case tokenOne?.value === undefined:
+      case topToken?.value === undefined:
         return "Enter an amount";
-      case parseFloat(tokenOne?.value) === 0 || parseFloat(tokenOne?.value) < 0:
+      case parseFloat(topToken?.value) === 0 || parseFloat(topToken?.value) < 0:
         return "Amount must be greater than 0";
       case loading:
         return "loading...";
-      case isNaN(parseFloat(tokenOne?.value)):
+      case isNaN(parseFloat(topToken?.value)):
         return "Enter an amount";
-      case tokenOneBalance === "0" ||
-        parseFloat(tokenOneBalance) < parseFloat(tokenOne?.value):
+      case topTokenBalance === "0" ||
+        parseFloat(topTokenBalance) < parseFloat(topToken?.value):
         return "Insufficient funds";
       case wrapTia:
         return "Wrap";

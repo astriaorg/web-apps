@@ -23,7 +23,7 @@ interface ConfirmationModalProps {
   handleModalActionButton: () => void;
 }
 
-export default function ConfirmationModal({
+export function ConfirmationModal({
   open,
   buttonText,
   children,

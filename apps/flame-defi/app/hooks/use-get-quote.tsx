@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { parseUnits } from "viem";
 import { useEvmChainData } from "config";
-import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
+import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 
 export const useGetQuote = () => {
   const {
@@ -16,40 +16,40 @@ export const useGetQuote = () => {
   const getQuote = useCallback(
     async (
       type: TRADE_TYPE,
-      tokenOne: TokenState,
-      tokenTwo: TokenState,
+      topToken: TokenInputState,
+      bottomToken: TokenInputState,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
       // can't swap between native and wrapped native tokens.
       if (
-        (tokenOne.token?.isNative && tokenTwo.token?.isWrappedNative) ||
-        (tokenOne.token?.isWrappedNative && tokenTwo.token?.isNative)
+        (topToken.token?.isNative && bottomToken.token?.isWrappedNative) ||
+        (topToken.token?.isWrappedNative && bottomToken.token?.isNative)
       ) {
         return;
       }
       // can't swap for the same token
-      if (tokenOne.token?.equals(tokenTwo.token)) {
+      if (topToken.token?.equals(bottomToken.token)) {
         return;
       }
-      const amount = tokenOne?.value
+      const amount = topToken?.value
         ? parseUnits(
-            tokenOne.value,
-            tokenOne?.token?.coinDecimals || 18,
+            topToken.value,
+            topToken?.token?.coinDecimals || 18,
           ).toString()
         : "";
 
       // This is a fix for TIA not having a ERC20 contract address
-      const tokenInAddress = tokenOne?.token?.isNative
+      const tokenInAddress = topToken?.token?.isNative
         ? chainContracts?.wrappedNativeToken.address
-        : tokenOne?.token?.erc20ContractAddress;
-      const tokenInDecimals = tokenOne?.token?.coinDecimals;
-      const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
+        : topToken?.token?.erc20ContractAddress;
+      const tokenInDecimals = topToken?.token?.coinDecimals;
+      const tokenInSymbol = topToken?.token?.coinDenom.toLocaleLowerCase();
 
-      const tokenOutAddress = tokenTwo?.token?.isNative
+      const tokenOutAddress = bottomToken?.token?.isNative
         ? chainContracts?.wrappedNativeToken.address
-        : tokenTwo?.token?.erc20ContractAddress;
-      const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
-      const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
+        : bottomToken?.token?.erc20ContractAddress;
+      const tokenOutDecimals = bottomToken?.token?.coinDecimals;
+      const tokenOutSymbol = bottomToken?.token?.coinDenom.toLocaleLowerCase();
 
       if (
         !(

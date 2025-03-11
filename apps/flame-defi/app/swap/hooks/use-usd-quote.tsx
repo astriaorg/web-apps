@@ -2,10 +2,10 @@ import { useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 
 import { useEvmChainData } from "config";
-import { EvmCurrency, TokenState, TRADE_TYPE } from "@repo/flame-types";
+import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 import { useGetQuote } from "../../hooks";
 
-export const useUsdQuote = (inputToken?: TokenState) => {
+export const useUsdQuote = (inputToken?: TokenInputState) => {
   const { selectedChain } = useEvmChainData();
   const usdcToken = selectedChain.currencies?.find(
     (currency) => currency.coinDenom === "USDC",
