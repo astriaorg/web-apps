@@ -2,22 +2,18 @@
 
 import { cn } from "@repo/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
+import { forwardRef } from "react";
 import { CardContext } from "./card.context";
 
-export const cardVariants = cva("", {
+export const cardVariants = cva("rounded-xl", {
   variants: {
     variant: {
-      default: "rounded-xl bg-surface-1",
-      accent: "rounded-xl bg-brand",
-    },
-    padding: {
-      default: "",
-      md: "p-6",
+      default: "bg-surface-1",
+      accent: "bg-brand",
     },
   },
   defaultVariants: {
     variant: "default",
-    padding: "default",
   },
 });
 
@@ -27,23 +23,17 @@ export interface CardProps
   isLoading?: boolean;
 }
 
-export const Card = ({
-  className,
-  isLoading = false,
-  padding,
-  variant,
-  ...props
-}: CardProps) => {
-  return (
-    <CardContext.Provider value={{ isLoading, variant }}>
-      <div
-        className={cn(
-          "flex flex-col",
-          cardVariants({ padding, variant }),
-          className,
-        )}
-        {...props}
-      />
-    </CardContext.Provider>
-  );
-};
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, isLoading = false, variant, ...props }, ref) => {
+    return (
+      <CardContext.Provider value={{ isLoading, variant }}>
+        <div
+          ref={ref}
+          className={cn("flex flex-col", cardVariants({ variant }), className)}
+          {...props}
+        />
+      </CardContext.Provider>
+    );
+  },
+);
+Card.displayName = "Card";

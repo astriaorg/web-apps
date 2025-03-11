@@ -103,7 +103,7 @@ export const ContentSection = () => {
             />
 
             <div className="mt-10 flex flex-col space-y-4">
-              <Skeleton isLoading={isPending}>
+              <Skeleton isLoading={isPending} className="w-52">
                 <div className="text-base/4 font-semibold">Overview</div>
               </Skeleton>
               <LineChart

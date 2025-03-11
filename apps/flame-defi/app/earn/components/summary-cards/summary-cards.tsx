@@ -1,4 +1,9 @@
-import { AnimatedCounter, Card, CardLabel } from "@repo/ui/components";
+import {
+  AnimatedCounter,
+  Card,
+  CardContent,
+  CardLabel,
+} from "@repo/ui/components";
 import { FormatNumberOptions } from "react-intl";
 
 export interface SummaryCardsProps
@@ -27,21 +32,22 @@ export const SummaryCards = ({
         <Card
           key={`summary-cards_item_${index}`}
           isLoading={isLoading}
-          padding="md"
           variant={it.variant}
           // Don't overflow the card on smaller screens after animation completes.
           className="space-y-2 overflow-hidden max-w-[calc(100vw - 32px)]"
         >
-          <CardLabel>
-            <span className="flex-1">{it.label.left}</span>
-            <span>{it.label.right}</span>
-          </CardLabel>
-          <AnimatedCounter
-            value={it.value}
-            className="text-5xl/12 font-dot truncate"
-            options={it.options}
-            useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
-          />
+          <CardContent>
+            <CardLabel>
+              <span className="flex-1">{it.label.left}</span>
+              <span>{it.label.right}</span>
+            </CardLabel>
+            <AnimatedCounter
+              value={it.value}
+              className="text-5xl/12 font-dot truncate"
+              options={it.options}
+              useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
+            />
+          </CardContent>
         </Card>
       ))}
     </div>

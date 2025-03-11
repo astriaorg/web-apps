@@ -1,10 +1,10 @@
 import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { cva } from "class-variance-authority";
-import React, { forwardRef } from "react";
+import { forwardRef } from "react";
 import { useCardContext } from "./card.context";
 
-const cardLabelVariants = cva("flex items-center space-x-2 text-sm/5", {
+const cardDescriptionVariants = cva("", {
   variants: {
     variant: {
       default: "text-typography-subdued",
@@ -16,7 +16,7 @@ const cardLabelVariants = cva("flex items-center space-x-2 text-sm/5", {
   },
 });
 
-export const CardLabel = forwardRef<
+export const CardDescription = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
@@ -26,10 +26,14 @@ export const CardLabel = forwardRef<
     <Skeleton isLoading={isLoading}>
       <div
         ref={ref}
-        className={cn(cardLabelVariants({ variant }), className)}
+        className={cn(
+          "text-sm/5",
+          cardDescriptionVariants({ variant }),
+          className,
+        )}
         {...props}
       />
     </Skeleton>
   );
 });
-CardLabel.displayName = "CardLabel";
+CardDescription.displayName = "CardDescription";

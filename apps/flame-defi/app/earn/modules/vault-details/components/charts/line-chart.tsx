@@ -1,6 +1,7 @@
 import {
   Card,
-  CardFigureText,
+  CardContent,
+  CardFigureLabel,
   CardLabel,
   Skeleton,
   Tabs,
@@ -68,47 +69,49 @@ export const LineChart = ({
   }
 
   return (
-    <Card isLoading={isLoading} padding="md" className="space-y-2">
-      <CardLabel className="relative">
-        <span>{title}</span>
-        <span className="absolute right-0">
-          <Tabs
-            defaultValue={selectedInterval}
-            onValueChange={(value) => {
-              setSelectedInterval(value as ChartInterval);
-              setTooltipContent(null);
-            }}
-          >
-            <TabsList>
-              {intervals.map((it) => (
-                <TabsTrigger key={it} value={it}>
-                  {it}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </span>
-      </CardLabel>
-      <CardFigureText>{figure}</CardFigureText>
+    <Card isLoading={isLoading}>
+      <CardContent className="space-y-2">
+        <CardLabel className="relative">
+          <span>{title}</span>
+          <span className="absolute right-0">
+            <Tabs
+              defaultValue={selectedInterval}
+              onValueChange={(value) => {
+                setSelectedInterval(value as ChartInterval);
+                setTooltipContent(null);
+              }}
+            >
+              <TabsList>
+                {intervals.map((it) => (
+                  <TabsTrigger key={it} value={it}>
+                    {it}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </span>
+        </CardLabel>
+        <CardFigureLabel>{figure}</CardFigureLabel>
 
-      <div className="mt-4" />
-      <Skeleton isLoading={isLoading} className="w-full">
-        <div className="relative">
-          <svg ref={svgRef} className="earn-chart h-52" />
-          <div
-            ref={tooltipRef}
-            className={cn(
-              tooltipVariants(),
-              "absolute",
-              tooltipContent ? "block" : "hidden",
-            )}
-          >
-            <div className="flex flex-col">
-              {tooltipContent && renderTooltip(tooltipContent)}
+        <div className="mt-4" />
+        <Skeleton isLoading={isLoading} className="w-full">
+          <div className="relative">
+            <svg ref={svgRef} className="earn-chart h-52" />
+            <div
+              ref={tooltipRef}
+              className={cn(
+                tooltipVariants(),
+                "absolute",
+                tooltipContent ? "block" : "hidden",
+              )}
+            >
+              <div className="flex flex-col">
+                {tooltipContent && renderTooltip(tooltipContent)}
+              </div>
             </div>
           </div>
-        </div>
-      </Skeleton>
+        </Skeleton>
+      </CardContent>
     </Card>
   );
 };

@@ -1,4 +1,4 @@
-import { Card, CardLabel } from "@repo/ui/components";
+import { Card, CardContent, CardLabel } from "@repo/ui/components";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
 import { FormattedDate } from "react-intl";
@@ -48,20 +48,17 @@ export const OverviewCards = () => {
   return (
     <div className="grid grid-cols-3 gap-2">
       {items.map((it, index) => (
-        <Card
-          key={`overview-cards_item_${index}`}
-          isLoading={isPending}
-          padding="md"
-          className="space-y-2"
-        >
-          <CardLabel>
-            <span className="truncate text-lg text-typography-default">
-              {it.value}
-            </span>
-          </CardLabel>
-          <CardLabel>
-            <span className="truncate">{it.label.left}</span>
-          </CardLabel>
+        <Card key={`overview-cards_item_${index}`} isLoading={isPending}>
+          <CardContent className="space-y-2">
+            <CardLabel>
+              <span className="truncate text-lg text-typography-default">
+                {it.value}
+              </span>
+            </CardLabel>
+            <CardLabel>
+              <span className="truncate">{it.label.left}</span>
+            </CardLabel>
+          </CardContent>
         </Card>
       ))}
     </div>
