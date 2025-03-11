@@ -1,4 +1,4 @@
-import { EvmCurrency, TokenState, TXN_STATUS } from "@repo/flame-types";
+import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { useTxnInfo } from "./hooks";
 
 export enum TOKEN_INPUTS {
@@ -17,16 +17,16 @@ export interface OneToOneQuoteProps {
 
 export interface SwapPairProps {
   id: TOKEN_INPUTS;
-  inputToken: TokenState;
-  oppositeToken: TokenState;
+  inputToken: TokenInputState;
+  oppositeToken: TokenInputState;
   balance: string;
   label: string;
 }
 
 export interface TxnStepsProps {
   expectedOutputFormatted?: string;
-  topToken?: TokenState;
-  bottomToken?: TokenState;
+  topToken?: TokenInputState;
+  bottomToken?: TokenInputState;
   isTiaWtia?: boolean;
   txnHash?: `0x${string}`;
   txnMsg?: string;
@@ -40,8 +40,8 @@ export interface TxnDetailsProps extends TxnStepsProps {
 
 export interface SwapTxnStepsProps {
   txnInfo: ReturnType<typeof useTxnInfo>;
-  topToken: TokenState;
-  bottomToken: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   txnStatus: TXN_STATUS | undefined;
   txnHash: `0x${string}` | undefined;
   txnMsg: string | undefined;

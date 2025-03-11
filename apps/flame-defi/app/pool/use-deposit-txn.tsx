@@ -1,6 +1,6 @@
-import { TokenState } from "@repo/flame-types";
+import { TokenInputState } from "@repo/flame-types";
 
-export function useDepositTxn(inputOne: TokenState, inputTwo: TokenState) {
+export function useDepositTxn(inputOne: TokenInputState, inputTwo: TokenInputState) {
   // TODO: pull in real token values and balances from api and calculate the txn info here
 
   if (inputOne.value === undefined || inputTwo.value === undefined) {

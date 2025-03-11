@@ -15,7 +15,7 @@ import { ArrowDownIcon } from "@repo/ui/icons";
 import { ActionButton } from "@repo/ui/components";
 import {
   EvmCurrency,
-  TokenState,
+  TokenInputState,
   TRADE_TYPE,
   TXN_STATUS,
 } from "@repo/flame-types";
@@ -31,12 +31,12 @@ export default function SwapPage(): React.ReactElement {
   const { currencies } = selectedChain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [inputOne, setInputOne] = useState<TokenState>({
+  const [inputOne, setInputOne] = useState<TokenInputState>({
     token: currencies?.[0],
     value: "",
     isQuoteValue: false,
   });
-  const [inputTwo, setInputTwo] = useState<TokenState>({
+  const [inputTwo, setInputTwo] = useState<TokenInputState>({
     token: null,
     value: "",
     isQuoteValue: true,
@@ -130,7 +130,7 @@ export default function SwapPage(): React.ReactElement {
       (
         tradeType: TRADE_TYPE,
         tokenData: { token: EvmCurrency; value: string },
-        token: TokenState,
+        token: TokenInputState,
         tokenInput: TOKEN_INPUTS,
       ) => {
         getQuote(tradeType, tokenData, token).then((res) => {

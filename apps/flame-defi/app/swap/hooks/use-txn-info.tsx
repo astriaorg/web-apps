@@ -3,7 +3,7 @@ import {
   TRADE_TYPE,
   Token,
   TokenAmount,
-  TokenState,
+  TokenInputState,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
@@ -16,7 +16,7 @@ import { useGetQuote } from "../../hooks";
 // quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
-const useTxnQuote = (inputOne: TokenState, inputTwo: TokenState) => {
+const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
   const { quoteError, getQuote } = useGetQuote();
   const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
   const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
@@ -142,8 +142,8 @@ export const useTxnInfo = ({
   validSwapInputs,
 }: {
   quote: GetQuoteResult | null;
-  topToken: TokenState;
-  bottomToken: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }) => {

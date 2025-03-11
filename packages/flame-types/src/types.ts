@@ -429,14 +429,14 @@ export type EvmChains = {
 };
 
 // TODO - consolidate with `TokenAmount` type
-export interface TokenState {
-  // FIXME - why is this ever null?
-  token?: EvmCurrency | null;
+export interface TokenInputState {
+  // token might be null before user has selected a token
+  token: EvmCurrency | null;
   value: string;
   isQuoteValue?: boolean;
 }
 
-export const tokenStateToBig = (token: TokenState): Big => {
+export const tokenStateToBig = (token: TokenInputState): Big => {
   if (!token?.value || !token.token) return new Big(0);
   const decimals = token.token.coinDecimals || 18;
   const fixedValue = new Big(token.value).toFixed(decimals);

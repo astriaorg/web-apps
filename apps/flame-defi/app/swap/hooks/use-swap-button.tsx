@@ -16,7 +16,7 @@ import {
   evmChainToRainbowKitChain,
   EvmCurrency,
   GetQuoteResult,
-  TokenState,
+  TokenInputState,
   tokenStateToBig,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
@@ -26,8 +26,8 @@ import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface SwapButtonProps {
-  topToken: TokenState;
-  bottomToken: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   topTokenBalance: string;
   quote: GetQuoteResult | null;
   loading: boolean;
@@ -40,14 +40,14 @@ interface ErrorWithMessage {
 }
 
 const useCheckTokenApproval = (
-  topToken: TokenState,
-  bottomToken: TokenState,
+  topToken: TokenInputState,
+  bottomToken: TokenInputState,
 ): EvmCurrency | null => {
   const { tokenAllowances } = useEvmWallet();
   const topTokenValueBig = tokenStateToBig(topToken);
   const bottomTokenValueBig = tokenStateToBig(bottomToken);
 
-  const findApproval = (token: TokenState) =>
+  const findApproval = (token: TokenInputState) =>
     tokenAllowances.find(
       (allowanceToken) => allowanceToken.symbol === token?.token?.coinDenom,
     );

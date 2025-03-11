@@ -1,6 +1,6 @@
 "use client";
 
-import { TokenState } from "@repo/flame-types";
+import { TokenInputState } from "@repo/flame-types";
 import { InfoTooltip, Skeleton } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import {
@@ -22,7 +22,7 @@ enum TOKEN_INPUTS {
 
 export interface TxnInfoProps {
   id: TOKEN_INPUTS;
-  inputToken: TokenState;
+  inputToken: TokenInputState;
   txnInfo: ReturnType<typeof useTxnInfo>;
 }
 
@@ -34,8 +34,8 @@ export function TxnInfo({
   quote,
 }: {
   txnInfo: ReturnType<typeof useTxnInfo>;
-  topToken: TokenState;
-  bottomToken: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   oneToOneQuote: OneToOneQuoteProps;
   quote: GetQuoteResult;
 }) {
