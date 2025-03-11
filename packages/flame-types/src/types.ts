@@ -433,7 +433,7 @@ export interface TokenState {
   // FIXME - why is this ever null?
   token?: EvmCurrency | null;
   value: string;
-  isQuoteValue?: boolean;
+  isQuoteValue: boolean;
 }
 
 export const tokenStateToBig = (token: TokenState): Big => {
