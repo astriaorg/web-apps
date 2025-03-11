@@ -1,15 +1,22 @@
+import { cn } from "@repo/ui/utils";
 import { Image } from "components/image";
 import { Asset, Maybe } from "earn/generated/gql/graphql";
 
-interface MarketAssetsProps {
+interface MarketAssetsProps extends React.HTMLAttributes<HTMLDivElement> {
   assetA?: Maybe<Asset>;
   assetB: Maybe<Asset>;
   size: number;
 }
 
-export const MarketAssets = ({ assetA, assetB, size }: MarketAssetsProps) => {
+export const MarketAssets = ({
+  assetA,
+  assetB,
+  size,
+  className,
+  ...props
+}: MarketAssetsProps) => {
   return (
-    <div className="flex items-center space-x-2 lg:hidden">
+    <div className={cn("flex items-center space-x-2", className)} {...props}>
       <div className="flex items-center -space-x-2 shrink-0">
         {assetA && (
           <Image

@@ -18,11 +18,12 @@ export const HeaderSection = () => {
                 assetA={data?.marketByUniqueKey.collateralAsset as Maybe<Asset>}
                 assetB={data?.marketByUniqueKey.loanAsset as Maybe<Asset>}
                 size={40}
+                className="text-3xl/8 font-medium"
               />
             </Skeleton>
             {data?.marketByUniqueKey.collateralAsset && (
               <Skeleton isLoading={isPending} className="w-40">
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="whitespace-nowrap w-min">
                   {data?.marketByUniqueKey.collateralAsset?.name}
                 </Badge>
               </Skeleton>

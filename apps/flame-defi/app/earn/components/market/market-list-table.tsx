@@ -88,6 +88,7 @@ export const MarketListTable = ({
                   assetA={row.original.collateralAsset}
                   assetB={row.original.loanAsset}
                   size={24}
+                  className="lg:hidden"
                 />
               </div>
             </>
