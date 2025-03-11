@@ -55,7 +55,7 @@ const Navbar = () => {
         </a>
       </div>
       <div id="topNavbar" className="flex-1 hidden md:flex">
-        <div className="flex justify-center items-center font-mono font-medium">
+        <div className="flex justify-center items-center font-mono font-medium mr-2">
           <Link href="/" className={navLinkClasses("/")}>
             BRIDGE
           </Link>
@@ -66,9 +66,14 @@ const Navbar = () => {
             POOL
           </Link>
           {featureFlags.earnEnabled && (
-            <Link href="/earn" className={navLinkClasses("/earn")}>
-              EARN
-            </Link>
+            <>
+              <Link href="/earn" className={navLinkClasses("/earn")}>
+                EARN
+              </Link>
+              <Link href="/borrow" className={navLinkClasses("/borrow")}>
+                BORROW
+              </Link>
+            </>
           )}
         </div>
       </div>

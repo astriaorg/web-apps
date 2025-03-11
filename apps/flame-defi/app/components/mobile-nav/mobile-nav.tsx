@@ -80,12 +80,20 @@ function MobileNav() {
                 Pool
               </Link>
               {featureFlags.earnEnabled && (
-                <Link
-                  href="/earn"
-                  className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
-                >
-                  Earn
-                </Link>
+                <>
+                  <Link
+                    href="/earn"
+                    className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
+                  >
+                    Earn
+                  </Link>
+                  <Link
+                    href="/borrow"
+                    className={`font-medium text-grey-light text-base ${pathname === "/borrow" ? "text-orange-soft" : ""}`}
+                  >
+                    Borrow
+                  </Link>
+                </>
               )}
             </div>
           </div>
