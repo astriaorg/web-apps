@@ -44,10 +44,9 @@ const query = graphql(`
             state {
               collateralAssets
               liquidityAssets
+              liquidityAssetsUsd
               netBorrowApy
               netSupplyApy
-              supplyAssets
-              supplyAssetsUsd
             }
             uniqueKey
           }

@@ -20,8 +20,8 @@ export const getPlaceholderData = (length: number): Market[] =>
         },
         state: {
           netSupplyApy: 0,
-          supplyAssets: 0,
-          supplyAssetsUsd: 0,
+          liquidityAssets: 0,
+          liquidityAssetsUsd: 0,
         },
         uniqueKey: `0x${index}`,
       }) as Market,

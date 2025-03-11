@@ -27,7 +27,7 @@ import { Image } from "components/image";
 import { MarketAssets } from "earn/components/market";
 import { ROUTES } from "earn/constants/routes";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
-import { Market } from "earn/generated/gql/graphql";
+import { Market, MarketOrderBy } from "earn/generated/gql/graphql";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { FormattedNumber } from "react-intl";
@@ -57,9 +57,10 @@ export const MarketListTable = ({
   const columnHelper = createColumnHelper<Market>();
 
   const columns = useMemo(() => {
+    // Use `MarketOrderBy` as ID for server-side sorting.
     return [
       columnHelper.accessor("collateralAsset.name", {
-        id: "collateralAsset.name",
+        id: MarketOrderBy.CollateralAssetSymbol,
         header: () => {
           return (
             <>
@@ -94,11 +95,11 @@ export const MarketListTable = ({
             </>
           );
         },
-        enableSorting: false,
+        enableSorting: true,
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("loanAsset.name", {
-        id: "loanAsset.name",
+        id: MarketOrderBy.LoanAssetSymbol,
         header: "Loan",
         cell: ({ row }) => {
           return (
@@ -114,18 +115,16 @@ export const MarketListTable = ({
             </div>
           );
         },
-        enableSorting: false,
+        enableSorting: true,
         footer: (info) => info.column.id,
       }),
       columnHelper.accessor("lltv", {
-        id: "lltv",
+        id: MarketOrderBy.Lltv,
         header: "LLTV",
         cell: ({ row }) => {
           return (
             <FormattedNumber
-              value={new Big(row.original.lltv ?? 0)
-                .div(10 ** (row.original.collateralAsset?.decimals ?? 18))
-                .toNumber()}
+              value={new Big(row.original.lltv ?? 0).div(10 ** 18).toNumber()}
               style="percent"
               minimumFractionDigits={2}
             />
@@ -163,14 +162,14 @@ export const MarketListTable = ({
       //     footer: (info) => info.column.id,
       //   }),
       columnHelper.accessor("state.supplyAssets", {
-        id: "market.state.supplyAssets",
-        header: "Total Supply",
+        id: MarketOrderBy.TotalLiquidityUsd,
+        header: "Liquidity",
         cell: ({ row }) => {
           const {
-            value: formattedTotalAssets,
-            suffix: formattedTotalAssetsSuffix,
+            value: formattedLiquidityAssets,
+            suffix: formattedLiquidityAssetsSuffix,
           } = formatAbbreviatedNumber(
-            new Big(row.original.state?.supplyAssets ?? 0)
+            new Big(row.original.state?.liquidityAssets ?? 0)
               .div(10 ** row.original.loanAsset.decimals)
               .toFixed(),
             {
@@ -179,10 +178,10 @@ export const MarketListTable = ({
           );
 
           const {
-            value: formattedTotalAssetsUSD,
-            suffix: formattedTotalAssetsUSDSuffix,
+            value: formattedLiquidityAssetsUSD,
+            suffix: formattedLiquidityAssetsUSDSuffix,
           } = formatAbbreviatedNumber(
-            new Big(row.original.state?.supplyAssetsUsd ?? 0).toFixed(),
+            new Big(row.original.state?.liquidityAssetsUsd ?? 0).toFixed(),
             {
               minimumFractionDigits: 2,
             },
@@ -197,18 +196,18 @@ export const MarketListTable = ({
                 )}
               >
                 <span className={cn("truncate max-w-[25vw]", "md:max-w-auto")}>
-                  {formattedTotalAssets}
-                  {formattedTotalAssetsSuffix}
+                  {formattedLiquidityAssets}
+                  {formattedLiquidityAssetsSuffix}
                   {NON_BREAKING_SPACE}
                   {row.original.loanAsset.symbol}
                 </span>
                 <Badge>
                   <FormattedNumber
-                    value={+formattedTotalAssetsUSD}
+                    value={+formattedLiquidityAssetsUSD}
                     style="currency"
                     currency="USD"
                   />
-                  {formattedTotalAssetsUSDSuffix}
+                  {formattedLiquidityAssetsUSDSuffix}
                 </Badge>
               </div>
               <div className="lg:hidden flex justify-end pr-3">
@@ -260,7 +259,7 @@ export const MarketListTable = ({
       //     footer: (info) => info.column.id,
       //   }),
       columnHelper.accessor("state.netSupplyApy", {
-        id: "market.state.netSupplyApy",
+        id: MarketOrderBy.NetSupplyApy,
         header: "APY",
         cell: ({ row }) => {
           return (
@@ -273,7 +272,7 @@ export const MarketListTable = ({
             </div>
           );
         },
-        enableSorting: false,
+        enableSorting: true,
         footer: (info) => info.column.id,
       }),
     ];

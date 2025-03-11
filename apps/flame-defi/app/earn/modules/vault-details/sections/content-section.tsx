@@ -4,7 +4,7 @@ import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
-import { Market } from "earn/generated/gql/graphql";
+import { Market, MarketOrderBy } from "earn/generated/gql/graphql";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
@@ -21,7 +21,7 @@ export const ContentSection = () => {
 
   const [sorting, setSorting] = useState<SortingState>([
     {
-      id: "market.state.supplyAssets",
+      id: MarketOrderBy.TotalLiquidityUsd,
       desc: true,
     },
   ]);

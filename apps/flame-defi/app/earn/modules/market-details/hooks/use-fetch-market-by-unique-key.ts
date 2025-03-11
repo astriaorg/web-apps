@@ -25,8 +25,6 @@ const query = graphql(`
         liquidityAssets
         netBorrowApy
         netSupplyApy
-        supplyAssets
-        supplyAssetsUsd
       }
       supplyingVaults {
         address
