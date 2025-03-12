@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useGetQuote } from "../../hooks";
+import { TransactionInfo } from "../types";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
 // quoteGas values are the values we display in top token input field.
@@ -47,7 +48,7 @@ const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
  * Returns the price impact as a decimal (e.g. -0.002 means -0.2%).
  */
 const calculatePriceImpact = (txnQuoteData: GetQuoteResult): number => {
-  const hops = txnQuoteData?.route?.[0];
+  const hops = txnQuoteData.route?.[0];
 
   if (!hops) {
     return 0;
@@ -144,7 +145,7 @@ export const useTxnInfo = ({
   bottomToken: TokenInputState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
-}) => {
+}): TransactionInfo => {
   const { formatNumber } = useIntl();
   const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
     topToken,
@@ -173,7 +174,7 @@ export const useTxnInfo = ({
       parseFloat(
         formatUnits(
           BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-          bottomToken?.token?.coinDecimals || 18,
+          bottomToken.token?.coinDecimals || 18,
         ),
       ),
       { minimumFractionDigits: 6, maximumFractionDigits: 6 },

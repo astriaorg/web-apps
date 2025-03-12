@@ -34,19 +34,19 @@ export function TxnDetails({
     <>
       <div className="flex flex-col items-center gap-3 mb-8 mt-6 relative">
         <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
-          <span>{formatDecimalValues(topToken?.value || "0", 6)}</span>
+          <span>{formatDecimalValues(topToken.value || "0", 6)}</span>
           <span className="flex items-center gap-1">
-            {topToken?.token?.IconComponent &&
-              topToken?.token?.IconComponent({ size: 24 })}
-            {topToken?.token?.coinDenom}
+            {topToken.token?.IconComponent &&
+              topToken.token.IconComponent({ size: 24 })}
+            {topToken.token?.coinDenom}
           </span>
         </div>
         <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
           <span>{expectedOutputFormatted}</span>
           <span className="flex items-center gap-1">
-            {bottomToken?.token?.IconComponent &&
-              bottomToken?.token?.IconComponent({ size: 24 })}
-            {bottomToken?.token?.coinDenom}
+            {bottomToken.token?.IconComponent &&
+              bottomToken.token.IconComponent({ size: 24 })}
+            {bottomToken.token?.coinDenom}
           </span>
         </div>
         <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
@@ -85,7 +85,7 @@ export function TxnDetails({
           </span>
           <span className="text-grey-light text-sm font-medium">
             {expectedOutputFormatted}{" "}
-            <span>{bottomToken?.token?.coinDenom}</span>
+            <span>{bottomToken.token?.coinDenom}</span>
           </span>
         </div>
         <div className="flex justify-between">
@@ -113,7 +113,7 @@ export function TxnDetails({
           </div>
           <div className="text-grey-light flex items-center gap-1 text-sm font-medium">
             <span>{minimumReceived}</span>
-            <span>{bottomToken?.token?.coinDenom}</span>
+            <span>{bottomToken.token?.coinDenom}</span>
           </div>
         </div>
       </div>
@@ -136,15 +136,15 @@ function TxnLoader({
         </span>
         <div className="flex items-center gap-1 justify-center text-sm md:text-base">
           <span>
-            {formatDecimalValues(topToken?.value || "0", 6)}{" "}
-            <span>{topToken?.token?.coinDenom}</span>
+            {formatDecimalValues(topToken.value || "0", 6)}{" "}
+            <span>{topToken.token?.coinDenom}</span>
           </span>
           <span>for</span>
           <span>
             {isTiaWtia
-              ? formatDecimalValues(bottomToken?.value || "0", 6)
+              ? formatDecimalValues(bottomToken.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span> {bottomToken?.token?.coinDenom}</span>
+            <span> {bottomToken.token?.coinDenom}</span>
           </span>
         </div>
       </div>
@@ -169,16 +169,16 @@ function TxnSuccess({
           <div className="flex items-center gap-1">
             <span>Swapped</span>
             <span>
-              {formatDecimalValues(topToken?.value || "0", 6)}{" "}
-              <span>{topToken?.token?.coinDenom}</span>
+              {formatDecimalValues(topToken.value || "0", 6)}{" "}
+              <span>{topToken.token?.coinDenom}</span>
             </span>
           </div>
           <span>for</span>
           <div className="flex items-center gap-1">
             {isTiaWtia
-              ? formatDecimalValues(bottomToken?.value || "0", 6)
+              ? formatDecimalValues(bottomToken.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span>{bottomToken?.token?.coinDenom}</span>
+            <span>{bottomToken.token?.coinDenom}</span>
           </div>
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
@@ -196,7 +196,7 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed({ txnMsg }: TxnStepsProps) {
+function TxnFailed({ txnMsg }: Pick<TxnStepsProps, "txnMsg">) {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange-soft" />

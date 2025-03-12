@@ -11,12 +11,11 @@ import {
 } from "@repo/ui/shadcn-primitives";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { GetQuoteResult } from "@repo/flame-types";
-import { useTxnInfo } from "../hooks";
-import { OneToOneQuoteProps } from "../types";
+import { OneToOneQuoteProps, TransactionInfo } from "../types";
 import { RoutePath } from "./route-path";
 
 export interface TxnInfoProps {
-  txnInfo: ReturnType<typeof useTxnInfo>;
+  txnInfo: TransactionInfo;
   topToken: TokenInputState;
   bottomToken: TokenInputState;
   oneToOneQuote: OneToOneQuoteProps;

@@ -33,7 +33,7 @@ export default function SwapPage(): React.ReactElement {
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputOne, setInputOne] = useState<TokenInputState>({
-    token: currencies?.[0],
+    token: currencies[0],
     value: "",
     isQuoteValue: false,
   });
