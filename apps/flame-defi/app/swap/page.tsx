@@ -25,7 +25,7 @@ import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
 import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
-import { SwapPairProps, TOKEN_INPUTS } from "./types";
+import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
 export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();
@@ -62,14 +62,14 @@ export default function SwapPage(): React.ReactElement {
 
   const swapInputs: SwapPairProps[] = [
     {
-      id: TOKEN_INPUTS.INPUT_ONE,
+      id: SWAP_INPUT_ID.INPUT_ONE,
       inputToken: inputOne,
       oppositeToken: inputTwo,
       balance: balances[0]?.value || "0",
       label: flipTokens ? "Buy" : "Sell",
     },
     {
-      id: TOKEN_INPUTS.INPUT_TWO,
+      id: SWAP_INPUT_ID.INPUT_TWO,
       inputToken: inputTwo,
       oppositeToken: inputOne,
       balance: balances[1]?.value || "0",
@@ -131,16 +131,16 @@ export default function SwapPage(): React.ReactElement {
         tradeType: TRADE_TYPE,
         tokenIn: TokenInputState,
         tokenOut: TokenInputState,
-        tokenInput: TOKEN_INPUTS,
+        inputId: SWAP_INPUT_ID,
       ) => {
         getQuote(tradeType, tokenIn, tokenOut).then((res) => {
-          if (tokenInput === TOKEN_INPUTS.INPUT_ONE && res) {
+          if (inputId === SWAP_INPUT_ID.INPUT_ONE && res) {
             setInputTwo((prev) => ({
               ...prev,
               value: res.quoteDecimals,
               isQuoteValue: true,
             }));
-          } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO && res) {
+          } else if (inputId === SWAP_INPUT_ID.INPUT_TWO && res) {
             setInputOne((prev) => ({
               ...prev,
               value: res.quoteDecimals,
@@ -169,7 +169,7 @@ export default function SwapPage(): React.ReactElement {
   }, [setQuote, setTxnStatus, topToken, bottomToken]);
 
   const handleInputChange = useCallback(
-    (value: string, tokenInput: TOKEN_INPUTS) => {
+    (value: string, inputId: SWAP_INPUT_ID) => {
       setErrorText(null);
 
       // clear all values and cancel any current getQuotes if user zeros input
@@ -184,13 +184,13 @@ export default function SwapPage(): React.ReactElement {
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
+      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
         newInputOne = { ...inputOne, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputTwo = { ...inputTwo, value: "", isQuoteValue: true };
         setInputOne(newInputOne);
         setInputTwo(newInputTwo);
-      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
+      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
         newInputTwo = { ...inputTwo, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputOne = { ...inputOne, value: "", isQuoteValue: true };
@@ -228,7 +228,7 @@ export default function SwapPage(): React.ReactElement {
           newTradeType,
           newTopTokenInput,
           newBottomTokenInput,
-          tokenInput,
+          inputId,
         );
       }
     },
@@ -239,7 +239,7 @@ export default function SwapPage(): React.ReactElement {
     (
       selectedToken: EvmCurrency,
       oppositeTokenInput: TokenInputState,
-      tokenInput: TOKEN_INPUTS,
+      inputId: SWAP_INPUT_ID,
     ) => {
       setErrorText(null);
 
@@ -248,10 +248,10 @@ export default function SwapPage(): React.ReactElement {
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
+      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
         newInputOne = { ...inputOne, token: selectedToken };
         setInputOne(newInputOne);
-      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
+      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
         newInputTwo = { ...inputTwo, token: selectedToken };
         setInputTwo(newInputTwo);
       }

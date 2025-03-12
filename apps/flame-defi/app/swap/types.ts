@@ -1,6 +1,6 @@
 import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
 
-export enum TOKEN_INPUTS {
+export enum SWAP_INPUT_ID {
   INPUT_ONE = "input_one",
   INPUT_TWO = "input_two",
 }
@@ -15,7 +15,7 @@ export interface OneToOneQuoteProps {
 }
 
 export interface SwapPairProps {
-  id: TOKEN_INPUTS;
+  id: SWAP_INPUT_ID;
   inputToken: TokenInputState;
   oppositeToken: TokenInputState;
   balance: string;
@@ -59,11 +59,11 @@ export interface SwapTxnStepsProps {
 }
 
 export interface SwapInputProps extends SwapPairProps {
-  onInputChange: (value: string, tokenInput: TOKEN_INPUTS) => void;
+  onInputChange: (value: string, inputId: SWAP_INPUT_ID) => void;
   onTokenSelect: (
     token: EvmCurrency,
     oppositeToken: TokenInputState,
-    tokenInput: TOKEN_INPUTS,
+    inputId: SWAP_INPUT_ID,
   ) => void;
   availableTokens: EvmCurrency[];
   label: string;
