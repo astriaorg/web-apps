@@ -138,7 +138,7 @@ export const ContentSection = () => {
                     minimumFractionDigits={2}
                   />
                 }
-                renderTooltip={(value) => (
+                renderTooltipContent={(value) => (
                   <>
                     <div>{formatDate(value.x * 1000)}</div>
                     <div>
@@ -175,7 +175,7 @@ export const ContentSection = () => {
                     minimumFractionDigits: 2,
                   },
                 )}
-                renderTooltip={(value) => {
+                renderTooltipContent={(value) => {
                   return (
                     <>
                       <div>{formatDate(value.x * 1000)}</div>

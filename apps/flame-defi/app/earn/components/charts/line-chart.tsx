@@ -7,7 +7,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
   getDownsampledData,
   getTickIntervalData,
   Skeleton,
@@ -15,6 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components";
+import { ChartTooltipContent } from "earn/components/charts/chart-tooltip-content";
 import { FloatDataPoint } from "earn/generated/gql/graphql";
 import { ChartInterval } from "earn/modules/vault-details/types";
 import { useMemo } from "react";
@@ -24,13 +24,11 @@ import {
   CartesianGrid,
   Line,
   XAxis,
+  YAxis,
 } from "recharts";
 
 const CHART_CONFIG = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
+  y: {},
 } satisfies ChartConfig;
 
 interface LineChartProps {
@@ -42,7 +40,7 @@ interface LineChartProps {
   setSelectedInterval: (value: ChartInterval) => void;
   title: React.ReactNode;
   figure: React.ReactNode;
-  renderTooltip: (value: FloatDataPoint) => React.ReactNode;
+  renderTooltipContent: (value: FloatDataPoint) => React.ReactNode;
 }
 
 export const LineChart = ({
@@ -54,7 +52,7 @@ export const LineChart = ({
   setSelectedInterval,
   title,
   figure,
-  renderTooltip,
+  renderTooltipContent,
 }: LineChartProps) => {
   const { formatDate } = useIntl();
 
@@ -108,8 +106,11 @@ export const LineChart = ({
 
         <div className="mt-4" />
         <Skeleton isLoading={isLoading} className="w-full">
-          <ChartContainer config={CHART_CONFIG}>
-            <BaseLineChart accessibilityLayer data={downsampled}>
+          <ChartContainer
+            config={CHART_CONFIG}
+            className="w-full h-52 min-h-52"
+          >
+            <BaseLineChart data={downsampled} height={208}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="x"
@@ -118,18 +119,41 @@ export const LineChart = ({
                 ticks={ticks}
                 dy={16}
                 tickFormatter={(value) =>
-                  formatDate(value, { month: "short", year: "2-digit" })
+                  formatDate(value, {
+                    day: "numeric",
+                    month: "short",
+                    year: "2-digit",
+                  })
                 }
+              />
+              <YAxis
+                dataKey="y"
+                hide
+                // Make chart have some margin at the top and bottom.
+                domain={[
+                  (dataMin: number) => {
+                    return dataMin * 0.1;
+                  },
+                  (dataMax: number) => {
+                    return dataMax * 1.1;
+                  },
+                ]}
               />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent hideLabel />}
+                content={(content) => (
+                  <ChartTooltipContent
+                    {...content}
+                    renderTooltipContent={renderTooltipContent}
+                  />
+                )}
               />
               <Line
                 dataKey="y"
                 stroke="var(--color-brand)"
-                strokeWidth={2}
+                strokeWidth={1}
                 dot={false}
+                activeDot={{ r: 4.5 }}
               />
             </BaseLineChart>
           </ChartContainer>
