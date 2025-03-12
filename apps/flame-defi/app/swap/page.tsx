@@ -404,6 +404,7 @@ export default function SwapPage(): React.ReactElement {
             oneToOneQuote={oneToOneQuote}
             txnHash={txnHash}
             txnMsg={txnMsg}
+            isQuoteLoading={loading}
           />
         </ConfirmationModal>
         {(!userAccount.address || tokenApprovalNeeded) && (

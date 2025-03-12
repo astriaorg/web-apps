@@ -436,11 +436,15 @@ export interface TokenInputState {
   isQuoteValue?: boolean;
 }
 
+/**
+ * Converts a TokenInputState to a Big number in its raw blockchain representation (with scaled decimals)
+ * For example, if token.value is "1.5" and token decimals is 18, this returns 1.5 × 10^18
+ */
 export const tokenStateToBig = (token: TokenInputState): Big => {
-  if (!token?.value || !token.token) return new Big(0);
-  const decimals = token.token.coinDecimals || 18;
-  const fixedValue = new Big(token.value).toFixed(decimals);
-  return new Big(fixedValue);
+  if (!token.value || !token.token) return new Big(0);
+  const decimals = token.token.coinDecimals;
+  // Convert the human-readable value to raw blockchain units by multiplying by 10^decimals
+  return new Big(token.value).mul(new Big(10).pow(decimals));
 };
 
 export enum ChainId {
@@ -527,6 +531,17 @@ function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
     );
   }
   return JSBI.BigInt(slippageTolerancePercent * 100);
+}
+
+/**
+ * Represents an ERC-20 token allowance granted to a spender.
+ * Contains the token symbol and the approved amount as a string.
+ */
+export interface TokenAllowance {
+  /** The symbol of the token (e.g., "USDC", "TIA") */
+  symbol: string;
+  /** The allowance amount as a string */
+  value: string;
 }
 
 /**

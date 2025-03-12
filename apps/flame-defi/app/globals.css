@@ -232,6 +232,26 @@ html[data-theme="dark"] {
       opacity: 1;
     }
   }
+
+  @keyframes lightUpOrange {
+    0% {
+      opacity: 0.2;
+      box-shadow: none;
+      border-color: #f5f5f5;
+    }
+    50% {
+      opacity: 1;
+      box-shadow:
+        0 0 10px #df5822,
+        0 0 20px #f09226;
+      border-color: #f09226;
+    }
+    100% {
+      opacity: 0.2;
+      box-shadow: none;
+      border-color: #f5f5f5;
+    }
+  }
 }
 
 @layer base {
@@ -586,4 +606,13 @@ html[data-theme="dark"] {
 @utility slide-out-to-right-* {
   --tw-exit-translate-x: calc(--value(integer) * var(--spacing));
   --tw-exit-translate-x: --value(--translate- *, [percentage], ratio, [length]);
+}
+
+.animate-light-up-orange {
+  animation: lightUpOrange 1s ease-in-out infinite;
+}
+
+.card-spacer {
+  border-top: 1px solid #f5f5f5;
+  transition: border-color 0.3s ease;
 }

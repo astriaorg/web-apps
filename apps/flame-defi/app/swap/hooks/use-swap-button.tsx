@@ -14,14 +14,14 @@ import {
 } from "features/evm-wallet";
 import {
   evmChainToRainbowKitChain,
-  EvmCurrency,
   GetQuoteResult,
+  TokenAllowance,
   TokenInputState,
   tokenStateToBig,
 } from "@repo/flame-types";
+import { useConfig } from "config";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
-import Big from "big.js";
 import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
@@ -39,39 +39,27 @@ interface ErrorWithMessage {
   message: string;
 }
 
-const useCheckTokenApproval = (
-  topToken: TokenInputState,
-  bottomToken: TokenInputState,
-): EvmCurrency | null => {
-  const { tokenAllowances } = useEvmWallet();
-  const topTokenValueBig = tokenStateToBig(topToken);
-  const bottomTokenValueBig = tokenStateToBig(bottomToken);
-
-  const findApproval = (token: TokenInputState) =>
-    tokenAllowances.find(
-      (allowanceToken) => allowanceToken.symbol === token.token?.coinDenom,
-    );
-
-  const topTokenNeedingApproval = topToken.token
-    ? findApproval(topToken)
-    : null;
-  const bottomTokenNeedingApproval = bottomToken.token
-    ? findApproval(bottomToken)
-    : null;
-
-  if (
-    topTokenNeedingApproval &&
-    topTokenValueBig.gt(new Big(topTokenNeedingApproval.allowance.toString()))
-  ) {
-    return topToken.token || null;
+// return the token needing approval or null if o approval needed
+const getTokenNeedingApproval = (
+  tokenInput: TokenInputState,
+  tokenAllowances: TokenAllowance[],
+): TokenInputState | null => {
+  if (!tokenInput.token) {
+    return null;
   }
-  if (
-    bottomTokenNeedingApproval &&
-    bottomTokenValueBig.gt(
-      new Big(bottomTokenNeedingApproval.allowance.toString()),
-    )
-  ) {
-    return bottomToken.token || null;
+
+  const token = tokenInput.token;
+  const existingAllowance = tokenAllowances.find(
+    (allowanceToken) => token.coinDenom === allowanceToken.symbol,
+  );
+
+  if (existingAllowance) {
+    const tokenInputGreaterThanAllowance = tokenStateToBig(tokenInput).gt(
+      existingAllowance.value,
+    );
+    if (tokenInputGreaterThanAllowance) {
+      return tokenInput;
+    }
   }
 
   return null;
@@ -87,7 +75,8 @@ export function useSwapButton({
   tradeType,
 }: SwapButtonProps) {
   const { selectedChain } = useEvmChainData();
-  const { approveToken } = useEvmWallet();
+  const { approveToken, tokenAllowances } = useEvmWallet();
+  const { tokenApprovalAmount } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSwapSlippageTolerance();
@@ -98,7 +87,10 @@ export function useSwapButton({
   const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenNeedingApproval = useCheckTokenApproval(topToken, bottomToken);
+  const tokenNeedingApproval = getTokenNeedingApproval(
+    topToken,
+    tokenAllowances,
+  );
 
   const wrapTia =
     topToken.token?.isNative && bottomToken.token?.isWrappedNative;
@@ -124,6 +116,9 @@ export function useSwapButton({
   }, [quoteError]);
 
   useEffect(() => {
+    if (!userAccount.address) {
+      return;
+    }
     if (result.data?.status === "success") {
       setTxnStatus(TXN_STATUS.SUCCESS);
       addRecentTransaction({
@@ -137,7 +132,7 @@ export function useSwapButton({
       setTxnStatus(TXN_STATUS.FAILED);
       handleTxnModalErrorMsgs("", "Transaction failed");
     }
-  }, [result.data, txnHash, addRecentTransaction]);
+  }, [result.data, txnHash, addRecentTransaction, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wtiaAddress = selectedChain.contracts.wrappedNativeToken.address;
@@ -234,13 +229,16 @@ export function useSwapButton({
     slippageTolerance,
   ]);
 
-  const handleTokenApproval = async (token: EvmCurrency | null) => {
-    if (!token) {
+  const handleTokenApproval = async (tokenNeedingApproval: TokenInputState) => {
+    if (!tokenNeedingApproval.token || !tokenNeedingApproval.value) {
       return null;
     }
     try {
       setTxnStatus(TXN_STATUS.PENDING);
-      const txHash = await approveToken(token);
+      const txHash = await approveToken(
+        tokenNeedingApproval.token,
+        tokenApprovalAmount,
+      );
       if (txHash) {
         setTxnHash(txHash);
       }
@@ -299,7 +297,7 @@ export function useSwapButton({
       case !topToken.token || !bottomToken.token:
         return "Select a token";
       case tokenNeedingApproval !== null && txnStatus !== TXN_STATUS.PENDING:
-        return `Approve ${tokenNeedingApproval.coinDenom}`;
+        return `Approve ${tokenNeedingApproval.token?.coinDenom}`;
       case tokenNeedingApproval !== null && txnStatus === TXN_STATUS.PENDING:
         return "Pending wallet approval...";
       case txnStatus === TXN_STATUS.PENDING:

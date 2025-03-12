@@ -35,6 +35,7 @@ export interface TxnDetailsProps extends TxnStepsProps {
   priceImpact: string | undefined;
   minimumReceived: string | undefined;
   oneToOneQuote: OneToOneQuoteProps;
+  isQuoteLoading: boolean;
 }
 
 export interface TransactionInfo {
@@ -56,6 +57,7 @@ export interface SwapTxnStepsProps {
   txnMsg: string | undefined;
   isTiaWtia: boolean;
   oneToOneQuote: OneToOneQuoteProps;
+  isQuoteLoading: boolean;
 }
 
 export interface SwapInputProps extends SwapPairProps {

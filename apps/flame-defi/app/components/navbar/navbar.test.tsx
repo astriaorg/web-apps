@@ -2,6 +2,11 @@ import { screen } from "@testing-library/react";
 import { renderWithProviders } from "testing/helpers";
 import Navbar from "./navbar";
 
+// Mock the usePathname hook from Next.js
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn().mockReturnValue("/"),
+}));
+
 describe("Navbar Component", () => {
   test("renders company logo", () => {
     renderWithProviders(<Navbar />);
