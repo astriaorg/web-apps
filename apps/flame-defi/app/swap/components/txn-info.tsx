@@ -15,15 +15,12 @@ import { useTxnInfo } from "../hooks";
 import { OneToOneQuoteProps } from "../types";
 import { RoutePath } from "./route-path";
 
-enum TOKEN_INPUTS {
-  TOKEN_ONE = "token_one",
-  TOKEN_TWO = "token_two",
-}
-
 export interface TxnInfoProps {
-  id: TOKEN_INPUTS;
-  inputToken: TokenInputState;
   txnInfo: ReturnType<typeof useTxnInfo>;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
+  oneToOneQuote: OneToOneQuoteProps;
+  quote: GetQuoteResult;
 }
 
 export function TxnInfo({
@@ -32,13 +29,7 @@ export function TxnInfo({
   bottomToken,
   oneToOneQuote,
   quote,
-}: {
-  txnInfo: ReturnType<typeof useTxnInfo>;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
-  oneToOneQuote: OneToOneQuoteProps;
-  quote: GetQuoteResult;
-}) {
+}: TxnInfoProps) {
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
   return (
@@ -50,22 +41,22 @@ export function TxnInfo({
         <div className="flex items-center justify-between pb-2">
           <Skeleton
             className="rounded-sm"
-            isLoading={oneToOneQuote?.oneToOneLoading}
+            isLoading={oneToOneQuote.oneToOneLoading}
           >
             <div
               className="flex items-center cursor-pointer text-white font-medium gap-1"
               onClick={() =>
-                oneToOneQuote?.setFlipDirection(!oneToOneQuote?.flipDirection)
+                oneToOneQuote.setFlipDirection(!oneToOneQuote.flipDirection)
               }
             >
               <div className="flex items-center gap-1">
                 <span>{formatDecimalValues("1", 0)}</span>
-                <span>{oneToOneQuote?.topTokenSymbol}</span>
+                <span>{oneToOneQuote.topTokenSymbol}</span>
               </div>
               <div>=</div>
               <div className="flex items-center gap-1">
-                <span>{oneToOneQuote?.bottomTokenValue}</span>
-                <span>{oneToOneQuote?.bottomTokenSymbol}</span>
+                <span>{oneToOneQuote.bottomTokenValue}</span>
+                <span>{oneToOneQuote.bottomTokenSymbol}</span>
               </div>
             </div>
           </Skeleton>
@@ -98,7 +89,7 @@ export function TxnInfo({
               </span>
               <span className="text-grey-light">
                 {txnInfo.expectedOutputFormatted}{" "}
-                <span>{bottomToken?.token?.coinDenom}</span>
+                <span>{bottomToken.token?.coinDenom}</span>
               </span>
             </p>
             <p className="flex justify-between">
@@ -136,7 +127,7 @@ export function TxnInfo({
               </div>
               <span className="text-grey-light">
                 {txnInfo.minimumReceived}{" "}
-                <span>{bottomToken?.token?.coinDenom}</span>
+                <span>{bottomToken.token?.coinDenom}</span>
               </span>
             </div>
           </div>
@@ -145,8 +136,8 @@ export function TxnInfo({
             <RoutePath
               quoteRoute={quote.route}
               loading={txnInfo.txnQuoteDataLoading}
-              symbolIn={topToken?.token?.coinDenom}
-              symbolOut={bottomToken?.token?.coinDenom}
+              symbolIn={topToken.token?.coinDenom}
+              symbolOut={bottomToken.token?.coinDenom}
               networkFee={txnInfo.formattedGasUseEstimateUSD}
             />
           )}
