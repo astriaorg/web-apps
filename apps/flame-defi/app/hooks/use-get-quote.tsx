@@ -110,7 +110,7 @@ export const useGetQuote = () => {
         setLoading(false);
       }
     },
-    [chainId, chainContracts?.wrappedNativeToken.address],
+    [chainId, chainContracts.wrappedNativeToken.address],
   );
 
   const cancelGetQuote = useCallback(() => {

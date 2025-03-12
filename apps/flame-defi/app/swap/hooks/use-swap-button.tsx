@@ -49,13 +49,13 @@ const useCheckTokenApproval = (
 
   const findApproval = (token: TokenInputState) =>
     tokenAllowances.find(
-      (allowanceToken) => allowanceToken.symbol === token?.token?.coinDenom,
+      (allowanceToken) => allowanceToken.symbol === token.token?.coinDenom,
     );
 
-  const topTokenNeedingApproval = topToken?.token
+  const topTokenNeedingApproval = topToken.token
     ? findApproval(topToken)
     : null;
-  const bottomTokenNeedingApproval = bottomToken?.token
+  const bottomTokenNeedingApproval = bottomToken.token
     ? findApproval(bottomToken)
     : null;
 
@@ -101,12 +101,12 @@ export function useSwapButton({
   const tokenNeedingApproval = useCheckTokenApproval(topToken, bottomToken);
 
   const wrapTia =
-    topToken?.token?.isNative && bottomToken?.token?.isWrappedNative;
+    topToken.token?.isNative && bottomToken.token?.isWrappedNative;
   const unwrapTia =
-    topToken?.token?.isWrappedNative && bottomToken?.token?.isNative;
+    topToken.token?.isWrappedNative && bottomToken.token?.isNative;
 
-  const handleTxnModalErrorMsgs = (error?: string, defaultMsg?: string) => {
-    if (error?.includes("rejected")) {
+  const handleTxnModalErrorMsgs = (error: string, defaultMsg?: string) => {
+    if (error.includes("rejected")) {
       setTxnMsg("Transaction rejected");
     } else if (defaultMsg) {
       setTxnMsg(defaultMsg);
@@ -140,8 +140,8 @@ export function useSwapButton({
   }, [result.data, txnHash, addRecentTransaction]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wtiaAddress = selectedChain.contracts?.wrappedNativeToken.address;
-    if (!selectedChain?.chainId || !wtiaAddress) {
+    const wtiaAddress = selectedChain.contracts.wrappedNativeToken.address;
+    if (!selectedChain.chainId || !wtiaAddress) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
@@ -187,12 +187,12 @@ export function useSwapButton({
   }, [quote, tradeType]);
 
   const handleSwap = useCallback(async () => {
-    if (!trade || !userAccount.address || !selectedChain?.chainId) {
+    if (!trade || !userAccount.address || !selectedChain.chainId) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
     try {
-      const swapRouterAddress = selectedChain.contracts?.swapRouter.address;
+      const swapRouterAddress = selectedChain.contracts.swapRouter.address;
       if (!swapRouterAddress) {
         console.warn("Swap router address is not defined. Cannot swap.");
         return;
@@ -260,17 +260,18 @@ export function useSwapButton({
     }
   };
 
+  // FIXME - parseFloat is not sufficient for huge numbers
   const validSwapInputs = Boolean(
     !loading &&
       txnStatus !== TXN_STATUS.PENDING &&
       errorText === null &&
-      topToken?.token &&
-      bottomToken?.token &&
-      topToken?.value !== undefined &&
-      bottomToken?.value !== undefined &&
-      parseFloat(topToken?.value) > 0 &&
-      parseFloat(bottomToken?.value) > 0 &&
-      parseFloat(topToken?.value) <= parseFloat(topTokenBalance),
+      topToken.token &&
+      bottomToken.token &&
+      topToken.value !== undefined &&
+      bottomToken.value !== undefined &&
+      parseFloat(topToken.value) > 0 &&
+      parseFloat(bottomToken.value) > 0 &&
+      parseFloat(topToken.value) <= parseFloat(topTokenBalance),
   );
 
   const onSubmitCallback = () => {
@@ -290,28 +291,29 @@ export function useSwapButton({
     }
   };
 
+  // FIXME - parseFloat is not sufficient for huge numbers
   const getButtonText = () => {
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
-      case !topToken?.token || !bottomToken?.token:
+      case !topToken.token || !bottomToken.token:
         return "Select a token";
       case tokenNeedingApproval !== null && txnStatus !== TXN_STATUS.PENDING:
-        return `Approve ${tokenNeedingApproval?.coinDenom}`;
+        return `Approve ${tokenNeedingApproval.coinDenom}`;
       case tokenNeedingApproval !== null && txnStatus === TXN_STATUS.PENDING:
         return "Pending wallet approval...";
       case txnStatus === TXN_STATUS.PENDING:
         return "Pending...";
-      case topToken?.value === undefined:
+      case topToken.value === undefined:
         return "Enter an amount";
-      case parseFloat(topToken?.value) === 0 || parseFloat(topToken?.value) < 0:
+      case parseFloat(topToken.value) === 0 || parseFloat(topToken.value) < 0:
         return "Amount must be greater than 0";
       case loading:
         return "loading...";
-      case isNaN(parseFloat(topToken?.value)):
+      case isNaN(parseFloat(topToken.value)):
         return "Enter an amount";
       case topTokenBalance === "0" ||
-        parseFloat(topTokenBalance) < parseFloat(topToken?.value):
+        parseFloat(topTokenBalance) < parseFloat(topToken.value):
         return "Insufficient funds";
       case wrapTia:
         return "Wrap";

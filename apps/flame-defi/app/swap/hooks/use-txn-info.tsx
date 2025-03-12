@@ -46,9 +46,7 @@ const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
  * Calculates the price impact
  * Returns the price impact as a decimal (e.g. -0.002 means -0.2%).
  */
-const calculatePriceImpact = (
-  txnQuoteData: GetQuoteResult | null | undefined,
-): number => {
+const calculatePriceImpact = (txnQuoteData: GetQuoteResult): number => {
   const hops = txnQuoteData?.route?.[0];
 
   if (!hops) {
@@ -74,7 +72,7 @@ const calculatePriceImpact = (
     // Compute the raw price from sqrtPriceX96:
     // - rawPrice = (sqrtPriceX96 / 2^96)^2 = (sqrtPriceX96^2) / 2^192.
     const sqrtPriceX96 = JSBI.BigInt(hop.sqrtRatioX96);
-    const numerator = JSBI.multiply(sqrtPriceX96, sqrtPriceX96);
+    const numerator = JSBI.exponentiate(sqrtPriceX96, JSBI.BigInt(2));
     const denominator = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(192));
     const rawPrice =
       Number(numerator.toString()) / Number(denominator.toString());
@@ -101,8 +99,8 @@ const calculatePriceImpact = (
   // Compute the overall execution price:
   // - txnQuoteData.amountDecimals: initial input amount
   // - txnQuoteData.quoteDecimals: final output amount
-  const overallInput = parseFloat(txnQuoteData?.amountDecimals);
-  const overallOutput = parseFloat(txnQuoteData?.quoteDecimals);
+  const overallInput = parseFloat(txnQuoteData.amountDecimals);
+  const overallOutput = parseFloat(txnQuoteData.quoteDecimals);
   const overallExecutionPrice = overallOutput / overallInput;
 
   // Price impact is defined as:
@@ -156,12 +154,12 @@ export const useTxnInfo = ({
 
   useEffect(() => {
     if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
-      fetchTxnQuote();
+      void fetchTxnQuote();
     }
   }, [tradeType, fetchTxnQuote, validSwapInputs]);
 
   const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
-  const priceImpact = calculatePriceImpact(txnQuoteData);
+  const priceImpact = txnQuoteData ? calculatePriceImpact(txnQuoteData) : 0;
 
   return {
     txnQuoteDataLoading: txnQuoteLoading,

@@ -7,7 +7,7 @@ import { useGetQuote } from "../../hooks";
 
 export const useUsdQuote = (inputToken: TokenInputState) => {
   const { selectedChain } = useEvmChainData();
-  const usdcToken = selectedChain.currencies?.find(
+  const usdcToken = selectedChain.currencies.find(
     (currency) => currency.coinDenom === "USDC",
   );
   const { quote, loading, quoteError, getQuote } = useGetQuote();

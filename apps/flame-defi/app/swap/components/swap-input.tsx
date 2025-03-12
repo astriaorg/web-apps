@@ -44,8 +44,8 @@ export function SwapInput({
 
     if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
       return formatFiat(inputToken.value);
-    } else if (usdQuote?.quote) {
-      return formatFiat(usdQuote?.quote?.quoteDecimals);
+    } else if (usdQuote.quote) {
+      return formatFiat(usdQuote.quote.quoteDecimals);
     } else {
       return "-";
     }
@@ -80,7 +80,7 @@ export function SwapInput({
           <TokenSelector
             tokens={availableTokens}
             selectedToken={inputToken.token}
-            unavailableToken={oppositeToken?.token}
+            unavailableToken={oppositeToken.token}
             setSelectedToken={(token) =>
               onTokenSelect(token, oppositeToken, id)
             }
@@ -92,7 +92,7 @@ export function SwapInput({
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 4,
                 })}{" "}
-                {inputToken?.token?.coinDenom}
+                {inputToken.token?.coinDenom}
               </span>
               {
                 <span
@@ -112,7 +112,7 @@ export function SwapInput({
       </div>
       <div>
         <Skeleton
-          isLoading={usdQuote?.loading || txnQuoteLoading}
+          isLoading={usdQuote.loading || txnQuoteLoading}
           className="rounded-sm w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">
