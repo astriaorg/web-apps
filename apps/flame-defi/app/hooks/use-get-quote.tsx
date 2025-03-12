@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
 import { useEvmChainData } from "config";
 import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
@@ -15,58 +15,56 @@ export const useGetQuote = () => {
 
   const getQuote = useCallback(
     async (
-      type: TRADE_TYPE,
-      topToken: TokenInputState,
-      bottomToken: TokenInputState,
+      tradeType: TRADE_TYPE,
+      tokenIn: TokenInputState,
+      tokenOut: TokenInputState,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
+      // tokens must exist
+      if (!tokenIn.token || !tokenOut.token) {
+        return;
+      }
       // can't swap between native and wrapped native tokens.
       if (
-        (topToken.token?.isNative && bottomToken.token?.isWrappedNative) ||
-        (topToken.token?.isWrappedNative && bottomToken.token?.isNative)
+        (tokenIn.token.isNative && tokenOut.token.isWrappedNative) ||
+        (tokenIn.token.isWrappedNative && tokenOut.token.isNative)
       ) {
         return;
       }
       // can't swap for the same token
-      if (topToken.token?.equals(bottomToken.token)) {
+      if (tokenIn.token.equals(tokenOut.token)) {
         return;
       }
-      const amount = topToken?.value
-        ? parseUnits(
-            topToken.value,
-            topToken?.token?.coinDecimals || 18,
-          ).toString()
-        : "";
 
-      // This is a fix for TIA not having a ERC20 contract address
-      const tokenInAddress = topToken?.token?.isNative
-        ? chainContracts?.wrappedNativeToken.address
-        : topToken?.token?.erc20ContractAddress;
-      const tokenInDecimals = topToken?.token?.coinDecimals;
-      const tokenInSymbol = topToken?.token?.coinDenom.toLocaleLowerCase();
-
-      const tokenOutAddress = bottomToken?.token?.isNative
-        ? chainContracts?.wrappedNativeToken.address
-        : bottomToken?.token?.erc20ContractAddress;
-      const tokenOutDecimals = bottomToken?.token?.coinDecimals;
-      const tokenOutSymbol = bottomToken?.token?.coinDenom.toLocaleLowerCase();
-
-      if (
-        !(
-          chainId &&
-          tokenInAddress &&
-          tokenInDecimals !== undefined &&
-          tokenInSymbol &&
-          tokenOutAddress &&
-          tokenOutDecimals !== undefined &&
-          tokenOutSymbol &&
-          amount &&
-          parseFloat(amount) > 0 &&
-          type
-        )
-      ) {
+      // get value from tokenIn or tokenOut based on tradeType
+      const value =
+        tradeType === TRADE_TYPE.EXACT_IN ? tokenIn.value : tokenOut.value;
+      const valueDecimals =
+        tradeType === TRADE_TYPE.EXACT_IN
+          ? tokenIn.token.coinDecimals
+          : tokenOut.token.coinDecimals;
+      const amount = parseUnits(value, valueDecimals).toString();
+      // must have value
+      if (amount === "0") {
         return;
       }
+
+      // NOTE - we need to use the address of the wrapped native token
+      //  when getting quotes using the native currency
+      const tokenInAddress = tokenIn.token.isNative
+        ? chainContracts.wrappedNativeToken.address
+        : tokenIn.token.erc20ContractAddress;
+      const tokenInDecimals = tokenIn.token.coinDecimals;
+      // NOTE - this is an abuse of the fact that the swap-routing-api doesn't
+      //  seem to use the symbol for the quote, or even check if the symbol
+      //  matches the address supplied
+      const tokenInSymbol = tokenIn.token.coinDenom.toLocaleLowerCase();
+
+      const tokenOutAddress = tokenOut.token.isNative
+        ? chainContracts.wrappedNativeToken.address
+        : tokenOut.token.erc20ContractAddress;
+      const tokenOutDecimals = tokenOut.token.coinDecimals;
+      const tokenOutSymbol = tokenOut.token.coinDenom.toLocaleLowerCase();
 
       try {
         setLoading(true);
@@ -82,7 +80,7 @@ export const useGetQuote = () => {
           `&tokenOutDecimals=${tokenOutDecimals}` +
           `&tokenOutSymbol=${tokenOutSymbol}` +
           `&amount=${amount}` +
-          `&type=${type}`;
+          `&type=${tradeType}`;
 
         const response = await fetch(url, {
           method: "GET",

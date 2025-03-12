@@ -12,7 +12,6 @@ export function SwapInput({
   availableTokens,
   balance,
   id,
-  index,
   inputToken,
   label,
   onInputChange,
@@ -71,7 +70,7 @@ export function SwapInput({
             type="number"
             value={inputToken.value}
             onChange={(e) => {
-              onInputChange(e.target.value, id, index);
+              onInputChange(e.target.value, id);
             }}
             className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden text-[36px]"
             placeholder="0"
@@ -82,7 +81,9 @@ export function SwapInput({
             tokens={availableTokens}
             selectedToken={inputToken.token}
             unavailableToken={oppositeToken?.token}
-            setSelectedToken={(token) => onTokenSelect(token, id, index)}
+            setSelectedToken={(token) =>
+              onTokenSelect(token, oppositeToken, id)
+            }
           />
           {inputToken.token && balance && !isDustAmount(balance) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
@@ -96,7 +97,7 @@ export function SwapInput({
               {
                 <span
                   onClick={() => {
-                    onInputChange(balance, id, index);
+                    onInputChange(balance, id);
                   }}
                   className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
                 >
