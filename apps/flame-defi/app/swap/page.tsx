@@ -306,7 +306,6 @@ export default function SwapPage(): React.ReactElement {
     if (newTopTokenInput.value !== "" || newBottomTokenInput.value !== "") {
       getQuote(newTradeType, newTopTokenInput, newBottomTokenInput).then(
         (res) => {
-          console.log(res);
           if (inputOne.isQuoteValue && res) {
             setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
           } else if (inputTwo.isQuoteValue && res) {
