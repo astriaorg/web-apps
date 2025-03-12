@@ -312,7 +312,7 @@ export default function SwapPage(): React.ReactElement {
           } else if (inputTwo.isQuoteValue && res) {
             setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
           }
-        }
+        },
       );
     }
   };
