@@ -208,22 +208,24 @@ export default function SwapPage(): React.ReactElement {
         return;
       }
 
+      // these won't have been recalculated yet, so calculate them here to use in the quote
       const newTopTokenInput = flipTokens ? newInputTwo : newInputOne;
       const newBottomTokenInput = flipTokens ? newInputOne : newInputTwo;
-      const tradeType = newTopTokenInput.isQuoteValue
+      const newTradeType = newTopTokenInput.isQuoteValue
         ? TRADE_TYPE.EXACT_OUT
         : TRADE_TYPE.EXACT_IN;
 
-      setTradeType(tradeType);
+      setTradeType(newTradeType);
 
       const exactInWithValue =
-        tradeType === TRADE_TYPE.EXACT_IN && newTopTokenInput.value !== "0";
+        newTradeType === TRADE_TYPE.EXACT_IN && newTopTokenInput.value !== "0";
       const exactOutWithValue =
-        tradeType === TRADE_TYPE.EXACT_OUT && newBottomTokenInput.value !== "0";
+        newTradeType === TRADE_TYPE.EXACT_OUT &&
+        newBottomTokenInput.value !== "0";
 
       if (exactInWithValue || exactOutWithValue) {
         debouncedGetQuoteRef.current(
-          tradeType,
+          newTradeType,
           newTopTokenInput,
           newBottomTokenInput,
           tokenInput,
@@ -264,11 +266,9 @@ export default function SwapPage(): React.ReactElement {
         return;
       }
 
+      // these won't have been recalculated yet, so calculate them here to use in the quote
       const newTopTokenInput = flipTokens ? newInputTwo : newInputOne;
       const newBottomTokenInput = flipTokens ? newInputOne : newInputTwo;
-      const tradeType = newTopTokenInput.isQuoteValue
-        ? TRADE_TYPE.EXACT_OUT
-        : TRADE_TYPE.EXACT_IN;
 
       const exactInWithValue =
         tradeType === TRADE_TYPE.EXACT_IN && newTopTokenInput.value !== "0";
@@ -287,7 +287,7 @@ export default function SwapPage(): React.ReactElement {
         );
       }
     },
-    [inputOne, inputTwo, setErrorText, flipTokens, getQuote],
+    [setErrorText, inputOne, inputTwo, flipTokens, tradeType, getQuote],
   );
 
   // toggle tradeType and flipTokens and get new quote accordingly
@@ -297,17 +297,23 @@ export default function SwapPage(): React.ReactElement {
 
     // determine what the next topToken and bottomToken will be based on the
     // new flipTokens value and use them to get a quote
-    const nextTopToken = newFlipTokens ? inputTwo : inputOne;
-    const nextBottomToken = newFlipTokens ? inputOne : inputTwo;
+    const newTopTokenInput = newFlipTokens ? inputTwo : inputOne;
+    const newBottomTokenInput = newFlipTokens ? inputOne : inputTwo;
 
     setTradeType(newTradeType);
     setFlipTokens(newFlipTokens);
 
-    if (nextTopToken.value !== "" || nextBottomToken.value !== "") {
-      // FIXME - when the arrow is clicked, the isQuoteValue value gets cleared.
-      //  where does this happen at? or is it just hidden because of loading state
-      //  in SwapInput?
-      getQuote(newTradeType, nextTopToken, nextBottomToken);
+    if (newTopTokenInput.value !== "" || newBottomTokenInput.value !== "") {
+      getQuote(newTradeType, newTopTokenInput, newBottomTokenInput).then(
+        (res) => {
+          console.log(res);
+          if (inputOne.isQuoteValue && res) {
+            setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
+          } else if (inputTwo.isQuoteValue && res) {
+            setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
+          }
+        }
+      );
     }
   };
 
