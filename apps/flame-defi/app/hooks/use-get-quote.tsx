@@ -16,8 +16,8 @@ export const useGetQuote = () => {
   const getQuote = useCallback(
     async (
       tradeType: TRADE_TYPE,
-      tokenIn: TokenInputState,
-      tokenOut: TokenInputState,
+      tokenIn: Omit<TokenInputState, "isQuoteValue">,
+      tokenOut: Omit<TokenInputState, "isQuoteValue">,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
       // tokens must exist
