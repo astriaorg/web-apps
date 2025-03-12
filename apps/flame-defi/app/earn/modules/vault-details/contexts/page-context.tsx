@@ -1,4 +1,4 @@
-import { getTimeseriesOptions } from "earn/modules/vault-details/components/charts/charts.utils";
+import { getTimeseriesOptions } from "earn/components/charts";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
 import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";

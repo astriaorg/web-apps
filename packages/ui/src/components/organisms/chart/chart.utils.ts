@@ -1,4 +1,4 @@
-import { ChartConfig, ChartTickInterval } from "./chart.types";
+import { ChartConfig, ChartInterval, ChartTickInterval } from "./chart.types";
 
 type DateParams = number | string | Date;
 
@@ -66,6 +66,15 @@ export const getDownsampledData = <T>(
   }
 
   return data;
+};
+
+export const CHART_INTERVAL_TO_CHART_TICK_INTERVAL: {
+  [key in ChartInterval]: ChartTickInterval;
+} = {
+  "1w": "3d",
+  "1m": "1w",
+  "3m": "1m",
+  all: "1m",
 };
 
 /**

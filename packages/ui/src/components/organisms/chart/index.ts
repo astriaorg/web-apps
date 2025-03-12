@@ -5,3 +5,9 @@ export { ChartStyle } from "./chart-style";
 export { ChartTooltip } from "./chart-tooltip";
 export { ChartTooltipContent } from "./chart-tooltip-content";
 export { ChartContext, useChart } from "./chart.context";
+export { type ChartConfig } from "./chart.types";
+export {
+  CHART_INTERVAL_TO_CHART_TICK_INTERVAL,
+  getDownsampledData,
+  getTickIntervalData,
+} from "./chart.utils";

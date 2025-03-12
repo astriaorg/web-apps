@@ -312,28 +312,6 @@ html[data-theme="dark"] {
   @apply flex-1 bg-transparent focus:outline-hidden placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
 }
 
-@utility earn-chart {
-  @apply overflow-visible;
-
-  > g {
-    @apply text-typography-light;
-    text-anchor: start;
-
-    line {
-      @apply hidden;
-    }
-
-    text {
-      @apply uppercase text-xs/3 font-medium tracking-wider;
-    }
-  }
-
-  > path,
-  > rect {
-    @apply text-orange;
-  }
-}
-
 @utility fade-out {
   @apply animate-fade-out;
 }
