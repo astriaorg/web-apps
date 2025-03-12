@@ -39,7 +39,7 @@ export interface TxnDetailsProps extends TxnStepsProps {
 
 export interface TransactionInfo {
   txnQuoteDataLoading: boolean;
-  gasUseEstimateUSD: string | undefined;
+  gasUseEstimateUSD: string;
   formattedGasUseEstimateUSD: string;
   expectedOutputBigInt: bigint;
   expectedOutputFormatted: string;

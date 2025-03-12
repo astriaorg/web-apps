@@ -164,7 +164,7 @@ export const useTxnInfo = ({
 
   return {
     txnQuoteDataLoading: txnQuoteLoading,
-    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
+    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD || "0",
     formattedGasUseEstimateUSD: formatNumber(
       parseFloat(txnQuoteData?.gasUseEstimateUSD || "0"),
       { minimumFractionDigits: 4, maximumFractionDigits: 4 },
