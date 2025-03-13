@@ -17,14 +17,15 @@ import {
   EvmCurrency,
   TokenInputState,
   TRADE_TYPE,
+  TRADE_TYPE_OPPOSITES,
   TXN_STATUS,
 } from "@repo/flame-types";
 import { useGetQuote } from "../hooks";
-import { useSwapButton, useOneToOneQuote, useTxnInfo } from "./hooks";
-import { SwapTxnSteps, SwapInput, TxnInfo } from "./components";
+import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
+import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
 import { useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
-import { TOKEN_INPUTS, SwapPairProps } from "./types";
+import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
 export default function SwapPage(): React.ReactElement {
   const { selectedChain } = useEvmChainData();
@@ -32,7 +33,7 @@ export default function SwapPage(): React.ReactElement {
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputOne, setInputOne] = useState<TokenInputState>({
-    token: currencies?.[0],
+    token: currencies[0],
     value: "",
     isQuoteValue: false,
   });
@@ -47,7 +48,7 @@ export default function SwapPage(): React.ReactElement {
       (inputOne.token?.isNative && inputTwo.token?.isWrappedNative) ||
         (inputOne.token?.isWrappedNative && inputTwo.token?.isNative),
     );
-  }, [inputOne, inputTwo]);
+  }, [inputOne.token, inputTwo.token]);
 
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
@@ -61,18 +62,18 @@ export default function SwapPage(): React.ReactElement {
 
   const swapInputs: SwapPairProps[] = [
     {
-      id: TOKEN_INPUTS.INPUT_ONE,
+      id: SWAP_INPUT_ID.INPUT_ONE,
       inputToken: inputOne,
       oppositeToken: inputTwo,
       balance: balances[0]?.value || "0",
-      label: flipTokens ? "Sell" : "Buy",
+      label: flipTokens ? "Buy" : "Sell",
     },
     {
-      id: TOKEN_INPUTS.INPUT_TWO,
+      id: SWAP_INPUT_ID.INPUT_TWO,
       inputToken: inputTwo,
       oppositeToken: inputOne,
       balance: balances[1]?.value || "0",
-      label: flipTokens ? "Buy" : "Sell",
+      label: flipTokens ? "Sell" : "Buy",
     },
   ];
 
@@ -82,7 +83,6 @@ export default function SwapPage(): React.ReactElement {
   ];
   const topToken = swapPairs[0].inputToken;
   const bottomToken = swapPairs[1].inputToken;
-  const userInputToken = !topToken.isQuoteValue ? topToken : bottomToken;
 
   useEffect(() => {
     if (userAccount.address && (inputOne.token || inputTwo.token)) {
@@ -129,18 +129,18 @@ export default function SwapPage(): React.ReactElement {
     debounce(
       (
         tradeType: TRADE_TYPE,
-        tokenData: { token: EvmCurrency; value: string },
-        token: TokenInputState,
-        tokenInput: TOKEN_INPUTS,
+        tokenIn: TokenInputState,
+        tokenOut: TokenInputState,
+        inputId: SWAP_INPUT_ID,
       ) => {
-        getQuote(tradeType, tokenData, token).then((res) => {
-          if (tokenInput === TOKEN_INPUTS.INPUT_ONE && res) {
+        getQuote(tradeType, tokenIn, tokenOut).then((res) => {
+          if (inputId === SWAP_INPUT_ID.INPUT_ONE && res) {
             setInputTwo((prev) => ({
               ...prev,
               value: res.quoteDecimals,
               isQuoteValue: true,
             }));
-          } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO && res) {
+          } else if (inputId === SWAP_INPUT_ID.INPUT_TWO && res) {
             setInputOne((prev) => ({
               ...prev,
               value: res.quoteDecimals,
@@ -153,15 +153,9 @@ export default function SwapPage(): React.ReactElement {
     ),
   );
 
-  const handleTradeType = useCallback((index: number) => {
-    if (index === 0) {
-      setTradeType(TRADE_TYPE.EXACT_IN);
-    } else if (index === 1) {
-      setTradeType(TRADE_TYPE.EXACT_OUT);
-    }
-  }, []);
-
-  const handleTiaWtiaInputs = (value: string) => {
+  // the native currency and wrapped tokens are always the same price,
+  // so update inputOne and inputTwo with the same value
+  const handleWhenNativeAndWrapped = (value: string) => {
     setInputOne((prev) => ({ ...prev, value: value }));
     setInputTwo((prev) => ({ ...prev, value: value }));
   };
@@ -175,132 +169,149 @@ export default function SwapPage(): React.ReactElement {
   }, [setQuote, setTxnStatus, topToken, bottomToken]);
 
   const handleInputChange = useCallback(
-    (value: string, tokenInput: TOKEN_INPUTS, index: number) => {
-      if (isTiaWtia) {
-        handleTiaWtiaInputs(value);
-        return;
-      }
+    (value: string, inputId: SWAP_INPUT_ID) => {
       setErrorText(null);
-      handleTradeType(index);
 
-      const tradeType =
-        index === 0 ? TRADE_TYPE.EXACT_IN : TRADE_TYPE.EXACT_OUT;
-
-      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
-        setInputOne((prev) => ({ ...prev, value: value, isQuoteValue: false }));
-        setInputTwo((prev) => ({ ...prev, value: "", isQuoteValue: true }));
-      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
-        setInputTwo((prev) => ({ ...prev, value: value, isQuoteValue: false }));
-        setInputOne((prev) => ({ ...prev, value: "", isQuoteValue: true }));
-      }
-
-      if (
-        value !== "" &&
-        parseFloat(value) > 0 &&
-        topToken.token &&
-        bottomToken.token
-      ) {
-        debouncedGetQuoteRef.current(
-          tradeType,
-          { token: topToken.token, value },
-          bottomToken,
-          tokenInput,
-        );
-      }
-
+      // clear all values and cancel any current getQuotes if user zeros input
       if (value === "" || value === "0") {
         setInputOne((prev) => ({ ...prev, value: value }));
         setInputTwo((prev) => ({ ...prev, value: value }));
         cancelGetQuote();
       }
+
+      // we won't have up-to-date inputs after setting them in state,
+      // so calculate them here so we can use them to get the quote
+      let newInputOne = inputOne;
+      let newInputTwo = inputTwo;
+
+      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+        newInputOne = { ...inputOne, value, isQuoteValue: false };
+        // zero out the other input's value and set it as the quoted value when user types in an input
+        newInputTwo = { ...inputTwo, value: "", isQuoteValue: true };
+        setInputOne(newInputOne);
+        setInputTwo(newInputTwo);
+      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+        newInputTwo = { ...inputTwo, value, isQuoteValue: false };
+        // zero out the other input's value and set it as the quoted value when user types in an input
+        newInputOne = { ...inputOne, value: "", isQuoteValue: true };
+        setInputTwo(newInputTwo);
+        setInputOne(newInputOne);
+      }
+
+      if (
+        (newInputOne.token?.isNative && newInputTwo.token?.isWrappedNative) ||
+        (newInputOne.token?.isWrappedNative && newInputTwo.token?.isNative)
+      ) {
+        handleWhenNativeAndWrapped(value);
+        // we don't need to get a quote if we're wrapping/unwrapping,
+        // so we can return early
+        return;
+      }
+
+      // these won't have been recalculated yet, so calculate them here to use in the quote
+      const newTopTokenInput = flipTokens ? newInputTwo : newInputOne;
+      const newBottomTokenInput = flipTokens ? newInputOne : newInputTwo;
+      const newTradeType = newTopTokenInput.isQuoteValue
+        ? TRADE_TYPE.EXACT_OUT
+        : TRADE_TYPE.EXACT_IN;
+
+      setTradeType(newTradeType);
+
+      const exactInWithValue =
+        newTradeType === TRADE_TYPE.EXACT_IN && newTopTokenInput.value !== "0";
+      const exactOutWithValue =
+        newTradeType === TRADE_TYPE.EXACT_OUT &&
+        newBottomTokenInput.value !== "0";
+
+      if (exactInWithValue || exactOutWithValue) {
+        debouncedGetQuoteRef.current(
+          newTradeType,
+          newTopTokenInput,
+          newBottomTokenInput,
+          inputId,
+        );
+      }
     },
-    [
-      topToken,
-      bottomToken,
-      handleTradeType,
-      isTiaWtia,
-      debouncedGetQuoteRef,
-      cancelGetQuote,
-      setErrorText,
-    ],
+    [setErrorText, inputOne, inputTwo, flipTokens, cancelGetQuote],
   );
 
   const handleTokenSelect = useCallback(
-    (selectedToken: EvmCurrency, tokenInput: TOKEN_INPUTS, index: number) => {
-      const oppositeInputToken =
-        tokenInput === TOKEN_INPUTS.INPUT_ONE ? bottomToken : topToken;
-      if (
-        (selectedToken.isNative && oppositeInputToken.token?.isWrappedNative) ||
-        (selectedToken.isWrappedNative && oppositeInputToken.token?.isNative)
-      ) {
-        const value =
-          tokenInput === TOKEN_INPUTS.INPUT_ONE
-            ? bottomToken.value
-            : topToken.value;
-        handleTiaWtiaInputs(value);
-      }
-
-      if (tokenInput === TOKEN_INPUTS.INPUT_ONE) {
-        setInputOne((prev) => ({ ...prev, token: selectedToken }));
-      } else if (tokenInput === TOKEN_INPUTS.INPUT_TWO) {
-        setInputTwo((prev) => ({ ...prev, token: selectedToken }));
-      }
-
+    (
+      selectedToken: EvmCurrency,
+      oppositeTokenInput: TokenInputState,
+      inputId: SWAP_INPUT_ID,
+    ) => {
       setErrorText(null);
 
-      const tradeType = topToken.isQuoteValue
-        ? TRADE_TYPE.EXACT_OUT
-        : TRADE_TYPE.EXACT_IN;
-      const exactInToken = index === 0 ? selectedToken : topToken.token;
-      const exactOutToken =
-        index === 0 && bottomToken.token ? bottomToken.token : selectedToken;
+      // we won't have up-to-date inputs after setting them in state,
+      // so calculate them here so we can use them to get the quote
+      let newInputOne = inputOne;
+      let newInputTwo = inputTwo;
+
+      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+        newInputOne = { ...inputOne, token: selectedToken };
+        setInputOne(newInputOne);
+      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+        newInputTwo = { ...inputTwo, token: selectedToken };
+        setInputTwo(newInputTwo);
+      }
 
       if (
-        userInputToken.value !== "" &&
-        parseFloat(userInputToken.value) > 0 &&
-        exactInToken &&
-        exactOutToken
+        (newInputOne.token?.isNative && newInputTwo.token?.isWrappedNative) ||
+        (newInputOne.token?.isWrappedNative && newInputTwo.token?.isNative)
       ) {
-        getQuote(
-          tradeType,
-          { token: exactInToken, value: userInputToken.value },
-          { token: exactOutToken, value: "" },
-        ).then((res) => {
+        handleWhenNativeAndWrapped(oppositeTokenInput.value);
+        // we don't need to get a quote if we're wrapping/unwrapping,
+        // so we can return early
+        return;
+      }
+
+      // these won't have been recalculated yet, so calculate them here to use in the quote
+      const newTopTokenInput = flipTokens ? newInputTwo : newInputOne;
+      const newBottomTokenInput = flipTokens ? newInputOne : newInputTwo;
+
+      const exactInWithValue =
+        tradeType === TRADE_TYPE.EXACT_IN && newTopTokenInput.value !== "0";
+      const exactOutWithValue =
+        tradeType === TRADE_TYPE.EXACT_OUT && newBottomTokenInput.value !== "0";
+
+      if (exactInWithValue || exactOutWithValue) {
+        getQuote(tradeType, newTopTokenInput, newBottomTokenInput).then(
+          (res) => {
+            if (newInputOne.isQuoteValue && res) {
+              setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
+            } else if (newInputTwo.isQuoteValue && res) {
+              setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
+            }
+          },
+        );
+      }
+    },
+    [setErrorText, inputOne, inputTwo, flipTokens, tradeType, getQuote],
+  );
+
+  // toggle tradeType and flipTokens and get new quote accordingly
+  const handleArrowClick = () => {
+    const newTradeType = TRADE_TYPE_OPPOSITES[tradeType];
+    const newFlipTokens = !flipTokens;
+
+    // determine what the next topToken and bottomToken will be based on the
+    // new flipTokens value and use them to get a quote
+    const newTopTokenInput = newFlipTokens ? inputTwo : inputOne;
+    const newBottomTokenInput = newFlipTokens ? inputOne : inputTwo;
+
+    setTradeType(newTradeType);
+    setFlipTokens(newFlipTokens);
+
+    if (newTopTokenInput.value !== "" || newBottomTokenInput.value !== "") {
+      getQuote(newTradeType, newTopTokenInput, newBottomTokenInput).then(
+        (res) => {
           if (inputOne.isQuoteValue && res) {
             setInputOne((prev) => ({ ...prev, value: res.quoteDecimals }));
           } else if (inputTwo.isQuoteValue && res) {
             setInputTwo((prev) => ({ ...prev, value: res.quoteDecimals }));
           }
-        });
-      }
-    },
-    [
-      getQuote,
-      topToken,
-      bottomToken,
-      setErrorText,
-      userInputToken,
-      inputOne,
-      inputTwo,
-    ],
-  );
-
-  const handleArrowClick = () => {
-    const newTradeType =
-      tradeType === TRADE_TYPE.EXACT_IN
-        ? TRADE_TYPE.EXACT_OUT
-        : TRADE_TYPE.EXACT_IN;
-    setFlipTokens((prev) => !prev);
-    setTradeType(newTradeType);
-
-    const preFlipTokenOne = !flipTokens ? inputTwo : inputOne;
-    const preFlipTokenTwo = !flipTokens ? inputOne : inputTwo;
-
-    if (preFlipTokenOne.value !== "" || preFlipTokenTwo.value !== "") {
-      getQuote(
-        newTradeType,
-        { token: preFlipTokenOne.token, value: userInputToken.value },
-        preFlipTokenTwo,
+        },
       );
     }
   };
@@ -348,7 +359,6 @@ export default function SwapPage(): React.ReactElement {
                   availableTokens={currencies}
                   balance={balance}
                   id={id}
-                  index={index}
                   inputToken={inputToken}
                   key={index}
                   label={label}

@@ -5,9 +5,9 @@ import { useEvmChainData } from "config";
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 import { useGetQuote } from "../../hooks";
 
-export const useUsdQuote = (inputToken?: TokenInputState) => {
+export const useUsdQuote = (inputToken: TokenInputState) => {
   const { selectedChain } = useEvmChainData();
-  const usdcToken = selectedChain.currencies?.find(
+  const usdcToken = selectedChain.currencies.find(
     (currency) => currency.coinDenom === "USDC",
   );
   const { quote, loading, quoteError, getQuote } = useGetQuote();
@@ -15,23 +15,21 @@ export const useUsdQuote = (inputToken?: TokenInputState) => {
   const debouncedGetQuoteRef = useRef(
     debounce(
       (
-        tradeType: TRADE_TYPE,
-        tokenData: { token: EvmCurrency; value: string },
+        inputToken: Omit<TokenInputState, "isQuoteValue">,
         usdcToken: EvmCurrency,
       ) => {
-        getQuote(tradeType, tokenData, { token: usdcToken, value: "" });
+        void getQuote(TRADE_TYPE.EXACT_IN, inputToken, {
+          token: usdcToken,
+          value: "",
+        });
       },
       500,
     ),
   );
 
   useEffect(() => {
-    if (inputToken && inputToken.token && inputToken.value && usdcToken) {
-      debouncedGetQuoteRef.current(
-        TRADE_TYPE.EXACT_IN,
-        { token: inputToken.token, value: inputToken.value },
-        usdcToken,
-      );
+    if (inputToken.value !== "0" && usdcToken) {
+      debouncedGetQuoteRef.current(inputToken, usdcToken);
     }
   }, [inputToken, usdcToken]);
 

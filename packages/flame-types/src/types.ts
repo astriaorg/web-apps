@@ -604,6 +604,11 @@ export enum TRADE_TYPE {
   EXACT_OUT = "exactOut",
 }
 
+export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
+  [TRADE_TYPE.EXACT_IN]: TRADE_TYPE.EXACT_OUT,
+  [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
+};
+
 export enum TXN_STATUS {
   IDLE = "idle",
   PENDING = "pending",
