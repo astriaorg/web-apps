@@ -10,4 +10,5 @@ export {
   CHART_INTERVAL_TO_CHART_TICK_INTERVAL,
   getDownsampledData,
   getTickIntervalData,
+  getTickIntervalDateTimeFormatOptions,
 } from "./chart.utils";

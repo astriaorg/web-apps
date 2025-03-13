@@ -140,7 +140,7 @@ export const ContentSection = () => {
                 }
                 renderTooltipContent={(value) => (
                   <>
-                    <div>{formatDate(value.x * 1000)}</div>
+                    <div>{formatDate(value.x * 1000, { timeZone: "UTC" })}</div>
                     <div>
                       {formatNumber(value.y ?? 0, {
                         style: "percent",
@@ -178,7 +178,9 @@ export const ContentSection = () => {
                 renderTooltipContent={(value) => {
                   return (
                     <>
-                      <div>{formatDate(value.x * 1000)}</div>
+                      <div>
+                        {formatDate(value.x * 1000, { timeZone: "UTC" })}
+                      </div>
                       <div>
                         {formatAbbreviatedNumber((value.y ?? 0).toString(), {
                           style: "currency",

@@ -9,6 +9,7 @@ import {
   ChartTooltip,
   getDownsampledData,
   getTickIntervalData,
+  getTickIntervalDateTimeFormatOptions,
   Skeleton,
   Tabs,
   TabsList,
@@ -56,25 +57,28 @@ export const LineChart = ({
 }: LineChartProps) => {
   const { formatDate } = useIntl();
 
-  const downsampled = useMemo<FloatDataPoint[]>(() => {
+  const interval = useMemo(
+    () => CHART_INTERVAL_TO_CHART_TICK_INTERVAL[selectedInterval],
+    [selectedInterval],
+  );
+
+  const { downsampled, ticks } = useMemo(() => {
     if (!data) {
-      return [];
+      return { downsampledData: [], ticks: [] };
     }
 
-    // Convert to milliseconds.
-    return getDownsampledData(data).map((it) => ({ ...it, x: it.x * 1000 }));
-  }, [data]);
+    const downsampled = getDownsampledData(data);
 
-  const ticks = useMemo(() => {
-    if (!downsampled) {
-      return [];
-    }
-
-    return getTickIntervalData(downsampled, {
-      interval: CHART_INTERVAL_TO_CHART_TICK_INTERVAL[selectedInterval],
-      key: "x",
-    }).map((it) => (it as FloatDataPoint).x);
-  }, [downsampled, selectedInterval]);
+    return {
+      downsampled,
+      ticks: getTickIntervalData<FloatDataPoint>(
+        // Convert seconds to milliseconds.
+        downsampled.map((it) => ({ ...it, x: it.x * 1000 })),
+        interval,
+        "x",
+      ).map((it) => (it?.x ?? 0) / 1000),
+    };
+  }, [data, interval]);
 
   if (isError || data === null) {
     return null;
@@ -115,16 +119,17 @@ export const LineChart = ({
               <XAxis
                 dataKey="x"
                 tickLine={false}
-                axisLine={false}
                 ticks={ticks}
                 dy={16}
-                tickFormatter={(value) =>
-                  formatDate(value, {
-                    day: "numeric",
-                    month: "short",
-                    year: "2-digit",
-                  })
+                tickFormatter={(value: FloatDataPoint["x"]) =>
+                  formatDate(
+                    value * 1000,
+                    getTickIntervalDateTimeFormatOptions(interval),
+                  )
                 }
+                // Show overflowing ticks.
+                // allowDataOverflow
+                // interval={0}
               />
               <YAxis
                 dataKey="y"

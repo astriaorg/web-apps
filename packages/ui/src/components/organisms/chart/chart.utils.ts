@@ -82,13 +82,11 @@ export const CHART_INTERVAL_TO_CHART_TICK_INTERVAL: {
  */
 export const getTickIntervalData = <T>(
   data: T[],
-  options: {
-    interval: ChartTickInterval;
-    /**
-     * The accessor key for the date value in the data point.
-     */
-    key: keyof T;
-  },
+  interval: ChartTickInterval,
+  /**
+   * The accessor key for the date value in the data point.
+   */
+  key: keyof T,
 ): (T | null)[] => {
   const result: (T | null)[] = [];
 
@@ -96,30 +94,28 @@ export const getTickIntervalData = <T>(
     return result;
   }
 
-  switch (options.interval) {
+  switch (interval) {
     case "3d":
     case "1w": {
       const milliseconds = (() => {
-        switch (options.interval) {
+        switch (interval) {
           case "3d":
             return 1000 * 60 * 60 * 24 * 3;
           case "1w":
             return 1000 * 60 * 60 * 24 * 7;
           default:
-            throw new Error(
-              `Invalid chart tick interval: "${options.interval}".`,
-            );
+            throw new Error(`Invalid chart tick interval: "${interval}".`);
         }
       })();
 
       let previousDate = data[0]
-        ? new Date(data[0][options.key as keyof T] as DateParams).getTime()
+        ? new Date(data[0][key as keyof T] as DateParams).getTime()
         : 0;
       result.push(data[0] as T);
 
       for (let i = 1; i < data.length; i++) {
         const currentDate = new Date(
-          (data[i] as T)[options.key as keyof T] as DateParams,
+          (data[i] as T)[key as keyof T] as DateParams,
         ).getTime();
         if (currentDate >= previousDate + milliseconds) {
           result.push(data[i] as T);
@@ -135,12 +131,10 @@ export const getTickIntervalData = <T>(
 
       for (let i = 1; i < data.length; i++) {
         const currentMonth = new Date(
-          (data[i] as T)[options.key as keyof T] as DateParams,
+          (data[i] as T)[key as keyof T] as DateParams,
         ).getUTCMonth();
         const previousMonth = previousItem
-          ? new Date(
-              previousItem[options.key as keyof T] as DateParams,
-            ).getUTCMonth()
+          ? new Date(previousItem[key as keyof T] as DateParams).getUTCMonth()
           : -1;
 
         if (currentMonth !== previousMonth) {
@@ -152,9 +146,35 @@ export const getTickIntervalData = <T>(
       break;
     }
     default: {
-      throw new Error(`Invalid chart tick interval: "${options.interval}".`);
+      throw new Error(`Invalid chart tick interval: "${interval}".`);
     }
   }
 
   return result;
+};
+
+export const getTickIntervalDateTimeFormatOptions = (
+  interval: ChartTickInterval,
+): Intl.DateTimeFormatOptions => {
+  switch (interval) {
+    case "3d":
+    case "1w": {
+      return {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      };
+    }
+    case "1m": {
+      return {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      };
+    }
+    default: {
+      throw new Error(`Invalid chart tick interval: "${interval}".`);
+    }
+  }
 };
