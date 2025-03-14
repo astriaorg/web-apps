@@ -19,6 +19,7 @@ export function TxnDetails({
   priceImpact,
   minimumReceived,
   oneToOneQuote,
+  isQuoteLoading,
 }: TxnDetailsProps) {
   const {
     topTokenSymbol,
@@ -33,22 +34,26 @@ export function TxnDetails({
   return (
     <>
       <div className="flex flex-col items-center gap-3 mb-8 mt-6 relative">
-        <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
-          <span>{formatDecimalValues(topToken.value || "0", 6)}</span>
-          <span className="flex items-center gap-1">
-            {topToken.token?.IconComponent &&
-              topToken.token.IconComponent({ size: 24 })}
-            {topToken.token?.coinDenom}
-          </span>
-        </div>
-        <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
-          <span>{expectedOutputFormatted}</span>
-          <span className="flex items-center gap-1">
-            {bottomToken.token?.IconComponent &&
-              bottomToken.token.IconComponent({ size: 24 })}
-            {bottomToken.token?.coinDenom}
-          </span>
-        </div>
+        <Skeleton className="rounded-sm w-full" isLoading={isQuoteLoading}>
+          <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
+            <span>{formatDecimalValues(topToken.value || "0", 6)}</span>
+            <span className="flex items-center gap-1">
+              {topToken.token?.IconComponent &&
+                topToken.token.IconComponent({ size: 24 })}
+              {topToken.token?.coinDenom}
+            </span>
+          </div>
+        </Skeleton>
+        <Skeleton className="rounded-sm w-full" isLoading={isQuoteLoading}>
+          <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
+            <span>{expectedOutputFormatted}</span>
+            <span className="flex items-center gap-1">
+              {bottomToken.token?.IconComponent &&
+                bottomToken.token.IconComponent({ size: 24 })}
+              {bottomToken.token?.coinDenom}
+            </span>
+          </div>
+        </Skeleton>
         <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
           <div className="z-10 p-1 bg-grey-dark rounded-xl border-4 border-black">
             <ArrowDownIcon aria-label="Swap" size={20} />
@@ -218,6 +223,7 @@ export function SwapTxnSteps({
   txnHash,
   txnMsg,
   oneToOneQuote,
+  isQuoteLoading,
 }: SwapTxnStepsProps) {
   return (
     <div className="h-[320px]">
@@ -230,6 +236,7 @@ export function SwapTxnSteps({
           minimumReceived={txnInfo.minimumReceived}
           isTiaWtia={isTiaWtia}
           oneToOneQuote={oneToOneQuote}
+          isQuoteLoading={isQuoteLoading}
         />
       )}
       {txnStatus === TXN_STATUS.PENDING && (
