@@ -52,7 +52,7 @@ export const getDownsampledData = <T>(
      * Threshold for the maximum number of data points to display.
      */
     maximumDataPoints: number;
-  } = { maximumDataPoints: 1000 },
+  } = { maximumDataPoints: 100 },
 ) => {
   if (data.length > options.maximumDataPoints) {
     const downsampled: T[] = [];

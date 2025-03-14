@@ -26,7 +26,6 @@ export const ChartContainer = React.forwardRef<
         ref={ref}
         className={cn(
           "flex aspect-video justify-center",
-          "",
           // Axis text.
           "[&_.recharts-cartesian-axis-tick_text]:fill-typography-light [&_.recharts-cartesian-axis-tick_text]:uppercase [&_.recharts-cartesian-axis-tick_text]:text-xs/3 [&_.recharts-cartesian-axis-tick_text]:font-medium [&_.recharts-cartesian-axis-tick_text]:tracking-wider",
           // Grid lines.
