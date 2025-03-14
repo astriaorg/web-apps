@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
-import { useEvmChainData } from "config";
+import { useConfig, useEvmChainData } from "config";
 import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 
 export const useGetQuote = () => {
+  const { swapQuoteAPIURL } = useConfig();
   const {
     selectedChain: { chainId, contracts: chainContracts },
   } = useEvmChainData();
@@ -71,7 +72,7 @@ export const useGetQuote = () => {
         setError(null);
 
         const url =
-          `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
+          `${swapQuoteAPIURL}?` +
           `chainId=${chainId}` +
           `&tokenInAddress=${tokenInAddress}` +
           `&tokenInDecimals=${tokenInDecimals}` +
@@ -110,7 +111,7 @@ export const useGetQuote = () => {
         setLoading(false);
       }
     },
-    [chainId, chainContracts.wrappedNativeToken.address],
+    [chainId, chainContracts.wrappedNativeToken.address, swapQuoteAPIURL],
   );
 
   const cancelGetQuote = useCallback(() => {

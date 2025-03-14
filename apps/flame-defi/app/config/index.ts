@@ -24,6 +24,8 @@ export interface AppConfig {
   earnAPIURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
+  // The URL for the swap quote API.
+  swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
   // The default approval amount for tokens.
