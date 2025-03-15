@@ -1,4 +1,5 @@
-import { StatusCard } from "@repo/ui/components";
+import { Skeleton, StatusCard } from "@repo/ui/components";
+import { formatAbbreviatedNumber } from "@repo/ui/utils";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
@@ -8,8 +9,10 @@ import { BorrowCards } from "earn/modules/market-details/components/borrow-cards
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo, useState } from "react";
+import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
+  const { formatNumber } = useIntl();
   const {
     query: { data, isPending, status },
   } = usePageContext();
@@ -35,21 +38,21 @@ export const ContentSection = () => {
     return [
       {
         label: {
-          left: "APY",
-          right: data?.marketByUniqueKey.loanAsset.symbol,
-        },
-        value: data?.marketByUniqueKey.state?.netBorrowApy ?? 0,
-        options: {
-          style: "percent",
-          minimumFractionDigits: 2,
-        },
-        variant: "accent",
-      },
-      {
-        label: {
           left: "Total Supply",
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
+        footer: (() => {
+          const { value, suffix } = formatAbbreviatedNumber(
+            (data?.marketByUniqueKey.state?.supplyAssetsUsd ?? 0).toString(),
+          );
+
+          return (
+            formatNumber(+value, {
+              style: "currency",
+              currency: "USD",
+            }) + suffix
+          );
+        })(),
         value: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
           .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
           .toNumber(),
@@ -57,12 +60,25 @@ export const ContentSection = () => {
           minimumFractionDigits: 2,
         },
         useAbbreviatedNumberFormat: true,
+        variant: "accent",
       },
       {
         label: {
           left: "Liquidity",
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
+        footer: (() => {
+          const { value, suffix } = formatAbbreviatedNumber(
+            (data?.marketByUniqueKey.state?.liquidityAssetsUsd ?? 0).toString(),
+          );
+
+          return (
+            formatNumber(+value, {
+              style: "currency",
+              currency: "USD",
+            }) + suffix
+          );
+        })(),
         value: new Big(data?.marketByUniqueKey.state?.liquidityAssets ?? 0)
           .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
           .toNumber(),
@@ -73,18 +89,17 @@ export const ContentSection = () => {
       },
       {
         label: {
-          left: "LLTV",
+          left: "APY",
+          right: data?.marketByUniqueKey.loanAsset.symbol,
         },
-        value: new Big(data?.marketByUniqueKey.lltv ?? 0)
-          .div(10 ** 18)
-          .toNumber(),
+        value: data?.marketByUniqueKey.state?.netBorrowApy ?? 0,
         options: {
           style: "percent",
           minimumFractionDigits: 2,
         },
       },
     ];
-  }, [data]);
+  }, [data, formatNumber]);
 
   return (
     <section className="flex flex-col px-4">
@@ -97,12 +112,16 @@ export const ContentSection = () => {
         <div className="mt-12 flex flex-col gap-10 lg:gap-2 lg:flex-row">
           {/* Summary section. */}
           <div className="order-2 lg:order-1 lg:basis-2/3">
-            <div className="flex flex-col gap-2">
-              <SummaryCards
-                items={items}
-                isLoading={isPending}
-                className="grid grid-cols-2 gap-2"
-              />
+            <SummaryCards
+              items={items}
+              isLoading={isPending}
+              className="grid grid-cols-3 gap-2"
+            />
+
+            <div className="mt-10 flex flex-col space-y-4">
+              <Skeleton isLoading={isPending} className="w-52">
+                <div className="text-base/4 font-semibold">Overview</div>
+              </Skeleton>
               <OverviewCards />
               <VaultListTable
                 data={formattedData}

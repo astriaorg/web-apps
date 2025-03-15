@@ -2,6 +2,7 @@ import {
   AnimatedCounter,
   Card,
   CardContent,
+  CardLabel,
   Skeleton,
 } from "@repo/ui/components";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
@@ -20,7 +21,6 @@ export const MarketSummary = () => {
     {
       label: {
         left: React.ReactNode;
-        right?: React.ReactNode;
       };
       value: number;
     }[]
@@ -46,9 +46,9 @@ export const MarketSummary = () => {
       {items.map((it, index) => (
         <Card key={`market-summary_card_${index}`}>
           <CardContent className="space-y-2">
-            <span className="text-xs/3 text-typography-light">
-              {it.label.left}
-            </span>
+            <CardLabel>
+              <span>{it.label.left}</span>
+            </CardLabel>
 
             <Skeleton isLoading={isPending}>
               <AnimatedCounter

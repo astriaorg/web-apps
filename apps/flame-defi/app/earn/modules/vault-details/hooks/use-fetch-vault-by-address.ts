@@ -15,6 +15,7 @@ const query = graphql(`
       }
       liquidity {
         underlying
+        usd
       }
       metadata {
         curators {

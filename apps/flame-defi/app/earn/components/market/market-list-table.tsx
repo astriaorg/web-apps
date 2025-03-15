@@ -182,9 +182,6 @@ export const MarketListTable = ({
             suffix: formattedLiquidityAssetsUSDSuffix,
           } = formatAbbreviatedNumber(
             new Big(row.original.state?.liquidityAssetsUsd ?? 0).toFixed(),
-            {
-              minimumFractionDigits: 2,
-            },
           );
 
           return (

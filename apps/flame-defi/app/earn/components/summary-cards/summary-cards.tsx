@@ -14,6 +14,7 @@ export interface SummaryCardsProps
       left: React.ReactNode;
       right?: React.ReactNode;
     };
+    footer?: React.ReactNode;
     value: number;
     variant?: React.ComponentPropsWithoutRef<typeof Card>["variant"];
     options?: FormatNumberOptions;
@@ -34,9 +35,9 @@ export const SummaryCards = ({
           isLoading={isLoading}
           variant={it.variant}
           // Don't overflow the card on smaller screens after animation completes.
-          className="space-y-2 overflow-hidden max-w-[calc(100vw - 32px)]"
+          className="overflow-hidden max-w-[calc(100vw - 32px)]"
         >
-          <CardContent>
+          <CardContent className="space-y-2">
             <CardLabel>
               <span className="flex-1">{it.label.left}</span>
               <span>{it.label.right}</span>
@@ -47,6 +48,11 @@ export const SummaryCards = ({
               options={it.options}
               useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
             />
+            <CardLabel>
+              <span className="text-xs text-typography-default truncate">
+                {it.footer}
+              </span>
+            </CardLabel>
           </CardContent>
         </Card>
       ))}

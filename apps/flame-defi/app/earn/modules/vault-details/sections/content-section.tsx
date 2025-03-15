@@ -57,6 +57,18 @@ export const ContentSection = () => {
           left: "Total Deposits",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          const { value, suffix } = formatAbbreviatedNumber(
+            (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
+          );
+
+          return (
+            formatNumber(+value, {
+              style: "currency",
+              currency: "USD",
+            }) + suffix
+          );
+        })(),
         value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -72,6 +84,18 @@ export const ContentSection = () => {
           left: "Liquidity",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          const { value, suffix } = formatAbbreviatedNumber(
+            (data?.vaultByAddress.liquidity?.usd ?? 0).toString(),
+          );
+
+          return (
+            formatNumber(+value, {
+              style: "currency",
+              currency: "USD",
+            }) + suffix
+          );
+        })(),
         value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -83,7 +107,7 @@ export const ContentSection = () => {
         useAbbreviatedNumberFormat: true,
       },
     ];
-  }, [data]);
+  }, [data, formatNumber]);
 
   return (
     <section className="flex flex-col px-4">

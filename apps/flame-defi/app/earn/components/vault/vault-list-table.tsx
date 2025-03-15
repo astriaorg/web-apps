@@ -111,9 +111,6 @@ export const VaultListTable = ({
             suffix: formattedTotalAssetsUSDSuffix,
           } = formatAbbreviatedNumber(
             new Big(row.original.state?.totalAssetsUsd ?? 0).toFixed(),
-            {
-              minimumFractionDigits: 2,
-            },
           );
 
           return (
