@@ -1,4 +1,3 @@
-export * from "./use-get-quote";
 export * from "./use-one-to-one-quote";
 export * from "./use-swap-button";
 export * from "./use-txn-info";

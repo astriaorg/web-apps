@@ -1,8 +1,8 @@
-import { Card, CardFigureInput, CardLabel } from "@repo/ui/components";
-import { FormattedNumber } from "@repo/ui/intl";
+import { Button, Card, CardFigureInput, CardLabel } from "@repo/ui/components";
 import { Image } from "components/image";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import React, { useMemo } from "react";
+import { FormattedNumber } from "react-intl";
 
 export const DepositCards = () => {
   const {
@@ -105,7 +105,7 @@ export const DepositCards = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card isLoading={isPending} padding="md">
+      <Card isLoading={isPending} padding="md" className="space-y-2">
         <CardLabel>
           <span className="flex-1">
             Deposit {data?.vaultByAddress.asset.symbol}
@@ -121,7 +121,7 @@ export const DepositCards = () => {
           </div>
         </CardLabel>
         <CardFigureInput placeholder="0.00" />
-        <CardLabel className="text-text-light text-sm/3">
+        <CardLabel className="text-typography-light text-sm/3">
           <FormattedNumber
             value={0}
             minimumFractionDigits={2}
@@ -141,10 +141,13 @@ export const DepositCards = () => {
               <span className="flex-1">{it.label.left}</span>
               <div>{it.label.right}</div>
             </CardLabel>
-            <CardLabel className="text-2xl/6 text-text">{it.value}</CardLabel>
+            <CardLabel className="text-2xl/6 text-typography-default">
+              {it.value}
+            </CardLabel>
           </div>
         ))}
       </Card>
+      <Button>Connect Wallet</Button>
     </div>
   );
 };

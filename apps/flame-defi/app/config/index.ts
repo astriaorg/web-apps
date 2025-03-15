@@ -1,11 +1,3 @@
-import {
-  getAllChainConfigs,
-  getFlameChainId,
-  getFlameNetworkByChainId,
-} from "./chain-configs";
-import { ConfigContextProvider } from "./contexts/config-context";
-import { getEnvVariable } from "./env";
-import { useConfig, useEvmChainData } from "./hooks/use-config";
 import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 
 /**
@@ -32,6 +24,8 @@ export interface AppConfig {
   earnAPIURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
   feedbackFormURL: string | null;
+  // The URL for the swap quote API.
+  swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
   // The default approval amount for tokens.
@@ -39,6 +33,7 @@ export interface AppConfig {
   // The default slippage tolerance for swaps.
   swapSlippageToleranceDefault: number;
   // The data for the fee options.
+  // TODO - replace with FeeData type after it's moved to flame-types package
   feeData: {
     id: number;
     feePercent: string;
@@ -52,12 +47,11 @@ export interface AppConfig {
   };
 }
 
+export { ConfigContextProvider } from "./contexts/config-context";
 export {
-  ConfigContextProvider,
   getAllChainConfigs,
-  getEnvVariable,
   getFlameChainId,
   getFlameNetworkByChainId,
-  useConfig,
-  useEvmChainData,
-};
+} from "./chain-configs";
+export { getEnvVariable, getOptionalEnvVariable } from "./env";
+export { useConfig, useEvmChainData } from "./hooks/use-config";

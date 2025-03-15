@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/use-config";
-import { graphql } from "earn/gql";
-import { TimeseriesOptions } from "earn/gql/graphql";
+import { graphql } from "earn/generated/gql";
+import { TimeseriesOptions } from "earn/generated/gql/graphql";
 import {
   CHART_CACHE_TIME_MILLISECONDS,
   CHART_TYPE,

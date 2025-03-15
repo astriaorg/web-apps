@@ -1,4 +1,10 @@
 import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/shadcn-primitives";
+import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
@@ -6,12 +12,6 @@ import {
   ConnectEvmWalletButton,
   SingleWalletConnect,
 } from "features/evm-wallet";
-import {
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/shadcn-primitives";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
@@ -32,13 +32,13 @@ export default function ConnectWalletsButton() {
           <PopoverTrigger asChild>
             <Button
               variant="default"
-              className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white w-[156px] text-base"
+              className="rounded-xl bg-button-gradient text-white transition border border-orange-soft hover:border-white w-[156px] text-base cursor-pointer"
             >
               <span>{isConnected ? "Connected" : "Connect"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="flex flex-col w-30 mr-12 text-white gap-3 p-5 bg-radial-dark"
+            className="flex flex-col w-30 mr-12 text-white gap-3 p-5 bg-radial-dark w-[350px] border border-border"
             side="bottom"
           >
             <div className="hover:text-orange-soft transition">

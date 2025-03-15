@@ -1,5 +1,5 @@
 import { useAccount } from "wagmi";
-import { CopyToClipboardButton } from "@repo/ui/components";
+import { CopyToClipboardButton, Skeleton } from "@repo/ui/components";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
@@ -23,7 +23,12 @@ export function SingleWalletContent({
     disconnectEvmWallet,
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
+    usdcToNativeQuote,
+    quoteLoading,
   } = useEvmWallet();
+  const formattedEvmBalanceValue = formatDecimalValues(
+    evmNativeTokenBalance?.value,
+  );
 
   const handleDisconnect = () => {
     disconnectEvmWallet();
@@ -65,15 +70,22 @@ export function SingleWalletContent({
 
       <div className="text-white ml-8 mt-4">
         <div>
-          {isLoadingEvmNativeTokenBalance && <div>Loading...</div>}
-          {!isLoadingEvmNativeTokenBalance && evmNativeTokenBalance && (
-            <div className="text-[20px] font-bold">
-              {formatDecimalValues(evmNativeTokenBalance.value)}{" "}
-              {evmNativeTokenBalance.symbol}
+          <Skeleton
+            className="w-[100px] h-[20px]"
+            isLoading={Boolean(
+              isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance,
+            )}
+          >
+            <div className="text-[20px] mb-2 font-bold flex items-center gap-2">
+              <span>{formattedEvmBalanceValue}</span>
+              <span>{evmNativeTokenBalance?.symbol}</span>
             </div>
-          )}
-          {/* TODO - price in USD */}
-          <div>$0.00 USD</div>
+          </Skeleton>
+          <Skeleton className="w-[100px] h-[20px]" isLoading={quoteLoading}>
+            <div className="text-base font-normal">
+              ${usdcToNativeQuote?.value} USD
+            </div>
+          </Skeleton>
         </div>
 
         {/* Transactions Section - TODO */}
@@ -106,7 +118,7 @@ export default function SingleWalletConnect() {
 
   return userAccount.address ? (
     <Popover>
-      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px]">
+      <PopoverTrigger className="flex items-center gap-2 transition border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px] cursor-pointer ">
         <div className="flex items-center gap-2">
           <FlameIcon size={16} />
           <span className="text-white text-base font-normal">
@@ -116,7 +128,7 @@ export default function SingleWalletConnect() {
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
-        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark w-full md:w-[300px]"
+        className="flex flex-col mr-12 gap-3 p-5 bg-radial-dark w-full md:w-[300px] border border-border"
       >
         <SingleWalletContent address={userAccount.address} />
       </PopoverContent>
@@ -125,7 +137,7 @@ export default function SingleWalletConnect() {
     <Button
       variant="default"
       onClick={() => connectEvmWallet()}
-      className="rounded-xl bg-button-gradient text-white transition border border-button-gradient hover:border-white text-base w-[156px]"
+      className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white text-base w-[156px]"
     >
       <span>Connect</span>
     </Button>

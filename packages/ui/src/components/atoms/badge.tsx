@@ -8,8 +8,8 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-surface-3 text-text-subdued",
-        subdued: "bg-surface-1 text-text-subdued",
+        default: "bg-surface-3 text-typography-subdued",
+        secondary: "bg-surface-1 text-typography-subdued",
         destructive: "",
         outline: "",
       },

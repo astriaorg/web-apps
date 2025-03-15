@@ -429,18 +429,22 @@ export type EvmChains = {
 };
 
 // TODO - consolidate with `TokenAmount` type
-export interface TokenState {
-  // FIXME - why is this ever null?
-  token?: EvmCurrency | null;
+export interface TokenInputState {
+  // token might be null before user has selected a token
+  token: EvmCurrency | null;
   value: string;
   isQuoteValue?: boolean;
 }
 
-export const tokenStateToBig = (token: TokenState): Big => {
-  if (!token?.value || !token.token) return new Big(0);
-  const decimals = token.token.coinDecimals || 18;
-  const fixedValue = new Big(token.value).toFixed(decimals);
-  return new Big(fixedValue);
+/**
+ * Converts a TokenInputState to a Big number in its raw blockchain representation (with scaled decimals)
+ * For example, if token.value is "1.5" and token decimals is 18, this returns 1.5 × 10^18
+ */
+export const tokenStateToBig = (token: TokenInputState): Big => {
+  if (!token.value || !token.token) return new Big(0);
+  const decimals = token.token.coinDecimals;
+  // Convert the human-readable value to raw blockchain units by multiplying by 10^decimals
+  return new Big(token.value).mul(new Big(10).pow(decimals));
 };
 
 export enum ChainId {
@@ -530,6 +534,17 @@ function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
 }
 
 /**
+ * Represents an ERC-20 token allowance granted to a spender.
+ * Contains the token symbol and the approved amount as a string.
+ */
+export interface TokenAllowance {
+  /** The symbol of the token (e.g., "USDC", "TIA") */
+  symbol: string;
+  /** The allowance amount as a string */
+  value: string;
+}
+
+/**
  * A token amount represents an amount of a token.
  * TODO - consolidate this type with `TokenState` type
  */
@@ -603,6 +618,11 @@ export enum TRADE_TYPE {
   EXACT_IN = "exactIn",
   EXACT_OUT = "exactOut",
 }
+
+export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
+  [TRADE_TYPE.EXACT_IN]: TRADE_TYPE.EXACT_OUT,
+  [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
+};
 
 export enum TXN_STATUS {
   IDLE = "idle",

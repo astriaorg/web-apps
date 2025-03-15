@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { getChainConfigs } from "../chain-configs";
-import { getEnvVariable } from "../env";
+import { getEnvVariable, getOptionalEnvVariable } from "../env";
 import type { AppConfig } from "../index";
 import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
@@ -25,6 +25,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
+  const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
   const tokenApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
@@ -71,12 +72,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     },
   ];
 
-  let feedbackFormURL: string | null;
-  try {
-    feedbackFormURL = getEnvVariable("NEXT_PUBLIC_FEEDBACK_FORM_URL");
-  } catch {
-    feedbackFormURL = null;
-  }
+  const feedbackFormURL = getOptionalEnvVariable(
+    "NEXT_PUBLIC_FEEDBACK_FORM_URL",
+  );
 
   // default to Mainnet
   // TODO - remember in localStorage?
@@ -89,8 +87,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
   const networksList = useMemo(() => {
-    return (
-      process.env.NEXT_PUBLIC_NETWORK_LIST_OPTIONS || "dusk,mainnet"
+    return getEnvVariable(
+      "NEXT_PUBLIC_NETWORK_LIST_OPTIONS",
+      "dusk,mainnet",
     ).split(",") as FlameNetwork[];
   }, []);
 
@@ -103,7 +102,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   };
 
   // Parse feature flags - explicitly check for "true"
-  const earnEnabled = process.env.NEXT_PUBLIC_FEATURE_EARN_ENABLED === "true";
+  const earnEnabled =
+    getEnvVariable("NEXT_PUBLIC_FEATURE_EARN_ENABLED", "false") === "true";
 
   return (
     <ConfigContext.Provider
@@ -118,6 +118,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         poolURL,
         earnAPIURL,
         feedbackFormURL,
+        swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,
         swapSlippageToleranceDefault,

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/use-config";
-import { graphql } from "earn/gql";
+import { graphql } from "earn/generated/gql";
 import request from "graphql-request";
 
 const query = graphql(`
@@ -40,6 +40,7 @@ const query = graphql(`
               supplyAssets
               supplyAssetsUsd
             }
+            uniqueKey
           }
           supplyCapUsd
         }

@@ -10,7 +10,13 @@
     "flame-defi#build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "env": ["NEXT_ENV"],
+      "env": [
+        "VERCEL_DEPLOYMENT_ID",
+        "GRAFANA_SOURCE_MAP_UPLOADER_APP_ID",
+        "GRAFANA_SOURCE_MAP_UPLOADER_STACK_ID",
+        "GRAFANA_SOURCE_MAP_UPLOADER_ENDPOINT",
+        "GRAFANA_SOURCE_MAP_UPLOADER_API_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {

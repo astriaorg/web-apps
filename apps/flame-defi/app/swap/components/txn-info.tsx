@@ -1,39 +1,34 @@
 "use client";
 
+import { TokenInputState } from "@repo/flame-types";
+import { InfoTooltip, Skeleton } from "@repo/ui/components";
+import { GasIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Skeleton,
 } from "@repo/ui/shadcn-primitives";
-import { InfoTooltip } from "@repo/ui/components";
-import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { TokenState } from "@repo/flame-types";
-import { useTxnInfo } from "../hooks";
-import { OneToOneQuoteProps } from "./types";
-
-enum TOKEN_INPUTS {
-  TOKEN_ONE = "token_one",
-  TOKEN_TWO = "token_two",
-}
+import { GetQuoteResult } from "@repo/flame-types";
+import { OneToOneQuoteProps, TransactionInfo } from "../types";
+import { RoutePath } from "./route-path";
 
 export interface TxnInfoProps {
-  id: TOKEN_INPUTS;
-  inputToken: TokenState;
-  txnInfo: ReturnType<typeof useTxnInfo>;
+  txnInfo: TransactionInfo;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
+  oneToOneQuote: OneToOneQuoteProps;
+  quote: GetQuoteResult;
 }
 
 export function TxnInfo({
   txnInfo,
-  tokenTwo,
+  topToken,
+  bottomToken,
   oneToOneQuote,
-}: {
-  txnInfo: ReturnType<typeof useTxnInfo>;
-  tokenTwo: TokenState;
-  oneToOneQuote: OneToOneQuoteProps;
-}) {
+  quote,
+}: TxnInfoProps) {
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
   return (
@@ -42,35 +37,35 @@ export function TxnInfo({
         value="transaction-details"
         className="text-grey-light text-sm border-b-0"
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between pb-2">
           <Skeleton
-            className="rounded"
-            isLoading={oneToOneQuote?.oneToOneLoading}
+            className="rounded-sm"
+            isLoading={oneToOneQuote.oneToOneLoading}
           >
             <div
               className="flex items-center cursor-pointer text-white font-medium gap-1"
               onClick={() =>
-                oneToOneQuote?.setFlipDirection(!oneToOneQuote?.flipDirection)
+                oneToOneQuote.setFlipDirection(!oneToOneQuote.flipDirection)
               }
             >
               <div className="flex items-center gap-1">
                 <span>{formatDecimalValues("1", 0)}</span>
-                <span>{oneToOneQuote?.tokenOneSymbol}</span>
+                <span>{oneToOneQuote.topTokenSymbol}</span>
               </div>
               <div>=</div>
               <div className="flex items-center gap-1">
-                <span>{oneToOneQuote?.tokenTwoValue}</span>
-                <span>{oneToOneQuote?.tokenTwoSymbol}</span>
+                <span>{oneToOneQuote.bottomTokenValue}</span>
+                <span>{oneToOneQuote.bottomTokenSymbol}</span>
               </div>
             </div>
           </Skeleton>
           <Skeleton
-            className="rounded w-[100px] h-[25px] mt-3"
+            className="rounded-sm w-[100px] h-[25px] mt-3"
             isLoading={txnInfo.txnQuoteDataLoading}
           >
             <AccordionTrigger>
               {txnInfo.gasUseEstimateUSD && (
-                <div className="[&>svg]:!transform-none flex items-center gap-1 width: 100%">
+                <div className="[&>svg]:transform-none! flex items-center gap-1 width: 100%">
                   <GasIcon size={20} />
                   <span className="mr-1">
                     ${txnInfo.formattedGasUseEstimateUSD}
@@ -88,11 +83,12 @@ export function TxnInfo({
                 <InfoTooltip
                   content="The amount you expect to receive at the current market price. You may receive less or more if the market price changes while your transaction is pending."
                   side="right"
+                  className="max-w-[250px]"
                 />
               </span>
               <span className="text-grey-light">
                 {txnInfo.expectedOutputFormatted}{" "}
-                <span>{tokenTwo?.token?.coinDenom}</span>
+                <span>{bottomToken.token?.coinDenom}</span>
               </span>
             </p>
             <p className="flex justify-between">
@@ -117,21 +113,33 @@ export function TxnInfo({
                 ${txnInfo.formattedGasUseEstimateUSD}
               </span>
             </p>
-            <p className="flex justify-between">
-              <span className="text-grey-light flex items-center gap-1">
-                Minimum received after slippage ({swapSlippageTolerance}
-                %){" "}
+            <div className="flex justify-between">
+              <div className="flex gap-1 items-center">
+                <span className="w-[116px] md:w-full text-sm text-grey-light">
+                  Min received after slippage ({swapSlippageTolerance}%)
+                </span>
                 <InfoTooltip
+                  className="max-w-[250px]"
                   content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
                   side="right"
                 />
-              </span>
+              </div>
               <span className="text-grey-light">
                 {txnInfo.minimumReceived}{" "}
-                <span>{tokenTwo?.token?.coinDenom}</span>
+                <span>{bottomToken.token?.coinDenom}</span>
               </span>
-            </p>
+            </div>
           </div>
+          <div className="h-[1px] border border-border w-full my-4"></div>
+          {quote && quote.route && (
+            <RoutePath
+              quoteRoute={quote.route}
+              loading={txnInfo.txnQuoteDataLoading}
+              symbolIn={topToken.token?.coinDenom}
+              symbolOut={bottomToken.token?.coinDenom}
+              networkFee={txnInfo.formattedGasUseEstimateUSD}
+            />
+          )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>

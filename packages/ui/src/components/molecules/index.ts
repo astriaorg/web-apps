@@ -7,6 +7,8 @@ export * from "./copy-to-clipboard-button";
 export * from "./dropdown";
 export * from "./info-tooltip";
 export * from "./search-input";
+export * from "./status-card";
 export * from "./success-check";
 export * from "./toggle-switch";
+export * from "./token-icon";
 export * from "./token-selector";

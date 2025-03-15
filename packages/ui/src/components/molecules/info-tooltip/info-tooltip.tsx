@@ -7,16 +7,18 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../../shadcn-primitives";
+} from "../../atoms";
 
 interface InfoTooltipProps {
   content: string;
   side?: "left" | "right" | "top" | "bottom" | undefined;
+  className?: string;
 }
 
 export const InfoTooltip: React.FC<InfoTooltipProps> = ({
   content,
   side,
+  className,
 }: InfoTooltipProps) => {
   const [open, setOpen] = useState(false);
 
@@ -31,7 +33,9 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
             />
           </span>
         </TooltipTrigger>
-        <TooltipContent side={side}>{content}</TooltipContent>
+        <TooltipContent side={side} className={className}>
+          {content}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

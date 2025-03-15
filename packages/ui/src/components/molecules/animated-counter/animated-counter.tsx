@@ -1,44 +1,105 @@
 "use client";
 
-import { FormatNumberOptions, FormattedNumber } from "../../../intl";
-import { cn } from "../../../utils";
+import { animate } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FormatNumberOptions, useIntl } from "react-intl";
+import { cn, formatAbbreviatedNumber } from "../../../utils";
 import { Skeleton } from "../../atoms";
 
-export interface AnimatedCounterProps
-  extends React.HTMLAttributes<HTMLSpanElement> {
+interface AnimatedCounterProps extends React.HTMLAttributes<HTMLSpanElement> {
   value: number;
-  counter: number | null;
   options?: FormatNumberOptions;
-  /**
-   * Used for syncing animation state between multiple cards.
-   */
-  isSyncingAnimation?: boolean;
+  useAbbreviatedNumberFormat?: boolean;
 }
 
 export const AnimatedCounter = ({
   value,
-  counter,
   options,
-  isSyncingAnimation,
+  useAbbreviatedNumberFormat,
   className,
   ...props
 }: AnimatedCounterProps) => {
+  const { formatNumber } = useIntl();
+
+  const [hasStartedAnimating, setHasStartedAnimating] = useState(false);
+
+  const counterRef = useRef<HTMLSpanElement>(null);
+
+  const formatAnimatedCounterNumber = useCallback(
+    (
+      value: AnimatedCounterProps["value"],
+      options: AnimatedCounterProps["options"],
+      useAbbreviatedNumberFormat: AnimatedCounterProps["useAbbreviatedNumberFormat"],
+    ) => {
+      if (useAbbreviatedNumberFormat) {
+        const { value: formattedValue, suffix: formattedValueSuffix } =
+          formatAbbreviatedNumber(Math.round(value).toString(), options);
+
+        return `${formattedValue}${formattedValueSuffix}`;
+      }
+
+      return formatNumber(value, options);
+    },
+    [formatNumber],
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (value <= 0) {
+      if (isMounted) {
+        setHasStartedAnimating(true);
+      }
+
+      if (counterRef.current) {
+        counterRef.current.innerHTML = formatAnimatedCounterNumber(
+          0,
+          options,
+          useAbbreviatedNumberFormat,
+        );
+      }
+
+      return;
+    }
+
+    animate(0, value, {
+      duration: 0.5,
+      ease: [0, 1, 0, 1],
+      onPlay: () => {
+        if (isMounted) {
+          setHasStartedAnimating(true);
+        }
+      },
+      onUpdate: (latest) => {
+        if (counterRef.current) {
+          counterRef.current.innerHTML = formatAnimatedCounterNumber(
+            latest,
+            options,
+            useAbbreviatedNumberFormat,
+          );
+        }
+      },
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [value, formatAnimatedCounterNumber, options, useAbbreviatedNumberFormat]);
+
   return (
-    <div className="relative">
-      {/* Reserve space for animation to prevent card size increasing with counter value. */}
-      <span className={cn("opacity-0", className)} {...props}>
-        <FormattedNumber value={value} {...options} />
-      </span>
-      <span
-        className={cn("w-full absolute top-0 left-0", className)}
-        {...props}
-      >
-        <Skeleton isLoading={!counter || !isSyncingAnimation}>
-          <span>
-            <FormattedNumber value={counter ?? 0} {...options} />
-          </span>
-        </Skeleton>
-      </span>
-    </div>
+    // Show skeleton when the counter hasn't started animating.
+    <Skeleton isLoading={!hasStartedAnimating}>
+      <div className="relative overflow-hidden">
+        {/* Reserve space for the maximum value to prevent card size increasing with the animation. */}
+        <span className={cn("opacity-0", className)} {...props}>
+          {formatAnimatedCounterNumber(value, options, false)}
+        </span>
+        <span
+          ref={counterRef}
+          className={cn("w-full absolute top-0 left-0", className)}
+          {...props}
+        ></span>
+      </div>
+    </Skeleton>
   );
 };

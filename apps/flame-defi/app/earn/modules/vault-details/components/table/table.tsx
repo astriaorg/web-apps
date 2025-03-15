@@ -9,7 +9,6 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
-import { FormattedNumber, useIntl } from "@repo/ui/intl";
 import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
 import {
   createColumnHelper,
@@ -21,12 +20,16 @@ import {
 } from "@tanstack/react-table";
 import Big from "big.js";
 import { Image } from "components/image";
-import { VaultAllocationHistory } from "earn/gql/graphql";
+import { ROUTES } from "earn/constants/routes";
+import { VaultAllocationHistory } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { FormattedNumber, useIntl } from "react-intl";
 
 export const Table = () => {
   const { formatNumber } = useIntl();
+  const router = useRouter();
   const {
     query: { data, isError, isPending },
   } = usePageContext();
@@ -247,6 +250,11 @@ export const Table = () => {
                 "hover:bg-surface-2 hover:cursor-pointer whitespace-nowrap",
                 isPending && "pointer-events-none",
               )}
+              onClick={() =>
+                router.push(
+                  ROUTES.MARKET_DETAILS + row.original.market.uniqueKey,
+                )
+              }
             >
               {row.getVisibleCells().map((cell) => (
                 <TableCell key={cell.id}>

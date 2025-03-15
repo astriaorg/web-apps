@@ -2,7 +2,6 @@
 
 import { InfoTooltip } from "@repo/ui/components";
 import { GearIcon } from "@repo/ui/icons";
-import { useIntl } from "@repo/ui/intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +19,7 @@ import {
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { useConfig } from "config";
 import { useState } from "react";
+import { useIntl } from "react-intl";
 
 export const SettingsPopover = () => {
   const { formatNumber } = useIntl();
@@ -99,7 +99,10 @@ export const SettingsPopover = () => {
   return (
     <Popover onOpenChange={handlePopoverOpenChange}>
       <PopoverTrigger>
-        <a className="text-grey-light hover:text-white" aria-label="Settings">
+        <a
+          className="text-grey-light hover:text-white cursor-pointer"
+          aria-label="Settings"
+        >
           <GearIcon
             className={`transition ${expertMode ? "stroke-orange-soft" : ""}`}
           />
@@ -112,24 +115,30 @@ export const SettingsPopover = () => {
             <div className="flex justify-between">
               <div className="flex items-center gap-1">
                 <label className="text-sm text-white">Expert Mode</label>
-                <InfoTooltip content="Allow high price impact trades and skip the confirm screen. Use at your own risk." />
+                <InfoTooltip
+                  className="max-w-[250px]"
+                  content="Allow high price impact trades and skip the confirm screen. Use at your own risk."
+                />
               </div>
               <Switch
                 checked={expertMode}
                 onCheckedChange={handleExpertModeChange}
-                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-accent [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange-soft [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
               />
             </div>
           </div>
           <div className="space-y-2 mb-2">
             <div className="flex items-center gap-1">
               <label className="text-sm text-white">Slippage Tolerance</label>
-              <InfoTooltip content="Your transaction will revert if the price changes unfavorably by more than this percentage." />
+              <InfoTooltip
+                className="max-w-[250px]"
+                content="Your transaction will revert if the price changes unfavorably by more than this percentage."
+              />
             </div>
             <div className="flex justify-between">
               <button
                 disabled={!expertMode}
-                className="text-sm text-white bg-accent px-3 py-1 rounded-sm mr-2"
+                className="text-sm text-white bg-orange-soft px-3 py-1 rounded-lg mr-2 cursor-pointer"
                 onClick={() => setCustomSlippage(swapSlippageToleranceDefault)}
               >
                 Auto
@@ -144,7 +153,7 @@ export const SettingsPopover = () => {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                  className="w-full px-3 py-1 pr-7 bg-grey-dark font-sans rounded-sm text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-none focus:ring-1 focus:ring-primary normalize-input"
+                  className="w-full px-3 py-1 pr-7 bg-grey-dark font-sans rounded-lg text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-hidden focus:ring-1 focus:ring-primary normalize-input"
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white">
                   %
@@ -183,11 +192,11 @@ export const SettingsPopover = () => {
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-grey-dark text-white hover:bg-grey-light">
+            <AlertDialogCancel className="bg-grey-dark text-white hover:bg-grey-light cursor-pointer">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-accent text-white hover:bg-accent/90"
+              className="bg-orange-soft text-white hover:bg-orange-soft/90 cursor-pointer"
               onClick={() => {
                 setExpertMode(true);
                 setInLocalStorage("settings", {

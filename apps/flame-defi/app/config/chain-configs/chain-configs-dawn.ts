@@ -1,5 +1,6 @@
 import {
   CelestiaIcon,
+  DropTiaIcon,
   FlameIcon,
   NeutronIcon,
   NobleIcon,
@@ -66,20 +67,6 @@ const CelestiaChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-160",
       sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
-      IconComponent: CelestiaIcon,
-    },
-    {
-      // Coin denomination to be displayed to the user.
-      coinDenom: "fakeTIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-      coinMinimalDenom: "ufaketia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
-      coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
-      ibcChannel: "channel-420",
-      sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
       IconComponent: CelestiaIcon,
     },
   ],
@@ -246,7 +233,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       // coinGeckoId: ""
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     },
   ],
   // List of coin/tokens used as a fee token in this chain.
@@ -336,7 +323,7 @@ const FlameChainInfo: EvmChainInfo = {
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: CelestiaIcon,
+      IconComponent: DropTiaIcon,
     }),
   ],
   IconComponent: FlameIcon,

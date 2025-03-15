@@ -13,18 +13,18 @@ const Navbar = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
-  const navLinkClasses = (path: string) => `
+  const navLinkClasses = (activePath: boolean) => `
     relative px-4 py-2 text-grey-light hover:text-white
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
     hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
     ${
-      pathname === path
+      activePath
         ? `
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
       after:left-1/2 after:transform after:-translate-x-1/2
-      after:w-[85%] after:h-1 after:bg-gradient-to-r
+      after:w-[85%] after:h-1 after:bg-linear-to-r
       after:from-[#EA9B57] after:to-[#CB513F]
     `
         : ""
@@ -33,14 +33,14 @@ const Navbar = () => {
 
   return (
     <nav
-      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full bg-black"
+      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full h-[85px] bg-black"
       aria-label="main navigation"
     >
-      <div className="flex items-center">
+      <div className="flex flex-1 items-center">
         <a
           target="_blank"
           href={brandURL}
-          className="flex flex-1 items-center pl-0 p-2 px-3 md:w-[290px]"
+          className="flex items-center pl-0 p-2 px-3"
           rel="noreferrer"
         >
           <Image
@@ -54,19 +54,28 @@ const Navbar = () => {
           <FlameIcon size={36} className="block lg:hidden" />
         </a>
       </div>
-      <div id="topNavbar" className="flex-1 hidden md:block">
+      <div id="topNavbar" className="flex-1 hidden md:flex">
         <div className="flex justify-center items-center font-mono font-medium">
-          <Link href="/" className={navLinkClasses("/")}>
+          <Link href="/" className={navLinkClasses(pathname === "/")}>
             BRIDGE
           </Link>
-          <Link href="/swap" className={navLinkClasses("/swap")}>
+          <Link
+            href="/swap"
+            className={navLinkClasses(pathname.includes("/swap"))}
+          >
             SWAP
           </Link>
-          <Link href="/pool" className={navLinkClasses("/pool")}>
+          <Link
+            href="/pool"
+            className={navLinkClasses(pathname.includes("/pool"))}
+          >
             POOL
           </Link>
           {featureFlags.earnEnabled && (
-            <Link href="/earn" className={navLinkClasses("/earn")}>
+            <Link
+              href="/earn"
+              className={navLinkClasses(pathname.includes("/earn"))}
+            >
               EARN
             </Link>
           )}

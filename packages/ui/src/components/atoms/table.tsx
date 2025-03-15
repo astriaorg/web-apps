@@ -56,7 +56,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "text-xs/3 text-text-subdued font-medium tracking-wider uppercase align-middle h-12 px-3 first:pl-6 ",
+      "text-xs/3 text-typography-subdued font-medium tracking-wider uppercase align-middle h-12 px-3 first:pl-6 ",
       className,
     )}
     {...props}
@@ -71,7 +71,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "h-[72px] px-3 first:pl-6 border-t border-stroke text-sm",
+      "h-[72px] px-3 first:pl-6 border-t border-stroke-default text-sm",
       className,
     )}
     {...props}
@@ -97,7 +97,7 @@ const TableSortIcon = React.forwardRef<HTMLDivElement, TableSortIconProps>(
     <div
       ref={ref}
       className={cn(
-        "cursor-pointer text-text-subdued hover:text-text hover:opacity-100",
+        "cursor-pointer text-typography-subdued hover:text-typography-default hover:opacity-100",
         "transform transition-transform duration-200",
         isActive ? "opacity-100" : "opacity-0",
         isAscending && "rotate-180",
