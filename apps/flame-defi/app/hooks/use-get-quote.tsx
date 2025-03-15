@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
-import { useEvmChainData } from "config";
-import { GetQuoteResult, TokenState, TRADE_TYPE } from "@repo/flame-types";
+import { useConfig, useEvmChainData } from "config";
+import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 
 export const useGetQuote = () => {
+  const { swapQuoteAPIURL } = useConfig();
   const {
     selectedChain: { chainId, contracts: chainContracts },
   } = useEvmChainData();
@@ -15,65 +16,63 @@ export const useGetQuote = () => {
 
   const getQuote = useCallback(
     async (
-      type: TRADE_TYPE,
-      tokenOne: TokenState,
-      tokenTwo: TokenState,
+      tradeType: TRADE_TYPE,
+      tokenIn: Omit<TokenInputState, "isQuoteValue">,
+      tokenOut: Omit<TokenInputState, "isQuoteValue">,
     ): Promise<GetQuoteResult | undefined> => {
       abortControllerRef.current = new AbortController();
+      // tokens must exist
+      if (!tokenIn.token || !tokenOut.token) {
+        return;
+      }
       // can't swap between native and wrapped native tokens.
       if (
-        (tokenOne.token?.isNative && tokenTwo.token?.isWrappedNative) ||
-        (tokenOne.token?.isWrappedNative && tokenTwo.token?.isNative)
+        (tokenIn.token.isNative && tokenOut.token.isWrappedNative) ||
+        (tokenIn.token.isWrappedNative && tokenOut.token.isNative)
       ) {
         return;
       }
       // can't swap for the same token
-      if (tokenOne.token?.equals(tokenTwo.token)) {
+      if (tokenIn.token.equals(tokenOut.token)) {
         return;
       }
-      const amount = tokenOne?.value
-        ? parseUnits(
-            tokenOne.value,
-            tokenOne?.token?.coinDecimals || 18,
-          ).toString()
-        : "";
 
-      // This is a fix for TIA not having a ERC20 contract address
-      const tokenInAddress = tokenOne?.token?.isNative
-        ? chainContracts?.wrappedNativeToken.address
-        : tokenOne?.token?.erc20ContractAddress;
-      const tokenInDecimals = tokenOne?.token?.coinDecimals;
-      const tokenInSymbol = tokenOne?.token?.coinDenom.toLocaleLowerCase();
-
-      const tokenOutAddress = tokenTwo?.token?.isNative
-        ? chainContracts?.wrappedNativeToken.address
-        : tokenTwo?.token?.erc20ContractAddress;
-      const tokenOutDecimals = tokenTwo?.token?.coinDecimals;
-      const tokenOutSymbol = tokenTwo?.token?.coinDenom.toLocaleLowerCase();
-
-      if (
-        !(
-          chainId &&
-          tokenInAddress &&
-          tokenInDecimals !== undefined &&
-          tokenInSymbol &&
-          tokenOutAddress &&
-          tokenOutDecimals !== undefined &&
-          tokenOutSymbol &&
-          amount &&
-          parseFloat(amount) > 0 &&
-          type
-        )
-      ) {
+      // get value from tokenIn or tokenOut based on tradeType
+      const value =
+        tradeType === TRADE_TYPE.EXACT_IN ? tokenIn.value : tokenOut.value;
+      const valueDecimals =
+        tradeType === TRADE_TYPE.EXACT_IN
+          ? tokenIn.token.coinDecimals
+          : tokenOut.token.coinDecimals;
+      const amount = parseUnits(value, valueDecimals).toString();
+      // must have value
+      if (amount === "0") {
         return;
       }
+
+      // NOTE - we need to use the address of the wrapped native token
+      //  when getting quotes using the native currency
+      const tokenInAddress = tokenIn.token.isNative
+        ? chainContracts.wrappedNativeToken.address
+        : tokenIn.token.erc20ContractAddress;
+      const tokenInDecimals = tokenIn.token.coinDecimals;
+      // NOTE - this is an abuse of the fact that the swap-routing-api doesn't
+      //  seem to use the symbol for the quote, or even check if the symbol
+      //  matches the address supplied
+      const tokenInSymbol = tokenIn.token.coinDenom.toLocaleLowerCase();
+
+      const tokenOutAddress = tokenOut.token.isNative
+        ? chainContracts.wrappedNativeToken.address
+        : tokenOut.token.erc20ContractAddress;
+      const tokenOutDecimals = tokenOut.token.coinDecimals;
+      const tokenOutSymbol = tokenOut.token.coinDenom.toLocaleLowerCase();
 
       try {
         setLoading(true);
         setError(null);
 
         const url =
-          `https://us-west2-swap-routing-api-dev.cloudfunctions.net/get-quote?` +
+          `${swapQuoteAPIURL}?` +
           `chainId=${chainId}` +
           `&tokenInAddress=${tokenInAddress}` +
           `&tokenInDecimals=${tokenInDecimals}` +
@@ -82,7 +81,7 @@ export const useGetQuote = () => {
           `&tokenOutDecimals=${tokenOutDecimals}` +
           `&tokenOutSymbol=${tokenOutSymbol}` +
           `&amount=${amount}` +
-          `&type=${type}`;
+          `&type=${tradeType}`;
 
         const response = await fetch(url, {
           method: "GET",
@@ -112,7 +111,7 @@ export const useGetQuote = () => {
         setLoading(false);
       }
     },
-    [chainId, chainContracts?.wrappedNativeToken.address],
+    [chainId, chainContracts.wrappedNativeToken.address, swapQuoteAPIURL],
   );
 
   const cancelGetQuote = useCallback(() => {

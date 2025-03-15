@@ -24,8 +24,8 @@ export interface StepProps {
 }
 
 export interface TokenPair {
-  tokenOne: EvmCurrency | undefined;
-  tokenTwo: EvmCurrency | undefined;
+  tokenOne: EvmCurrency | null;
+  tokenTwo: EvmCurrency | null;
 }
 
 // TODO - move to flame-types
@@ -54,15 +54,15 @@ export default function NewPoolPosition({
     feeData[0],
   );
   const [tokenPair, setTokenPair] = useState<TokenPair>({
-    tokenOne: currencies?.[0],
-    tokenTwo: undefined,
+    tokenOne: currencies?.[0] || null,
+    tokenTwo: null,
   });
 
   const reset = () => {
     setStep(0);
     setTokenPair({
-      tokenOne: currencies?.[0],
-      tokenTwo: undefined,
+      tokenOne: currencies?.[0] || null,
+      tokenTwo: null,
     });
     setSelectedFeeTier(feeData[0]);
   };

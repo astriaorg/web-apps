@@ -13,13 +13,13 @@ const Navbar = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
-  const navLinkClasses = (path: string) => `
+  const navLinkClasses = (activePath: boolean) => `
     relative px-4 py-2 text-grey-light hover:text-white
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
     hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
     ${
-      pathname === path
+      activePath
         ? `
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
@@ -56,21 +56,33 @@ const Navbar = () => {
       </div>
       <div id="topNavbar" className="flex-1 hidden md:flex">
         <div className="flex justify-center items-center font-mono font-medium mr-2">
-          <Link href="/" className={navLinkClasses("/")}>
+          <Link href="/" className={navLinkClasses(pathname === "/")}>
             BRIDGE
           </Link>
-          <Link href="/swap" className={navLinkClasses("/swap")}>
+          <Link
+            href="/swap"
+            className={navLinkClasses(pathname.includes("/swap"))}
+          >
             SWAP
           </Link>
-          <Link href="/pool" className={navLinkClasses("/pool")}>
+          <Link
+            href="/pool"
+            className={navLinkClasses(pathname.includes("/pool"))}
+          >
             POOL
           </Link>
           {featureFlags.earnEnabled && (
             <>
-              <Link href="/earn" className={navLinkClasses("/earn")}>
+              <Link
+                href="/earn"
+                className={navLinkClasses(pathname.includes("/earn"))}
+              >
                 EARN
               </Link>
-              <Link href="/borrow" className={navLinkClasses("/borrow")}>
+              <Link
+                href="/borrow"
+                className={navLinkClasses(pathname.includes("/borrow"))}
+              >
                 BORROW
               </Link>
             </>

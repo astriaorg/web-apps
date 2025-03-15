@@ -2,7 +2,7 @@
 
 import { StepProps } from "./new-pool-position";
 import { ActionButton } from "@repo/ui/components";
-import { TokenState } from "@repo/flame-types";
+import { TokenInputState } from "@repo/flame-types";
 import { useState } from "react";
 import { useDepositTxn } from "../use-deposit-txn";
 
@@ -11,11 +11,11 @@ export default function DepositAmountsStep({
   tokenPair,
 }: StepProps): React.ReactElement {
   const { tokenOne, tokenTwo } = tokenPair;
-  const [inputOne, setInputOne] = useState<TokenState>({
+  const [inputOne, setInputOne] = useState<TokenInputState>({
     token: tokenOne,
     value: "",
   });
-  const [inputTwo, setInputTwo] = useState<TokenState>({
+  const [inputTwo, setInputTwo] = useState<TokenInputState>({
     token: tokenTwo,
     value: "",
   });

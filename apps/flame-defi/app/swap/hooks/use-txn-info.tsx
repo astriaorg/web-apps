@@ -3,7 +3,7 @@ import {
   TRADE_TYPE,
   Token,
   TokenAmount,
-  TokenState,
+  TokenInputState,
 } from "@repo/flame-types";
 import { getSwapSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
@@ -11,12 +11,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useGetQuote } from "../../hooks";
+import { TransactionInfo } from "../types";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the
 // quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
-const useTxnQuote = (inputOne: TokenState, inputTwo: TokenState) => {
+const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
   const { quoteError, getQuote } = useGetQuote();
   const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
   const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
@@ -46,10 +47,8 @@ const useTxnQuote = (inputOne: TokenState, inputTwo: TokenState) => {
  * Calculates the price impact
  * Returns the price impact as a decimal (e.g. -0.002 means -0.2%).
  */
-const calculatePriceImpact = (
-  txnQuoteData: GetQuoteResult | null | undefined,
-): number => {
-  const hops = txnQuoteData?.route?.[0];
+const calculatePriceImpact = (txnQuoteData: GetQuoteResult): number => {
+  const hops = txnQuoteData.route?.[0];
 
   if (!hops) {
     return 0;
@@ -74,7 +73,7 @@ const calculatePriceImpact = (
     // Compute the raw price from sqrtPriceX96:
     // - rawPrice = (sqrtPriceX96 / 2^96)^2 = (sqrtPriceX96^2) / 2^192.
     const sqrtPriceX96 = JSBI.BigInt(hop.sqrtRatioX96);
-    const numerator = JSBI.multiply(sqrtPriceX96, sqrtPriceX96);
+    const numerator = JSBI.exponentiate(sqrtPriceX96, JSBI.BigInt(2));
     const denominator = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(192));
     const rawPrice =
       Number(numerator.toString()) / Number(denominator.toString());
@@ -101,8 +100,8 @@ const calculatePriceImpact = (
   // Compute the overall execution price:
   // - txnQuoteData.amountDecimals: initial input amount
   // - txnQuoteData.quoteDecimals: final output amount
-  const overallInput = parseFloat(txnQuoteData?.amountDecimals);
-  const overallOutput = parseFloat(txnQuoteData?.quoteDecimals);
+  const overallInput = parseFloat(txnQuoteData.amountDecimals);
+  const overallOutput = parseFloat(txnQuoteData.quoteDecimals);
   const overallExecutionPrice = overallOutput / overallInput;
 
   // Price impact is defined as:
@@ -136,36 +135,36 @@ const calculateMinimumReceived = (
 
 export const useTxnInfo = ({
   quote,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   tradeType,
   validSwapInputs,
 }: {
   quote: GetQuoteResult | null;
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
+  topToken: TokenInputState;
+  bottomToken: TokenInputState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
-}) => {
+}): TransactionInfo => {
   const { formatNumber } = useIntl();
   const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
-    tokenOne,
-    tokenTwo,
+    topToken,
+    bottomToken,
   );
   const swapSlippageTolerance = getSwapSlippageTolerance();
 
   useEffect(() => {
     if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
-      fetchTxnQuote();
+      void fetchTxnQuote();
     }
   }, [tradeType, fetchTxnQuote, validSwapInputs]);
 
   const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
-  const priceImpact = calculatePriceImpact(txnQuoteData);
+  const priceImpact = txnQuoteData ? calculatePriceImpact(txnQuoteData) : 0;
 
   return {
     txnQuoteDataLoading: txnQuoteLoading,
-    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD,
+    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD || "0",
     formattedGasUseEstimateUSD: formatNumber(
       parseFloat(txnQuoteData?.gasUseEstimateUSD || "0"),
       { minimumFractionDigits: 4, maximumFractionDigits: 4 },
@@ -175,7 +174,7 @@ export const useTxnInfo = ({
       parseFloat(
         formatUnits(
           BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-          tokenTwo?.token?.coinDecimals || 18,
+          bottomToken.token?.coinDecimals || 18,
         ),
       ),
       { minimumFractionDigits: 6, maximumFractionDigits: 6 },

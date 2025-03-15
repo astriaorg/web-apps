@@ -1,6 +1,6 @@
 "use client";
 
-import { TokenState, TXN_STATUS } from "@repo/flame-types";
+import { TXN_STATUS } from "@repo/flame-types";
 import {
   BlockLoader,
   InfoTooltip,
@@ -10,46 +10,21 @@ import {
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
-import { useTxnInfo } from "../hooks";
-import { OneToOneQuoteProps } from "./types";
-interface TxnStepsProps {
-  expectedOutputFormatted?: string;
-  tokenOne?: TokenState;
-  tokenTwo?: TokenState;
-  isTiaWtia?: boolean;
-  txnHash?: `0x${string}`;
-  txnMsg?: string;
-}
-
-interface TxnDetailsProps extends TxnStepsProps {
-  priceImpact: string | undefined;
-  minimumReceived: string | undefined;
-  oneToOneQuote: OneToOneQuoteProps;
-}
-
-interface SwapTxnStepsProps {
-  txnInfo: ReturnType<typeof useTxnInfo>;
-  tokenOne: TokenState;
-  tokenTwo: TokenState;
-  txnStatus: TXN_STATUS | undefined;
-  txnHash: `0x${string}` | undefined;
-  txnMsg: string | undefined;
-  isTiaWtia: boolean;
-  oneToOneQuote: OneToOneQuoteProps;
-}
+import { SwapTxnStepsProps, TxnDetailsProps, TxnStepsProps } from "../types";
 
 export function TxnDetails({
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   expectedOutputFormatted,
   priceImpact,
   minimumReceived,
   oneToOneQuote,
+  isQuoteLoading,
 }: TxnDetailsProps) {
   const {
-    tokenOneSymbol,
-    tokenTwoSymbol,
-    tokenTwoValue,
+    topTokenSymbol,
+    bottomTokenSymbol,
+    bottomTokenValue,
     oneToOneLoading,
     setFlipDirection,
     flipDirection,
@@ -59,22 +34,26 @@ export function TxnDetails({
   return (
     <>
       <div className="flex flex-col items-center gap-3 mb-8 mt-6 relative">
-        <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
-          <span>{formatDecimalValues(tokenOne?.value || "0", 6)}</span>
-          <span className="flex items-center gap-1">
-            {tokenOne?.token?.IconComponent &&
-              tokenOne?.token?.IconComponent({ size: 24 })}
-            {tokenOne?.token?.coinDenom}
-          </span>
-        </div>
-        <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
-          <span>{expectedOutputFormatted}</span>
-          <span className="flex items-center gap-1">
-            {tokenTwo?.token?.IconComponent &&
-              tokenTwo?.token?.IconComponent({ size: 24 })}
-            {tokenTwo?.token?.coinDenom}
-          </span>
-        </div>
+        <Skeleton className="rounded-sm w-full" isLoading={isQuoteLoading}>
+          <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
+            <span>{formatDecimalValues(topToken.value || "0", 6)}</span>
+            <span className="flex items-center gap-1">
+              {topToken.token?.IconComponent &&
+                topToken.token.IconComponent({ size: 24 })}
+              {topToken.token?.coinDenom}
+            </span>
+          </div>
+        </Skeleton>
+        <Skeleton className="rounded-sm w-full" isLoading={isQuoteLoading}>
+          <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
+            <span>{expectedOutputFormatted}</span>
+            <span className="flex items-center gap-1">
+              {bottomToken.token?.IconComponent &&
+                bottomToken.token.IconComponent({ size: 24 })}
+              {bottomToken.token?.coinDenom}
+            </span>
+          </div>
+        </Skeleton>
         <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
           <div className="z-10 p-1 bg-grey-dark rounded-xl border-4 border-black">
             <ArrowDownIcon aria-label="Swap" size={20} />
@@ -89,12 +68,12 @@ export function TxnDetails({
           >
             <div className="flex items-center gap-1">
               <span>{formatDecimalValues("1", 0)}</span>
-              <span>{tokenOneSymbol}</span>
+              <span>{topTokenSymbol}</span>
             </div>
             <div>=</div>
             <div className="flex items-center gap-1">
-              <span>{tokenTwoValue}</span>
-              <span>{tokenTwoSymbol}</span>
+              <span>{bottomTokenValue}</span>
+              <span>{bottomTokenSymbol}</span>
             </div>
           </div>
         </Skeleton>
@@ -110,7 +89,8 @@ export function TxnDetails({
             />
           </span>
           <span className="text-grey-light text-sm font-medium">
-            {expectedOutputFormatted} <span>{tokenTwo?.token?.coinDenom}</span>
+            {expectedOutputFormatted}{" "}
+            <span>{bottomToken.token?.coinDenom}</span>
           </span>
         </div>
         <div className="flex justify-between">
@@ -138,7 +118,7 @@ export function TxnDetails({
           </div>
           <div className="text-grey-light flex items-center gap-1 text-sm font-medium">
             <span>{minimumReceived}</span>
-            <span>{tokenTwo?.token?.coinDenom}</span>
+            <span>{bottomToken.token?.coinDenom}</span>
           </div>
         </div>
       </div>
@@ -148,8 +128,8 @@ export function TxnDetails({
 
 function TxnLoader({
   expectedOutputFormatted,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   isTiaWtia,
 }: TxnStepsProps) {
   return (
@@ -161,15 +141,15 @@ function TxnLoader({
         </span>
         <div className="flex items-center gap-1 justify-center text-sm md:text-base">
           <span>
-            {formatDecimalValues(tokenOne?.value || "0", 6)}{" "}
-            <span>{tokenOne?.token?.coinDenom}</span>
+            {formatDecimalValues(topToken.value || "0", 6)}{" "}
+            <span>{topToken.token?.coinDenom}</span>
           </span>
           <span>for</span>
           <span>
             {isTiaWtia
-              ? formatDecimalValues(tokenTwo?.value || "0", 6)
+              ? formatDecimalValues(bottomToken.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span> {tokenTwo?.token?.coinDenom}</span>
+            <span> {bottomToken.token?.coinDenom}</span>
           </span>
         </div>
       </div>
@@ -178,8 +158,8 @@ function TxnLoader({
 }
 
 function TxnSuccess({
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   expectedOutputFormatted,
   isTiaWtia,
   txnHash,
@@ -194,16 +174,16 @@ function TxnSuccess({
           <div className="flex items-center gap-1">
             <span>Swapped</span>
             <span>
-              {formatDecimalValues(tokenOne?.value || "0", 6)}{" "}
-              <span>{tokenOne?.token?.coinDenom}</span>
+              {formatDecimalValues(topToken.value || "0", 6)}{" "}
+              <span>{topToken.token?.coinDenom}</span>
             </span>
           </div>
           <span>for</span>
           <div className="flex items-center gap-1">
             {isTiaWtia
-              ? formatDecimalValues(tokenTwo?.value || "0", 6)
+              ? formatDecimalValues(bottomToken.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span>{tokenTwo?.token?.coinDenom}</span>
+            <span>{bottomToken.token?.coinDenom}</span>
           </div>
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
@@ -221,7 +201,7 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed({ txnMsg }: TxnStepsProps) {
+function TxnFailed({ txnMsg }: Pick<TxnStepsProps, "txnMsg">) {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange-soft" />
@@ -237,38 +217,40 @@ function TxnFailed({ txnMsg }: TxnStepsProps) {
 export function SwapTxnSteps({
   txnStatus,
   txnInfo,
-  tokenOne,
-  tokenTwo,
+  topToken,
+  bottomToken,
   isTiaWtia,
   txnHash,
   txnMsg,
   oneToOneQuote,
+  isQuoteLoading,
 }: SwapTxnStepsProps) {
   return (
     <div className="h-[320px]">
       {txnStatus === TXN_STATUS.IDLE && !isTiaWtia && (
         <TxnDetails
-          tokenOne={tokenOne}
-          tokenTwo={tokenTwo}
+          topToken={topToken}
+          bottomToken={bottomToken}
           expectedOutputFormatted={txnInfo.expectedOutputFormatted}
           priceImpact={txnInfo.priceImpact}
           minimumReceived={txnInfo.minimumReceived}
           isTiaWtia={isTiaWtia}
           oneToOneQuote={oneToOneQuote}
+          isQuoteLoading={isQuoteLoading}
         />
       )}
       {txnStatus === TXN_STATUS.PENDING && (
         <TxnLoader
-          tokenOne={tokenOne}
-          tokenTwo={tokenTwo}
+          topToken={topToken}
+          bottomToken={bottomToken}
           expectedOutputFormatted={txnInfo.expectedOutputFormatted}
           isTiaWtia={isTiaWtia}
         />
       )}
       {txnStatus === TXN_STATUS.SUCCESS && (
         <TxnSuccess
-          tokenOne={tokenOne}
-          tokenTwo={tokenTwo}
+          topToken={topToken}
+          bottomToken={bottomToken}
           expectedOutputFormatted={txnInfo.expectedOutputFormatted}
           isTiaWtia={isTiaWtia}
           txnHash={txnHash}

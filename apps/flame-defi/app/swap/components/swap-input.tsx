@@ -1,4 +1,3 @@
-import { EvmCurrency, GetQuoteResult, TokenState } from "@repo/flame-types";
 import { Skeleton, TokenSelector } from "@repo/ui/components";
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
@@ -7,31 +6,18 @@ import {
 } from "@repo/ui/utils";
 import { useIntl } from "react-intl";
 import { useUsdQuote } from "../hooks";
-
-interface SwapInputProps {
-  inputToken: TokenState;
-  oppositeToken: TokenState;
-  onInputChange: (value: string, index: number) => void;
-  availableTokens?: EvmCurrency[];
-  onTokenSelect: (token: EvmCurrency, index: number) => void;
-  label: string;
-  txnQuoteData: GetQuoteResult | null;
-  txnQuoteLoading: boolean;
-  txnQuoteError: string | null;
-  index: number;
-  balance: string;
-}
+import { SwapInputProps } from "../types";
 
 export function SwapInput({
-  inputToken,
-  onInputChange,
   availableTokens,
-  oppositeToken,
-  onTokenSelect,
-  label,
-  txnQuoteLoading,
-  index,
   balance,
+  id,
+  inputToken,
+  label,
+  onInputChange,
+  onTokenSelect,
+  oppositeToken,
+  txnQuoteLoading,
 }: SwapInputProps) {
   const { locale, formatNumber } = useIntl();
   const usdQuote = useUsdQuote(inputToken);
@@ -58,8 +44,8 @@ export function SwapInput({
 
     if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
       return formatFiat(inputToken.value);
-    } else if (usdQuote?.quote) {
-      return formatFiat(usdQuote?.quote?.quoteDecimals);
+    } else if (usdQuote.quote) {
+      return formatFiat(usdQuote.quote.quoteDecimals);
     } else {
       return "-";
     }
@@ -84,7 +70,7 @@ export function SwapInput({
             type="number"
             value={inputToken.value}
             onChange={(e) => {
-              onInputChange(e.target.value, index);
+              onInputChange(e.target.value, id);
             }}
             className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden text-[36px]"
             placeholder="0"
@@ -94,8 +80,10 @@ export function SwapInput({
           <TokenSelector
             tokens={availableTokens}
             selectedToken={inputToken.token}
-            unavailableToken={oppositeToken?.token}
-            setSelectedToken={(token) => onTokenSelect(token, index)}
+            unavailableToken={oppositeToken.token}
+            setSelectedToken={(token) =>
+              onTokenSelect(token, oppositeToken, id)
+            }
           />
           {inputToken.token && balance && !isDustAmount(balance) ? (
             <div className="text-sm font-medium text-grey-light flex items-center mt-3">
@@ -104,12 +92,12 @@ export function SwapInput({
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 4,
                 })}{" "}
-                {inputToken?.token?.coinDenom}
+                {inputToken.token?.coinDenom}
               </span>
               {
                 <span
                   onClick={() => {
-                    onInputChange(balance, index);
+                    onInputChange(balance, id);
                   }}
                   className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
                 >
@@ -124,7 +112,7 @@ export function SwapInput({
       </div>
       <div>
         <Skeleton
-          isLoading={usdQuote?.loading || txnQuoteLoading}
+          isLoading={usdQuote.loading || txnQuoteLoading}
           className="rounded-sm w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">

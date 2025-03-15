@@ -25,6 +25,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
+  const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
   const tokenApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
@@ -117,6 +118,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         poolURL,
         earnAPIURL,
         feedbackFormURL,
+        swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,
         swapSlippageToleranceDefault,
