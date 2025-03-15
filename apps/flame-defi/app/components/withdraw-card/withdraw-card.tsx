@@ -324,7 +324,7 @@ export default function WithdrawCard(): React.ReactElement {
             </div>
           </div>
           {fromAddress && (
-            <div className="py-2 px-3 mt-4 rounded-xl bg-grey-dark">
+            <div className="mt-4 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
               {fromAddress && (
                 <p className="text-grey-light font-semibold">
                   Address: {shortenAddress(fromAddress)}
@@ -344,7 +344,9 @@ export default function WithdrawCard(): React.ReactElement {
                 </p>
               )}
               {selectedEvmCurrency?.erc20ContractAddress && (
-                <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
+                <div className="mt-3">
+                  <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
+                </div>
               )}
             </div>
           )}

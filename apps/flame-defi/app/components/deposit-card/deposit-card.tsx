@@ -407,7 +407,7 @@ export default function DepositCard(): React.ReactElement {
           {evmAccountAddress &&
             !isRecipientAddressEditable &&
             !recipientAddressOverride && (
-              <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+              <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
                 {evmAccountAddress && (
                   <p
                     className="text-grey-light font-semibold cursor-pointer"
@@ -434,9 +434,11 @@ export default function DepositCard(): React.ReactElement {
                   </p>
                 )}
                 {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
-                  <AddErc20ToWalletButton
-                    evmCurrency={selectedEvmCurrencyOption.value}
-                  />
+                  <div className="mt-3">
+                    <AddErc20ToWalletButton
+                      evmCurrency={selectedEvmCurrencyOption.value}
+                    />
+                  </div>
                 )}
               </div>
             )}
