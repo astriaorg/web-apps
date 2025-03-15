@@ -19,7 +19,7 @@ const buttonVariants = cva(
         destructive: "",
         outline: "",
         secondary: `bg-surface-3 text-typography-default ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
-        ghost: "",
+        ghost: "hover:text-typography-light",
         link: "",
       },
       size: {

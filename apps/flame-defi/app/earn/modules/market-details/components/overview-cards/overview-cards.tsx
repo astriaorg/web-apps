@@ -1,9 +1,10 @@
 import { Card, CardContent, CardLabel } from "@repo/ui/components";
 import Big from "big.js";
-import { Image } from "components/image";
+import { Asset } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
 import { FormattedDate, useIntl } from "react-intl";
+import { AssetRow } from "./asset-row";
 
 export const OverviewCards = () => {
   const { formatNumber } = useIntl();
@@ -25,38 +26,14 @@ export const OverviewCards = () => {
           left: "Collateral Token",
         },
         value: (
-          <div className="flex items-center space-x-2 overflow-hidden">
-            <Image
-              src={data?.marketByUniqueKey.collateralAsset?.logoURI}
-              alt={data?.marketByUniqueKey.collateralAsset?.symbol}
-              width={16}
-              height={16}
-              className="rounded-full"
-            />
-            <span className="truncate">
-              {data?.marketByUniqueKey.collateralAsset?.symbol ?? "-"}
-            </span>
-          </div>
+          <AssetRow asset={data?.marketByUniqueKey.collateralAsset as Asset} />
         ),
       },
       {
         label: {
           left: "Loan Token",
         },
-        value: (
-          <div className="flex items-center space-x-2 overflow-hidden">
-            <Image
-              src={data?.marketByUniqueKey.loanAsset.logoURI}
-              alt={data?.marketByUniqueKey.loanAsset.symbol}
-              width={16}
-              height={16}
-              className="rounded-full"
-            />
-            <span className="truncate">
-              {data?.marketByUniqueKey.loanAsset.symbol}
-            </span>
-          </div>
-        ),
+        value: <AssetRow asset={data?.marketByUniqueKey.loanAsset as Asset} />,
       },
       {
         label: {

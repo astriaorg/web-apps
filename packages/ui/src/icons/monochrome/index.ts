@@ -8,6 +8,7 @@ export * from "./chevron-down-small-icon";
 export * from "./chevron-right-small-icon";
 export * from "./clipboard-icon";
 export * from "./close-icon";
+export * from "./copy-icon";
 export * from "./dot-icon";
 export * from "./edit-icon";
 export * from "./error-icon";
