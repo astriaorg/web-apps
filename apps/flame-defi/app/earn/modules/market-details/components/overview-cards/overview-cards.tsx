@@ -56,12 +56,14 @@ export const OverviewCards = () => {
         },
         value: (
           <span className="truncate">
-            <FormattedDate
-              value={data?.marketByUniqueKey.creationTimestamp * 1000}
-              year="numeric"
-              month="long"
-              day="numeric"
-            />
+            {data?.marketByUniqueKey.creationTimestamp && (
+              <FormattedDate
+                value={data.marketByUniqueKey.creationTimestamp * 1000}
+                year="numeric"
+                month="long"
+                day="numeric"
+              />
+            )}
           </span>
         ),
       },
