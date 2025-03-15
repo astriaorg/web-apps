@@ -111,9 +111,7 @@ export function SwapInput({
           )}
           {inputToken.token && !inputToken.token.isNative && (
             <div className="mt-1 text-right">
-              <AddErc20ToWalletButton 
-                evmCurrency={inputToken.token}
-              />
+              <AddErc20ToWalletButton evmCurrency={inputToken.token} />
             </div>
           )}
         </div>
