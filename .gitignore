@@ -31,8 +31,8 @@ build
 dist
 
 # artifacts from ai tooling
-CLAUDE.md
 codebase.md
+.ai
 
 # Debug
 npm-debug.log*
