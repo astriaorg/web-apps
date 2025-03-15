@@ -69,7 +69,7 @@ export const OverviewCards = () => {
   }, [data, formatNumber]);
 
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
       {items.map((it, index) => (
         <Card key={`overview-cards_item_${index}`} isLoading={isPending}>
           <CardContent className="space-y-2">

@@ -123,7 +123,7 @@ export const ContentSection = () => {
             <SummaryCards
               items={items}
               isLoading={isPending}
-              className="grid lg:grid-cols-3 gap-2"
+              className="grid gap-2 md:grid-cols-3"
             />
 
             <div className="mt-10 flex flex-col space-y-4">
