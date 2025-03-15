@@ -44,6 +44,7 @@ export interface AppConfig {
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;
+    poolEnabled: boolean;
   };
 }
 

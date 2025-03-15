@@ -104,6 +104,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   // Parse feature flags - explicitly check for "true"
   const earnEnabled =
     getEnvVariable("NEXT_PUBLIC_FEATURE_EARN_ENABLED", "false") === "true";
+  const poolEnabled =
+    getEnvVariable("NEXT_PUBLIC_FEATURE_POOL_ENABLED", "false") === "true";
 
   return (
     <ConfigContext.Provider
@@ -125,6 +127,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         feeData,
         featureFlags: {
           earnEnabled,
+          poolEnabled,
         },
       }}
     >

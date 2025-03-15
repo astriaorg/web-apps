@@ -73,12 +73,14 @@ function MobileNav() {
               >
                 Swap
               </Link>
-              <Link
-                href="/pool"
-                className={`font-medium text-grey-light text-base ${pathname === "/pool" ? "text-orange-soft" : ""}`}
-              >
-                Pool
-              </Link>
+              {featureFlags.poolEnabled && (
+                <Link
+                  href="/pool"
+                  className={`font-medium text-grey-light text-base ${pathname === "/pool" ? "text-orange-soft" : ""}`}
+                >
+                  Pool
+                </Link>
+              )}
               {featureFlags.earnEnabled && (
                 <Link
                   href="/earn"
