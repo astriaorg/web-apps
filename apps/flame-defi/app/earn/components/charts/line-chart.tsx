@@ -14,7 +14,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 import { ChartTooltip } from "earn/components/charts/chart-tooltip";
 import { FloatDataPoint } from "earn/generated/gql/graphql";
 import { ChartInterval } from "earn/modules/vault-details/types";
@@ -24,6 +23,7 @@ import {
   LineChart as BaseLineChart,
   CartesianGrid,
   Line,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -58,7 +58,7 @@ export const LineChart = ({
   figure,
   renderTooltipContent,
 }: LineChartProps) => {
-  const { formatDate, formatNumber } = useIntl();
+  const { formatDate } = useIntl();
 
   const chartRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -168,11 +168,21 @@ export const LineChart = ({
           <div className="relative">
             <ChartTooltip
               ref={tooltipRef}
-              className={cn("absolute", tooltip.x === null && "opacity-0")}
-              {...(tooltip.x !== null &&
-                tooltip.y !== null && {
-                  style: { top: tooltip.y, left: tooltip.x },
+              className="absolute"
+              {...(!!tooltip.x &&
+                !!tooltip.y && {
+                  style: {
+                    top: tooltip.y,
+                    left: tooltip.x,
+                  },
                 })}
+              // Handle edge case where tooltip width is 0 when mouse move is fired.
+              // Use opacity and not display to keep the width for subsequent renders.
+              {...(tooltipRef.current?.clientWidth === 0 && {
+                style: {
+                  opacity: "0",
+                },
+              })}
             >
               {tooltip.data && renderTooltipContent(tooltip.data)}
             </ChartTooltip>
@@ -186,7 +196,6 @@ export const LineChart = ({
                 height={208}
                 onMouseMove={handleOnMouseMove}
                 onMouseLeave={() => setTooltip({ x: null, y: null })}
-                style={{ position: "relative" }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -204,22 +213,20 @@ export const LineChart = ({
                   // allowDataOverflow
                   // interval={0}
                 />
-                <YAxis
-                  dataKey="y"
-                  hide
-                  domain={[0, dataMax]}
-                  tickFormatter={(value: number) =>
-                    formatNumber(value, {
-                      style: "percent",
-                    })
-                  }
-                />
+                <YAxis dataKey="y" hide domain={[0, dataMax]} />
                 <Line
                   dataKey="y"
                   stroke="var(--color-brand)"
                   strokeWidth={1}
                   dot={false}
                   activeDot={{ r: 4.5 }}
+                />
+                {/* Need to have Rechart's tooltip for the `activeDot` to show. */}
+                <Tooltip
+                  position={{ x: 0, y: 0 }}
+                  itemStyle={{ display: "none" }}
+                  wrapperStyle={{ display: "none" }}
+                  cursor={false}
                 />
               </BaseLineChart>
             </ChartContainer>
