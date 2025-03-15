@@ -31,7 +31,7 @@ describe("getTickIntervalData", () => {
   it("should return an empty array when input data is empty", () => {
     const data: number[] = [];
     for (const interval of CHART_TICK_INTERVALS) {
-      const result = getTickIntervalData(data, { interval, key: "" as any });
+      const result = getTickIntervalData(data, interval, "" as any);
       expect(result).toEqual([]);
     }
   });
@@ -46,7 +46,7 @@ describe("getTickIntervalData", () => {
       { x: new Date("2024-06-01").getTime(), y: 0 },
     ];
     for (const interval of CHART_TICK_INTERVALS) {
-      const result = getTickIntervalData(data, { interval, key: "x" });
+      const result = getTickIntervalData(data, interval, "x");
       expect(result).toEqual(data);
     }
   });
@@ -61,7 +61,7 @@ describe("getTickIntervalData", () => {
       { x: new Date("2024-02-01").getTime(), y: 0 },
       { x: new Date("2024-03-01").getTime(), y: 0 },
     ];
-    const result = getTickIntervalData(data, { interval: "1w", key: "x" });
+    const result = getTickIntervalData(data, "1w", "x");
     expect(result).toEqual([
       { x: new Date("2024-01-01").getTime(), y: 0 },
       { x: new Date("2024-01-08").getTime(), y: 0 },
@@ -80,7 +80,7 @@ describe("getTickIntervalData", () => {
       { x: new Date("2024-02-01").getTime(), y: 0 }, // + 2 months.
       { x: new Date("2024-03-01").getTime(), y: 0 },
     ];
-    const result = getTickIntervalData(data, { interval: "1m", key: "x" });
+    const result = getTickIntervalData(data, "1m", "x");
     expect(result).toEqual([
       { x: new Date("2023-12-01").getTime(), y: 0 },
       { x: new Date("2024-01-01").getTime(), y: 0 },

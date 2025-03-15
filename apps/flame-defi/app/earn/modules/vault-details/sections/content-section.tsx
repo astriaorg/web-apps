@@ -13,7 +13,7 @@ import { useMemo, useState } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 
 export const ContentSection = () => {
-  const { formatDate, formatNumber } = useIntl();
+  const { formatNumber } = useIntl();
   const {
     charts,
     query: { data, isPending, status },
@@ -138,16 +138,19 @@ export const ContentSection = () => {
                     minimumFractionDigits={2}
                   />
                 }
+                renderLabelContent={(value) =>
+                  formatNumber(value.y ?? 0, {
+                    style: "percent",
+                    minimumFractionDigits: 2,
+                  })
+                }
                 renderTooltipContent={(value) => (
-                  <>
-                    <div>{formatDate(value.x * 1000, { timeZone: "UTC" })}</div>
-                    <div>
-                      {formatNumber(value.y ?? 0, {
-                        style: "percent",
-                        minimumFractionDigits: 2,
-                      })}
-                    </div>
-                  </>
+                  <div>
+                    {formatNumber(value.y ?? 0, {
+                      style: "percent",
+                      minimumFractionDigits: 2,
+                    })}
+                  </div>
                 )}
               />
               <LineChart
@@ -175,20 +178,22 @@ export const ContentSection = () => {
                     minimumFractionDigits: 2,
                   },
                 )}
+                renderLabelContent={(value) => {
+                  return formatAbbreviatedNumber((value.y ?? 0).toString(), {
+                    style: "currency",
+                    currency: "USD",
+                    minimumFractionDigits: 2,
+                  });
+                }}
                 renderTooltipContent={(value) => {
                   return (
-                    <>
-                      <div>
-                        {formatDate(value.x * 1000, { timeZone: "UTC" })}
-                      </div>
-                      <div>
-                        {formatAbbreviatedNumber((value.y ?? 0).toString(), {
-                          style: "currency",
-                          currency: "USD",
-                          minimumFractionDigits: 2,
-                        })}
-                      </div>
-                    </>
+                    <div>
+                      {formatAbbreviatedNumber((value.y ?? 0).toString(), {
+                        style: "currency",
+                        currency: "USD",
+                        minimumFractionDigits: 2,
+                      })}
+                    </div>
                   );
                 }}
               />

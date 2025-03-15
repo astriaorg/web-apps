@@ -15,7 +15,6 @@ import {
   TabsTrigger,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { ChartTooltip } from "earn/components/charts/chart-tooltip";
 import { FloatDataPoint } from "earn/generated/gql/graphql";
 import { ChartInterval } from "earn/modules/vault-details/types";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -23,7 +22,9 @@ import { useIntl } from "react-intl";
 import {
   LineChart as BaseLineChart,
   CartesianGrid,
+  Label,
   Line,
+  ReferenceLine,
   Tooltip,
   XAxis,
   YAxis,
@@ -45,6 +46,7 @@ interface LineChartProps {
   setSelectedInterval: (value: ChartInterval) => void;
   title: React.ReactNode;
   figure: React.ReactNode;
+  renderLabelContent: (value: Pick<FloatDataPoint, "y">) => string;
   renderTooltipContent: (value: FloatDataPoint) => React.ReactNode;
 }
 
@@ -57,6 +59,7 @@ export const LineChart = ({
   setSelectedInterval,
   title,
   figure,
+  renderLabelContent,
   renderTooltipContent,
 }: LineChartProps) => {
   const { formatDate } = useIntl();
@@ -65,20 +68,26 @@ export const LineChart = ({
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   const [tooltip, setTooltip] = useState<{
-    x: number | null;
-    y: number | null;
+    x?: number;
+    y?: number;
     data?: FloatDataPoint;
     isOverRightBoundary: boolean;
-  }>({ x: null, y: null, isOverRightBoundary: false });
+  }>({ isOverRightBoundary: false });
 
   const interval = useMemo(
     () => CHART_INTERVAL_TO_CHART_TICK_INTERVAL[selectedInterval],
     [selectedInterval],
   );
 
-  const { downsampled, ticks, dataMax } = useMemo(() => {
+  const { downsampled, ticks, dataMin, dataMax, dataAverage } = useMemo(() => {
     if (!data) {
-      return { downsampled: [], ticks: [], dataMin: 0, dataMax: 0 };
+      return {
+        downsampled: [],
+        ticks: [],
+        dataMin: 0,
+        dataMax: 0,
+        dataAverage: 0,
+      };
     }
 
     const downsampled = getDownsampledData(data);
@@ -93,8 +102,9 @@ export const LineChart = ({
         interval,
         "x",
       ).map((it) => (it?.x ?? 0) / 1000),
-      dataMin: Math.min(...domain),
+      dataMin: Math.max(0, Math.min(...domain) * 0.1), // Make chart have some margin at the bottom.
       dataMax: Math.max(...domain),
+      dataAverage: domain.reduce((acc, it) => acc + it, 0) / domain.length,
     };
   }, [data, interval]);
 
@@ -125,7 +135,7 @@ export const LineChart = ({
 
         const currentY: NonNullable<FloatDataPoint["y"]> =
           e.activePayload?.[0]?.value ?? 0;
-        tooltipY = (1 - currentY / dataMax) * CHART_HEIGHT - 32;
+        tooltipY = (1 - currentY / (dataMax - dataMin)) * CHART_HEIGHT - 28;
 
         setTooltip({
           x: tooltipX,
@@ -139,7 +149,7 @@ export const LineChart = ({
         });
       }
     },
-    [dataMax],
+    [dataMin, dataMax],
   );
 
   if (isError || data === null) {
@@ -181,16 +191,13 @@ export const LineChart = ({
               data={downsampled}
               height={208}
               onMouseMove={handleOnMouseMove}
-              onMouseLeave={() =>
-                setTooltip({ x: null, y: null, isOverRightBoundary: false })
-              }
             >
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="x"
                 tickLine={false}
                 ticks={ticks}
-                dy={16}
+                dy={12}
                 tickFormatter={(value: FloatDataPoint["x"]) =>
                   formatDate(
                     value * 1000,
@@ -201,7 +208,16 @@ export const LineChart = ({
                 // allowDataOverflow
                 // interval={0}
               />
-              <YAxis dataKey="y" hide domain={[0, dataMax]} />
+              <YAxis dataKey="y" hide domain={[dataMin, dataMax]} />
+              <ReferenceLine y={dataAverage} strokeDasharray="4 4">
+                <Label
+                  value={`Average ${renderLabelContent({ y: dataAverage })}`}
+                  fill="var(--color-typography-light)"
+                  position="insideTopLeft"
+                  offset={10}
+                  className="text-xs/3"
+                />
+              </ReferenceLine>
               <Line
                 dataKey="y"
                 stroke="var(--color-brand)"
@@ -210,20 +226,21 @@ export const LineChart = ({
                 activeDot={{ r: 4.5 }}
               />
               <Tooltip
-                position={{ x: tooltip.x ?? 0, y: tooltip.y ?? 0 }}
+                position={{ x: tooltip.x, y: tooltip.y }}
                 animationDuration={0}
                 isAnimationActive={false}
                 cursor={false}
                 content={(content) => (
-                  <ChartTooltip
+                  <div
                     ref={tooltipRef}
                     className={cn(
+                      "text-brand text-sm text-center",
                       tooltip.isOverRightBoundary && "-translate-x-full",
                     )}
                   >
                     {content.payload?.[0]?.payload &&
                       renderTooltipContent(content.payload[0].payload)}
-                  </ChartTooltip>
+                  </div>
                 )}
               />
             </BaseLineChart>

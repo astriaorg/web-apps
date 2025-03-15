@@ -162,14 +162,12 @@ export const getTickIntervalDateTimeFormatOptions = (
       return {
         day: "numeric",
         month: "short",
-        year: "numeric",
         timeZone: "UTC",
       };
     }
     case "1m": {
       return {
         month: "short",
-        year: "numeric",
         timeZone: "UTC",
       };
     }
