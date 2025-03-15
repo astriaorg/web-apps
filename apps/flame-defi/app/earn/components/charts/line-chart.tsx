@@ -14,6 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import { ChartTooltip } from "earn/components/charts/chart-tooltip";
 import { FloatDataPoint } from "earn/generated/gql/graphql";
 import { ChartInterval } from "earn/modules/vault-details/types";
@@ -67,7 +68,8 @@ export const LineChart = ({
     x: number | null;
     y: number | null;
     data?: FloatDataPoint;
-  }>({ x: null, y: null });
+    isOverRightBoundary: boolean;
+  }>({ x: null, y: null, isOverRightBoundary: false });
 
   const interval = useMemo(
     () => CHART_INTERVAL_TO_CHART_TICK_INTERVAL[selectedInterval],
@@ -123,12 +125,17 @@ export const LineChart = ({
 
         const currentY: NonNullable<FloatDataPoint["y"]> =
           e.activePayload?.[0]?.value ?? 0;
-        tooltipY = (1 - currentY / dataMax) * CHART_HEIGHT - 50;
+        tooltipY = (1 - currentY / dataMax) * CHART_HEIGHT - 32;
 
         setTooltip({
           x: tooltipX,
           y: tooltipY,
           data: e.activePayload?.[0].payload,
+          // Handle edge case when tooltip width is 0 and rendered incorrectly on the right boundary.
+          // Setting style via tooltipRef.current.style... doesn't work.
+          isOverRightBoundary:
+            tooltipRef.current?.clientWidth === 0 &&
+            e.chartX + 10 >= rightBoundary,
         });
       }
     },
@@ -165,72 +172,62 @@ export const LineChart = ({
 
         <div className="mt-10" />
         <Skeleton isLoading={isLoading} className="w-full">
-          <div className="relative">
-            <ChartTooltip
-              ref={tooltipRef}
-              className="absolute"
-              {...(!!tooltip.x &&
-                !!tooltip.y && {
-                  style: {
-                    top: tooltip.y,
-                    left: tooltip.x,
-                  },
-                })}
-              // Handle edge case where tooltip width is 0 when mouse move is fired.
-              // Use opacity and not display to keep the width for subsequent renders.
-              {...(tooltipRef.current?.clientWidth === 0 && {
-                style: {
-                  opacity: "0",
-                },
-              })}
+          <ChartContainer
+            ref={chartRef}
+            config={CHART_CONFIG}
+            className="w-full h-52 min-h-52"
+          >
+            <BaseLineChart
+              data={downsampled}
+              height={208}
+              onMouseMove={handleOnMouseMove}
+              onMouseLeave={() =>
+                setTooltip({ x: null, y: null, isOverRightBoundary: false })
+              }
             >
-              {tooltip.data && renderTooltipContent(tooltip.data)}
-            </ChartTooltip>
-            <ChartContainer
-              ref={chartRef}
-              config={CHART_CONFIG}
-              className="w-full h-52 min-h-52"
-            >
-              <BaseLineChart
-                data={downsampled}
-                height={208}
-                onMouseMove={handleOnMouseMove}
-                onMouseLeave={() => setTooltip({ x: null, y: null })}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="x"
-                  tickLine={false}
-                  ticks={ticks}
-                  dy={16}
-                  tickFormatter={(value: FloatDataPoint["x"]) =>
-                    formatDate(
-                      value * 1000,
-                      getTickIntervalDateTimeFormatOptions(interval),
-                    )
-                  }
-                  // Show overflowing ticks.
-                  // allowDataOverflow
-                  // interval={0}
-                />
-                <YAxis dataKey="y" hide domain={[0, dataMax]} />
-                <Line
-                  dataKey="y"
-                  stroke="var(--color-brand)"
-                  strokeWidth={1}
-                  dot={false}
-                  activeDot={{ r: 4.5 }}
-                />
-                {/* Need to have Rechart's tooltip for the `activeDot` to show. */}
-                <Tooltip
-                  position={{ x: 0, y: 0 }}
-                  itemStyle={{ display: "none" }}
-                  wrapperStyle={{ display: "none" }}
-                  cursor={false}
-                />
-              </BaseLineChart>
-            </ChartContainer>
-          </div>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="x"
+                tickLine={false}
+                ticks={ticks}
+                dy={16}
+                tickFormatter={(value: FloatDataPoint["x"]) =>
+                  formatDate(
+                    value * 1000,
+                    getTickIntervalDateTimeFormatOptions(interval),
+                  )
+                }
+                // Show overflowing ticks.
+                // allowDataOverflow
+                // interval={0}
+              />
+              <YAxis dataKey="y" hide domain={[0, dataMax]} />
+              <Line
+                dataKey="y"
+                stroke="var(--color-brand)"
+                strokeWidth={1}
+                dot={false}
+                activeDot={{ r: 4.5 }}
+              />
+              <Tooltip
+                position={{ x: tooltip.x ?? 0, y: tooltip.y ?? 0 }}
+                animationDuration={0}
+                isAnimationActive={false}
+                cursor={false}
+                content={(content) => (
+                  <ChartTooltip
+                    ref={tooltipRef}
+                    className={cn(
+                      tooltip.isOverRightBoundary && "-translate-x-full",
+                    )}
+                  >
+                    {content.payload?.[0]?.payload &&
+                      renderTooltipContent(content.payload[0].payload)}
+                  </ChartTooltip>
+                )}
+              />
+            </BaseLineChart>
+          </ChartContainer>
         </Skeleton>
       </CardContent>
     </Card>
