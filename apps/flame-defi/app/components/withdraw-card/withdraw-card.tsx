@@ -343,7 +343,7 @@ export default function WithdrawCard(): React.ReactElement {
                   Balance: <i className="fas fa-spinner fa-pulse" />
                 </p>
               )}
-              {selectedEvmCurrency?.erc20ContractAddress && (
+              {selectedEvmCurrency?.erc20ContractAddress && fromAddress && (
                 <div className="mt-3">
                   <AddErc20ToWalletButton evmCurrency={selectedEvmCurrency} />
                 </div>

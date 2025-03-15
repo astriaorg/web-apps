@@ -433,13 +433,14 @@ export default function DepositCard(): React.ReactElement {
                     Balance: <i className="fas fa-spinner fa-pulse" />
                   </p>
                 )}
-                {selectedEvmCurrencyOption?.value?.erc20ContractAddress && (
-                  <div className="mt-3">
-                    <AddErc20ToWalletButton
-                      evmCurrency={selectedEvmCurrencyOption.value}
-                    />
-                  </div>
-                )}
+                {selectedEvmCurrencyOption?.value?.erc20ContractAddress &&
+                  evmAccountAddress && (
+                    <div className="mt-3">
+                      <AddErc20ToWalletButton
+                        evmCurrency={selectedEvmCurrencyOption.value}
+                      />
+                    </div>
+                  )}
               </div>
             )}
           {recipientAddressOverride && !isRecipientAddressEditable && (
