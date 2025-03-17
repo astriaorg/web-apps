@@ -51,7 +51,7 @@ export const useFetchVaultByAddressHistoricalState = ({
         // TODO: Get chain ID from wallet context.
         chainId: null,
         includeAPYData: type === CHART_TYPE.APY,
-        includeTotalSupplyData: type === CHART_TYPE.TOTAL_SUPPLY,
+        includeTotalSupplyData: type === CHART_TYPE.TOTAL_ASSETS,
       });
 
       // Data doesn't come sorted from the API.

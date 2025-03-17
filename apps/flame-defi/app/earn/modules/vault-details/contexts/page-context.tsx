@@ -37,7 +37,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     [CHART_TYPE.APY]: {
       selectedInterval: ChartInterval;
     };
-    [CHART_TYPE.TOTAL_SUPPLY]: {
+    [CHART_TYPE.TOTAL_ASSETS]: {
       // TODO: Add currency selector when we support more currencies.
       selectedInterval: ChartInterval;
     };
@@ -45,7 +45,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     [CHART_TYPE.APY]: {
       selectedInterval: "3m",
     },
-    [CHART_TYPE.TOTAL_SUPPLY]: {
+    [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: "3m",
     },
   });
@@ -67,9 +67,9 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const queryTotalSupplyChart = useFetchVaultByAddressHistoricalState({
     variables: {
       address: params.address,
-      type: CHART_TYPE.TOTAL_SUPPLY,
+      type: CHART_TYPE.TOTAL_ASSETS,
       options: getTimeseriesOptions(
-        charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+        charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval,
       ),
     },
   });
@@ -103,12 +103,12 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
             },
             query: queryAPYChart,
           },
-          [CHART_TYPE.TOTAL_SUPPLY]: {
-            selectedInterval: charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+          [CHART_TYPE.TOTAL_ASSETS]: {
+            selectedInterval: charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval,
             setSelectedInterval: (value: ChartInterval) => {
               setCharts({
                 ...charts,
-                [CHART_TYPE.TOTAL_SUPPLY]: {
+                [CHART_TYPE.TOTAL_ASSETS]: {
                   selectedInterval: value,
                 },
               });

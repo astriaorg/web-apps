@@ -155,19 +155,19 @@ export const ContentSection = () => {
               />
               <LineChart
                 data={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].query.data?.vaultByAddress
+                  charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
                     .historicalState.totalAssetsUsd
                 }
-                isError={charts[CHART_TYPE.TOTAL_SUPPLY].query.isError}
+                isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
                 isLoading={
-                  isPending || charts[CHART_TYPE.TOTAL_SUPPLY].query.isPending
+                  isPending || charts[CHART_TYPE.TOTAL_ASSETS].query.isPending
                 }
                 intervals={CHART_INTERVALS}
                 selectedInterval={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval
+                  charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval
                 }
                 setSelectedInterval={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].setSelectedInterval
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedInterval
                 }
                 title="Total Supply"
                 figure={formatAbbreviatedNumber(

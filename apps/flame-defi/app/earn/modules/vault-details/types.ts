@@ -5,5 +5,5 @@ export type ChartInterval = (typeof CHART_INTERVALS)[number];
 
 export const CHART_TYPE = {
   APY: "APY",
-  TOTAL_SUPPLY: "TOTAL_SUPPLY",
+  TOTAL_ASSETS: "TOTAL_ASSETS",
 } as const;
