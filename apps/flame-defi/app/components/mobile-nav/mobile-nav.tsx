@@ -74,12 +74,14 @@ function MobileNav() {
               >
                 Swap
               </Link>
-              <Link
-                href="/pool"
-                className={getLinkStyles(pathname.startsWith("/pool"))}
-              >
-                Pool
-              </Link>
+              {featureFlags.poolEnabled && (
+                <Link
+                  href="/pool"
+                  className={getLinkStyles(pathname.startsWith("/pool"))}
+                >
+                  Pool
+                </Link>
+              )}
               {featureFlags.earnEnabled && (
                 <>
                   <Link

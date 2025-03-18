@@ -65,12 +65,14 @@ const Navbar = () => {
           >
             SWAP
           </Link>
-          <Link
-            href="/pool"
-            className={navLinkClasses(pathname.includes("/pool"))}
-          >
-            POOL
-          </Link>
+          {featureFlags.poolEnabled && (
+            <Link
+              href="/pool"
+              className={navLinkClasses(pathname.includes("/pool"))}
+            >
+              POOL
+            </Link>
+          )}
           {featureFlags.earnEnabled && (
             <>
               <Link

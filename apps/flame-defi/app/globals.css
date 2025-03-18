@@ -26,7 +26,7 @@
   --color-yellow: hsl(43, 71%, 58%);
 
   /* [Deprecated] Semantic Colors */
-  --background: var(--color-black);
+  --background: 203 45% 4%;
   --foreground: var(--color-black);
   --muted: var(--color-grey-dark);
   --muted-foreground: var(--color-grey-light);
@@ -146,7 +146,8 @@ html[data-theme="dark"] {
   --color-typography-subdued: hsl(var(--color-gray-300));
   --color-typography-black: hsl(var(--color-gray-1000));
 
-  --color-background-default: hsl(var(--color-gray-1000));
+  /* Updated background color to match bridge.astria.org */
+  --color-background-default: hsl(203, 45%, 4%);
   --color-surface-1: hsl(var(--color-gray-900));
   --color-surface-2: hsl(var(--color-gray-850));
   --color-surface-3: hsl(var(--color-gray-800));
