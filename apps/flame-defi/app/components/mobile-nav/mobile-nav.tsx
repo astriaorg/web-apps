@@ -8,11 +8,15 @@ import {
   DrawerContent,
   DrawerTrigger,
 } from "@repo/ui/shadcn-primitives";
+import { cn } from "@repo/ui/utils";
 import MobileWalletConnect from "components/mobile-wallet-connect/mobile-wallet-connect";
 import { useConfig } from "config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+
+const getLinkStyles = (isActivePathname: boolean) =>
+  cn("font-medium text-grey-light text-base", isActivePathname && "text-brand");
 
 function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,21 +65,18 @@ function MobileNav() {
               Flame Apps
             </div>
             <div className="flex flex-col items-baseline space-y-4 mt-4">
-              <Link
-                href="/"
-                className={`font-medium text-grey-light text-base ${pathname === "/" ? "text-orange-soft" : ""}`}
-              >
+              <Link href="/" className={getLinkStyles(pathname === "/")}>
                 Bridge
               </Link>
               <Link
                 href="/swap"
-                className={`font-medium text-grey-light text-base ${pathname === "/swap" ? "text-orange-soft" : ""}`}
+                className={getLinkStyles(pathname.startsWith("/swap"))}
               >
                 Swap
               </Link>
               <Link
                 href="/pool"
-                className={`font-medium text-grey-light text-base ${pathname === "/pool" ? "text-orange-soft" : ""}`}
+                className={getLinkStyles(pathname.startsWith("/pool"))}
               >
                 Pool
               </Link>
@@ -83,13 +84,13 @@ function MobileNav() {
                 <>
                   <Link
                     href="/earn"
-                    className={`font-medium text-grey-light text-base ${pathname === "/earn" ? "text-orange-soft" : ""}`}
+                    className={getLinkStyles(pathname.startsWith("/earn"))}
                   >
                     Earn
                   </Link>
                   <Link
                     href="/borrow"
-                    className={`font-medium text-grey-light text-base ${pathname === "/borrow" ? "text-orange-soft" : ""}`}
+                    className={getLinkStyles(pathname.startsWith("/borrow"))}
                   >
                     Borrow
                   </Link>
