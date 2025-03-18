@@ -1,4 +1,4 @@
-import { Skeleton, StatusCard } from "@repo/ui/components";
+import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
@@ -14,7 +14,6 @@ import {
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import {
-  CHART_INTERVALS,
   CHART_TYPE,
   TOTAL_ASSETS_OPTION,
   TOTAL_ASSETS_OPTIONS,

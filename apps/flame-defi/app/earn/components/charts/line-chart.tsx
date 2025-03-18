@@ -7,6 +7,7 @@ import {
   CHART_INTERVAL_TO_CHART_TICK_INTERVAL,
   ChartConfig,
   ChartContainer,
+  ChartInterval,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,7 +23,6 @@ import {
 import { ChevronDownSmallIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { Maybe } from "earn/generated/gql/graphql";
-import { ChartInterval } from "earn/modules/vault-details/types";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {

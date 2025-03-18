@@ -1,8 +1,6 @@
+import { ChartInterval } from "@repo/ui/components";
 import type { TimeseriesOptions } from "earn/generated/gql/graphql";
-import {
-  CHART_CACHE_TIME_MILLISECONDS,
-  ChartInterval,
-} from "earn/modules/vault-details/types";
+import { CHART_CACHE_TIME_MILLISECONDS } from "./charts.types";
 
 /**
  * @returns The start and end timestamps for the given chart interval.
