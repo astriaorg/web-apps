@@ -19,12 +19,9 @@ import {
   TOTAL_ASSETS_OPTIONS,
   TotalAssetsOption,
 } from "earn/modules/vault-details/types";
-import { useMemo, useState } from "react";
-import { useIntl } from "react-intl";
+import { useCallback, useMemo, useState } from "react";
 
 export const ContentSection = () => {
-  const { formatNumber } = useIntl();
-  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
   const {
     charts,
     query: { data, isPending, status },
@@ -111,14 +108,61 @@ export const ContentSection = () => {
     ];
   }, [data, formatAbbreviatedNumber]);
 
-  const style = useMemo(() => {
+  const {
+    data: totalAssetsData,
+    title,
+    figure,
+    style,
+  } = useMemo<{
+    data?: (BigIntDataPoint | FloatDataPoint)[] | null;
+    title: string;
+    figure: React.ReactNode;
+    style?: string;
+  }>(() => {
     if (
       charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
       TOTAL_ASSETS_OPTION.FIAT
     ) {
-      return "currency";
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+          .historicalState.totalAssetsUsd,
+        title: `Total Deposits (USD)`,
+        figure: data?.vaultByAddress.state?.totalAssetsUsd,
+        style: "currency",
+      };
     }
-  }, [charts]);
+
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.ASSET
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+          .historicalState.totalAssets,
+        title: `Total Deposits (${data?.vaultByAddress.asset.symbol})`,
+        figure: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+          .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+          .toFixed(),
+      };
+    }
+
+    throw new Error(
+      `Invalid chart selected option "${charts[CHART_TYPE.TOTAL_ASSETS].selectedOption}".`,
+    );
+  }, [charts, data]);
+
+  const renderSelectedOption = useCallback(
+    (value: TotalAssetsOption) => {
+      if (value === TOTAL_ASSETS_OPTION.ASSET) {
+        return data?.vaultByAddress.asset.symbol;
+      }
+
+      if (value === TOTAL_ASSETS_OPTION.FIAT) {
+        return "USD";
+      }
+    },
+    [data?.vaultByAddress.asset.symbol],
+  );
 
   return (
     <section className="flex flex-col px-4">
@@ -167,14 +211,7 @@ export const ContentSection = () => {
                 }
               />
               <LineChart<BigIntDataPoint | FloatDataPoint, TotalAssetsOption>
-                data={
-                  charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
-                  TOTAL_ASSETS_OPTION.ASSET
-                    ? charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
-                        .historicalState.totalAssets
-                    : charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
-                        .historicalState.totalAssetsUsd
-                }
+                data={totalAssetsData}
                 isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
                 isLoading={
                   isPending || charts[CHART_TYPE.TOTAL_ASSETS].query.isPending
@@ -194,23 +231,11 @@ export const ContentSection = () => {
                 setSelectedOption={
                   charts[CHART_TYPE.TOTAL_ASSETS].setSelectedOption
                 }
-                renderSelectedOption={(value) => {
-                  return value === TOTAL_ASSETS_OPTION.ASSET
-                    ? data?.vaultByAddress.asset.symbol
-                    : "USD";
-                }}
-                title="Total Deposits"
+                renderSelectedOption={renderSelectedOption}
+                title={title}
                 figure={formatChartValue(
                   {
-                    y:
-                      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
-                      TOTAL_ASSETS_OPTION.ASSET
-                        ? new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
-                            .div(
-                              10 ** (data?.vaultByAddress.asset.decimals ?? 18),
-                            )
-                            .toFixed()
-                        : data?.vaultByAddress.state?.totalAssetsUsd,
+                    y: figure,
                   },
                   { style },
                 )}

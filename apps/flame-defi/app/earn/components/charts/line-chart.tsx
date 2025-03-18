@@ -197,13 +197,14 @@ export const LineChart = <
                       <ChevronDownSmallIcon />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start">
+                  <DropdownMenuContent align="start" className="bg-surface-3">
                     {options.map((option) => (
                       <DropdownMenuItem
                         key={option}
                         onSelect={() => {
                           setSelectedOption?.(option);
                         }}
+                        className="focus:bg-surface-2"
                       >
                         {renderSelectedOption?.(option)}
                       </DropdownMenuItem>

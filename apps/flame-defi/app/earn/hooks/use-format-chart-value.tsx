@@ -16,6 +16,7 @@ export const useFormatChartValue = () => {
         return formatNumber(value.y ?? 0, {
           style,
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         });
       }
 
@@ -24,14 +25,16 @@ export const useFormatChartValue = () => {
           style,
           currency: "USD",
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         });
       }
 
       return formatAbbreviatedNumber(value.y ?? 0, {
         minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
     },
-    [formatNumber],
+    [formatNumber, formatAbbreviatedNumber],
   );
 
   return {

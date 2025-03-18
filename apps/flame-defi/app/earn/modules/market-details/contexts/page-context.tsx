@@ -1,19 +1,20 @@
 import { ChartInterval } from "@repo/ui/components";
-import { CHART_TYPE, getTimeseriesOptions } from "earn/components/charts";
+import {
+  CHART_TYPE,
+  Charts as ChartsType,
+  getTimeseriesOptions,
+} from "earn/components/charts";
 import { useFetchMarketByUniqueKey } from "earn/modules/market-details/hooks/use-fetch-market-by-unique-key";
 import { useFetchMarketByUniqueKeyHistoricalState } from "earn/modules/market-details/hooks/use-fetch-market-by-unique-key-historical-state";
+import { TOTAL_ASSETS_OPTION } from "earn/modules/market-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 
-type Charts = {
-  [key in keyof typeof CHART_TYPE]: {
-    selectedInterval: ChartInterval;
-    setSelectedInterval: (value: ChartInterval) => void;
-    query: ReturnType<typeof useFetchMarketByUniqueKeyHistoricalState>;
-  };
-};
+type Charts = ChartsType<
+  ReturnType<typeof useFetchMarketByUniqueKeyHistoricalState>
+>;
 
 export interface PageContextProps extends PropsWithChildren {
   key: string;
@@ -39,6 +40,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     };
     [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: ChartInterval;
+      selectedOption: string;
     };
   }>({
     [CHART_TYPE.APY]: {
@@ -46,6 +48,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
     [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: "3m",
+      selectedOption: TOTAL_ASSETS_OPTION.BORROW,
     },
   });
 
@@ -106,6 +109,16 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 [CHART_TYPE.TOTAL_ASSETS]: {
                   ...charts[CHART_TYPE.TOTAL_ASSETS],
                   selectedInterval: value,
+                },
+              });
+            },
+            selectedOption: charts[CHART_TYPE.TOTAL_ASSETS].selectedOption,
+            setSelectedOption: (value: string) => {
+              setCharts({
+                ...charts,
+                [CHART_TYPE.TOTAL_ASSETS]: {
+                  ...charts[CHART_TYPE.TOTAL_ASSETS],
+                  selectedOption: value,
                 },
               });
             },

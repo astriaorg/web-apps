@@ -21,6 +21,7 @@ const query = graphql(`
         symbol
       }
       state {
+        borrowAssets
         collateralAssets
         liquidityAssets
         liquidityAssetsUsd

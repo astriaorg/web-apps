@@ -27,6 +27,15 @@ const query = graphql(`
           x
           y
         }
+        supplyAssets(options: $options) @include(if: $includeTotalAssetsData) {
+          x
+          y
+        }
+        liquidityAssets(options: $options)
+          @include(if: $includeTotalAssetsData) {
+          x
+          y
+        }
       }
       collateralAsset {
         decimals
@@ -67,6 +76,16 @@ export const useFetchMarketByUniqueKeyHistoricalState = ({
         result.marketByUniqueKey.historicalState.borrowAssets =
           getSortedAndScaledData(
             result.marketByUniqueKey.historicalState.borrowAssets,
+            result.marketByUniqueKey.loanAsset.decimals,
+          );
+        result.marketByUniqueKey.historicalState.supplyAssets =
+          getSortedAndScaledData(
+            result.marketByUniqueKey.historicalState.supplyAssets,
+            result.marketByUniqueKey.collateralAsset?.decimals ?? 18,
+          );
+        result.marketByUniqueKey.historicalState.liquidityAssets =
+          getSortedAndScaledData(
+            result.marketByUniqueKey.historicalState.supplyAssets,
             result.marketByUniqueKey.loanAsset.decimals,
           );
       }

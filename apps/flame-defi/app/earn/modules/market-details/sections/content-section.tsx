@@ -5,12 +5,21 @@ import Big from "big.js";
 import { CHART_TYPE, LineChart } from "earn/components/charts";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { getPlaceholderData, VaultListTable } from "earn/components/vault";
-import { Vault, VaultOrderBy } from "earn/generated/gql/graphql";
+import {
+  BigIntDataPoint,
+  Vault,
+  VaultOrderBy,
+} from "earn/generated/gql/graphql";
 import { useFormatChartValue } from "earn/hooks/use-format-chart-value";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
-import { useMemo, useState } from "react";
+import {
+  TOTAL_ASSETS_OPTION,
+  TOTAL_ASSETS_OPTIONS,
+  TotalAssetsOption,
+} from "earn/modules/market-details/types";
+import { useCallback, useMemo, useState } from "react";
 
 export const ContentSection = () => {
   const {
@@ -56,6 +65,7 @@ export const ContentSection = () => {
           .toNumber(),
         options: {
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         },
         useAbbreviatedNumberFormat: true,
         variant: "accent",
@@ -79,6 +89,7 @@ export const ContentSection = () => {
           .toNumber(),
         options: {
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         },
         useAbbreviatedNumberFormat: true,
       },
@@ -91,13 +102,82 @@ export const ContentSection = () => {
         options: {
           style: "percent",
           minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
         },
       },
     ];
   }, [data, formatAbbreviatedNumber]);
 
-  const style = useMemo(() => {
-    return undefined;
+  const {
+    data: totalAssetsData,
+    title,
+    figure,
+    style,
+  } = useMemo<{
+    data?: BigIntDataPoint[] | null;
+    title: string;
+    figure: React.ReactNode;
+    style?: string;
+  }>(() => {
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.BORROW
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.marketByUniqueKey
+          .historicalState?.borrowAssets,
+        title: `Total Borrow (${data?.marketByUniqueKey.loanAsset.symbol})`,
+        figure: new Big(data?.marketByUniqueKey.state?.borrowAssets ?? 0)
+          .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
+          .toFixed(),
+      };
+    }
+
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.SUPPLY
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.marketByUniqueKey
+          .historicalState?.supplyAssets,
+        title: `Total Supply (${data?.marketByUniqueKey.loanAsset.symbol})`,
+        figure: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
+          .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
+          .toFixed(),
+      };
+    }
+
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.LIQUIDITY
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.marketByUniqueKey
+          .historicalState?.liquidityAssets,
+        title: `Total Liquidity (${data?.marketByUniqueKey.loanAsset.symbol})`,
+        figure: new Big(data?.marketByUniqueKey.state?.liquidityAssets ?? 0)
+          .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
+          .toFixed(),
+      };
+    }
+
+    throw new Error(
+      `Invalid chart selected option "${charts[CHART_TYPE.TOTAL_ASSETS].selectedOption}".`,
+    );
+  }, [charts, data]);
+
+  const renderSelectedOption = useCallback((value: TotalAssetsOption) => {
+    if (value === TOTAL_ASSETS_OPTION.BORROW) {
+      return "Borrow";
+    }
+
+    if (value === TOTAL_ASSETS_OPTION.SUPPLY) {
+      return "Supply";
+    }
+
+    if (value === TOTAL_ASSETS_OPTION.LIQUIDITY) {
+      return "Liquidity";
+    }
   }, []);
 
   return (
@@ -124,10 +204,7 @@ export const ContentSection = () => {
               <OverviewCards />
 
               <LineChart
-                data={
-                  charts[CHART_TYPE.TOTAL_ASSETS].query.data?.marketByUniqueKey
-                    .historicalState?.borrowAssets
-                }
+                data={totalAssetsData}
                 isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
                 isLoading={
                   isPending || charts[CHART_TYPE.TOTAL_ASSETS].query.isPending
@@ -139,16 +216,19 @@ export const ContentSection = () => {
                 setSelectedInterval={
                   charts[CHART_TYPE.TOTAL_ASSETS].setSelectedInterval
                 }
-                title={`Total Assets`}
+                options={TOTAL_ASSETS_OPTIONS}
+                selectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS]
+                    .selectedOption as TotalAssetsOption
+                }
+                setSelectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedOption
+                }
+                renderSelectedOption={renderSelectedOption}
+                title={title}
                 figure={formatChartValue(
                   {
-                    y: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
-                      .div(
-                        10 **
-                          (data?.marketByUniqueKey.collateralAsset?.decimals ??
-                            18),
-                      )
-                      .toFixed(),
+                    y: figure,
                   },
                   { style },
                 )}
