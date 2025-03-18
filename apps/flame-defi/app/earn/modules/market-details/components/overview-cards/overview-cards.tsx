@@ -43,10 +43,7 @@ export const OverviewCards = () => {
           <span className="truncate">
             {formatNumber(
               new Big(data?.marketByUniqueKey.lltv ?? 0)
-                .div(
-                  10 **
-                    (data?.marketByUniqueKey.collateralAsset?.decimals ?? 18),
-                )
+                .div(10 ** 18) // LLTV is always 18 decimals.
                 .toNumber(),
               { style: "percent", minimumFractionDigits: 2 },
             )}
