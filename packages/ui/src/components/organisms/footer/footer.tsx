@@ -11,7 +11,7 @@ export const Footer = (): React.ReactElement => {
           <NetworkStatus />
         </div>
         <p>
-          &copy; 2024. All Rights Reserved.{" "}
+          &copy; 2025. All Rights Reserved.{" "}
           <a
             href="https://www.astria.org/"
             className="text-orange-soft hover:underline"
