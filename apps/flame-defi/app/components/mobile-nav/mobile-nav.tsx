@@ -15,7 +15,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-const getLinkStyles = (isActivePathname: boolean) =>
+const navLinkClasses = (isActivePathname: boolean) =>
   cn("font-medium text-grey-light text-base", isActivePathname && "text-brand");
 
 function MobileNav() {
@@ -65,19 +65,19 @@ function MobileNav() {
               Flame Apps
             </div>
             <div className="flex flex-col items-baseline space-y-4 mt-4">
-              <Link href="/" className={getLinkStyles(pathname === "/")}>
+              <Link href="/" className={navLinkClasses(pathname === "/")}>
                 Bridge
               </Link>
               <Link
                 href="/swap"
-                className={getLinkStyles(pathname.startsWith("/swap"))}
+                className={navLinkClasses(pathname.startsWith("/swap"))}
               >
                 Swap
               </Link>
               {featureFlags.poolEnabled && (
                 <Link
                   href="/pool"
-                  className={getLinkStyles(pathname.startsWith("/pool"))}
+                  className={navLinkClasses(pathname.startsWith("/pool"))}
                 >
                   Pool
                 </Link>
@@ -86,13 +86,13 @@ function MobileNav() {
                 <>
                   <Link
                     href="/earn"
-                    className={getLinkStyles(pathname.startsWith("/earn"))}
+                    className={navLinkClasses(pathname.startsWith("/earn"))}
                   >
                     Earn
                   </Link>
                   <Link
                     href="/borrow"
-                    className={getLinkStyles(pathname.startsWith("/borrow"))}
+                    className={navLinkClasses(pathname.startsWith("/borrow"))}
                   >
                     Borrow
                   </Link>
