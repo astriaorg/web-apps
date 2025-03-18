@@ -21,3 +21,4 @@ export const CardFigureInput = ({
     </Skeleton>
   );
 };
+CardFigureInput.displayName = "CardFigureInput";

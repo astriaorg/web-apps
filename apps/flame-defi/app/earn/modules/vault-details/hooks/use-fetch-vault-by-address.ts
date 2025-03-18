@@ -15,6 +15,7 @@ const query = graphql(`
       }
       liquidity {
         underlying
+        usd
       }
       metadata {
         curators {
@@ -28,14 +29,24 @@ const query = graphql(`
         allocation {
           market {
             collateralAsset {
+              decimals
               logoURI
+              name
               symbol
             }
+            creationTimestamp
+            lltv
             loanAsset {
+              decimals
               logoURI
+              name
               symbol
             }
             state {
+              collateralAssets
+              liquidityAssets
+              liquidityAssetsUsd
+              netBorrowApy
               netSupplyApy
               supplyAssets
               supplyAssetsUsd

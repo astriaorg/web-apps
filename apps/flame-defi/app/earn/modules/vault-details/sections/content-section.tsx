@@ -1,13 +1,15 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
-import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
+import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
+import { Market, MarketOrderBy } from "earn/generated/gql/graphql";
 import { LineChart } from "earn/modules/vault-details/components/charts";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
-import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 
 export const ContentSection = () => {
@@ -16,11 +18,23 @@ export const ContentSection = () => {
     charts,
     query: { data, isPending, status },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
-  const { value: formattedTotalSupply, suffix: formattedTotalSupplySuffix } =
-    formatAbbreviatedNumber(
-      (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
-    );
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: MarketOrderBy.TotalLiquidityUsd,
+      desc: true,
+    },
+  ]);
+
+  const formattedData = useMemo(() => {
+    if (isPending) {
+      return getPlaceholderData(3);
+    }
+
+    return (data?.vaultByAddress.state?.allocation?.map((it) => it.market) ??
+      []) as Market[];
+  }, [data, isPending]);
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
     return [
@@ -39,6 +53,15 @@ export const ContentSection = () => {
           left: "Total Deposits",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          return formatAbbreviatedNumber(
+            (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
+            {
+              style: "currency",
+              currency: "USD",
+            },
+          );
+        })(),
         value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -54,6 +77,15 @@ export const ContentSection = () => {
           left: "Liquidity",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          return formatAbbreviatedNumber(
+            (data?.vaultByAddress.liquidity?.usd ?? 0).toString(),
+            {
+              style: "currency",
+              currency: "USD",
+            },
+          );
+        })(),
         value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -65,7 +97,7 @@ export const ContentSection = () => {
         useAbbreviatedNumberFormat: true,
       },
     ];
-  }, [data]);
+  }, [data, formatAbbreviatedNumber]);
 
   return (
     <section className="flex flex-col px-4">
@@ -81,11 +113,11 @@ export const ContentSection = () => {
             <SummaryCards
               items={items}
               isLoading={isPending}
-              className="grid lg:grid-cols-3 gap-2"
+              className="grid gap-2 md:grid-cols-3"
             />
 
             <div className="mt-10 flex flex-col space-y-4">
-              <Skeleton isLoading={isPending}>
+              <Skeleton isLoading={isPending} className="w-52">
                 <div className="text-base/4 font-semibold">Overview</div>
               </Skeleton>
               <LineChart
@@ -135,34 +167,40 @@ export const ContentSection = () => {
                   charts[CHART_TYPE.TOTAL_SUPPLY].setSelectedInterval
                 }
                 title="Total Supply"
-                figure={
-                  formatNumber(+formattedTotalSupply, {
+                figure={formatAbbreviatedNumber(
+                  (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
+                  {
                     style: "currency",
                     currency: "USD",
                     minimumFractionDigits: 2,
-                  }) + formattedTotalSupplySuffix
-                }
+                  },
+                )}
                 renderTooltip={(value) => {
-                  const { value: totalSupply, suffix } =
-                    formatAbbreviatedNumber((value.y ?? 0).toString());
-
                   return (
                     <>
                       <div>{formatDate(value.x * 1000)}</div>
                       <div>
-                        {formatNumber(+totalSupply, {
+                        {formatAbbreviatedNumber((value.y ?? 0).toString(), {
                           style: "currency",
                           currency: "USD",
                           minimumFractionDigits: 2,
                         })}
-                        {suffix}
                       </div>
                     </>
                   );
                 }}
               />
 
-              <Table />
+              <MarketListTable
+                data={formattedData}
+                sorting={sorting}
+                onSortingChange={setSorting}
+                getHeaderIsActive={(header) => header.id === sorting[0]?.id}
+                getHeaderIsAscending={(header) =>
+                  header.column.getNextSortingOrder() === "desc"
+                }
+                isLoading={isPending}
+              />
             </div>
           </div>
 

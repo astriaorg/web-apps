@@ -23,10 +23,16 @@ const query = graphql(`
       state {
         collateralAssets
         liquidityAssets
+        liquidityAssetsUsd
         netBorrowApy
+        netSupplyApy
+        supplyAssets
+        supplyAssetsUsd
       }
       supplyingVaults {
         address
+        symbol
+        name
         asset {
           decimals
           logoURI
@@ -39,13 +45,13 @@ const query = graphql(`
             name
           }
         }
-        name
         state {
+          netApy
           totalAssets
           totalAssetsUsd
-          totalSupply
         }
       }
+      uniqueKey
     }
   }
 `);

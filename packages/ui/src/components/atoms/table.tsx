@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { ArrowDownIcon } from "../../icons";
+import { ChevronDownSmallIcon } from "../../icons";
 import { cn } from "../../utils";
 
 const Table = React.forwardRef<
@@ -105,7 +105,7 @@ const TableSortIcon = React.forwardRef<HTMLDivElement, TableSortIconProps>(
       )}
       {...props}
     >
-      <ArrowDownIcon aria-label="Sort" size={16} />
+      <ChevronDownSmallIcon aria-label="Sort" size={16} />
     </div>
   ),
 );

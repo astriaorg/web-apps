@@ -2,7 +2,7 @@ import type { IconProps } from "@repo/flame-types";
 
 import { DEFAULT_ICON_SIZE } from "../constants";
 
-export const CaretRightIcon: React.FC<IconProps> = ({
+export const ChevronDownSmallIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
 }: IconProps) => {
@@ -19,9 +19,11 @@ export const CaretRightIcon: React.FC<IconProps> = ({
       aria-hidden="true"
     >
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+        d="M16.25 10.75L12.25 14.75L8.25 10.75"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
       />
     </svg>
   );

@@ -1,10 +1,7 @@
-"use client";
-
+import { Input } from "@repo/ui/components";
+import { SearchIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/utils";
 import { useRef, useState } from "react";
-
-import { SearchIcon } from "../../../icons";
-import { cn } from "../../../utils";
-import { Input } from "../../atoms";
 
 export const SearchInput = ({
   className,
