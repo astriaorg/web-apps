@@ -24,6 +24,7 @@ import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
   const {
     charts,
     query: { data, isPending, status },

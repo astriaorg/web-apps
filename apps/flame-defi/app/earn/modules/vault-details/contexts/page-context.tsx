@@ -1,5 +1,9 @@
 import { ChartInterval } from "@repo/ui/components";
-import { CHART_TYPE, getTimeseriesOptions } from "earn/components/charts";
+import {
+  CHART_TYPE,
+  Charts as ChartsType,
+  getTimeseriesOptions,
+} from "earn/components/charts";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
 import { TOTAL_ASSETS_OPTION } from "earn/modules/vault-details/types";
@@ -8,15 +12,9 @@ import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 
-type Charts = {
-  [key in keyof typeof CHART_TYPE]: {
-    selectedInterval: ChartInterval;
-    setSelectedInterval: (value: ChartInterval) => void;
-    selectedOption?: string;
-    setSelectedOption?: (value: string) => void;
-    query: ReturnType<typeof useFetchVaultByAddressHistoricalState>;
-  };
-};
+type Charts = ChartsType<
+  ReturnType<typeof useFetchVaultByAddressHistoricalState>
+>;
 
 export interface PageContextProps extends PropsWithChildren {
   address: string;

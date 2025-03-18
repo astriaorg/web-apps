@@ -1,10 +1,11 @@
-import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { BigIntDataPoint, FloatDataPoint } from "earn/generated/gql/graphql";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
 export const useFormatChartValue = () => {
   const { formatNumber } = useIntl();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   const formatChartValue = useCallback(
     (
@@ -18,25 +19,17 @@ export const useFormatChartValue = () => {
         });
       }
 
-      const { value: totalSupply, suffix } = formatAbbreviatedNumber(
-        value.y ?? 0,
-      );
-
       if (style === "currency") {
-        return (
-          formatNumber(+totalSupply, {
-            style,
-            currency: "USD",
-            minimumFractionDigits: 2,
-          }) + suffix
-        );
+        return formatAbbreviatedNumber(value.y ?? 0, {
+          style,
+          currency: "USD",
+          minimumFractionDigits: 2,
+        });
       }
 
-      return (
-        formatNumber(+totalSupply, {
-          minimumFractionDigits: 2,
-        }) + suffix
-      );
+      return formatAbbreviatedNumber(value.y ?? 0, {
+        minimumFractionDigits: 2,
+      });
     },
     [formatNumber],
   );
