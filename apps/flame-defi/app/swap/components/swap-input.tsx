@@ -5,8 +5,10 @@ import {
   isDustAmount,
 } from "@repo/ui/utils";
 import { useIntl } from "react-intl";
+import { useAccount } from "wagmi";
 import { useUsdQuote } from "../hooks";
 import { SwapInputProps } from "../types";
+import AddErc20ToWalletButton from "features/evm-wallet/components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
 
 export function SwapInput({
   availableTokens,
@@ -20,6 +22,7 @@ export function SwapInput({
   txnQuoteLoading,
 }: SwapInputProps) {
   const { locale, formatNumber } = useIntl();
+  const { isConnected } = useAccount();
   const usdQuote = useUsdQuote(inputToken);
 
   const handleFiatValue = () => {
@@ -107,6 +110,11 @@ export function SwapInput({
             </div>
           ) : (
             <div className="h-[20px] mt-3 w-[100%]"></div>
+          )}
+          {inputToken.token && !inputToken.token.isNative && isConnected && (
+            <div className="mt-1 text-right">
+              <AddErc20ToWalletButton evmCurrency={inputToken.token} />
+            </div>
           )}
         </div>
       </div>
