@@ -1,4 +1,12 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { DropdownOption } from "components/dropdown";
+import {
+  getFlameChainId,
+  getFlameNetworkByChainId,
+  useConfig as useAppConfig,
+  useEvmChainData,
+} from "config";
+import { useBalancePolling } from "features/get-balance-polling";
 import React, {
   useCallback,
   useEffect,
@@ -15,14 +23,6 @@ import {
   useDisconnect,
   useSwitchChain,
 } from "wagmi";
-import { DropdownOption } from "@repo/ui/components";
-import {
-  getFlameChainId,
-  getFlameNetworkByChainId,
-  useConfig as useAppConfig,
-  useEvmChainData,
-} from "config";
-import { useBalancePolling } from "features/get-balance-polling";
 
 import {
   EvmChainInfo,
@@ -31,12 +31,12 @@ import {
   TokenAllowance,
   TRADE_TYPE,
 } from "@repo/flame-types";
+import { useGetQuote } from "../../../hooks";
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/astria-withdrawer-service/astria-withdrawer-service";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
-import { useGetQuote } from "../../../hooks";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
