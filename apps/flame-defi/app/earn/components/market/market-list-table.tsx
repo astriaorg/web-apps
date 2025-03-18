@@ -126,7 +126,9 @@ export const MarketListTable = ({
         cell: ({ row }) => {
           return (
             <FormattedNumber
-              value={new Big(row.original.lltv ?? 0).div(10 ** 18).toNumber()}
+              value={new Big(row.original.lltv ?? 0)
+                .div(10 ** (row.original.collateralAsset?.decimals ?? 18))
+                .toNumber()}
               style="percent"
               minimumFractionDigits={2}
             />

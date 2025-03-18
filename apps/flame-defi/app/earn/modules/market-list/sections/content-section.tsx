@@ -28,7 +28,7 @@ export const ContentSection = () => {
       return getPlaceholderData(PAGE_SIZE);
     }
 
-    return data?.markets.items ? (data.markets.items as Market[]) : [];
+    return (data?.markets.items ?? []) as Market[];
   }, [data, isPending]);
 
   return (

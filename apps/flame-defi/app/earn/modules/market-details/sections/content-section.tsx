@@ -1,5 +1,5 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
-import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
@@ -9,13 +9,12 @@ import { BorrowCards } from "earn/modules/market-details/components/borrow-cards
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo, useState } from "react";
-import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
-  const { formatNumber } = useIntl();
   const {
     query: { data, isPending, status },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -29,9 +28,7 @@ export const ContentSection = () => {
       return getPlaceholderData(3);
     }
 
-    return data?.marketByUniqueKey.supplyingVaults
-      ? (data.marketByUniqueKey.supplyingVaults as Vault[])
-      : [];
+    return (data?.marketByUniqueKey.supplyingVaults ?? []) as Vault[];
   }, [data, isPending]);
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
@@ -42,15 +39,12 @@ export const ContentSection = () => {
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
         footer: (() => {
-          const { value, suffix } = formatAbbreviatedNumber(
+          return formatAbbreviatedNumber(
             (data?.marketByUniqueKey.state?.supplyAssetsUsd ?? 0).toString(),
-          );
-
-          return (
-            formatNumber(+value, {
+            {
               style: "currency",
               currency: "USD",
-            }) + suffix
+            },
           );
         })(),
         value: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
@@ -68,15 +62,12 @@ export const ContentSection = () => {
           right: data?.marketByUniqueKey.loanAsset.symbol,
         },
         footer: (() => {
-          const { value, suffix } = formatAbbreviatedNumber(
+          return formatAbbreviatedNumber(
             (data?.marketByUniqueKey.state?.liquidityAssetsUsd ?? 0).toString(),
-          );
-
-          return (
-            formatNumber(+value, {
+            {
               style: "currency",
               currency: "USD",
-            }) + suffix
+            },
           );
         })(),
         value: new Big(data?.marketByUniqueKey.state?.liquidityAssets ?? 0)
@@ -99,7 +90,7 @@ export const ContentSection = () => {
         },
       },
     ];
-  }, [data, formatNumber]);
+  }, [data, formatAbbreviatedNumber]);
 
   return (
     <section className="flex flex-col px-4">

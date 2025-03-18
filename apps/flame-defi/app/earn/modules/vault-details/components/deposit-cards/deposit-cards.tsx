@@ -119,7 +119,7 @@ export const DepositCards = () => {
             </span>
             <div>
               <Image
-                src={data?.vaultByAddress?.asset.logoURI}
+                src={data?.vaultByAddress.asset.logoURI}
                 alt={data?.vaultByAddress.asset.name}
                 width={16}
                 height={16}

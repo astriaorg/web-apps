@@ -1,5 +1,5 @@
 import { Skeleton, StatusCard } from "@repo/ui/components";
-import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
 import { getPlaceholderData, MarketListTable } from "earn/components/market";
@@ -18,6 +18,7 @@ export const ContentSection = () => {
     charts,
     query: { data, isPending, status },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -34,11 +35,6 @@ export const ContentSection = () => {
     return (data?.vaultByAddress.state?.allocation?.map((it) => it.market) ??
       []) as Market[];
   }, [data, isPending]);
-
-  const { value: formattedTotalSupply, suffix: formattedTotalSupplySuffix } =
-    formatAbbreviatedNumber(
-      (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
-    );
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
     return [
@@ -58,15 +54,12 @@ export const ContentSection = () => {
           right: data?.vaultByAddress.asset.symbol,
         },
         footer: (() => {
-          const { value, suffix } = formatAbbreviatedNumber(
+          return formatAbbreviatedNumber(
             (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
-          );
-
-          return (
-            formatNumber(+value, {
+            {
               style: "currency",
               currency: "USD",
-            }) + suffix
+            },
           );
         })(),
         value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
@@ -85,15 +78,12 @@ export const ContentSection = () => {
           right: data?.vaultByAddress.asset.symbol,
         },
         footer: (() => {
-          const { value, suffix } = formatAbbreviatedNumber(
+          return formatAbbreviatedNumber(
             (data?.vaultByAddress.liquidity?.usd ?? 0).toString(),
-          );
-
-          return (
-            formatNumber(+value, {
+            {
               style: "currency",
               currency: "USD",
-            }) + suffix
+            },
           );
         })(),
         value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
@@ -107,7 +97,7 @@ export const ContentSection = () => {
         useAbbreviatedNumberFormat: true,
       },
     ];
-  }, [data, formatNumber]);
+  }, [data, formatAbbreviatedNumber]);
 
   return (
     <section className="flex flex-col px-4">
@@ -177,27 +167,24 @@ export const ContentSection = () => {
                   charts[CHART_TYPE.TOTAL_SUPPLY].setSelectedInterval
                 }
                 title="Total Supply"
-                figure={
-                  formatNumber(+formattedTotalSupply, {
+                figure={formatAbbreviatedNumber(
+                  (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
+                  {
                     style: "currency",
                     currency: "USD",
                     minimumFractionDigits: 2,
-                  }) + formattedTotalSupplySuffix
-                }
+                  },
+                )}
                 renderTooltip={(value) => {
-                  const { value: totalSupply, suffix } =
-                    formatAbbreviatedNumber((value.y ?? 0).toString());
-
                   return (
                     <>
                       <div>{formatDate(value.x * 1000)}</div>
                       <div>
-                        {formatNumber(+totalSupply, {
+                        {formatAbbreviatedNumber((value.y ?? 0).toString(), {
                           style: "currency",
                           currency: "USD",
                           minimumFractionDigits: 2,
                         })}
-                        {suffix}
                       </div>
                     </>
                   );

@@ -28,7 +28,7 @@ export const ContentSection = () => {
       return getPlaceholderData(PAGE_SIZE);
     }
 
-    return data?.vaults.items ? (data.vaults.items as Vault[]) : [];
+    return (data?.vaults.items ?? []) as Vault[];
   }, [data, isPending]);
 
   return (

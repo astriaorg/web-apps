@@ -11,7 +11,7 @@ import {
 interface CopyToClipboardProps extends React.PropsWithChildren {
   value: string;
   content?: React.ReactNode;
-  side?: "left" | "right" | "top" | "bottom" | undefined;
+  side: React.ComponentPropsWithoutRef<typeof TooltipContent>["side"];
 }
 
 export const CopyToClipboard = ({
