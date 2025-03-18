@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardContent,
   CardFigureLabel,
@@ -6,6 +7,10 @@ import {
   CHART_INTERVAL_TO_CHART_TICK_INTERVAL,
   ChartConfig,
   ChartContainer,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   getDownsampledData,
   getTickIntervalData,
   getTickIntervalDateTimeFormatOptions,
@@ -14,8 +19,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components";
+import { ChevronDownSmallIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { FloatDataPoint } from "earn/generated/gql/graphql";
+import { Maybe } from "earn/generated/gql/graphql";
 import { ChartInterval } from "earn/modules/vault-details/types";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -37,31 +43,45 @@ const CHART_CONFIG = {
   y: {},
 } satisfies ChartConfig;
 
-interface LineChartProps {
-  data?: FloatDataPoint[] | null;
+interface LineChartProps<
+  DataType extends { x: number; y?: Maybe<number> },
+  OptionType extends string,
+> {
+  data?: DataType[] | null;
   isError: boolean;
   isLoading: boolean;
   intervals: readonly ChartInterval[];
   selectedInterval: ChartInterval;
   setSelectedInterval: (value: ChartInterval) => void;
+  options?: readonly OptionType[];
+  selectedOption?: OptionType;
+  setSelectedOption?: (value: OptionType) => void;
+  renderSelectedOption?: (value: OptionType) => React.ReactNode;
   title: React.ReactNode;
   figure: React.ReactNode;
-  renderLabelContent: (value: Pick<FloatDataPoint, "y">) => string;
-  renderTooltipContent: (value: FloatDataPoint) => React.ReactNode;
+  renderLabelContent: (value: Pick<DataType, "y">) => string;
+  renderTooltipContent: (value: DataType) => React.ReactNode;
 }
 
-export const LineChart = ({
+export const LineChart = <
+  DataType extends { x: number; y?: Maybe<number> },
+  OptionType extends string,
+>({
   data,
   isError,
   isLoading,
   intervals,
   selectedInterval,
   setSelectedInterval,
+  options,
+  selectedOption,
+  setSelectedOption,
+  renderSelectedOption,
   title,
   figure,
   renderLabelContent,
   renderTooltipContent,
-}: LineChartProps) => {
+}: LineChartProps<DataType, OptionType>) => {
   const { formatDate } = useIntl();
 
   const chartRef = useRef<HTMLDivElement>(null);
@@ -70,7 +90,7 @@ export const LineChart = ({
   const [tooltip, setTooltip] = useState<{
     x?: number;
     y?: number;
-    data?: FloatDataPoint;
+    data?: DataType;
     isOverRightBoundary: boolean;
   }>({ isOverRightBoundary: false });
 
@@ -96,7 +116,7 @@ export const LineChart = ({
 
     return {
       downsampled,
-      ticks: getTickIntervalData<FloatDataPoint>(
+      ticks: getTickIntervalData(
         // Convert seconds to milliseconds.
         downsampled.map((it) => ({ ...it, x: it.x * 1000 })),
         interval,
@@ -133,7 +153,7 @@ export const LineChart = ({
           tooltipX = e.chartX - tooltipRect.width / 2;
         }
 
-        const currentY: NonNullable<FloatDataPoint["y"]> =
+        const currentY: NonNullable<DataType["y"]> =
           e.activePayload?.[0]?.value ?? 0;
         tooltipY = (1 - currentY / (dataMax - dataMin)) * CHART_HEIGHT - 28;
 
@@ -158,10 +178,39 @@ export const LineChart = ({
 
   return (
     <Card isLoading={isLoading}>
-      <CardContent className="space-y-2">
-        <CardLabel className="relative">
-          <span>{title}</span>
-          <span className="absolute right-0">
+      <CardContent className="flex flex-col">
+        <div className="relative flex flex-col gap-6">
+          <div className="flex flex-col">
+            <CardLabel className="flex flex-col items-start gap-2 md:flex-row md:justify-between">
+              <span>{title}</span>
+            </CardLabel>
+            <CardFigureLabel className="mt-2">{figure}</CardFigureLabel>
+          </div>
+
+          <div className="flex space-x-4 md:absolute md:right-0">
+            {options?.length && (
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="secondary">
+                    {renderSelectedOption?.(selectedOption as OptionType)}
+                    <ChevronDownSmallIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  {options.map((option) => (
+                    <DropdownMenuItem
+                      key={option}
+                      onSelect={() => {
+                        setSelectedOption?.(option);
+                      }}
+                    >
+                      {renderSelectedOption?.(option)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             <Tabs
               defaultValue={selectedInterval}
               onValueChange={(value) => {
@@ -176,9 +225,8 @@ export const LineChart = ({
                 ))}
               </TabsList>
             </Tabs>
-          </span>
-        </CardLabel>
-        <CardFigureLabel>{figure}</CardFigureLabel>
+          </div>
+        </div>
 
         <div className="mt-10" />
         <Skeleton isLoading={isLoading} className="w-full">
@@ -198,7 +246,7 @@ export const LineChart = ({
                 tickLine={false}
                 ticks={ticks}
                 dy={12}
-                tickFormatter={(value: FloatDataPoint["x"]) =>
+                tickFormatter={(value: DataType["x"]) =>
                   formatDate(
                     value * 1000,
                     getTickIntervalDateTimeFormatOptions(interval),

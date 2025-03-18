@@ -1,7 +1,11 @@
 import { getTimeseriesOptions } from "earn/components/charts";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
-import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";
+import {
+  CHART_TYPE,
+  ChartInterval,
+  TOTAL_ASSETS_OPTION,
+} from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
@@ -11,6 +15,8 @@ type Charts = {
   [key in keyof typeof CHART_TYPE]: {
     selectedInterval: ChartInterval;
     setSelectedInterval: (value: ChartInterval) => void;
+    selectedOption?: string;
+    setSelectedOption?: (value: string) => void;
     query: ReturnType<typeof useFetchVaultByAddressHistoricalState>;
   };
 };
@@ -38,8 +44,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       selectedInterval: ChartInterval;
     };
     [CHART_TYPE.TOTAL_ASSETS]: {
-      // TODO: Add currency selector when we support more currencies.
       selectedInterval: ChartInterval;
+      selectedOption: string;
     };
   }>({
     [CHART_TYPE.APY]: {
@@ -47,6 +53,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
     [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: "3m",
+      selectedOption: TOTAL_ASSETS_OPTION.ASSET,
     },
   });
 
@@ -109,7 +116,18 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
               setCharts({
                 ...charts,
                 [CHART_TYPE.TOTAL_ASSETS]: {
+                  ...charts[CHART_TYPE.TOTAL_ASSETS],
                   selectedInterval: value,
+                },
+              });
+            },
+            selectedOption: charts[CHART_TYPE.TOTAL_ASSETS].selectedOption,
+            setSelectedOption: (value: string) => {
+              setCharts({
+                ...charts,
+                [CHART_TYPE.TOTAL_ASSETS]: {
+                  ...charts[CHART_TYPE.TOTAL_ASSETS],
+                  selectedOption: value,
                 },
               });
             },

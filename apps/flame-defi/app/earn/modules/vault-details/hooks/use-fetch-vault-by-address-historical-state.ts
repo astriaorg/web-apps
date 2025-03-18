@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import Big from "big.js";
 import { useConfig } from "config/hooks/use-config";
 import { graphql } from "earn/generated/gql";
 import { TimeseriesOptions } from "earn/generated/gql/graphql";
@@ -13,17 +14,24 @@ const query = graphql(`
     $address: String!
     $chainId: Int
     $includeAPYData: Boolean!
-    $includeTotalSupplyData: Boolean!
+    $includeTotalAssetsData: Boolean!
     $options: TimeseriesOptions
   ) {
     vaultByAddress(address: $address, chainId: $chainId) {
+      asset {
+        decimals
+      }
       historicalState {
         dailyApy(options: $options) @include(if: $includeAPYData) {
           x
           y
         }
+        totalAssets(options: $options) @include(if: $includeTotalAssetsData) {
+          x
+          y
+        }
         totalAssetsUsd(options: $options)
-          @include(if: $includeTotalSupplyData) {
+          @include(if: $includeTotalAssetsData) {
           x
           y
         }
@@ -51,11 +59,23 @@ export const useFetchVaultByAddressHistoricalState = ({
         // TODO: Get chain ID from wallet context.
         chainId: null,
         includeAPYData: type === CHART_TYPE.APY,
-        includeTotalSupplyData: type === CHART_TYPE.TOTAL_ASSETS,
+        includeTotalAssetsData: type === CHART_TYPE.TOTAL_ASSETS,
       });
 
       // Data doesn't come sorted from the API.
       result.vaultByAddress.historicalState.dailyApy?.sort((a, b) => a.x - b.x);
+      result.vaultByAddress.historicalState.totalAssets =
+        result.vaultByAddress.historicalState.totalAssets
+          ?.map((it) => {
+            // Scale in query and convert to number to prevent number overflow issues.
+            return {
+              ...it,
+              y: new Big(it.y)
+                .div(10 ** result.vaultByAddress.asset.decimals)
+                .toNumber(),
+            };
+          })
+          .sort((a, b) => a.x - b.x);
       result.vaultByAddress.historicalState.totalAssetsUsd?.sort(
         (a, b) => a.x - b.x,
       );

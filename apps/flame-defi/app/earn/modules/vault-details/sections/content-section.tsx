@@ -5,11 +5,22 @@ import Big from "big.js";
 import { LineChart } from "earn/components/charts";
 import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
-import { Market, MarketOrderBy } from "earn/generated/gql/graphql";
+import {
+  BigIntDataPoint,
+  FloatDataPoint,
+  Market,
+  MarketOrderBy,
+} from "earn/generated/gql/graphql";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
-import { useMemo, useState } from "react";
+import {
+  CHART_INTERVALS,
+  CHART_TYPE,
+  TOTAL_ASSETS_OPTION,
+  TOTAL_ASSETS_OPTIONS,
+  TotalAssetsOption,
+} from "earn/modules/vault-details/types";
+import { useCallback, useMemo, useState } from "react";
 import { FormattedNumber, useIntl } from "react-intl";
 
 export const ContentSection = () => {
@@ -99,6 +110,26 @@ export const ContentSection = () => {
     ];
   }, [data, formatAbbreviatedNumber]);
 
+  const renderTotalAssetFigure = useCallback(
+    (value: Pick<BigIntDataPoint | FloatDataPoint, "y">) => {
+      if (
+        charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+        TOTAL_ASSETS_OPTION.ASSET
+      ) {
+        return formatAbbreviatedNumber(value.y ?? 0, {
+          minimumFractionDigits: 2,
+        });
+      }
+
+      return formatAbbreviatedNumber(value.y ?? 0, {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+      });
+    },
+    [charts, formatNumber],
+  );
+
   return (
     <section className="flex flex-col px-4">
       {status === "error" && (
@@ -153,10 +184,14 @@ export const ContentSection = () => {
                   </div>
                 )}
               />
-              <LineChart
+              <LineChart<BigIntDataPoint | FloatDataPoint, TotalAssetsOption>
                 data={
-                  charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
-                    .historicalState.totalAssetsUsd
+                  charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+                  TOTAL_ASSETS_OPTION.ASSET
+                    ? charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+                        .historicalState.totalAssets
+                    : charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+                        .historicalState.totalAssetsUsd
                 }
                 isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
                 isLoading={
@@ -169,33 +204,33 @@ export const ContentSection = () => {
                 setSelectedInterval={
                   charts[CHART_TYPE.TOTAL_ASSETS].setSelectedInterval
                 }
-                title="Total Supply"
-                figure={formatAbbreviatedNumber(
-                  (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
-                  {
-                    style: "currency",
-                    currency: "USD",
-                    minimumFractionDigits: 2,
-                  },
-                )}
-                renderLabelContent={(value) => {
-                  return formatAbbreviatedNumber((value.y ?? 0).toString(), {
-                    style: "currency",
-                    currency: "USD",
-                    minimumFractionDigits: 2,
-                  });
+                options={TOTAL_ASSETS_OPTIONS}
+                selectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS]
+                    .selectedOption as TotalAssetsOption
+                }
+                setSelectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedOption
+                }
+                renderSelectedOption={(value) => {
+                  return value === TOTAL_ASSETS_OPTION.ASSET
+                    ? data?.vaultByAddress.asset.symbol
+                    : "USD";
                 }}
-                renderTooltipContent={(value) => {
-                  return (
-                    <div>
-                      {formatAbbreviatedNumber((value.y ?? 0).toString(), {
-                        style: "currency",
-                        currency: "USD",
-                        minimumFractionDigits: 2,
-                      })}
-                    </div>
-                  );
-                }}
+                title="Total Deposits"
+                figure={renderTotalAssetFigure({
+                  y:
+                    charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+                    TOTAL_ASSETS_OPTION.ASSET
+                      ? new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+                          .div(
+                            10 ** (data?.vaultByAddress.asset.decimals ?? 18),
+                          )
+                          .toFixed()
+                      : data?.vaultByAddress.state?.totalAssetsUsd,
+                })}
+                renderLabelContent={renderTotalAssetFigure}
+                renderTooltipContent={renderTotalAssetFigure}
               />
 
               <MarketListTable
