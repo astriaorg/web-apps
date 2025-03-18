@@ -20,7 +20,7 @@ import {
   TotalAssetsOption,
 } from "earn/modules/vault-details/types";
 import { useCallback, useMemo, useState } from "react";
-import { FormattedNumber, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
@@ -109,6 +109,16 @@ export const ContentSection = () => {
     ];
   }, [data, formatAbbreviatedNumber]);
 
+  const renderAPYFigure = useCallback(
+    (value: Pick<BigIntDataPoint | FloatDataPoint, "y">) => {
+      return formatNumber(value.y ?? 0, {
+        style: "percent",
+        minimumFractionDigits: 2,
+      });
+    },
+    [charts, formatNumber],
+  );
+
   const renderTotalAssetFigure = useCallback(
     (value: Pick<BigIntDataPoint | FloatDataPoint, "y">) => {
       if (
@@ -161,27 +171,11 @@ export const ContentSection = () => {
                 selectedInterval={charts[CHART_TYPE.APY].selectedInterval}
                 setSelectedInterval={charts[CHART_TYPE.APY].setSelectedInterval}
                 title="APY"
-                figure={
-                  <FormattedNumber
-                    value={data?.vaultByAddress.state?.netApy ?? 0}
-                    style="percent"
-                    minimumFractionDigits={2}
-                  />
-                }
-                renderLabelContent={(value) =>
-                  formatNumber(value.y ?? 0, {
-                    style: "percent",
-                    minimumFractionDigits: 2,
-                  })
-                }
-                renderTooltipContent={(value) => (
-                  <div>
-                    {formatNumber(value.y ?? 0, {
-                      style: "percent",
-                      minimumFractionDigits: 2,
-                    })}
-                  </div>
-                )}
+                figure={renderTotalAssetFigure({
+                  y: data?.vaultByAddress.state?.netApy ?? 0,
+                })}
+                renderLabelContent={renderTotalAssetFigure}
+                renderTooltipContent={renderTotalAssetFigure}
               />
               <LineChart<BigIntDataPoint | FloatDataPoint, TotalAssetsOption>
                 data={
