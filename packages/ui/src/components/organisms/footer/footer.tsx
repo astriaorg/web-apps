@@ -1,9 +1,15 @@
+"use client";
+
 import type React from "react";
+import { NetworkStatus } from "./network-status";
 
 export const Footer = (): React.ReactElement => {
   return (
-    <footer className="mt-[100px] pb-[50px]">
-      <div className="text-center">
+    <footer className="w-full pt-20 pb-10">
+      <div className="relative text-center">
+        <div className="absolute right-4 bottom-0">
+          <NetworkStatus />
+        </div>
         <p>
           &copy; 2024. All Rights Reserved.{" "}
           <a
