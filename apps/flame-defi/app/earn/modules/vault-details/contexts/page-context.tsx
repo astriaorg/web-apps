@@ -71,7 +71,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
-  const queryTotalSupplyChart = useFetchVaultByAddressHistoricalState({
+  const queryTotalAssetsChart = useFetchVaultByAddressHistoricalState({
     variables: {
       address: params.address,
       type: CHART_TYPE.TOTAL_ASSETS,
@@ -85,13 +85,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     if (
       query.isError ||
       queryAPYChart.isError ||
-      queryTotalSupplyChart.isError
+      queryTotalAssetsChart.isError
     ) {
       return "error";
     }
 
     return "success";
-  }, [query.isError, queryAPYChart.isError, queryTotalSupplyChart.isError]);
+  }, [query.isError, queryAPYChart.isError, queryTotalAssetsChart.isError]);
 
   return (
     <PageContext.Provider
@@ -131,7 +131,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
                 },
               });
             },
-            query: queryTotalSupplyChart,
+            query: queryTotalAssetsChart,
           },
         },
         status,
