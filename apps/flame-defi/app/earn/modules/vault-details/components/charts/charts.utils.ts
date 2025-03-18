@@ -167,7 +167,7 @@ export const initializeLineChart = <T extends FloatDataPoint>({
       d3
         .axisBottom(x)
         .tickValues(intervals.map((it) => it.x.toString()))
-        .tickFormat((it) => formatDate(new Date(+it * 1000)))
+        .tickFormat((it) => formatDate(new Date(Number(it) * 1000)))
         .tickPadding(16)
         .tickSize(0),
     );

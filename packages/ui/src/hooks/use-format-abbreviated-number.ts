@@ -7,7 +7,7 @@ export const useFormatAbbreviatedNumber = () => {
   return {
     formatAbbreviatedNumber: (value: string, options: FormatNumberOptions) => {
       const { value: formattedValue, suffix } = formatAbbreviatedNumber(value);
-      return formatNumber(+formattedValue, options) + suffix;
+      return formatNumber(Number(formattedValue), options) + suffix;
     },
   };
 };

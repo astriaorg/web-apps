@@ -232,7 +232,7 @@ export const MarketListTable = ({
       //         );
 
       //         return (
-      //           formatNumber(+value, {
+      //           formatNumber(Number(value), {
       //             style: "currency",
       //             currency: "USD",
       //             minimumFractionDigits: 2,
