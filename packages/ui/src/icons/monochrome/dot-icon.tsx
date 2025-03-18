@@ -10,12 +10,12 @@ export const DotIcon: React.FC<IconProps> = ({
       width={size}
       height={size}
       viewBox="0 0 16 16"
-      fill="none"
+      fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
-      <path fill="var(--color-surface-3)" d="M8 3a5 5 0 100 10A5 5 0 008 3z" />
+      <path d="M8 3a5 5 0 100 10A5 5 0 008 3z" />
     </svg>
   );
 };
