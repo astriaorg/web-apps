@@ -10,41 +10,39 @@ import { TimeseriesOptions } from "earn/generated/gql/graphql";
 import request from "graphql-request";
 
 const query = graphql(`
-  query VaultByAddressHistoricalState(
-    $address: String!
+  query MarketByUniqueKeyHistoricalState(
+    $key: String!
     $chainId: Int
     $includeAPYData: Boolean!
     $includeTotalAssetsData: Boolean!
     $options: TimeseriesOptions
   ) {
-    vaultByAddress(address: $address, chainId: $chainId) {
-      asset {
+    marketByUniqueKey(uniqueKey: $key, chainId: $chainId) {
+      historicalState {
+        dailyBorrowApy(options: $options) @include(if: $includeAPYData) {
+          x
+          y
+        }
+        borrowAssets(options: $options) @include(if: $includeTotalAssetsData) {
+          x
+          y
+        }
+      }
+      collateralAsset {
         decimals
       }
-      historicalState {
-        dailyApy(options: $options) @include(if: $includeAPYData) {
-          x
-          y
-        }
-        totalAssets(options: $options) @include(if: $includeTotalAssetsData) {
-          x
-          y
-        }
-        totalAssetsUsd(options: $options)
-          @include(if: $includeTotalAssetsData) {
-          x
-          y
-        }
+      loanAsset {
+        decimals
       }
     }
   }
 `);
 
-export const useFetchVaultByAddressHistoricalState = ({
+export const useFetchMarketByUniqueKeyHistoricalState = ({
   variables: { type, ...variables },
 }: {
   variables: {
-    address: string;
+    key: string;
     options: TimeseriesOptions;
     type: keyof typeof CHART_TYPE;
   };
@@ -52,26 +50,26 @@ export const useFetchVaultByAddressHistoricalState = ({
   const { earnAPIURL } = useConfig();
 
   return useQuery({
-    queryKey: ["useFetchVaultByAddressHistoricalState", type, variables],
+    queryKey: ["useFetchMarketByUniqueKeyHistoricalState", type, variables],
     queryFn: async () => {
       const result = await request(earnAPIURL, query, {
         ...variables,
         // TODO: Get chain ID from wallet context.
-        chainId: null,
+        chainId: 1,
         includeAPYData: type === CHART_TYPE.APY,
         includeTotalAssetsData: type === CHART_TYPE.TOTAL_ASSETS,
       });
 
-      // Data doesn't come sorted from the API.
-      result.vaultByAddress.historicalState.dailyApy?.sort((a, b) => a.x - b.x);
-      result.vaultByAddress.historicalState.totalAssets =
-        getSortedAndScaledData(
-          result.vaultByAddress.historicalState.totalAssets,
-          result.vaultByAddress.asset.decimals,
+      if (result.marketByUniqueKey.historicalState) {
+        result.marketByUniqueKey.historicalState.dailyBorrowApy?.sort(
+          (a, b) => a.x - b.x,
         );
-      result.vaultByAddress.historicalState.totalAssetsUsd?.sort(
-        (a, b) => a.x - b.x,
-      );
+        result.marketByUniqueKey.historicalState.borrowAssets =
+          getSortedAndScaledData(
+            result.marketByUniqueKey.historicalState.borrowAssets,
+            result.marketByUniqueKey.loanAsset.decimals,
+          );
+      }
 
       return result;
     },

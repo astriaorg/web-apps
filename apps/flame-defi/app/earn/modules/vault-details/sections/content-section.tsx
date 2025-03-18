@@ -140,6 +140,7 @@ export const ContentSection = () => {
               <Skeleton isLoading={isPending} className="w-52">
                 <div className="text-base/4 font-semibold">Overview</div>
               </Skeleton>
+
               <LineChart
                 data={
                   charts[CHART_TYPE.APY].query.data?.vaultByAddress

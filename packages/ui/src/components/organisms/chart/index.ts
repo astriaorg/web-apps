@@ -11,4 +11,5 @@ export {
   getDownsampledData,
   getTickIntervalData,
   getTickIntervalDateTimeFormatOptions,
+  getTimestampsFromInterval,
 } from "./chart.utils";

@@ -1,5 +1,9 @@
-import { ChartInterval } from "@repo/ui/components";
-import type { TimeseriesOptions } from "earn/generated/gql/graphql";
+import { ChartInterval, getTimestampsFromInterval } from "@repo/ui/components";
+import Big from "big.js";
+import type {
+  BigIntDataPoint,
+  TimeseriesOptions,
+} from "earn/generated/gql/graphql";
 import { CHART_CACHE_TIME_MILLISECONDS } from "./charts.types";
 
 /**
@@ -8,10 +12,13 @@ import { CHART_CACHE_TIME_MILLISECONDS } from "./charts.types";
 export const getTimeseriesOptions = (
   chartInterval: ChartInterval,
 ): TimeseriesOptions => {
+  const { startTimestamp, endTimestamp } =
+    getTimestampsFromInterval(chartInterval);
+
   if (chartInterval === "all") {
     return {
-      startTimestamp: null,
-      endTimestamp: null,
+      startTimestamp,
+      endTimestamp,
     };
   }
 
@@ -22,45 +29,34 @@ export const getTimeseriesOptions = (
     return Math.floor(timestamp / secondsIn5Minutes) * secondsIn5Minutes;
   };
 
-  const getTimestampsFromInterval = (interval: ChartInterval) => {
-    const now = Date.now();
-    const date = new Date();
-
-    switch (interval) {
-      case "1w": {
-        date.setDate(date.getDate() - 7);
-        return {
-          startTimestamp: date.getTime(),
-          endTimestamp: now,
-        };
-      }
-      case "1m": {
-        date.setMonth(date.getMonth() - 1);
-        return {
-          startTimestamp: date.getTime(),
-          endTimestamp: now,
-        };
-      }
-      case "3m": {
-        date.setMonth(date.getMonth() - 3);
-        return {
-          startTimestamp: date.getTime(),
-          endTimestamp: now,
-        };
-      }
-      default: {
-        throw new Error(`Invalid interval: "${interval}".`);
-      }
-    }
-  };
-
-  const { startTimestamp, endTimestamp } =
-    getTimestampsFromInterval(chartInterval);
-
   return {
     startTimestamp: Math.floor(
-      roundDownToNearest5Minutes(startTimestamp / 1000),
+      roundDownToNearest5Minutes((startTimestamp as number) / 1000),
     ),
-    endTimestamp: Math.floor(roundDownToNearest5Minutes(endTimestamp / 1000)),
+    endTimestamp: Math.floor(
+      roundDownToNearest5Minutes((endTimestamp as number) / 1000),
+    ),
   };
+};
+
+/**
+ * Scales and sorts the data. Call this at the query level to prevent number overflow issues when rendering the chart.
+ */
+export const getSortedAndScaledData = (
+  data: BigIntDataPoint[] | null = null,
+  decimals: number,
+) => {
+  if (!data) {
+    return null;
+  }
+
+  return data
+    .map((it) => {
+      //
+      return {
+        ...it,
+        y: new Big(it.y).div(10 ** decimals).toNumber(), // Convert to number, if we leave as a string the chart will have number overflow issues.
+      };
+    })
+    .sort((a, b) => a.x - b.x);
 };

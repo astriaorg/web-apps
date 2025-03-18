@@ -153,6 +153,9 @@ export const getTickIntervalData = <T>(
   return result;
 };
 
+/**
+ * @returns The date/time format options for a given tick interval.
+ */
 export const getTickIntervalDateTimeFormatOptions = (
   interval: ChartTickInterval,
 ): Intl.DateTimeFormatOptions => {
@@ -173,6 +176,48 @@ export const getTickIntervalDateTimeFormatOptions = (
     }
     default: {
       throw new Error(`Invalid chart tick interval: "${interval}".`);
+    }
+  }
+};
+
+/**
+ * @returns The start and end timestamps for a given interval.
+ */
+export const getTimestampsFromInterval = (interval: ChartInterval) => {
+  if (interval === "all") {
+    return {
+      startTimestamp: null,
+      endTimestamp: null,
+    };
+  }
+
+  const now = Date.now();
+  const date = new Date();
+
+  switch (interval) {
+    case "1w": {
+      date.setDate(date.getDate() - 7);
+      return {
+        startTimestamp: date.getTime(),
+        endTimestamp: now,
+      };
+    }
+    case "1m": {
+      date.setMonth(date.getMonth() - 1);
+      return {
+        startTimestamp: date.getTime(),
+        endTimestamp: now,
+      };
+    }
+    case "3m": {
+      date.setMonth(date.getMonth() - 3);
+      return {
+        startTimestamp: date.getTime(),
+        endTimestamp: now,
+      };
+    }
+    default: {
+      throw new Error(`Invalid interval: "${interval}".`);
     }
   }
 };

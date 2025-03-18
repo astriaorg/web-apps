@@ -1,10 +1,12 @@
-import { Skeleton, StatusCard } from "@repo/ui/components";
+import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
+import { CHART_TYPE, LineChart } from "earn/components/charts";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { getPlaceholderData, VaultListTable } from "earn/components/vault";
 import { Vault, VaultOrderBy } from "earn/generated/gql/graphql";
+import { useFormatChartValue } from "earn/hooks/use-format-chart-value";
 import { BorrowCards } from "earn/modules/market-details/components/borrow-cards";
 import { OverviewCards } from "earn/modules/market-details/components/overview-cards";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
@@ -12,9 +14,11 @@ import { useMemo, useState } from "react";
 
 export const ContentSection = () => {
   const {
+    charts,
     query: { data, isPending, status },
   } = usePageContext();
   const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
+  const { formatChartValue } = useFormatChartValue();
 
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -92,6 +96,10 @@ export const ContentSection = () => {
     ];
   }, [data, formatAbbreviatedNumber]);
 
+  const style = useMemo(() => {
+    return undefined;
+  }, []);
+
   return (
     <section className="flex flex-col px-4">
       {status === "error" && (
@@ -114,6 +122,68 @@ export const ContentSection = () => {
                 <div className="text-base/4 font-semibold">Overview</div>
               </Skeleton>
               <OverviewCards />
+
+              <LineChart
+                data={
+                  charts[CHART_TYPE.TOTAL_ASSETS].query.data?.marketByUniqueKey
+                    .historicalState?.borrowAssets
+                }
+                isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
+                isLoading={
+                  isPending || charts[CHART_TYPE.TOTAL_ASSETS].query.isPending
+                }
+                intervals={CHART_INTERVALS}
+                selectedInterval={
+                  charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval
+                }
+                setSelectedInterval={
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedInterval
+                }
+                title={`Total Assets`}
+                figure={formatChartValue(
+                  {
+                    y: new Big(data?.marketByUniqueKey.state?.supplyAssets ?? 0)
+                      .div(
+                        10 **
+                          (data?.marketByUniqueKey.collateralAsset?.decimals ??
+                            18),
+                      )
+                      .toFixed(),
+                  },
+                  { style },
+                )}
+                renderLabelContent={(value) =>
+                  formatChartValue(value, { style })
+                }
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style })
+                }
+              />
+              <LineChart
+                data={
+                  charts[CHART_TYPE.APY].query.data?.marketByUniqueKey
+                    .historicalState?.dailyBorrowApy
+                }
+                isError={charts[CHART_TYPE.APY].query.isError}
+                isLoading={isPending || charts[CHART_TYPE.APY].query.isPending}
+                intervals={CHART_INTERVALS}
+                selectedInterval={charts[CHART_TYPE.APY].selectedInterval}
+                setSelectedInterval={charts[CHART_TYPE.APY].setSelectedInterval}
+                title="APY"
+                figure={formatChartValue(
+                  {
+                    y: data?.marketByUniqueKey.state?.netBorrowApy ?? 0,
+                  },
+                  { style: "percent" },
+                )}
+                renderLabelContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
+                }
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
+                }
+              />
+
               <VaultListTable
                 data={formattedData}
                 sorting={sorting}
