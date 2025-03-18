@@ -71,7 +71,7 @@ export const getDownsampledData = <T>(
 export const CHART_INTERVAL_TO_CHART_TICK_INTERVAL: {
   [key in ChartInterval]: ChartTickInterval;
 } = {
-  "1w": "3d",
+  "1w": "1d",
   "1m": "1w",
   "3m": "1m",
   all: "1m",
@@ -95,10 +95,13 @@ export const getTickIntervalData = <T>(
   }
 
   switch (interval) {
+    case "1d":
     case "3d":
     case "1w": {
       const milliseconds = (() => {
         switch (interval) {
+          case "1d":
+            return 1000 * 60 * 60 * 24 * 1;
           case "3d":
             return 1000 * 60 * 60 * 24 * 3;
           case "1w":
@@ -160,6 +163,7 @@ export const getTickIntervalDateTimeFormatOptions = (
   interval: ChartTickInterval,
 ): Intl.DateTimeFormatOptions => {
   switch (interval) {
+    case "1d":
     case "3d":
     case "1w": {
       return {
