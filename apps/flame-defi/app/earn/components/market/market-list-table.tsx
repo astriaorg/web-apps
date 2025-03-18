@@ -10,8 +10,9 @@ import {
   TableRow,
   TableSortIcon,
 } from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { ChevronRightSmallIcon } from "@repo/ui/icons";
-import { cn, formatAbbreviatedNumber } from "@repo/ui/utils";
+import { cn } from "@repo/ui/utils";
 import {
   createColumnHelper,
   flexRender,
@@ -53,6 +54,7 @@ export const MarketListTable = ({
   isLoading,
 }: MarketListTableProps) => {
   const router = useRouter();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   const columnHelper = createColumnHelper<Market>();
 
@@ -165,25 +167,6 @@ export const MarketListTable = ({
         id: MarketOrderBy.TotalLiquidityUsd,
         header: "Liquidity",
         cell: ({ row }) => {
-          const {
-            value: formattedLiquidityAssets,
-            suffix: formattedLiquidityAssetsSuffix,
-          } = formatAbbreviatedNumber(
-            new Big(row.original.state?.liquidityAssets ?? 0)
-              .div(10 ** row.original.loanAsset.decimals)
-              .toFixed(),
-            {
-              minimumFractionDigits: 2,
-            },
-          );
-
-          const {
-            value: formattedLiquidityAssetsUSD,
-            suffix: formattedLiquidityAssetsUSDSuffix,
-          } = formatAbbreviatedNumber(
-            new Big(row.original.state?.liquidityAssetsUsd ?? 0).toFixed(),
-          );
-
           return (
             <div className="flex items-center justify-between space-x-4">
               <div
@@ -193,18 +176,23 @@ export const MarketListTable = ({
                 )}
               >
                 <span className={cn("truncate max-w-[25vw]", "md:max-w-auto")}>
-                  {formattedLiquidityAssets}
-                  {formattedLiquidityAssetsSuffix}
+                  {formatAbbreviatedNumber(
+                    new Big(row.original.state?.liquidityAssets ?? 0)
+                      .div(10 ** row.original.loanAsset.decimals)
+                      .toFixed(),
+                    { minimumFractionDigits: 2 },
+                  )}
                   {NON_BREAKING_SPACE}
                   {row.original.loanAsset.symbol}
                 </span>
                 <Badge>
-                  <FormattedNumber
-                    value={+formattedLiquidityAssetsUSD}
-                    style="currency"
-                    currency="USD"
-                  />
-                  {formattedLiquidityAssetsUSDSuffix}
+                  {formatAbbreviatedNumber(
+                    (row.original.state?.liquidityAssetsUsd ?? 0).toString(),
+                    {
+                      style: "currency",
+                      currency: "USD",
+                    },
+                  )}
                 </Badge>
               </div>
               <div className="lg:hidden flex justify-end pr-3">
