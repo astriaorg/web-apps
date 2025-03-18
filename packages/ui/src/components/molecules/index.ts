@@ -5,7 +5,6 @@ export * from "./block-loader";
 export * from "./card";
 export * from "./copy-to-clipboard";
 export * from "./copy-to-clipboard-button";
-export * from "./dropdown";
 export * from "./info-tooltip";
 export * from "./status-card";
 export * from "./success-check";
