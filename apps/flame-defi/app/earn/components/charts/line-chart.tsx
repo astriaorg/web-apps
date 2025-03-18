@@ -179,53 +179,55 @@ export const LineChart = <
   return (
     <Card isLoading={isLoading}>
       <CardContent className="flex flex-col">
-        <div className="relative flex flex-col gap-6">
-          <div className="flex flex-col">
-            <CardLabel className="flex flex-col items-start gap-2 md:flex-row md:justify-between">
+        <div className="relative flex flex-col gap-6 whitespace-nowrap">
+          <div className="flex flex-col space-y-2">
+            <CardLabel className="w-min flex flex-col items-start gap-2 md:flex-row md:justify-between">
               <span>{title}</span>
             </CardLabel>
-            <CardFigureLabel className="mt-2">{figure}</CardFigureLabel>
+            <CardFigureLabel className="w-min">{figure}</CardFigureLabel>
           </div>
 
-          <div className="flex space-x-4 md:absolute md:right-0">
-            {options?.length && (
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="secondary">
-                    {renderSelectedOption?.(selectedOption as OptionType)}
-                    <ChevronDownSmallIcon />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  {options.map((option) => (
-                    <DropdownMenuItem
-                      key={option}
-                      onSelect={() => {
-                        setSelectedOption?.(option);
-                      }}
-                    >
-                      {renderSelectedOption?.(option)}
-                    </DropdownMenuItem>
+          <Skeleton isLoading={isLoading} className="md:absolute">
+            <div className="flex space-x-4 md:absolute md:right-0">
+              {options?.length && (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="sm" variant="secondary">
+                      {renderSelectedOption?.(selectedOption as OptionType)}
+                      <ChevronDownSmallIcon />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {options.map((option) => (
+                      <DropdownMenuItem
+                        key={option}
+                        onSelect={() => {
+                          setSelectedOption?.(option);
+                        }}
+                      >
+                        {renderSelectedOption?.(option)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              <Tabs
+                defaultValue={selectedInterval}
+                onValueChange={(value) => {
+                  setSelectedInterval(value as ChartInterval);
+                }}
+              >
+                <TabsList>
+                  {intervals.map((it) => (
+                    <TabsTrigger key={it} value={it}>
+                      {it}
+                    </TabsTrigger>
                   ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            <Tabs
-              defaultValue={selectedInterval}
-              onValueChange={(value) => {
-                setSelectedInterval(value as ChartInterval);
-              }}
-            >
-              <TabsList>
-                {intervals.map((it) => (
-                  <TabsTrigger key={it} value={it}>
-                    {it}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
+                </TabsList>
+              </Tabs>
+            </div>
+          </Skeleton>
         </div>
 
         <div className="mt-10" />
