@@ -1,12 +1,6 @@
 "use client";
 
 import { Decimal } from "@cosmjs/math";
-import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Dropdown } from "@repo/ui/components";
-import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
-import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
 import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -15,6 +9,12 @@ import {
   WalletIcon,
 } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { Dropdown } from "components/dropdown";
+import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
+import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
+import { NotificationType, useNotifications } from "features/notifications";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();
