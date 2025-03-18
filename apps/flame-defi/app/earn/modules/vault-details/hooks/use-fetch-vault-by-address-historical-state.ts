@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import Big from "big.js";
 import { useConfig } from "config/hooks/use-config";
-import { CHART_CACHE_TIME_MILLISECONDS } from "earn/components/charts";
+import {
+  CHART_CACHE_TIME_MILLISECONDS,
+  CHART_TYPE,
+} from "earn/components/charts";
 import { graphql } from "earn/generated/gql";
 import { TimeseriesOptions } from "earn/generated/gql/graphql";
-import { CHART_TYPE } from "earn/modules/vault-details/types";
 import request from "graphql-request";
 
 const query = graphql(`

@@ -1,11 +1,8 @@
 import { ChartInterval } from "@repo/ui/components";
-import { getTimeseriesOptions } from "earn/components/charts";
+import { CHART_TYPE, getTimeseriesOptions } from "earn/components/charts";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
-import {
-  CHART_TYPE,
-  TOTAL_ASSETS_OPTION,
-} from "earn/modules/vault-details/types";
+import { TOTAL_ASSETS_OPTION } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 

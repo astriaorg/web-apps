@@ -2,7 +2,7 @@ import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
-import { LineChart } from "earn/components/charts";
+import { CHART_TYPE, LineChart } from "earn/components/charts";
 import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import {
@@ -11,15 +11,15 @@ import {
   Market,
   MarketOrderBy,
 } from "earn/generated/gql/graphql";
+import { useFormatChartValue } from "earn/hooks/use-format-chart-value";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import {
-  CHART_TYPE,
   TOTAL_ASSETS_OPTION,
   TOTAL_ASSETS_OPTIONS,
   TotalAssetsOption,
 } from "earn/modules/vault-details/types";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
@@ -29,6 +29,7 @@ export const ContentSection = () => {
     query: { data, isPending, status },
   } = usePageContext();
   const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
+  const { formatChartValue } = useFormatChartValue();
 
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -109,35 +110,14 @@ export const ContentSection = () => {
     ];
   }, [data, formatAbbreviatedNumber]);
 
-  const renderAPYFigure = useCallback(
-    (value: Pick<BigIntDataPoint | FloatDataPoint, "y">) => {
-      return formatNumber(value.y ?? 0, {
-        style: "percent",
-        minimumFractionDigits: 2,
-      });
-    },
-    [charts, formatNumber],
-  );
-
-  const renderTotalAssetFigure = useCallback(
-    (value: Pick<BigIntDataPoint | FloatDataPoint, "y">) => {
-      if (
-        charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
-        TOTAL_ASSETS_OPTION.ASSET
-      ) {
-        return formatAbbreviatedNumber(value.y ?? 0, {
-          minimumFractionDigits: 2,
-        });
-      }
-
-      return formatAbbreviatedNumber(value.y ?? 0, {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-      });
-    },
-    [charts, formatNumber],
-  );
+  const style = useMemo(() => {
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.FIAT
+    ) {
+      return "currency";
+    }
+  }, [charts]);
 
   return (
     <section className="flex flex-col px-4">
@@ -171,11 +151,18 @@ export const ContentSection = () => {
                 selectedInterval={charts[CHART_TYPE.APY].selectedInterval}
                 setSelectedInterval={charts[CHART_TYPE.APY].setSelectedInterval}
                 title="APY"
-                figure={renderTotalAssetFigure({
-                  y: data?.vaultByAddress.state?.netApy ?? 0,
-                })}
-                renderLabelContent={renderTotalAssetFigure}
-                renderTooltipContent={renderTotalAssetFigure}
+                figure={formatChartValue(
+                  {
+                    y: data?.vaultByAddress.state?.netApy ?? 0,
+                  },
+                  { style: "percent" },
+                )}
+                renderLabelContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
+                }
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
+                }
               />
               <LineChart<BigIntDataPoint | FloatDataPoint, TotalAssetsOption>
                 data={
@@ -211,19 +198,26 @@ export const ContentSection = () => {
                     : "USD";
                 }}
                 title="Total Deposits"
-                figure={renderTotalAssetFigure({
-                  y:
-                    charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
-                    TOTAL_ASSETS_OPTION.ASSET
-                      ? new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
-                          .div(
-                            10 ** (data?.vaultByAddress.asset.decimals ?? 18),
-                          )
-                          .toFixed()
-                      : data?.vaultByAddress.state?.totalAssetsUsd,
-                })}
-                renderLabelContent={renderTotalAssetFigure}
-                renderTooltipContent={renderTotalAssetFigure}
+                figure={formatChartValue(
+                  {
+                    y:
+                      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+                      TOTAL_ASSETS_OPTION.ASSET
+                        ? new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+                            .div(
+                              10 ** (data?.vaultByAddress.asset.decimals ?? 18),
+                            )
+                            .toFixed()
+                        : data?.vaultByAddress.state?.totalAssetsUsd,
+                  },
+                  { style },
+                )}
+                renderLabelContent={(value) =>
+                  formatChartValue(value, { style })
+                }
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style })
+                }
               />
 
               <MarketListTable
