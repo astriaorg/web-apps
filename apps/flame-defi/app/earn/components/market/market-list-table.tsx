@@ -261,7 +261,7 @@ export const MarketListTable = ({
         footer: (info) => info.column.id,
       }),
     ];
-  }, [columnHelper]);
+  }, [columnHelper, formatAbbreviatedNumber]);
 
   const table = useReactTable<Market>({
     columns,

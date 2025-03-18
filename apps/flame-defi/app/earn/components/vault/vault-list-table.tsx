@@ -180,7 +180,7 @@ export const VaultListTable = ({
         footer: (info) => info.column.id,
       }),
     ];
-  }, [columnHelper]);
+  }, [columnHelper, formatAbbreviatedNumber]);
 
   const table = useReactTable<Vault>({
     columns,
