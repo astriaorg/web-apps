@@ -59,7 +59,7 @@ interface LineChartProps<
   renderSelectedOption?: (value: OptionType) => React.ReactNode;
   title: React.ReactNode;
   figure: React.ReactNode;
-  renderLabelContent: (value: Pick<DataType, "y">) => string;
+  renderAverageReferenceLineContent: (value: Pick<DataType, "y">) => string;
   renderTooltipContent: (value: DataType) => React.ReactNode;
 }
 
@@ -79,7 +79,7 @@ export const LineChart = <
   renderSelectedOption,
   title,
   figure,
-  renderLabelContent,
+  renderAverageReferenceLineContent,
   renderTooltipContent,
 }: LineChartProps<DataType, OptionType>) => {
   const { formatDate } = useIntl();
@@ -261,7 +261,7 @@ export const LineChart = <
               <YAxis dataKey="y" hide domain={[dataMin, dataMax]} />
               <ReferenceLine y={dataAverage} strokeDasharray="4 4">
                 <Label
-                  value={`Average ${renderLabelContent({ y: dataAverage })}`}
+                  value={`Average ${renderAverageReferenceLineContent({ y: dataAverage })}`}
                   fill="var(--color-typography-light)"
                   position="insideTopLeft"
                   offset={10}

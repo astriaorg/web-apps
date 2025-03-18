@@ -152,7 +152,7 @@ export const ContentSection = () => {
                   },
                   { style },
                 )}
-                renderLabelContent={(value) =>
+                renderAverageReferenceLineContent={(value) =>
                   formatChartValue(value, { style })
                 }
                 renderTooltipContent={(value) =>
@@ -176,7 +176,7 @@ export const ContentSection = () => {
                   },
                   { style: "percent" },
                 )}
-                renderLabelContent={(value) =>
+                renderAverageReferenceLineContent={(value) =>
                   formatChartValue(value, { style: "percent" })
                 }
                 renderTooltipContent={(value) =>
