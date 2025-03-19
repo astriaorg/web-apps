@@ -20,6 +20,7 @@ const buttonVariants = cva(
         outline: "",
         secondary: `bg-surface-3 text-typography-default ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
         ghost: "hover:text-typography-light",
+        gradient: "rounded-xl bg-button-gradient text-white transition border border-orange-soft hover:border-white",
         link: "",
       },
       size: {

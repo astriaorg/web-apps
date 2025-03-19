@@ -13,7 +13,7 @@ import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { shortenAddress } from "@repo/ui/utils";
 import { useConfig } from "config";
 import {
@@ -105,8 +105,8 @@ export default function MobileWalletConnect({
         <div>
           {isBridgePage && (
             <Button
-              variant="default"
-              className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white w-[156px] text-base"
+              variant="gradient"
+              className="w-[156px] text-base"
             >
               {isConnected ? "Connected" : "Connect"}
             </Button>
@@ -125,8 +125,8 @@ export default function MobileWalletConnect({
                 </div>
               ) : (
                 <Button
-                  variant="default"
-                  className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white w-[156px] text-base"
+                  variant="gradient"
+                  className="w-[156px] text-base"
                   onClick={() => connectEvmWallet()}
                 >
                   Connect
