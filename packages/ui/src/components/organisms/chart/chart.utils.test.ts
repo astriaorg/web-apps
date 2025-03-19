@@ -31,6 +31,7 @@ describe("getTickIntervalData", () => {
   it("should return an empty array when input data is empty", () => {
     const data: number[] = [];
     for (const interval of CHART_TICK_INTERVALS) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = getTickIntervalData(data, interval, "" as any);
       expect(result).toEqual([]);
     }
