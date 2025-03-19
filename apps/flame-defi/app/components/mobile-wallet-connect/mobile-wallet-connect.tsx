@@ -104,10 +104,7 @@ export default function MobileWalletConnect({
       <DrawerTrigger asChild>
         <div>
           {isBridgePage && (
-            <Button
-              variant="gradient"
-              className="w-[156px] text-base"
-            >
+            <Button variant="gradient" className="w-[156px] text-base">
               {isConnected ? "Connected" : "Connect"}
             </Button>
           )}

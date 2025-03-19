@@ -1,5 +1,12 @@
 import { useAccount } from "wagmi";
-import { CopyToClipboardButton, Skeleton, Button, Popover, PopoverContent, PopoverTrigger } from "@repo/ui/components";
+import {
+  CopyToClipboardButton,
+  Skeleton,
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";

@@ -525,7 +525,11 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <Button variant="gradient" onClick={handleDeposit} disabled={isDepositDisabled}>
+        <Button
+          variant="gradient"
+          onClick={handleDeposit}
+          disabled={isDepositDisabled}
+        >
           {isLoading ? "Processing..." : "Deposit"}
         </Button>
       </div>

@@ -513,7 +513,11 @@ export default function WithdrawCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <Button variant="gradient" onClick={handleWithdraw} disabled={isWithdrawDisabled}>
+        <Button
+          variant="gradient"
+          onClick={handleWithdraw}
+          disabled={isWithdrawDisabled}
+        >
           {isLoading ? "Processing..." : "Withdraw"}
         </Button>
       </div>

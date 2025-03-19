@@ -408,7 +408,11 @@ export default function SwapPage(): React.ReactElement {
           />
         </ConfirmationModal>
         {(!userAccount.address || tokenApprovalNeeded) && (
-          <Button variant="gradient" onClick={onSubmitCallback} className="w-full mt-2">
+          <Button
+            variant="gradient"
+            onClick={onSubmitCallback}
+            className="w-full mt-2"
+          >
             {buttonText}
           </Button>
         )}
