@@ -113,7 +113,7 @@ export default function SingleWalletConnect() {
 
   return userAccount.address ? (
     <Popover>
-      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px] cursor-pointer ">
+      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 cursor-pointer h-[40px]">
         <div className="flex items-center gap-2">
           <FlameIcon size={16} />
           <span className="text-white text-base font-normal">
