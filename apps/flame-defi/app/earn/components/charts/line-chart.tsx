@@ -155,7 +155,10 @@ export const LineChart = <
 
         const currentY: NonNullable<DataType["y"]> =
           e.activePayload?.[0]?.value ?? 0;
-        tooltipY = (1 - currentY / (dataMax - dataMin)) * CHART_HEIGHT - 28;
+        // When data is all zero, handle division by zero.
+        const range = dataMax - dataMin;
+        tooltipY =
+          range === 0 ? 48 : (1 - currentY / range) * CHART_HEIGHT - 28;
 
         setTooltip({
           x: tooltipX,
