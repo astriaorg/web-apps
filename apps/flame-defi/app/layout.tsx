@@ -7,7 +7,7 @@ import "./globals.css";
 import Navbar from "components/navbar/navbar";
 import localFont from "next/font/local";
 import { Observability } from "./features/observability";
-import { RouteAnimation } from "route-animation";
+import { RouteAnimation } from "components/route-animation/route-animation";
 
 export const metadata = {
   title: "Flame App",
