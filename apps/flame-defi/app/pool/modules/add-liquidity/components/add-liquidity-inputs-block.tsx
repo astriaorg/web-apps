@@ -6,10 +6,7 @@ export const AddLiquidityInputsBlock = () => {
   return (
     <>
       <div className="flex gap-4 w-full">
-        <Card
-          padding="md"
-          className="flex flex-row items-center justify-between"
-        >
+        <Card className="flex flex-row items-center justify-between px-4 py-6">
           <CardFigureInput placeholder="0.00" className="flex w-full" />
           <div className="flex flex-col items-end w-[85px]">
             <div className="flex items-center gap-2 rounded-2xl justify-between mb-2">
@@ -27,10 +24,7 @@ export const AddLiquidityInputsBlock = () => {
             </span>
           </div>
         </Card>
-        <Card
-          padding="md"
-          className="flex flex-row items-center justify-between"
-        >
+        <Card className="flex flex-row items-center justify-between px-4 py-6">
           <CardFigureInput placeholder="0.00" className="flex w-full" />
           <div className="flex flex-col items-end w-[85px]">
             <div className="flex items-center gap-2 rounded-2xl justify-between mb-2">
