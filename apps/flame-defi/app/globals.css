@@ -102,45 +102,33 @@
   --color-success: ;
   --color-warning: ;
   --color-danger: ;
-
-  --chart-1:;
-  --chart-2: ;
-  --chart-3: ;
-  --chart-4:;
-  --chart-5: ;
 }
 
 html[data-theme="light"] {
-  --color-icon-default: hsl(var(--color-gray-150));
-  --color-icon-light: hsl(var(--color-gray-650));
+  --color-icon-default: hsl(var(--color-gray-850));
+  --color-icon-light: hsl(var(--color-gray-350));
   --color-icon-subdued: hsl(var(--color-gray-500));
 
-  --color-stroke-default: hsl(var(--color-gray-800));
-  --color-stroke-active: hsl(var(--color-gray-250));
+  --color-stroke-default: hsl(var(--color-gray-200));
+  --color-stroke-active: hsl(var(--color-gray-750));
 
-  --color-typography-default: hsl(var(--color-gray-0));
-  --color-typography-secondary: hsl(var(--color-gray-150));
-  --color-typography-inverted: hsl(var(--color-gray-1000));
-  --color-typography-light: hsl(var(--color-gray-600));
-  --color-typography-subdued: hsl(var(--color-gray-300));
+  --color-typography-default: hsl(var(--color-gray-1000));
+  --color-typography-secondary: hsl(var(--color-gray-850));
+  --color-typography-inverted: hsl(var(--color-gray-0));
+  --color-typography-light: hsl(var(--color-gray-400));
+  --color-typography-subdued: hsl(var(--color-gray-700));
   --color-typography-black: hsl(var(--color-gray-1000));
 
-  --color-background-default: hsl(var(--color-gray-1000));
-  --color-surface-1: hsl(var(--color-gray-900));
-  --color-surface-2: hsl(var(--color-gray-850));
-  --color-surface-3: hsl(var(--color-gray-800));
-  --color-surface-inverted: hsl(var(--color-gray-0));
+  --color-background-default: hsl(var(--color-gray-0));
+  --color-surface-1: hsl(var(--color-gray-50));
+  --color-surface-2: hsl(var(--color-gray-100));
+  --color-surface-3: hsl(var(--color-gray-150));
+  --color-surface-inverted: hsl(var(--color-gray-1000));
 
   --color-brand: hsl(var(--color-orange-100));
   --color-success: hsl(var(--color-green-100));
   --color-warning: hsl(var(--color-yellow-100));
   --color-danger: hsl(var(--color-red-100));
-
-  --chart-1: 12 76% 61%;
-  --chart-2: 173 58% 39%;
-  --chart-3: 197 37% 24%;
-  --chart-4: 43 74% 66%;
-  --chart-5: 27 87% 67%;
 }
 
 html[data-theme="dark"] {
@@ -169,12 +157,6 @@ html[data-theme="dark"] {
   --color-success: hsl(var(--color-green-200));
   --color-warning: hsl(var(--color-yellow-200));
   --color-danger: hsl(var(--color-red-200));
-
-  --chart-1: 220 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 340 75% 55%;
 }
 
 @theme {

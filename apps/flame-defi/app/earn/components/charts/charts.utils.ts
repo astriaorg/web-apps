@@ -52,7 +52,6 @@ export const getSortedAndScaledData = (
 
   return data
     .map((it) => {
-      //
       return {
         ...it,
         y: new Big(it.y).div(10 ** decimals).toNumber(), // Convert to number, if we leave as a string the chart will have number overflow issues.
