@@ -1,10 +1,13 @@
+"use client";
+
 import React, { useState } from "react";
-import { useConfig, useEvmChainData } from "config";
+import { useEvmChainData } from "config";
 import { EvmCurrency } from "@repo/flame-types";
-import { ActionButton, TokenSelector } from "@repo/ui/components";
-import { Button, DialogTrigger } from "@repo/ui/shadcn-primitives";
+import { Button, TokenSelector } from "@repo/ui/components";
+import { DialogTrigger } from "@repo/ui/shadcn-primitives";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
-import { FeeData, TokenPair } from "./new-pool-position";
+import { FeeData, TokenPair } from "../../../types";
+import { usePoolContext } from "pool/hooks";
 
 export interface TokenPairsStepProps {
   step: number;
@@ -39,15 +42,15 @@ const CustomTokenButton = ({
   </DialogTrigger>
 );
 
-export default function TokenPairsStep({
+export const TokenPairsStep = ({
   step,
   setStep,
   setTokenPair,
   tokenPair,
   selectedFeeTier,
   setSelectedFeeTier,
-}: TokenPairsStepProps): React.ReactElement {
-  const { feeData } = useConfig();
+}: TokenPairsStepProps): React.ReactElement => {
+  const { feeData } = usePoolContext();
   const {
     selectedChain: { currencies },
   } = useEvmChainData();
@@ -187,18 +190,16 @@ export default function TokenPairsStep({
                 </div>
               ))}
             </div>
-            <ActionButton
+            <Button
               className="mt-8 w-full"
-              buttonText="Continue"
-              callback={() => setStep(1)}
-              disabled={
-                tokenPair.tokenOne === undefined ||
-                tokenPair.tokenTwo === undefined
-              }
-            />
+              onClick={() => setStep(1)}
+              disabled={!tokenPair.tokenOne || !tokenPair.tokenTwo}
+            >
+              Continue
+            </Button>
           </div>
         </div>
       )}
     </div>
   );
-}
+};

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactECharts from "echarts-for-react";
 
-const AreaChartWithRange: React.FC = () => {
+export const AreaChartWithRange: React.FC = () => {
   const option = {
     backgroundColor: "#071520", // HSL(203, 45%, 4%) converted to hex
     tooltip: {
@@ -107,5 +107,3 @@ const AreaChartWithRange: React.FC = () => {
     </div>
   );
 };
-
-export default AreaChartWithRange;

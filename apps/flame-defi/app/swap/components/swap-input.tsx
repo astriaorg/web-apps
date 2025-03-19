@@ -109,7 +109,7 @@ export function SwapInput({
               }
             </div>
           ) : (
-            <div className="h-[20px] mt-3 w-[100%]"></div>
+            <div></div>
           )}
           {inputToken.token && !inputToken.token.isNative && isConnected && (
             <div className="mt-1 text-right">

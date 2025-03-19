@@ -1,3 +1,5 @@
+import { cn } from "../../../utils";
+
 interface ToggleSwitchProps {
   toggleOptions: string[];
   className?: string;
@@ -13,7 +15,10 @@ export function ToggleSwitch({
 }: ToggleSwitchProps) {
   return (
     <div
-      className={`w-full h-full flex relative rounded-[50px] bg-black overflow-hidden border border-solid border-border text-base ${className}`}
+      className={cn(
+        "w-full h-full flex relative rounded-[50px] bg-black overflow-hidden border border-solid border-border text-base",
+        className,
+      )}
     >
       <div
         className="absolute inset-0 transition-transform duration-300 ease-in-out bg-grey-dark rounded-[50px] m-1"
@@ -25,7 +30,10 @@ export function ToggleSwitch({
       {toggleOptions.map((option, i) => (
         <div
           key={i}
-          onClick={() => setSelectedOption(option)}
+          onClick={() => {
+            if (option === selectedOption) return;
+            setSelectedOption(option);
+          }}
           className={`
               flex items-center justify-center
               flex-1 py-2 px-4

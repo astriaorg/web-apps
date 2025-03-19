@@ -3,7 +3,7 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConfig as useWagmiConfig } from "wagmi";
-import { Dropdown } from "@repo/ui/components";
+import { Button, Dropdown } from "@repo/ui/components";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import {
   AddErc20ToWalletButton,
@@ -12,7 +12,7 @@ import {
 } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
-import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer } from "@repo/ui/components";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 
 export default function WithdrawCard(): React.ReactElement {
@@ -513,12 +513,13 @@ export default function WithdrawCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <ActionButton
-          callback={handleWithdraw}
+        <Button
+          variant="gradient"
+          onClick={handleWithdraw}
           disabled={isWithdrawDisabled}
-          isLoading={isLoading}
-          buttonText={"Withdraw"}
-        />
+        >
+          {isLoading ? "Processing..." : "Withdraw"}
+        </Button>
       </div>
     </div>
   );

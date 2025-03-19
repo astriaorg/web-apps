@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,52 +8,29 @@ import {
   BreadcrumbSeparator,
   Button,
 } from "@repo/ui/shadcn-primitives";
-import { useState } from "react";
-import TokenPairsStep from "./token-pairs-step";
-import PriceRangeStep from "./price-range-step";
-import DepositAmountsStep from "./deposit-amounts-step";
+import React, { useState } from "react";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";
-import { useEvmChainData, useConfig } from "config";
-import React from "react";
-import { EvmCurrency } from "@repo/flame-types";
+import { useEvmChainData } from "config";
+import Link from "next/link";
+import {
+  TokenPairsStep,
+  PriceRangeStep,
+  DepositAmountsStep,
+} from "./components";
+import { FeeData, TokenPair } from "../../types";
+import { usePoolContext } from "pool/hooks";
 
-export interface StepProps {
-  step: number;
-  setStep: (thing: number) => void;
-  tokenPair: TokenPair;
-  selectedFeeTier: FeeData | undefined;
-}
-
-export interface TokenPair {
-  tokenOne: EvmCurrency | null;
-  tokenTwo: EvmCurrency | null;
-}
-
-// TODO - move to flame-types
-export interface FeeData {
-  id: number;
-  feePercent: string;
-  text: string;
-  tvl: string;
-  selectPercent: string;
-}
-
-export default function NewPoolPosition({
-  newPositionPage,
-  setNewPositionPage,
-}: {
-  newPositionPage: boolean;
-  setNewPositionPage: (newPositionPage: boolean) => void;
-}): React.ReactElement {
-  const { feeData } = useConfig();
+export const NewPosition = () => {
+  const { feeData } = usePoolContext();
   const userAccount = useAccount();
   const {
     selectedChain: { currencies },
   } = useEvmChainData();
   const [step, setStep] = useState(0);
+  const defaultFeeData = feeData.find((fee) => fee.feePercent === "0.3%");
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeData | undefined>(
-    feeData[0],
+    defaultFeeData,
   );
   const [tokenPair, setTokenPair] = useState<TokenPair>({
     tokenOne: currencies?.[0] || null,
@@ -64,20 +43,20 @@ export default function NewPoolPosition({
       tokenOne: currencies?.[0] || null,
       tokenTwo: null,
     });
-    setSelectedFeeTier(feeData[0]);
+    setSelectedFeeTier(defaultFeeData);
   };
 
   return (
-    <div>
+    <div className="max-w-[700px] w-full mx-auto">
       <div className="flex items-center justify-start mb-8">
-        {userAccount.address && newPositionPage && (
-          <div
+        {userAccount.address && (
+          <Link
             className="flex items-center gap-2 cursor-pointer hover:text-orange-soft transition"
-            onClick={() => setNewPositionPage(false)}
+            href="/pool"
           >
             <ChevronDownIcon className="rotate-[90deg]" />
             <h2 className="text-lg font-medium">Your Positions</h2>
-          </div>
+          </Link>
         )}
       </div>
       <div className="flex items-baseline justify-between">
@@ -140,4 +119,4 @@ export default function NewPoolPosition({
       </div>
     </div>
   );
-}
+};

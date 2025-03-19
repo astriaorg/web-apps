@@ -16,7 +16,7 @@ export const PlusIcon: React.FC<IconProps> = ({
       className={className}
       aria-hidden="true"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
     >
       <path
         strokeLinecap="round"

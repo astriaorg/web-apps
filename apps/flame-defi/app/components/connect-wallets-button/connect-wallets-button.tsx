@@ -3,7 +3,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
@@ -31,14 +31,14 @@ export default function ConnectWalletsButton() {
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              variant="default"
-              className="rounded-xl bg-button-gradient text-white transition border border-orange-soft hover:border-white w-[156px] text-base cursor-pointer"
+              variant="gradient"
+              className="text-base cursor-pointer w-[156px]"
             >
               <span>{isConnected ? "Connected" : "Connect"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="flex flex-col w-30 mr-12 text-white gap-3 p-5 bg-radial-dark w-[350px] border border-border"
+            className="flex flex-col mr-12 text-white gap-3 p-5 bg-radial-dark w-[350px] border border-border"
             side="bottom"
           >
             <div className="hover:text-orange-soft transition">
