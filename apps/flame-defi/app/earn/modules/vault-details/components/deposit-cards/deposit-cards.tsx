@@ -115,7 +115,7 @@ export const DepositCards = () => {
         <CardContent className="space-y-2">
           <CardLabel>
             <span className="flex-1">
-              Deposit {data?.vaultByAddress.asset.symbol}
+              {`Deposit ${data?.vaultByAddress.asset.symbol}`}
             </span>
             <div>
               <Image
