@@ -279,28 +279,33 @@ export class SwapRouterService extends GenericContractService {
 
       if (options.feeRecipient) {
         // unwrapWETH9WithFee to take fee on native token output
-        calls.push(this.encodeUnwrapWETHWithFeeCall(
-          minimumAmount, 
-          options.recipient, 
-          options.feeRecipient
-        ));
+        calls.push(
+          this.encodeUnwrapWETHWithFeeCall(
+            minimumAmount,
+            options.recipient,
+            options.feeRecipient,
+          ),
+        );
       } else {
         // use regular unwrapWETH9 with no fee
         calls.push(this.encodeUnwrapWETHCall(minimumAmount));
       }
     } else if (options.feeRecipient) {
       // if we have a fee recipient but not native output, use sweepTokenWithFee
-      const tokenOut = trade.route.path[trade.route.path.length - 1]?.address as `0x${string}`;
+      const tokenOut = trade.route.path[trade.route.path.length - 1]
+        ?.address as `0x${string}`;
       const minimumAmount = trade.outputAmount
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
-      
-      calls.push(this.encodeSweepTokenWithFeeCall(
-        tokenOut,
-        minimumAmount,
-        options.recipient,
-        options.feeRecipient
-      ));
+
+      calls.push(
+        this.encodeSweepTokenWithFeeCall(
+          tokenOut,
+          minimumAmount,
+          options.recipient,
+          options.feeRecipient,
+        ),
+      );
     }
 
     return await this.writeContractMethod(chainId, "multicall", [calls], value);
@@ -324,9 +329,9 @@ export class SwapRouterService extends GenericContractService {
    * This method is used when collecting fees on native token outputs (e.g., ETH, TIA).
    */
   private encodeUnwrapWETHWithFeeCall(
-    minimumAmount: string, 
-    recipient: `0x${string}`, 
-    feeRecipient: `0x${string}`
+    minimumAmount: string,
+    recipient: `0x${string}`,
+    feeRecipient: `0x${string}`,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -341,27 +346,33 @@ export class SwapRouterService extends GenericContractService {
    */
   private encodeSweepTokenWithFeeCall(
     token: `0x${string}`,
-    minimumAmount: string, 
-    recipient: `0x${string}`, 
-    feeRecipient: `0x${string}`
+    minimumAmount: string,
+    recipient: `0x${string}`,
+    feeRecipient: `0x${string}`,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "sweepTokenWithFee",
-      args: [token, BigInt(minimumAmount), recipient, DEFAULT_FEE_BIPS, feeRecipient],
+      args: [
+        token,
+        BigInt(minimumAmount),
+        recipient,
+        DEFAULT_FEE_BIPS,
+        feeRecipient,
+      ],
     });
   }
-  
+
   /**
    * Determines the appropriate recipient address based on swap options.
    */
   private determineRecipient(options: SwapOptions): `0x${string}` {
-    // For native output or when a fee recipient is specified, 
+    // For native output or when a fee recipient is specified,
     // we need to send to the router first
     if (options.isNativeOut || options.feeRecipient) {
       return this.contractAddress;
     }
-    
+
     // Otherwise we can send directly to the recipient
     return options.recipient;
   }
