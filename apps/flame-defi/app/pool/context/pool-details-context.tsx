@@ -83,12 +83,13 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   const [poolTokenData, setPoolTokenData] = useState<PoolTokenData[]>(
     positionData?.tokenData || [],
   );
-  const [selectedSymbol, setSelectedSymbol] = useState<string>(
-    poolTokenData[0]?.symbol || "",
-  );
 
   const poolTokenOne = poolTokenData[0] || defaultPoolToken;
   const poolTokenTwo = poolTokenData[1] || defaultPoolToken;
+
+  const [selectedSymbol, setSelectedSymbol] = useState<string>(
+    poolTokenOne?.symbol || "",
+  );
 
   const handleReverseTokenData = (symbol: string) => {
     const reversedTokenData = [...poolTokenData].reverse();
