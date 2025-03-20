@@ -102,8 +102,7 @@ export const BorrowCards = () => {
         <CardContent className="space-y-2">
           <CardLabel>
             <span className="flex-1 truncate">
-              Supply Collateral{" "}
-              {data?.marketByUniqueKey.collateralAsset?.symbol}
+              {`Supply Collateral ${data?.marketByUniqueKey.collateralAsset?.symbol}`}
             </span>
             <div>
               <Image
@@ -131,7 +130,7 @@ export const BorrowCards = () => {
         <CardContent className="space-y-2">
           <CardLabel>
             <span className="flex-1 truncate">
-              Borrow {data?.marketByUniqueKey.loanAsset.symbol}
+              {`Borrow ${data?.marketByUniqueKey.loanAsset.symbol}`}
             </span>
             <div>
               <Image
