@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { useEvmChainData } from "config";
 import { EvmCurrency } from "@repo/flame-types";
-import { Button, TokenSelector } from "@repo/ui/components";
-import { DialogTrigger } from "@repo/ui/shadcn-primitives";
+import { Button, TokenSelector, DialogTrigger } from "@repo/ui/components";
 import { CheckMarkIcon, ChevronDownIcon, EditIcon } from "@repo/ui/icons";
 import { FeeData, TokenPair } from "../../../types";
 import { usePoolContext } from "pool/hooks";

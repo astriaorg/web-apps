@@ -12,7 +12,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { FlameIcon } from "@repo/ui/icons";
 import { FlameNetwork } from "@repo/flame-types";
 
@@ -52,7 +52,7 @@ export default function NetworkSelector(): React.ReactElement {
           </div>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="bg-radial-dark">
+      <SelectContent className="bg-radial-dark border-border">
         <SelectGroup>
           <SelectLabel className="text-white text-base">Networks</SelectLabel>
           {networksList.map((network) => (

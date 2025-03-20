@@ -41,7 +41,6 @@
     "typescript": "5.5.4"
   },
   "exports": {
-    "./shadcn-primitives": "./src/shadcn-primitives/index.ts",
     "./components": "./src/components/index.ts",
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",

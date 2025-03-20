@@ -7,7 +7,7 @@ import {
   Drawer,
   DrawerContent,
   DrawerTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import MobileWalletConnect from "components/mobile-wallet-connect/mobile-wallet-connect";
 import { useConfig } from "config";
