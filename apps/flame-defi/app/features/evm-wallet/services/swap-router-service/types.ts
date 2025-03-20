@@ -145,4 +145,9 @@ export interface SwapOptions {
    * True when output token is native.
    */
   isNativeOut: boolean;
+  /**
+   * The address of the fee recipient. If provided, a 25 bips (0.25%) fee will be
+   * taken and sent to this address. When not provided, no fee is taken.
+   */
+  feeRecipient?: `0x${string}`;
 }

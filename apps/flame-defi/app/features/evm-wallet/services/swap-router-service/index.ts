@@ -26,6 +26,9 @@ import {
 } from "./types";
 import { GenericContractService } from "../generic-contract-service";
 
+// Default fee in basis points (25 bips = 0.25%)
+const DEFAULT_FEE_BIPS = 25n;
+
 export class SwapRouterService extends GenericContractService {
   private readonly chainConfig: Chain;
 
@@ -36,15 +39,15 @@ export class SwapRouterService extends GenericContractService {
 
   private getExactInputParams(
     trade: Trade,
-    recipient: `0x${string}`,
+    options: SwapOptions,
     slippageTolerance: number,
     deadline: bigint,
-    isNativeOut: boolean,
   ): {
     functionName: "exactInputSingle" | "exactInput";
     args: readonly [ExactInputSingleParams] | readonly [ExactInputParams];
   } {
     const isMultiHop = trade.route.pools.length > 1;
+    const recipient = this.determineRecipient(options);
 
     if (isMultiHop) {
       return {
@@ -52,7 +55,7 @@ export class SwapRouterService extends GenericContractService {
         args: [
           {
             path: this.encodePath(trade.route),
-            recipient: isNativeOut ? this.contractAddress : recipient,
+            recipient,
             amountIn: BigInt(trade.inputAmount.raw.toString()),
             amountOutMinimum: BigInt(
               trade.outputAmount
@@ -80,7 +83,7 @@ export class SwapRouterService extends GenericContractService {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isNativeOut ? this.contractAddress : recipient,
+          recipient,
           amountIn: BigInt(trade.inputAmount.raw.toString()),
           amountOutMinimum: BigInt(
             trade.outputAmount
@@ -96,15 +99,15 @@ export class SwapRouterService extends GenericContractService {
 
   private getExactOutputParams(
     trade: Trade,
-    recipient: `0x${string}`,
+    options: SwapOptions,
     slippageTolerance: number,
     deadline: bigint,
-    isNativeOut: boolean,
   ): {
     functionName: "exactOutputSingle" | "exactOutput";
     args: readonly [ExactOutputSingleParams] | readonly [ExactOutputParams];
   } {
     const isMultiHop = trade.route.pools.length > 1;
+    const recipient = this.determineRecipient(options);
 
     if (isMultiHop) {
       return {
@@ -112,7 +115,7 @@ export class SwapRouterService extends GenericContractService {
         args: [
           {
             path: this.encodePathReversed(trade.route),
-            recipient: isNativeOut ? this.contractAddress : recipient,
+            recipient,
             amountOut: BigInt(trade.outputAmount.raw.toString()),
             amountInMaximum: BigInt(
               trade.inputAmount
@@ -140,7 +143,7 @@ export class SwapRouterService extends GenericContractService {
           tokenIn,
           tokenOut,
           fee,
-          recipient: isNativeOut ? this.contractAddress : recipient,
+          recipient,
           amountOut: BigInt(trade.outputAmount.raw.toString()),
           amountInMaximum: BigInt(
             trade.inputAmount
@@ -215,17 +218,15 @@ export class SwapRouterService extends GenericContractService {
       trade.type === TRADE_TYPE.EXACT_IN
         ? this.getExactInputParams(
             trade,
-            options.recipient,
+            options,
             options.slippageTolerance,
             options.deadline,
-            options.isNativeOut,
           )
         : this.getExactOutputParams(
             trade,
-            options.recipient,
+            options,
             options.slippageTolerance,
             options.deadline,
-            options.isNativeOut,
           );
 
     // for simple erc20 token swaps
@@ -270,18 +271,46 @@ export class SwapRouterService extends GenericContractService {
     // add swap
     calls.push(this.encodeSwapCall(swapParams.functionName, swapParams.args));
 
-    // add unwrapWETH if needed
+    // add unwrap WETH or sweepTokenWithFee if needed
     if (options.isNativeOut) {
       const minimumAmount = trade.outputAmount
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
 
-      calls.push(this.encodeUnwrapWETHCall(minimumAmount));
+      if (options.feeRecipient) {
+        // unwrapWETH9WithFee to take fee on native token output
+        calls.push(this.encodeUnwrapWETHWithFeeCall(
+          minimumAmount, 
+          options.recipient, 
+          options.feeRecipient
+        ));
+      } else {
+        // use regular unwrapWETH9 with no fee
+        calls.push(this.encodeUnwrapWETHCall(minimumAmount));
+      }
+    } else if (options.feeRecipient) {
+      // if we have a fee recipient but not native output, use sweepTokenWithFee
+      const tokenOut = trade.route.path[trade.route.path.length - 1]?.address as `0x${string}`;
+      const minimumAmount = trade.outputAmount
+        .withSlippage(options.slippageTolerance, true)
+        .raw.toString();
+      
+      calls.push(this.encodeSweepTokenWithFeeCall(
+        tokenOut,
+        minimumAmount,
+        options.recipient,
+        options.feeRecipient
+      ));
     }
 
     return await this.writeContractMethod(chainId, "multicall", [calls], value);
   }
 
+  /**
+   * Encodes an unwrapWETH9 function call to be used in a multicall transaction.
+   * This method is used to unwrap WETH (wrapped native token) back to the native token (e.g., ETH, TIA)
+   * without taking a fee.
+   */
   private encodeUnwrapWETHCall(minimumAmount: string): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -290,6 +319,56 @@ export class SwapRouterService extends GenericContractService {
     });
   }
 
+  /**
+   * Encodes an unwrapWETH9WithFee function call to be used in a multicall transaction.
+   * This method is used when collecting fees on native token outputs (e.g., ETH, TIA).
+   */
+  private encodeUnwrapWETHWithFeeCall(
+    minimumAmount: string, 
+    recipient: `0x${string}`, 
+    feeRecipient: `0x${string}`
+  ): string {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "unwrapWETH9WithFee",
+      args: [BigInt(minimumAmount), recipient, DEFAULT_FEE_BIPS, feeRecipient],
+    });
+  }
+
+  /**
+   * Encodes a sweepTokenWithFee function call to be used in a multicall transaction.
+   * This method is used when collecting fees on token outputs that are not native tokens.
+   */
+  private encodeSweepTokenWithFeeCall(
+    token: `0x${string}`,
+    minimumAmount: string, 
+    recipient: `0x${string}`, 
+    feeRecipient: `0x${string}`
+  ): string {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "sweepTokenWithFee",
+      args: [token, BigInt(minimumAmount), recipient, DEFAULT_FEE_BIPS, feeRecipient],
+    });
+  }
+  
+  /**
+   * Determines the appropriate recipient address based on swap options.
+   */
+  private determineRecipient(options: SwapOptions): `0x${string}` {
+    // For native output or when a fee recipient is specified, 
+    // we need to send to the router first
+    if (options.isNativeOut || options.feeRecipient) {
+      return this.contractAddress;
+    }
+    
+    // Otherwise we can send directly to the recipient
+    return options.recipient;
+  }
+
+  /**
+   * Encodes a swap function call to be used in a multicall transaction.
+   */
   private encodeSwapCall(
     functionName:
       | "exactInputSingle"
