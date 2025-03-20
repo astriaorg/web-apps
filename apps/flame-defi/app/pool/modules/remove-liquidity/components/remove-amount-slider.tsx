@@ -1,9 +1,13 @@
 "use client";
 
 import { Badge, Slider } from "@repo/ui/components";
-import { useState} from "react";
+import { useState } from "react";
 
-export const RemoveAmountSlider = ({ handlePercentToRemove }: { handlePercentToRemove: (percent: number) => void }) => {
+export const RemoveAmountSlider = ({
+  handlePercentToRemove,
+}: {
+  handlePercentToRemove: (percent: number) => void;
+}) => {
   const [sliderValue, setSliderValue] = useState([25]);
 
   const handleChange = (value: number[]) => {
@@ -14,8 +18,8 @@ export const RemoveAmountSlider = ({ handlePercentToRemove }: { handlePercentToR
   };
 
   return (
-    <div className="flex gap-4 items-center justify-between w-full">
-      <div className="flex flex-col gap-4 w-1/2">
+    <div className="flex flex-col md:flex-row gap-4 items-center justify-between w-full">
+      <div className="flex flex-col gap-4 w-full mb-6 md:mb-0 md:w-1/2">
         <div className="flex flex-col gap-4">
           <span className="text-base font-medium">Current Amount:</span>
           <span className="text-5xl/12 font-dot">{sliderValue[0]}%</span>
@@ -52,7 +56,7 @@ export const RemoveAmountSlider = ({ handlePercentToRemove }: { handlePercentToR
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 w-1/2">
+      <div className="flex flex-col gap-4 w-full md:w-1/2">
         <Slider
           value={sliderValue}
           onValueChange={handleChange}

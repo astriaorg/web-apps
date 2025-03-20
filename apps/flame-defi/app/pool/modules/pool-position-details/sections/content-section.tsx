@@ -12,7 +12,7 @@ export const ContentSection = () => {
     selectedSymbol,
     handleReverseTokenData,
     symbols,
-    tokenData,
+    poolTokenData,
     collectAsWTIA,
     handleCollectAsWTIA,
     modalOpen,
@@ -35,17 +35,17 @@ export const ContentSection = () => {
             className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
           />
         </div>
-        <div className="flex gap-2 w-full">
-          <div className="flex flex-col gap-2 w-2/4">
+        <div className="flex flex-col md:flex-row gap-2 w-full">
+          <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Liquidity" value="$-" />
-            <TokenInfoCard tokenData={tokenData} showLiquidity={true} />
+            <TokenInfoCard poolTokenData={poolTokenData} showLiquidity={true} />
           </div>
-          <div className="flex flex-col gap-2 w-2/4">
+          <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Unclaimed fees" value="$-" />
-            <TokenInfoCard tokenData={tokenData} />
+            <TokenInfoCard poolTokenData={poolTokenData} />
           </div>
         </div>
-        <div className="w-2/4">
+        <div className="w-full md:w-2/4">
           <ConfirmationModal
             open={modalOpen}
             buttonText={"Collect Fees"}
@@ -58,7 +58,7 @@ export const ContentSection = () => {
           >
             <PoolTxnSteps
               txnStatus={TXN_STATUS.IDLE}
-              poolPositionData={tokenData}
+              poolPositionData={poolTokenData}
               txnHash={""}
               txnMsg={""}
             />

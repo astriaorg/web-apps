@@ -46,7 +46,7 @@ export interface PoolPositionsTableData {
   inRange: boolean;
 }
 
-export interface TokenPriceData {
+export interface PoolTokenData {
   symbol: string;
   unclaimedFees: number;
   liquidity: number;
@@ -54,7 +54,7 @@ export interface TokenPriceData {
 }
 
 export type Position = {
-  tokenData: TokenPriceData[];
+  tokenData: PoolTokenData[];
   feeTier: number;
   inRange: boolean;
   positionStatus: string;
@@ -73,7 +73,7 @@ export type PoolContextProps = {
 
 export type PoolDetailsContextProps = {
   positionDetails: Position | undefined;
-  tokenData: TokenPriceData[];
+  poolTokenData: PoolTokenData[];
   feeTier: string;
   symbols: string[];
   selectedSymbol: string;
@@ -84,11 +84,13 @@ export type PoolDetailsContextProps = {
   setTxnStatus: (txnStatus: TXN_STATUS) => void;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
+  poolTokenOne: PoolTokenData;
+  poolTokenTwo: PoolTokenData;
 };
 
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
-  poolPositionData: TokenPriceData[];
+  poolPositionData: PoolTokenData[];
   txnHash: string;
   txnMsg: string;
   addLiquidityInputValues?: string[];
@@ -107,11 +109,16 @@ export const getTxnType = (pathname: string): TxnType => {
   return TxnType.COLLECT_FEE;
 };
 
-export type TxnComponentProps = Pick<PoolTxnStepsProps, "poolPositionData" | "addLiquidityInputValues">;
-export type TxnLoaderProps = Pick<PoolTxnStepsProps, "poolPositionData" | "addLiquidityInputValues"> & { txnType: TxnType };
-export type TxnSuccessProps = Pick<PoolTxnStepsProps, "txnHash" | "poolPositionData">;
+export type TxnComponentProps = Pick<
+  PoolTxnStepsProps,
+  "poolPositionData" | "addLiquidityInputValues"
+>;
+export type TxnLoaderProps = Pick<
+  PoolTxnStepsProps,
+  "poolPositionData" | "addLiquidityInputValues"
+> & { txnType: TxnType };
+export type TxnSuccessProps = Pick<
+  PoolTxnStepsProps,
+  "txnHash" | "poolPositionData"
+>;
 export type TxnFailedProps = Pick<PoolTxnStepsProps, "txnMsg">;
-
-
-
-

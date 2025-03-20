@@ -9,13 +9,13 @@ import { usePoolDetailsContext } from "pool/hooks";
 import { useState } from "react";
 
 export const ContentSection = () => {
-  const { tokenData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
+  const { poolTokenData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
     usePoolDetailsContext();
   const [inputOne, setInputOne] = useState<string>("");
   const [inputTwo, setInputTwo] = useState<string>("");
-  
+
   return (
-    <div className="flex flex-col flex-1 mt-12">
+    <div className="flex flex-col flex-1 mt-0 md:mt-12">
       {/* 
         NOTE: Do we actually need the price range block in this component. Do people want this information here?
       <PriceRangeBlock
@@ -25,14 +25,21 @@ export const ContentSection = () => {
       /> */}
       <div className="flex flex-col gap-4 mt-4">
         <TokenLiquidityBlock />
-        <AddLiquidityInputsBlock inputOne={inputOne} inputTwo={inputTwo} setInputOne={setInputOne} setInputTwo={setInputTwo} />
+        <AddLiquidityInputsBlock
+          inputOne={inputOne}
+          inputTwo={inputTwo}
+          setInputOne={setInputOne}
+          setInputTwo={setInputTwo}
+        />
         <div className="flex w-full gap-4">
-          <div className="w-1/2" />
-          <div className="w-1/2">
+          <div className="hidden md:block md:w-1/2" />
+          <div className="w-full md:w-1/2">
             <ConfirmationModal
               open={modalOpen}
               buttonText={"Add liquidity"}
-              actionButtonText={txnStatus === TXN_STATUS.PENDING ? "Close" : "Add liquidity"}
+              actionButtonText={
+                txnStatus === TXN_STATUS.PENDING ? "Close" : "Add liquidity"
+              }
               showOpenButton={true}
               handleOpenModal={() => setModalOpen(true)}
               handleModalActionButton={() => {
@@ -48,7 +55,7 @@ export const ContentSection = () => {
             >
               <PoolTxnSteps
                 txnStatus={txnStatus}
-                poolPositionData={tokenData}
+                poolPositionData={poolTokenData}
                 addLiquidityInputValues={[inputOne, inputTwo]}
                 txnHash={""}
                 txnMsg={""}

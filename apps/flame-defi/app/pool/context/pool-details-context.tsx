@@ -1,7 +1,7 @@
 "use client";
-import { Position, TokenPriceData } from "pool/types";
-import { Positions } from "pool/types";
 
+import { Position, PoolTokenData } from "pool/types";
+import { Positions } from "pool/types";
 import { useParams } from "next/navigation";
 import { PoolDetailsContextProps } from "pool/types";
 import { createContext, PropsWithChildren, useState } from "react";
@@ -58,6 +58,13 @@ const positionDetails: Positions = {
   },
 };
 
+const defaultPoolToken = {
+  symbol: "",
+  unclaimedFees: 0,
+  liquidity: 0,
+  liquidityPercentage: 0,
+};
+
 export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   const params = useParams();
   const { formatNumber } = useIntl();
@@ -73,16 +80,19 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
     position,
   );
   const symbols = positionData?.tokenData.map((token) => token.symbol) || [];
-  const [tokenData, setTokenData] = useState<TokenPriceData[]>(
+  const [poolTokenData, setPoolTokenData] = useState<PoolTokenData[]>(
     positionData?.tokenData || [],
   );
   const [selectedSymbol, setSelectedSymbol] = useState<string>(
-    tokenData[0]?.symbol || "",
+    poolTokenData[0]?.symbol || "",
   );
 
+  const poolTokenOne = poolTokenData[0] || defaultPoolToken;
+  const poolTokenTwo = poolTokenData[1] || defaultPoolToken;
+
   const handleReverseTokenData = (symbol: string) => {
-    const reversedTokenData = [...tokenData].reverse();
-    setTokenData(reversedTokenData);
+    const reversedTokenData = [...poolTokenData].reverse();
+    setPoolTokenData(reversedTokenData);
     setSelectedSymbol(symbol);
   };
 
@@ -105,7 +115,7 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
       });
     }
     setPositionData(positionData);
-    setSelectedSymbol(tokenData[0]?.symbol || "");
+    setSelectedSymbol(poolTokenOne.symbol || "");
   };
 
   const feeTier = formatNumber(position?.feeTier || 0, {
@@ -117,7 +127,7 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
     <PoolDetailsContext.Provider
       value={{
         positionDetails: position,
-        tokenData,
+        poolTokenData,
         feeTier,
         symbols,
         selectedSymbol,
@@ -128,6 +138,8 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
         setTxnStatus,
         modalOpen,
         setModalOpen,
+        poolTokenOne,
+        poolTokenTwo,
       }}
     >
       {children}

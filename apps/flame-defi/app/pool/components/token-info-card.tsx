@@ -1,13 +1,13 @@
 import { Badge, TokenIcon } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { TokenPriceData } from "pool/types";
+import { PoolTokenData } from "pool/types";
 
 export function TokenInfoCard({
-  tokenData,
+  poolTokenData,
   showLiquidity = false,
   className,
 }: {
-  tokenData: TokenPriceData[];
+  poolTokenData: PoolTokenData[];
   showLiquidity?: boolean;
   className?: string;
 }) {
@@ -15,7 +15,7 @@ export function TokenInfoCard({
     <div className={cn("flex-1 bg-surface-1 rounded-lg p-6", className)}>
       <div className="flex flex-col space-y-4">
         <div className="flex flex-col gap-4">
-          {tokenData.map((token, index) => (
+          {poolTokenData.map((token, index) => (
             <div
               key={index}
               className="flex justify-between items-center gap-2"

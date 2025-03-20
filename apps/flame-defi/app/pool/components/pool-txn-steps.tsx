@@ -79,10 +79,13 @@ export const AddLiquidityTxnDetails = ({
                   {token.symbol}
                 </span>
                 <span>
-                  {formatNumber(parseFloat(addLiquidityInputValues?.[index] || '') || 0, {
-                    minimumFractionDigits: 6,
-                    maximumFractionDigits: 6,
-                  })}
+                  {formatNumber(
+                    parseFloat(addLiquidityInputValues?.[index] || "") || 0,
+                    {
+                      minimumFractionDigits: 6,
+                      maximumFractionDigits: 6,
+                    },
+                  )}
                 </span>
               </div>
             ))}
@@ -149,7 +152,7 @@ export const RemoveLiquidityTxnDetails = ({
               </div>
             ))}
             <span className="text-xs w-full text-left mt-2">
-            You will also collect fees earned from this position.
+              You will also collect fees earned from this position.
             </span>
           </div>
         </Skeleton>
@@ -158,7 +161,11 @@ export const RemoveLiquidityTxnDetails = ({
   );
 };
 
-const TxnLoader = ({ poolPositionData, addLiquidityInputValues, txnType }: TxnLoaderProps) => {
+const TxnLoader = ({
+  poolPositionData,
+  addLiquidityInputValues,
+  txnType,
+}: TxnLoaderProps) => {
   const { formatNumber } = useIntl();
 
   return (
@@ -174,7 +181,7 @@ const TxnLoader = ({ poolPositionData, addLiquidityInputValues, txnType }: TxnLo
             <>
               <span>Supplying</span>
               <span className="flex items-center gap-1">
-                {formatNumber(parseFloat(addLiquidityInputValues?.[0] || '0'), {
+                {formatNumber(parseFloat(addLiquidityInputValues?.[0] || "0"), {
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
@@ -182,7 +189,7 @@ const TxnLoader = ({ poolPositionData, addLiquidityInputValues, txnType }: TxnLo
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
-                {formatNumber(parseFloat(addLiquidityInputValues?.[1] || '0'), {
+                {formatNumber(parseFloat(addLiquidityInputValues?.[1] || "0"), {
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
@@ -262,23 +269,25 @@ export function PoolTxnSteps({
   const txnType = getTxnType(pathname);
   const TxnComponent = TxnDetails[txnType];
 
-
   return (
     <div>
       {txnStatus === TXN_STATUS.IDLE && (
-        <TxnComponent poolPositionData={poolPositionData} addLiquidityInputValues={addLiquidityInputValues} />
+        <TxnComponent
+          poolPositionData={poolPositionData}
+          addLiquidityInputValues={addLiquidityInputValues}
+        />
       )}
       {txnStatus === TXN_STATUS.PENDING && (
-        <TxnLoader poolPositionData={poolPositionData} txnType={txnType} addLiquidityInputValues={addLiquidityInputValues} />
+        <TxnLoader
+          poolPositionData={poolPositionData}
+          txnType={txnType}
+          addLiquidityInputValues={addLiquidityInputValues}
+        />
       )}
       {txnStatus === TXN_STATUS.SUCCESS && (
         <TxnSuccess poolPositionData={poolPositionData} txnHash={txnHash} />
       )}
-      {txnStatus === TXN_STATUS.FAILED && (
-        <TxnFailed
-          txnMsg={txnMsg}
-        />
-      )}
+      {txnStatus === TXN_STATUS.FAILED && <TxnFailed txnMsg={txnMsg} />}
     </div>
   );
 }

@@ -2,23 +2,28 @@ import { Badge, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
 import { usePoolDetailsContext } from "pool/hooks";
 import { PoolFeesAndLiquidityCard } from "./pool-fees-and-liquidity-card";
-import { TokenPriceData } from "pool/types";
+import { PoolTokenData } from "pool/types";
 
-export const TokenLiquidityBlock = ({ valuesToRemove }: { valuesToRemove: TokenPriceData[] }) => {
-  const { tokenData, feeTier } = usePoolDetailsContext();
+export const TokenLiquidityBlock = ({
+  liquidityToRemove,
+}: {
+  liquidityToRemove: PoolTokenData[];
+}) => {
+  const { poolTokenData, poolTokenOne, poolTokenTwo, feeTier } =
+    usePoolDetailsContext();
 
   return (
-    <div className="flex gap-4">
+    <div className="flex flex-col md:flex-row gap-4">
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4 justify-center">
         {/* TODO: loading state */}
         <Skeleton isLoading={false} className="">
           <div className="flex flex-col space-x-2">
             <MultiTokenIcon
-              symbols={tokenData.map((token) => token.symbol)}
+              symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
               size={24}
             />
             <h1 className="text-2xl/8 mt-2">
-              {tokenData[0]?.symbol}/{tokenData[1]?.symbol}
+              {poolTokenOne.symbol}/{poolTokenTwo.symbol}
             </h1>
           </div>
         </Skeleton>
@@ -39,7 +44,11 @@ export const TokenLiquidityBlock = ({ valuesToRemove }: { valuesToRemove: TokenP
         </Skeleton>
       </div>
       <div className="flex flex-col flex-1 bg-surface-1 rounded-lg p-4">
-        <PoolFeesAndLiquidityCard tokenData={tokenData} className="p-0" valuesToRemove={valuesToRemove}/>
+        <PoolFeesAndLiquidityCard
+          poolTokenData={poolTokenData}
+          className="p-0"
+          liquidityToRemove={liquidityToRemove}
+        />
       </div>
     </div>
   );
