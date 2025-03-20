@@ -9,6 +9,7 @@ import {
 } from "viem";
 import {
   GetQuoteResult,
+  HexString,
   Token,
   TokenAmount,
   TRADE_TYPE,
@@ -68,8 +69,8 @@ export class SwapRouterService extends GenericContractService {
       };
     }
 
-    const tokenIn = trade.route.path[0]?.address as `0x${string}`;
-    const tokenOut = trade.route.path[1]?.address as `0x${string}`;
+    const tokenIn = trade.route.path[0]?.address as HexString;
+    const tokenOut = trade.route.path[1]?.address as HexString;
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
@@ -128,8 +129,8 @@ export class SwapRouterService extends GenericContractService {
       };
     }
 
-    const tokenIn = trade.route.path[0]?.address as `0x${string}`;
-    const tokenOut = trade.route.path[1]?.address as `0x${string}`;
+    const tokenIn = trade.route.path[0]?.address as HexString;
+    const tokenOut = trade.route.path[1]?.address as HexString;
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
@@ -157,7 +158,7 @@ export class SwapRouterService extends GenericContractService {
     };
   }
 
-  private encodePath(route: Route): `0x${string}` {
+  private encodePath(route: Route): HexString {
     const encoded = route.pools
       .map((pool, i) => {
         const tokenIn = route.path[i];
@@ -174,7 +175,7 @@ export class SwapRouterService extends GenericContractService {
     return `0x${encoded}`;
   }
 
-  private encodePathReversed(route: Route): `0x${string}` {
+  private encodePathReversed(route: Route): HexString {
     const encoded = [...route.pools]
       .reverse()
       .map((pool, i, reversedPools) => {
@@ -205,13 +206,13 @@ export class SwapRouterService extends GenericContractService {
     chainId: number,
     trade: Trade,
     options: SwapOptions,
-  ): Promise<`0x${string}`> {
+  ): Promise<HexString> {
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
 
     const walletClient = await this.getWalletClient(chainId);
     const publicClient = await this.getPublicClient(chainId);
-    const signerAddress = walletClient.account?.address as `0x${string}`;
+    const signerAddress = walletClient.account?.address as HexString;
 
     // get swap parameters based on trade type
     const swapParams =
@@ -293,7 +294,7 @@ export class SwapRouterService extends GenericContractService {
     } else if (options.feeRecipient) {
       // if we have a fee recipient but not native output, use sweepTokenWithFee
       const tokenOut = trade.route.path[trade.route.path.length - 1]
-        ?.address as `0x${string}`;
+        ?.address as HexString;
       const minimumAmount = trade.outputAmount
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
@@ -330,8 +331,8 @@ export class SwapRouterService extends GenericContractService {
    */
   private encodeUnwrapWETHWithFeeCall(
     minimumAmount: string,
-    recipient: `0x${string}`,
-    feeRecipient: `0x${string}`,
+    recipient: HexString,
+    feeRecipient: HexString,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -345,10 +346,10 @@ export class SwapRouterService extends GenericContractService {
    * This method is used when collecting fees on token outputs that are not native tokens.
    */
   private encodeSweepTokenWithFeeCall(
-    token: `0x${string}`,
+    token: HexString,
     minimumAmount: string,
-    recipient: `0x${string}`,
-    feeRecipient: `0x${string}`,
+    recipient: HexString,
+    feeRecipient: HexString,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -366,7 +367,7 @@ export class SwapRouterService extends GenericContractService {
   /**
    * Determines the appropriate recipient address based on swap options.
    */
-  private determineRecipient(options: SwapOptions): `0x${string}` {
+  private determineRecipient(options: SwapOptions): HexString {
     // For native output or when a fee recipient is specified,
     // we need to send to the router first
     if (options.isNativeOut || options.feeRecipient) {
@@ -391,7 +392,7 @@ export class SwapRouterService extends GenericContractService {
       | readonly [ExactInputParams]
       | readonly [ExactOutputSingleParams]
       | readonly [ExactOutputParams],
-  ): `0x${string}` {
+  ): HexString {
     return encodeFunctionData({
       abi: this.abi,
       functionName,
@@ -434,7 +435,7 @@ export class SwapRouterService extends GenericContractService {
       | readonly [ExactOutputParams],
     value?: bigint,
     gas?: bigint,
-  ): Promise<`0x${string}`> {
+  ): Promise<HexString> {
     const walletClient = await this.getWalletClient(chainId);
 
     try {
