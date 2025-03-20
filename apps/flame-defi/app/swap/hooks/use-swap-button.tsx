@@ -205,6 +205,7 @@ export function useSwapButton({
         deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
         isNativeIn: topToken.token?.coinDenom.toLocaleLowerCase() === "tia",
         isNativeOut: bottomToken.token?.coinDenom.toLocaleLowerCase() === "tia",
+        // TODO - fee recipient
       };
 
       const tx = await swapRouterService.executeSwap(
