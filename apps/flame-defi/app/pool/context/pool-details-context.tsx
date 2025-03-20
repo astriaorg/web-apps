@@ -64,10 +64,14 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   const currentPoolDetails = getFromLocalStorage("poolDetails") || {};
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [collectAsWTIA, setCollectAsWTIA] = useState<boolean>(currentPoolDetails.collectAsWTIA || false);
+  const [collectAsWTIA, setCollectAsWTIA] = useState<boolean>(
+    currentPoolDetails.collectAsWTIA || false,
+  );
   const poolId = params["pool-id"];
   const position = positionDetails[Number(poolId)];
-  const [positionData, setPositionData] = useState<Position | undefined>(position);
+  const [positionData, setPositionData] = useState<Position | undefined>(
+    position,
+  );
   const symbols = positionData?.tokenData.map((token) => token.symbol) || [];
   const [tokenData, setTokenData] = useState<TokenPriceData[]>(
     positionData?.tokenData || [],
@@ -85,17 +89,17 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   const handleCollectAsWTIA = (collectAsWTIA: boolean) => {
     setCollectAsWTIA(collectAsWTIA);
     setInLocalStorage("poolDetails", {
-      collectAsWTIA: collectAsWTIA
+      collectAsWTIA: collectAsWTIA,
     });
-    if(collectAsWTIA) {
+    if (collectAsWTIA) {
       positionData?.tokenData.map((token) => {
-        if(token.symbol === "TIA") {
+        if (token.symbol === "TIA") {
           token.symbol = "WTIA";
         }
       });
     } else {
       positionData?.tokenData.map((token) => {
-        if(token.symbol === "WTIA") {
+        if (token.symbol === "WTIA") {
           token.symbol = "TIA";
         }
       });

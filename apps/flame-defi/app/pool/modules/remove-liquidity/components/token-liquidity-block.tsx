@@ -1,9 +1,10 @@
 import { Badge, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
-import { TokenInfoCard } from "pool/components";
 import { usePoolDetailsContext } from "pool/hooks";
+import { PoolFeesAndLiquidityCard } from "./pool-fees-and-liquidity-card";
+import { TokenPriceData } from "pool/types";
 
-export const TokenLiquidityBlock = () => {
+export const TokenLiquidityBlock = ({ valuesToRemove }: { valuesToRemove: TokenPriceData[] }) => {
   const { tokenData, feeTier } = usePoolDetailsContext();
 
   return (
@@ -37,13 +38,8 @@ export const TokenLiquidityBlock = () => {
           </div>
         </Skeleton>
       </div>
-      <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4">
-        <TokenInfoCard tokenData={tokenData} className="p-0" />
-        <hr className="border-t border-border mt-2 mb-2" />
-        <div className="flex justify-between">
-          <span className="text-base text-text-subdued">Fee Tier</span>
-          <span className="text-base text-text-subdued">{feeTier}</span>
-        </div>
+      <div className="flex flex-col flex-1 bg-surface-1 rounded-lg p-4">
+        <PoolFeesAndLiquidityCard tokenData={tokenData} className="p-0" valuesToRemove={valuesToRemove}/>
       </div>
     </div>
   );

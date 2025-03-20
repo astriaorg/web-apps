@@ -1,13 +1,16 @@
 "use client";
 
-import * as React from "react";
 import { Badge, Slider } from "@repo/ui/components";
+import { useState} from "react";
 
-export const RemoveAmountSlider = () => {
-  const [sliderValue, setSliderValue] = React.useState([25]);
+export const RemoveAmountSlider = ({ handlePercentToRemove }: { handlePercentToRemove: (percent: number) => void }) => {
+  const [sliderValue, setSliderValue] = useState([25]);
 
   const handleChange = (value: number[]) => {
-    setSliderValue(value);
+    if (value[0]) {
+      setSliderValue(value);
+      handlePercentToRemove(value[0]);
+    }
   };
 
   return (
@@ -20,29 +23,29 @@ export const RemoveAmountSlider = () => {
         <div className="flex gap-2">
           <Badge
             variant="default"
-            className="cursor-pointer"
-            onClick={() => setSliderValue([25])}
+            className="cursor-pointer hover:bg-grey-medium hover:text-white transition"
+            onClick={() => handleChange([25])}
           >
             25%
           </Badge>
           <Badge
             variant="default"
-            className="cursor-pointer"
-            onClick={() => setSliderValue([50])}
+            className="cursor-pointer hover:bg-grey-medium hover:text-white transition"
+            onClick={() => handleChange([50])}
           >
             50%
           </Badge>
           <Badge
             variant="default"
-            className="cursor-pointer"
-            onClick={() => setSliderValue([75])}
+            className="cursor-pointer hover:bg-grey-medium hover:text-white transition"
+            onClick={() => handleChange([75])}
           >
             75%
           </Badge>
           <Badge
             variant="default"
-            className="cursor-pointer"
-            onClick={() => setSliderValue([100])}
+            className="cursor-pointer hover:bg-grey-medium hover:text-white transition"
+            onClick={() => handleChange([100])}
           >
             Max
           </Badge>

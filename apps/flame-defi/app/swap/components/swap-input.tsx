@@ -59,7 +59,6 @@ export function SwapInput({
       ? handleFiatValue()
       : "-";
 
-
   return (
     <div
       className={`flex flex-col rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium focus-within:bg-background focus-within:border-grey-medium`}

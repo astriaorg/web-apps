@@ -1,5 +1,12 @@
 import { EvmCurrency, TXN_STATUS } from "@repo/flame-types";
 
+export interface AddLiquidityInputsBlockProps {
+  inputOne: string;
+  inputTwo: string;
+  setInputOne: (value: string) => void;
+  setInputTwo: (value: string) => void;
+}
+
 export interface StepProps {
   step: number;
   setStep: (thing: number) => void;
@@ -84,4 +91,27 @@ export type PoolTxnStepsProps = {
   poolPositionData: TokenPriceData[];
   txnHash: string;
   txnMsg: string;
+  addLiquidityInputValues?: string[];
 };
+
+export enum TxnType {
+  ADD_LIQUIDITY = "add-liquidity",
+  REMOVE_LIQUIDITY = "remove-liquidity",
+  COLLECT_FEE = "collect-fee",
+}
+
+export const getTxnType = (pathname: string): TxnType => {
+  if (pathname.includes(TxnType.ADD_LIQUIDITY)) return TxnType.ADD_LIQUIDITY;
+  if (pathname.includes(TxnType.REMOVE_LIQUIDITY))
+    return TxnType.REMOVE_LIQUIDITY;
+  return TxnType.COLLECT_FEE;
+};
+
+export type TxnComponentProps = Pick<PoolTxnStepsProps, "poolPositionData" | "addLiquidityInputValues">;
+export type TxnLoaderProps = Pick<PoolTxnStepsProps, "poolPositionData" | "addLiquidityInputValues"> & { txnType: TxnType };
+export type TxnSuccessProps = Pick<PoolTxnStepsProps, "txnHash" | "poolPositionData">;
+export type TxnFailedProps = Pick<PoolTxnStepsProps, "txnMsg">;
+
+
+
+

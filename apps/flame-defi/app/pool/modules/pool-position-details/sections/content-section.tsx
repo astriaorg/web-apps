@@ -8,8 +8,16 @@ import { Switch } from "@repo/ui/components";
 import { TXN_STATUS } from "@repo/flame-types";
 
 export const ContentSection = () => {
-  const { selectedSymbol, handleReverseTokenData, symbols, tokenData, collectAsWTIA, handleCollectAsWTIA, modalOpen, setModalOpen } =
-    usePoolDetailsContext();
+  const {
+    selectedSymbol,
+    handleReverseTokenData,
+    symbols,
+    tokenData,
+    collectAsWTIA,
+    handleCollectAsWTIA,
+    modalOpen,
+    setModalOpen,
+  } = usePoolDetailsContext();
 
   return (
     <div className="flex flex-col flex-1 mt-12">
@@ -19,14 +27,14 @@ export const ContentSection = () => {
         handleReverseTokenData={handleReverseTokenData}
       />
       <div className="flex flex-col gap-4 mt-4 items-end">
-      <div className="flex items-center gap-2 justify-end">
-            <span className="text-sm">Collect as WTIA</span>
-            <Switch
-              checked={collectAsWTIA}
-              onCheckedChange={() => handleCollectAsWTIA(!collectAsWTIA)}
-              className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
-            />
-          </div>
+        <div className="flex items-center gap-2 justify-end">
+          <span className="text-sm">Collect as WTIA</span>
+          <Switch
+            checked={collectAsWTIA}
+            onCheckedChange={() => handleCollectAsWTIA(!collectAsWTIA)}
+            className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+          />
+        </div>
         <div className="flex gap-2 w-full">
           <div className="flex flex-col gap-2 w-2/4">
             <PositionInfoCard leftLabel="Liquidity" value="$-" />

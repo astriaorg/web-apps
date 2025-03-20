@@ -3,18 +3,24 @@
 import { TokenLiquidityBlock } from "../components";
 import { Switch } from "@repo/ui/components";
 import { RemoveAmountSlider } from "../components";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolDetailsContext, useRemoveLiquidity } from "pool/hooks";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { TXN_STATUS } from "@repo/flame-types";
 import { PoolTxnSteps } from "pool/components";
 
 export const ContentSection = () => {
-  const { collectAsWTIA, handleCollectAsWTIA, tokenData, modalOpen, setModalOpen } = usePoolDetailsContext();
+  const {
+    collectAsWTIA,
+    handleCollectAsWTIA,
+    modalOpen,
+    setModalOpen,
+  } = usePoolDetailsContext();
+  const { valuesToRemove, handlePercentToRemove } = useRemoveLiquidity();
 
   return (
     <div className="flex flex-col flex-1 mt-12">
       <div className="flex flex-col gap-4 mt-4">
-        <TokenLiquidityBlock />
+        <TokenLiquidityBlock valuesToRemove={valuesToRemove}/>
         <div className="flex items-center justify-between mt-8">
           <h2 className="text-lg font-medium">Amount to Remove</h2>
 
@@ -28,7 +34,7 @@ export const ContentSection = () => {
           </div>
         </div>
         <div className="flex gap-4 w-full bg-surface-1 rounded-lg p-4">
-          <RemoveAmountSlider />
+          <RemoveAmountSlider handlePercentToRemove={handlePercentToRemove} />
         </div>
         <div className="flex w-full gap-4">
           <div className="w-1/2" />
@@ -47,7 +53,7 @@ export const ContentSection = () => {
             >
               <PoolTxnSteps
                 txnStatus={TXN_STATUS.IDLE}
-                poolPositionData={tokenData}
+                poolPositionData={valuesToRemove}
                 txnHash={""}
                 txnMsg={""}
               />
