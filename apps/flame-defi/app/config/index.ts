@@ -38,7 +38,7 @@ export interface AppConfig {
   // The default slippage tolerance for swaps.
   swapSlippageToleranceDefault: number;
   // The fee recipient address for swaps.
-  feeRecipientAddress?: HexString;
+  feeRecipient?: HexString;
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;

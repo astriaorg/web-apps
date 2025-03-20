@@ -50,7 +50,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     "NEXT_PUBLIC_FEEDBACK_FORM_URL",
   );
 
-  const feeRecipientAddress = getOptionalEnvVariable(
+  const feeRecipient = getOptionalEnvVariable(
     "NEXT_PUBLIC_FEE_RECIPIENT_ADDRESS",
   ) as HexString;
 
@@ -98,7 +98,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         poolURL,
         earnAPIURL,
         feedbackFormURL,
-        feeRecipientAddress,
+        feeRecipient,
         swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,

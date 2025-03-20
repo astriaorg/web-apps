@@ -77,7 +77,7 @@ export function useSwapButton({
 }: SwapButtonProps) {
   const { selectedChain } = useEvmChainData();
   const { approveToken, tokenAllowances } = useEvmWallet();
-  const { tokenApprovalAmount, feeRecipientAddress } = useConfig();
+  const { tokenApprovalAmount, feeRecipient } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSwapSlippageTolerance();
@@ -206,7 +206,7 @@ export function useSwapButton({
         deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
         isNativeIn: topToken.token?.coinDenom.toLocaleLowerCase() === "tia",
         isNativeOut: bottomToken.token?.coinDenom.toLocaleLowerCase() === "tia",
-        feeRecipientAddress,
+        feeRecipient,
       };
 
       const tx = await swapRouterService.executeSwap(
@@ -229,7 +229,7 @@ export function useSwapButton({
     selectedChain,
     wagmiConfig,
     slippageTolerance,
-    feeRecipientAddress,
+    feeRecipient,
   ]);
 
   const handleTokenApproval = async (tokenNeedingApproval: TokenInputState) => {
