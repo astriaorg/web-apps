@@ -24,7 +24,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "@radix-ui/react-slider": "^1.2.3",
     "framer-motion": "^12.5.0"
   }
 }
