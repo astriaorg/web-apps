@@ -51,7 +51,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   );
 
   const feeRecipient = getOptionalEnvVariable(
-    "NEXT_PUBLIC_FEE_RECIPIENT_ADDRESS",
+    "NEXT_PUBLIC_FEE_RECIPIENT",
   ) as HexString;
 
   // default to Mainnet
