@@ -2,7 +2,12 @@ import React, { useMemo } from "react";
 import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable, getOptionalEnvVariable } from "../env";
 import type { AppConfig } from "../index";
-import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
+import {
+  CosmosChains,
+  EvmChains,
+  FlameNetwork,
+  HexString,
+} from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
@@ -44,6 +49,10 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const feedbackFormURL = getOptionalEnvVariable(
     "NEXT_PUBLIC_FEEDBACK_FORM_URL",
   );
+
+  const feeRecipientAddress = getOptionalEnvVariable(
+    "NEXT_PUBLIC_FEE_RECIPIENT_ADDRESS",
+  ) as HexString;
 
   // default to Mainnet
   // TODO - remember in localStorage?
@@ -89,6 +98,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         poolURL,
         earnAPIURL,
         feedbackFormURL,
+        feeRecipientAddress,
         swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,

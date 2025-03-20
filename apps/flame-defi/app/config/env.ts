@@ -31,6 +31,9 @@ export const ENV = {
   NEXT_PUBLIC_FARO_APP_NAME: process.env.NEXT_PUBLIC_FARO_APP_NAME,
   NEXT_PUBLIC_FARO_APP_NAMESPACE: process.env.NEXT_PUBLIC_FARO_APP_NAMESPACE,
   VERCEL_DEPLOYMENT_ID: process.env.VERCEL_DEPLOYMENT_ID,
+  // fee recipient
+  NEXT_PUBLIC_FEE_RECIPIENT_ADDRESS:
+    process.env.NEXT_PUBLIC_FEE_RECIPIENT_ADDRESS,
 };
 
 /**
@@ -57,13 +60,9 @@ export const getEnvVariable = (
 
 /**
  * Get optional environment variable
- *
- * @param {string} key - key of environment variable
- * @returns {string | null} value of environment variable or null if not set
  */
 export const getOptionalEnvVariable = (
   key: keyof typeof ENV,
-): string | null => {
-  const value = ENV[key];
-  return value || null;
+): string | undefined => {
+  return ENV[key];
 };
