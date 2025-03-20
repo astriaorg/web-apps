@@ -292,6 +292,7 @@ export class SwapRouterService extends GenericContractService {
         calls.push(this.encodeUnwrapWETHCall(minimumAmount));
       }
     } else if (options.feeRecipient) {
+      // TODO - not falling into here properly?
       // if we have a fee recipient but not native output, use sweepTokenWithFee
       const tokenOut = trade.route.path[trade.route.path.length - 1]
         ?.address as HexString;

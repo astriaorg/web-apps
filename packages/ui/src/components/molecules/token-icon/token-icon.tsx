@@ -33,7 +33,6 @@ type TokenIconMap = {
   };
 };
 
-// FIXME - this is redundant and can be derived from the chain configs
 const tokenIcons: TokenIconMap = {
   [TokenSymbol.TIA]: {
     Icon: CelestiaIcon,
