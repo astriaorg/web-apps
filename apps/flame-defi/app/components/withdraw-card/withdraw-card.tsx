@@ -1,6 +1,6 @@
 "use client";
 
-import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
@@ -513,12 +513,13 @@ export default function WithdrawCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <ActionButton
-          callback={handleWithdraw}
+        <Button
+          variant="gradient"
+          onClick={handleWithdraw}
           disabled={isWithdrawDisabled}
-          isLoading={isLoading}
-          buttonText={"Withdraw"}
-        />
+        >
+          {isLoading ? "Processing..." : "Withdraw"}
+        </Button>
       </div>
     </div>
   );

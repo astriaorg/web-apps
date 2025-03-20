@@ -1,7 +1,7 @@
 "use client";
 
 import { Decimal } from "@cosmjs/math";
-import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
   EditIcon,
@@ -525,12 +525,13 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <ActionButton
-          callback={handleDeposit}
+        <Button
+          variant="gradient"
+          onClick={handleDeposit}
           disabled={isDepositDisabled}
-          isLoading={isLoading}
-          buttonText={"Deposit"}
-        />
+        >
+          {isLoading ? "Processing..." : "Deposit"}
+        </Button>
       </div>
     </div>
   );

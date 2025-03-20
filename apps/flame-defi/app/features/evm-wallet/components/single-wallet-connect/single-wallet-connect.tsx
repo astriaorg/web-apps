@@ -1,15 +1,17 @@
 import { useAccount } from "wagmi";
-import { CopyToClipboardButton, Skeleton } from "@repo/ui/components";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
+  CopyToClipboardButton,
+  Skeleton,
   Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
+import { useEvmWallet } from "../../hooks/use-evm-wallet";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import { useEvmChainData } from "config";
+
 export function SingleWalletContent({
   address,
   handleClose,
@@ -118,7 +120,7 @@ export default function SingleWalletConnect() {
 
   return userAccount.address ? (
     <Popover>
-      <PopoverTrigger className="flex items-center gap-2 transition border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 h-[36px] cursor-pointer ">
+      <PopoverTrigger className="flex items-center gap-2 border border-border hover:border-orange-soft rounded-xl transition px-3 py-2 cursor-pointer h-[40px]">
         <div className="flex items-center gap-2">
           <FlameIcon size={16} />
           <span className="text-white text-base font-normal">
@@ -135,9 +137,9 @@ export default function SingleWalletConnect() {
     </Popover>
   ) : (
     <Button
-      variant="default"
+      variant="gradient"
       onClick={() => connectEvmWallet()}
-      className="rounded-xl bg-button-gradient text-white transition border border-transparent hover:border-white text-base w-[156px]"
+      className="text-base w-[156px]"
     >
       <span>Connect</span>
     </Button>

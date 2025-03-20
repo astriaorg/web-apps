@@ -1,51 +1,86 @@
 "use client";
 
-import { StepProps } from "./new-pool-position";
+import { StepProps } from "../../../types";
 import { EditIcon, MinusIcon, PlusIcon } from "@repo/ui/icons";
-import { ActionButton, ToggleSwitch } from "@repo/ui/components";
+import { Button, ToggleSwitch } from "@repo/ui/components";
 import { useCallback, useEffect, useState } from "react";
-import AreaChartWithRange from "./area-chart-with-range";
-import { Button } from "@repo/ui/shadcn-primitives";
-import MiniAreaChart from "./mini-area-chart";
+import { AreaChartWithRange } from "./area-chart-with-range";
+import { MiniAreaChart } from "./mini-area-chart";
 
-export default function PriceRangeStep({
+const PlusMinusButtons = ({
+  handlePriceChange,
+}: {
+  handlePriceChange: (action: "increase" | "decrease") => void;
+}) => {
+  return (
+    <div className="flex flex-col justify-between">
+      <div
+        className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
+        onClick={() => handlePriceChange("increase")}
+      >
+        <PlusIcon size={20} />
+      </div>
+      <div
+        className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
+        onClick={() => handlePriceChange("decrease")}
+      >
+        <MinusIcon size={20} />
+      </div>
+    </div>
+  );
+};
+
+enum PRICE_RANGE_OPTIONS {
+  FULL_RANGE = "Full Range",
+  CUSTOM_RANGE = "Custom Range",
+}
+
+export const PriceRangeStep = ({
   step,
   setStep,
   tokenPair,
-}: StepProps): React.ReactElement {
+}: StepProps): React.ReactElement => {
   const { tokenOne, tokenTwo } = tokenPair;
   const [selectedToken, setSelectedToken] = useState(tokenOne?.coinDenom || "");
-  const [selectedRange, setSelectedRange] = useState("Full Range");
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(Infinity);
+  const [selectedRange, setSelectedRange] = useState(
+    PRICE_RANGE_OPTIONS.FULL_RANGE,
+  );
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  useEffect(() => {
+    if (minPrice !== "" || maxPrice !== "") {
+      setSelectedRange(PRICE_RANGE_OPTIONS.CUSTOM_RANGE);
+    }
+  }, [minPrice, maxPrice]);
 
   useEffect(() => {
     if (step === 0) {
       setSelectedToken(tokenOne?.coinDenom || "");
-      setSelectedRange("Full Range");
-      setMinPrice(0);
-      setMaxPrice(Infinity);
+      setSelectedRange(PRICE_RANGE_OPTIONS.FULL_RANGE);
+      setMinPrice("");
+      setMaxPrice("");
     }
   }, [step, tokenOne]);
 
   useEffect(() => {
-    if (selectedRange === "Full Range") {
-      setMinPrice(0);
-      setMaxPrice(Infinity);
+    if (selectedRange === PRICE_RANGE_OPTIONS.FULL_RANGE) {
+      setMinPrice("");
+      setMaxPrice("");
     } else {
-      setMinPrice(0.001);
-      setMaxPrice(4);
+      setMinPrice("0.001");
+      setMaxPrice("4");
     }
   }, [selectedRange]);
 
   const handleMinPriceChange = useCallback(
     (action: "increase" | "decrease") => {
       if (action === "increase") {
-        setMinPrice(minPrice + 0.01);
+        setMinPrice((prev) => (parseFloat(prev) + 0.01).toString());
       } else {
-        const newPrice = minPrice - 0.01;
+        const newPrice = parseFloat(minPrice) - 0.01;
         if (newPrice >= 0) {
-          setMinPrice(newPrice);
+          setMinPrice(newPrice.toString());
         }
       }
     },
@@ -54,14 +89,14 @@ export default function PriceRangeStep({
 
   const handleMaxPriceChange = useCallback(
     (action: "increase" | "decrease") => {
-      if (maxPrice === Infinity) {
-        setMaxPrice(0);
+      if (maxPrice === "") {
+        setMaxPrice("0");
       } else if (action === "increase") {
-        setMaxPrice(maxPrice + 0.01);
+        setMaxPrice((prev) => (parseFloat(prev) + 0.01).toString());
       } else {
-        const newPrice = maxPrice - 0.01;
+        const newPrice = parseFloat(maxPrice) - 0.01;
         if (newPrice >= 0) {
-          setMaxPrice(newPrice);
+          setMaxPrice(newPrice.toString());
         }
       }
     },
@@ -113,14 +148,19 @@ export default function PriceRangeStep({
           </div>
           <div className="h-[40px]">
             <ToggleSwitch
-              toggleOptions={["Full Range", "Custom Range"]}
+              toggleOptions={[
+                PRICE_RANGE_OPTIONS.FULL_RANGE,
+                PRICE_RANGE_OPTIONS.CUSTOM_RANGE,
+              ]}
               className="text-sm mt-8"
               selectedOption={selectedRange}
-              setSelectedOption={setSelectedRange}
+              setSelectedOption={(option) =>
+                setSelectedRange(option as PRICE_RANGE_OPTIONS)
+              }
             />
           </div>
           <p className="text-sm text-grey-light mt-4 mb-4">
-            {selectedRange === "Full Range"
+            {selectedRange === PRICE_RANGE_OPTIONS.FULL_RANGE
               ? "Providing full range liquidity ensures continuous market participation across all possible prices, offering simplicity but with potential for higher impermanent loss."
               : "Custom range allows you to concentrate your liquidity within specific price bounds, enhancing capital efficiency and fee earnings but requiring more active management."}
           </p>
@@ -138,7 +178,7 @@ export default function PriceRangeStep({
                   className="normalize-input w-[75%] sm:max-w-[75%] text-[36px]"
                   placeholder="0"
                   value={minPrice}
-                  onChange={(e) => setMinPrice(Number(e.target.value))}
+                  onChange={(e) => setMinPrice(e.target.value)}
                 />
                 <span className="text-sm text-grey-light font-medium">
                   {selectedToken === tokenOne?.coinDenom
@@ -147,20 +187,9 @@ export default function PriceRangeStep({
                   per {selectedToken}
                 </span>
               </div>
-              <div className="flex flex-col justify-between">
-                <div
-                  className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
-                  onClick={() => handleMinPriceChange("increase")}
-                >
-                  <PlusIcon size={20} />
-                </div>
-                <div
-                  className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
-                  onClick={() => handleMinPriceChange("decrease")}
-                >
-                  <MinusIcon size={20} />
-                </div>
-              </div>
+              {selectedRange === PRICE_RANGE_OPTIONS.CUSTOM_RANGE && (
+                <PlusMinusButtons handlePriceChange={handleMinPriceChange} />
+              )}
             </div>
             <div className="flex-1 flex bg-semi-white rounded-r-2xl p-4 border border-solid border-border">
               <div className="flex flex-col">
@@ -172,7 +201,7 @@ export default function PriceRangeStep({
                   className="normalize-input w-[75%] sm:max-w-[75%] text-[36px]"
                   placeholder="∞"
                   value={maxPrice}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  onChange={(e) => setMaxPrice(e.target.value)}
                 />
                 <span className="text-sm text-grey-light font-medium">
                   {selectedToken === tokenOne?.coinDenom
@@ -181,29 +210,16 @@ export default function PriceRangeStep({
                   per {selectedToken}
                 </span>
               </div>
-              <div className="flex flex-col justify-between">
-                <div
-                  className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
-                  onClick={() => handleMaxPriceChange("increase")}
-                >
-                  <PlusIcon size={20} />
-                </div>
-                <div
-                  className="cursor-pointer p-2 bg-grey-dark rounded-full text-white hover:bg-grey-medium transition"
-                  onClick={() => handleMaxPriceChange("decrease")}
-                >
-                  <MinusIcon size={20} />
-                </div>
-              </div>
+              {selectedRange === PRICE_RANGE_OPTIONS.CUSTOM_RANGE && (
+                <PlusMinusButtons handlePriceChange={handleMaxPriceChange} />
+              )}
             </div>
           </div>
-          <ActionButton
-            className="mt-8 w-full"
-            buttonText="Continue"
-            callback={() => setStep(2)}
-          />
+          <Button className="mt-8 w-full" onClick={() => setStep(2)}>
+            Continue
+          </Button>
         </div>
       )}
     </div>
   );
-}
+};

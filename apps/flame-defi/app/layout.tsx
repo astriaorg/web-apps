@@ -7,6 +7,7 @@ import "./globals.css";
 import Navbar from "components/navbar/navbar";
 import localFont from "next/font/local";
 import { Observability } from "./features/observability";
+import { RouteAnimation } from "components/route-animation/route-animation";
 
 export const metadata = {
   title: "Flame App",
@@ -221,9 +222,11 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <SideTag label="Get Help" />
-            <main className="flex flex-col grow items-center w-full">
-              {children}
-            </main>
+            <RouteAnimation>
+              <main className="flex flex-col grow items-center w-full">
+                {children}
+              </main>
+            </RouteAnimation>
             <Footer />
           </div>
         </Providers>
