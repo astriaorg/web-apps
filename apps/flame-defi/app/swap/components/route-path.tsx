@@ -5,7 +5,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { V3PoolInRoute } from "@repo/flame-types";
 import { MultiTokenIcon, Skeleton, TokenIcon } from "@repo/ui/components";
 import { useIntl } from "react-intl";

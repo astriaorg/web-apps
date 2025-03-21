@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Switch,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { useConfig } from "config";
 import { useState } from "react";

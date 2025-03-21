@@ -11,7 +11,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { useEvmChainData } from "config";
 
 interface ConnectEvmWalletButtonProps {
