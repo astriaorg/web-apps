@@ -1,19 +1,32 @@
 import {
-  Button,
   Card,
   CardContent,
   CardFigureInput,
   CardLabel,
+  Skeleton,
+  useAssetAmountInput,
 } from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import Big from "big.js";
 import { Image } from "components/image";
+import { WalletActionButton } from "earn/components/wallet-action-button";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
+import { useAccount } from "wagmi";
 
 export const DepositCards = () => {
   const {
     query: { data, isPending },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
+  const { isConnected } = useAccount();
+
+  const { amount, onInput, onReset, isValid } = useAssetAmountInput({
+    balance: "0",
+    minimum: "0",
+    asset: data?.vaultByAddress.asset,
+  });
 
   const items = useMemo<
     {
@@ -109,6 +122,12 @@ export const DepositCards = () => {
     ];
   }, [data]);
 
+  useEffect(() => {
+    if (!isConnected) {
+      onReset();
+    }
+  }, [isConnected, onReset]);
+
   return (
     <div className="flex flex-col gap-2">
       <Card isLoading={isPending}>
@@ -127,15 +146,28 @@ export const DepositCards = () => {
               />
             </div>
           </CardLabel>
-          <CardFigureInput placeholder="0.00" />
-          <CardLabel className="text-typography-light text-sm/3">
-            <FormattedNumber
-              value={0}
-              minimumFractionDigits={2}
-              maximumFractionDigits={2}
-              style="currency"
-              currency="USD"
+          <Skeleton isLoading={isPending}>
+            <CardFigureInput
+              value={amount.value}
+              onInput={onInput}
+              readOnly={!isConnected}
             />
+          </Skeleton>
+          <CardLabel className="text-typography-light text-sm/3">
+            {data?.vaultByAddress.asset.priceUsd && amount.value
+              ? formatAbbreviatedNumber(
+                  new Big(data.vaultByAddress.asset.priceUsd ?? 0)
+                    .mul(amount.value)
+                    .toFixed(),
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    style: "currency",
+                    currency: "USD",
+                  },
+                  { threshold: "million" },
+                )
+              : "-"}
           </CardLabel>
         </CardContent>
       </Card>
@@ -157,7 +189,11 @@ export const DepositCards = () => {
           ))}
         </CardContent>
       </Card>
-      <Button>Connect Wallet</Button>
+      <Skeleton isLoading={isPending}>
+        <WalletActionButton disabled={isConnected ? isValid : false}>
+          Deposit
+        </WalletActionButton>
+      </Skeleton>
     </div>
   );
 };

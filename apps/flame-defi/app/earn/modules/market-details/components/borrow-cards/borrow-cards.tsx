@@ -1,19 +1,57 @@
 import {
-  Button,
   Card,
   CardContent,
   CardFigureInput,
   CardLabel,
+  Skeleton,
+  useAssetAmountInput,
 } from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import Big from "big.js";
 import { Image } from "components/image";
+import { WalletActionButton } from "earn/components/wallet-action-button";
+import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
-import { useMemo } from "react";
+import { redirect } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
+import { useAccount } from "wagmi";
 
 export const BorrowCards = () => {
   const {
     query: { data, isPending },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
+  const { isConnected } = useAccount();
+
+  useEffect(() => {
+    // TODO: Should probably use a middleware redirect.
+    if (!isPending && !data?.marketByUniqueKey.collateralAsset) {
+      redirect(ROUTES.MARKET_LIST);
+    }
+  }, [isPending, data?.marketByUniqueKey.collateralAsset]);
+
+  const {
+    amount: amountSupply,
+    onInput: onInputSupply,
+    onReset: onResetSupply,
+    isValid: isValidSupply,
+  } = useAssetAmountInput({
+    balance: "0",
+    minimum: "0",
+    asset: data?.marketByUniqueKey.collateralAsset ?? undefined,
+  });
+
+  const {
+    amount: amountBorrow,
+    onInput: onInputBorrow,
+    onReset: onResetBorrow,
+    isValid: isValidBorrow,
+  } = useAssetAmountInput({
+    balance: "0",
+    minimum: "0",
+    asset: data?.marketByUniqueKey.collateralAsset ?? undefined,
+  });
 
   const items = useMemo<
     {
@@ -96,6 +134,13 @@ export const BorrowCards = () => {
     ];
   }, [data]);
 
+  useEffect(() => {
+    if (!isConnected) {
+      onResetSupply();
+      onResetBorrow();
+    }
+  }, [isConnected, onResetSupply, onResetBorrow]);
+
   return (
     <div className="flex flex-col gap-2">
       <Card isLoading={isPending}>
@@ -114,15 +159,27 @@ export const BorrowCards = () => {
               />
             </div>
           </CardLabel>
-          <CardFigureInput placeholder="0.00" />
+          <CardFigureInput
+            value={amountSupply.value}
+            onInput={onInputSupply}
+            readOnly={!isConnected}
+          />
           <CardLabel className="text-typography-light text-sm/3">
-            <FormattedNumber
-              value={0}
-              minimumFractionDigits={2}
-              maximumFractionDigits={2}
-              style="currency"
-              currency="USD"
-            />
+            {data?.marketByUniqueKey.collateralAsset?.priceUsd &&
+            amountSupply.value
+              ? formatAbbreviatedNumber(
+                  new Big(data.marketByUniqueKey.collateralAsset.priceUsd ?? 0)
+                    .mul(amountSupply.value)
+                    .toFixed(),
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    style: "currency",
+                    currency: "USD",
+                  },
+                  { threshold: "million" },
+                )
+              : "-"}
           </CardLabel>
         </CardContent>
       </Card>
@@ -142,15 +199,26 @@ export const BorrowCards = () => {
               />
             </div>
           </CardLabel>
-          <CardFigureInput placeholder="0.00" />
+          <CardFigureInput
+            value={amountBorrow.value}
+            onInput={onInputBorrow}
+            readOnly={!isConnected}
+          />
           <CardLabel className="text-typography-light text-sm/3">
-            <FormattedNumber
-              value={0}
-              minimumFractionDigits={2}
-              maximumFractionDigits={2}
-              style="currency"
-              currency="USD"
-            />
+            {data?.marketByUniqueKey.loanAsset.priceUsd && amountBorrow.value
+              ? formatAbbreviatedNumber(
+                  new Big(data.marketByUniqueKey.loanAsset.priceUsd ?? 0)
+                    .mul(amountBorrow.value)
+                    .toFixed(),
+                  {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    style: "currency",
+                    currency: "USD",
+                  },
+                  { threshold: "million" },
+                )
+              : "-"}
           </CardLabel>
         </CardContent>
       </Card>
@@ -172,7 +240,13 @@ export const BorrowCards = () => {
           ))}
         </CardContent>
       </Card>
-      <Button>Connect Wallet</Button>
+      <Skeleton isLoading={isPending}>
+        <WalletActionButton
+          disabled={isConnected ? !isValidSupply && !isValidBorrow : false}
+        >
+          Deposit
+        </WalletActionButton>
+      </Skeleton>
     </div>
   );
 };

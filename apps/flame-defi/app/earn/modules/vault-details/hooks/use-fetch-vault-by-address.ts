@@ -12,6 +12,7 @@ const query = graphql(`
         logoURI
         name
         symbol
+        priceUsd
       }
       liquidity {
         underlying
