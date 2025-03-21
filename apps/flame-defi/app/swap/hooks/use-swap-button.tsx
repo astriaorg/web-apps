@@ -15,6 +15,7 @@ import {
 import {
   evmChainToRainbowKitChain,
   GetQuoteResult,
+  HexString,
   TokenAllowance,
   TokenInputState,
   tokenStateToBig,
@@ -76,7 +77,7 @@ export function useSwapButton({
 }: SwapButtonProps) {
   const { selectedChain } = useEvmChainData();
   const { approveToken, tokenAllowances } = useEvmWallet();
-  const { tokenApprovalAmount } = useConfig();
+  const { tokenApprovalAmount, feeRecipient } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSwapSlippageTolerance();
@@ -84,7 +85,7 @@ export function useSwapButton({
   const { connectEvmWallet } = useEvmWallet();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
-  const [txnHash, setTxnHash] = useState<`0x${string}` | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
   const tokenNeedingApproval = getTokenNeedingApproval(
@@ -195,7 +196,7 @@ export function useSwapButton({
 
       const swapRouterService = createSwapRouterService(
         wagmiConfig,
-        swapRouterAddress as `0x${string}`,
+        swapRouterAddress as HexString,
         evmChainToRainbowKitChain(selectedChain) as Chain,
       );
 
@@ -205,6 +206,7 @@ export function useSwapButton({
         deadline: BigInt(Math.floor(Date.now() / 1000) + 1800), // 30 minutes from now
         isNativeIn: topToken.token?.coinDenom.toLocaleLowerCase() === "tia",
         isNativeOut: bottomToken.token?.coinDenom.toLocaleLowerCase() === "tia",
+        feeRecipient,
       };
 
       const tx = await swapRouterService.executeSwap(
@@ -227,6 +229,7 @@ export function useSwapButton({
     selectedChain,
     wagmiConfig,
     slippageTolerance,
+    feeRecipient,
   ]);
 
   const handleTokenApproval = async (tokenNeedingApproval: TokenInputState) => {

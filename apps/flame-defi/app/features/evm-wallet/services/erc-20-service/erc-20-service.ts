@@ -1,5 +1,6 @@
 import type { Config } from "@wagmi/core";
 import { type Address, erc20Abi, parseUnits } from "viem";
+import { HexString } from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 
 export class Erc20Service extends GenericContractService {
@@ -21,7 +22,7 @@ export class Erc20Service extends GenericContractService {
     contractAddress: Address,
     tokenApprovalAmount: string,
     decimals: number,
-  ): Promise<`0x${string}`> {
+  ): Promise<HexString> {
     const amountAsBigInt = parseUnits(tokenApprovalAmount, decimals);
     // NOTE: Reset this to 0 whenever we want to reset the approval
     // const amountAsBigInt = BigInt('0');

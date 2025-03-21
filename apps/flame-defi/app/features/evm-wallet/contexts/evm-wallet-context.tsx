@@ -28,6 +28,7 @@ import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
+  HexString,
   TokenAllowance,
   TRADE_TYPE,
 } from "@repo/flame-types";
@@ -62,7 +63,7 @@ export interface EvmWalletContextProps {
   approveToken: (
     token: EvmCurrency,
     value: string,
-  ) => Promise<`0x${string}` | null>;
+  ) => Promise<HexString | null>;
   usdcToNativeQuote: { value: string; symbol: string };
   quoteLoading: boolean;
 }
@@ -379,7 +380,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       }
       const erc20Service = createErc20Service(
         wagmiConfig,
-        token.erc20ContractAddress as `0x${string}`,
+        token.erc20ContractAddress as HexString,
       );
 
       const txHash = await erc20Service.approveToken(
@@ -427,7 +428,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       if (currency.erc20ContractAddress) {
         const erc20Service = createErc20Service(
           wagmiConfig,
-          currency.erc20ContractAddress as `0x${string}`,
+          currency.erc20ContractAddress as HexString,
         );
         try {
           const allowance = await erc20Service.getTokenAllowance(

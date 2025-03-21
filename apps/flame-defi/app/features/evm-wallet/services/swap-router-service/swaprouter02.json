@@ -1,5 +1,33 @@
 [
   {
+    "name": "sweepTokenWithFee",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "name": "amountMinimum",
+        "type": "uint256"
+      },
+      {
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "name": "feeBips",
+        "type": "uint256"
+      },
+      {
+        "name": "feeRecipient",
+        "type": "address"
+      }
+    ],
+    "outputs": []
+  },
+  {
     "name": "exactInputSingle",
     "type": "function",
     "stateMutability": "payable",
@@ -200,6 +228,30 @@
       {
         "name": "amountMinimum",
         "type": "uint256"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "name": "unwrapWETH9WithFee",
+    "type": "function",
+    "stateMutability": "payable",
+    "inputs": [
+      {
+        "name": "amountMinimum",
+        "type": "uint256"
+      },
+      {
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "name": "feeBips",
+        "type": "uint256"
+      },
+      {
+        "name": "feeRecipient",
+        "type": "address"
       }
     ],
     "outputs": []
