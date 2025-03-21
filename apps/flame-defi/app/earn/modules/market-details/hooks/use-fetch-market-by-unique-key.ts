@@ -11,6 +11,7 @@ const query = graphql(`
         logoURI
         name
         symbol
+        priceUsd
       }
       creationTimestamp
       lltv
@@ -19,8 +20,10 @@ const query = graphql(`
         logoURI
         name
         symbol
+        priceUsd
       }
       state {
+        borrowAssets
         collateralAssets
         liquidityAssets
         liquidityAssetsUsd

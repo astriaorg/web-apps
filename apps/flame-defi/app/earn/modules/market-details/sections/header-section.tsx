@@ -19,7 +19,7 @@ export const HeaderSection = () => {
 
         {status !== "error" && (
           <div className="flex flex-col space-y-3">
-            <Skeleton isLoading={isPending}>
+            <Skeleton isLoading={isPending} className="w-64">
               <MarketAssets
                 assetA={data?.marketByUniqueKey.collateralAsset as Maybe<Asset>}
                 assetB={data?.marketByUniqueKey.loanAsset as Maybe<Asset>}
@@ -27,13 +27,13 @@ export const HeaderSection = () => {
                 className="text-3xl/8 font-medium"
               />
             </Skeleton>
-            {data?.marketByUniqueKey.collateralAsset && (
-              <Skeleton isLoading={isPending} className="w-40">
+            <Skeleton isLoading={isPending} className="w-40 h-5">
+              {data?.marketByUniqueKey.collateralAsset && (
                 <Badge variant="secondary" className="whitespace-nowrap w-min">
                   {data?.marketByUniqueKey.collateralAsset?.name}
                 </Badge>
-              </Skeleton>
-            )}
+              )}
+            </Skeleton>
           </div>
         )}
       </div>

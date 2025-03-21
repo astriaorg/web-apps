@@ -62,48 +62,68 @@ export const FORMAT_ABBREVIATED_NUMBER_SUFFIX = {
   THOUSAND: "K",
 };
 
+type Threshold = "thousand" | "million" | "billion";
+const DEFAULT_THRESHOLD: Threshold = "thousand";
+const THRESHOLD_TO_NUMBER_MAP = {
+  thousand: THOUSAND,
+  million: MILLION,
+  billion: BILLION,
+};
+
+export type FormatAbbreviatedNumberOptions = {
+  /**
+   * The threshold for when to start abbreviating the number.
+   *
+   * If not provided, the number will always be abbreviated.
+   */
+  threshold?: Threshold;
+};
+
 /**
  * @param value A numeric string to format.
  * @returns The formatted numeric string and the suffix (K, M, B) to make large numbers more readable.
  */
 export const formatAbbreviatedNumber = (
   value: string,
-  {
-    minimumFractionDigits,
-    showFullThousandValue,
-  }: {
-    minimumFractionDigits?: number;
-    showFullThousandValue?: boolean;
-  } = {},
+  { threshold = DEFAULT_THRESHOLD }: FormatAbbreviatedNumberOptions = {
+    threshold: DEFAULT_THRESHOLD,
+  },
 ) => {
   const big = new Big(value);
   const absolute = big.abs();
 
-  if (absolute.gte(BILLION)) {
+  if (
+    absolute.gte(BILLION) &&
+    absolute.gt(THRESHOLD_TO_NUMBER_MAP[threshold])
+  ) {
     return {
-      value: big.div(BILLION).toFixed(minimumFractionDigits),
+      value: big.div(BILLION).toFixed(),
       suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.BILLION,
     };
   }
 
-  if (absolute.gte(MILLION)) {
+  if (
+    absolute.gte(MILLION) &&
+    absolute.gt(THRESHOLD_TO_NUMBER_MAP[threshold])
+  ) {
     return {
-      value: big.div(MILLION).toFixed(minimumFractionDigits),
+      value: big.div(MILLION).toFixed(),
       suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.MILLION,
     };
   }
 
-  if (absolute.gte(THOUSAND)) {
+  if (
+    absolute.gte(THOUSAND) &&
+    absolute.gt(THRESHOLD_TO_NUMBER_MAP[threshold])
+  ) {
     return {
-      value: showFullThousandValue
-        ? big.toFixed(minimumFractionDigits)
-        : big.div(THOUSAND).toFixed(minimumFractionDigits),
+      value: big.div(THOUSAND).toFixed(),
       suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND,
     };
   }
 
   return {
-    value: big.toFixed(minimumFractionDigits),
+    value: big.toFixed(),
     suffix: "",
   };
 };
