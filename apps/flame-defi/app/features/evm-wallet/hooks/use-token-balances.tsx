@@ -61,7 +61,7 @@ export const useTokenBalances = (
               selectedToken.coinDecimals,
             );
             updateBalance(
-              balanceStr.toString() || "0",
+              balanceStr,
               selectedToken.coinDenom,
               index,
             );

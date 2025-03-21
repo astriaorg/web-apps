@@ -38,7 +38,7 @@ export const CollectFeeTxnDetails = ({ poolTokens }: TxnComponentProps) => {
                   {token.symbol}
                 </span>
                 <span>
-                  {formatNumber(token.unclaimedFees || 0, {
+                  {formatNumber(token.unclaimedFees, {
                     minimumFractionDigits: 6,
                     maximumFractionDigits: 6,
                   })}
@@ -77,7 +77,7 @@ export const AddLiquidityTxnDetails = ({
                 </span>
                 <span>
                   {formatNumber(
-                    parseFloat(addLiquidityInputValues?.[index] || "") || 0,
+                    parseFloat(addLiquidityInputValues?.[index] || "0"),
                     {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
@@ -117,7 +117,7 @@ export const RemoveLiquidityTxnDetails = ({
                 </span>
                 <span className="flex items-center gap-2">
                   <span>
-                    {formatNumber(token.liquidity || 0, {
+                    {formatNumber(token.liquidity, {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
                     })}
@@ -139,7 +139,7 @@ export const RemoveLiquidityTxnDetails = ({
                 </span>
                 <span className="flex items-center gap-2">
                   <span>
-                    {formatNumber(token.unclaimedFees || 0, {
+                    {formatNumber(token.unclaimedFees, {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
                     })}
@@ -184,7 +184,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens?.[0]?.symbol}</span>
+                <span>{poolTokens[0]?.symbol}</span>
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
@@ -192,7 +192,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens?.[1]?.symbol}</span>
+                <span>{poolTokens[1]?.symbol}</span>
               </span>
             </>
           )}
