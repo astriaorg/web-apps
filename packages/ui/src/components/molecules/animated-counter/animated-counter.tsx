@@ -39,7 +39,7 @@ export const AnimatedCounter = ({
 
       return formatNumber(value, options);
     },
-    [formatNumber],
+    [formatNumber, formatAbbreviatedNumber],
   );
 
   useEffect(() => {
