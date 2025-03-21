@@ -3,17 +3,17 @@
 import { Position, PoolToken } from "pool/types";
 import { Positions } from "pool/types";
 import { useParams } from "next/navigation";
-import { PoolDetailsContextProps } from "pool/types";
+import { PoolPositionContextProps } from "pool/types";
 import { createContext, PropsWithChildren, useState } from "react";
 import { useIntl } from "react-intl";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { TXN_STATUS } from "@repo/flame-types";
 
-export const PoolDetailsContext = createContext<
-  PoolDetailsContextProps | undefined
+export const PoolPositionContext = createContext<
+  PoolPositionContextProps | undefined
 >(undefined);
 
-const mockPositionDetails: Positions = {
+const mockPosition: Positions = {
   0: {
     tokens: [
       {
@@ -65,7 +65,9 @@ const defaultPoolToken = {
   liquidityPercentage: 0,
 };
 
-export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
+export const PoolPositionContextProvider = ({
+  children,
+}: PropsWithChildren) => {
   const params = useParams();
   const { formatNumber } = useIntl();
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
@@ -75,7 +77,7 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
     currentPoolSettings.collectAsNative || false,
   );
   const poolId = params["pool-id"];
-  const position = mockPositionDetails[Number(poolId)];
+  const position = mockPosition[Number(poolId)];
   const [positionDetails, setPositionDetails] = useState<Position | undefined>(
     position,
   );
@@ -125,9 +127,9 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   });
 
   return (
-    <PoolDetailsContext.Provider
+    <PoolPositionContext.Provider
       value={{
-        positionDetails: position,
+        position,
         poolTokens,
         feeTier,
         symbols,
@@ -144,6 +146,6 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-    </PoolDetailsContext.Provider>
+    </PoolPositionContext.Provider>
   );
 };

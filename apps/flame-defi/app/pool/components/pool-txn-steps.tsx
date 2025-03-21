@@ -10,7 +10,7 @@ import {
 import { ErrorIcon } from "@repo/ui/icons";
 import { useEvmChainData } from "config";
 import { usePathname } from "next/navigation";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import {
   PoolTxnStepsProps,
   TxnComponentProps,
@@ -21,7 +21,7 @@ import {
 } from "pool/types";
 import { useIntl } from "react-intl";
 
-export const CollectFeeTxnDetails = ({ poolTokens }: TxnComponentProps) => {
+export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
   return (
     <>
@@ -55,12 +55,13 @@ export const CollectFeeTxnDetails = ({ poolTokens }: TxnComponentProps) => {
   );
 };
 
-export const AddLiquidityTxnDetails = ({
+export const AddLiquidityTxnSummary = ({
   poolTokens,
   addLiquidityInputValues,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
-  const { feeTier } = usePoolDetailsContext();
+  const { feeTier } = usePoolPositionContext();
+
   return (
     <>
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
@@ -98,7 +99,7 @@ export const AddLiquidityTxnDetails = ({
   );
 };
 
-export const RemoveLiquidityTxnDetails = ({
+export const RemoveLiquidityTxnSummary = ({
   poolTokens,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
@@ -252,9 +253,9 @@ const TxnFailed = ({ txnMsg }: TxnFailedProps) => {
 };
 
 const TxnDetails = {
-  [POOL_TXN_TYPE.ADD_LIQUIDITY]: AddLiquidityTxnDetails,
-  [POOL_TXN_TYPE.REMOVE_LIQUIDITY]: RemoveLiquidityTxnDetails,
-  [POOL_TXN_TYPE.COLLECT_FEE]: CollectFeeTxnDetails,
+  [POOL_TXN_TYPE.ADD_LIQUIDITY]: AddLiquidityTxnSummary,
+  [POOL_TXN_TYPE.REMOVE_LIQUIDITY]: RemoveLiquidityTxnSummary,
+  [POOL_TXN_TYPE.COLLECT_FEE]: CollectFeeTxnSummary,
 } as const;
 
 export function PoolTxnSteps({

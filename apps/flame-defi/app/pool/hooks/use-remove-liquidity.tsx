@@ -1,9 +1,9 @@
 import { PoolToken } from "pool/types";
 import { useState, useEffect } from "react";
-import { usePoolDetailsContext } from ".";
+import { usePoolPositionContext } from ".";
 
 export const useRemoveLiquidity = () => {
-  const { poolTokens, collectAsNative } = usePoolDetailsContext();
+  const { poolTokens, collectAsNative } = usePoolPositionContext();
 
   const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>(() =>
     poolTokens.map((token) => ({

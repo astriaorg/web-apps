@@ -1,5 +1,5 @@
 import { useTokenBalances } from "features/evm-wallet";
-import { usePoolDetailsContext } from "./use-pool-details-context";
+import { usePoolPositionContext } from "./use-pool-position-context";
 import { useAccount } from "wagmi";
 import { useEvmChainData } from "config";
 import { useEffect } from "react";
@@ -8,7 +8,7 @@ export const useGetPoolTokenBalances = () => {
   const userAccount = useAccount();
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
-  const { poolTokenOne, poolTokenTwo } = usePoolDetailsContext();
+  const { poolTokenOne, poolTokenTwo } = usePoolPositionContext();
 
   const tokenOneBalance = currencies.find(
     (currency) =>

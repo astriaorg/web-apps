@@ -1,14 +1,14 @@
 import { HeaderSection } from "./sections/header-section";
 import { ContentSection } from "./sections/content-section";
-import { PoolDetailsContextProvider } from "pool/context/pool-details-context";
+import { PoolPositionContextProvider } from "pool/context/pool-position-context";
 
 export const AddLiquidity = () => {
   return (
-    <PoolDetailsContextProvider>
+    <PoolPositionContextProvider>
       <div className="flex flex-col">
         <HeaderSection />
         <ContentSection />
       </div>
-    </PoolDetailsContextProvider>
+    </PoolPositionContextProvider>
   );
 };

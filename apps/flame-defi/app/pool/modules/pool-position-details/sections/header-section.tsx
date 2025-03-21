@@ -3,13 +3,13 @@
 import { Badge, Button, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { ArrowLeftIcon, DotIcon } from "@repo/ui/icons";
 import { usePathname, useRouter } from "next/navigation";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import { ROUTES } from "../../../constants/routes";
 
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { poolTokenOne, poolTokenTwo, feeTier } = usePoolDetailsContext();
+  const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">

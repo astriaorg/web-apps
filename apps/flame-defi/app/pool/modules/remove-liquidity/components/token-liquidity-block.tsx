@@ -1,6 +1,6 @@
 import { Badge, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import { PoolFeesAndLiquidityCard } from "./pool-fees-and-liquidity-card";
 import { PoolToken } from "pool/types";
 
@@ -10,7 +10,7 @@ export const TokenLiquidityBlock = ({
   liquidityToRemove: PoolToken[];
 }) => {
   const { poolTokens, poolTokenOne, poolTokenTwo, feeTier } =
-    usePoolDetailsContext();
+    usePoolPositionContext();
 
   return (
     <div className="flex flex-col md:flex-row gap-4">

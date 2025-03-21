@@ -1,7 +1,7 @@
 "use client";
 
 import { PositionInfoCard } from "../components";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { Switch } from "@repo/ui/components";
@@ -17,7 +17,7 @@ export const ContentSection = () => {
     handleCollectAsNative,
     modalOpen,
     setModalOpen,
-  } = usePoolDetailsContext();
+  } = usePoolPositionContext();
 
   return (
     <div className="flex flex-col flex-1 mt-12">

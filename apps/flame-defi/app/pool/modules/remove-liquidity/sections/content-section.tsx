@@ -3,14 +3,14 @@
 import { TokenLiquidityBlock } from "../components";
 import { Switch } from "@repo/ui/components";
 import { RemoveAmountSlider } from "../components";
-import { usePoolDetailsContext, useRemoveLiquidity } from "pool/hooks";
+import { usePoolPositionContext, useRemoveLiquidity } from "pool/hooks";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { TXN_STATUS } from "@repo/flame-types";
 import { PoolTxnSteps } from "pool/components";
 
 export const ContentSection = () => {
   const { collectAsNative, handleCollectAsNative, modalOpen, setModalOpen } =
-    usePoolDetailsContext();
+    usePoolPositionContext();
   const { liquidityToRemove, handlePercentToRemove } = useRemoveLiquidity();
 
   return (

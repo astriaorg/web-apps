@@ -5,12 +5,12 @@ import { ConfirmationModal } from "components/confirmation-modal/confirmation-mo
 import { TokenLiquidityBlock, AddLiquidityInputsBlock } from "../components";
 import { PoolTxnSteps } from "pool/components";
 import { TXN_STATUS } from "@repo/flame-types";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import { useState } from "react";
 
 export const ContentSection = () => {
   const { poolTokens, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
-    usePoolDetailsContext();
+    usePoolPositionContext();
   const [inputOne, setInputOne] = useState<string>("");
   const [inputTwo, setInputTwo] = useState<string>("");
 

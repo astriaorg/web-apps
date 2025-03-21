@@ -1,5 +1,5 @@
 import { Card, CardFigureInput, TokenIcon } from "@repo/ui/components";
-import { useGetPoolTokenBalances, usePoolDetailsContext } from "pool/hooks";
+import { useGetPoolTokenBalances, usePoolPositionContext } from "pool/hooks";
 import { AddLiquidityInputsBlockProps } from "pool/types";
 import { useIntl } from "react-intl";
 
@@ -10,7 +10,7 @@ export const AddLiquidityInputsBlock = ({
   setInputTwo,
 }: AddLiquidityInputsBlockProps) => {
   const { formatNumber } = useIntl();
-  const { poolTokenOne, poolTokenTwo } = usePoolDetailsContext();
+  const { poolTokenOne, poolTokenTwo } = usePoolPositionContext();
   const { balances, tokenOneBalance, tokenTwoBalance } =
     useGetPoolTokenBalances();
 
