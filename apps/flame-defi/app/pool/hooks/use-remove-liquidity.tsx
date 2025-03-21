@@ -5,12 +5,11 @@ import { usePoolDetailsContext } from ".";
 export const useRemoveLiquidity = () => {
   const { poolTokens, collectAsNative } = usePoolDetailsContext();
 
-  const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>(
-    () =>
-      poolTokens.map((token) => ({
-        ...token,
-        liquidity: token.liquidity * 0.25, // Set initial liquidity to 25% to match the slider initial value
-      })),
+  const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>(() =>
+    poolTokens.map((token) => ({
+      ...token,
+      liquidity: token.liquidity * 0.25, // Set initial liquidity to 25% to match the slider initial value
+    })),
   );
 
   useEffect(() => {

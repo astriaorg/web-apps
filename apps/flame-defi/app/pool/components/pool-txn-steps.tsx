@@ -21,9 +21,7 @@ import {
 } from "pool/types";
 import { useIntl } from "react-intl";
 
-export const CollectFeeTxnDetails = ({
-  poolTokens,
-}: TxnComponentProps) => {
+export const CollectFeeTxnDetails = ({ poolTokens }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
   return (
     <>

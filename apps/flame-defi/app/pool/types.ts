@@ -124,5 +124,4 @@ export type TxnLoaderProps = {
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
   txnHash: string;
-}
-
+};
