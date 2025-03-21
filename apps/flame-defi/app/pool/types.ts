@@ -35,7 +35,7 @@ export interface PriceCardProps {
   className?: string;
 }
 
-export interface poolPositionsRecord {
+export interface PoolPositionsRecord {
   position: {
     id: number;
     symbol: string;
@@ -68,7 +68,7 @@ export type Positions = {
 
 export type PoolContextProps = {
   feeData: FeeData[];
-  poolPositionsRecord: poolPositionsRecord[];
+  poolPositionsRecord: PoolPositionsRecord[];
 };
 
 export type PoolPositionContextProps = {

@@ -1,7 +1,7 @@
 import { MultiTokenIcon } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
-import { poolPositionsRecord } from "pool/types";
+import { PoolPositionsRecord } from "pool/types";
 import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { usePoolContext } from "./use-pool-context";
@@ -17,7 +17,7 @@ export const usePositionsTable = () => {
     [poolPositionsRecord, hideClosedPositions],
   );
 
-  const columnHelper = createColumnHelper<poolPositionsRecord>();
+  const columnHelper = createColumnHelper<PoolPositionsRecord>();
   const columns = useMemo(() => {
     return [
       columnHelper.accessor("position", {
