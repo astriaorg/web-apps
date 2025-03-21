@@ -60,11 +60,7 @@ export const useTokenBalances = (
               balanceRes,
               selectedToken.coinDecimals,
             );
-            updateBalance(
-              balanceStr.toString() || "0",
-              selectedToken.coinDenom,
-              index,
-            );
+            updateBalance(balanceStr, selectedToken.coinDenom, index);
           } else {
             // this is the native token
             let balance = "0";

@@ -630,3 +630,7 @@ export enum TXN_STATUS {
   SUCCESS = "success",
   FAILED = "failed",
 }
+
+export type TxnFailedProps = {
+  txnMsg: string | undefined;
+};

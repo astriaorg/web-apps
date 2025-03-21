@@ -7,7 +7,7 @@ export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
 );
 
-const poolPositionsTableData = [
+const poolPositionsRecord = [
   {
     position: {
       id: 0,
@@ -66,7 +66,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
     <PoolContext.Provider
       value={{
         feeData,
-        poolPositionsTableData,
+        poolPositionsRecord,
       }}
     >
       {children}

@@ -22,7 +22,8 @@
         "big.js",
         "react",
         "react-dom",
-        "react-intl"
+        "react-intl",
+        "motion"
       ],
       "dependencyTypes": [
         "prod"
