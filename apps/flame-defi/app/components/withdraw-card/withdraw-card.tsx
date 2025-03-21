@@ -1,9 +1,9 @@
 "use client";
 
-import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useConfig as useWagmiConfig } from "wagmi";
-import { Button, Dropdown } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
+import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { Dropdown } from "components/dropdown";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import {
   AddErc20ToWalletButton,
@@ -11,9 +11,9 @@ import {
   useEvmWallet,
 } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
-import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
-import { AnimatedArrowSpacer } from "@repo/ui/components";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useConfig as useWagmiConfig } from "wagmi";
 
 export default function WithdrawCard(): React.ReactElement {
   const wagmiConfig = useWagmiConfig();

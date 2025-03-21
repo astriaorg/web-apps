@@ -55,7 +55,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       skip: (currentPage - 1) * PAGE_SIZE,
       orderBy,
       orderDirection,
-      where: { search: debouncedSearch || null, lltv_gte: 1 },
+      // TODO: Get chain ID from wallet context.
+      where: { search: debouncedSearch || null, lltv_gte: 1, chainId_in: [1] },
     },
   });
 

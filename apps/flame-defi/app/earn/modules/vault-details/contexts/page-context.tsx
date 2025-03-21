@@ -1,19 +1,20 @@
-import { getTimeseriesOptions } from "earn/modules/vault-details/components/charts/charts.utils";
+import { ChartInterval } from "@repo/ui/components";
+import {
+  CHART_TYPE,
+  Charts as ChartsType,
+  getTimeseriesOptions,
+} from "earn/components/charts";
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
-import { CHART_TYPE, ChartInterval } from "earn/modules/vault-details/types";
+import { TOTAL_ASSETS_OPTION } from "earn/modules/vault-details/types";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 
-type Charts = {
-  [key in keyof typeof CHART_TYPE]: {
-    selectedInterval: ChartInterval;
-    setSelectedInterval: (value: ChartInterval) => void;
-    query: ReturnType<typeof useFetchVaultByAddressHistoricalState>;
-  };
-};
+type Charts = ChartsType<
+  ReturnType<typeof useFetchVaultByAddressHistoricalState>
+>;
 
 export interface PageContextProps extends PropsWithChildren {
   address: string;
@@ -37,16 +38,17 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     [CHART_TYPE.APY]: {
       selectedInterval: ChartInterval;
     };
-    [CHART_TYPE.TOTAL_SUPPLY]: {
-      // TODO: Add currency selector when we support more currencies.
+    [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: ChartInterval;
+      selectedOption: string;
     };
   }>({
     [CHART_TYPE.APY]: {
       selectedInterval: "3m",
     },
-    [CHART_TYPE.TOTAL_SUPPLY]: {
+    [CHART_TYPE.TOTAL_ASSETS]: {
       selectedInterval: "3m",
+      selectedOption: TOTAL_ASSETS_OPTION.ASSET,
     },
   });
 
@@ -64,12 +66,12 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
-  const queryTotalSupplyChart = useFetchVaultByAddressHistoricalState({
+  const queryTotalAssetsChart = useFetchVaultByAddressHistoricalState({
     variables: {
       address: params.address,
-      type: CHART_TYPE.TOTAL_SUPPLY,
+      type: CHART_TYPE.TOTAL_ASSETS,
       options: getTimeseriesOptions(
-        charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+        charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval,
       ),
     },
   });
@@ -78,13 +80,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     if (
       query.isError ||
       queryAPYChart.isError ||
-      queryTotalSupplyChart.isError
+      queryTotalAssetsChart.isError
     ) {
       return "error";
     }
 
     return "success";
-  }, [query.isError, queryAPYChart.isError, queryTotalSupplyChart.isError]);
+  }, [query.isError, queryAPYChart.isError, queryTotalAssetsChart.isError]);
 
   return (
     <PageContext.Provider
@@ -103,17 +105,28 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
             },
             query: queryAPYChart,
           },
-          [CHART_TYPE.TOTAL_SUPPLY]: {
-            selectedInterval: charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval,
+          [CHART_TYPE.TOTAL_ASSETS]: {
+            selectedInterval: charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval,
             setSelectedInterval: (value: ChartInterval) => {
               setCharts({
                 ...charts,
-                [CHART_TYPE.TOTAL_SUPPLY]: {
+                [CHART_TYPE.TOTAL_ASSETS]: {
+                  ...charts[CHART_TYPE.TOTAL_ASSETS],
                   selectedInterval: value,
                 },
               });
             },
-            query: queryTotalSupplyChart,
+            selectedOption: charts[CHART_TYPE.TOTAL_ASSETS].selectedOption,
+            setSelectedOption: (value: string) => {
+              setCharts({
+                ...charts,
+                [CHART_TYPE.TOTAL_ASSETS]: {
+                  ...charts[CHART_TYPE.TOTAL_ASSETS],
+                  selectedOption: value,
+                },
+              });
+            },
+            query: queryTotalAssetsChart,
           },
         },
         status,
