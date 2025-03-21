@@ -1,15 +1,15 @@
 import { TokenIcon } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { PoolTokenData } from "pool/types";
+import { PoolToken } from "pool/types";
 import { useIntl } from "react-intl";
 export const PoolFeesAndLiquidityCard = ({
-  poolTokenData,
+  poolTokens,
   className,
   liquidityToRemove,
 }: {
-  poolTokenData: PoolTokenData[];
+  poolTokens: PoolToken[];
   className: string;
-  liquidityToRemove: PoolTokenData[];
+  liquidityToRemove: PoolToken[];
 }) => {
   const { formatNumber } = useIntl();
 
@@ -41,7 +41,7 @@ export const PoolFeesAndLiquidityCard = ({
         </div>
         <hr className="border-t border-border mt-4 mb-4" />
         <div className="flex flex-col gap-4">
-          {poolTokenData.map((token, index) => (
+          {poolTokens.map((token, index) => (
             <div
               key={index}
               className="flex justify-between items-center gap-2"

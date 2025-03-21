@@ -9,7 +9,7 @@ import { usePoolDetailsContext } from "pool/hooks";
 import { useState } from "react";
 
 export const ContentSection = () => {
-  const { poolTokenData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
+  const { poolTokens, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
     usePoolDetailsContext();
   const [inputOne, setInputOne] = useState<string>("");
   const [inputTwo, setInputTwo] = useState<string>("");
@@ -55,7 +55,7 @@ export const ContentSection = () => {
             >
               <PoolTxnSteps
                 txnStatus={txnStatus}
-                poolPositionData={poolTokenData}
+                poolTokens={poolTokens}
                 addLiquidityInputValues={[inputOne, inputTwo]}
                 txnHash={""}
                 txnMsg={""}

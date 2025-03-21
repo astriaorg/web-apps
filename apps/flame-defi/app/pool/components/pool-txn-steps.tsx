@@ -1,6 +1,6 @@
 "use client";
 
-import { TXN_STATUS } from "@repo/flame-types";
+import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
 import {
   BlockLoader,
   Skeleton,
@@ -14,16 +14,15 @@ import { usePoolDetailsContext } from "pool/hooks";
 import {
   PoolTxnStepsProps,
   TxnComponentProps,
-  TxnFailedProps,
   TxnLoaderProps,
   TxnSuccessProps,
-  TxnType,
+  POOL_TXN_TYPE,
   getTxnType,
 } from "pool/types";
 import { useIntl } from "react-intl";
 
 export const CollectFeeTxnDetails = ({
-  poolPositionData,
+  poolTokens,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
   return (
@@ -31,7 +30,7 @@ export const CollectFeeTxnDetails = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg gap-2">
-            {poolPositionData.map((token) => (
+            {poolTokens.map((token) => (
               <div
                 key={token.symbol}
                 className="flex items-center justify-between"
@@ -59,7 +58,7 @@ export const CollectFeeTxnDetails = ({
 };
 
 export const AddLiquidityTxnDetails = ({
-  poolPositionData,
+  poolTokens,
   addLiquidityInputValues,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
@@ -69,7 +68,7 @@ export const AddLiquidityTxnDetails = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolPositionData.map((token, index) => (
+            {poolTokens.map((token, index) => (
               <div
                 key={token.symbol}
                 className="flex items-center justify-between"
@@ -102,7 +101,7 @@ export const AddLiquidityTxnDetails = ({
 };
 
 export const RemoveLiquidityTxnDetails = ({
-  poolPositionData,
+  poolTokens,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
   return (
@@ -110,7 +109,7 @@ export const RemoveLiquidityTxnDetails = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolPositionData.map((token) => (
+            {poolTokens.map((token) => (
               <div
                 key={token.symbol}
                 className="flex items-center justify-between"
@@ -132,7 +131,7 @@ export const RemoveLiquidityTxnDetails = ({
           </div>
           <hr className="border-t border-border mt-2 mb-2 w-full" />
           <div className="flex flex-col w-full gap-2">
-            {poolPositionData.map((token) => (
+            {poolTokens.map((token) => (
               <div
                 key={token.symbol}
                 className="flex items-center justify-between"
@@ -162,9 +161,9 @@ export const RemoveLiquidityTxnDetails = ({
 };
 
 const TxnLoader = ({
-  poolPositionData,
+  poolTokens,
   addLiquidityInputValues,
-  txnType,
+  poolTxnType,
 }: TxnLoaderProps) => {
   const { formatNumber } = useIntl();
 
@@ -176,8 +175,10 @@ const TxnLoader = ({
           Confirm Transaction in wallet
         </span>
         <div className="flex items-center gap-1 justify-center text-sm md:text-base">
-          {txnType === TxnType.COLLECT_FEE && <span>Collecting Fees</span>}
-          {txnType === TxnType.ADD_LIQUIDITY && (
+          {poolTxnType === POOL_TXN_TYPE.COLLECT_FEE && (
+            <span>Collecting Fees</span>
+          )}
+          {poolTxnType === POOL_TXN_TYPE.ADD_LIQUIDITY && (
             <>
               <span>Supplying</span>
               <span className="flex items-center gap-1">
@@ -185,7 +186,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolPositionData?.[0]?.symbol}</span>
+                <span>{poolTokens?.[0]?.symbol}</span>
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
@@ -193,7 +194,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolPositionData?.[1]?.symbol}</span>
+                <span>{poolTokens?.[1]?.symbol}</span>
               </span>
             </>
           )}
@@ -253,39 +254,39 @@ const TxnFailed = ({ txnMsg }: TxnFailedProps) => {
 };
 
 const TxnDetails = {
-  [TxnType.ADD_LIQUIDITY]: AddLiquidityTxnDetails,
-  [TxnType.REMOVE_LIQUIDITY]: RemoveLiquidityTxnDetails,
-  [TxnType.COLLECT_FEE]: CollectFeeTxnDetails,
+  [POOL_TXN_TYPE.ADD_LIQUIDITY]: AddLiquidityTxnDetails,
+  [POOL_TXN_TYPE.REMOVE_LIQUIDITY]: RemoveLiquidityTxnDetails,
+  [POOL_TXN_TYPE.COLLECT_FEE]: CollectFeeTxnDetails,
 } as const;
 
 export function PoolTxnSteps({
   txnStatus,
-  poolPositionData,
+  poolTokens,
   txnHash,
   txnMsg,
   addLiquidityInputValues,
 }: PoolTxnStepsProps) {
   const pathname = usePathname();
-  const txnType = getTxnType(pathname);
-  const TxnComponent = TxnDetails[txnType];
+  const poolTxnType = getTxnType(pathname);
+  const TxnComponent = TxnDetails[poolTxnType];
 
   return (
     <div>
       {txnStatus === TXN_STATUS.IDLE && (
         <TxnComponent
-          poolPositionData={poolPositionData}
+          poolTokens={poolTokens}
           addLiquidityInputValues={addLiquidityInputValues}
         />
       )}
       {txnStatus === TXN_STATUS.PENDING && (
         <TxnLoader
-          poolPositionData={poolPositionData}
-          txnType={txnType}
+          poolTokens={poolTokens}
+          poolTxnType={poolTxnType}
           addLiquidityInputValues={addLiquidityInputValues}
         />
       )}
       {txnStatus === TXN_STATUS.SUCCESS && (
-        <TxnSuccess poolPositionData={poolPositionData} txnHash={txnHash} />
+        <TxnSuccess poolTokens={poolTokens} txnHash={txnHash} />
       )}
       {txnStatus === TXN_STATUS.FAILED && <TxnFailed txnMsg={txnMsg} />}
     </div>

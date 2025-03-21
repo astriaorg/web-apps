@@ -9,7 +9,7 @@ import { TXN_STATUS } from "@repo/flame-types";
 import { PoolTxnSteps } from "pool/components";
 
 export const ContentSection = () => {
-  const { collectAsWTIA, handleCollectAsWTIA, modalOpen, setModalOpen } =
+  const { collectAsNative, handleCollectAsNative, modalOpen, setModalOpen } =
     usePoolDetailsContext();
   const { liquidityToRemove, handlePercentToRemove } = useRemoveLiquidity();
 
@@ -23,8 +23,8 @@ export const ContentSection = () => {
           <div className="flex items-center gap-2">
             <span className="text-sm">Collect as WTIA</span>
             <Switch
-              checked={collectAsWTIA}
-              onCheckedChange={() => handleCollectAsWTIA(!collectAsWTIA)}
+              checked={collectAsNative}
+              onCheckedChange={() => handleCollectAsNative(!collectAsNative)}
               className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
             />
           </div>
@@ -49,9 +49,10 @@ export const ContentSection = () => {
             >
               <PoolTxnSteps
                 txnStatus={TXN_STATUS.IDLE}
-                poolPositionData={liquidityToRemove}
+                poolTokens={liquidityToRemove}
                 txnHash={""}
                 txnMsg={""}
+                addLiquidityInputValues={null}
               />
             </ConfirmationModal>
           </div>

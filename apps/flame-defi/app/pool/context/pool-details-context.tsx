@@ -1,6 +1,6 @@
 "use client";
 
-import { Position, PoolTokenData } from "pool/types";
+import { Position, PoolToken } from "pool/types";
 import { Positions } from "pool/types";
 import { useParams } from "next/navigation";
 import { PoolDetailsContextProps } from "pool/types";
@@ -13,9 +13,9 @@ export const PoolDetailsContext = createContext<
   PoolDetailsContextProps | undefined
 >(undefined);
 
-const positionDetails: Positions = {
+const mockPositionDetails: Positions = {
   0: {
-    tokenData: [
+    tokens: [
       {
         symbol: "TIA",
         unclaimedFees: 0.0078,
@@ -36,7 +36,7 @@ const positionDetails: Positions = {
     positionStatus: "In range",
   },
   1: {
-    tokenData: [
+    tokens: [
       {
         symbol: "TIA",
         unclaimedFees: 0.0078,
@@ -68,54 +68,54 @@ const defaultPoolToken = {
 export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
   const params = useParams();
   const { formatNumber } = useIntl();
-  const currentPoolDetails = getFromLocalStorage("poolDetails") || {};
+  const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [collectAsWTIA, setCollectAsWTIA] = useState<boolean>(
-    currentPoolDetails.collectAsWTIA || false,
+  const [collectAsNative, setCollectAsNative] = useState<boolean>(
+    currentPoolSettings.collectAsNative || false,
   );
   const poolId = params["pool-id"];
-  const position = positionDetails[Number(poolId)];
-  const [positionData, setPositionData] = useState<Position | undefined>(
+  const position = mockPositionDetails[Number(poolId)];
+  const [positionDetails, setPositionDetails] = useState<Position | undefined>(
     position,
   );
-  const symbols = positionData?.tokenData.map((token) => token.symbol) || [];
-  const [poolTokenData, setPoolTokenData] = useState<PoolTokenData[]>(
-    positionData?.tokenData || [],
+  const symbols = positionDetails?.tokens.map((token) => token.symbol) || [];
+  const [poolTokens, setPoolTokens] = useState<PoolToken[]>(
+    positionDetails?.tokens || [],
   );
 
-  const poolTokenOne = poolTokenData[0] || defaultPoolToken;
-  const poolTokenTwo = poolTokenData[1] || defaultPoolToken;
+  const poolTokenOne = poolTokens[0] || defaultPoolToken;
+  const poolTokenTwo = poolTokens[1] || defaultPoolToken;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string>(
     poolTokenOne?.symbol || "",
   );
 
   const handleReverseTokenData = (symbol: string) => {
-    const reversedTokenData = [...poolTokenData].reverse();
-    setPoolTokenData(reversedTokenData);
+    const reversedTokenData = [...poolTokens].reverse();
+    setPoolTokens(reversedTokenData);
     setSelectedSymbol(symbol);
   };
 
-  const handleCollectAsWTIA = (collectAsWTIA: boolean) => {
-    setCollectAsWTIA(collectAsWTIA);
-    setInLocalStorage("poolDetails", {
-      collectAsWTIA: collectAsWTIA,
+  const handleCollectAsNative = (collectAsNative: boolean) => {
+    setCollectAsNative(collectAsNative);
+    setInLocalStorage("poolSettings", {
+      collectAsNative: collectAsNative,
     });
-    if (collectAsWTIA) {
-      positionData?.tokenData.map((token) => {
+    if (collectAsNative) {
+      positionDetails?.tokens.map((token) => {
         if (token.symbol === "TIA") {
           token.symbol = "WTIA";
         }
       });
     } else {
-      positionData?.tokenData.map((token) => {
+      positionDetails?.tokens.map((token) => {
         if (token.symbol === "WTIA") {
           token.symbol = "TIA";
         }
       });
     }
-    setPositionData(positionData);
+    setPositionDetails(positionDetails);
     setSelectedSymbol(poolTokenOne.symbol || "");
   };
 
@@ -128,13 +128,13 @@ export const PoolDetailsContextProvider = ({ children }: PropsWithChildren) => {
     <PoolDetailsContext.Provider
       value={{
         positionDetails: position,
-        poolTokenData,
+        poolTokens,
         feeTier,
         symbols,
         selectedSymbol,
         handleReverseTokenData,
-        collectAsWTIA,
-        handleCollectAsWTIA,
+        collectAsNative,
+        handleCollectAsNative,
         txnStatus,
         setTxnStatus,
         modalOpen,

@@ -46,7 +46,7 @@ export interface PoolPositionsTableData {
   inRange: boolean;
 }
 
-export interface PoolTokenData {
+export interface PoolToken {
   symbol: string;
   unclaimedFees: number;
   liquidity: number;
@@ -54,7 +54,7 @@ export interface PoolTokenData {
 }
 
 export type Position = {
-  tokenData: PoolTokenData[];
+  tokens: PoolToken[];
   feeTier: number;
   inRange: boolean;
   positionStatus: string;
@@ -73,52 +73,56 @@ export type PoolContextProps = {
 
 export type PoolDetailsContextProps = {
   positionDetails: Position | undefined;
-  poolTokenData: PoolTokenData[];
+  poolTokens: PoolToken[];
   feeTier: string;
   symbols: string[];
   selectedSymbol: string;
   handleReverseTokenData: (symbol: string) => void;
-  collectAsWTIA: boolean;
-  handleCollectAsWTIA: (collectAsWTIA: boolean) => void;
+  collectAsNative: boolean;
+  handleCollectAsNative: (collectAsNative: boolean) => void;
   txnStatus: TXN_STATUS;
   setTxnStatus: (txnStatus: TXN_STATUS) => void;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
-  poolTokenOne: PoolTokenData;
-  poolTokenTwo: PoolTokenData;
+  poolTokenOne: PoolToken;
+  poolTokenTwo: PoolToken;
 };
 
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
-  poolPositionData: PoolTokenData[];
+  poolTokens: PoolToken[];
   txnHash: string;
   txnMsg: string;
-  addLiquidityInputValues?: string[];
+  addLiquidityInputValues: string[] | null;
 };
 
-export enum TxnType {
+export enum POOL_TXN_TYPE {
   ADD_LIQUIDITY = "add-liquidity",
   REMOVE_LIQUIDITY = "remove-liquidity",
   COLLECT_FEE = "collect-fee",
 }
 
-export const getTxnType = (pathname: string): TxnType => {
-  if (pathname.includes(TxnType.ADD_LIQUIDITY)) return TxnType.ADD_LIQUIDITY;
-  if (pathname.includes(TxnType.REMOVE_LIQUIDITY))
-    return TxnType.REMOVE_LIQUIDITY;
-  return TxnType.COLLECT_FEE;
+export const getTxnType = (pathname: string): POOL_TXN_TYPE => {
+  if (pathname.includes(POOL_TXN_TYPE.ADD_LIQUIDITY))
+    return POOL_TXN_TYPE.ADD_LIQUIDITY;
+  if (pathname.includes(POOL_TXN_TYPE.REMOVE_LIQUIDITY))
+    return POOL_TXN_TYPE.REMOVE_LIQUIDITY;
+  return POOL_TXN_TYPE.COLLECT_FEE;
 };
 
-export type TxnComponentProps = Pick<
-  PoolTxnStepsProps,
-  "poolPositionData" | "addLiquidityInputValues"
->;
-export type TxnLoaderProps = Pick<
-  PoolTxnStepsProps,
-  "poolPositionData" | "addLiquidityInputValues"
-> & { txnType: TxnType };
-export type TxnSuccessProps = Pick<
-  PoolTxnStepsProps,
-  "txnHash" | "poolPositionData"
->;
-export type TxnFailedProps = Pick<PoolTxnStepsProps, "txnMsg">;
+export type TxnComponentProps = {
+  poolTokens: PoolToken[];
+  addLiquidityInputValues: string[] | null;
+};
+
+export type TxnLoaderProps = {
+  poolTokens: PoolToken[];
+  addLiquidityInputValues: string[] | null;
+  poolTxnType: POOL_TXN_TYPE;
+};
+
+export type TxnSuccessProps = {
+  poolTokens: PoolToken[];
+  txnHash: string;
+}
+

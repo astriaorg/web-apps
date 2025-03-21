@@ -12,9 +12,9 @@ export const ContentSection = () => {
     selectedSymbol,
     handleReverseTokenData,
     symbols,
-    poolTokenData,
-    collectAsWTIA,
-    handleCollectAsWTIA,
+    poolTokens,
+    collectAsNative,
+    handleCollectAsNative,
     modalOpen,
     setModalOpen,
   } = usePoolDetailsContext();
@@ -30,19 +30,19 @@ export const ContentSection = () => {
         <div className="flex items-center gap-2 justify-end">
           <span className="text-sm">Collect as WTIA</span>
           <Switch
-            checked={collectAsWTIA}
-            onCheckedChange={() => handleCollectAsWTIA(!collectAsWTIA)}
+            checked={collectAsNative}
+            onCheckedChange={() => handleCollectAsNative(!collectAsNative)}
             className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
           />
         </div>
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Liquidity" value="$-" />
-            <TokenInfoCard poolTokenData={poolTokenData} showLiquidity={true} />
+            <TokenInfoCard poolTokens={poolTokens} showLiquidity={true} />
           </div>
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Unclaimed fees" value="$-" />
-            <TokenInfoCard poolTokenData={poolTokenData} />
+            <TokenInfoCard poolTokens={poolTokens} />
           </div>
         </div>
         <div className="w-full md:w-2/4">
@@ -58,9 +58,10 @@ export const ContentSection = () => {
           >
             <PoolTxnSteps
               txnStatus={TXN_STATUS.IDLE}
-              poolPositionData={poolTokenData}
+              poolTokens={poolTokens}
               txnHash={""}
               txnMsg={""}
+              addLiquidityInputValues={null}
             />
           </ConfirmationModal>
         </div>

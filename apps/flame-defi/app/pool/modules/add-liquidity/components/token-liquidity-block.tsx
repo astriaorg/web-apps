@@ -4,7 +4,7 @@ import { TokenInfoCard } from "pool/components";
 import { usePoolDetailsContext } from "pool/hooks";
 
 export const TokenLiquidityBlock = () => {
-  const { poolTokenData, poolTokenOne, poolTokenTwo, feeTier } =
+  const { poolTokens, poolTokenOne, poolTokenTwo, feeTier } =
     usePoolDetailsContext();
 
   return (
@@ -39,7 +39,7 @@ export const TokenLiquidityBlock = () => {
         </Skeleton>
       </div>
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4">
-        <TokenInfoCard poolTokenData={poolTokenData} className="p-0" />
+        <TokenInfoCard poolTokens={poolTokens} className="p-0" />
         <hr className="border-t border-border mt-2 mb-2" />
         <div className="flex justify-between">
           <span className="text-base text-text-subdued">Fee Tier</span>
