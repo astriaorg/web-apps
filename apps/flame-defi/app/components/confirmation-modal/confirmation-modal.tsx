@@ -1,14 +1,14 @@
 "use client";
 
+import { CloseIcon } from "@repo/ui/icons";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from "@repo/ui/shadcn-primitives";
-import { CloseIcon } from "@repo/ui/icons";
-import { Button } from "@repo/ui/components";
+} from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 
 interface ConfirmationModalProps {

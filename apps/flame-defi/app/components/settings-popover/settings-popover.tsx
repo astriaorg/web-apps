@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Switch,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import { useConfig } from "config";
 import { useState } from "react";
@@ -104,7 +104,7 @@ export const SettingsPopover = () => {
           aria-label="Settings"
         >
           <GearIcon
-            className={`transition ${expertMode ? "stroke-orange-soft" : ""}`}
+            className={`transition ${expertMode ? "stroke-orange" : ""}`}
           />
         </a>
       </PopoverTrigger>
@@ -123,7 +123,7 @@ export const SettingsPopover = () => {
               <Switch
                 checked={expertMode}
                 onCheckedChange={handleExpertModeChange}
-                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange-soft [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
               />
             </div>
           </div>
@@ -138,7 +138,7 @@ export const SettingsPopover = () => {
             <div className="flex justify-between">
               <button
                 disabled={!expertMode}
-                className="text-sm text-white bg-orange-soft px-3 py-1 rounded-lg mr-2 cursor-pointer"
+                className="text-sm text-white bg-orange px-3 py-1 rounded-lg mr-2 cursor-pointer"
                 onClick={() => setCustomSlippage(swapSlippageToleranceDefault)}
               >
                 Auto
@@ -164,7 +164,7 @@ export const SettingsPopover = () => {
           <div className="h-4">
             {slippageError && (
               <p
-                className={`text-sm ${slippageError.error ? "text-red" : "text-orange-soft"}`}
+                className={`text-sm ${slippageError.error ? "text-red" : "text-orange"}`}
               >
                 {slippageError.msg}
               </p>
@@ -196,7 +196,7 @@ export const SettingsPopover = () => {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-orange-soft text-white hover:bg-orange-soft/90 cursor-pointer"
+              className="bg-orange text-white hover:bg-orange/90 cursor-pointer"
               onClick={() => {
                 setExpertMode(true);
                 setInLocalStorage("settings", {

@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
-} from "../../../shadcn-primitives";
+} from "../../atoms";
 import { TokenIcon } from "../token-icon";
 
 interface TokenSelectorProps {

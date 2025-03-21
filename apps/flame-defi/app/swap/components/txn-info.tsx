@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { GetQuoteResult } from "@repo/flame-types";
 import { OneToOneQuoteProps, TransactionInfo } from "../types";

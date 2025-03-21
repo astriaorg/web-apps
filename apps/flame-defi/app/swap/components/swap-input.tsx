@@ -102,7 +102,7 @@ export function SwapInput({
                   onClick={() => {
                     onInputChange(balance, id);
                   }}
-                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
+                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-white text-sm cursor-pointer transition"
                 >
                   Max
                 </span>

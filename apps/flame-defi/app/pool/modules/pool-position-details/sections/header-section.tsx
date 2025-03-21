@@ -3,13 +3,13 @@
 import { Badge, Button, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { ArrowLeftIcon, DotIcon } from "@repo/ui/icons";
 import { usePathname, useRouter } from "next/navigation";
-import { usePoolDetailsContext } from "pool/hooks";
+import { usePoolPositionContext } from "pool/hooks";
 import { ROUTES } from "../../../constants/routes";
 
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { tokenData, percent } = usePoolDetailsContext();
+  const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
@@ -28,11 +28,11 @@ export const HeaderSection = () => {
           <Skeleton isLoading={false} className="">
             <div className="flex items-center space-x-2">
               <MultiTokenIcon
-                symbols={tokenData.map((token) => token.symbol)}
+                symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
                 size={24}
               />
               <h1 className="text-3xl/8">
-                {tokenData[0]?.symbol}/{tokenData[1]?.symbol}
+                {poolTokenOne.symbol}/{poolTokenTwo.symbol}
               </h1>
             </div>
           </Skeleton>
@@ -46,7 +46,7 @@ export const HeaderSection = () => {
                 <span>In range</span>
               </Badge>
               <Badge variant="default" className="flex items-center space-x-2">
-                {percent}
+                {feeTier}
               </Badge>
             </div>
           </Skeleton>
