@@ -3,7 +3,7 @@
 import { Input } from "@repo/ui/components";
 import { useValidateAssetAmount, type ValidationAsset } from "@repo/ui/hooks";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import type { Amount } from "./types";
+import type { Amount } from "./asset-amount-input.types";
 
 type Params = {
   asset?: ValidationAsset;
