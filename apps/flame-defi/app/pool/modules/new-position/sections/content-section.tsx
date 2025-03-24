@@ -1,7 +1,7 @@
 "use client";
 
 import { usePoolContext } from "pool/hooks";
-import { TokenInputState } from "@repo/flame-types";
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { useEvmChainData } from "config";
 import { useState } from "react";
 import {
@@ -10,10 +10,12 @@ import {
   FeeRange,
 } from "../components";
 import { FeeData } from "pool/types";
-import { Button } from "@repo/ui/components";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { PoolTxnSteps } from "pool/components";
 
 export const ContentSection = () => {
-  const { feeData } = usePoolContext();
+  const { feeData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
+    usePoolContext();
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
   const defaultFeeData = feeData[2] as FeeData;
@@ -47,9 +49,47 @@ export const ContentSection = () => {
       </div>
       <div className="flex flex-col gap-4 w-full md:w-1/2">
         <NewPositionPriceRange />
-        <Button className="w-full" variant="default">
-          Create Position
-        </Button>
+        <ConfirmationModal
+          open={modalOpen}
+          buttonText={"Create Position"}
+          actionButtonText={
+            txnStatus === TXN_STATUS.PENDING ? "Close" : "Add liquidity"
+          }
+          showOpenButton={true}
+          handleOpenModal={() => setModalOpen(true)}
+          handleModalActionButton={() => {
+            if (txnStatus === TXN_STATUS.IDLE) {
+              setTxnStatus(TXN_STATUS.PENDING);
+            } else {
+              setTxnStatus(TXN_STATUS.IDLE);
+              setModalOpen(false);
+            }
+          }}
+          handleCloseModal={() => setModalOpen(false)}
+          title={"New position"}
+        >
+          <PoolTxnSteps
+            txnStatus={txnStatus}
+            poolTokens={[
+              {
+                symbol: inputOne.token?.coinDenom || "",
+                unclaimedFees: 0,
+                liquidity: 0,
+                liquidityPercentage: 0,
+              },
+              {
+                symbol: inputTwo.token?.coinDenom || "",
+                unclaimedFees: 0,
+                liquidity: 0,
+                liquidityPercentage: 0,
+              },
+            ]}
+            addLiquidityInputValues={[inputOne.value, inputTwo.value]}
+            selectedFeeTier={selectedFeeTier.feePercent}
+            txnHash={""}
+            txnMsg={""}
+          />
+        </ConfirmationModal>
       </div>
     </div>
   );
