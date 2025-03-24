@@ -3,6 +3,7 @@ export * from "./alert-dialog";
 export * from "./badge";
 export * from "./breadcrumbs";
 export * from "./button";
+export * from "./chart";
 export * from "./dialog";
 export * from "./drawer";
 export * from "./dropdown";

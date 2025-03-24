@@ -1,5 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { DropdownOption } from "components/dropdown";
+import type { DropdownOption } from "components/dropdown";
 import {
   getFlameChainId,
   getFlameNetworkByChainId,

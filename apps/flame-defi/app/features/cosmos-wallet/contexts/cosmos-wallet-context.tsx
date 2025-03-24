@@ -13,7 +13,7 @@ import {
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { removeNonNumeric } from "@repo/ui/utils";
-import { DropdownOption } from "components/dropdown";
+import type { DropdownOption } from "components/dropdown";
 import { useIntl } from "react-intl";
 import { useGetQuote } from "../../../hooks";
 import { getBalanceFromChain } from "../services/cosmos";
