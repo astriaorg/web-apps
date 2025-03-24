@@ -1,5 +1,6 @@
 export * from "./animated-counter";
 export * from "./animated-down-arrow-spacer";
+export * from "./asset-amount-input";
 export * from "./block-loader";
 export * from "./card";
 export * from "./copy-to-clipboard";
