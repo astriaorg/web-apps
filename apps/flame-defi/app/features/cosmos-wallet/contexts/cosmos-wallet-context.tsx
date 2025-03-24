@@ -2,6 +2,7 @@ import { useChain } from "@cosmos-kit/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SigningStargateClient } from "@cosmjs/stargate";
+import type { DropdownOption } from "components/dropdown";
 import { useConfig, useEvmChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 
@@ -13,7 +14,6 @@ import {
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { removeNonNumeric } from "@repo/ui/utils";
-import type { DropdownOption } from "components/dropdown";
 import { useIntl } from "react-intl";
 import { useGetQuote } from "../../../hooks";
 import { getBalanceFromChain } from "../services/cosmos";
