@@ -1,109 +1,101 @@
 import React from "react";
-import ReactECharts from "echarts-for-react";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  ReferenceLine,
+} from "recharts";
 
-export const AreaChartWithRange: React.FC = () => {
-  const option = {
-    backgroundColor: "#071520", // HSL(203, 45%, 4%) converted to hex
-    tooltip: {
-      trigger: "axis",
-    },
-    // We adjust the grid so our chart has some margins and won't clip the axis.
-    // The chart itself sits "behind" the dataZoom overlay.
-    grid: {
-      left: 50,
-      right: 30,
-      top: 50,
-      bottom: 50,
-    },
-    xAxis: {
-      type: "category",
-      boundaryGap: false,
-      data: [
-        120, 132, 101, 134, 90, 230, 210, 180, 222, 150, 210, 300, 250, 400,
-      ],
-    },
-    yAxis: {
-      type: "value",
-      splitLine: { show: false },
-      axisLabel: { show: false },
-    },
-    series: [
-      {
-        name: "Example Data",
-        type: "line",
-        smooth: false,
-        showSymbol: false,
-        areaStyle: {
-          color: "rgba(230, 149, 41, 0.2)",
-        },
-        lineStyle: {
-          color: "rgba(230, 149, 41, 1)",
-        },
-        itemStyle: {
-          color: "rgba(230, 149, 41, 1)",
-        },
-        data: [
-          120, 132, 101, 134, 90, 230, 210, 180, 222, 150, 210, 300, 250, 400,
-        ],
-      },
-    ],
-    // This dataZoom configuration creates a draggable range‐selector
-    // that covers the entire plotting area. We make it semi‐transparent
-    // so that the chart is still visible behind it.
-    dataZoom: [
-      {
-        type: "slider",
-        show: true,
-        // Fill the full chart area:
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "100%",
+interface AreaChartWithRangeProps {
+  priceRange?: number[];
+}
 
-        // Default range (from 0% to 100% of x‐axis)
-        start: 0,
-        end: 100,
+export const AreaChartWithRange: React.FC<AreaChartWithRangeProps> = ({
+  // TODO: replace this with the actual price range for the pool
+  priceRange = [1, 30],
+}) => {
+  // Generate sample data for the chart
+  const generateData = () => {
+    const data = [];
+    // Make a more interesting curve with some random variance
+    const baseValues = [
+      20, 18, 22, 20, 23, 25, 21, 19, 22, 24, 22, 26, 27, 25, 28, 30,
+    ];
 
-        // Give it some transparency so the data is visible underneath
-        backgroundColor: "rgba(0, 0, 0, 0.1)",
-        fillerColor: "rgba(0, 0, 0, 0.1)",
-        borderColor: "transparent",
+    for (let i = 0; i < 31; i++) {
+      const index = Math.min(
+        Math.floor((i / 30) * (baseValues.length - 1)),
+        baseValues.length - 2,
+      );
+      const nextIndex = Math.min(index + 1, baseValues.length - 1);
+      const fraction = (i / 30) * (baseValues.length - 1) - index;
 
-        // Turn off extra details and shadows to keep it looking clean
-        showDetail: false,
-        showDataShadow: false,
+      // Interpolate between baseValues with safe access
+      const currentValue = baseValues[index] || 20;
+      const nextValue = baseValues[nextIndex] || 20;
+      const interpolatedValue =
+        currentValue + fraction * (nextValue - currentValue);
 
-        // Make the handles smaller (default is 100%)
-        handleSize: "30%",
+      // Add a small random variance
+      const value = interpolatedValue + (Math.random() * 2 - 1);
 
-        // Hide the top bar
-        moveHandleSize: 0, // Hide the move handle
-        moveHandleIcon: "M 0 0 V 100", // Vertical line from top to bottom
-        moveHandleStyle: {
-          opacity: 0,
-        },
-
-        handleStyle: {
-          color: "rgba(230, 149, 41, 0.5)",
-          borderColor: "rgba(230, 149, 41, 0.5)",
-        },
-        emphasis: {
-          handleStyle: {
-            color: "rgba(230, 149, 41, 1)",
-            borderColor: "rgba(230, 149, 41, 1)",
-          },
-        },
-      },
-    ],
+      data.push({
+        x: i,
+        value,
+      });
+    }
+    return data;
   };
 
+  const data = generateData();
+  const minValue = priceRange?.[0] || 0;
+  const maxValue = priceRange?.[1] || 30;
+  const chartMin = 0;
+
   return (
-    <div style={{ width: "100%", margin: "0 auto" }}>
-      <ReactECharts
-        option={option}
-        style={{ width: "100%", height: "200px" }}
-      />
-    </div>
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data} margin={{ top: 0, right: 0, left: 15, bottom: 0 }}>
+        <defs>
+          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#E69529" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#E69529" stopOpacity={0.1} />
+          </linearGradient>
+        </defs>
+
+        {/* Adjust XAxis to ensure 0 is visible */}
+        <XAxis
+          dataKey="x"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: "#666", fontSize: 10 }}
+          ticks={[0, 10, 20, 30]}
+          tickFormatter={(value) => `${value}`}
+          domain={[0, 30]}
+          allowDataOverflow={true}
+          padding={{ left: 0, right: 0 }}
+          interval="preserveStartEnd"
+        />
+        <YAxis hide />
+
+        {/* Add reference lines for the selected price range */}
+        <ReferenceLine x={minValue} stroke="#E69529" strokeWidth={1} />
+        <ReferenceLine x={maxValue} stroke="#E69529" strokeWidth={1} />
+
+        {/* Create the highlighted area */}
+        <Area
+          type="monotone"
+          dataKey="value"
+          stroke="#E69529"
+          strokeWidth={2}
+          fill="url(#colorValue)"
+          activeDot={false}
+          isAnimationActive={false}
+          baseLine={chartMin}
+          connectNulls
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 };
