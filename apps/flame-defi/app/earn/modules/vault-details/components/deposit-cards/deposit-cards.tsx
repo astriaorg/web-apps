@@ -1,25 +1,25 @@
 import {
   Card,
   CardContent,
-  CardFigureInput,
   CardLabel,
   Skeleton,
   useAssetAmountInput,
 } from "@repo/ui/components";
-import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
-import Big from "big.js";
 import { Image } from "components/image";
+import { DepositCard } from "earn/components/deposit-card";
 import { WalletActionButton } from "earn/components/wallet-action-button";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import React, { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 import { useAccount } from "wagmi";
 
+// TODO: Get balance from contract.
+const BALANCE = "0";
+
 export const DepositCards = () => {
   const {
     query: { data, isPending },
   } = usePageContext();
-  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
   const { isConnected } = useAccount();
 
   const { amount, onInput, onReset, isValid } = useAssetAmountInput({
@@ -130,45 +130,14 @@ export const DepositCards = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Card isLoading={isPending}>
-        <CardContent className="space-y-2">
-          <CardLabel>
-            <span className="flex-1">
-              {`Deposit ${data?.vaultByAddress.asset.symbol}`}
-            </span>
-            <div>
-              <Image
-                src={data?.vaultByAddress.asset.logoURI}
-                alt={data?.vaultByAddress.asset.name}
-                width={16}
-                height={16}
-                className="rounded-full"
-              />
-            </div>
-          </CardLabel>
-          <CardFigureInput
-            value={amount.value}
-            onInput={onInput}
-            readOnly={!isConnected}
-          />
-          <CardLabel className="text-typography-light text-sm/3">
-            {data?.vaultByAddress.asset.priceUsd && amount.value
-              ? formatAbbreviatedNumber(
-                  new Big(data.vaultByAddress.asset.priceUsd ?? 0)
-                    .mul(amount.value)
-                    .toFixed(),
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    style: "currency",
-                    currency: "USD",
-                  },
-                  { threshold: "million" },
-                )
-              : "-"}
-          </CardLabel>
-        </CardContent>
-      </Card>
+      <DepositCard
+        asset={data?.vaultByAddress.asset}
+        title="Deposit"
+        amount={amount}
+        balance={BALANCE}
+        isLoading={isPending}
+        onInput={onInput}
+      />
       <Card isLoading={isPending}>
         <CardContent className="space-y-4">
           {items.map((it, index) => (

@@ -32,16 +32,16 @@ export const useAssetAmountInput = ({
     setIsPristine(!amount.value);
   }, [amount.value, isPristine]);
 
-  const onInput = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (evt) => {
+  const onInput = useCallback(
+    ({ value }: { value: string }) => {
       if (!asset) {
         return;
       }
 
       setAmount({
-        value: evt.target.value,
+        value,
         validation: validate({
-          value: evt.target.value,
+          value,
           asset,
           decimals: asset.decimals,
           minimum,
