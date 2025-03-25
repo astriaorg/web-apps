@@ -5,7 +5,7 @@ import { Asset } from "earn/generated/gql/graphql";
 
 export const AssetRow = ({ asset }: { asset?: Asset }) => {
   return (
-    <div className="flex items-center space-x-2 overflow-hidden">
+    <div className="flex items-center space-x-2 overflow-hidden h-7">
       <Image
         src={asset?.logoURI}
         alt={asset?.symbol}
@@ -14,15 +14,17 @@ export const AssetRow = ({ asset }: { asset?: Asset }) => {
         className="rounded-full"
       />
       <span className="truncate">{asset?.symbol ?? "-"}</span>
-      <CopyToClipboard content="Copy Address" value={asset?.symbol ?? ""}>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-icon-subdued h-auto py-0"
-        >
-          <CopyIcon className="w-4 h-4 shrink-0" />
-        </Button>
-      </CopyToClipboard>
+      {asset?.address && (
+        <CopyToClipboard content="Copy Address" value={asset.address}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-icon-subdued h-auto py-0"
+          >
+            <CopyIcon className="w-4 h-4 shrink-0" />
+          </Button>
+        </CopyToClipboard>
+      )}
     </div>
   );
 };

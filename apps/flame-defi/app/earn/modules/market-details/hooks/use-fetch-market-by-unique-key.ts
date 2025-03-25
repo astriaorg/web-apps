@@ -7,18 +7,22 @@ const query = graphql(`
   query MarketByUniqueKey($key: String!, $chainId: Int) {
     marketByUniqueKey(uniqueKey: $key, chainId: $chainId) {
       collateralAsset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       creationTimestamp
       lltv
       loanAsset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       state {
         borrowAssets

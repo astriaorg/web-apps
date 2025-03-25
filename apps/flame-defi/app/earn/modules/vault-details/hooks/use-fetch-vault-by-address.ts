@@ -8,10 +8,12 @@ const query = graphql(`
     vaultByAddress(address: $address, chainId: $chainId) {
       address
       asset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       liquidity {
         underlying
