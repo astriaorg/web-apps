@@ -5,12 +5,14 @@ import {
   Skeleton,
   useAssetAmountInput,
 } from "@repo/ui/components";
+import Big from "big.js";
 import { Image } from "components/image";
 import { DepositCard } from "earn/components/deposit-card";
 import { WalletActionButton } from "earn/components/wallet-action-button";
 import { ROUTES } from "earn/constants/routes";
+import { useFetchMarketPosition } from "earn/modules/market-details/hooks/use-fetch-market-position";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
-import { redirect } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 import { useAccount } from "wagmi";
@@ -19,10 +21,19 @@ import { useAccount } from "wagmi";
 const BALANCE = "0";
 
 export const BorrowCards = () => {
+  const params = useParams<{ key: string }>();
   const {
     query: { data, isPending },
   } = usePageContext();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+
+  const { data: marketPositionData, isPending: marketPositionIsPending } =
+    useFetchMarketPosition({
+      variables: {
+        key: params.key,
+        address,
+      },
+    });
 
   useEffect(() => {
     // TODO: Should probably use a middleware redirect.
@@ -50,7 +61,7 @@ export const BorrowCards = () => {
   } = useAssetAmountInput({
     balance: BALANCE,
     minimum: "0",
-    asset: data?.marketByUniqueKey.collateralAsset ?? undefined,
+    asset: data?.marketByUniqueKey.loanAsset ?? undefined,
   });
 
   const items = useMemo<
@@ -79,12 +90,20 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: (
+        value: isConnected ? (
           <FormattedNumber
-            value={0}
+            value={new Big(
+              marketPositionData?.marketPosition.state?.collateral ?? 0,
+            )
+              .div(
+                10 ** (data?.marketByUniqueKey.collateralAsset?.decimals ?? 18),
+              )
+              .toNumber()}
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
+        ) : (
+          "-"
         ),
       },
       {
@@ -103,12 +122,18 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: (
+        value: isConnected ? (
           <FormattedNumber
-            value={0}
+            value={new Big(
+              marketPositionData?.marketPosition.state?.borrowAssets ?? 0,
+            )
+              .div(10 ** (data?.marketByUniqueKey.loanAsset.decimals ?? 18))
+              .toNumber()}
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
+        ) : (
+          "-"
         ),
       },
       {
@@ -117,14 +142,25 @@ export const BorrowCards = () => {
         },
         value: (
           <>
-            <FormattedNumber
-              value={0}
-              minimumFractionDigits={2}
-              style="percent"
-            />
+            {isConnected &&
+            !!marketPositionData?.marketPosition.state?.collateral ? (
+              <FormattedNumber
+                value={new Big(
+                  marketPositionData?.marketPosition.state?.borrowAssets ?? 0,
+                )
+                  .div(marketPositionData.marketPosition.state.collateral)
+                  .toNumber()}
+                minimumFractionDigits={2}
+                style="percent"
+              />
+            ) : (
+              "-"
+            )}
             {` / `}
             <FormattedNumber
-              value={0}
+              value={new Big(data?.marketByUniqueKey.lltv ?? 0)
+                .div(10 ** 18)
+                .toNumber()}
               minimumFractionDigits={2}
               style="percent"
             />
@@ -132,7 +168,7 @@ export const BorrowCards = () => {
         ),
       },
     ];
-  }, [data]);
+  }, [data, marketPositionData, isConnected]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -159,7 +195,7 @@ export const BorrowCards = () => {
         isLoading={isPending}
         onInput={onInputBorrow}
       />
-      <Card isLoading={isPending}>
+      <Card isLoading={isPending || marketPositionIsPending}>
         <CardContent className="space-y-4">
           {items.map((it, index) => (
             <div
