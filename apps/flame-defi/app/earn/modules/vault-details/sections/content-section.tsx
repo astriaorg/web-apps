@@ -1,26 +1,49 @@
-import { Skeleton, StatusCard } from "@repo/ui/components";
-import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
+import { CHART_TYPE, LineChart } from "earn/components/charts";
+import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
-import { LineChart } from "earn/modules/vault-details/components/charts";
+import {
+  BigIntDataPoint,
+  FloatDataPoint,
+  Market,
+  MarketOrderBy,
+} from "earn/generated/gql/graphql";
+import { useFormatChartValue } from "earn/hooks/use-format-chart-value";
 import { DepositCards } from "earn/modules/vault-details/components/deposit-cards";
-import { Table } from "earn/modules/vault-details/components/table";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import { CHART_INTERVALS, CHART_TYPE } from "earn/modules/vault-details/types";
-import { useMemo } from "react";
-import { FormattedNumber, useIntl } from "react-intl";
+import {
+  TOTAL_ASSETS_OPTION,
+  TOTAL_ASSETS_OPTIONS,
+  TotalAssetsOption,
+} from "earn/modules/vault-details/types";
+import { useCallback, useMemo, useState } from "react";
 
 export const ContentSection = () => {
-  const { formatDate, formatNumber } = useIntl();
   const {
     charts,
     query: { data, isPending, status },
   } = usePageContext();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
+  const { formatChartValue } = useFormatChartValue();
 
-  const { value: formattedTotalSupply, suffix: formattedTotalSupplySuffix } =
-    formatAbbreviatedNumber(
-      (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
-    );
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: MarketOrderBy.TotalLiquidityUsd,
+      desc: true,
+    },
+  ]);
+
+  const formattedData = useMemo(() => {
+    if (isPending) {
+      return getPlaceholderData(3);
+    }
+
+    return (data?.vaultByAddress.state?.allocation?.map((it) => it.market) ??
+      []) as Market[];
+  }, [data, isPending]);
 
   const items = useMemo<SummaryCardsProps["items"]>(() => {
     return [
@@ -39,6 +62,15 @@ export const ContentSection = () => {
           left: "Total Deposits",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          return formatAbbreviatedNumber(
+            (data?.vaultByAddress.state?.totalAssetsUsd ?? 0).toString(),
+            {
+              style: "currency",
+              currency: "USD",
+            },
+          );
+        })(),
         value: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -54,6 +86,15 @@ export const ContentSection = () => {
           left: "Liquidity",
           right: data?.vaultByAddress.asset.symbol,
         },
+        footer: (() => {
+          return formatAbbreviatedNumber(
+            (data?.vaultByAddress.liquidity?.usd ?? 0).toString(),
+            {
+              style: "currency",
+              currency: "USD",
+            },
+          );
+        })(),
         value: new Big(data?.vaultByAddress.liquidity?.underlying ?? 0)
           .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
           .toNumber(),
@@ -65,7 +106,63 @@ export const ContentSection = () => {
         useAbbreviatedNumberFormat: true,
       },
     ];
-  }, [data]);
+  }, [data, formatAbbreviatedNumber]);
+
+  const {
+    data: totalAssetsData,
+    title,
+    figure,
+    style,
+  } = useMemo<{
+    data?: (BigIntDataPoint | FloatDataPoint)[] | null;
+    title: string;
+    figure: React.ReactNode;
+    style?: string;
+  }>(() => {
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.FIAT
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+          .historicalState.totalAssetsUsd,
+        title: `Total Deposits (USD)`,
+        figure: data?.vaultByAddress.state?.totalAssetsUsd,
+        style: "currency",
+      };
+    }
+
+    if (
+      charts[CHART_TYPE.TOTAL_ASSETS].selectedOption ===
+      TOTAL_ASSETS_OPTION.ASSET
+    ) {
+      return {
+        data: charts[CHART_TYPE.TOTAL_ASSETS].query.data?.vaultByAddress
+          .historicalState.totalAssets,
+        title: `Total Deposits (${data?.vaultByAddress.asset.symbol})`,
+        figure: new Big(data?.vaultByAddress.state?.totalAssets ?? 0)
+          .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+          .toFixed(),
+      };
+    }
+
+    throw new Error(
+      `Invalid chart selected option "${charts[CHART_TYPE.TOTAL_ASSETS].selectedOption}".`,
+    );
+  }, [charts, data]);
+
+  const renderSelectedOption = useCallback(
+    (value: TotalAssetsOption) => {
+      if (value === TOTAL_ASSETS_OPTION.ASSET) {
+        return data?.vaultByAddress.asset.symbol;
+      }
+
+      if (value === TOTAL_ASSETS_OPTION.FIAT) {
+        return "USD";
+      }
+    },
+    [data?.vaultByAddress.asset.symbol],
+  );
 
   return (
     <section className="flex flex-col px-4">
@@ -81,13 +178,14 @@ export const ContentSection = () => {
             <SummaryCards
               items={items}
               isLoading={isPending}
-              className="grid lg:grid-cols-3 gap-2"
+              className="grid gap-2 md:grid-cols-3"
             />
 
             <div className="mt-10 flex flex-col space-y-4">
-              <Skeleton isLoading={isPending}>
+              <Skeleton isLoading={isPending} className="w-52">
                 <div className="text-base/4 font-semibold">Overview</div>
               </Skeleton>
+
               <LineChart
                 data={
                   charts[CHART_TYPE.APY].query.data?.vaultByAddress
@@ -99,70 +197,66 @@ export const ContentSection = () => {
                 selectedInterval={charts[CHART_TYPE.APY].selectedInterval}
                 setSelectedInterval={charts[CHART_TYPE.APY].setSelectedInterval}
                 title="APY"
-                figure={
-                  <FormattedNumber
-                    value={data?.vaultByAddress.state?.netApy ?? 0}
-                    style="percent"
-                    minimumFractionDigits={2}
-                  />
-                }
-                renderTooltip={(value) => (
-                  <>
-                    <div>{formatDate(value.x * 1000)}</div>
-                    <div>
-                      {formatNumber(value.y ?? 0, {
-                        style: "percent",
-                        minimumFractionDigits: 2,
-                      })}
-                    </div>
-                  </>
+                figure={formatChartValue(
+                  {
+                    y: data?.vaultByAddress.state?.netApy ?? 0,
+                  },
+                  { style: "percent" },
                 )}
-              />
-              <LineChart
-                data={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].query.data?.vaultByAddress
-                    .historicalState.totalAssetsUsd
+                renderAverageReferenceLineContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
                 }
-                isError={charts[CHART_TYPE.TOTAL_SUPPLY].query.isError}
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style: "percent" })
+                }
+              />
+              <LineChart<BigIntDataPoint | FloatDataPoint, TotalAssetsOption>
+                data={totalAssetsData}
+                isError={charts[CHART_TYPE.TOTAL_ASSETS].query.isError}
                 isLoading={
-                  isPending || charts[CHART_TYPE.TOTAL_SUPPLY].query.isPending
+                  isPending || charts[CHART_TYPE.TOTAL_ASSETS].query.isPending
                 }
                 intervals={CHART_INTERVALS}
                 selectedInterval={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].selectedInterval
+                  charts[CHART_TYPE.TOTAL_ASSETS].selectedInterval
                 }
                 setSelectedInterval={
-                  charts[CHART_TYPE.TOTAL_SUPPLY].setSelectedInterval
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedInterval
                 }
-                title="Total Supply"
-                figure={
-                  formatNumber(+formattedTotalSupply, {
-                    style: "currency",
-                    currency: "USD",
-                    minimumFractionDigits: 2,
-                  }) + formattedTotalSupplySuffix
+                options={TOTAL_ASSETS_OPTIONS}
+                selectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS]
+                    .selectedOption as TotalAssetsOption
                 }
-                renderTooltip={(value) => {
-                  const { value: totalSupply, suffix } =
-                    formatAbbreviatedNumber((value.y ?? 0).toString());
-
-                  return (
-                    <>
-                      <div>{formatDate(value.x * 1000)}</div>
-                      <div>
-                        {formatNumber(+totalSupply, {
-                          style: "currency",
-                          currency: "USD",
-                          minimumFractionDigits: 2,
-                        })}
-                        {suffix}
-                      </div>
-                    </>
-                  );
-                }}
+                setSelectedOption={
+                  charts[CHART_TYPE.TOTAL_ASSETS].setSelectedOption
+                }
+                renderSelectedOption={renderSelectedOption}
+                title={title}
+                figure={formatChartValue(
+                  {
+                    y: figure,
+                  },
+                  { style },
+                )}
+                renderAverageReferenceLineContent={(value) =>
+                  formatChartValue(value, { style })
+                }
+                renderTooltipContent={(value) =>
+                  formatChartValue(value, { style })
+                }
               />
 
-              <Table />
+              <MarketListTable
+                data={formattedData}
+                sorting={sorting}
+                onSortingChange={setSorting}
+                getHeaderIsActive={(header) => header.id === sorting[0]?.id}
+                getHeaderIsAscending={(header) =>
+                  header.column.getNextSortingOrder() === "desc"
+                }
+                isLoading={isPending}
+              />
             </div>
           </div>
 

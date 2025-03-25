@@ -1,14 +1,14 @@
 "use client";
 
+import { CloseIcon } from "@repo/ui/icons";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from "@repo/ui/shadcn-primitives";
-import { CloseIcon } from "@repo/ui/icons";
-import { ActionButton } from "@repo/ui/components";
+} from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 
 interface ConfirmationModalProps {
@@ -35,16 +35,14 @@ export function ConfirmationModal({
   handleModalActionButton,
 }: ConfirmationModalProps): React.ReactElement {
   return (
-    <Dialog open={open} onOpenChange={() => handleCloseModal()}>
+    <Dialog open={open}>
       <DialogTrigger
         asChild
         className={cn("w-full", !showOpenButton && "hidden")}
       >
-        <ActionButton
-          callback={handleOpenModal}
-          buttonText={buttonText}
-          className="w-full mt-2"
-        />
+        <Button onClick={handleOpenModal} className="w-full mt-2">
+          {buttonText}
+        </Button>
       </DialogTrigger>
 
       <DialogPortal>
@@ -57,11 +55,9 @@ export function ConfirmationModal({
           </div>
           <div className="flex flex-col justify-between">
             <div>{children}</div>
-            <ActionButton
-              callback={handleModalActionButton}
-              buttonText={actionButtonText}
-              className="w-full mt-6"
-            />
+            <Button onClick={handleModalActionButton} className="w-full mt-6">
+              {actionButtonText}
+            </Button>
           </div>
         </DialogContent>
       </DialogPortal>

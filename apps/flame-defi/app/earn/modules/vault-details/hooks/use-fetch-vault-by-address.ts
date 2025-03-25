@@ -8,13 +8,16 @@ const query = graphql(`
     vaultByAddress(address: $address, chainId: $chainId) {
       address
       asset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       liquidity {
         underlying
+        usd
       }
       metadata {
         curators {
@@ -28,14 +31,24 @@ const query = graphql(`
         allocation {
           market {
             collateralAsset {
+              decimals
               logoURI
+              name
               symbol
             }
+            creationTimestamp
+            lltv
             loanAsset {
+              decimals
               logoURI
+              name
               symbol
             }
             state {
+              collateralAssets
+              liquidityAssets
+              liquidityAssetsUsd
+              netBorrowApy
               netSupplyApy
               supplyAssets
               supplyAssetsUsd

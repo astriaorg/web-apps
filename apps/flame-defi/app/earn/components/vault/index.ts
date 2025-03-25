@@ -1,2 +1,2 @@
-export { VaultCurators } from "./vault-curators";
-export { VaultTotalSupply } from "./vault-total-supply";
+export { VaultListTable } from "./vault-list-table";
+export { getPlaceholderData } from "./vault.utils";

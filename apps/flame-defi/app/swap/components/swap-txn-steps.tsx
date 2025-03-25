@@ -1,6 +1,6 @@
 "use client";
 
-import { TXN_STATUS } from "@repo/flame-types";
+import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
 import {
   BlockLoader,
   InfoTooltip,
@@ -201,7 +201,7 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed({ txnMsg }: Pick<TxnStepsProps, "txnMsg">) {
+function TxnFailed({ txnMsg }: TxnFailedProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange-soft" />

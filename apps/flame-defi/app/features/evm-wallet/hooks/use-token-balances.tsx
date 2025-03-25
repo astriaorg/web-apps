@@ -1,4 +1,4 @@
-import { EvmCurrency, EvmChainInfo } from "@repo/flame-types";
+import { EvmCurrency, EvmChainInfo, HexString } from "@repo/flame-types";
 import { createWithdrawerService } from "features/evm-wallet";
 import type { AstriaErc20WithdrawerService } from "features/evm-wallet/services/astria-withdrawer-service/astria-withdrawer-service";
 import { useCallback, useState } from "react";
@@ -6,7 +6,7 @@ import { formatUnits } from "viem";
 import { useConfig, useBalance } from "wagmi";
 
 export const useTokenBalances = (
-  userAddress: `0x${string}` | undefined,
+  userAddress: HexString | undefined,
   evmChain: EvmChainInfo | undefined,
 ) => {
   const wagmiConfig = useConfig();
@@ -17,7 +17,7 @@ export const useTokenBalances = (
   const [error, setError] = useState<Error | null>(null);
 
   const { data: nativeBalance } = useBalance({
-    address: userAddress as `0x${string}`,
+    address: userAddress as HexString,
   });
 
   const updateBalance = (value: string, symbol: string, index: number) => {
@@ -60,11 +60,7 @@ export const useTokenBalances = (
               balanceRes,
               selectedToken.coinDecimals,
             );
-            updateBalance(
-              balanceStr.toString() || "0",
-              selectedToken.coinDenom,
-              index,
-            );
+            updateBalance(balanceStr, selectedToken.coinDenom, index);
           } else {
             // this is the native token
             let balance = "0";

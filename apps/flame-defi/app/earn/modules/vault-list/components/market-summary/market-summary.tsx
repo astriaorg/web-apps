@@ -1,4 +1,10 @@
-import { AnimatedCounter, Card, Skeleton } from "@repo/ui/components";
+import {
+  AnimatedCounter,
+  Card,
+  CardContent,
+  CardLabel,
+  Skeleton,
+} from "@repo/ui/components";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
 
@@ -15,7 +21,6 @@ export const MarketSummary = () => {
     {
       label: {
         left: React.ReactNode;
-        right?: React.ReactNode;
       };
       value: number;
     }[]
@@ -39,27 +44,25 @@ export const MarketSummary = () => {
   return (
     <div className="grid gap-2 md:grid-cols-2">
       {items.map((it, index) => (
-        <Card
-          key={`market-summary_card_${index}`}
-          padding="md"
-          className="space-y-2"
-        >
-          <span className="text-xs/3 text-typography-light">
-            {it.label.left}
-          </span>
+        <Card key={`market-summary_card_${index}`}>
+          <CardContent className="space-y-2">
+            <CardLabel>
+              <span>{it.label.left}</span>
+            </CardLabel>
 
-          <Skeleton isLoading={isPending}>
-            <AnimatedCounter
-              value={it.value}
-              className="text-3xl/8 font-dot"
-              options={{
-                style: "currency",
-                currency: "USD",
-                maximumFractionDigits: 0,
-              }}
-              useAbbreviatedNumberFormat
-            />
-          </Skeleton>
+            <Skeleton isLoading={isPending}>
+              <AnimatedCounter
+                value={it.value}
+                className="text-3xl/8 font-dot"
+                options={{
+                  style: "currency",
+                  currency: "USD",
+                  maximumFractionDigits: 0,
+                }}
+                useAbbreviatedNumberFormat
+              />
+            </Skeleton>
+          </CardContent>
         </Card>
       ))}
     </div>

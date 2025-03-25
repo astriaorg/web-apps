@@ -2,7 +2,12 @@ import React, { useMemo } from "react";
 import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable, getOptionalEnvVariable } from "../env";
 import type { AppConfig } from "../index";
-import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
+import {
+  CosmosChains,
+  EvmChains,
+  FlameNetwork,
+  HexString,
+} from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
@@ -41,40 +46,13 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     });
   }
 
-  const feeData = [
-    {
-      id: 0,
-      feePercent: "0.3%",
-      text: "Best for most pairs.",
-      tvl: "100M",
-      selectPercent: "0.3%",
-    },
-    {
-      id: 1,
-      feePercent: "0.5%",
-      text: "Best for stable pairs.",
-      tvl: "100M",
-      selectPercent: "0.5%",
-    },
-    {
-      id: 2,
-      feePercent: "1%",
-      text: "Best for high-volatility pairs.",
-      tvl: "100M",
-      selectPercent: "1%",
-    },
-    {
-      id: 3,
-      feePercent: "1%",
-      text: "Best for high-volatility pairs.",
-      tvl: "100M",
-      selectPercent: "1%",
-    },
-  ];
-
   const feedbackFormURL = getOptionalEnvVariable(
     "NEXT_PUBLIC_FEEDBACK_FORM_URL",
   );
+
+  const feeRecipient = getOptionalEnvVariable(
+    "NEXT_PUBLIC_FEE_RECIPIENT",
+  ) as HexString;
 
   // default to Mainnet
   // TODO - remember in localStorage?
@@ -120,11 +98,11 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         poolURL,
         earnAPIURL,
         feedbackFormURL,
+        feeRecipient,
         swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,
         swapSlippageToleranceDefault,
-        feeData,
         featureFlags: {
           earnEnabled,
           poolEnabled,

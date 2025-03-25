@@ -20,9 +20,11 @@
       "label": "use exact version numbers in production",
       "packages": [
         "big.js",
+        "motion",
         "react",
         "react-dom",
-        "react-intl"
+        "react-intl",
+        "recharts"
       ],
       "dependencyTypes": [
         "prod"

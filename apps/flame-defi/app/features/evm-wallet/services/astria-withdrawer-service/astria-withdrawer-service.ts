@@ -2,6 +2,7 @@ import type { Config } from "@wagmi/core";
 import { type Abi, type Address, parseUnits } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
+import { HexString } from "@repo/flame-types";
 
 // AstriaWithdrawerService.ts
 export class AstriaWithdrawerService extends GenericContractService {
@@ -29,7 +30,7 @@ export class AstriaWithdrawerService extends GenericContractService {
     amountDenom: number,
     fee: string,
     memo: string,
-  ): Promise<`0x${string}`> {
+  ): Promise<HexString> {
     const amountWei = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     const totalAmount = amountWei + feeWei;
@@ -76,7 +77,7 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
     amountDenom: number,
     fee: string,
     memo: string,
-  ): Promise<`0x${string}`> {
+  ): Promise<HexString> {
     const amountBaseUnits = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     return this.writeContractMethod(

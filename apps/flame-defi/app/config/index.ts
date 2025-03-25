@@ -1,4 +1,9 @@
-import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
+import {
+  CosmosChains,
+  EvmChains,
+  HexString,
+  FlameNetwork,
+} from "@repo/flame-types";
 
 /**
  * Represents the configuration object for the application.
@@ -23,7 +28,7 @@ export interface AppConfig {
   // The base URL for the Morpho API.
   earnAPIURL: string;
   // The URL for the feedback form side tag. Hides side tag when null.
-  feedbackFormURL: string | null;
+  feedbackFormURL?: string;
   // The URL for the swap quote API.
   swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
@@ -32,15 +37,8 @@ export interface AppConfig {
   tokenApprovalAmount: string;
   // The default slippage tolerance for swaps.
   swapSlippageToleranceDefault: number;
-  // The data for the fee options.
-  // TODO - replace with FeeData type after it's moved to flame-types package
-  feeData: {
-    id: number;
-    feePercent: string;
-    text: string;
-    tvl: string;
-    selectPercent: string;
-  }[];
+  // The fee recipient address for swaps.
+  feeRecipient?: HexString;
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;
