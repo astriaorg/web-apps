@@ -240,6 +240,12 @@ export function ibcCurrencyBelongsToChain(
 }
 
 /**
+ * Simple type representing a hex string
+ * Note: This is just a string type constraint, not a complex object
+ */
+export type HexString = `0x${string}`;
+
+/**
  * Represents a currency on an EVM chain, which can be either a native token or an ERC-20 token.
  */
 export class EvmCurrency {
@@ -259,10 +265,10 @@ export class EvmCurrency {
   public readonly ibcWithdrawalFeeWei: string;
 
   /** ERC-20 contract address if this is a token, undefined for native currencies */
-  public readonly erc20ContractAddress?: `0x${string}`;
+  public readonly erc20ContractAddress?: HexString;
 
   /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
-  public readonly nativeTokenWithdrawerContractAddress?: `0x${string}`;
+  public readonly nativeTokenWithdrawerContractAddress?: HexString;
 
   /** True if this is a wrapped native token (e.g., wTIA) */
   public readonly isWrappedNative: boolean;
@@ -279,8 +285,8 @@ export class EvmCurrency {
     coinMinimalDenom: string;
     coinDecimals: number;
     ibcWithdrawalFeeWei: string;
-    erc20ContractAddress?: `0x${string}`;
-    nativeTokenWithdrawerContractAddress?: `0x${string}`;
+    erc20ContractAddress?: HexString;
+    nativeTokenWithdrawerContractAddress?: HexString;
     isWrappedNative: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {

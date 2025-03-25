@@ -7,11 +7,14 @@ import {
   UsdcIcon,
   WrappedTiaIcon,
   DotIcon,
+  DropTiaIcon,
 } from "../../../icons";
 import { type ComponentType } from "react";
 
+// FIXME - this is redundant and can be derived from the chain configs
 export enum TokenSymbol {
   TIA = "tia",
+  DTIA = "dtia",
   WTIA = "wtia",
   STTIA = "sttia",
   USDC = "usdc",
@@ -33,6 +36,9 @@ type TokenIconMap = {
 const tokenIcons: TokenIconMap = {
   [TokenSymbol.TIA]: {
     Icon: CelestiaIcon,
+  },
+  [TokenSymbol.DTIA]: {
+    Icon: DropTiaIcon,
   },
   [TokenSymbol.WTIA]: {
     Icon: WrappedTiaIcon,
