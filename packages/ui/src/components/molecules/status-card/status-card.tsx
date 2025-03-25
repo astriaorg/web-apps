@@ -1,35 +1,56 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { useMemo } from "react";
+import { TableIcon, WarningTriangleIcon } from "../../../icons";
 import { cn } from "../../../utils";
 import { Card, type CardProps } from "../card";
 
 export const statusCardVariants = cva("", {
   variants: {
-    variant: {
-      default: "text-typography-secondary",
+    status: {
+      default: "",
+      error: "text-typography-subdued",
+      empty: "text-typography-subdued",
+      success: "text-typography-subdued",
     },
   },
   defaultVariants: {
-    variant: "default",
+    status: "default",
   },
 });
 
 interface StatusCardProps
-  extends Omit<CardProps, "variant">,
+  extends CardProps,
     VariantProps<typeof statusCardVariants> {}
 
 export const StatusCard = ({
+  children,
   className,
-  variant,
+  status,
   ...props
 }: StatusCardProps) => {
+  const icon = useMemo(() => {
+    // TODO: Handle other icons.
+    if (status === "empty") {
+      return <TableIcon className="w-10 h-10 mb-6 text-icon-subdued" />;
+    }
+    if (status === "error") {
+      return <WarningTriangleIcon className="w-10 h-10 mb-6 text-danger" />;
+    }
+
+    return null;
+  }, [status]);
+
   return (
     <Card
       className={cn(
-        "min-h-52 flex items-center justify-center p-12",
-        statusCardVariants({ variant }),
+        "min-h-100 flex items-center justify-center p-12 text-sm",
+        statusCardVariants({ status }),
         className,
       )}
       {...props}
-    />
+    >
+      {icon}
+      {children}
+    </Card>
   );
 };

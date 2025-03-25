@@ -1,4 +1,12 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import type { DropdownOption } from "components/dropdown";
+import {
+  getFlameChainId,
+  getFlameNetworkByChainId,
+  useConfig as useAppConfig,
+  useEvmChainData,
+} from "config";
+import { useBalancePolling } from "features/get-balance-polling";
 import React, {
   useCallback,
   useEffect,
@@ -15,28 +23,21 @@ import {
   useDisconnect,
   useSwitchChain,
 } from "wagmi";
-import { DropdownOption } from "@repo/ui/components";
-import {
-  getFlameChainId,
-  getFlameNetworkByChainId,
-  useConfig as useAppConfig,
-  useEvmChainData,
-} from "config";
-import { useBalancePolling } from "features/get-balance-polling";
 
 import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
+  HexString,
   TokenAllowance,
   TRADE_TYPE,
 } from "@repo/flame-types";
+import { useGetQuote } from "../../../hooks";
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/astria-withdrawer-service/astria-withdrawer-service";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
-import { useGetQuote } from "../../../hooks";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -62,7 +63,7 @@ export interface EvmWalletContextProps {
   approveToken: (
     token: EvmCurrency,
     value: string,
-  ) => Promise<`0x${string}` | null>;
+  ) => Promise<HexString | null>;
   usdcToNativeQuote: { value: string; symbol: string };
   quoteLoading: boolean;
 }
@@ -379,7 +380,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       }
       const erc20Service = createErc20Service(
         wagmiConfig,
-        token.erc20ContractAddress as `0x${string}`,
+        token.erc20ContractAddress as HexString,
       );
 
       const txHash = await erc20Service.approveToken(
@@ -427,7 +428,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       if (currency.erc20ContractAddress) {
         const erc20Service = createErc20Service(
           wagmiConfig,
-          currency.erc20ContractAddress as `0x${string}`,
+          currency.erc20ContractAddress as HexString,
         );
         try {
           const allowance = await erc20Service.getTokenAllowance(

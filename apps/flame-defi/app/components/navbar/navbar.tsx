@@ -13,13 +13,13 @@ const Navbar = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
-  const navLinkClasses = (activePath: boolean) => `
+  const navLinkClasses = (isActivePathname: boolean) => `
     relative px-4 py-2 text-grey-light hover:text-white
     hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
     hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
     hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
     ${
-      activePath
+      isActivePathname
         ? `
       text-white
       after:content-[''] after:absolute after:bottom-[-22px]
@@ -55,31 +55,39 @@ const Navbar = () => {
         </a>
       </div>
       <div id="topNavbar" className="flex-1 hidden md:flex">
-        <div className="flex justify-center items-center font-mono font-medium">
+        <div className="flex justify-center items-center font-mono font-medium mr-2">
           <Link href="/" className={navLinkClasses(pathname === "/")}>
             BRIDGE
           </Link>
           <Link
             href="/swap"
-            className={navLinkClasses(pathname.includes("/swap"))}
+            className={navLinkClasses(pathname.startsWith("/swap"))}
           >
             SWAP
           </Link>
           {featureFlags.poolEnabled && (
             <Link
               href="/pool"
-              className={navLinkClasses(pathname.includes("/pool"))}
+              className={navLinkClasses(pathname.startsWith("/pool"))}
             >
               POOL
             </Link>
           )}
           {featureFlags.earnEnabled && (
-            <Link
-              href="/earn"
-              className={navLinkClasses(pathname.includes("/earn"))}
-            >
-              EARN
-            </Link>
+            <>
+              <Link
+                href="/earn"
+                className={navLinkClasses(pathname.startsWith("/earn"))}
+              >
+                EARN
+              </Link>
+              <Link
+                href="/borrow"
+                className={navLinkClasses(pathname.startsWith("/borrow"))}
+              >
+                BORROW
+              </Link>
+            </>
           )}
         </div>
       </div>

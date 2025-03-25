@@ -2,11 +2,10 @@ import { useChain } from "@cosmos-kit/react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SigningStargateClient } from "@cosmjs/stargate";
-import { DropdownOption } from "@repo/ui/components";
+import type { DropdownOption } from "components/dropdown";
 import { useConfig, useEvmChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 
-import { getBalanceFromChain } from "../services/cosmos";
 import {
   CosmosChainInfo,
   cosmosChainNameFromId,
@@ -14,9 +13,11 @@ import {
   ibcCurrencyBelongsToChain,
   TRADE_TYPE,
 } from "@repo/flame-types";
-import { useGetQuote } from "../../../hooks";
-import { useIntl } from "react-intl";
 import { removeNonNumeric } from "@repo/ui/utils";
+import { useIntl } from "react-intl";
+import { useGetQuote } from "../../../hooks";
+import { getBalanceFromChain } from "../services/cosmos";
+
 export interface CosmosWalletContextProps {
   connectCosmosWallet: () => void;
   cosmosAccountAddress: string | null;

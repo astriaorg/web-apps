@@ -1,9 +1,9 @@
 import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
+  formatDecimalValues,
   formatNumber,
   formatNumberAsPercent,
-  formatDecimalValues,
   isDustAmount,
   removeNonNumeric,
 } from "./number-helpers";
@@ -49,23 +49,13 @@ describe("formatAbbreviatedNumber", () => {
     });
   });
 
-  it("should format with minimumFractionDigits", () => {
-    const result = formatAbbreviatedNumber("1500000", {
-      minimumFractionDigits: 3,
-    });
-    expect(result).toEqual({
-      value: "1.500",
-      suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.MILLION,
-    });
-  });
-
-  it("should show full thousand value when showFullThousandValue is true", () => {
+  it("should not change numbers below the threshold", () => {
     const result = formatAbbreviatedNumber("7500", {
-      showFullThousandValue: true,
+      threshold: "million",
     });
     expect(result).toEqual({
       value: "7500",
-      suffix: FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND,
+      suffix: "",
     });
   });
 });

@@ -5,37 +5,10 @@ import {
   OrderDirection,
   VaultFilters,
   VaultOrderBy,
-  VaultsQuery,
 } from "earn/generated/gql/graphql";
 import request from "graphql-request";
 
 export const PAGE_SIZE = 25;
-
-export const PLACEHOLDER_DATA: VaultsQuery = {
-  vaults: {
-    items: Array.from({ length: PAGE_SIZE }).map((_, index) => ({
-      address: `0x${index}`,
-      symbol: "ETH",
-      name: "Ethereum",
-      asset: {
-        address: `0x${index}`,
-        decimals: 18,
-        logoURI: "",
-      },
-      state: {
-        netApy: 0,
-        totalAssets: 0,
-        totalAssetsUsd: 0,
-      },
-    })),
-    pageInfo: {
-      countTotal: PAGE_SIZE,
-      count: PAGE_SIZE,
-      limit: PAGE_SIZE,
-      skip: 0,
-    },
-  },
-};
 
 const query = graphql(`
   query Vaults(
@@ -60,6 +33,12 @@ const query = graphql(`
           address
           decimals
           logoURI
+        }
+        metadata {
+          curators {
+            image
+            name
+          }
         }
         state {
           netApy

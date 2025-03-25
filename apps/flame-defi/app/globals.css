@@ -70,7 +70,12 @@
   --color-gray-1000: 0 0% 0%;
 
   --color-orange-100: 20 100% 54%;
-  --color-chartreuse-100: 72 100% 72%;
+  --color-green-100: 70 100% 75%;
+  --color-green-200: 125 53% 66%;
+  --color-yellow-100: 53 100% 73%;
+  --color-yellow-200: 40 100% 54%;
+  --color-red-100: 351 100% 72%;
+  --color-red-200: 351 100% 60%;
 
   /* Tokens */
   --color-icon-default: ;
@@ -93,32 +98,37 @@
   --color-surface-3: ;
   --color-surface-inverted: ;
 
-  --color-orange: ;
-  --color-orange: ;
+  --color-brand: ;
+  --color-success: ;
+  --color-warning: ;
+  --color-danger: ;
 }
 
 html[data-theme="light"] {
-  --color-icon-default: hsl(var(--color-gray-150));
-  --color-icon-light: hsl(var(--color-gray-650));
+  --color-icon-default: hsl(var(--color-gray-850));
+  --color-icon-light: hsl(var(--color-gray-350));
   --color-icon-subdued: hsl(var(--color-gray-500));
 
-  --color-stroke-default: hsl(var(--color-gray-800));
-  --color-stroke-active: hsl(var(--color-gray-250));
+  --color-stroke-default: hsl(var(--color-gray-200));
+  --color-stroke-active: hsl(var(--color-gray-750));
 
-  --color-typography-default: hsl(var(--color-gray-0));
-  --color-typography-secondary: hsl(var(--color-gray-150));
-  --color-typography-inverted: hsl(var(--color-gray-1000));
-  --color-typography-light: hsl(var(--color-gray-600));
-  --color-typography-subdued: hsl(var(--color-gray-300));
+  --color-typography-default: hsl(var(--color-gray-1000));
+  --color-typography-secondary: hsl(var(--color-gray-850));
+  --color-typography-inverted: hsl(var(--color-gray-0));
+  --color-typography-light: hsl(var(--color-gray-400));
+  --color-typography-subdued: hsl(var(--color-gray-700));
   --color-typography-black: hsl(var(--color-gray-1000));
 
-  --color-background-default: hsl(var(--color-gray-1000));
-  --color-surface-1: hsl(var(--color-gray-900));
-  --color-surface-2: hsl(var(--color-gray-850));
-  --color-surface-3: hsl(var(--color-gray-800));
-  --color-surface-inverted: hsl(var(--color-gray-0));
+  --color-background-default: hsl(var(--color-gray-0));
+  --color-surface-1: hsl(var(--color-gray-50));
+  --color-surface-2: hsl(var(--color-gray-100));
+  --color-surface-3: hsl(var(--color-gray-150));
+  --color-surface-inverted: hsl(var(--color-gray-1000));
 
-  --color-orange: hsl(var(--color-orange-100));
+  --color-brand: hsl(var(--color-orange-100));
+  --color-success: hsl(var(--color-green-100));
+  --color-warning: hsl(var(--color-yellow-100));
+  --color-danger: hsl(var(--color-red-100));
 }
 
 html[data-theme="dark"] {
@@ -143,7 +153,10 @@ html[data-theme="dark"] {
   --color-surface-3: hsl(var(--color-gray-800));
   --color-surface-inverted: hsl(var(--color-gray-0));
 
-  --color-orange: hsl(var(--color-orange-100));
+  --color-brand: hsl(var(--color-orange-100));
+  --color-success: hsl(var(--color-green-200));
+  --color-warning: hsl(var(--color-yellow-200));
+  --color-danger: hsl(var(--color-red-200));
 }
 
 @theme {
@@ -259,6 +272,7 @@ html[data-theme="dark"] {
   html,
   body {
     @apply h-screen;
+    @apply overflow-x-hidden;
   }
   body {
     @apply m-0 p-0 bg-background-default font-sans antialiased text-typography-default;
@@ -279,28 +293,6 @@ html[data-theme="dark"] {
 
 @utility normalize-input {
   @apply flex-1 bg-transparent focus:outline-hidden placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
-}
-
-@utility earn-chart {
-  @apply overflow-visible;
-
-  > g {
-    @apply text-typography-light;
-    text-anchor: start;
-
-    line {
-      @apply hidden;
-    }
-
-    text {
-      @apply uppercase text-xs/3 font-medium tracking-wider;
-    }
-  }
-
-  > path,
-  > rect {
-    @apply text-orange;
-  }
 }
 
 @utility fade-out {

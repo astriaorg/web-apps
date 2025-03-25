@@ -1,7 +1,6 @@
 import { Badge, InfoTooltip, Skeleton } from "@repo/ui/components";
 import { Image } from "components/image";
 import { BackButton } from "earn/components/back-button";
-import { VaultCurators } from "earn/components/vault";
 import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
@@ -37,7 +36,7 @@ export const HeaderSection = () => {
                   className="flex items-center space-x-2"
                 >
                   <Image
-                    src={data?.vaultByAddress?.asset.logoURI}
+                    src={data?.vaultByAddress.asset.logoURI}
                     alt={data?.vaultByAddress.asset.name}
                     width={16}
                     height={16}
@@ -45,9 +44,22 @@ export const HeaderSection = () => {
                   />
                   <span>{data?.vaultByAddress.asset.symbol}</span>
                 </Badge>
-                <VaultCurators
-                  curators={data?.vaultByAddress.metadata?.curators}
-                />
+                {data?.vaultByAddress.metadata?.curators?.map((it, index) => (
+                  <Badge
+                    key={`curator_${index}`}
+                    variant="secondary"
+                    className="flex items-center space-x-2"
+                  >
+                    <Image
+                      src={it.image}
+                      alt={it.name}
+                      width={16}
+                      height={16}
+                      className="rounded-full"
+                    />
+                    <span>{it.name}</span>
+                  </Badge>
+                ))}
               </div>
             </Skeleton>
           </div>

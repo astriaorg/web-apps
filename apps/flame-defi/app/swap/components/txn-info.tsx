@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
 import { GetQuoteResult } from "@repo/flame-types";
 import { OneToOneQuoteProps, TransactionInfo } from "../types";
@@ -113,6 +113,22 @@ export function TxnInfo({
                 ${txnInfo.formattedGasUseEstimateUSD}
               </span>
             </p>
+            {Boolean(txnInfo.frontendFeeEstimate) && (
+              <p className="flex justify-between">
+                <span className="text-grey-light flex items-center gap-1">
+                  {/* TODO - show fee percentage from config */}
+                  Fee (0.25%){" "}
+                  <InfoTooltip
+                    content="Fees are applied to ensure the best experience on Flame, and have already been factored into this quote."
+                    side="right"
+                  />
+                </span>
+                <span className="text-grey-light">
+                  {txnInfo.frontendFeeEstimate}{" "}
+                  <span>{bottomToken.token?.coinDenom}</span>
+                </span>
+              </p>
+            )}
             <div className="flex justify-between">
               <div className="flex gap-1 items-center">
                 <span className="w-[116px] md:w-full text-sm text-grey-light">

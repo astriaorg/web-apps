@@ -1,14 +1,10 @@
 import { Skeleton, TokenSelector } from "@repo/ui/components";
-import {
-  FORMAT_ABBREVIATED_NUMBER_SUFFIX,
-  formatAbbreviatedNumber,
-  isDustAmount,
-} from "@repo/ui/utils";
+import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
+import AddErc20ToWalletButton from "features/evm-wallet/components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 import { useUsdQuote } from "../hooks";
 import { SwapInputProps } from "../types";
-import AddErc20ToWalletButton from "features/evm-wallet/components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
 
 export function SwapInput({
   availableTokens,
@@ -27,8 +23,8 @@ export function SwapInput({
 
   const handleFiatValue = () => {
     const formatFiat = (value: string) => {
-      const { value: formattedValue, suffix } = formatAbbreviatedNumber(value, {
-        showFullThousandValue: true,
+      const { value: formattedValue } = formatAbbreviatedNumber(value, {
+        threshold: "million",
       });
       const localeString = (+formattedValue).toLocaleString(locale, {
         minimumFractionDigits: 2,
@@ -42,7 +38,7 @@ export function SwapInput({
         return localeString.replace("-", "");
       }
 
-      return `${localeString}${suffix === FORMAT_ABBREVIATED_NUMBER_SUFFIX.THOUSAND ? "" : suffix}`;
+      return localeString;
     };
 
     if (inputToken.token?.coinDenom === "USDC" && inputToken.value !== "") {
@@ -102,14 +98,14 @@ export function SwapInput({
                   onClick={() => {
                     onInputChange(balance, id);
                   }}
-                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-orange-soft text-sm cursor-pointer transition"
+                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-white text-sm cursor-pointer transition"
                 >
                   Max
                 </span>
               }
             </div>
           ) : (
-            <div className="h-[20px] mt-3 w-[100%]"></div>
+            <div></div>
           )}
           {inputToken.token && !inputToken.token.isNative && isConnected && (
             <div className="mt-1 text-right">

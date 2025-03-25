@@ -7,26 +7,37 @@ const query = graphql(`
   query MarketByUniqueKey($key: String!, $chainId: Int) {
     marketByUniqueKey(uniqueKey: $key, chainId: $chainId) {
       collateralAsset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       creationTimestamp
       lltv
       loanAsset {
+        address
         decimals
         logoURI
         name
         symbol
+        priceUsd
       }
       state {
+        borrowAssets
         collateralAssets
         liquidityAssets
+        liquidityAssetsUsd
         netBorrowApy
+        netSupplyApy
+        supplyAssets
+        supplyAssetsUsd
       }
       supplyingVaults {
         address
+        symbol
+        name
         asset {
           decimals
           logoURI
@@ -39,13 +50,13 @@ const query = graphql(`
             name
           }
         }
-        name
         state {
+          netApy
           totalAssets
           totalAssetsUsd
-          totalSupply
         }
       }
+      uniqueKey
     }
   }
 `);

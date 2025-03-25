@@ -3,7 +3,8 @@
 import { animate } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormatNumberOptions, useIntl } from "react-intl";
-import { cn, formatAbbreviatedNumber } from "../../../utils";
+import { useFormatAbbreviatedNumber } from "../../../hooks";
+import { cn } from "../../../utils";
 import { Skeleton } from "../../atoms";
 
 interface AnimatedCounterProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -20,6 +21,7 @@ export const AnimatedCounter = ({
   ...props
 }: AnimatedCounterProps) => {
   const { formatNumber } = useIntl();
+  const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   const [hasStartedAnimating, setHasStartedAnimating] = useState(false);
 
@@ -32,15 +34,12 @@ export const AnimatedCounter = ({
       useAbbreviatedNumberFormat: AnimatedCounterProps["useAbbreviatedNumberFormat"],
     ) => {
       if (useAbbreviatedNumberFormat) {
-        const { value: formattedValue, suffix: formattedValueSuffix } =
-          formatAbbreviatedNumber(Math.round(value).toString(), options);
-
-        return `${formattedValue}${formattedValueSuffix}`;
+        return formatAbbreviatedNumber(Math.round(value).toString(), options);
       }
 
       return formatNumber(value, options);
     },
-    [formatNumber],
+    [formatNumber, formatAbbreviatedNumber],
   );
 
   useEffect(() => {

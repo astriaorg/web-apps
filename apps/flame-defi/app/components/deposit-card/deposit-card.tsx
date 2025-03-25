@@ -1,13 +1,7 @@
 "use client";
 
 import { Decimal } from "@cosmjs/math";
-import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Dropdown } from "@repo/ui/components";
-import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
-import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
-import { ActionButton, AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
   EditIcon,
@@ -15,6 +9,12 @@ import {
   WalletIcon,
 } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { Dropdown } from "components/dropdown";
+import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
+import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
+import { NotificationType, useNotifications } from "features/notifications";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function DepositCard(): React.ReactElement {
   const { addNotification } = useNotifications();
@@ -525,12 +525,13 @@ export default function DepositCard(): React.ReactElement {
       </div>
 
       <div className="mt-4">
-        <ActionButton
-          callback={handleDeposit}
+        <Button
+          variant="gradient"
+          onClick={handleDeposit}
           disabled={isDepositDisabled}
-          isLoading={isLoading}
-          buttonText={"Deposit"}
-        />
+        >
+          {isLoading ? "Processing..." : "Deposit"}
+        </Button>
       </div>
     </div>
   );

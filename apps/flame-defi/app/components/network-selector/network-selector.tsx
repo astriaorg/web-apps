@@ -12,7 +12,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import { FlameIcon } from "@repo/ui/icons";
 import { FlameNetwork } from "@repo/flame-types";
 
@@ -37,7 +37,7 @@ export default function NetworkSelector(): React.ReactElement {
       value={selectedFlameNetwork}
       onValueChange={(value) => handleNetworkSelect(value as FlameNetwork)}
     >
-      <SelectTrigger className="w-[140px] capitalize border-border hover:border-orange-soft rounded-xl text-white transition text-base">
+      <SelectTrigger className="w-[140px] capitalize border-border hover:border-orange-soft rounded-xl text-white transition text-base h-[40px]">
         <SelectValue
           placeholder={
             <div className="flex items-center gap-2 text-base">
@@ -52,7 +52,7 @@ export default function NetworkSelector(): React.ReactElement {
           </div>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="bg-radial-dark">
+      <SelectContent className="bg-radial-dark border-border">
         <SelectGroup>
           <SelectLabel className="text-white text-base">Networks</SelectLabel>
           {networksList.map((network) => (
