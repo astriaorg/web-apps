@@ -1,30 +1,28 @@
 import { MultiTokenIcon } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
 import { createColumnHelper } from "@tanstack/react-table";
-import { PoolPositionsTableData } from "pool/types";
+import { PoolPositionsRecord } from "pool/types";
 import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { usePoolContext } from "./use-pool-context";
 
 export const usePositionsTable = () => {
   const { formatNumber } = useIntl();
-  const { poolPositionsTableData } = usePoolContext();
+  const { poolPositionsRecord } = usePoolContext();
   const [hideClosedPositions, setHideClosedPositions] = useState(false);
 
   const filteredData = useMemo(
     () =>
-      poolPositionsTableData.filter(
-        (row) => !hideClosedPositions || row.inRange,
-      ),
-    [poolPositionsTableData, hideClosedPositions],
+      poolPositionsRecord.filter((row) => !hideClosedPositions || row.inRange),
+    [poolPositionsRecord, hideClosedPositions],
   );
 
-  const columnHelper = createColumnHelper<PoolPositionsTableData>();
+  const columnHelper = createColumnHelper<PoolPositionsRecord>();
   const columns = useMemo(() => {
     return [
       columnHelper.accessor("position", {
         id: "yourPositions",
-        header: `Your Positions (${poolPositionsTableData.length})`,
+        header: `Your Positions (${poolPositionsRecord.length})`,
         cell: ({ row }) => {
           return (
             <div className="flex items-center space-x-2 md:space-x-4">
@@ -66,7 +64,7 @@ export const usePositionsTable = () => {
         },
       }),
     ];
-  }, [columnHelper, poolPositionsTableData, formatNumber]);
+  }, [columnHelper, poolPositionsRecord, formatNumber]);
 
   return {
     tableData: filteredData,

@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 import React, { useState } from "react";
 import { ChevronDownIcon, ResetIcon } from "@repo/ui/icons";
 import { useAccount } from "wagmi";

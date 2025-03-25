@@ -127,7 +127,7 @@ export const MarketListTable = ({
           return (
             <FormattedNumber
               value={new Big(row.original.lltv ?? 0)
-                .div(10 ** (row.original.collateralAsset?.decimals ?? 18))
+                .div(10 ** 18) // LLTV is always 18 decimals.
                 .toNumber()}
               style="percent"
               minimumFractionDigits={2}

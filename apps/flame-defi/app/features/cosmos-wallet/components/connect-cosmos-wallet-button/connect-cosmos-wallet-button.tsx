@@ -14,7 +14,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@repo/ui/shadcn-primitives";
+} from "@repo/ui/components";
 
 interface ConnectCosmosWalletButtonProps {
   // Label to show before the user is connected to a wallet.

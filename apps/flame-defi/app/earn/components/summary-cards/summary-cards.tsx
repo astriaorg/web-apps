@@ -3,6 +3,7 @@ import {
   Card,
   CardContent,
   CardLabel,
+  Skeleton,
 } from "@repo/ui/components";
 import { FormatNumberOptions } from "react-intl";
 
@@ -42,12 +43,14 @@ export const SummaryCards = ({
               <span className="flex-1">{it.label.left}</span>
               <span>{it.label.right}</span>
             </CardLabel>
-            <AnimatedCounter
-              value={it.value}
-              className="text-5xl/12 font-dot truncate"
-              options={it.options}
-              useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
-            />
+            <Skeleton isLoading={isLoading}>
+              <AnimatedCounter
+                value={it.value}
+                className="text-5xl/12 font-dot truncate"
+                options={it.options}
+                useAbbreviatedNumberFormat={it.useAbbreviatedNumberFormat}
+              />
+            </Skeleton>
             <CardLabel>
               <span className="text-xs text-typography-default truncate">
                 {it.footer}
