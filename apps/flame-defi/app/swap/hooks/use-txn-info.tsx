@@ -162,6 +162,20 @@ export const useTxnInfo = ({
   const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
   const priceImpact = txnQuoteData ? calculatePriceImpact(txnQuoteData) : 0;
 
+  // calculate and format the fee in the output token
+  const frontendFeeEstimate =
+    txnQuoteData && bottomToken.token
+      ? formatNumber(
+          parseFloat(
+            formatUnits(
+              BigInt(txnQuoteData.quoteGasAdjusted || "0"),
+              bottomToken.token.coinDecimals,
+            ),
+          ) * 0.0025, // TODO - get fee percentage from config
+          { minimumFractionDigits: 6, maximumFractionDigits: 6 },
+        )
+      : undefined;
+
   return {
     txnQuoteDataLoading: txnQuoteLoading,
     gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD || "0",
@@ -191,5 +205,6 @@ export const useTxnInfo = ({
           { minimumFractionDigits: 6, maximumFractionDigits: 6 },
         )
       : "0.00",
+    frontendFeeEstimate,
   };
 };

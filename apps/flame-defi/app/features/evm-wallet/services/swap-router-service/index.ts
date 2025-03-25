@@ -28,6 +28,7 @@ import {
 import { GenericContractService } from "../generic-contract-service";
 
 // Default fee in basis points (25 bips = 0.25%)
+// TODO - move to AppConfig
 const DEFAULT_FEE_BIPS = 25n;
 
 export class SwapRouterService extends GenericContractService {

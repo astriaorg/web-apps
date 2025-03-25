@@ -51,6 +51,7 @@ export interface TransactionInfo {
   expectedOutputFormatted: string;
   priceImpact: string;
   minimumReceived: string;
+  frontendFeeEstimate?: string;
 }
 
 export interface SwapTxnStepsProps {
