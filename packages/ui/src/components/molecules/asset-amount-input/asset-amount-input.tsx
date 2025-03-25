@@ -11,7 +11,11 @@ type Params = {
   balance?: string;
 };
 
-export const useAssetAmountInput = ({ balance, minimum, asset }: Params) => {
+export const useAssetAmountInput = ({
+  balance = "0",
+  minimum,
+  asset,
+}: Params) => {
   const validate = useValidateAssetAmount();
 
   const [amount, setAmount] = useState<Amount>({
@@ -59,8 +63,8 @@ export const useAssetAmountInput = ({ balance, minimum, asset }: Params) => {
   }, []);
 
   const isInvalid = useMemo(() => {
-    return !isPristine && !!amount.validation && !amount.validation.isValid;
-  }, [isPristine, amount.validation]);
+    return !!amount.validation && !amount.validation.isValid;
+  }, [amount.validation]);
 
   return {
     amount,

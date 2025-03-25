@@ -146,13 +146,11 @@ export const DepositCards = () => {
               />
             </div>
           </CardLabel>
-          <Skeleton isLoading={isPending}>
-            <CardFigureInput
-              value={amount.value}
-              onInput={onInput}
-              readOnly={!isConnected}
-            />
-          </Skeleton>
+          <CardFigureInput
+            value={amount.value}
+            onInput={onInput}
+            readOnly={!isConnected}
+          />
           <CardLabel className="text-typography-light text-sm/3">
             {data?.vaultByAddress.asset.priceUsd && amount.value
               ? formatAbbreviatedNumber(
@@ -190,7 +188,7 @@ export const DepositCards = () => {
         </CardContent>
       </Card>
       <Skeleton isLoading={isPending}>
-        <WalletActionButton disabled={isConnected ? isValid : false}>
+        <WalletActionButton disabled={isConnected ? !isValid : false}>
           Deposit
         </WalletActionButton>
       </Skeleton>

@@ -242,7 +242,7 @@ export const BorrowCards = () => {
       </Card>
       <Skeleton isLoading={isPending}>
         <WalletActionButton
-          disabled={isConnected ? !isValidSupply && !isValidBorrow : false}
+          disabled={isConnected ? !isValidBorrow || !isValidSupply : false}
         >
           Deposit
         </WalletActionButton>
