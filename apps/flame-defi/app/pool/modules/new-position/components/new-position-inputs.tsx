@@ -40,7 +40,7 @@ export const NewPositionInputs = ({
             <CardFigureInput
               placeholder="0.00"
               value={input.value}
-              className="normalize-input flex w-full max-w-[62%] md:max-w-[60%] text-ellipsis overflow-hidden"
+              className="normalize-input flex w-full max-w-[62%] md:max-w-[75%] text-ellipsis overflow-hidden"
               onChange={(e) => setInput({ ...input, value: e.target.value })}
             />
             <div className="flex flex-col items-end w-[85px]">

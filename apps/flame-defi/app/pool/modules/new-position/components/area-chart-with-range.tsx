@@ -9,13 +9,13 @@ import {
 } from "recharts";
 
 interface AreaChartWithRangeProps {
-  priceRange?: number[];
+  priceRange: number[];
 }
 
 export const AreaChartWithRange: React.FC<AreaChartWithRangeProps> = ({
   // TODO: replace this with the actual price range for the pool
   priceRange = [1, 30],
-}) => {
+}: AreaChartWithRangeProps) => {
   // Generate sample data for the chart
   const generateData = () => {
     const data = [];
@@ -50,8 +50,8 @@ export const AreaChartWithRange: React.FC<AreaChartWithRangeProps> = ({
   };
 
   const data = generateData();
-  const minValue = priceRange?.[0] || 0;
-  const maxValue = priceRange?.[1] || 30;
+  const minValue = priceRange[0];
+  const maxValue = priceRange[1];
   const chartMin = 0;
 
   return (
