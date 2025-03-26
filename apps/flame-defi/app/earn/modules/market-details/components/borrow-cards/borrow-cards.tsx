@@ -76,8 +76,6 @@ export const BorrowCards = () => {
       value: React.ReactNode;
     }[]
   >(() => {
-    const isFetchEnabled = isConnected && fetchStatus !== "idle";
-
     return [
       {
         label: {
@@ -95,7 +93,7 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: isFetchEnabled ? (
+        value: (
           <FormattedNumber
             value={new Big(
               marketPositionData?.marketPosition.state?.collateral ?? 0,
@@ -107,8 +105,6 @@ export const BorrowCards = () => {
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
-        ) : (
-          "-"
         ),
       },
       {
@@ -127,7 +123,7 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: isFetchEnabled ? (
+        value: (
           <FormattedNumber
             value={new Big(
               marketPositionData?.marketPosition.state?.borrowAssets ?? 0,
@@ -137,8 +133,6 @@ export const BorrowCards = () => {
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
-        ) : (
-          "-"
         ),
       },
       {
@@ -147,8 +141,7 @@ export const BorrowCards = () => {
         },
         value: (
           <>
-            {isFetchEnabled &&
-            !!marketPositionData?.marketPosition.state?.collateral ? (
+            {marketPositionData?.marketPosition.state?.collateral ? (
               <FormattedNumber
                 value={new Big(
                   marketPositionData?.marketPosition.state?.borrowAssets ?? 0,
@@ -173,7 +166,7 @@ export const BorrowCards = () => {
         ),
       },
     ];
-  }, [data, marketPositionData, isConnected, fetchStatus]);
+  }, [data, marketPositionData]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -216,7 +209,7 @@ export const BorrowCards = () => {
                 <div>{it.label.right}</div>
               </CardLabel>
               <CardLabel className="text-2xl/6 text-typography-default">
-                {it.value}
+                {isConnected && fetchStatus !== "idle" ? it.value : "-"}
               </CardLabel>
             </div>
           ))}

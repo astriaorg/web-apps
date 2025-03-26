@@ -52,8 +52,6 @@ export const DepositCards = () => {
       value: React.ReactNode;
     }[]
   >(() => {
-    const isFetchEnabled = isConnected && fetchStatus !== "idle";
-
     return [
       {
         label: {
@@ -71,7 +69,7 @@ export const DepositCards = () => {
             </div>
           ),
         },
-        value: isFetchEnabled ? (
+        value: (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -79,8 +77,6 @@ export const DepositCards = () => {
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
-        ) : (
-          "-"
         ),
       },
       {
@@ -102,7 +98,7 @@ export const DepositCards = () => {
           left: "Projected Earnings / Month",
           right: "USD",
         },
-        value: isFetchEnabled ? (
+        value: (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -120,8 +116,6 @@ export const DepositCards = () => {
             style="currency"
             currency="USD"
           />
-        ) : (
-          "-"
         ),
       },
       {
@@ -129,7 +123,7 @@ export const DepositCards = () => {
           left: "Projected Earnings / Year",
           right: "USD",
         },
-        value: isFetchEnabled ? (
+        value: (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -141,12 +135,10 @@ export const DepositCards = () => {
             style="currency"
             currency="USD"
           />
-        ) : (
-          "-"
         ),
       },
     ];
-  }, [data, vaultPositionData, isConnected, fetchStatus]);
+  }, [data, vaultPositionData]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -180,7 +172,7 @@ export const DepositCards = () => {
                 <div>{it.label.right}</div>
               </CardLabel>
               <CardLabel className="text-2xl/6 text-typography-default">
-                {it.value}
+                {isConnected && fetchStatus !== "idle" ? it.value : "-"}
               </CardLabel>
             </div>
           ))}
