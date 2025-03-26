@@ -200,7 +200,11 @@ export const BorrowCards = () => {
         isLoading={isPending}
         onInput={onInputBorrow}
       />
-      <Card isLoading={isPending || marketPositionIsPending}>
+      <Card
+        isLoading={
+          isPending || (marketPositionIsPending && fetchStatus !== "idle")
+        }
+      >
         <CardContent className="space-y-4">
           {items.map((it, index) => (
             <div
