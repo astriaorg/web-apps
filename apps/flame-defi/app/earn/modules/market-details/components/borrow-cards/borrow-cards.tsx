@@ -27,13 +27,16 @@ export const BorrowCards = () => {
   } = usePageContext();
   const { isConnected, address } = useAccount();
 
-  const { data: marketPositionData, isPending: marketPositionIsPending } =
-    useFetchMarketPosition({
-      variables: {
-        key: params.key,
-        address,
-      },
-    });
+  const {
+    data: marketPositionData,
+    isPending: marketPositionIsPending,
+    fetchStatus,
+  } = useFetchMarketPosition({
+    variables: {
+      key: params.key,
+      address,
+    },
+  });
 
   useEffect(() => {
     // TODO: Should probably use a middleware redirect.
@@ -73,6 +76,8 @@ export const BorrowCards = () => {
       value: React.ReactNode;
     }[]
   >(() => {
+    const isFetchEnabled = isConnected && fetchStatus !== "idle";
+
     return [
       {
         label: {
@@ -90,7 +95,7 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: isConnected ? (
+        value: isFetchEnabled ? (
           <FormattedNumber
             value={new Big(
               marketPositionData?.marketPosition.state?.collateral ?? 0,
@@ -122,7 +127,7 @@ export const BorrowCards = () => {
             </div>
           ),
         },
-        value: isConnected ? (
+        value: isFetchEnabled ? (
           <FormattedNumber
             value={new Big(
               marketPositionData?.marketPosition.state?.borrowAssets ?? 0,
@@ -142,7 +147,7 @@ export const BorrowCards = () => {
         },
         value: (
           <>
-            {isConnected &&
+            {isFetchEnabled &&
             !!marketPositionData?.marketPosition.state?.collateral ? (
               <FormattedNumber
                 value={new Big(
@@ -168,7 +173,7 @@ export const BorrowCards = () => {
         ),
       },
     ];
-  }, [data, marketPositionData, isConnected]);
+  }, [data, marketPositionData, isConnected, fetchStatus]);
 
   useEffect(() => {
     if (!isConnected) {

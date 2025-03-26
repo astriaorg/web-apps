@@ -26,13 +26,16 @@ export const DepositCards = () => {
   } = usePageContext();
   const { isConnected, address } = useAccount();
 
-  const { data: vaultPositionData, isPending: vaultPositionIsPending } =
-    useFetchVaultPosition({
-      variables: {
-        vault: params.address,
-        address,
-      },
-    });
+  const {
+    data: vaultPositionData,
+    isPending: vaultPositionIsPending,
+    fetchStatus,
+  } = useFetchVaultPosition({
+    variables: {
+      vault: params.address,
+      address,
+    },
+  });
 
   const { amount, onInput, onReset, isValid } = useAssetAmountInput({
     balance: "0",
@@ -49,6 +52,8 @@ export const DepositCards = () => {
       value: React.ReactNode;
     }[]
   >(() => {
+    const isFetchEnabled = isConnected && fetchStatus !== "idle";
+
     return [
       {
         label: {
@@ -66,7 +71,7 @@ export const DepositCards = () => {
             </div>
           ),
         },
-        value: isConnected ? (
+        value: isFetchEnabled ? (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -97,7 +102,7 @@ export const DepositCards = () => {
           left: "Projected Earnings / Month",
           right: "USD",
         },
-        value: isConnected ? (
+        value: isFetchEnabled ? (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -124,7 +129,7 @@ export const DepositCards = () => {
           left: "Projected Earnings / Year",
           right: "USD",
         },
-        value: isConnected ? (
+        value: isFetchEnabled ? (
           <FormattedNumber
             value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
               .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
@@ -141,7 +146,7 @@ export const DepositCards = () => {
         ),
       },
     ];
-  }, [data, vaultPositionData, isConnected]);
+  }, [data, vaultPositionData, isConnected, fetchStatus]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -159,7 +164,11 @@ export const DepositCards = () => {
         isLoading={isPending}
         onInput={onInput}
       />
-      <Card isLoading={isPending || vaultPositionIsPending}>
+      <Card
+        isLoading={
+          isPending || (vaultPositionIsPending && fetchStatus !== "idle")
+        }
+      >
         <CardContent className="space-y-4">
           {items.map((it, index) => (
             <div

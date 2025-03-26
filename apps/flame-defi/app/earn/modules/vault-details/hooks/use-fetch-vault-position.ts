@@ -35,6 +35,7 @@ export const useFetchVaultPosition = ({
         return;
       }
 
+      // Note: API will throw an error if the user has no position in the vault.
       return request(earnAPIURL, query, {
         ...variables,
         address,
