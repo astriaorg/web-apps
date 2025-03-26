@@ -30,6 +30,7 @@ export const useFetchMarketPosition = ({
 
   return useQuery({
     enabled: !!address,
+    retry: false,
     queryKey: ["useFetchMarketPosition", variables, address],
     queryFn: async () => {
       if (!address) {

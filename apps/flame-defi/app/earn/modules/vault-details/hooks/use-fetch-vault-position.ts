@@ -29,13 +29,15 @@ export const useFetchVaultPosition = ({
 
   return useQuery({
     enabled: !!address,
+    // API will throw an error by design if the user has no position in the vault.
+    // Disable retries so failed queries don't retry, causing the loader to keep re-appearing.
+    retry: false,
     queryKey: ["useFetchVaultPosition", variables, address],
     queryFn: async () => {
       if (!address) {
         return;
       }
 
-      // Note: API will throw an error if the user has no position in the vault.
       return request(earnAPIURL, query, {
         ...variables,
         address,
