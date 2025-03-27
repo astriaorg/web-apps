@@ -40,9 +40,9 @@ export const getSummarizedData = <T extends Point>(
   const max = Math.max(...domain);
   const min = Math.min(...domain);
   const range = max - min;
-  // The `simplify` function requires a threshold value to determine the tolerance for simplification.
+  // The `simplify` function requires a value to determine the tolerance for simplification.
   // Because each chart has a different range, this calculation may not be perfect and more cases may need to be handled.
-  const threshold = (() => {
+  const tolerance = (() => {
     if (range < 1) {
       // Handles percentages, i.e. 0.00 < x < 1.00
       return range * 0.01;
@@ -53,7 +53,7 @@ export const getSummarizedData = <T extends Point>(
   const average = domain.reduce((acc, it) => acc + it, 0) / domain.length;
 
   const downsampled =
-    data.length > options.maximumDataPoints ? simplify(data, threshold) : data;
+    data.length > options.maximumDataPoints ? simplify(data, tolerance) : data;
 
   return { downsampled, domain, max, min, range, average };
 };
