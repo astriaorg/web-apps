@@ -1,15 +1,16 @@
 import { cn } from "@repo/ui/utils";
 import Link from "next/link";
 
-interface NavbarLinkProps extends React.ComponentPropsWithoutRef<typeof Link> {
+interface NavigationMenuLinkProps
+  extends React.ComponentPropsWithoutRef<typeof Link> {
   isActive: boolean;
 }
 
-export const NavbarLink = ({
+export const NavigationMenuLink = ({
   children,
   isActive,
   ...props
-}: NavbarLinkProps) => {
+}: NavigationMenuLinkProps) => {
   return (
     <div
       className={cn(

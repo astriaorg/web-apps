@@ -6,9 +6,9 @@ import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import MobileNav from "../mobile-nav/mobile-nav";
 import NetworkSelector from "../network-selector/network-selector";
-import { NavbarLink } from "./navbar-link";
+import { NavigationMenuLink } from "./navigation-menu-link";
 
-const Navbar = () => {
+export const NavigationMenu = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
@@ -27,34 +27,43 @@ const Navbar = () => {
         >
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
-        <div className="flex items-center space-x-8">
-          <NavbarLink href="/" isActive={pathname === "/"}>
+        <div className="items-center space-x-8 hidden lg:flex">
+          <NavigationMenuLink href="/" isActive={pathname === "/"}>
             Bridge
-          </NavbarLink>
-          <NavbarLink href="/swap" isActive={pathname.startsWith("/swap")}>
+          </NavigationMenuLink>
+          <NavigationMenuLink
+            href="/swap"
+            isActive={pathname.startsWith("/swap")}
+          >
             Swap
-          </NavbarLink>
+          </NavigationMenuLink>
           {featureFlags.poolEnabled && (
-            <NavbarLink href="/pool" isActive={pathname.startsWith("/pool")}>
+            <NavigationMenuLink
+              href="/pool"
+              isActive={pathname.startsWith("/pool")}
+            >
               Pool
-            </NavbarLink>
+            </NavigationMenuLink>
           )}
           {featureFlags.earnEnabled && (
             <>
-              <NavbarLink href="/earn" isActive={pathname.startsWith("/earn")}>
+              <NavigationMenuLink
+                href="/earn"
+                isActive={pathname.startsWith("/earn")}
+              >
                 Earn
-              </NavbarLink>
-              <NavbarLink
+              </NavigationMenuLink>
+              <NavigationMenuLink
                 href="/borrow"
                 isActive={pathname.startsWith("/borrow")}
               >
                 Borrow
-              </NavbarLink>
+              </NavigationMenuLink>
             </>
           )}
         </div>
       </div>
-      <div className="hidden md:flex gap-6 items-center">
+      <div className="hidden lg:flex gap-6 items-center">
         <NetworkSelector />
         <ConnectWalletsButton />
       </div>
@@ -62,5 +71,3 @@ const Navbar = () => {
     </nav>
   );
 };
-
-export default Navbar;
