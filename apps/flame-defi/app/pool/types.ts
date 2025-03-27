@@ -36,12 +36,9 @@ export interface PriceCardProps {
 }
 
 export interface PoolPositionsRecord {
-  position: {
-    id: number;
-    symbol: string;
-    symbolTwo: string;
-    percent: number;
-  };
+  symbol: string;
+  symbolTwo: string;
+  feePercent: string;
   positionStatus: string;
   inRange: boolean;
 }
@@ -66,9 +63,35 @@ export type Positions = {
   [key: number]: Position;
 };
 
+// export type PoolPosition = {
+//   nonce: bigint;
+//   operator: string;
+//   tokenAddress0: string;
+//   tokenAddress1: string;
+//   fee: number;
+//   tickLower: number;
+//   tickUpper: number;
+//   liquidity: bigint;
+//   feeGrowthInside0LastX128: bigint;
+//   feeGrowthInside1LastX128: bigint;
+//   tokensOwed0: bigint;
+//   tokensOwed1: bigint;
+//   token0: EvmCurrency | null;
+//   token1: EvmCurrency | null;
+// };
+
+export type PoolPosition = {
+  feePercent: string;
+  symbolOne: string;
+  symbolTwo: string;
+  inRange: boolean;
+  positionStatus: string;
+};
+
 export type PoolContextProps = {
   feeData: FeeData[];
-  poolPositionsRecord: PoolPositionsRecord[];
+  poolPositions: PoolPosition[];
+  poolPositionsLoading: boolean;
 };
 
 export type PoolPositionContextProps = {

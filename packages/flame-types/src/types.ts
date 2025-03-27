@@ -365,6 +365,9 @@ export type EvmChainInfo = {
     [label: string]: ChainContract;
     wrappedNativeToken: ChainContract;
     swapRouter: ChainContract;
+    nonfungiblePositionManager: ChainContract;
+    poolFactory: ChainContract;
+    poolContract: ChainContract;
   };
 };
 
