@@ -27,7 +27,7 @@ const Navbar = () => {
         >
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
-        <div className="flex items-center space-x-8 h-full">
+        <div className="flex items-center space-x-8">
           <NavbarLink href="/" isActive={pathname === "/"}>
             Bridge
           </NavbarLink>
