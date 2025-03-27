@@ -4,8 +4,8 @@ import { FlameIcon } from "@repo/ui/icons";
 import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
-import MobileNav from "../mobile-nav/mobile-nav";
 import NetworkSelector from "../network-selector/network-selector";
+import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
 
 export const NavigationMenu = () => {
@@ -67,7 +67,7 @@ export const NavigationMenu = () => {
         <NetworkSelector />
         <ConnectWalletsButton />
       </div>
-      <MobileNav />
+      <MobileNavigationMenu />
     </nav>
   );
 };

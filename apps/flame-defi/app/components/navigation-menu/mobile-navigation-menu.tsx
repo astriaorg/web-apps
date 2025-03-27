@@ -9,7 +9,7 @@ import {
   DrawerTrigger,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import MobileWalletConnect from "components/mobile-wallet-connect/mobile-wallet-connect";
+import { MobileWalletConnect } from "components/navigation-menu/mobile-wallet-connect";
 import { useConfig } from "config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +18,7 @@ import { useCallback, useEffect, useState } from "react";
 const navLinkClasses = (isActivePathname: boolean) =>
   cn("font-medium text-grey-light text-base", isActivePathname && "text-brand");
 
-function MobileNav() {
+export const MobileNavigationMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { featureFlags } = useConfig();
@@ -32,7 +32,7 @@ function MobileNav() {
   }, [pathname]);
 
   return (
-    <div className="flex items-center gap-4 md:hidden">
+    <div className="flex items-center gap-4 lg:hidden">
       <MobileWalletConnect handleClose={handleClose} />
       <Drawer open={isOpen} onOpenChange={setIsOpen} direction="bottom">
         <DrawerTrigger asChild>
@@ -178,6 +178,4 @@ function MobileNav() {
       </Drawer>
     </div>
   );
-}
-
-export default MobileNav;
+};
