@@ -1,63 +1,52 @@
 "use client";
 
+import { useConfig, useAccount } from "wagmi";
+import { useEvmChainData } from "config/hooks/use-config";
+import {
+  createNonFungiblePositionService,
+  createPoolFactoryService,
+} from "features/evm-wallet";
+import { PoolContextProps, PoolPosition } from "pool/types";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { TXN_STATUS } from "@repo/flame-types";
-import { PoolContextProps } from "pool/types";
-import { createContext, PropsWithChildren, useState } from "react";
+import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
+import { getTokenDataFromCurrencies } from "./pool-position-helpers";
 
 export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
 );
 
-const poolPositionsRecord = [
-  {
-    position: {
-      id: 0,
-      symbol: "TIA",
-      symbolTwo: "milkTIA",
-      percent: 0.0005,
-      apr: 0.12,
-    },
-    inRange: true,
-    positionStatus: "In range",
-  },
-  {
-    position: {
-      id: 1,
-      symbol: "TIA",
-      symbolTwo: "USDC",
-      percent: 0.0005,
-      apr: 0.1,
-    },
-    inRange: false,
-    positionStatus: "Closed",
-  },
-];
-
 const feeData = [
   {
     id: 0,
-    feePercent: "0.01%",
+    feeTier: FEE_TIER.LOWEST,
     text: "Best for very stable pairs",
     tvl: "100M",
     selectPercent: "0.01%",
   },
   {
     id: 1,
-    feePercent: "0.05%",
+    feeTier: FEE_TIER.LOW,
     text: "Best for stable pairs.",
     tvl: "100M",
     selectPercent: "0.05%",
   },
   {
     id: 2,
-    feePercent: "0.3%",
+    feeTier: FEE_TIER.MEDIUM,
     text: "Best for most pairs.",
     tvl: "100M",
     selectPercent: "0.3%",
   },
   {
     id: 3,
-    feePercent: "1%",
+    feeTier: FEE_TIER.HIGH,
     text: "Best for exotic pairs.",
     tvl: "100M",
     selectPercent: "1%",
@@ -65,14 +54,93 @@ const feeData = [
 ];
 
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
+  const wagmiConfig = useConfig();
+  const { selectedChain } = useEvmChainData();
+  const { currencies } = selectedChain;
+  const { address } = useAccount();
+  const [poolPositions, setPoolPositions] = useState<PoolPosition[]>([]);
+  const [poolPositionsLoading, setPoolPositionsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
+
+  const getPoolPositions = useCallback(async () => {
+    if (!address) {
+      return;
+    }
+    const factoryService = createPoolFactoryService(
+      wagmiConfig,
+      selectedChain.contracts.poolFactory.address,
+    );
+
+    setPoolPositionsLoading(true);
+
+    try {
+      const nonFungiblePositionService = createNonFungiblePositionService(
+        wagmiConfig,
+        selectedChain.contracts.nonfungiblePositionManager.address,
+      );
+
+      const positions = await nonFungiblePositionService.getAllPositions(
+        selectedChain.chainId,
+        address,
+      );
+
+      const positionsWithCurrencyData = positions.map(async (position) => {
+        const isClosed = position.liquidity === 0n;
+        const feePercent = (position.fee / 1_000_000) as FeeTier;
+
+        const tokenOne = getTokenDataFromCurrencies(
+          currencies,
+          position.tokenAddress0,
+          selectedChain.contracts.wrappedNativeToken.address
+        );
+
+        const tokenTwo = getTokenDataFromCurrencies(
+          currencies,
+          position.tokenAddress1,
+          selectedChain.contracts.wrappedNativeToken.address
+        );
+
+        const poolAddress = await factoryService.getPool(
+          selectedChain.chainId,
+          position.tokenAddress0,
+          position.tokenAddress1,
+          position.fee,
+        );
+
+        return {
+          symbolOne: tokenOne?.coinDenom ?? "",
+          symbolTwo: tokenTwo?.coinDenom ?? "",
+          feePercent,
+          inRange: isClosed ? false : true,
+          positionStatus: isClosed ? "Closed" : "In range",
+          poolAddress,
+          tokenId: position.tokenId,
+          tokenOne,
+          tokenTwo,
+          ...position,
+        };
+      });
+
+      const resolvedPositions = await Promise.all(positionsWithCurrencyData);
+      setPoolPositions(resolvedPositions);
+    } catch (error) {
+      console.warn("Error fetching pool positions:", error);
+    } finally {
+      setPoolPositionsLoading(false);
+    }
+  }, [address, currencies, wagmiConfig, selectedChain]);
+
+  useEffect(() => {
+    getPoolPositions();
+  }, [getPoolPositions]);
 
   return (
     <PoolContext.Provider
       value={{
         feeData,
-        poolPositionsRecord,
+        poolPositions,
+        poolPositionsLoading,
         modalOpen,
         setModalOpen,
         txnStatus,

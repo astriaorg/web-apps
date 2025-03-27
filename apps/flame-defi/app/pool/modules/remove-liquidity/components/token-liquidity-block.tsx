@@ -9,26 +9,28 @@ export const TokenLiquidityBlock = ({
 }: {
   liquidityToRemove: PoolToken[];
 }) => {
-  const { poolTokens, poolTokenOne, poolTokenTwo, feeTier } =
+  const { poolTokenOne, poolTokenTwo, feeTier } =
     usePoolPositionContext();
+  const symbolsReady = poolTokenOne?.symbol && poolTokenTwo?.symbol;
 
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4 justify-center">
         {/* TODO: loading state */}
-        <Skeleton isLoading={false} className="">
-          <div className="flex flex-col space-x-2">
-            <MultiTokenIcon
-              symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
-              size={24}
-            />
-            <h1 className="text-2xl/8 mt-2">
-              {poolTokenOne.symbol}/{poolTokenTwo.symbol}
-            </h1>
-          </div>
+        <Skeleton isLoading={!symbolsReady} className="">
+          {symbolsReady && (
+            <div className="flex flex-col space-x-2">
+              <MultiTokenIcon
+                symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
+                size={24}
+              />
+              <h1 className="text-2xl/8 mt-2">
+                {poolTokenOne.symbol}/{poolTokenTwo.symbol}
+              </h1>
+            </div>
+          )}
         </Skeleton>
-        {/* TODO: loading state */}
-        <Skeleton isLoading={false} className="">
+        <Skeleton isLoading={!feeTier} className="">
           <div className="flex space-x-2">
             <Badge
               variant="default"
@@ -44,11 +46,13 @@ export const TokenLiquidityBlock = ({
         </Skeleton>
       </div>
       <div className="flex flex-col flex-1 bg-surface-1 rounded-lg p-4">
-        <PoolFeesAndLiquidityCard
-          poolTokens={poolTokens}
-          className="p-0"
-          liquidityToRemove={liquidityToRemove}
-        />
+        {poolTokenOne && poolTokenTwo && (
+          <PoolFeesAndLiquidityCard
+            poolTokens={[poolTokenOne, poolTokenTwo]}
+            className="p-0"
+            liquidityToRemove={liquidityToRemove}
+          />
+        )}
       </div>
     </div>
   );

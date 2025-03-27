@@ -5,6 +5,7 @@ import { CheckMarkIcon } from "@repo/ui/icons";
 import { FeeData } from "../../../types";
 import { usePoolContext } from "pool/hooks";
 import { cn } from "@repo/ui/utils";
+import { useIntl } from "react-intl";
 
 export interface FeeRangeProps {
   selectedFeeTier: FeeData;
@@ -16,10 +17,10 @@ export const FeeRange = ({
   setSelectedFeeTier,
 }: FeeRangeProps): React.ReactElement => {
   const { feeData } = usePoolContext();
-
+  const { formatNumber } = useIntl();
   return (
     <div className="flex flex-col gap-2">
-      {feeData.map(({ feePercent, text, selectPercent }, i) => (
+      {feeData.map(({ feeTier, text, selectPercent }, i) => (
         <div
           key={i}
           className={cn(
@@ -37,7 +38,11 @@ export const FeeRange = ({
                   selectedFeeTier.id === i ? "opacity-100" : "opacity-0",
                 )}
               />
-              {feePercent}
+              {formatNumber(feeTier / 1_000_000, {
+                style: "percent",
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 2,
+              })}
             </span>
             <span className="text-grey-light text-sm text-left">{text}</span>
           </div>
