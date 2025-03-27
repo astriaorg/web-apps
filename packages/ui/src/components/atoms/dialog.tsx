@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import * as React from "react";
 
+import { CloseIcon } from "../../icons";
 import { cn } from "../../utils";
 
 const Dialog = DialogPrimitive.Root;
@@ -55,8 +55,12 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
           {...props}
         >
           {children}
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-orange-soft data-[state=open]:text-muted-foreground">
-            <X className="h-4 w-4" />
+          <DialogPrimitive.Close
+            className="absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-orange-soft data-[state=open]:text-muted-foreground"
+            // This label is used to apply styling when the close button needs to be customized.
+            aria-label="Close"
+          >
+            <CloseIcon className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         </DialogPrimitive.Content>
