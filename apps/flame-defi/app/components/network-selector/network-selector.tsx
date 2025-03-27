@@ -3,7 +3,7 @@
 import type React from "react";
 import { useCallback } from "react";
 
-import { useConfig } from "config";
+import { FlameNetwork } from "@repo/flame-types";
 import {
   Select,
   SelectContent,
@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components";
-import { FlameIcon } from "@repo/ui/icons";
-import { FlameNetwork } from "@repo/flame-types";
+import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { useConfig } from "config";
 
 export default function NetworkSelector(): React.ReactElement {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =
