@@ -3,90 +3,53 @@
 import { FlameIcon } from "@repo/ui/icons";
 import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
 import { useConfig } from "config";
-import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileNav from "../mobile-nav/mobile-nav";
 import NetworkSelector from "../network-selector/network-selector";
+import { NavbarLink } from "./navbar-link";
 
 const Navbar = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
-  const navLinkClasses = (isActivePathname: boolean) => `
-    relative px-4 py-2 text-grey-light hover:text-white
-    hover:after:content-[''] hover:after:absolute hover:after:bottom-[-22px]
-    hover:after:left-1/2 hover:after:transform hover:after:-translate-x-1/2
-    hover:after:w-[85%] hover:after:h-1 hover:after:bg-[#9CA3AF]
-    ${
-      isActivePathname
-        ? `
-      text-white
-      after:content-[''] after:absolute after:bottom-[-22px]
-      after:left-1/2 after:transform after:-translate-x-1/2
-      after:w-[85%] after:h-1 after:bg-linear-to-r
-      after:from-[#EA9B57] after:to-[#CB513F]
-    `
-        : ""
-    }
-  `;
-
   return (
     <nav
-      className="flex justify-between border-b border-[#2A2A2A] px-4 lg:px-12 py-4 w-full h-[85px] bg-black"
-      aria-label="main navigation"
+      className="flex items-center justify-between px-4 py-2 w-full h-14 bg-background-default"
+      aria-label="Navigation"
+      role="navigation"
     >
       <div className="flex flex-1 items-center">
         <a
           target="_blank"
           href={brandURL}
-          className="flex items-center pl-0 p-2 px-3"
+          className="flex items-center w-8 h-8 overflow-hidden mr-12"
           rel="noreferrer"
         >
-          <Image
-            src="/assets/logo-flame-w-text.svg"
-            width={161}
-            height={32}
-            alt="Flame Logo"
-            className="hidden lg:block"
-            priority
-          />
-          <FlameIcon size={36} className="block lg:hidden" />
+          <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
-      </div>
-      <div id="topNavbar" className="flex-1 hidden md:flex">
-        <div className="flex justify-center items-center font-mono font-medium mr-2">
-          <Link href="/" className={navLinkClasses(pathname === "/")}>
-            BRIDGE
-          </Link>
-          <Link
-            href="/swap"
-            className={navLinkClasses(pathname.startsWith("/swap"))}
-          >
-            SWAP
-          </Link>
+        <div className="flex items-center space-x-8 h-full">
+          <NavbarLink href="/" isActive={pathname === "/"}>
+            Bridge
+          </NavbarLink>
+          <NavbarLink href="/swap" isActive={pathname.startsWith("/swap")}>
+            Swap
+          </NavbarLink>
           {featureFlags.poolEnabled && (
-            <Link
-              href="/pool"
-              className={navLinkClasses(pathname.startsWith("/pool"))}
-            >
-              POOL
-            </Link>
+            <NavbarLink href="/pool" isActive={pathname.startsWith("/pool")}>
+              Pool
+            </NavbarLink>
           )}
           {featureFlags.earnEnabled && (
             <>
-              <Link
-                href="/earn"
-                className={navLinkClasses(pathname.startsWith("/earn"))}
-              >
-                EARN
-              </Link>
-              <Link
+              <NavbarLink href="/earn" isActive={pathname.startsWith("/earn")}>
+                Earn
+              </NavbarLink>
+              <NavbarLink
                 href="/borrow"
-                className={navLinkClasses(pathname.startsWith("/borrow"))}
+                isActive={pathname.startsWith("/borrow")}
               >
-                BORROW
-              </Link>
+                Borrow
+              </NavbarLink>
             </>
           )}
         </div>
