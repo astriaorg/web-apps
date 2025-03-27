@@ -1,4 +1,4 @@
-import { EvmCurrency, TXN_STATUS } from "@repo/flame-types";
+import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
@@ -6,12 +6,12 @@ export interface AddLiquidityInputsBlockProps {
   setInputOne: (value: string) => void;
   setInputTwo: (value: string) => void;
 }
-
-export interface StepProps {
-  step: number;
-  setStep: (thing: number) => void;
-  tokenPair: TokenPair;
-  selectedFeeTier: FeeData | undefined;
+export interface NewPositionInputsProps {
+  inputOne: TokenInputState;
+  inputTwo: TokenInputState;
+  setInputOne: (value: TokenInputState) => void;
+  setInputTwo: (value: TokenInputState) => void;
+  currencies: EvmCurrency[];
 }
 
 export interface TokenPair {

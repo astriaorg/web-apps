@@ -1,19 +1,32 @@
 import {
-  Button,
   Card,
   CardContent,
-  CardFigureInput,
   CardLabel,
+  Skeleton,
+  useAssetAmountInput,
 } from "@repo/ui/components";
 import { Image } from "components/image";
+import { DepositCard } from "earn/components/deposit-card";
+import { WalletActionButton } from "earn/components/wallet-action-button";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
+import { useAccount } from "wagmi";
+
+// TODO: Get balance from contract.
+const BALANCE = "0";
 
 export const DepositCards = () => {
   const {
     query: { data, isPending },
   } = usePageContext();
+  const { isConnected } = useAccount();
+
+  const { amount, onInput, onReset, isValid } = useAssetAmountInput({
+    balance: "0",
+    minimum: "0",
+    asset: data?.vaultByAddress.asset,
+  });
 
   const items = useMemo<
     {
@@ -109,36 +122,22 @@ export const DepositCards = () => {
     ];
   }, [data]);
 
+  useEffect(() => {
+    if (!isConnected) {
+      onReset();
+    }
+  }, [isConnected, onReset]);
+
   return (
     <div className="flex flex-col gap-2">
-      <Card isLoading={isPending}>
-        <CardContent className="space-y-2">
-          <CardLabel>
-            <span className="flex-1">
-              Deposit {data?.vaultByAddress.asset.symbol}
-            </span>
-            <div>
-              <Image
-                src={data?.vaultByAddress.asset.logoURI}
-                alt={data?.vaultByAddress.asset.name}
-                width={16}
-                height={16}
-                className="rounded-full"
-              />
-            </div>
-          </CardLabel>
-          <CardFigureInput placeholder="0.00" />
-          <CardLabel className="text-typography-light text-sm/3">
-            <FormattedNumber
-              value={0}
-              minimumFractionDigits={2}
-              maximumFractionDigits={2}
-              style="currency"
-              currency="USD"
-            />
-          </CardLabel>
-        </CardContent>
-      </Card>
+      <DepositCard
+        asset={data?.vaultByAddress.asset}
+        title="Deposit"
+        amount={amount}
+        balance={BALANCE}
+        isLoading={isPending}
+        onInput={onInput}
+      />
       <Card isLoading={isPending}>
         <CardContent className="space-y-4">
           {items.map((it, index) => (
@@ -157,7 +156,11 @@ export const DepositCards = () => {
           ))}
         </CardContent>
       </Card>
-      <Button>Connect Wallet</Button>
+      <Skeleton isLoading={isPending}>
+        <WalletActionButton disabled={isConnected ? !isValid : false}>
+          Deposit
+        </WalletActionButton>
+      </Skeleton>
     </div>
   );
 };
