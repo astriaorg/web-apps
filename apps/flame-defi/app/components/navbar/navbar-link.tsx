@@ -13,7 +13,7 @@ export const NavbarLink = ({
   return (
     <div
       className={cn(
-        "relative text-typography-light",
+        "relative text-typography-light hover:text-typography-default",
         isActive &&
           `text-typography-default after:content-[''] after:absolute after:transform after:-bottom-0 after:left-1/2  after:-translate-x-1/2 after:w-full after:h-[1px] after:bg-typography-default`,
       )}
