@@ -78,13 +78,12 @@ export const AddLiquidityTxnSummary = ({
                   {token.symbol}
                 </span>
                 <span>
-                  {formatNumber(
-                    parseFloat(addLiquidityInputValues?.[index] || "0"),
-                    {
+                  {addLiquidityInputValues &&
+                    addLiquidityInputValues[index] &&
+                    formatNumber(parseFloat(addLiquidityInputValues[index]), {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
-                    },
-                  )}
+                    })}
                 </span>
               </div>
             ))}
