@@ -12,7 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  getDownsampledData,
+  getSummarizedData,
   getTickIntervalData,
   getTickIntervalDateTimeFormatOptions,
   Skeleton,
@@ -110,9 +110,9 @@ export const LineChart = <
       };
     }
 
-    const downsampled = getDownsampledData(data);
-
-    const domain = downsampled.map((it) => it.y ?? 0);
+    const { downsampled, min, max, average } = getSummarizedData(
+      data as { x: number; y: number }[],
+    );
 
     return {
       downsampled,
@@ -122,9 +122,9 @@ export const LineChart = <
         interval,
         "x",
       ).map((it) => (it?.x ?? 0) / 1000),
-      dataMin: Math.max(0, Math.min(...domain) * 0.1), // Make chart have some margin at the bottom.
-      dataMax: Math.max(...domain),
-      dataAverage: domain.reduce((acc, it) => acc + it, 0) / domain.length,
+      dataMin: Math.max(0, min * 0.1), // Make chart have some margin at the bottom.
+      dataMax: max,
+      dataAverage: average,
     };
   }, [data, interval]);
 
