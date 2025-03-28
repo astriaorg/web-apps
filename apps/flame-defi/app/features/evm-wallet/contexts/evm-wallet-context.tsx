@@ -284,7 +284,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [selectedEvmChain]);
 
   const ibcWithdrawFeeDisplay = useMemo(() => {
-    if (!selectedEvmChainNativeToken || !selectedEvmCurrency?.ibcWithdrawalFeeWei) {
+    if (
+      !selectedEvmChainNativeToken ||
+      !selectedEvmCurrency?.ibcWithdrawalFeeWei
+    ) {
       return "";
     }
 

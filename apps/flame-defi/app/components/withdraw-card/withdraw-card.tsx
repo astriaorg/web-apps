@@ -199,7 +199,7 @@ export default function WithdrawCard(): React.ReactElement {
       if (!selectedEvmCurrency.ibcWithdrawalFeeWei) {
         // NOTE - we started with only cosmos chains so they were all ibc withdrawals previously,
         //  but we will be supporting Base withdrawals soon probably
-        throw new Error("Base withdrawals coming soon but not yet supported.")
+        throw new Error("Base withdrawals coming soon but not yet supported.");
       }
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
