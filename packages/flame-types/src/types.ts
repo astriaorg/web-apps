@@ -8,8 +8,8 @@ import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract } from "viem";
 import React from "react";
 import JSBI from "jsbi";
-
 import Big from "big.js";
+
 // FIXME - i manually recreated types from keplr here as a stop gap.
 //  this will get refactored further when i update the config logic
 //  to support network switching
@@ -262,7 +262,7 @@ export class EvmCurrency {
   public readonly coinDecimals: number;
 
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
-  public readonly ibcWithdrawalFeeWei: string;
+  public readonly ibcWithdrawalFeeWei?: string;
 
   /** ERC-20 contract address if this is a token, undefined for native currencies */
   public readonly erc20ContractAddress?: HexString;
@@ -284,7 +284,7 @@ export class EvmCurrency {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
-    ibcWithdrawalFeeWei: string;
+    ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: HexString;
     nativeTokenWithdrawerContractAddress?: HexString;
     isWrappedNative: boolean;
@@ -357,15 +357,32 @@ export class EvmCurrency {
 export type EvmChainInfo = {
   chainId: number;
   chainName: string;
-  currencies: [EvmCurrency, ...EvmCurrency[]];
   rpcUrls: string[];
-  IconComponent?: React.FC;
   blockExplorerUrl?: string;
   contracts: {
     [label: string]: ChainContract;
     wrappedNativeToken: ChainContract;
     swapRouter: ChainContract;
   };
+  currencies: [EvmCurrency, ...EvmCurrency[]];
+  IconComponent?: React.FC;
+};
+
+/**
+ * Represents a chain on the Base network.
+ *
+ * NOTE: `BaseChainInfo` was too ambiguous even if technically correct name.
+ */
+export type CoinbaseChainInfo = Omit<EvmChainInfo, "contracts"> & {
+  contracts: {
+    [label: string]: ChainContract;
+    intentBridgeDeposit: ChainContract;
+  };
+};
+
+// CoinbaseChains type maps labels to CoinbaseChainInfo objects
+export type CoinbaseChains = {
+  [label: string]: CoinbaseChainInfo;
 };
 
 /**

@@ -1,9 +1,15 @@
-import { CosmosChains, EvmChains, FlameNetwork } from "@repo/flame-types";
+import {
+  CoinbaseChains,
+  CosmosChains,
+  EvmChains,
+  FlameNetwork,
+} from "@repo/flame-types";
 
 export interface FlameNetworkConfig {
   name: FlameNetwork;
   evmChains: EvmChains;
   cosmosChains: CosmosChains;
+  coinbaseChains: CoinbaseChains;
 }
 
 export interface ChainConfigsObject {
@@ -23,21 +29,25 @@ const NETWORK_CONFIGS: NetworkConfigs = {
     name: FlameNetwork.LOCAL,
     evmChains: local.evmChains,
     cosmosChains: local.cosmosChains,
+    coinbaseChains: local.coinbaseChains,
   },
   [FlameNetwork.DUSK]: {
     name: FlameNetwork.DUSK,
     evmChains: dusk.evmChains,
     cosmosChains: dusk.cosmosChains,
+    coinbaseChains: dusk.coinbaseChains,
   },
   [FlameNetwork.DAWN]: {
     name: FlameNetwork.DAWN,
     evmChains: dawn.evmChains,
     cosmosChains: dawn.cosmosChains,
+    coinbaseChains: dawn.coinbaseChains,
   },
   [FlameNetwork.MAINNET]: {
     name: FlameNetwork.MAINNET,
     evmChains: mainnet.evmChains,
     cosmosChains: mainnet.cosmosChains,
+    coinbaseChains: mainnet.coinbaseChains,
   },
 };
 

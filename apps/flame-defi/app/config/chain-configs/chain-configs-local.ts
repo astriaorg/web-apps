@@ -1,5 +1,13 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
 import {
+  BaseIcon,
+  CelestiaIcon,
+  FlameIcon,
+  NobleIcon,
+  UsdcIcon,
+} from "@repo/ui/icons";
+import {
+  CoinbaseChainInfo,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -264,4 +272,33 @@ const FakeChainInfo: EvmChainInfo = {
 export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
   Fake: FakeChainInfo,
+};
+
+const BaseChainInfo: CoinbaseChainInfo = {
+  chainId: 84532,
+  chainName: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorerUrl: "https://sepolia.basescan.org",
+  contracts: {
+    intentBridgeDeposit: {
+      address: "0x",
+    },
+  },
+  currencies: [
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };

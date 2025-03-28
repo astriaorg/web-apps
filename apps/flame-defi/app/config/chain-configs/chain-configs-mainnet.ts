@@ -1,4 +1,5 @@
 import {
+  BaseIcon,
   CelestiaIcon,
   DropTiaIcon,
   FlameIcon,
@@ -12,6 +13,8 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
+  CoinbaseChainInfo,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -419,4 +422,33 @@ const FlameChainInfo: EvmChainInfo = {
 
 export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
+};
+
+const BaseChainInfo: CoinbaseChainInfo = {
+  chainId: 8453,
+  chainName: "Base",
+  rpcUrls: ["https://mainnet.base.org"],
+  blockExplorerUrl: "https://basescan.org/",
+  contracts: {
+    intentBridgeDeposit: {
+      address: "0x",
+    },
+  },
+  currencies: [
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };
