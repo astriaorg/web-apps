@@ -25,7 +25,7 @@ export default function WithdrawCard(): React.ReactElement {
     evmChainsOptions,
     selectedEvmChain,
     selectedEvmChainOption,
-    withdrawFeeDisplay,
+    ibcWithdrawFeeDisplay,
     defaultEvmCurrencyOption,
     selectEvmCurrency,
     evmCurrencyOptions,
@@ -195,6 +195,11 @@ export default function WithdrawCard(): React.ReactElement {
         : selectedEvmCurrency.erc20ContractAddress;
       if (!contractAddress) {
         throw new Error("No contract address found");
+      }
+      if (!selectedEvmCurrency.ibcWithdrawalFeeWei) {
+        // NOTE - we started with only cosmos chains so they were all ibc withdrawals previously,
+        //  but we will be supporting Base withdrawals soon probably
+        throw new Error("Base withdrawals coming soon but not yet supported.")
       }
       const withdrawerSvc = createWithdrawerService(
         wagmiConfig,
@@ -422,9 +427,9 @@ export default function WithdrawCard(): React.ReactElement {
                     Balance: <i className="fas fa-spinner fa-pulse" />
                   </p>
                 )}
-                {withdrawFeeDisplay && (
+                {ibcWithdrawFeeDisplay && (
                   <div className="mt-2 text-grey-light text-sm">
-                    Withdrawal fee: {withdrawFeeDisplay}
+                    Withdrawal fee: {ibcWithdrawFeeDisplay}
                   </div>
                 )}
               </div>

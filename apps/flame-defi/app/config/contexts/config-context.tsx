@@ -3,6 +3,7 @@ import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable, getOptionalEnvVariable } from "../env";
 import type { AppConfig } from "../index";
 import {
+  CoinbaseChains,
   CosmosChains,
   EvmChains,
   FlameNetwork,
@@ -59,10 +60,15 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const { evmChains: evm, cosmosChains: cosmos } =
-    getChainConfigs(selectedFlameNetwork);
+  const {
+    evmChains: evm,
+    cosmosChains: cosmos,
+    coinbaseChains: coinbase,
+  } = getChainConfigs(selectedFlameNetwork);
   const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
+  const [coinbaseChains, setCoinbaseChains] =
+    React.useState<CoinbaseChains>(coinbase);
 
   const networksList = useMemo(() => {
     return getEnvVariable(
@@ -73,9 +79,11 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
-    const { evmChains, cosmosChains } = getChainConfigs(network);
+    const { evmChains, cosmosChains, coinbaseChains } =
+      getChainConfigs(network);
     setEvmChains(evmChains);
     setCosmosChains(cosmosChains);
+    setCoinbaseChains(coinbaseChains);
     setSelectedFlameNetwork(network);
   };
 
@@ -90,6 +98,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
       value={{
         cosmosChains,
         evmChains,
+        coinbaseChains,
         selectedFlameNetwork,
         selectFlameNetwork,
         brandURL,

@@ -57,7 +57,7 @@ export interface EvmWalletContextProps {
   selectedEvmCurrencyBalance: { value: string; symbol: string } | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   selectEvmCurrency: (currency: EvmCurrency) => void;
-  withdrawFeeDisplay: string;
+  ibcWithdrawFeeDisplay: string;
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
   approveToken: (
@@ -283,8 +283,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     return selectedEvmChain?.currencies[0];
   }, [selectedEvmChain]);
 
-  const withdrawFeeDisplay = useMemo(() => {
-    if (!selectedEvmChainNativeToken || !selectedEvmCurrency) {
+  const ibcWithdrawFeeDisplay = useMemo(() => {
+    if (!selectedEvmChainNativeToken || !selectedEvmCurrency?.ibcWithdrawalFeeWei) {
       return "";
     }
 
@@ -474,7 +474,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectedEvmCurrencyBalance,
     selectEvmChain,
     selectEvmCurrency,
-    withdrawFeeDisplay,
+    ibcWithdrawFeeDisplay,
     getTokenAllowances,
     approveToken,
     tokenAllowances,

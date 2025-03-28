@@ -1,4 +1,5 @@
 import type {
+  CoinbaseChains,
   CosmosChains,
   EvmChains,
   FlameNetwork,
@@ -13,6 +14,8 @@ export interface AppConfig {
   cosmosChains: CosmosChains;
   // The configurations for EVM chains.
   evmChains: EvmChains;
+  // The configurations for Base chains.
+  coinbaseChains: CoinbaseChains;
   // The selected Flame network.
   selectedFlameNetwork: FlameNetwork;
   // Function to select the Flame network.
