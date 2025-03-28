@@ -47,7 +47,8 @@
     "./components": "./src/components/index.ts",
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./icons": "./src/icons/index.ts"
+    "./icons": "./src/icons/index.ts",
+    "./icons/polychrome": "./src/icons/polychrome/index.ts"
   },
   "private": true,
   "scripts": {
