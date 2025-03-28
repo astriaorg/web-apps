@@ -5,10 +5,13 @@ import {
   Skeleton,
   useAssetAmountInput,
 } from "@repo/ui/components";
+import Big from "big.js";
 import { Image } from "components/image";
 import { DepositCard } from "earn/components/deposit-card";
 import { WalletActionButton } from "earn/components/wallet-action-button";
+import { useFetchVaultPosition } from "earn/modules/vault-details/hooks/use-fetch-vault-position";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
+import { useParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 import { useAccount } from "wagmi";
@@ -17,10 +20,22 @@ import { useAccount } from "wagmi";
 const BALANCE = "0";
 
 export const DepositCards = () => {
+  const params = useParams<{ address: string }>();
   const {
     query: { data, isPending },
   } = usePageContext();
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
+
+  const {
+    data: vaultPositionData,
+    isPending: vaultPositionIsPending,
+    fetchStatus,
+  } = useFetchVaultPosition({
+    variables: {
+      vault: params.address,
+      address,
+    },
+  });
 
   const { amount, onInput, onReset, isValid } = useAssetAmountInput({
     balance: "0",
@@ -56,7 +71,9 @@ export const DepositCards = () => {
         },
         value: (
           <FormattedNumber
-            value={0}
+            value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
+              .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+              .toNumber()}
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
@@ -83,7 +100,17 @@ export const DepositCards = () => {
         },
         value: (
           <FormattedNumber
-            value={0}
+            value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
+              .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+              .mul(
+                // APY is the annual rate with compounding, this calculates the monthly rate.
+                Math.pow(
+                  1 + (data?.vaultByAddress.state?.netApy ?? 0),
+                  1 / 12,
+                ) - 1,
+              )
+              .mul(data?.vaultByAddress.asset.priceUsd ?? 0)
+              .toNumber()}
             minimumFractionDigits={2}
             maximumFractionDigits={2}
             style="currency"
@@ -98,7 +125,11 @@ export const DepositCards = () => {
         },
         value: (
           <FormattedNumber
-            value={0}
+            value={new Big(vaultPositionData?.vaultPosition.state?.assets ?? 0)
+              .div(10 ** (data?.vaultByAddress.asset.decimals ?? 18))
+              .mul(data?.vaultByAddress.state?.netApy ?? 0)
+              .mul(data?.vaultByAddress.asset.priceUsd ?? 0)
+              .toNumber()}
             minimumFractionDigits={2}
             maximumFractionDigits={2}
             style="currency"
@@ -106,21 +137,8 @@ export const DepositCards = () => {
           />
         ),
       },
-      {
-        label: {
-          left: "Wallet Balance",
-          right: data?.vaultByAddress.asset.symbol,
-        },
-        value: (
-          <FormattedNumber
-            value={0}
-            minimumFractionDigits={2}
-            maximumFractionDigits={2}
-          />
-        ),
-      },
     ];
-  }, [data]);
+  }, [data, vaultPositionData]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -138,7 +156,11 @@ export const DepositCards = () => {
         isLoading={isPending}
         onInput={onInput}
       />
-      <Card isLoading={isPending}>
+      <Card
+        isLoading={
+          isPending || (vaultPositionIsPending && fetchStatus !== "idle")
+        }
+      >
         <CardContent className="space-y-4">
           {items.map((it, index) => (
             <div
@@ -150,7 +172,7 @@ export const DepositCards = () => {
                 <div>{it.label.right}</div>
               </CardLabel>
               <CardLabel className="text-2xl/6 text-typography-default">
-                {it.value}
+                {isConnected && fetchStatus !== "idle" ? it.value : "-"}
               </CardLabel>
             </div>
           ))}

@@ -1,12 +1,15 @@
+import simplify from "simplify-js";
 import { ChartInterval, ChartTickInterval } from "./chart.types";
 
 type DateParams = number | string | Date;
+type Point = { x: number; y: number };
 
 /**
  * Downsamples data to a maximum number of data points.
  * Useful for displaying large datasets in charts to avoid performance issues.
  */
-export const getDownsampledData = <T>(
+
+export const getSummarizedData = <T extends Point>(
   data: T[],
   options: {
     /**
@@ -14,19 +17,45 @@ export const getDownsampledData = <T>(
      */
     maximumDataPoints: number;
   } = { maximumDataPoints: 100 },
-) => {
-  if (data.length > options.maximumDataPoints) {
-    const downsampled: T[] = [];
-    const interval = Math.ceil(data.length / options.maximumDataPoints);
-
-    for (let i = 0; i < data.length; i += interval) {
-      downsampled.push(data[i] as T);
-    }
-
-    return downsampled;
+): {
+  downsampled: Point[];
+  domain: number[];
+  max: number;
+  min: number;
+  range: number;
+  average: number;
+} => {
+  if (!data.length) {
+    return {
+      downsampled: [],
+      domain: [],
+      max: 0,
+      min: 0,
+      range: 0,
+      average: 0,
+    };
   }
 
-  return data;
+  const domain = data.map((it) => it.y ?? 0);
+  const max = Math.max(...domain);
+  const min = Math.min(...domain);
+  const range = max - min;
+  // The `simplify` function requires a value to determine the tolerance for simplification.
+  // Because each chart has a different range, this calculation may not be perfect and more cases may need to be handled.
+  const tolerance = (() => {
+    if (range < 1) {
+      // Handles percentages, i.e. 0.00 < x < 1.00
+      return range * 0.01;
+    }
+    return undefined;
+  })();
+
+  const average = domain.reduce((acc, it) => acc + it, 0) / domain.length;
+
+  const downsampled =
+    data.length > options.maximumDataPoints ? simplify(data, tolerance) : data;
+
+  return { downsampled, domain, max, min, range, average };
 };
 
 export const CHART_INTERVAL_TO_CHART_TICK_INTERVAL: {

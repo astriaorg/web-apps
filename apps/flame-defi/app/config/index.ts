@@ -1,8 +1,8 @@
-import {
+import type {
   CosmosChains,
   EvmChains,
-  HexString,
   FlameNetwork,
+  HexString,
 } from "@repo/flame-types";
 
 /**
@@ -17,13 +17,13 @@ export interface AppConfig {
   selectedFlameNetwork: FlameNetwork;
   // Function to select the Flame network.
   selectFlameNetwork: (network: FlameNetwork) => void;
-  // The URL for the brand link in the navbar.
+  // The URL for the brand link in the navigation menu.
   brandURL: string;
-  // The URL for the bridge link in the navbar.
+  // The URL for the bridge link in the navigation menu.
   bridgeURL: string;
-  // The URL for the swap link in the navbar.
+  // The URL for the swap link in the navigation menu.
   swapURL: string;
-  // The URL for the pool link in the navbar.
+  // The URL for the pool link in the navigation menu.
   poolURL: string;
   // The base URL for the Morpho API.
   earnAPIURL: string;
@@ -46,11 +46,11 @@ export interface AppConfig {
   };
 }
 
-export { ConfigContextProvider } from "./contexts/config-context";
 export {
   getAllChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
 } from "./chain-configs";
+export { ConfigContextProvider } from "./contexts/config-context";
 export { getEnvVariable, getOptionalEnvVariable } from "./env";
 export { useConfig, useEvmChainData } from "./hooks/use-config";

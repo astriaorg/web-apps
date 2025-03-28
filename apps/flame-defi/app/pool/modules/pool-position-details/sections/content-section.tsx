@@ -1,13 +1,13 @@
 "use client";
 
 import { PositionInfoCard } from "../components";
-import { usePoolPositionContext } from "pool/hooks";
+import { usePoolPositionContext, usePoolContext } from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { Switch } from "@repo/ui/components";
-import { TXN_STATUS } from "@repo/flame-types";
 
 export const ContentSection = () => {
+  const { modalOpen, setModalOpen, txnStatus } = usePoolContext();
   const {
     selectedSymbol,
     handleReverseTokenData,
@@ -15,8 +15,6 @@ export const ContentSection = () => {
     poolTokens,
     collectAsNative,
     handleCollectAsNative,
-    modalOpen,
-    setModalOpen,
   } = usePoolPositionContext();
 
   return (
@@ -57,7 +55,7 @@ export const ContentSection = () => {
             title={"Claim Fees"}
           >
             <PoolTxnSteps
-              txnStatus={TXN_STATUS.IDLE}
+              txnStatus={txnStatus}
               poolTokens={poolTokens}
               txnHash={""}
               txnMsg={""}

@@ -1,21 +1,15 @@
 import { usePathname } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 
-import { FlameNetwork } from "@repo/flame-types";
-import { CheckMarkIcon, FlameIcon } from "@repo/ui/icons";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
   Button,
   Drawer,
   DrawerContent,
   DrawerTrigger,
 } from "@repo/ui/components";
+import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
-import { useConfig } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
@@ -25,65 +19,13 @@ import {
   SingleWalletContent,
   useEvmWallet,
 } from "features/evm-wallet";
+import { MobileNetworkSelect } from "./mobile-network-select";
 
-const MobileNetworkSelector = () => {
-  const { selectedFlameNetwork, selectFlameNetwork, networksList } =
-    useConfig();
-
-  const handleNetworkSelect = useCallback(
-    (network: FlameNetwork) => {
-      selectFlameNetwork(network);
-    },
-    [selectFlameNetwork],
-  );
-
-  return (
-    <Accordion type="single" collapsible className="w-full">
-      <AccordionItem
-        value="transaction-details"
-        className="text-grey-light text-sm border-b-0"
-      >
-        <div className="flex items-center justify-between w-full">
-          <AccordionTrigger className="flex items-center gap-2">
-            <FlameIcon />
-            <span className="text-white text-base font-normal capitalize">
-              {selectedFlameNetwork}
-            </span>
-          </AccordionTrigger>
-        </div>
-        <AccordionContent>
-          {networksList.map((network) => (
-            <div
-              key={network}
-              className="capitalize cursor-pointer mt-4"
-              onClick={() => handleNetworkSelect(network)}
-            >
-              <div className="flex items-center justify-between text-white text-base">
-                <div className="flex items-center gap-2">
-                  <FlameIcon />
-                  <span
-                    className={`${selectedFlameNetwork === network ? "text-orange-soft" : "text-white"} text-base`}
-                  >
-                    {network}
-                  </span>
-                </div>
-                {selectedFlameNetwork === network && (
-                  <CheckMarkIcon className="text-orange-soft" />
-                )}
-              </div>
-            </div>
-          ))}
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-};
-
-export default function MobileWalletConnect({
+export const MobileWalletConnect = ({
   handleClose,
 }: {
   handleClose: () => void;
-}) {
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { connectEvmWallet } = useEvmWallet();
@@ -135,7 +77,7 @@ export default function MobileWalletConnect({
       </DrawerTrigger>
       <DrawerContent className="bg-radial-dark pb-12">
         <div className="pt-4 pb-0 px-8 flex flex-col items-start">
-          <MobileNetworkSelector />
+          <MobileNetworkSelect />
           <hr className="border-border w-full my-4" />
           {isBridgePage ? (
             <>
@@ -159,4 +101,4 @@ export default function MobileWalletConnect({
       </DrawerContent>
     </Drawer>
   );
-}
+};

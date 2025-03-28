@@ -7,7 +7,6 @@ import { PoolPositionContextProps } from "pool/types";
 import { createContext, PropsWithChildren, useState } from "react";
 import { useIntl } from "react-intl";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
-import { TXN_STATUS } from "@repo/flame-types";
 
 export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined
@@ -71,8 +70,6 @@ export const PoolPositionContextProvider = ({
   const params = useParams();
   const { formatNumber } = useIntl();
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const [collectAsNative, setCollectAsNative] = useState<boolean>(
     currentPoolSettings.collectAsNative || false,
   );
@@ -137,10 +134,6 @@ export const PoolPositionContextProvider = ({
         handleReverseTokenData,
         collectAsNative,
         handleCollectAsNative,
-        txnStatus,
-        setTxnStatus,
-        modalOpen,
-        setModalOpen,
         poolTokenOne,
         poolTokenTwo,
       }}

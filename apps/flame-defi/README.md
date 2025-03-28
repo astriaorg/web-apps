@@ -8,7 +8,7 @@ the Astria Flame app.
 ### Application directory structure
 
 - `app/bridge` - bridge page
-- `app/components` - More general React components for the app, e.g. Navbar,
+- `app/components` - More general React components for the app, e.g. `NavigationMenu`,
   Dropdown, CopyToClipboardButton, etc
 - `app/config` - Configuration for the app
   - `app/config/chainConfigs` - Celestia and Astria chain information

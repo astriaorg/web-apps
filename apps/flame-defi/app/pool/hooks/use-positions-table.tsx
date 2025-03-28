@@ -34,11 +34,27 @@ export const usePositionsTable = () => {
                 size={24}
                 shift={10}
               />
-              <span className="text-lg font-medium">
+              <span className="text-base font-medium ml-2">
                 {row.original.position.symbol}/{row.original.position.symbolTwo}
               </span>
               <span className="bg-surface-2 text-white text-sm px-3 py-1 rounded-xl group-hover:bg-black transition">
                 {formatNumber(row.original.position.percent, {
+                  style: "percent",
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("position.apr", {
+        id: "apr",
+        header: "APR",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center justify-start w-full space-x-2 md:space-x-4">
+              <span className="text-white text-base">
+                {formatNumber(row.original.position.apr, {
                   style: "percent",
                   maximumFractionDigits: 2,
                 })}

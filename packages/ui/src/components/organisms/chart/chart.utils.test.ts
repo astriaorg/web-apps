@@ -1,29 +1,59 @@
 import { CHART_TICK_INTERVALS } from "./chart.types";
-import { getDownsampledData, getTickIntervalData } from "./chart.utils";
+import { getSummarizedData, getTickIntervalData } from "./chart.utils";
 
-describe("getDownsampledData", () => {
-  it("should return an empty array when input data is empty", () => {
-    const data: number[] = [];
-    const result = getDownsampledData(data, { maximumDataPoints: 10 });
-    expect(result).toEqual([]);
+describe("getSummarizedData", () => {
+  it("should return correct summary for a simple dataset", () => {
+    const data = [
+      { x: 1, y: 10 },
+      { x: 2, y: 20 },
+      { x: 3, y: 30 },
+    ];
+    const result = getSummarizedData(data);
+    expect(result).toEqual({
+      downsampled: data,
+      domain: [10, 20, 30],
+      max: 30,
+      min: 10,
+      range: 20,
+      average: 20,
+    });
   });
 
-  it("should return the same data if the data length is less than or equal to the target length", () => {
-    const data = [1, 2, 3, 4, 5];
-    const result = getDownsampledData(data, { maximumDataPoints: 5 });
-    expect(result).toEqual(data);
+  it("should handle an empty dataset", () => {
+    const data: { x: number; y: number }[] = [];
+    const result = getSummarizedData(data);
+    expect(result).toEqual({
+      downsampled: [],
+      domain: [],
+      max: 0,
+      min: 0,
+      range: 0,
+      average: 0,
+    });
   });
 
-  it("should downsample the data to the target length", () => {
-    const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const result = getDownsampledData(data, { maximumDataPoints: 5 });
-    expect(result.length).toBe(5);
+  it("should downsample data correctly for a large dataset", () => {
+    const data = Array.from({ length: 1000 }, (_, i) => ({ x: i, y: i }));
+    const result = getSummarizedData(data);
+    expect(result.downsampled.length).toBeLessThanOrEqual(data.length);
+    expect(result.max).toBe(999);
+    expect(result.min).toBe(0);
+    expect(result.range).toBe(999);
+    expect(result.average).toBeCloseTo(499.5);
   });
 
-  it("should handle complex objects correctly", () => {
-    const data = [{ x: 1 }, { x: 2 }, { x: 3 }, { x: 4 }, { x: 5 }];
-    const result = getDownsampledData(data, { maximumDataPoints: 1 });
-    expect(result.length).toBe(1);
+  it("should handle data with very small range", () => {
+    const data = [
+      { x: 1, y: 0.01 },
+      { x: 2, y: 0.02 },
+      { x: 3, y: 0.03 },
+    ];
+    const result = getSummarizedData(data);
+    expect(result.downsampled).toEqual(data);
+    expect(result.max).toBe(0.03);
+    expect(result.min).toBe(0.01);
+    expect(result.range).toBeCloseTo(0.02);
+    expect(result.average).toBeCloseTo(0.02);
   });
 });
 

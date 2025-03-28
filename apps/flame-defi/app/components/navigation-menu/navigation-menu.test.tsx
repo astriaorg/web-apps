@@ -1,21 +1,21 @@
 import { screen } from "@testing-library/react";
 import { renderWithProviders } from "testing/helpers";
-import Navbar from "./navbar";
+import { NavigationMenu } from "./navigation-menu";
 
 // Mock the usePathname hook from Next.js
 jest.mock("next/navigation", () => ({
   usePathname: jest.fn().mockReturnValue("/"),
 }));
 
-describe("Navbar Component", () => {
+describe("`NavigationMenu` Component", () => {
   test("renders company logo", () => {
-    renderWithProviders(<Navbar />);
-    const logoElem = screen.getByAltText(/logo/i);
+    renderWithProviders(<NavigationMenu />);
+    const logoElem = screen.getByLabelText("Flame Logo");
     expect(logoElem).toBeInTheDocument();
   });
 
-  test("renders navbar links", () => {
-    renderWithProviders(<Navbar />);
+  test("renders navigation menu links", () => {
+    renderWithProviders(<NavigationMenu />);
     const bridgeLink = screen.getByText(/bridge/i);
     expect(bridgeLink).toBeInTheDocument();
     const swapLink = screen.getByText(/swap/i);
@@ -24,5 +24,7 @@ describe("Navbar Component", () => {
     expect(poolLink).toBeInTheDocument();
     const earnLink = screen.getByText(/earn/i);
     expect(earnLink).toBeInTheDocument();
+    const borrowLink = screen.getByText(/borrow/i);
+    expect(borrowLink).toBeInTheDocument();
   });
 });

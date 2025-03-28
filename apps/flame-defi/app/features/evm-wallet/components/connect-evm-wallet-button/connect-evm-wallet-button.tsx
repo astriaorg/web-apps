@@ -1,18 +1,19 @@
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 
 import { CopyToClipboardButton, Skeleton } from "@repo/ui/components";
 
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/components";
+import { PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
+import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
+import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.

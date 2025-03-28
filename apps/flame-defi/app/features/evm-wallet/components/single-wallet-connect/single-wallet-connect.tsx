@@ -1,16 +1,17 @@
-import { useAccount } from "wagmi";
 import {
-  CopyToClipboardButton,
-  Skeleton,
   Button,
+  CopyToClipboardButton,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Skeleton,
 } from "@repo/ui/components";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
+import { PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
+import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { FlameIcon, PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import { useEvmChainData } from "config";
+import { useAccount } from "wagmi";
+import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
 export function SingleWalletContent({
   address,
