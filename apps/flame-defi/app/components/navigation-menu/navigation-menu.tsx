@@ -2,6 +2,7 @@
 
 import { FlameIcon } from "@repo/ui/icons";
 import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
+import { ROUTES } from "components/footer/routes";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import NetworkSelector from "../network-selector/network-selector";
@@ -29,19 +30,19 @@ export const NavigationMenu = () => {
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
         <div className="items-center space-x-8 hidden lg:flex">
-          <NavigationMenuLink href="/" isActive={pathname === "/"}>
+          <NavigationMenuLink href="/" isActive={pathname === ROUTES.BRIDGE}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
-            href="/swap"
-            isActive={pathname.startsWith("/swap")}
+            href={ROUTES.SWAP}
+            isActive={pathname.startsWith(ROUTES.SWAP)}
           >
             Swap
           </NavigationMenuLink>
           {featureFlags.poolEnabled && (
             <NavigationMenuLink
-              href="/pool"
-              isActive={pathname.startsWith("/pool")}
+              href={ROUTES.POOL}
+              isActive={pathname.startsWith(ROUTES.POOL)}
             >
               Pool
             </NavigationMenuLink>
@@ -49,14 +50,14 @@ export const NavigationMenu = () => {
           {featureFlags.earnEnabled && (
             <>
               <NavigationMenuLink
-                href="/earn"
-                isActive={pathname.startsWith("/earn")}
+                href={ROUTES.EARN}
+                isActive={pathname.startsWith(ROUTES.EARN)}
               >
                 Earn
               </NavigationMenuLink>
               <NavigationMenuLink
-                href="/borrow"
-                isActive={pathname.startsWith("/borrow")}
+                href={ROUTES.BORROW}
+                isActive={pathname.startsWith(ROUTES.BORROW)}
               >
                 Borrow
               </NavigationMenuLink>
