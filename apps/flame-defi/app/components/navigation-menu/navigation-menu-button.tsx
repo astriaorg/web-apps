@@ -19,7 +19,7 @@ export const NavigationMenuButton = ({
     },
     opened: {
       rotate: 45,
-      translateY: 0.5,
+      translateY: 0.75,
     },
   };
   const bottom = {
@@ -29,7 +29,7 @@ export const NavigationMenuButton = ({
     },
     opened: {
       rotate: -45,
-      translateY: -0.5,
+      translateY: -0.75,
     },
   };
 
@@ -49,7 +49,6 @@ export const NavigationMenuButton = ({
     <motion.svg
       viewBox={`0 0 ${viewBoxWidth} ${4}`}
       overflow="visible"
-      // preserveAspectRatio="none"
       width={size}
       height={size}
       {...props}
@@ -57,18 +56,18 @@ export const NavigationMenuButton = ({
       <motion.line
         x1="0"
         x2={viewBoxWidth}
-        // 0 -> 2
-        y1="1.5"
-        y2="1.5"
+        // Default: 0 -> 2
+        y1="1.25"
+        y2="1.25"
         variants={top}
         {...line}
       />
       <motion.line
         x1="0"
         x2={viewBoxWidth}
-        // 4 -> -2
-        y1="2.5"
-        y2="2.5"
+        // Default: 4 -> -2
+        y1="2.75"
+        y2="2.75"
         variants={bottom}
         {...line}
       />
