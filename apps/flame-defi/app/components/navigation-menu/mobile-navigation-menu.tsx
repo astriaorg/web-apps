@@ -1,10 +1,15 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
+  Button,
   Dialog,
   DialogClose,
-  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -29,55 +34,67 @@ export const MobileNavigationMenu = () => {
   return (
     <div className="flex items-center gap-4 lg:hidden">
       <MobileWalletConnect handleClose={handleClose} />
-      <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <NavigationMenuButton size={20} isOpen={isOpen} />
-        </DialogTrigger>
-        {/* Hide the default close button so we can use a custom close button. */}
-        <DialogContent className="max-w-screen h-screen [&_button[aria-label='Close']]:hidden">
-          <DialogTitle className="sr-only">Flame Apps</DialogTitle>
-          <div className="flex flex-col items-center justify-center space-y-8">
-            <MobileNavigationMenuLink href="/" isActive={pathname === "/"}>
-              Bridge
-            </MobileNavigationMenuLink>
-            <MobileNavigationMenuLink
-              href="/swap"
-              isActive={pathname.startsWith("/swap")}
-            >
-              Swap
-            </MobileNavigationMenuLink>
-            {featureFlags.poolEnabled && (
-              <MobileNavigationMenuLink
-                href="/pool"
-                isActive={pathname.startsWith("/pool")}
-              >
-                Pool
-              </MobileNavigationMenuLink>
-            )}
-            {featureFlags.earnEnabled && (
-              <>
-                <MobileNavigationMenuLink
-                  href="/earn"
-                  isActive={pathname.startsWith("/earn")}
-                >
-                  Earn
-                </MobileNavigationMenuLink>
-                <MobileNavigationMenuLink
-                  href="/borrow"
-                  isActive={pathname.startsWith("/borrow")}
-                >
-                  Borrow
-                </MobileNavigationMenuLink>
-              </>
-            )}
-          </div>
-
-          {/* Align with the button in the navigation menu for seamless transitions. */}
-          <DialogClose className="absolute right-4 top-4.5">
+          <Button variant="ghost" className="p-0 hover:text-initial">
             <NavigationMenuButton size={20} isOpen={isOpen} />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-        </DialogContent>
+          </Button>
+        </DialogTrigger>
+        {/* Use primitive Dialog.Content so we can customize overlay and close button. */}
+        <DialogPortal>
+          <DialogOverlay className="bg-background-default" />
+          <DialogPrimitive.Content
+            className={cn(
+              "fixed z-50 top-0 left-0 w-screen h-screen bg-background-default duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+              // Fix layout shift when page has scrollbar. This is due to the `react-remove-scroll` library that Radix UI uses under the hood.
+              "w-[calc(100vw-var(--removed-body-scroll-bar-size,0px))]",
+            )}
+          >
+            <DialogTitle className="sr-only">Flame Apps</DialogTitle>
+            <DialogDescription className="sr-only"></DialogDescription>
+            <div className="flex flex-col items-center justify-center h-full space-y-8">
+              <MobileNavigationMenuLink href="/" isActive={pathname === "/"}>
+                Bridge
+              </MobileNavigationMenuLink>
+              <MobileNavigationMenuLink
+                href="/swap"
+                isActive={pathname.startsWith("/swap")}
+              >
+                Swap
+              </MobileNavigationMenuLink>
+              {featureFlags.poolEnabled && (
+                <MobileNavigationMenuLink
+                  href="/pool"
+                  isActive={pathname.startsWith("/pool")}
+                >
+                  Pool
+                </MobileNavigationMenuLink>
+              )}
+              {featureFlags.earnEnabled && (
+                <>
+                  <MobileNavigationMenuLink
+                    href="/earn"
+                    isActive={pathname.startsWith("/earn")}
+                  >
+                    Earn
+                  </MobileNavigationMenuLink>
+                  <MobileNavigationMenuLink
+                    href="/borrow"
+                    isActive={pathname.startsWith("/borrow")}
+                  >
+                    Borrow
+                  </MobileNavigationMenuLink>
+                </>
+              )}
+            </div>
+
+            {/* Align with the button in the navigation menu for seamless transitions. */}
+            <DialogClose className="absolute right-4 top-4.5">
+              <NavigationMenuButton size={20} isOpen={isOpen} />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogPrimitive.Content>
+        </DialogPortal>
       </Dialog>
     </div>
   );
