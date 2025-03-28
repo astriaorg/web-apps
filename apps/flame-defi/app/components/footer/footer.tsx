@@ -59,7 +59,7 @@ export const Footer = (): React.ReactElement => {
   return (
     <footer className="w-full mt-8 [&_li]:text-sm [&_li]:text-typography-light [&_li]:hover:text-typography-default">
       <section>
-        <div className="py-8 px-6 md:px-8 grid grid-cols-2 md:grid-cols-3 md:max-w-[600px] gap-8">
+        <div className="py-8 px-6 md:px-8 grid grid-cols-3 md:max-w-[600px] gap-2">
           {Object.entries(items).map(([category, links]) => (
             <div key={`footer_category-${category}`}>
               <h3 className="mb-4">{category}</h3>
@@ -76,10 +76,10 @@ export const Footer = (): React.ReactElement => {
       </section>
 
       <section>
-        <div className="px-6 md:px-8 py-2 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+        <div className="px-6 md:px-8 py-2 flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div className="flex items-center space-x-2 order-2 mb-4 md:order-1 md:mb-0">
             <FlameIcon className="w-4" aria-label="Flame Logo" />
-            <p className="text-xs">
+            <p className="text-xs text-center md:text-left">
               <span>
                 {`© ${new Date().getFullYear()} `}
                 <a
@@ -93,7 +93,7 @@ export const Footer = (): React.ReactElement => {
               <span> All rights reserved.</span>
             </p>
           </div>
-          <div>
+          <div className="order-1 md:order-2">
             <NetworkStatus />
           </div>
         </div>
