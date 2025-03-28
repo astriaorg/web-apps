@@ -67,7 +67,15 @@ export const Footer = (): React.ReactElement => {
                 <ul className="space-y-2">
                   {links.map((link, index) => (
                     <li key={`footer_category-${category}_link-${index}`}>
-                      <a href={link.href}>{link.name}</a>
+                      <a
+                        href={link.href}
+                        {...(!link.href.startsWith("/") && {
+                          rel: "noreferrer",
+                          target: "_blank",
+                        })}
+                      >
+                        {link.name}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -85,8 +93,10 @@ export const Footer = (): React.ReactElement => {
               <span>
                 {`© ${new Date().getFullYear()} `}
                 <a
-                  href="https://www.astria.org/"
+                  href="https://www.astria.org"
                   className="text-brand hover:underline"
+                  rel="noreferrer"
+                  target="_blank"
                 >
                   Astria.org
                 </a>
