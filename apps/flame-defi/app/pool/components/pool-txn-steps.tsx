@@ -58,6 +58,7 @@ export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
 export const AddLiquidityTxnSummary = ({
   poolTokens,
   addLiquidityInputValues,
+  selectedFeeTier,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
   const { feeTier } = usePoolPositionContext();
@@ -77,13 +78,12 @@ export const AddLiquidityTxnSummary = ({
                   {token.symbol}
                 </span>
                 <span>
-                  {formatNumber(
-                    parseFloat(addLiquidityInputValues?.[index] || "0"),
-                    {
+                  {addLiquidityInputValues &&
+                    addLiquidityInputValues[index] &&
+                    formatNumber(parseFloat(addLiquidityInputValues[index]), {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
-                    },
-                  )}
+                    })}
                 </span>
               </div>
             ))}
@@ -91,7 +91,7 @@ export const AddLiquidityTxnSummary = ({
           <hr className="border-t border-border mt-2 mb-2 w-full" />
           <div className="flex justify-between w-full gap-2">
             <span>Fee Tier</span>
-            <span>{feeTier}</span>
+            <span>{selectedFeeTier || feeTier}</span>
           </div>
         </Skeleton>
       </div>
@@ -177,11 +177,11 @@ const TxnLoader = ({
           {poolTxnType === POOL_TXN_TYPE.COLLECT_FEE && (
             <span>Collecting Fees</span>
           )}
-          {poolTxnType === POOL_TXN_TYPE.ADD_LIQUIDITY && (
+          {addLiquidityInputValues?.[0] && addLiquidityInputValues?.[1] && (
             <>
               <span>Supplying</span>
               <span className="flex items-center gap-1">
-                {formatNumber(parseFloat(addLiquidityInputValues?.[0] || "0"), {
+                {formatNumber(parseFloat(addLiquidityInputValues[0]), {
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
@@ -189,7 +189,7 @@ const TxnLoader = ({
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
-                {formatNumber(parseFloat(addLiquidityInputValues?.[1] || "0"), {
+                {formatNumber(parseFloat(addLiquidityInputValues[1]), {
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
@@ -254,6 +254,7 @@ const TxnFailed = ({ txnMsg }: TxnFailedProps) => {
 
 const TxnDetails = {
   [POOL_TXN_TYPE.ADD_LIQUIDITY]: AddLiquidityTxnSummary,
+  [POOL_TXN_TYPE.NEW_POSITION]: AddLiquidityTxnSummary,
   [POOL_TXN_TYPE.REMOVE_LIQUIDITY]: RemoveLiquidityTxnSummary,
   [POOL_TXN_TYPE.COLLECT_FEE]: CollectFeeTxnSummary,
 } as const;
@@ -264,6 +265,7 @@ export function PoolTxnSteps({
   txnHash,
   txnMsg,
   addLiquidityInputValues,
+  selectedFeeTier,
 }: PoolTxnStepsProps) {
   const pathname = usePathname();
   const poolTxnType = getTxnType(pathname);
@@ -275,6 +277,7 @@ export function PoolTxnSteps({
         <TxnComponent
           poolTokens={poolTokens}
           addLiquidityInputValues={addLiquidityInputValues}
+          selectedFeeTier={selectedFeeTier}
         />
       )}
       {txnStatus === TXN_STATUS.PENDING && (

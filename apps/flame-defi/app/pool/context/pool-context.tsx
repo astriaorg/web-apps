@@ -1,7 +1,8 @@
 "use client";
 
+import { TXN_STATUS } from "@repo/flame-types";
 import { PoolContextProps } from "pool/types";
-import { createContext, PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useState } from "react";
 
 export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
@@ -14,6 +15,7 @@ const poolPositionsRecord = [
       symbol: "TIA",
       symbolTwo: "milkTIA",
       percent: 0.0005,
+      apr: 0.12,
     },
     inRange: true,
     positionStatus: "In range",
@@ -24,6 +26,7 @@ const poolPositionsRecord = [
       symbol: "TIA",
       symbolTwo: "USDC",
       percent: 0.0005,
+      apr: 0.1,
     },
     inRange: false,
     positionStatus: "Closed",
@@ -62,11 +65,18 @@ const feeData = [
 ];
 
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
+
   return (
     <PoolContext.Provider
       value={{
         feeData,
         poolPositionsRecord,
+        modalOpen,
+        setModalOpen,
+        txnStatus,
+        setTxnStatus,
       }}
     >
       {children}
