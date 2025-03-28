@@ -24,6 +24,7 @@ export const NavigationMenu = () => {
           href={brandURL}
           className="flex items-center w-8 h-8 overflow-hidden mr-12"
           rel="noreferrer"
+          aria-label="Flame Logo"
         >
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>

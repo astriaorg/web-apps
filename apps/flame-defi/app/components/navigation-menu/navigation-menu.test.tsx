@@ -10,7 +10,7 @@ jest.mock("next/navigation", () => ({
 describe("`NavigationMenu` Component", () => {
   test("renders company logo", () => {
     renderWithProviders(<NavigationMenu />);
-    const logoElem = screen.getByAltText(/logo/i);
+    const logoElem = screen.getByLabelText("Flame Logo");
     expect(logoElem).toBeInTheDocument();
   });
 
