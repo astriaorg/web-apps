@@ -29,8 +29,6 @@ export const PositionsTable = () => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  console.log({poolPositionsLoading})
-
   return (
     <BaseTable className="w-full text-left whitespace-nowrap">
       <TableHeader>
@@ -69,7 +67,7 @@ export const PositionsTable = () => {
           <TableRow
             key={row.id}
             className="group cursor-pointer"
-            onClick={() => router.push(`${ROUTES.POOL}${row.id}`)}
+            onClick={() => router.push(`${ROUTES.POOL}${row.original.tokenId}`)}
           >
             {row.getVisibleCells().map((cell) => (
               <TableCell
@@ -81,7 +79,6 @@ export const PositionsTable = () => {
                   poolPositionsLoading && "pointer-events-none",
                 )}
               >
-                {/* TODO: Add loading state when ready */}
                 <Skeleton className="h-8" isLoading={poolPositionsLoading}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Skeleton>

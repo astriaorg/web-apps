@@ -1,13 +1,15 @@
 import type { Config } from "@wagmi/core";
 import { type Address, Abi } from "viem";
+import { HexString } from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
+import { PoolPositionResponse } from "pool/types";
 
 type PoolPosition = {
   nonce: bigint;
   operator: string;
-  tokenAddress0: string;
-  tokenAddress1: string;
+  tokenAddress0: Address;
+  tokenAddress1: Address;
   fee: number;
   tickLower: number;
   tickUpper: number;
@@ -19,8 +21,18 @@ type PoolPosition = {
 };
 
 export class NonFungiblePositionService extends GenericContractService {
+  /**
+   * Creates a new NonFungiblePositionService instance
+   *
+   * @param wagmiConfig - The wagmi configuration object
+   * @param contractAddress - The address of the NonFungiblePositionManager contract
+   */
   constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, NON_FUNGIBLE_POSITION_MANAGER_ABI as Abi);
+    super(
+      wagmiConfig,
+      contractAddress,
+      NON_FUNGIBLE_POSITION_MANAGER_ABI as Abi,
+    );
   }
 
   /**
@@ -28,16 +40,31 @@ export class NonFungiblePositionService extends GenericContractService {
    *
    * @param chainId - The chain ID of the EVM chain
    * @param tokenId - The ID of the token
-   * @returns Object containing transaction hash if successful
+   * @returns Object containing position data including liquidity, ticks, and fees
    */
   async positions(
     chainId: number,
     tokenId: string,
-  ): Promise<PoolPosition> {
-    const positionsArray = await this.readContractMethod(chainId, "positions", [
-      tokenId,
-    ]) as [bigint, string, string, string, bigint, bigint, bigint, bigint, bigint, bigint, bigint, bigint];
-  
+  ): Promise<PoolPositionResponse> {
+    const positionsArray = (await this.readContractMethod(
+      chainId,
+      "positions",
+      [tokenId],
+    )) as [
+      bigint,
+      string,
+      Address,
+      Address,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+    ];
+
     // Transform array to object with named properties
     const position: PoolPosition = {
       nonce: positionsArray[0],
@@ -57,6 +84,23 @@ export class NonFungiblePositionService extends GenericContractService {
     return position;
   }
 
+  /**
+   * Creates a new position in a Uniswap V3 pool
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param token0 - The address of the first token in the pair
+   * @param token1 - The address of the second token in the pair
+   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
+   * @param tickLower - The lower tick boundary of the position
+   * @param tickUpper - The upper tick boundary of the position
+   * @param amount0Desired - The desired amount of token0 to deposit
+   * @param amount1Desired - The desired amount of token1 to deposit
+   * @param amount0Min - The minimum amount of token0 to deposit
+   * @param amount1Min - The minimum amount of token1 to deposit
+   * @param recipient - The address that will receive the NFT
+   * @param deadline - The timestamp by which the transaction must be executed
+   * @returns Object containing transaction hash if successful
+   */
   async mint(
     chainId: number,
     token0: Address,
@@ -69,8 +113,8 @@ export class NonFungiblePositionService extends GenericContractService {
     amount0Min: number,
     amount1Min: number,
     recipient: Address,
-    deadline: number,   
-  ): Promise<any> {
+    deadline: number,
+  ): Promise<HexString> {
     const txHash = await this.writeContractMethod(chainId, "mint", [
       token0,
       token1,
@@ -88,6 +132,17 @@ export class NonFungiblePositionService extends GenericContractService {
     return txHash;
   }
 
+  /**
+   * Decreases the amount of liquidity in a position and accounts it to the position.
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param tokenId - The ID of the NFT position to decrease liquidity in
+   * @param liquidity - The amount by which liquidity will be decreased
+   * @param amount0Min - The minimum amount of token0 that should be accounted for the burned liquidity
+   * @param amount1Min - The minimum amount of token1 that should be accounted for the burned liquidity
+   * @param deadline - The time by which the transaction must be included to effect the change
+   * @returns Object containing transaction hash if successful
+   */
   async decreaseLiquidity(
     chainId: number,
     tokenId: string,
@@ -95,25 +150,33 @@ export class NonFungiblePositionService extends GenericContractService {
     amount0Min: number,
     amount1Min: number,
     deadline: number,
-  ): Promise<any> {
-    const txHash = await this.writeContractMethod(chainId, "decreaseLiquidity", [
-      tokenId,
-      liquidity,
-      amount0Min,
-      amount1Min,
-      deadline,
-    ]);
+  ): Promise<HexString> {
+    const txHash = await this.writeContractMethod(
+      chainId,
+      "decreaseLiquidity",
+      [tokenId, liquidity, amount0Min, amount1Min, deadline],
+    );
 
     return txHash;
   }
 
+  /**
+   * Collect fees and/or tokens from a position.
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param tokenId - The ID of the token
+   * @param recipient - The address that will receive the collected tokens
+   * @param amount0Max - The maximum amount of token0 to collect
+   * @param amount1Max - The maximum amount of token1 to collect
+   * @returns Object containing transaction hash if successful
+   */
   async collect(
     chainId: number,
     tokenId: string,
     recipient: Address,
     amount0Max: number,
     amount1Max: number,
-  ): Promise<any> {
+  ): Promise<HexString> {
     const txHash = await this.writeContractMethod(chainId, "collect", [
       tokenId,
       recipient,
@@ -126,35 +189,67 @@ export class NonFungiblePositionService extends GenericContractService {
 
   /**
    * Get the number of NFTs owned by an address
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param owner - The address to check the balance of
+   * @returns The number of NFTs owned by the address as a bigint
    */
   async balanceOf(chainId: number, owner: Address): Promise<bigint> {
-    return await this.readContractMethod(chainId, "balanceOf", [owner]) as bigint;
+    return (await this.readContractMethod(chainId, "balanceOf", [
+      owner,
+    ])) as bigint;
   }
 
   /**
    * Get the token ID at a given index of the owner's token list
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param owner - The address of the NFT owner
+   * @param index - The index in the owner's token list
+   * @returns The token ID at the specified index
    */
-  async tokenOfOwnerByIndex(chainId: number, owner: Address, index: number): Promise<bigint> {
-    return await this.readContractMethod(chainId, "tokenOfOwnerByIndex", [owner, index]) as bigint;
+  async tokenOfOwnerByIndex(
+    chainId: number,
+    owner: Address,
+    index: number,
+  ): Promise<bigint> {
+    return (await this.readContractMethod(chainId, "tokenOfOwnerByIndex", [
+      owner,
+      index,
+    ])) as bigint;
   }
 
   /**
    * Get all NFT positions owned by an address
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param owner - The address to get positions for
+   * @returns An array of position data for all NFTs owned by the address
    */
-  async getAllPositions(chainId: number, owner: Address): Promise<PoolPosition[]> {
+  async getAllPositions(
+    chainId: number,
+    owner: Address,
+  ): Promise<PoolPositionResponse[]> {
     const balance = await this.balanceOf(chainId, owner);
-    const positions: PoolPosition[] = [];
+    const positions: PoolPositionResponse[] = [];
 
     for (let i = 0; i < Number(balance); i++) {
       const tokenId = await this.tokenOfOwnerByIndex(chainId, owner, i);
       const position = await this.positions(chainId, tokenId.toString());
-      positions.push(position);
+      positions.push({ ...position, tokenId: tokenId.toString() });
     }
 
     return positions;
   }
 }
 
+/**
+ * Factory function to create a new NonFungiblePositionService instance
+ *
+ * @param wagmiConfig - The wagmi configuration object
+ * @param contractAddress - The address of the NonFungiblePositionManager contract
+ * @returns A new NonFungiblePositionService instance
+ */
 export function createNonFungiblePositionService(
   wagmiConfig: Config,
   contractAddress: Address,

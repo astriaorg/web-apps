@@ -1,10 +1,12 @@
 import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
-
+import { Address } from "viem";
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
   inputTwo: string;
   setInputOne: (value: string) => void;
   setInputTwo: (value: string) => void;
+  poolTokenOne: PoolToken;
+  poolTokenTwo: PoolToken;
 }
 export interface NewPositionInputsProps {
   inputOne: TokenInputState;
@@ -63,30 +65,32 @@ export type Positions = {
   [key: number]: Position;
 };
 
-// export type PoolPosition = {
-//   nonce: bigint;
-//   operator: string;
-//   tokenAddress0: string;
-//   tokenAddress1: string;
-//   fee: number;
-//   tickLower: number;
-//   tickUpper: number;
-//   liquidity: bigint;
-//   feeGrowthInside0LastX128: bigint;
-//   feeGrowthInside1LastX128: bigint;
-//   tokensOwed0: bigint;
-//   tokensOwed1: bigint;
-//   token0: EvmCurrency | null;
-//   token1: EvmCurrency | null;
-// };
+export type PoolPositionResponse = {
+  nonce: bigint;
+  operator: string;
+  tokenAddress0: Address;
+  tokenAddress1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: bigint;
+  feeGrowthInside0LastX128: bigint;
+  feeGrowthInside1LastX128: bigint;
+  tokensOwed0: bigint;
+  tokensOwed1: bigint;
+  tokenId?: string;
+};
 
-export type PoolPosition = {
+export interface PoolPosition extends PoolPositionResponse {
   feePercent: string;
   symbolOne: string;
   symbolTwo: string;
   inRange: boolean;
   positionStatus: string;
-};
+  poolAddress: Address | null;
+  tokenOne: EvmCurrency | null;
+  tokenTwo: EvmCurrency | null;
+}
 
 export type PoolContextProps = {
   feeData: FeeData[];
@@ -95,7 +99,6 @@ export type PoolContextProps = {
 };
 
 export type PoolPositionContextProps = {
-  position?: Position;
   poolTokens: PoolToken[];
   feeTier: string;
   symbols: string[];
@@ -107,8 +110,11 @@ export type PoolPositionContextProps = {
   setTxnStatus: (txnStatus: TXN_STATUS) => void;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
-  poolTokenOne: PoolToken;
-  poolTokenTwo: PoolToken;
+  poolTokenOne: PoolToken | null;
+  poolTokenTwo: PoolToken | null;
+  currentPrice: string;
+  minPrice: string;
+  maxPrice: string;
 };
 
 export type PoolTxnStepsProps = {

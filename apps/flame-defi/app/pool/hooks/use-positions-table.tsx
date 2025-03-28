@@ -10,8 +10,7 @@ export const usePositionsTable = () => {
   const [hideClosedPositions, setHideClosedPositions] = useState(false);
 
   const filteredData = useMemo(
-    () =>
-      poolPositions.filter((row) => !hideClosedPositions || row.inRange),
+    () => poolPositions.filter((row) => !hideClosedPositions || row.inRange),
     [poolPositions, hideClosedPositions],
   );
 
@@ -25,10 +24,7 @@ export const usePositionsTable = () => {
           return (
             <div className="flex items-center space-x-2 md:space-x-4">
               <MultiTokenIcon
-                symbols={[
-                  row.original.symbolOne,
-                  row.original.symbolTwo,
-                ]}
+                symbols={[row.original.symbolOne, row.original.symbolTwo]}
                 size={24}
                 shift={10}
               />

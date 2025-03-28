@@ -23,8 +23,7 @@ export function PriceCard({
             <span className="text-sm text-text-subdued">{rightLabel}</span>
           )}
         </div>
-        {/* TODO: add loading state */}
-        <Skeleton isLoading={false} className="w-12 h-5">
+        <Skeleton isLoading={!value} className="w-1/2 h-8">
           <span className="text-2xl font-medium">{value}</span>
         </Skeleton>
       </div>

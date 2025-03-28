@@ -9,8 +9,16 @@ import { usePoolPositionContext } from "pool/hooks";
 import { useState } from "react";
 
 export const ContentSection = () => {
-  const { poolTokens, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
-    usePoolPositionContext();
+  const {
+    poolTokens,
+    poolTokenOne,
+    poolTokenTwo,
+    feeTier,
+    modalOpen,
+    setModalOpen,
+    setTxnStatus,
+    txnStatus,
+  } = usePoolPositionContext();
   const [inputOne, setInputOne] = useState<string>("");
   const [inputTwo, setInputTwo] = useState<string>("");
 
@@ -24,13 +32,23 @@ export const ContentSection = () => {
         handleReverseTokenData={handleReverseTokenData}
       /> */}
       <div className="flex flex-col gap-4 mt-4">
-        <TokenLiquidityBlock />
-        <AddLiquidityInputsBlock
-          inputOne={inputOne}
-          inputTwo={inputTwo}
-          setInputOne={setInputOne}
-          setInputTwo={setInputTwo}
+        <TokenLiquidityBlock
+          poolTokenOne={poolTokenOne}
+          poolTokenTwo={poolTokenTwo}
+          feeTier={feeTier}
+          poolTokens={poolTokens}
         />
+
+        {poolTokenOne && poolTokenTwo && (
+          <AddLiquidityInputsBlock
+            inputOne={inputOne}
+            inputTwo={inputTwo}
+            setInputOne={setInputOne}
+            setInputTwo={setInputTwo}
+            poolTokenOne={poolTokenOne}
+            poolTokenTwo={poolTokenTwo}
+          />
+        )}
         <div className="flex w-full gap-4">
           <div className="hidden md:block md:w-1/2" />
           <div className="w-full md:w-1/2">
