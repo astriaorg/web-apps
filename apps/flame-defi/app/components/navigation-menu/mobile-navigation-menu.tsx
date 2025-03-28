@@ -1,17 +1,16 @@
 import {
-  Button,
   Dialog,
   DialogClose,
   DialogContent,
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components";
-import { CloseIcon } from "@repo/ui/icons";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";
 import { MobileWalletConnect } from "./mobile-wallet-connect";
+import { NavigationMenuButton } from "./navigation-menu-button";
 
 export const MobileNavigationMenu = () => {
   const pathname = usePathname();
@@ -32,28 +31,7 @@ export const MobileNavigationMenu = () => {
       <MobileWalletConnect handleClose={handleClose} />
       <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
         <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="p-2 hover:bg-transparent focus-visible:bg-transparent active:bg-transparent"
-          >
-            <div className="flex flex-col gap-1.5 w-6">
-              <div
-                className={`h-0.5 bg-current transition-all ${
-                  isOpen ? "rotate-45 translate-y-2" : ""
-                }`}
-              />
-              <div
-                className={`h-0.5 bg-current transition-all ${
-                  isOpen ? "opacity-0" : ""
-                }`}
-              />
-              <div
-                className={`h-0.5 bg-current transition-all ${
-                  isOpen ? "-rotate-45 -translate-y-2" : ""
-                }`}
-              />
-            </div>
-          </Button>
+          <NavigationMenuButton size={20} isOpen={isOpen} />
         </DialogTrigger>
         {/* Hide the default close button so we can use a custom close button. */}
         <DialogContent className="max-w-screen h-screen [&_button[aria-label='Close']]:hidden">
@@ -94,8 +72,9 @@ export const MobileNavigationMenu = () => {
             )}
           </div>
 
-          <DialogClose className="absolute right-3.5 top-3.5">
-            <CloseIcon className="h-5 w-5" />
+          {/* Align with the button in the navigation menu for seamless transitions. */}
+          <DialogClose className="absolute right-4 top-4.5">
+            <NavigationMenuButton size={20} isOpen={isOpen} />
             <span className="sr-only">Close</span>
           </DialogClose>
         </DialogContent>
