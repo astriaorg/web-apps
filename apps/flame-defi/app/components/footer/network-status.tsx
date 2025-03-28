@@ -1,10 +1,10 @@
 "use client";
 
 import { DotIcon } from "@repo/ui/icons";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useBlockNumber } from "wagmi";
 
-export const NetworkStatus = (): React.ReactElement => {
+export const NetworkStatus = () => {
   const [isNetworkHealthy, setIsNetworkHealthy] = useState(true);
   const { data: blockNumber, isError } = useBlockNumber({
     watch: true,
@@ -15,16 +15,18 @@ export const NetworkStatus = (): React.ReactElement => {
     setIsNetworkHealthy(!isError);
   }, [isError]);
 
-  const statusColor = isNetworkHealthy ? "text-green-500" : "text-red-500";
+  const statusColor = isNetworkHealthy ? "text-success" : "text-danger";
+
+  if (blockNumber === undefined) {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      {blockNumber !== undefined && (
-        <span className={`text-xs ${statusColor}`}>
-          {blockNumber.toString()}
-        </span>
-      )}
-      <DotIcon className={statusColor} size={8} />
+    <div
+      className={`flex items-center space-x-1 bg-black rounded-xl px-1.5 py-1 text-[8px]/2 font-medium font-mono ${statusColor}`}
+    >
+      <span>{blockNumber.toString()}</span>
+      <DotIcon size={9} />
     </div>
   );
 };
