@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { DotIcon } from "@repo/ui/icons";
+import React, { useEffect, useState } from "react";
 import { useBlockNumber } from "wagmi";
-import { DotIcon } from "../../../icons";
 
 export const NetworkStatus = (): React.ReactElement => {
   const [isNetworkHealthy, setIsNetworkHealthy] = useState(true);
