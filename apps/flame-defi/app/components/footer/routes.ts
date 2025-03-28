@@ -12,11 +12,11 @@ export const ROUTES = {
 
   DOCS: "https://docs.astria.org",
   AUDITS: "https://www.astria.org/audits",
-  EXPLORER: "https://astrotrek.io/",
+  EXPLORER: "https://astrotrek.io",
 
   TERMS: "https://www.astria.org/terms",
   PRIVACY: "https://www.astria.org/privacy",
 
   SOCIAL_TWITTER: "https://twitter.com/AstriaOrg",
   SOCIAL_GITHUB: "https://github.com/astriaorg",
-};
+} as const;
