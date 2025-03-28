@@ -30,6 +30,11 @@ export const Footer = (): React.ReactElement => {
             ]
           : []),
       ],
+      Developers: [
+        { name: "Docs", href: ROUTES.DOCS },
+        { name: "Audits", href: ROUTES.AUDITS },
+        { name: "Explorer", href: ROUTES.EXPLORER },
+      ],
       Company: [
         { name: "About Us", href: ROUTES.ABOUT },
         { name: "Careers", href: ROUTES.CAREERS },
@@ -37,11 +42,6 @@ export const Footer = (): React.ReactElement => {
         { name: "Terms", href: ROUTES.TERMS },
         { name: "Privacy", href: ROUTES.PRIVACY },
         { name: "Media Kit", href: ROUTES.MEDIA_KIT },
-      ],
-      Developers: [
-        { name: "Docs", href: ROUTES.DOCS },
-        { name: "Audits", href: ROUTES.AUDITS },
-        { name: "Explorer", href: ROUTES.EXPLORER },
       ],
     };
   }, [featureFlags]);
@@ -59,19 +59,21 @@ export const Footer = (): React.ReactElement => {
   return (
     <footer className="w-full mt-8 [&_li]:text-sm [&_li]:text-typography-light [&_li]:hover:text-typography-default">
       <section>
-        <div className="py-8 px-6 md:px-8 grid grid-cols-3 md:max-w-[600px] gap-2">
-          {Object.entries(items).map(([category, links]) => (
-            <div key={`footer_category-${category}`}>
-              <h3 className="mb-4">{category}</h3>
-              <ul className="space-y-2">
-                {links.map((link, index) => (
-                  <li key={`footer_category-${category}_link-${index}`}>
-                    <a href={link.href}>{link.name}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="py-8 px-6 md:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:gap-20">
+            {Object.entries(items).map(([category, links]) => (
+              <div key={`footer_category-${category}`}>
+                <h3 className="mb-4">{category}</h3>
+                <ul className="space-y-2">
+                  {links.map((link, index) => (
+                    <li key={`footer_category-${category}_link-${index}`}>
+                      <a href={link.href}>{link.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
