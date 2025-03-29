@@ -195,7 +195,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainType: "flame",
+  chainType: "astria",
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -235,7 +235,7 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 const FakeChainInfo: EvmChainInfo = {
-  chainType: "flame",
+  chainType: "astria",
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO

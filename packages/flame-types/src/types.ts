@@ -352,7 +352,7 @@ export class EvmCurrency {
  * Represents information about a Flame chain (which is EVM-compatible).
  */
 export interface EvmChainInfo extends BaseChainInfo {
-  readonly chainType: "flame";
+  readonly chainType: "astria";
   readonly chainId: number;
   readonly rpcUrls: string[];
   readonly blockExplorerUrl?: string;
@@ -653,7 +653,7 @@ export enum BRIDGE_TYPE {
   INTENT = "intent",
 }
 
-export type ChainType = "cosmos" | "flame" | "coinbase";
+export type ChainType = "cosmos" | "astria" | "coinbase";
 
 // Base chain interface that all chain types extend
 export interface BaseChainInfo {
@@ -680,17 +680,17 @@ export const SUPPORTED_BRIDGES: Record<
 > = {
   cosmos: {
     cosmos: [],
-    flame: [BRIDGE_TYPE.IBC],
+    astria: [BRIDGE_TYPE.IBC],
     coinbase: [],
   },
-  flame: {
+  astria: {
     cosmos: [BRIDGE_TYPE.IBC],
-    flame: [],
+    astria: [],
     coinbase: [],
   },
   coinbase: {
     cosmos: [],
-    flame: [BRIDGE_TYPE.INTENT],
+    astria: [BRIDGE_TYPE.INTENT],
     coinbase: [],
   },
 };

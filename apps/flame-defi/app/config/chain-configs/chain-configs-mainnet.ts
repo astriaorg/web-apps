@@ -343,9 +343,9 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainType: "flame",
+  chainType: "astria",
   chainId: 253368190,
-  chainName: "Flame",
+  chainName: "astria",
   rpcUrls: ["https://rpc.flame.astria.org"],
   blockExplorerUrl: "https://explorer.flame.astria.org",
   contracts: {

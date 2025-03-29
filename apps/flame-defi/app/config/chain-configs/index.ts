@@ -5,12 +5,10 @@ import {
   FlameNetwork,
 } from "@repo/flame-types";
 
-export interface FlameNetworkConfig {
-  name: FlameNetwork;
-  evmChains: EvmChains;
-  cosmosChains: CosmosChains;
-  coinbaseChains: CoinbaseChains;
-}
+import * as dawn from "./chain-configs-dawn";
+import * as dusk from "./chain-configs-dusk";
+import * as local from "./chain-configs-local";
+import * as mainnet from "./chain-configs-mainnet";
 
 export interface ChainConfigsObject {
   evmChains: EvmChains;
@@ -18,12 +16,11 @@ export interface ChainConfigsObject {
   coinbaseChains: CoinbaseChains;
 }
 
-export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
+export type FlameNetworkConfig = ChainConfigsObject & {
+  name: FlameNetwork;
+}
 
-import * as dawn from "./chain-configs-dawn";
-import * as dusk from "./chain-configs-dusk";
-import * as local from "./chain-configs-local";
-import * as mainnet from "./chain-configs-mainnet";
+export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
 
 const NETWORK_CONFIGS: NetworkConfigs = {
   [FlameNetwork.LOCAL]: {

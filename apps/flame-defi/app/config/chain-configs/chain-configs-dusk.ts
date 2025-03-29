@@ -202,7 +202,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
-  chainType: "flame",
+  chainType: "astria",
   chainId: 912559,
   chainName: "Flame Dusk-11",
   rpcUrls: ["https://rpc.evm.dusk-11.devnet.astria.org"],
