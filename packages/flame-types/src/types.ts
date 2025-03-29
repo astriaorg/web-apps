@@ -35,11 +35,11 @@ export interface BIP44 {
 /**
  * Represents information about a chain.
  */
-export interface CosmosChainInfo {
+export interface CosmosChainInfo extends BaseChainInfo {
+  readonly chainType: "cosmos";
   readonly rpc: string;
   readonly rest: string;
   readonly chainId: string;
-  readonly chainName: string;
   /**
    * This indicates the type of coin that can be used for stake.
    * You can get actual currency information from Currencies.
@@ -57,9 +57,6 @@ export interface CosmosChainInfo {
    * You can get actual currency information from Currencies.
    */
   readonly feeCurrencies: CosmosFeeCurrency[];
-
-  // The icon to use for this chain in the ui
-  readonly IconComponent?: React.FC;
 }
 
 /**
@@ -352,33 +349,37 @@ export class EvmCurrency {
 }
 
 /**
- * Represents information about an EVM chain.
+ * Represents information about a Flame chain (which is EVM-compatible).
  */
-export type EvmChainInfo = {
-  chainId: number;
-  chainName: string;
-  rpcUrls: string[];
-  blockExplorerUrl?: string;
-  contracts: {
+export interface EvmChainInfo extends BaseChainInfo {
+  readonly chainType: "flame";
+  readonly chainId: number;
+  readonly rpcUrls: string[];
+  readonly blockExplorerUrl?: string;
+  readonly contracts: {
     [label: string]: ChainContract;
     wrappedNativeToken: ChainContract;
     swapRouter: ChainContract;
   };
-  currencies: [EvmCurrency, ...EvmCurrency[]];
-  IconComponent?: React.FC;
-};
+  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
+}
 
 /**
- * Represents a chain on the Base network.
+ * Represents a chain on the Base network for Coinbase integration.
  *
  * NOTE: `BaseChainInfo` was too ambiguous even if technically correct name.
  */
-export type CoinbaseChainInfo = Omit<EvmChainInfo, "contracts"> & {
-  contracts: {
+export interface CoinbaseChainInfo extends BaseChainInfo {
+  readonly chainType: "coinbase";
+  readonly chainId: number;
+  readonly rpcUrls: string[];
+  readonly blockExplorerUrl?: string;
+  readonly contracts: {
     [label: string]: ChainContract;
     intentBridgeDeposit: ChainContract;
   };
-};
+  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
+}
 
 // CoinbaseChains type maps labels to CoinbaseChainInfo objects
 export type CoinbaseChains = {
@@ -646,6 +647,85 @@ export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
   [TRADE_TYPE.EXACT_IN]: TRADE_TYPE.EXACT_OUT,
   [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
 };
+
+export enum BRIDGE_TYPE {
+  IBC = "ibc",
+  INTENT = "intent",
+}
+
+export type ChainType = "cosmos" | "flame" | "coinbase";
+
+// Base chain interface that all chain types extend
+export interface BaseChainInfo {
+  chainType: ChainType;
+  chainName: string;
+  IconComponent?: React.FC;
+}
+
+export interface BridgeInfo {
+  type: BRIDGE_TYPE;
+  sourceChainType: ChainType;
+  targetChainType: ChainType;
+  isSupported: boolean;
+}
+
+export type BridgeMap = Record<string, BridgeInfo>;
+
+/**
+ * Map of supported bridge types between different chain types
+ */
+export const SUPPORTED_BRIDGES: Record<
+  ChainType,
+  Record<ChainType, BRIDGE_TYPE[]>
+> = {
+  cosmos: {
+    cosmos: [],
+    flame: [BRIDGE_TYPE.IBC],
+    coinbase: [],
+  },
+  flame: {
+    cosmos: [BRIDGE_TYPE.IBC],
+    flame: [],
+    coinbase: [],
+  },
+  coinbase: {
+    cosmos: [],
+    flame: [BRIDGE_TYPE.INTENT],
+    coinbase: [],
+  },
+};
+
+/**
+ * Gets the supported bridge types between two chains.
+ */
+export function getSupportedBridgeTypes(
+  sourceChain: BaseChainInfo,
+  targetChain: BaseChainInfo,
+): BRIDGE_TYPE[] {
+  return SUPPORTED_BRIDGES[sourceChain.chainType][targetChain.chainType];
+}
+
+/**
+ * Checks if a specific bridge type is supported between two chains.
+ */
+export function isBridgeTypeSupported(
+  sourceChain: BaseChainInfo,
+  targetChain: BaseChainInfo,
+  bridgeType: BRIDGE_TYPE,
+): boolean {
+  const supportedTypes = getSupportedBridgeTypes(sourceChain, targetChain);
+  return supportedTypes.includes(bridgeType);
+}
+
+/**
+ * Creates a unique bridge key for a source and target chain pairing.
+ */
+export function createBridgeKey(
+  sourceChain: BaseChainInfo,
+  targetChain: BaseChainInfo,
+): string {
+  return `${sourceChain.chainType}-${sourceChain.chainName}-to-${targetChain.chainType}-${targetChain.chainName}`;
+}
 
 export enum TXN_STATUS {
   IDLE = "idle",

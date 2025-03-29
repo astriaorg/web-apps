@@ -19,6 +19,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
   // The name of the chain to be displayed to the user.
@@ -101,6 +102,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "grand-1",
   chainName: "Noble Testnet",
   // RPC endpoint of the chain
@@ -183,6 +185,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "pion-1",
   chainName: "Neutron Testnet",
   // RPC endpoint of the chain
@@ -274,6 +277,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
+  chainType: "flame",
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
@@ -338,6 +342,7 @@ export const evmChains: EvmChains = {
 };
 
 const BaseChainInfo: CoinbaseChainInfo = {
+  chainType: "coinbase",
   chainId: 84532,
   chainName: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],

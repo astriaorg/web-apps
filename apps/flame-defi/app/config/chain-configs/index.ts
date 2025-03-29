@@ -15,6 +15,7 @@ export interface FlameNetworkConfig {
 export interface ChainConfigsObject {
   evmChains: EvmChains;
   cosmosChains: CosmosChains;
+  coinbaseChains: CoinbaseChains;
 }
 
 export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
@@ -95,14 +96,17 @@ export function getChainConfigs(network: FlameNetwork): FlameNetworkConfig {
 export function getAllChainConfigs(): ChainConfigsObject {
   const evmChains: EvmChains = {};
   const cosmosChains: CosmosChains = {};
+  const coinbaseChains: CoinbaseChains = {};
 
   for (const config of Object.values(NETWORK_CONFIGS)) {
     Object.assign(evmChains, config.evmChains);
     Object.assign(cosmosChains, config.cosmosChains);
+    Object.assign(coinbaseChains, config.coinbaseChains);
   }
 
   return {
     evmChains,
     cosmosChains,
+    coinbaseChains,
   };
 }

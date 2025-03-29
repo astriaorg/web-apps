@@ -23,6 +23,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   // Chain-id of the celestia chain.
   chainId: "celestia",
   // The name of the chain to be displayed to the user.
@@ -105,6 +106,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "neutron-1",
   chainName: "Neutron",
   // RPC endpoint of the chain
@@ -188,6 +190,7 @@ const NeutronChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "noble-1",
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
@@ -235,6 +238,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const OsmosisChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "osmosis-1",
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
@@ -284,6 +288,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
 };
 
 const StrideChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "stride-1",
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
@@ -338,6 +343,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
+  chainType: "flame",
   chainId: 253368190,
   chainName: "Flame",
   rpcUrls: ["https://rpc.flame.astria.org"],
@@ -425,6 +431,7 @@ export const evmChains: EvmChains = {
 };
 
 const BaseChainInfo: CoinbaseChainInfo = {
+  chainType: "coinbase",
   chainId: 8453,
   chainName: "Base",
   rpcUrls: ["https://mainnet.base.org"],
