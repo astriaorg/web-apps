@@ -10,9 +10,14 @@ import React from "react";
 import JSBI from "jsbi";
 import Big from "big.js";
 
-// FIXME - i manually recreated types from keplr here as a stop gap.
-//  this will get refactored further when i update the config logic
-//  to support network switching
+export type ChainType = "cosmos" | "astria" | "coinbase";
+
+// Base chain interface that all chain types extend
+export interface BaseChainInfo {
+  chainType: ChainType;
+  chainName: string;
+  IconComponent?: React.FC;
+}
 
 export interface IconProps {
   className?: string;
@@ -33,7 +38,7 @@ export interface BIP44 {
 }
 
 /**
- * Represents information about a chain.
+ * Represents information about a Cosmos chain.
  */
 export interface CosmosChainInfo extends BaseChainInfo {
   readonly chainType: "cosmos";
@@ -350,6 +355,8 @@ export class EvmCurrency {
 
 /**
  * Represents information about a Flame chain (which is EVM-compatible).
+ *
+ * TODO - rename to AstriaChainInfo
  */
 export interface EvmChainInfo extends BaseChainInfo {
   readonly chainType: "astria";
@@ -647,85 +654,6 @@ export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
   [TRADE_TYPE.EXACT_IN]: TRADE_TYPE.EXACT_OUT,
   [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
 };
-
-export enum BRIDGE_TYPE {
-  IBC = "ibc",
-  INTENT = "intent",
-}
-
-export type ChainType = "cosmos" | "astria" | "coinbase";
-
-// Base chain interface that all chain types extend
-export interface BaseChainInfo {
-  chainType: ChainType;
-  chainName: string;
-  IconComponent?: React.FC;
-}
-
-export interface BridgeInfo {
-  type: BRIDGE_TYPE;
-  sourceChainType: ChainType;
-  targetChainType: ChainType;
-  isSupported: boolean;
-}
-
-export type BridgeMap = Record<string, BridgeInfo>;
-
-/**
- * Map of supported bridge types between different chain types
- */
-export const SUPPORTED_BRIDGES: Record<
-  ChainType,
-  Record<ChainType, BRIDGE_TYPE[]>
-> = {
-  cosmos: {
-    cosmos: [],
-    astria: [BRIDGE_TYPE.IBC],
-    coinbase: [],
-  },
-  astria: {
-    cosmos: [BRIDGE_TYPE.IBC],
-    astria: [],
-    coinbase: [],
-  },
-  coinbase: {
-    cosmos: [],
-    astria: [BRIDGE_TYPE.INTENT],
-    coinbase: [],
-  },
-};
-
-/**
- * Gets the supported bridge types between two chains.
- */
-export function getSupportedBridgeTypes(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
-): BRIDGE_TYPE[] {
-  return SUPPORTED_BRIDGES[sourceChain.chainType][targetChain.chainType];
-}
-
-/**
- * Checks if a specific bridge type is supported between two chains.
- */
-export function isBridgeTypeSupported(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
-  bridgeType: BRIDGE_TYPE,
-): boolean {
-  const supportedTypes = getSupportedBridgeTypes(sourceChain, targetChain);
-  return supportedTypes.includes(bridgeType);
-}
-
-/**
- * Creates a unique bridge key for a source and target chain pairing.
- */
-export function createBridgeKey(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
-): string {
-  return `${sourceChain.chainType}-${sourceChain.chainName}-to-${targetChain.chainType}-${targetChain.chainName}`;
-}
 
 export enum TXN_STATUS {
   IDLE = "idle",
