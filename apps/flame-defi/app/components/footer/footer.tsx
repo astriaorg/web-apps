@@ -4,8 +4,8 @@ import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { useConfig } from "config";
 import type React from "react";
 import { useMemo } from "react";
+import { LINKS } from "./links";
 import { NetworkStatus } from "./network-status";
-import { ROUTES } from "./routes";
 
 export const Footer = (): React.ReactElement => {
   const { featureFlags } = useConfig();
@@ -18,30 +18,30 @@ export const Footer = (): React.ReactElement => {
   }>(() => {
     return {
       App: [
-        { name: "Bridge", href: ROUTES.BRIDGE },
-        { name: "Swap", href: ROUTES.SWAP },
+        { name: "Bridge", href: LINKS.BRIDGE },
+        { name: "Swap", href: LINKS.SWAP },
         ...(featureFlags.poolEnabled
-          ? [{ name: "Pool", href: ROUTES.POOL }]
+          ? [{ name: "Pool", href: LINKS.POOL }]
           : []),
         ...(featureFlags.earnEnabled
           ? [
-              { name: "Earn", href: ROUTES.EARN },
-              { name: "Borrow", href: ROUTES.BORROW },
+              { name: "Earn", href: LINKS.EARN },
+              { name: "Borrow", href: LINKS.BORROW },
             ]
           : []),
       ],
       Developers: [
-        { name: "Docs", href: ROUTES.DOCS },
-        { name: "Audits", href: ROUTES.AUDITS },
-        { name: "Explorer", href: ROUTES.EXPLORER },
+        { name: "Docs", href: LINKS.DOCS },
+        { name: "Audits", href: LINKS.AUDITS },
+        { name: "Explorer", href: LINKS.EXPLORER },
       ],
       Company: [
-        { name: "About Us", href: ROUTES.ABOUT },
-        { name: "Careers", href: ROUTES.CAREERS },
-        { name: "Blog", href: ROUTES.BLOG },
-        { name: "Terms", href: ROUTES.TERMS },
-        { name: "Privacy", href: ROUTES.PRIVACY },
-        { name: "Media Kit", href: ROUTES.MEDIA_KIT },
+        { name: "About Us", href: LINKS.ABOUT },
+        { name: "Careers", href: LINKS.CAREERS },
+        { name: "Blog", href: LINKS.BLOG },
+        { name: "Terms", href: LINKS.TERMS },
+        { name: "Privacy", href: LINKS.PRIVACY },
+        { name: "Media Kit", href: LINKS.MEDIA_KIT },
       ],
     };
   }, [featureFlags]);

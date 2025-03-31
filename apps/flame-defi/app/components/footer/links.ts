@@ -1,4 +1,4 @@
-export const ROUTES = {
+export const LINKS = {
   BRIDGE: "/",
   SWAP: "/swap",
   POOL: "/pool",

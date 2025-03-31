@@ -2,7 +2,7 @@
 
 import { FlameIcon } from "@repo/ui/icons";
 import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
-import { ROUTES } from "components/footer/routes";
+import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import NetworkSelector from "../network-selector/network-selector";
@@ -30,19 +30,19 @@ export const NavigationMenu = () => {
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
         <div className="items-center space-x-8 hidden lg:flex">
-          <NavigationMenuLink href="/" isActive={pathname === ROUTES.BRIDGE}>
+          <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
-            href={ROUTES.SWAP}
-            isActive={pathname.startsWith(ROUTES.SWAP)}
+            href={LINKS.SWAP}
+            isActive={pathname.startsWith(LINKS.SWAP)}
           >
             Swap
           </NavigationMenuLink>
           {featureFlags.poolEnabled && (
             <NavigationMenuLink
-              href={ROUTES.POOL}
-              isActive={pathname.startsWith(ROUTES.POOL)}
+              href={LINKS.POOL}
+              isActive={pathname.startsWith(LINKS.POOL)}
             >
               Pool
             </NavigationMenuLink>
@@ -50,14 +50,14 @@ export const NavigationMenu = () => {
           {featureFlags.earnEnabled && (
             <>
               <NavigationMenuLink
-                href={ROUTES.EARN}
-                isActive={pathname.startsWith(ROUTES.EARN)}
+                href={LINKS.EARN}
+                isActive={pathname.startsWith(LINKS.EARN)}
               >
                 Earn
               </NavigationMenuLink>
               <NavigationMenuLink
-                href={ROUTES.BORROW}
-                isActive={pathname.startsWith(ROUTES.BORROW)}
+                href={LINKS.BORROW}
+                isActive={pathname.startsWith(LINKS.BORROW)}
               >
                 Borrow
               </NavigationMenuLink>

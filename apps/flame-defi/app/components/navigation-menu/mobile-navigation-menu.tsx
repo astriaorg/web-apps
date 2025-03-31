@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { ROUTES } from "components/footer/routes";
+import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -55,21 +55,21 @@ export const MobileNavigationMenu = () => {
             <DialogDescription className="sr-only"></DialogDescription>
             <div className="flex flex-col items-center justify-center h-full space-y-8">
               <MobileNavigationMenuLink
-                href={ROUTES.BRIDGE}
-                isActive={pathname === ROUTES.BRIDGE}
+                href={LINKS.BRIDGE}
+                isActive={pathname === LINKS.BRIDGE}
               >
                 Bridge
               </MobileNavigationMenuLink>
               <MobileNavigationMenuLink
-                href={ROUTES.SWAP}
-                isActive={pathname.startsWith(ROUTES.SWAP)}
+                href={LINKS.SWAP}
+                isActive={pathname.startsWith(LINKS.SWAP)}
               >
                 Swap
               </MobileNavigationMenuLink>
               {featureFlags.poolEnabled && (
                 <MobileNavigationMenuLink
-                  href={ROUTES.POOL}
-                  isActive={pathname.startsWith(ROUTES.POOL)}
+                  href={LINKS.POOL}
+                  isActive={pathname.startsWith(LINKS.POOL)}
                 >
                   Pool
                 </MobileNavigationMenuLink>
@@ -77,14 +77,14 @@ export const MobileNavigationMenu = () => {
               {featureFlags.earnEnabled && (
                 <>
                   <MobileNavigationMenuLink
-                    href={ROUTES.EARN}
-                    isActive={pathname.startsWith(ROUTES.EARN)}
+                    href={LINKS.EARN}
+                    isActive={pathname.startsWith(LINKS.EARN)}
                   >
                     Earn
                   </MobileNavigationMenuLink>
                   <MobileNavigationMenuLink
-                    href={ROUTES.BORROW}
-                    isActive={pathname.startsWith(ROUTES.BORROW)}
+                    href={LINKS.BORROW}
+                    isActive={pathname.startsWith(LINKS.BORROW)}
                   >
                     Borrow
                   </MobileNavigationMenuLink>
