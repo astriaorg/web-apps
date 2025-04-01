@@ -46,13 +46,22 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
 
-  // FIXME - how does it know it's for Base?
+  const [coinbaseAccountAddress, setCoinbaseAccountAddress] = useState<
+    string | null
+  >(null);
+
+  // TODO - move this state to probably a deposit only context, or maybe just deposit-card for now
+  const [selectedCoinbaseChain, setSelectedCoinbaseChain] =
+    useState<CoinbaseChainInfo | null>(null);
+  const [selectedCoinbaseCurrency, setSelectedCoinbaseCurrency] =
+    useState<EvmCurrency | null>(null);
+
   const {
     status: nativeBalanceStatus,
     data: nativeBalance,
     isLoading: isLoadingCoinbaseNativeTokenBalance,
   } = useBalance({
-    chainId: 8453,
+    chainId: selectedCoinbaseChain?.chainId,
     address: userAccount.address,
   });
 
@@ -73,16 +82,6 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
 
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
-
-  const [coinbaseAccountAddress, setCoinbaseAccountAddress] = useState<
-    string | null
-  >(null);
-
-  // TODO - move this state to probably a deposit only context, or maybe just deposit-card for now
-  const [selectedCoinbaseChain, setSelectedCoinbaseChain] =
-    useState<CoinbaseChainInfo | null>(null);
-  const [selectedCoinbaseCurrency, setSelectedCoinbaseCurrency] =
-    useState<EvmCurrency | null>(null);
 
   // Set the address when the address, chain, or currency changes
   useEffect(() => {

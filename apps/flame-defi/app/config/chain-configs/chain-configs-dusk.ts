@@ -275,11 +275,6 @@ const BaseChainInfo: CoinbaseChainInfo = {
   chainName: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],
   blockExplorerUrl: "https://sepolia.basescan.org",
-  contracts: {
-    intentBridgeDeposit: {
-      address: "0x",
-    },
-  },
   currencies: [
     new EvmCurrency({
       coinDenom: "USDC",
@@ -287,6 +282,7 @@ const BaseChainInfo: CoinbaseChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
       erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      astriaIntentBridgeAddress: "0x",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: UsdcIcon,

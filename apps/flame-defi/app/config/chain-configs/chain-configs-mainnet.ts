@@ -436,11 +436,6 @@ const BaseChainInfo: CoinbaseChainInfo = {
   chainName: "Base",
   rpcUrls: ["https://mainnet.base.org"],
   blockExplorerUrl: "https://basescan.org/",
-  contracts: {
-    intentBridgeDeposit: {
-      address: "0x",
-    },
-  },
   currencies: [
     new EvmCurrency({
       coinDenom: "USDC",
@@ -448,6 +443,7 @@ const BaseChainInfo: CoinbaseChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
       erc20ContractAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      astriaIntentBridgeAddress: "0x",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: UsdcIcon,

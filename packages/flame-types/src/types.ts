@@ -272,6 +272,9 @@ export class EvmCurrency {
   /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
   public readonly nativeTokenWithdrawerContractAddress?: HexString;
 
+  /** Contract address for intent bridge **/
+  public readonly astriaIntentBridgeAddress?: HexString;
+
   /** True if this is a wrapped native token (e.g., wTIA) */
   public readonly isWrappedNative: boolean;
 
@@ -289,6 +292,7 @@ export class EvmCurrency {
     ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: HexString;
     nativeTokenWithdrawerContractAddress?: HexString;
+    astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {
@@ -300,6 +304,7 @@ export class EvmCurrency {
     this.erc20ContractAddress = params.erc20ContractAddress;
     this.nativeTokenWithdrawerContractAddress =
       params.nativeTokenWithdrawerContractAddress;
+    this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
     this.IconComponent = params.IconComponent;
   }
@@ -381,9 +386,8 @@ export interface CoinbaseChainInfo extends BaseChainInfo {
   readonly chainId: number;
   readonly rpcUrls: string[];
   readonly blockExplorerUrl?: string;
-  readonly contracts: {
+  readonly contracts?: {
     [label: string]: ChainContract;
-    intentBridgeDeposit: ChainContract;
   };
   readonly currencies: [EvmCurrency, ...EvmCurrency[]];
 }

@@ -3,9 +3,34 @@ import { type Address, erc20Abi, parseUnits } from "viem";
 import { HexString } from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 
+interface TransferParams {
+  recipient: Address;
+  amount: bigint;
+  chainId: number;
+}
+
 export class Erc20Service extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, erc20Abi);
+  }
+
+  /**
+   * Transfer tokens from the user's address to another address.
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param recipientAddress - The address of the recipient
+   * @param amount - The amount of tokens to transfer as a string
+   * @returns Transaction hash if successful
+   */
+  async transfer({
+    recipient,
+    amount,
+    chainId,
+  }: TransferParams): Promise<HexString> {
+    return await this.writeContractMethod(chainId, "transfer", [
+      recipient,
+      amount,
+    ]);
   }
 
   /**
