@@ -1,34 +1,12 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import type { DropdownOption } from "components/dropdown";
-import {
-  getFlameChainId,
-  getFlameNetworkByChainId,
-  useConfig as useAppConfig,
-} from "config";
+import { useConfig as useAppConfig } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useIntl } from "react-intl";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
-import {
-  useAccount,
-  useBalance,
-  useConfig,
-  useDisconnect,
-  useSwitchChain,
-} from "wagmi";
+import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
 
-import {
-  CoinbaseChainInfo,
-  CoinbaseChains,
-  EvmCurrency,
-  HexString,
-} from "@repo/flame-types";
+import { CoinbaseChainInfo, EvmCurrency } from "@repo/flame-types";
 
 export interface CoinbaseWalletContextProps {
   connectCoinbaseWallet: () => void;
@@ -49,9 +27,10 @@ export interface CoinbaseWalletContextProps {
   selectCoinbaseCurrency: (currency: EvmCurrency) => void;
 }
 
-export const CoinbaseWalletContext = React.createContext<CoinbaseWalletContextProps>(
-  {} as CoinbaseWalletContextProps,
-);
+export const CoinbaseWalletContext =
+  React.createContext<CoinbaseWalletContextProps>(
+    {} as CoinbaseWalletContextProps,
+  );
 
 interface CoinbaseWalletProviderProps {
   children: React.ReactNode;
@@ -60,25 +39,27 @@ interface CoinbaseWalletProviderProps {
 export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
   children,
 }) => {
-  const { coinbaseChains, selectedFlameNetwork, selectFlameNetwork } =
-    useAppConfig();
-  // Create a ref to use current selectedFlameNetwork value in useEffects without
-  // its change triggering the useEffect
-  const selectedFlameNetworkRef = useRef(selectedFlameNetwork);
+  const { coinbaseChains } = useAppConfig();
 
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
-  const { switchChain } = useSwitchChain();
-  const { formatNumber } = useIntl();
 
+  // FIXME - how does it know it's for Base?
   const {
     status: nativeBalanceStatus,
     data: nativeBalance,
     isLoading: isLoadingCoinbaseNativeTokenBalance,
   } = useBalance({
+    chainId: 8453,
     address: userAccount.address,
+  });
+
+  console.log({
+    isLoadingCoinbaseNativeTokenBalance,
+    nativeBalanceStatus,
+    nativeBalance,
   });
 
   const coinbaseNativeTokenBalance = useMemo(() => {
@@ -93,53 +74,32 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
 
-  const [selectedCoinbaseChain, setSelectedCoinbaseChain] = useState<CoinbaseChainInfo | null>(
-    null,
-  );
+  const [coinbaseAccountAddress, setCoinbaseAccountAddress] = useState<
+    string | null
+  >(null);
+
+  // TODO - move this state to probably a deposit only context, or maybe just deposit-card for now
+  const [selectedCoinbaseChain, setSelectedCoinbaseChain] =
+    useState<CoinbaseChainInfo | null>(null);
   const [selectedCoinbaseCurrency, setSelectedCoinbaseCurrency] =
     useState<EvmCurrency | null>(null);
-  const [coinbaseAccountAddress, setCoinbaseAccountAddress] = useState<string | null>(
-    null,
-  );
 
   // Set the address when the address, chain, or currency changes
   useEffect(() => {
-    if (selectedCoinbaseChain && selectedCoinbaseCurrency && userAccount?.address) {
+    if (
+      selectedCoinbaseChain &&
+      selectedCoinbaseCurrency &&
+      userAccount?.address
+    ) {
       setCoinbaseAccountAddress(userAccount.address);
     }
   }, [userAccount.address, selectedCoinbaseChain, selectedCoinbaseCurrency]);
-
-  // Set the selectedFlameNetwork if user switches from their wallet
-  useEffect(() => {
-    if (!userAccount?.chainId) {
-      return;
-    }
-    try {
-      const network = getFlameNetworkByChainId(userAccount.chainId);
-      selectFlameNetwork(network);
-    } catch (error) {
-      console.warn(
-        "User selected non Flame chain. Switching to selected Flame chain.",
-        error,
-      );
-      const chainId = getFlameChainId(selectedFlameNetworkRef.current);
-      switchChain({ chainId });
-    }
-  }, [selectFlameNetwork, userAccount.chainId, switchChain]);
 
   const resetState = useCallback(() => {
     setSelectedCoinbaseChain(null);
     setSelectedCoinbaseCurrency(null);
     setCoinbaseAccountAddress(null);
   }, []);
-
-  // Deselect chain and currency when network is changed and switch chains in wallet
-  useEffect(() => {
-    if (selectedFlameNetwork) {
-      resetState();
-      selectedFlameNetworkRef.current = selectedFlameNetwork;
-    }
-  }, [selectedFlameNetwork, resetState]);
 
   // Polling get balance
   const getBalanceCallback = useCallback(async () => {
@@ -163,7 +123,10 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
       nativeBalance.value,
       nativeBalance.decimals,
     );
-    return { value: formattedBalance, symbol: selectedCoinbaseCurrency.coinDenom };
+    return {
+      value: formattedBalance,
+      symbol: selectedCoinbaseCurrency.coinDenom,
+    };
   }, [
     wagmiConfig,
     nativeBalance?.value,

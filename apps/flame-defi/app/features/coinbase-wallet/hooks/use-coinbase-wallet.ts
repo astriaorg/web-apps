@@ -7,10 +7,12 @@ import { CoinbaseWalletContext } from "../contexts/coinbase-wallet-context";
  */
 export function useCoinbaseWallet() {
   const context = useContext(CoinbaseWalletContext);
-  
+
   if (context === undefined) {
-    throw new Error("useCoinbaseWallet must be used within a CoinbaseWalletProvider");
+    throw new Error(
+      "useCoinbaseWallet must be used within a CoinbaseWalletProvider",
+    );
   }
-  
+
   return context;
 }

@@ -18,7 +18,7 @@ export interface ChainConfigsObject {
 
 export type FlameNetworkConfig = ChainConfigsObject & {
   name: FlameNetwork;
-}
+};
 
 export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
 
