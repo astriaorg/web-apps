@@ -1,7 +1,7 @@
 "use client";
 
 import { usePoolContext } from "pool/hooks";
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { useEvmChainData } from "config";
 import { useState } from "react";
 import {
@@ -12,8 +12,9 @@ import {
 import { FeeData } from "pool/types";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { PoolTxnSteps } from "pool/components";
-
+import { useIntl } from "react-intl";
 export const ContentSection = () => {
+  const { formatNumber } = useIntl();
   const { feeData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
     usePoolContext();
   const { selectedChain } = useEvmChainData();
@@ -31,6 +32,8 @@ export const ContentSection = () => {
     value: "",
     isQuoteValue: true,
   });
+
+  const feeTier = selectedFeeTier.feeTier / 1_000_000;
 
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-0 md:mt-12 h-fit">
@@ -68,27 +71,33 @@ export const ContentSection = () => {
           handleCloseModal={() => setModalOpen(false)}
           title={"New position"}
         >
-          <PoolTxnSteps
-            txnStatus={txnStatus}
-            poolTokens={[
-              {
-                symbol: inputOne.token?.coinDenom || "",
-                unclaimedFees: 0,
-                liquidity: 0,
-                liquidityPercentage: 0,
-              },
-              {
-                symbol: inputTwo.token?.coinDenom || "",
-                unclaimedFees: 0,
-                liquidity: 0,
-                liquidityPercentage: 0,
-              },
-            ]}
-            addLiquidityInputValues={[inputOne.value, inputTwo.value]}
-            selectedFeeTier={selectedFeeTier.feePercent}
-            txnHash={""}
-            txnMsg={""}
-          />
+          {inputOne.token && inputTwo.token && (
+            <PoolTxnSteps
+              txnStatus={txnStatus}
+              poolTokens={[
+                {
+                  token: inputOne.token as EvmCurrency,
+                  unclaimedFees: 0,
+                  liquidity: 0,
+                  liquidityPercentage: 0,
+                },
+                {
+                  token: inputTwo.token as EvmCurrency,
+                  unclaimedFees: 0,
+                  liquidity: 0,
+                  liquidityPercentage: 0,
+                },
+              ]}
+              addLiquidityInputValues={[inputOne.value, inputTwo.value]}
+              selectedFeeTier={formatNumber(feeTier, {
+                style: "percent",
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 2,
+              })}
+              txnHash={""}
+              txnMsg={""}
+            />
+          )}
         </ConfirmationModal>
       </div>
     </div>

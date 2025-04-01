@@ -12,7 +12,8 @@ export const ContentSection = () => {
     selectedSymbol,
     handleReverseTokenData,
     symbols,
-    poolTokens,
+    poolTokenOne,
+    poolTokenTwo,
     collectAsNative,
     handleCollectAsNative,
   } = usePoolPositionContext();
@@ -36,32 +37,44 @@ export const ContentSection = () => {
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Liquidity" value="$-" />
-            <TokenInfoCard poolTokens={poolTokens} showLiquidity={true} />
+            <TokenInfoCard
+              poolTokenOne={poolTokenOne}
+              poolTokenTwo={poolTokenTwo}
+              showLiquidity={true}
+              showLiquidityPercentage
+            />
           </div>
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Unclaimed fees" value="$-" />
-            <TokenInfoCard poolTokens={poolTokens} />
+            <TokenInfoCard
+              poolTokenOne={poolTokenOne}
+              poolTokenTwo={poolTokenTwo}
+            />
           </div>
         </div>
         <div className="w-full md:w-2/4">
-          <ConfirmationModal
-            open={modalOpen}
-            buttonText={"Collect Fees"}
-            actionButtonText={"Collect"}
-            showOpenButton={true}
-            handleOpenModal={() => setModalOpen(true)}
-            handleModalActionButton={() => console.log("handle action button")}
-            handleCloseModal={() => setModalOpen(false)}
-            title={"Claim Fees"}
-          >
-            <PoolTxnSteps
-              txnStatus={txnStatus}
-              poolTokens={poolTokens}
-              txnHash={""}
-              txnMsg={""}
-              addLiquidityInputValues={null}
-            />
-          </ConfirmationModal>
+          {poolTokenOne && poolTokenTwo && (
+            <ConfirmationModal
+              open={modalOpen}
+              buttonText={"Collect Fees"}
+              actionButtonText={"Collect"}
+              showOpenButton={true}
+              handleOpenModal={() => setModalOpen(true)}
+              handleModalActionButton={() =>
+                console.log("handle action button")
+              }
+              handleCloseModal={() => setModalOpen(false)}
+              title={"Claim Fees"}
+            >
+              <PoolTxnSteps
+                txnStatus={txnStatus}
+                poolTokens={[poolTokenOne, poolTokenTwo]}
+                txnHash={""}
+                txnMsg={""}
+                addLiquidityInputValues={null}
+              />
+            </ConfirmationModal>
+          )}
         </div>
       </div>
     </div>

@@ -1,10 +1,14 @@
 import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
+import { Address } from "viem";
+import { FeeTier } from "./constants/pool-constants";
 
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
   inputTwo: string;
   setInputOne: (value: string) => void;
   setInputTwo: (value: string) => void;
+  poolTokenOne: PoolToken;
+  poolTokenTwo: PoolToken;
 }
 export interface NewPositionInputsProps {
   inputOne: TokenInputState;
@@ -21,7 +25,7 @@ export interface TokenPair {
 
 export interface FeeData {
   id: number;
-  feePercent: string;
+  feeTier: FeeTier;
   text: string;
   tvl: string;
   selectPercent: string;
@@ -35,41 +39,45 @@ export interface PriceCardProps {
   className?: string;
 }
 
-export interface PoolPositionsRecord {
-  position: {
-    id: number;
-    symbol: string;
-    symbolTwo: string;
-    percent: number;
-    apr: number;
-  };
-  positionStatus: string;
-  inRange: boolean;
-}
-
 export interface PoolToken {
-  symbol: string;
   unclaimedFees: number;
   liquidity: number;
   liquidityPercentage: number;
+  token: EvmCurrency;
 }
 
-export type Position = {
-  tokens: PoolToken[];
-  feeTier: number;
+export interface PoolPositionResponse {
+  nonce: bigint;
+  operator: string;
+  tokenAddress0: Address;
+  tokenAddress1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: bigint;
+  feeGrowthInside0LastX128: bigint;
+  feeGrowthInside1LastX128: bigint;
+  tokensOwed0: bigint;
+  tokensOwed1: bigint;
+}
+
+export interface GetAllPoolPositionsResponse extends PoolPositionResponse {
+  tokenId: string;
+}
+
+export interface PoolPosition extends GetAllPoolPositionsResponse {
+  feePercent: FeeTier;
   inRange: boolean;
   positionStatus: string;
-  min: number;
-  max: number | "∞";
-};
-
-export type Positions = {
-  [key: number]: Position;
-};
+  poolAddress: Address | null;
+  symbolOne: string;
+  symbolTwo: string;
+}
 
 export type PoolContextProps = {
   feeData: FeeData[];
-  poolPositionsRecord: PoolPositionsRecord[];
+  poolPositions: PoolPosition[];
+  poolPositionsLoading: boolean;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
   txnStatus: TXN_STATUS;
@@ -77,16 +85,17 @@ export type PoolContextProps = {
 };
 
 export type PoolPositionContextProps = {
-  position?: Position;
-  poolTokens: PoolToken[];
   feeTier: string;
   symbols: string[];
   selectedSymbol: string;
   handleReverseTokenData: (symbol: string) => void;
   collectAsNative: boolean;
   handleCollectAsNative: (collectAsNative: boolean) => void;
-  poolTokenOne: PoolToken;
-  poolTokenTwo: PoolToken;
+  poolTokenOne: PoolToken | null;
+  poolTokenTwo: PoolToken | null;
+  currentPrice: string;
+  minPrice: string;
+  maxPrice: string;
 };
 
 export type PoolTxnStepsProps = {

@@ -10,6 +10,8 @@ export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
+  const symbolsReady =
+    poolTokenOne?.token.coinDenom && poolTokenTwo?.token.coinDenom;
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
@@ -25,18 +27,23 @@ export const HeaderSection = () => {
           />
         </div>
         <div className="flex flex-col space-y-3">
-          <Skeleton isLoading={false} className="">
-            <div className="flex items-center space-x-2">
-              <MultiTokenIcon
-                symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
-                size={24}
-              />
-              <h1 className="text-3xl/8">
-                {poolTokenOne.symbol}/{poolTokenTwo.symbol}
-              </h1>
-            </div>
+          <Skeleton isLoading={!symbolsReady} className="w-full h-[40px]">
+            {symbolsReady && (
+              <div className="flex items-center space-x-2">
+                <MultiTokenIcon
+                  symbols={[
+                    poolTokenOne.token.coinDenom,
+                    poolTokenTwo.token.coinDenom,
+                  ]}
+                  size={24}
+                />
+                <h1 className="text-3xl/8">
+                  {poolTokenOne.token.coinDenom}/{poolTokenTwo.token.coinDenom}
+                </h1>
+              </div>
+            )}
           </Skeleton>
-          <Skeleton isLoading={false} className="">
+          <Skeleton isLoading={!symbolsReady} className="w-full h-[20px]">
             <div className="flex space-x-2">
               <Badge
                 variant="default"
