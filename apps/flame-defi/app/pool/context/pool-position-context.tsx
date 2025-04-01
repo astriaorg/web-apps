@@ -42,8 +42,8 @@ export const PoolPositionContextProvider = ({
   const { selectedChain, nativeToken, wrappedNativeToken } = useEvmChainData();
   const { currencies } = selectedChain;
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
-  const [collectAsNative, setCollectAsNative] = useState<boolean>(
-    currentPoolSettings.collectAsNative || false,
+  const [collectAsWrappedNative, setCollectAsWrappedNative] = useState<boolean>(
+    currentPoolSettings.collectAsWrappedNative || false,
   );
   const [currentPrice, setCurrentPrice] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
@@ -266,13 +266,13 @@ export const PoolPositionContextProvider = ({
     void getPriceRange();
   }, [invertedPrice, getPriceRange]);
 
-  const handleCollectAsNative = (collectAsNative: boolean) => {
-    setCollectAsNative(collectAsNative);
+  const handleCollectAsWrappedNative = (collectAsWrappedNative: boolean) => {
+    setCollectAsWrappedNative(collectAsWrappedNative);
     setInLocalStorage("poolSettings", {
-      collectAsNative: collectAsNative,
+      collectAsWrappedNative: collectAsWrappedNative,
     });
 
-    if (collectAsNative) {
+    if (collectAsWrappedNative) {
       poolTokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {
           poolToken.token = wrappedNativeToken;
@@ -296,8 +296,8 @@ export const PoolPositionContextProvider = ({
         rawFeeTier,
         selectedSymbol,
         handleReverseTokenData,
-        collectAsNative,
-        handleCollectAsNative,
+        collectAsWrappedNative,
+        handleCollectAsWrappedNative,
         poolToken0,
         poolToken1,
         currentPrice,

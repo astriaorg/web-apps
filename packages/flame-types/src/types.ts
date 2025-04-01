@@ -351,6 +351,10 @@ export class EvmCurrency {
   }
 }
 
+export interface ErrorWithMessage {
+  message: string;
+}
+
 /**
  * Represents information about an EVM chain.
  */

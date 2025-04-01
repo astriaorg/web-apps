@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import { useConfig as useAppConfig } from "config";
 import { getSlippageTolerance } from "@repo/ui/utils";
-import { createNonfungiblePositionManagerService } from "features/evm-wallet";
+import {
+  createNonfungiblePositionManagerService,
+  NonfungiblePositionManagerService,
+} from "features/evm-wallet";
 import { usePoolPositionContext } from "./use-pool-position-context";
-import { NonfungiblePositionManagerService } from "../../features/evm-wallet/services/non-fungible-position-manager-service";
 
 export const useAddLiquidityTxn = (
   input0Amount: string,
@@ -14,11 +16,10 @@ export const useAddLiquidityTxn = (
 ) => {
   const { address } = useAccount();
   const wagmiConfig = useConfig();
+  const { selectedChain } = useEvmChainData();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
-
-  const { selectedChain } = useEvmChainData();
   const { poolToken0, poolToken1, positionNftId } = usePoolPositionContext();
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;

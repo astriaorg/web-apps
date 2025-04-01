@@ -106,8 +106,6 @@ export type PoolContextProps = {
   poolPositionsLoading: boolean;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
-  txnStatus: TXN_STATUS;
-  setTxnStatus: (txnStatus: TXN_STATUS) => void;
   maxPrice: string;
   updateMaxPrice: (
     feeTier: number,
@@ -121,8 +119,8 @@ export type PoolPositionContextProps = {
   rawFeeTier: number; // The unformatted fee tier value to be used in calculations
   selectedSymbol: string; // The symbol of the token that is currently in the ToggleSwitch. Controls which set of token liquidity and price data is displayed
   handleReverseTokenData: (symbol: string) => void;
-  collectAsNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
-  handleCollectAsNative: (collectAsNative: boolean) => void;
+  collectAsWrappedNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
+  handleCollectAsWrappedNative: (collectAsWrappedNative: boolean) => void;
   poolToken0: PoolToken | null;
   poolToken1: PoolToken | null;
   poolPosition: PoolPositionResponse | null;

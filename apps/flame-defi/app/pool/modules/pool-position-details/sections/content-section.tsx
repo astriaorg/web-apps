@@ -5,16 +5,17 @@ import { usePoolPositionContext, usePoolContext } from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { Skeleton, Switch } from "@repo/ui/components";
+import { TXN_STATUS } from "@repo/flame-types";
 
 export const ContentSection = () => {
-  const { modalOpen, setModalOpen, txnStatus } = usePoolContext();
+  const { modalOpen, setModalOpen } = usePoolContext();
   const {
     selectedSymbol,
     handleReverseTokenData,
     poolToken0,
     poolToken1,
-    collectAsNative,
-    handleCollectAsNative,
+    collectAsWrappedNative,
+    handleCollectAsWrappedNative,
     isReversedPoolTokens,
   } = usePoolPositionContext();
   const poolTokens = isReversedPoolTokens
@@ -37,8 +38,10 @@ export const ContentSection = () => {
         <div className="flex items-center gap-2 justify-end">
           <span className="text-sm">Collect as WTIA</span>
           <Switch
-            checked={collectAsNative}
-            onCheckedChange={() => handleCollectAsNative(!collectAsNative)}
+            checked={collectAsWrappedNative}
+            onCheckedChange={() =>
+              handleCollectAsWrappedNative(!collectAsWrappedNative)
+            }
             className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
           />
         </div>
@@ -75,7 +78,7 @@ export const ContentSection = () => {
                 title={"Claim Fees"}
               >
                 <PoolTxnSteps
-                  txnStatus={txnStatus}
+                  txnStatus={TXN_STATUS.IDLE}
                   poolTokens={[token0, token1]}
                   txnHash={"0x"}
                   txnMsg={""}

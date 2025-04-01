@@ -4,6 +4,7 @@ import { EvmWalletProvider } from "./contexts/evm-wallet-context";
 import { useEvmWallet } from "./hooks/use-evm-wallet";
 import { useTokenBalances } from "./hooks/use-token-balances";
 import { createWithdrawerService } from "./services/astria-withdrawer-service/astria-withdrawer-service";
+import { createNonfungiblePositionManagerService, NonfungiblePositionManagerService } from "./services/non-fungible-position-manager-service";
 import { createNonfungiblePositionManagerService } from "./services/non-fungible-position-manager-service";
 import { createPoolFactoryService } from "./services/pool-factory-service";
 import { createPoolService } from "./services/pool-service";
@@ -26,6 +27,7 @@ export {
   createTradeFromQuote,
   createWethService,
   createWithdrawerService,
+  NonfungiblePositionManagerService,
   useEvmWallet,
   useTokenBalances,
 };

@@ -20,11 +20,10 @@ export const ContentSection = () => {
     feeData,
     modalOpen,
     setModalOpen,
-    setTxnStatus,
-    txnStatus,
     maxPrice,
     updateMaxPrice,
   } = usePoolContext();
+  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
   const defaultFeeData = feeData[2] as FeeData;
