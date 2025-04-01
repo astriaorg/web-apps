@@ -18,10 +18,10 @@ export const useRemoveLiquidity = () => {
   useEffect(() => {
     setLiquidityToRemove((prevValues) =>
       prevValues.map((token) => {
-        if (collectAsNative && token.symbol === "TIA") {
+        if (collectAsNative && token.isNative) {
           return { ...token, symbol: "WTIA" };
         }
-        if (!collectAsNative && token.symbol === "WTIA") {
+        if (!collectAsNative && token.isWrappedNative) {
           return { ...token, symbol: "TIA" };
         }
         return token;
