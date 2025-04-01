@@ -10,7 +10,8 @@ export const TokenLiquidityBlock = ({
   liquidityToRemove: PoolToken[];
 }) => {
   const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
-  const symbolsReady = poolTokenOne?.symbol && poolTokenTwo?.symbol;
+  const symbolsReady =
+    poolTokenOne?.token.coinDenom && poolTokenTwo?.token.coinDenom;
 
   return (
     <div className="flex flex-col md:flex-row gap-4">
@@ -20,11 +21,14 @@ export const TokenLiquidityBlock = ({
           {symbolsReady && (
             <div className="flex flex-col space-x-2">
               <MultiTokenIcon
-                symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
+                symbols={[
+                  poolTokenOne.token.coinDenom,
+                  poolTokenTwo.token.coinDenom,
+                ]}
                 size={24}
               />
               <h1 className="text-2xl/8 mt-2">
-                {poolTokenOne.symbol}/{poolTokenTwo.symbol}
+                {poolTokenOne.token.coinDenom}/{poolTokenTwo.token.coinDenom}
               </h1>
             </div>
           )}

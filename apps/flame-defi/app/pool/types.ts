@@ -48,12 +48,10 @@ export interface PoolPositionsRecord {
 }
 
 export interface PoolToken {
-  symbol: string;
   unclaimedFees: number;
   liquidity: number;
   liquidityPercentage: number;
-  isNative: boolean;
-  isWrappedNative: boolean;
+  token: EvmCurrency;
 }
 
 export type Position = {
@@ -69,7 +67,7 @@ export type Positions = {
   [key: number]: Position;
 };
 
-export type PoolPositionResponse = {
+export interface PoolPositionResponse {
   nonce: bigint;
   operator: string;
   tokenAddress0: Address;
@@ -82,33 +80,19 @@ export type PoolPositionResponse = {
   feeGrowthInside1LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
-};
+}
 
-export type GetAllPoolPositionsResponse = {
-  nonce: bigint;
-  operator: string;
-  tokenAddress0: Address;
-  tokenAddress1: Address;
-  fee: number;
-  tickLower: number;
-  tickUpper: number;
-  liquidity: bigint;
-  feeGrowthInside0LastX128: bigint;
-  feeGrowthInside1LastX128: bigint;
-  tokensOwed0: bigint;
-  tokensOwed1: bigint;
+export interface GetAllPoolPositionsResponse extends PoolPositionResponse {
   tokenId: string;
-};
+}
 
 export interface PoolPosition extends GetAllPoolPositionsResponse {
   feePercent: FeeTier;
-  symbolOne: string;
-  symbolTwo: string;
   inRange: boolean;
   positionStatus: string;
   poolAddress: Address | null;
-  tokenOne: EvmCurrency | null;
-  tokenTwo: EvmCurrency | null;
+  symbolOne: string;
+  symbolTwo: string;
 }
 
 export type PoolContextProps = {

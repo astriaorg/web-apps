@@ -28,37 +28,40 @@ export function TokenInfoCard({
           <div className="flex flex-col gap-4">
             {poolTokenOne &&
               poolTokenTwo &&
-              [poolTokenOne, poolTokenTwo].map((token, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center gap-2"
-                >
-                  <div className="flex items-center gap-2">
-                    <TokenIcon symbol={token.symbol} size={20} />
-                    <span className="text-base text-text-subdued">
-                      {token.symbol}
-                    </span>
+              [poolTokenOne, poolTokenTwo].map(
+                (
+                  { token, liquidity, unclaimedFees, liquidityPercentage },
+                  index,
+                ) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center gap-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <TokenIcon symbol={token.coinDenom} size={20} />
+                      <span className="text-base text-text-subdued">
+                        {token.coinDenom}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base text-text-subdued">
+                        {showLiquidity
+                          ? formatNumber(liquidity, {
+                              minimumFractionDigits: 5,
+                              maximumFractionDigits: 5,
+                            })
+                          : formatNumber(unclaimedFees, {
+                              minimumFractionDigits: 5,
+                              maximumFractionDigits: 5,
+                            })}
+                      </span>
+                      {showLiquidityPercentage && (
+                        <Badge variant="default">{liquidityPercentage}%</Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-base text-text-subdued">
-                      {showLiquidity
-                        ? formatNumber(token.liquidity, {
-                            minimumFractionDigits: 5,
-                            maximumFractionDigits: 5,
-                          })
-                        : formatNumber(token.unclaimedFees, {
-                            minimumFractionDigits: 5,
-                            maximumFractionDigits: 5,
-                          })}
-                    </span>
-                    {showLiquidityPercentage && (
-                      <Badge variant="default">
-                        {token.liquidityPercentage}%
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ),
+              )}
           </div>
         </Skeleton>
       </div>

@@ -39,7 +39,7 @@ export const PoolPositionContextProvider = ({
   const { address } = useAccount();
   const { formatNumber } = useIntl();
   const tokenId = params["token-id"] as string;
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain, nativeToken, wrappedNativeToken } = useEvmChainData();
   const { currencies } = selectedChain;
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
   const [collectAsNative, setCollectAsNative] = useState<boolean>(
@@ -75,22 +75,22 @@ export const PoolPositionContextProvider = ({
         selectedChain.chainId,
         tokenId,
       );
-      const tokenOne = getTokenDataFromCurrencies(
+      const token0 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
         selectedChain.contracts.wrappedNativeToken.address,
       );
-      const tokenTwo = getTokenDataFromCurrencies(
+      const token1 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress1,
         selectedChain.contracts.wrappedNativeToken.address,
       );
 
-      if (tokenOne && tokenTwo) {
+      if (token0 && token1) {
         const unclaimedFees0 =
-          Number(position.tokensOwed0) / 10 ** tokenOne.coinDecimals;
+          Number(position.tokensOwed0) / 10 ** token0.coinDecimals;
         const unclaimedFees1 =
-          Number(position.tokensOwed1) / 10 ** tokenTwo.coinDecimals;
+          Number(position.tokensOwed1) / 10 ** token1.coinDecimals;
         const factoryService = createPoolFactoryService(
           wagmiConfig,
           selectedChain.contracts.poolFactory.address,
@@ -107,31 +107,27 @@ export const PoolPositionContextProvider = ({
         const { amount0, amount1 } = getTokensLiquidityAmounts(
           position,
           slot0.sqrtPriceX96,
-          tokenOne.coinDecimals,
-          tokenTwo.coinDecimals,
+          token0.coinDecimals,
+          token1.coinDecimals,
         );
 
         const poolToken0: PoolToken = {
-          symbol: tokenOne.coinDenom,
           unclaimedFees: unclaimedFees0,
           liquidity: amount0,
           liquidityPercentage: 50, // TODO: figure out how to calculate this.
-          isNative: tokenOne.isNative,
-          isWrappedNative: tokenOne.isWrappedNative,
+          token: token0,
         };
 
         const poolToken1: PoolToken = {
-          symbol: tokenTwo.coinDenom,
           unclaimedFees: unclaimedFees1,
           liquidity: amount1,
           liquidityPercentage: 50, // TODO: figure out how to calculate this.
-          isNative: tokenTwo.isNative,
-          isWrappedNative: tokenTwo.isWrappedNative,
+          token: token1,
         };
 
-        setSymbols([poolToken0.symbol, poolToken1.symbol]);
+        setSymbols([poolToken0.token.coinDenom, poolToken1.token.coinDenom]);
         setPoolTokens([poolToken0, poolToken1]);
-        setSelectedSymbol(poolToken0.symbol);
+        setSelectedSymbol(poolToken0.token.coinDenom);
       }
     } catch (error) {
       console.error("Error fetching pool tokens:", error);
@@ -249,20 +245,23 @@ export const PoolPositionContextProvider = ({
 
     if (collectAsNative) {
       poolTokens.map((poolToken) => {
-        if (poolToken.isNative) {
-          poolToken.symbol = "WTIA";
+        if (poolToken.token.isNative && wrappedNativeToken) {
+          poolToken.token = wrappedNativeToken;
         }
       });
     } else {
       poolTokens.map((poolToken) => {
-        if (poolToken.isWrappedNative) {
-          poolToken.symbol = "TIA";
+        if (poolToken.token.isWrappedNative && nativeToken) {
+          poolToken.token = nativeToken;
         }
       });
     }
     setPoolTokens(poolTokens);
-    setSymbols([poolTokens[1]?.symbol || "", poolTokens[0]?.symbol || ""]);
-    setSelectedSymbol(poolTokens[0]?.symbol || "");
+    setSymbols([
+      poolTokens[1]?.token.coinDenom ?? "",
+      poolTokens[0]?.token.coinDenom ?? "",
+    ]);
+    setSelectedSymbol(poolTokens[0]?.token.coinDenom ?? "");
   };
 
   return (

@@ -22,11 +22,14 @@ export const TokenLiquidityBlock = ({
           {poolTokenOne && poolTokenTwo && (
             <div className="flex flex-col space-x-2">
               <MultiTokenIcon
-                symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
+                symbols={[
+                  poolTokenOne.token.coinDenom,
+                  poolTokenTwo.token.coinDenom,
+                ]}
                 size={24}
               />
               <h1 className="text-2xl/8">
-                {poolTokenOne.symbol}/{poolTokenTwo.symbol}
+                {poolTokenOne.token.coinDenom}/{poolTokenTwo.token.coinDenom}
               </h1>
             </div>
           )}

@@ -18,23 +18,23 @@ export const PoolFeesAndLiquidityCard = ({
     <div className={cn("flex-1 bg-surface-1 rounded-lg p-6", className)}>
       <div className="flex flex-col">
         <div className="flex flex-col gap-4">
-          {liquidityToRemove.map((token, index) => (
+          {liquidityToRemove.map(({ token, liquidity }, index) => (
             <div
               key={index}
               className="flex justify-between items-center gap-2"
             >
               <div className="flex items-center gap-2">
                 <span className="text-base text-text-subdued">
-                  Pooled {token.symbol}
+                  Pooled {token.coinDenom}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-2 text-base text-text-subdued">
-                  {formatNumber(token.liquidity, {
+                  {formatNumber(liquidity, {
                     minimumFractionDigits: 6,
                     maximumFractionDigits: 6,
                   })}
-                  <TokenIcon symbol={token.symbol} size={20} />
+                  <TokenIcon symbol={token.coinDenom} size={20} />
                 </span>
               </div>
             </div>
@@ -42,23 +42,23 @@ export const PoolFeesAndLiquidityCard = ({
         </div>
         <hr className="border-t border-border mt-4 mb-4" />
         <div className="flex flex-col gap-4">
-          {poolTokens.map((token, index) => (
+          {poolTokens.map(({ token, unclaimedFees }, index) => (
             <div
               key={index}
               className="flex justify-between items-center gap-2"
             >
               <div className="flex items-center gap-2">
                 <span className="text-base text-text-subdued">
-                  {token.symbol} Fees Earned
+                  {token.coinDenom} Fees Earned
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-2 text-base text-text-subdued">
-                  {formatNumber(token.unclaimedFees, {
+                  {formatNumber(unclaimedFees, {
                     minimumFractionDigits: 6,
                     maximumFractionDigits: 6,
                   })}
-                  <TokenIcon symbol={token.symbol} size={20} />
+                  <TokenIcon symbol={token.coinDenom} size={20} />
                 </span>
               </div>
             </div>

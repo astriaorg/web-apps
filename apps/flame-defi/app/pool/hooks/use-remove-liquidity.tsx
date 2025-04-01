@@ -1,10 +1,11 @@
 import { PoolToken } from "pool/types";
 import { useState, useEffect } from "react";
 import { usePoolPositionContext } from ".";
-
+import { useEvmChainData } from "config/hooks/use-config";
 export const useRemoveLiquidity = () => {
   const { poolTokenOne, poolTokenTwo, collectAsNative } =
     usePoolPositionContext();
+  const { wrappedNativeToken, nativeToken } = useEvmChainData();
   const poolTokens =
     poolTokenOne && poolTokenTwo ? [poolTokenOne, poolTokenTwo] : [];
 
@@ -17,17 +18,23 @@ export const useRemoveLiquidity = () => {
 
   useEffect(() => {
     setLiquidityToRemove((prevValues) =>
-      prevValues.map((token) => {
-        if (collectAsNative && token.isNative) {
-          return { ...token, symbol: "WTIA" };
+      prevValues.map((poolToken) => {
+        let updatedToken = poolToken.token;
+
+        if (collectAsNative && updatedToken.isNative && wrappedNativeToken) {
+          updatedToken = wrappedNativeToken;
         }
-        if (!collectAsNative && token.isWrappedNative) {
-          return { ...token, symbol: "TIA" };
+        if (!collectAsNative && updatedToken.isWrappedNative && nativeToken) {
+          updatedToken = nativeToken;
         }
-        return token;
+
+        return {
+          ...poolToken,
+          token: updatedToken,
+        };
       }),
     );
-  }, [collectAsNative]);
+  }, [collectAsNative, wrappedNativeToken, nativeToken]);
 
   const handlePercentToRemove = (percent: number) => {
     setLiquidityToRemove(

@@ -10,7 +10,8 @@ export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
-  const symbolsReady = poolTokenOne?.symbol && poolTokenTwo?.symbol;
+  const symbolsReady =
+    poolTokenOne?.token.coinDenom && poolTokenTwo?.token.coinDenom;
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
@@ -30,11 +31,14 @@ export const HeaderSection = () => {
             {symbolsReady && (
               <div className="flex items-center space-x-2">
                 <MultiTokenIcon
-                  symbols={[poolTokenOne.symbol, poolTokenTwo.symbol]}
+                  symbols={[
+                    poolTokenOne.token.coinDenom,
+                    poolTokenTwo.token.coinDenom,
+                  ]}
                   size={24}
                 />
                 <h1 className="text-3xl/8">
-                  {poolTokenOne.symbol}/{poolTokenTwo.symbol}
+                  {poolTokenOne.token.coinDenom}/{poolTokenTwo.token.coinDenom}
                 </h1>
               </div>
             )}

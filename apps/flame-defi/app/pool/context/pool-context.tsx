@@ -7,13 +7,7 @@ import {
   createPoolFactoryService,
 } from "features/evm-wallet";
 import { PoolContextProps, PoolPosition } from "pool/types";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { TXN_STATUS } from "@repo/flame-types";
 import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
 import { getTokenDataFromCurrencies } from "./pool-position-helpers";
@@ -63,76 +57,74 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
 
-  const getPoolPositions = useCallback(async () => {
-    if (!address) {
-      return;
-    }
-    const factoryService = createPoolFactoryService(
-      wagmiConfig,
-      selectedChain.contracts.poolFactory.address,
-    );
-
-    setPoolPositionsLoading(true);
-
-    try {
-      const nonFungiblePositionService = createNonFungiblePositionService(
-        wagmiConfig,
-        selectedChain.contracts.nonfungiblePositionManager.address,
-      );
-
-      const positions = await nonFungiblePositionService.getAllPositions(
-        selectedChain.chainId,
-        address,
-      );
-
-      const positionsWithCurrencyData = positions.map(async (position) => {
-        const isClosed = position.liquidity === 0n;
-        const feePercent = (position.fee / 1_000_000) as FeeTier;
-
-        const tokenOne = getTokenDataFromCurrencies(
-          currencies,
-          position.tokenAddress0,
-          selectedChain.contracts.wrappedNativeToken.address,
-        );
-
-        const tokenTwo = getTokenDataFromCurrencies(
-          currencies,
-          position.tokenAddress1,
-          selectedChain.contracts.wrappedNativeToken.address,
-        );
-
-        const poolAddress = await factoryService.getPool(
-          selectedChain.chainId,
-          position.tokenAddress0,
-          position.tokenAddress1,
-          position.fee,
-        );
-
-        return {
-          symbolOne: tokenOne?.coinDenom ?? "",
-          symbolTwo: tokenTwo?.coinDenom ?? "",
-          feePercent,
-          inRange: !isClosed,
-          positionStatus: isClosed ? "Closed" : "In range",
-          poolAddress,
-          tokenOne,
-          tokenTwo,
-          ...position,
-        };
-      });
-
-      const resolvedPositions = await Promise.all(positionsWithCurrencyData);
-      setPoolPositions(resolvedPositions);
-    } catch (error) {
-      console.warn("Error fetching pool positions:", error);
-    } finally {
-      setPoolPositionsLoading(false);
-    }
-  }, [address, currencies, wagmiConfig, selectedChain]);
-
   useEffect(() => {
-    void getPoolPositions();
-  }, [getPoolPositions]);
+    const getPoolPositions = async () => {
+      if (!address) {
+        return;
+      }
+      const factoryService = createPoolFactoryService(
+        wagmiConfig,
+        selectedChain.contracts.poolFactory.address,
+      );
+
+      setPoolPositionsLoading(true);
+
+      try {
+        const nonFungiblePositionService = createNonFungiblePositionService(
+          wagmiConfig,
+          selectedChain.contracts.nonfungiblePositionManager.address,
+        );
+
+        const positions = await nonFungiblePositionService.getAllPositions(
+          selectedChain.chainId,
+          address,
+        );
+
+        const positionsWithCurrencyData = positions.map(async (position) => {
+          const isClosed = position.liquidity === 0n;
+          const feePercent = (position.fee / 1_000_000) as FeeTier;
+
+          const tokenOne = getTokenDataFromCurrencies(
+            currencies,
+            position.tokenAddress0,
+            selectedChain.contracts.wrappedNativeToken.address,
+          );
+
+          const tokenTwo = getTokenDataFromCurrencies(
+            currencies,
+            position.tokenAddress1,
+            selectedChain.contracts.wrappedNativeToken.address,
+          );
+
+          const poolAddress = await factoryService.getPool(
+            selectedChain.chainId,
+            position.tokenAddress0,
+            position.tokenAddress1,
+            position.fee,
+          );
+
+          return {
+            symbolOne: tokenOne?.coinDenom ?? "",
+            symbolTwo: tokenTwo?.coinDenom ?? "",
+            feePercent,
+            inRange: !isClosed,
+            positionStatus: isClosed ? "Closed" : "In range",
+            poolAddress,
+            ...position,
+          };
+        });
+
+        const resolvedPositions = await Promise.all(positionsWithCurrencyData);
+        setPoolPositions(resolvedPositions);
+      } catch (error) {
+        console.warn("Error fetching pool positions:", error);
+      } finally {
+        setPoolPositionsLoading(false);
+      }
+    };
+
+    getPoolPositions();
+  }, [address, currencies, wagmiConfig, selectedChain]);
 
   return (
     <PoolContext.Provider

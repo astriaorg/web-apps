@@ -14,7 +14,10 @@ export const AddLiquidityInputsBlock = ({
 }: AddLiquidityInputsBlockProps) => {
   const { formatNumber } = useIntl();
   const { tokenOne, tokenTwo, tokenOneBalance, tokenTwoBalance } =
-    useGetPoolTokenBalances(poolTokenOne.symbol, poolTokenTwo.symbol);
+    useGetPoolTokenBalances(
+      poolTokenOne.token.coinDenom,
+      poolTokenTwo.token.coinDenom,
+    );
 
   // NOTE: This data is temporary. The token data will likely be coming from the API.
   const inputsArray = [

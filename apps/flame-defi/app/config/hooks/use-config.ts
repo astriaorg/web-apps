@@ -19,6 +19,12 @@ export const useEvmChainData = () => {
   const { evmChains } = useConfig();
   const evmChainsData = Object.values(evmChains);
   const selectedChain = evmChainsData[0] as EvmChainInfo;
+  const nativeToken = selectedChain.currencies.find(
+    (currency) => currency.isNative,
+  );
+  const wrappedNativeToken = selectedChain.currencies.find(
+    (currency) => currency.isWrappedNative,
+  );
 
-  return { selectedChain };
+  return { selectedChain, nativeToken, wrappedNativeToken };
 };

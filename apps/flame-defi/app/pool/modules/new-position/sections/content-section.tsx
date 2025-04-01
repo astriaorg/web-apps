@@ -1,7 +1,7 @@
 "use client";
 
 import { usePoolContext } from "pool/hooks";
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { useEvmChainData } from "config";
 import { useState } from "react";
 import {
@@ -71,35 +71,33 @@ export const ContentSection = () => {
           handleCloseModal={() => setModalOpen(false)}
           title={"New position"}
         >
-          <PoolTxnSteps
-            txnStatus={txnStatus}
-            poolTokens={[
-              {
-                symbol: inputOne.token?.coinDenom || "",
-                isNative: inputOne.token?.isNative || false,
-                isWrappedNative: inputOne.token?.isWrappedNative || false,
-                unclaimedFees: 0,
-                liquidity: 0,
-                liquidityPercentage: 0,
-              },
-              {
-                symbol: inputTwo.token?.coinDenom || "",
-                unclaimedFees: 0,
-                liquidity: 0,
-                liquidityPercentage: 0,
-                isNative: inputTwo.token?.isNative || false,
-                isWrappedNative: inputTwo.token?.isWrappedNative || false,
-              },
-            ]}
-            addLiquidityInputValues={[inputOne.value, inputTwo.value]}
-            selectedFeeTier={formatNumber(feeTier, {
-              style: "percent",
-              minimumFractionDigits: 1,
-              maximumFractionDigits: 2,
-            })}
-            txnHash={""}
-            txnMsg={""}
-          />
+          {inputOne.token && inputTwo.token && (
+            <PoolTxnSteps
+              txnStatus={txnStatus}
+              poolTokens={[
+                {
+                  token: inputOne.token as EvmCurrency,
+                  unclaimedFees: 0,
+                  liquidity: 0,
+                  liquidityPercentage: 0,
+                },
+                {
+                  token: inputTwo.token as EvmCurrency,
+                  unclaimedFees: 0,
+                  liquidity: 0,
+                  liquidityPercentage: 0,
+                },
+              ]}
+              addLiquidityInputValues={[inputOne.value, inputTwo.value]}
+              selectedFeeTier={formatNumber(feeTier, {
+                style: "percent",
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 2,
+              })}
+              txnHash={""}
+              txnMsg={""}
+            />
+          )}
         </ConfirmationModal>
       </div>
     </div>
