@@ -39,33 +39,12 @@ export interface PriceCardProps {
   className?: string;
 }
 
-export interface PoolPositionsRecord {
-  symbolOne: string;
-  symbolTwo: string;
-  feePercent: FeeTier;
-  positionStatus: string;
-  inRange: boolean;
-}
-
 export interface PoolToken {
   unclaimedFees: number;
   liquidity: number;
   liquidityPercentage: number;
   token: EvmCurrency;
 }
-
-export type Position = {
-  tokens: PoolToken[];
-  feeTier: number;
-  inRange: boolean;
-  positionStatus: string;
-  min: number;
-  max: number | "∞";
-};
-
-export type Positions = {
-  [key: number]: Position;
-};
 
 export interface PoolPositionResponse {
   nonce: bigint;
