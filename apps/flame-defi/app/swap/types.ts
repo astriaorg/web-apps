@@ -41,6 +41,7 @@ export interface TxnDetailsProps extends TxnStepsProps {
   minimumReceived: string | undefined;
   oneToOneQuote: OneToOneQuoteProps;
   isQuoteLoading: boolean;
+  frontendFeeEstimate?: string;
 }
 
 export interface TransactionInfo {
