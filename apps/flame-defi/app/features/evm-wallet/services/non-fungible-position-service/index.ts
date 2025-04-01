@@ -102,18 +102,22 @@ export class NonFungiblePositionService extends GenericContractService {
     deadline: number,
   ): Promise<HexString> {
     const txHash = await this.writeContractMethod(chainId, "mint", [
-      token0,
-      token1,
-      fee,
-      tickLower,
-      tickUpper,
-      amount0Desired,
-      amount1Desired,
-      amount0Min,
-      amount1Min,
-      recipient,
-      deadline,
+      {
+        token0,
+        token1,
+        fee,
+        tickLower,
+        tickUpper,
+        amount0Desired,
+        amount1Desired,
+        amount0Min,
+        amount1Min,
+        recipient,
+        deadline,
+      },
     ]);
+
+    console.log({ txHash });
 
     return txHash;
   }

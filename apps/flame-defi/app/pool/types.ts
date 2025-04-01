@@ -2,13 +2,16 @@ import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 import { Address } from "viem";
 import { FeeTier } from "./constants/pool-constants";
 
+export enum POOL_INPUT_ID {
+  INPUT_ONE = "input_one",
+  INPUT_TWO = "input_two",
+}
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
   inputTwo: string;
-  setInputOne: (value: string) => void;
-  setInputTwo: (value: string) => void;
-  poolTokenOne: PoolToken;
-  poolTokenTwo: PoolToken;
+  handleInputChange: (value: string, id: POOL_INPUT_ID, coinDecimals?: number) => void;
+  poolTokenOneSymbol: string;
+  poolTokenTwoSymbol: string;
 }
 export interface NewPositionInputsProps {
   inputOne: TokenInputState;
@@ -86,6 +89,7 @@ export type PoolContextProps = {
 
 export type PoolPositionContextProps = {
   feeTier: string;
+  rawFeeTier: number;
   symbols: string[];
   selectedSymbol: string;
   handleReverseTokenData: (symbol: string) => void;
@@ -93,6 +97,7 @@ export type PoolPositionContextProps = {
   handleCollectAsNative: (collectAsNative: boolean) => void;
   poolTokenOne: PoolToken | null;
   poolTokenTwo: PoolToken | null;
+  poolPosition: PoolPositionResponse | null;
   currentPrice: string;
   minPrice: string;
   maxPrice: string;

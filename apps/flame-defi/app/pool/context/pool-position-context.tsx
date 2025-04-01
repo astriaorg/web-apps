@@ -1,6 +1,6 @@
 "use client";
 
-import { PoolToken } from "pool/types";
+import { PoolPositionResponse, PoolToken } from "pool/types";
 import { useParams } from "next/navigation";
 import { PoolPositionContextProps } from "pool/types";
 import {
@@ -51,7 +51,9 @@ export const PoolPositionContextProvider = ({
   const [invertedPrice, setInvertedPrice] = useState<boolean>(false);
   const [symbols, setSymbols] = useState<string[]>([]);
   const [poolTokens, setPoolTokens] = useState<PoolToken[] | []>([]);
+  const [poolPosition, setPoolPosition] = useState<PoolPositionResponse | null>(null);
   const [feeTier, setFeeTier] = useState<string>("");
+  const [rawFeeTier, setRawFeeTier] = useState<number>(0);
 
   const poolTokenOne = poolTokens[0] || null;
   const poolTokenTwo = poolTokens[1] || null;
@@ -75,7 +77,9 @@ export const PoolPositionContextProvider = ({
         selectedChain.chainId,
         tokenId,
       );
-      const token0 = getTokenDataFromCurrencies(
+      setPoolPosition(position);
+
+      const tokenOne = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
         selectedChain.contracts.wrappedNativeToken.address,
@@ -144,6 +148,7 @@ export const PoolPositionContextProvider = ({
       maximumFractionDigits: 2,
     });
     setFeeTier(feeTier);
+    setRawFeeTier(position.fee);
   };
 
   const getPriceRange = useCallback(async () => {
@@ -268,6 +273,7 @@ export const PoolPositionContextProvider = ({
     <PoolPositionContext.Provider
       value={{
         feeTier,
+        rawFeeTier,
         symbols,
         selectedSymbol,
         handleReverseTokenData,
@@ -278,6 +284,7 @@ export const PoolPositionContextProvider = ({
         currentPrice,
         minPrice,
         maxPrice,
+        poolPosition,
       }}
     >
       {children}
