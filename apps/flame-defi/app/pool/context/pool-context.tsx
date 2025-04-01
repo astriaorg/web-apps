@@ -3,14 +3,24 @@
 import { useConfig, useAccount } from "wagmi";
 import { useEvmChainData } from "config/hooks/use-config";
 import {
-  createNonFungiblePositionService,
+  createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
 import { PoolContextProps, PoolPosition } from "pool/types";
-import { createContext, PropsWithChildren, useEffect, useState } from "react";
+import {
+  createContext,
+  PropsWithChildren,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { TXN_STATUS } from "@repo/flame-types";
 import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
-import { getTokenDataFromCurrencies } from "./pool-position-helpers";
+import {
+  getTokenDataFromCurrencies,
+  getMinMaxTick,
+  tickToPrice,
+} from "./pool-position-helpers";
 
 export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
@@ -57,6 +67,25 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
 
+  // Simplified state - only keep what's needed
+  const [maxPrice, setMaxPrice] = useState<string>("");
+
+  // Simplified function to update max price when fee tier changes
+  const updateMaxPrice = useCallback(
+    (feeTier: number, token0Decimals: number, token1Decimals: number) => {
+      const { MAX_TICK } = getMinMaxTick(feeTier);
+
+      // Calculate the max price based on MAX_TICK
+      const maxPriceValue = tickToPrice(
+        MAX_TICK,
+        token0Decimals,
+        token1Decimals,
+      );
+      setMaxPrice(maxPriceValue.toString());
+    },
+    [],
+  );
+
   useEffect(() => {
     const getPoolPositions = async () => {
       if (!address) {
@@ -70,15 +99,17 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
       setPoolPositionsLoading(true);
 
       try {
-        const nonFungiblePositionService = createNonFungiblePositionService(
-          wagmiConfig,
-          selectedChain.contracts.nonfungiblePositionManager.address,
-        );
+        const NonfungiblePositionManagerService =
+          createNonfungiblePositionManagerService(
+            wagmiConfig,
+            selectedChain.contracts.nonfungiblePositionManager.address,
+          );
 
-        const positions = await nonFungiblePositionService.getAllPositions(
-          selectedChain.chainId,
-          address,
-        );
+        const positions =
+          await NonfungiblePositionManagerService.getAllPositions(
+            selectedChain.chainId,
+            address,
+          );
 
         const positionsWithCurrencyData = positions.map(async (position) => {
           const isClosed = position.liquidity === 0n;
@@ -136,6 +167,8 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
         setModalOpen,
         txnStatus,
         setTxnStatus,
+        maxPrice,
+        updateMaxPrice,
       }}
     >
       {children}

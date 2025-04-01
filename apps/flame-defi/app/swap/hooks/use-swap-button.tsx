@@ -16,15 +16,14 @@ import {
   evmChainToRainbowKitChain,
   GetQuoteResult,
   HexString,
-  TokenAllowance,
   TokenInputState,
-  tokenStateToBig,
 } from "@repo/flame-types";
 import { useConfig } from "config";
-import { getSwapSlippageTolerance } from "@repo/ui/utils";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { useTokenApproval } from "hooks";
 
 interface SwapButtonProps {
   topToken: TokenInputState;
@@ -36,36 +35,6 @@ interface SwapButtonProps {
   tradeType: TRADE_TYPE;
 }
 
-interface ErrorWithMessage {
-  message: string;
-}
-
-// return the token needing approval or null if o approval needed
-const getTokenNeedingApproval = (
-  tokenInput: TokenInputState,
-  tokenAllowances: TokenAllowance[],
-): TokenInputState | null => {
-  if (!tokenInput.token) {
-    return null;
-  }
-
-  const token = tokenInput.token;
-  const existingAllowance = tokenAllowances.find(
-    (allowanceToken) => token.coinDenom === allowanceToken.symbol,
-  );
-
-  if (existingAllowance) {
-    const tokenInputGreaterThanAllowance = tokenStateToBig(tokenInput).gt(
-      existingAllowance.value,
-    );
-    if (tokenInputGreaterThanAllowance) {
-      return tokenInput;
-    }
-  }
-
-  return null;
-};
-
 export function useSwapButton({
   topToken,
   bottomToken,
@@ -76,11 +45,10 @@ export function useSwapButton({
   tradeType,
 }: SwapButtonProps) {
   const { selectedChain } = useEvmChainData();
-  const { approveToken, tokenAllowances } = useEvmWallet();
-  const { tokenApprovalAmount, feeRecipient } = useConfig();
+  const { feeRecipient } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
-  const slippageTolerance = getSwapSlippageTolerance();
+  const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
   const { connectEvmWallet } = useEvmWallet();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
@@ -88,10 +56,15 @@ export function useSwapButton({
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenNeedingApproval = getTokenNeedingApproval(
-    topToken,
-    tokenAllowances,
-  );
+  const { getTokenNeedingApproval } = useEvmWallet();
+  const tokenNeedingApproval = getTokenNeedingApproval(topToken);
+
+  const { handleTokenApproval } = useTokenApproval({
+    tokenNeedingApproval,
+    setTxnStatus,
+    setTxnHash,
+    setErrorText,
+  });
 
   const wrapTia =
     topToken.token?.isNative && bottomToken.token?.isWrappedNative;
@@ -154,7 +127,7 @@ export function useSwapButton({
         setTxnHash(tx);
       } catch (error) {
         const errorMessage =
-          (error as ErrorWithMessage).message || "Error unwrapping";
+          (error instanceof Error && error.message) || "Error unwrapping";
         setTxnStatus(TXN_STATUS.FAILED);
         handleTxnModalErrorMsgs(errorMessage);
       }
@@ -168,7 +141,7 @@ export function useSwapButton({
         setTxnHash(tx);
       } catch (error) {
         const errorMessage =
-          (error as ErrorWithMessage).message || "Error unwrapping";
+          (error instanceof Error && error.message) || "Error unwrapping";
         setTxnStatus(TXN_STATUS.FAILED);
         handleTxnModalErrorMsgs(errorMessage);
       }
@@ -217,7 +190,7 @@ export function useSwapButton({
       setTxnHash(tx);
     } catch (error) {
       const errorMessage =
-        (error as ErrorWithMessage).message || "Error executing swap";
+        (error instanceof Error && error.message) || "Error executing swap";
       setTxnStatus(TXN_STATUS.FAILED);
       handleTxnModalErrorMsgs(errorMessage);
     }
@@ -231,35 +204,6 @@ export function useSwapButton({
     slippageTolerance,
     feeRecipient,
   ]);
-
-  const handleTokenApproval = async (tokenNeedingApproval: TokenInputState) => {
-    if (!tokenNeedingApproval.token || !tokenNeedingApproval.value) {
-      return null;
-    }
-    try {
-      setTxnStatus(TXN_STATUS.PENDING);
-      const txHash = await approveToken(
-        tokenNeedingApproval.token,
-        tokenApprovalAmount,
-      );
-      if (txHash) {
-        setTxnHash(txHash);
-      }
-      return txHash;
-    } catch (error) {
-      if ((error as ErrorWithMessage).message.includes("User rejected")) {
-        console.warn(error);
-        setTxnStatus(TXN_STATUS.FAILED);
-        return null;
-      } else {
-        console.warn(error);
-        setErrorText("Error approving token");
-        setTxnStatus(TXN_STATUS.FAILED);
-      }
-
-      return null;
-    }
-  };
 
   // FIXME - parseFloat is not sufficient for huge numbers
   const validSwapInputs = Boolean(

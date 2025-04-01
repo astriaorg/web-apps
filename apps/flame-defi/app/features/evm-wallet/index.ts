@@ -8,7 +8,7 @@ import { useTokenBalances } from "./hooks/use-token-balances";
 import { createWithdrawerService } from "./services/astria-withdrawer-service/astria-withdrawer-service";
 import { createWethService } from "./services/weth-service";
 import { createTradeFromQuote } from "./services/swap-router-service";
-import { createNonFungiblePositionService } from "./services/non-fungible-position-service";
+import { createNonfungiblePositionManagerService } from "./services/non-fungible-position-manager-service";
 import { createPoolService } from "./services/pool-service";
 import { createPoolFactoryService } from "./services/pool-factory-service";
 import {
@@ -28,7 +28,7 @@ export {
   createWethService,
   createWithdrawerService,
   createTradeFromQuote,
-  createNonFungiblePositionService,
+  createNonfungiblePositionManagerService,
   createPoolService,
   createPoolFactoryService,
   useTokenBalances,

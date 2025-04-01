@@ -5,7 +5,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
-import { ChainContract } from "viem";
+import { ChainContract, parseUnits } from "viem";
 import React from "react";
 import JSBI from "jsbi";
 
@@ -446,6 +446,44 @@ export interface TokenInputState {
 }
 
 /**
+ * Converts a TokenInputState to a TokenAmount
+ * @param state The TokenInputState to convert
+ * @param chainId
+ * @returns A TokenAmount instance, or null if the token is not set
+ */
+export function tokenInputStateToTokenAmount(
+  state: TokenInputState,
+  chainId: number,
+): TokenAmount | null {
+  // Return null if token is not set
+  if (!state.token) {
+    return null;
+  }
+
+  // Return zero amount if value is empty
+  if (!state.value || state.value === "") {
+    const token = new Token(
+      chainId,
+      state.token.erc20ContractAddress || "0x0", // Use contract address or placeholder
+      state.token.coinDecimals,
+      state.token.coinDenom,
+    );
+    return new TokenAmount(token, "0");
+  }
+
+  // Create Token object
+  const token = new Token(
+    chainId,
+    state.token.erc20ContractAddress || "0x0", // Use contract address or placeholder
+    state.token.coinDecimals,
+    state.token.coinDenom,
+  );
+
+  // Create TokenAmount from human-readable value
+  return TokenAmount.fromReadable(token, state.value);
+}
+
+/**
  * Converts a TokenInputState to a Big number in its raw blockchain representation (with scaled decimals)
  * For example, if token.value is "1.5" and token decimals is 18, this returns 1.5 × 10^18
  */
@@ -571,6 +609,22 @@ export class TokenAmount {
     this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
   }
 
+  amountAsBigInt(): bigint {
+    return BigInt(this.raw.toString());
+  }
+
+  /**
+   * Converts a human-readable amount string to a TokenAmount
+   * @param token The token
+   * @param humanReadableAmount The amount as a human-readable string (e.g. "1.5")
+   * @returns A new TokenAmount instance
+   */
+  static fromReadable(token: Token, humanReadableAmount: string): TokenAmount {
+    // Use parseUnits from viem to handle decimals correctly
+    const parsedAmount = parseUnits(humanReadableAmount, token.decimals);
+    return new TokenAmount(token, parsedAmount.toString());
+  }
+
   withSlippage(
     slippageTolerancePercent: number,
     isMinimum: boolean,
@@ -598,6 +652,26 @@ export class TokenAmount {
     );
 
     return new TokenAmount(this.token, adjustedAmount);
+  }
+
+  /**
+   * Creates a TokenAmount from individual token parameters
+   * @param chainId The chain ID the token exists on
+   * @param tokenAddress The token contract address
+   * @param decimals The token decimals
+   * @param symbol The token symbol
+   * @param humanReadableAmount The token amount as a string or JSBI
+   * @returns A new TokenAmount instance
+   */
+  static fromArgs(
+    chainId: number,
+    tokenAddress: string,
+    decimals: number,
+    symbol: string,
+    humanReadableAmount: string,
+  ): TokenAmount {
+    const token = new Token(chainId, tokenAddress, decimals, symbol);
+    return TokenAmount.fromReadable(token, humanReadableAmount);
   }
 }
 

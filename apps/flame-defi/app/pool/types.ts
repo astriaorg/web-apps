@@ -1,26 +1,51 @@
-import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  HexString,
+  TXN_STATUS,
+  TokenInputState,
+} from "@repo/flame-types";
 import { Address } from "viem";
 import { FeeTier } from "./constants/pool-constants";
 
+export enum POOL_INPUT_ID {
+  INPUT_ZERO = "input_zero",
+  INPUT_ONE = "input_one",
+}
 export interface AddLiquidityInputsBlockProps {
-  inputOne: string;
-  inputTwo: string;
-  setInputOne: (value: string) => void;
-  setInputTwo: (value: string) => void;
-  poolTokenOne: PoolToken;
-  poolTokenTwo: PoolToken;
+  input0: string;
+  input1: string;
+  handleInputChange: (
+    value: string,
+    id: POOL_INPUT_ID,
+    coinDecimals?: number,
+  ) => void;
+  token0: EvmCurrency | null;
+  token1: EvmCurrency | null;
+  token0Balance: {
+    value: string;
+    symbol: string;
+  } | null;
+  token1Balance: {
+    value: string;
+    symbol: string;
+  } | null;
 }
 export interface NewPositionInputsProps {
-  inputOne: TokenInputState;
-  inputTwo: TokenInputState;
-  setInputOne: (value: TokenInputState) => void;
-  setInputTwo: (value: TokenInputState) => void;
+  input0: TokenInputState;
+  input1: TokenInputState;
+  setInput0: (value: TokenInputState) => void;
+  setInput1: (value: TokenInputState) => void;
   currencies: EvmCurrency[];
 }
 
 export interface TokenPair {
-  tokenOne: EvmCurrency | null;
-  tokenTwo: EvmCurrency | null;
+  token0: EvmCurrency | null;
+  token1: EvmCurrency | null;
+}
+
+export interface TokenBalance {
+  value: string;
+  symbol: string;
 }
 
 export interface FeeData {
@@ -31,12 +56,13 @@ export interface FeeData {
   selectPercent: string;
 }
 
-export interface PriceCardProps {
+export interface PriceRangeCardProps {
   leftLabel: string;
   value: string | number;
   rightLabel?: string;
   tooltipText?: string;
   className?: string;
+  variant?: "default" | "small";
 }
 
 export interface PoolToken {
@@ -82,26 +108,37 @@ export type PoolContextProps = {
   setModalOpen: (modalOpen: boolean) => void;
   txnStatus: TXN_STATUS;
   setTxnStatus: (txnStatus: TXN_STATUS) => void;
+  maxPrice: string;
+  updateMaxPrice: (
+    feeTier: number,
+    token0Decimals: number,
+    token1Decimals: number,
+  ) => void;
 };
 
 export type PoolPositionContextProps = {
   feeTier: string;
-  symbols: string[];
-  selectedSymbol: string;
+  rawFeeTier: number; // The unformatted fee tier value to be used in calculations
+  selectedSymbol: string; // The symbol of the token that is currently in the ToggleSwitch. Controls which set of token liquidity and price data is displayed
   handleReverseTokenData: (symbol: string) => void;
-  collectAsNative: boolean;
+  collectAsNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
   handleCollectAsNative: (collectAsNative: boolean) => void;
-  poolTokenOne: PoolToken | null;
-  poolTokenTwo: PoolToken | null;
+  poolToken0: PoolToken | null;
+  poolToken1: PoolToken | null;
+  poolPosition: PoolPositionResponse | null;
   currentPrice: string;
   minPrice: string;
   maxPrice: string;
+  isReversedPoolTokens: boolean; // This boolean is only used by the pool position details page and the pool context to reverse the token order based on the selected symbol
+  isPositionClosed: boolean; // This boolean is use to know when the position is closed and to hide collect fees and remove liquidity buttons
+  refreshPoolPosition: () => void;
+  positionNftId: string;
 };
 
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
   poolTokens: PoolToken[];
-  txnHash: string;
+  txnHash: HexString;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
@@ -138,5 +175,5 @@ export type TxnLoaderProps = {
 
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
-  txnHash: string;
+  txnHash: HexString;
 };

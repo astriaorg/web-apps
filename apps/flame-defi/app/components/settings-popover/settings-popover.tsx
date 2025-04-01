@@ -23,10 +23,10 @@ import { useIntl } from "react-intl";
 
 export const SettingsPopover = () => {
   const { formatNumber } = useIntl();
-  const { swapSlippageToleranceDefault } = useConfig();
+  const { defaultSlippageTolerance } = useConfig();
   const currentSettings = getFromLocalStorage("settings") || {};
   const [customSlippage, setCustomSlippage] = useState<number>(
-    currentSettings?.slippageTolerance || swapSlippageToleranceDefault,
+    currentSettings?.slippageTolerance || defaultSlippageTolerance,
   );
   const [slippageError, setSlippageError] = useState<{
     msg: string;
@@ -79,11 +79,11 @@ export const SettingsPopover = () => {
       setShowExpertModeDialog(true);
     } else {
       setExpertMode(false);
-      setCustomSlippage(swapSlippageToleranceDefault);
+      setCustomSlippage(defaultSlippageTolerance);
       setInLocalStorage("settings", {
         ...currentSettings,
         expertMode: false,
-        slippageTolerance: swapSlippageToleranceDefault,
+        slippageTolerance: defaultSlippageTolerance,
       });
       setSlippageError(null);
     }
@@ -91,7 +91,7 @@ export const SettingsPopover = () => {
 
   const handlePopoverOpenChange = () => {
     if (slippageError?.error && expertMode) {
-      setCustomSlippage(swapSlippageToleranceDefault);
+      setCustomSlippage(defaultSlippageTolerance);
       setSlippageError(null);
     }
   };
@@ -139,7 +139,7 @@ export const SettingsPopover = () => {
               <button
                 disabled={!expertMode}
                 className="text-sm text-white bg-orange px-3 py-1 rounded-lg mr-2 cursor-pointer"
-                onClick={() => setCustomSlippage(swapSlippageToleranceDefault)}
+                onClick={() => setCustomSlippage(defaultSlippageTolerance)}
               >
                 Auto
               </button>
@@ -149,7 +149,7 @@ export const SettingsPopover = () => {
                   type="number"
                   value={customSlippage}
                   onChange={handleCustomSlippageChange}
-                  placeholder={formatNumber(swapSlippageToleranceDefault, {
+                  placeholder={formatNumber(defaultSlippageTolerance, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
