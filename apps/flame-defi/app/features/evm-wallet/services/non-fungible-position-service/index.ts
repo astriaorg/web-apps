@@ -218,12 +218,9 @@ export class NonFungiblePositionService extends GenericContractService {
     const nftCount = await this.balanceOf(chainId, owner);
     const positions: PoolPositionResponse[] = [];
 
-    console.log({ nftCount });
-
     for (let i = 0; i < Number(nftCount); i++) {
       const tokenId = await this.tokenOfOwnerByIndex(chainId, owner, i);
       const position = await this.positions(chainId, tokenId.toString());
-      console.log({ position });
       positions.push({ ...position, tokenId: tokenId.toString() });
     }
 

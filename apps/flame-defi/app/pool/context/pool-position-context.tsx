@@ -116,6 +116,8 @@ export const PoolPositionContextProvider = ({
           unclaimedFees: unclaimedFees0,
           liquidity: amount0,
           liquidityPercentage: 50, // TODO: figure out how to calculate this.
+          isNative: tokenOne.isNative,
+          isWrappedNative: tokenOne.isWrappedNative,
         };
 
         const poolToken1: PoolToken = {
@@ -123,6 +125,8 @@ export const PoolPositionContextProvider = ({
           unclaimedFees: unclaimedFees1,
           liquidity: amount1,
           liquidityPercentage: 50, // TODO: figure out how to calculate this.
+          isNative: tokenTwo.isNative,
+          isWrappedNative: tokenTwo.isWrappedNative,
         };
 
         setSymbols([poolToken0.symbol, poolToken1.symbol]);
@@ -242,16 +246,17 @@ export const PoolPositionContextProvider = ({
     setInLocalStorage("poolSettings", {
       collectAsNative: collectAsNative,
     });
+
     if (collectAsNative) {
-      poolTokens.map((token) => {
-        if (token.symbol === "TIA") {
-          token.symbol = "WTIA";
+      poolTokens.map((poolToken) => {
+        if (poolToken.isNative) {
+          poolToken.symbol = "WTIA";
         }
       });
     } else {
-      poolTokens.map((token) => {
-        if (token.symbol === "WTIA") {
-          token.symbol = "TIA";
+      poolTokens.map((poolToken) => {
+        if (poolToken.isWrappedNative) {
+          poolToken.symbol = "TIA";
         }
       });
     }

@@ -48,10 +48,10 @@ export const tickToPrice = (
 export const getTokenDataFromCurrencies = (
   currencies: EvmCurrency[],
   tokenAddress: string,
-  wtiaAddress: HexString,
+  wrappedNative: HexString,
 ): EvmCurrency | null => {
   // NOTE: This check is required because the tokenAddress returned from the contract is WTIA but TIA is the native token and the only one we want to show.
-  if (tokenAddress === wtiaAddress) {
+  if (tokenAddress === wrappedNative) {
     return currencies.find((currency) => currency.isNative) || null;
   }
 

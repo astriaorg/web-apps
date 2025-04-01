@@ -40,7 +40,7 @@ export interface PriceCardProps {
 }
 
 export interface PoolPositionsRecord {
-  symbol: string;
+  symbolOne: string;
   symbolTwo: string;
   feePercent: FeeTier;
   positionStatus: string;
@@ -52,6 +52,8 @@ export interface PoolToken {
   unclaimedFees: number;
   liquidity: number;
   liquidityPercentage: number;
+  isNative: boolean;
+  isWrappedNative: boolean;
 }
 
 export type Position = {

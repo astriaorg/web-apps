@@ -76,6 +76,8 @@ export const ContentSection = () => {
             poolTokens={[
               {
                 symbol: inputOne.token?.coinDenom || "",
+                isNative: inputOne.token?.isNative || false,
+                isWrappedNative: inputOne.token?.isWrappedNative || false,
                 unclaimedFees: 0,
                 liquidity: 0,
                 liquidityPercentage: 0,
@@ -85,6 +87,8 @@ export const ContentSection = () => {
                 unclaimedFees: 0,
                 liquidity: 0,
                 liquidityPercentage: 0,
+                isNative: inputTwo.token?.isNative || false,
+                isWrappedNative: inputTwo.token?.isWrappedNative || false,
               },
             ]}
             addLiquidityInputValues={[inputOne.value, inputTwo.value]}
