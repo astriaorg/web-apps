@@ -10,8 +10,7 @@ import { useState } from "react";
 
 export const ContentSection = () => {
   const { modalOpen, setModalOpen, setTxnStatus, txnStatus } = usePoolContext();
-  const { poolTokenOne, poolTokenTwo, feeTier } =
-    usePoolPositionContext();
+  const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
   const [inputOne, setInputOne] = useState<string>("");
   const [inputTwo, setInputTwo] = useState<string>("");
 
@@ -46,30 +45,30 @@ export const ContentSection = () => {
           <div className="w-full md:w-1/2">
             {poolTokenOne && poolTokenTwo && (
               <ConfirmationModal
-              open={modalOpen}
-              buttonText={"Add liquidity"}
-              actionButtonText={
-                txnStatus === TXN_STATUS.PENDING ? "Close" : "Add liquidity"
-              }
-              showOpenButton={true}
-              handleOpenModal={() => setModalOpen(true)}
-              handleModalActionButton={() => {
-                if (txnStatus === TXN_STATUS.IDLE) {
-                  setTxnStatus(TXN_STATUS.PENDING);
-                } else {
-                  setTxnStatus(TXN_STATUS.IDLE);
-                  setModalOpen(false);
+                open={modalOpen}
+                buttonText={"Add liquidity"}
+                actionButtonText={
+                  txnStatus === TXN_STATUS.PENDING ? "Close" : "Add liquidity"
                 }
-              }}
-              handleCloseModal={() => setModalOpen(false)}
-              title={"Add liquidity"}
-            >
-              <PoolTxnSteps
-                txnStatus={txnStatus}
-                poolTokens={[poolTokenOne, poolTokenTwo]}
-                addLiquidityInputValues={[inputOne, inputTwo]}
-                txnHash={""}
-                txnMsg={""}
+                showOpenButton={true}
+                handleOpenModal={() => setModalOpen(true)}
+                handleModalActionButton={() => {
+                  if (txnStatus === TXN_STATUS.IDLE) {
+                    setTxnStatus(TXN_STATUS.PENDING);
+                  } else {
+                    setTxnStatus(TXN_STATUS.IDLE);
+                    setModalOpen(false);
+                  }
+                }}
+                handleCloseModal={() => setModalOpen(false)}
+                title={"Add liquidity"}
+              >
+                <PoolTxnSteps
+                  txnStatus={txnStatus}
+                  poolTokens={[poolTokenOne, poolTokenTwo]}
+                  addLiquidityInputValues={[inputOne, inputTwo]}
+                  txnHash={""}
+                  txnMsg={""}
                 />
               </ConfirmationModal>
             )}

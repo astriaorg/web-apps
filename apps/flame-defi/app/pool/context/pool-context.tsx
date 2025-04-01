@@ -92,13 +92,13 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
         const tokenOne = getTokenDataFromCurrencies(
           currencies,
           position.tokenAddress0,
-          selectedChain.contracts.wrappedNativeToken.address
+          selectedChain.contracts.wrappedNativeToken.address,
         );
 
         const tokenTwo = getTokenDataFromCurrencies(
           currencies,
           position.tokenAddress1,
-          selectedChain.contracts.wrappedNativeToken.address
+          selectedChain.contracts.wrappedNativeToken.address,
         );
 
         const poolAddress = await factoryService.getPool(

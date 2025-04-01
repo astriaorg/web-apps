@@ -12,7 +12,6 @@ export const TokenLiquidityBlock = ({
   poolTokenTwo: PoolToken | null;
   feeTier: string;
 }) => {
-
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4 justify-center">
@@ -51,7 +50,12 @@ export const TokenLiquidityBlock = ({
         </div>
       </div>
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4">
-        <TokenInfoCard poolTokenOne={poolTokenOne} poolTokenTwo={poolTokenTwo} className="p-0" showLiquidity={true}/>
+        <TokenInfoCard
+          poolTokenOne={poolTokenOne}
+          poolTokenTwo={poolTokenTwo}
+          className="p-0"
+          showLiquidity={true}
+        />
         <hr className="border-t border-border mt-2 mb-2" />
         <Skeleton
           isLoading={!poolTokenOne || !poolTokenTwo}

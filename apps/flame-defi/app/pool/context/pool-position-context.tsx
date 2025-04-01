@@ -78,12 +78,12 @@ export const PoolPositionContextProvider = ({
       const tokenOne = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
-        selectedChain.contracts.wrappedNativeToken.address
+        selectedChain.contracts.wrappedNativeToken.address,
       );
       const tokenTwo = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress1,
-        selectedChain.contracts.wrappedNativeToken.address
+        selectedChain.contracts.wrappedNativeToken.address,
       );
 
       if (tokenOne && tokenTwo) {
@@ -164,13 +164,13 @@ export const PoolPositionContextProvider = ({
       const token0 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
-        selectedChain.contracts.wrappedNativeToken.address
+        selectedChain.contracts.wrappedNativeToken.address,
       );
 
       const token1 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress1,
-        selectedChain.contracts.wrappedNativeToken.address
+        selectedChain.contracts.wrappedNativeToken.address,
       );
 
       const poolAddress = await factoryService.getPool(

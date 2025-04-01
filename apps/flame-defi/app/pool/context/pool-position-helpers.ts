@@ -52,11 +52,7 @@ export const getTokenDataFromCurrencies = (
 ): EvmCurrency | null => {
   // NOTE: This check is required because the tokenAddress returned from the contract is WTIA but TIA is the native token and the only one we want to show.
   if (tokenAddress === wtiaAddress) {
-    return (
-      currencies.find(
-        (currency) => currency.isNative,
-      ) || null
-    );
+    return currencies.find((currency) => currency.isNative) || null;
   }
 
   return (

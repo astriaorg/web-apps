@@ -9,8 +9,7 @@ export const TokenLiquidityBlock = ({
 }: {
   liquidityToRemove: PoolToken[];
 }) => {
-  const { poolTokenOne, poolTokenTwo, feeTier } =
-    usePoolPositionContext();
+  const { poolTokenOne, poolTokenTwo, feeTier } = usePoolPositionContext();
   const symbolsReady = poolTokenOne?.symbol && poolTokenTwo?.symbol;
 
   return (

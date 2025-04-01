@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import { usePoolPositionContext } from ".";
 
 export const useRemoveLiquidity = () => {
-  const { poolTokenOne, poolTokenTwo, collectAsNative } = usePoolPositionContext();
-  const poolTokens = poolTokenOne && poolTokenTwo ? [poolTokenOne, poolTokenTwo] : [];
+  const { poolTokenOne, poolTokenTwo, collectAsNative } =
+    usePoolPositionContext();
+  const poolTokens =
+    poolTokenOne && poolTokenTwo ? [poolTokenOne, poolTokenTwo] : [];
 
   const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>(() =>
     poolTokens.map((token) => ({
