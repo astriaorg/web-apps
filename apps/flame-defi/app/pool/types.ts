@@ -82,10 +82,25 @@ export type PoolPositionResponse = {
   feeGrowthInside1LastX128: bigint;
   tokensOwed0: bigint;
   tokensOwed1: bigint;
-  tokenId?: string;
 };
 
-export interface PoolPosition extends PoolPositionResponse {
+export type GetAllPoolPositionsResponse = {
+  nonce: bigint;
+  operator: string;
+  tokenAddress0: Address;
+  tokenAddress1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: bigint;
+  feeGrowthInside0LastX128: bigint;
+  feeGrowthInside1LastX128: bigint;
+  tokensOwed0: bigint;
+  tokensOwed1: bigint;
+  tokenId: string;
+};
+
+export interface PoolPosition extends GetAllPoolPositionsResponse {
   feePercent: FeeTier;
   symbolOne: string;
   symbolTwo: string;

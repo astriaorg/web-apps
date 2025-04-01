@@ -3,7 +3,7 @@ import { type Address, Abi } from "viem";
 import { HexString } from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
-import { PoolPositionResponse } from "pool/types";
+import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 
 type PositionResponseTuple = [
   bigint, // nonce
@@ -214,9 +214,9 @@ export class NonFungiblePositionService extends GenericContractService {
   async getAllPositions(
     chainId: number,
     owner: Address,
-  ): Promise<PoolPositionResponse[]> {
+  ): Promise<GetAllPoolPositionsResponse[]> {
     const nftCount = await this.balanceOf(chainId, owner);
-    const positions: PoolPositionResponse[] = [];
+    const positions: GetAllPoolPositionsResponse[] = [];
 
     for (let i = 0; i < Number(nftCount); i++) {
       const tokenId = await this.tokenOfOwnerByIndex(chainId, owner, i);

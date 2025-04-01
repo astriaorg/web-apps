@@ -112,10 +112,9 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
           symbolOne: tokenOne?.coinDenom ?? "",
           symbolTwo: tokenTwo?.coinDenom ?? "",
           feePercent,
-          inRange: isClosed ? false : true,
+          inRange: !isClosed,
           positionStatus: isClosed ? "Closed" : "In range",
           poolAddress,
-          tokenId: position.tokenId,
           tokenOne,
           tokenTwo,
           ...position,
@@ -132,7 +131,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   }, [address, currencies, wagmiConfig, selectedChain]);
 
   useEffect(() => {
-    getPoolPositions();
+    void getPoolPositions();
   }, [getPoolPositions]);
 
   return (
