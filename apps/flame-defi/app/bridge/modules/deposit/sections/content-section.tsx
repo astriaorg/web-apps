@@ -41,13 +41,14 @@ export const ContentSection = () => {
     handleEditRecipientClick,
     handleEditRecipientSave,
     handleEditRecipientClear,
+    isRecipientAddressValid,
     setIsRecipientAddressValid,
     setRecipientAddressOverride,
     handleConnectEvmWallet,
     isDepositDisabled,
     getActiveSourceAddress,
     additionalSourceOptions,
-    additionalEvmChainOptions,
+    additionalAstriaChainOptions,
     cosmosWallet,
     evmWallet,
     coinbaseWallet,
@@ -350,10 +351,10 @@ export const ContentSection = () => {
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div>
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">Source</div>
+              <div className="mb-2 sm:hidden">From</div>
               <div className="flex flex-col sm:flex-row sm:items-center">
                 <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  Source
+                  From
                 </div>
                 {Boolean(coinbaseOnrampBuyUrl) && (
                   <div>
@@ -484,7 +485,7 @@ export const ContentSection = () => {
                       placeholder="Connect Astria wallet or enter address"
                       options={evmWallet.evmChainsOptions}
                       onSelect={evmWallet.selectEvmChain}
-                      additionalOptions={additionalEvmChainOptions}
+                      additionalOptions={additionalAstriaChainOptions}
                       valueOverride={evmWallet.selectedEvmChainOption}
                       LeftIcon={WalletIcon}
                     />
@@ -548,47 +549,53 @@ export const ContentSection = () => {
                   </div>
                 )}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="field-info-box mt-3 py-2 px-3">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
                   <p
-                    className="has-text-grey-light has-text-weight-semibold is-clickable"
+                    className="text-grey-light font-semibold cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
-                      Address: {recipientAddressOverride}
+                      Address: {shortenAddress(recipientAddressOverride)}
                     </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
-                  {/* Form validation error messages would go here */}
-                  <p className="mt-2 has-text-grey-lighter has-text-weight-semibold is-size-7">
+                  {!isRecipientAddressValid && hasTouchedForm && (
+                    <div className="text-status-danger mt-2">
+                      Recipient address must be a valid EVM address
+                    </div>
+                  )}
+                  <p className="mt-2 text-grey-lighter font-semibold text-sm">
                     Connect via wallet to show balance
                   </p>
                 </div>
               )}
               {isRecipientAddressEditable && (
-                <div className="field-info-box mt-3 py-2 px-3">
-                  <div className="has-text-grey-light has-text-weight-semibold">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-grey-medium bg-semi-white">
+                  <div className="text-grey-light font-semibold">
                     <input
-                      className="input is-medium is-outlined-white"
+                      className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white"
                       type="text"
                       placeholder="0x..."
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
-                    <button
-                      type="button"
-                      className="button is-ghost is-outlined-white mr-2 mt-2"
-                      onClick={handleEditRecipientSave}
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      className="button is-ghost is-outlined-white mt-2"
-                      onClick={handleEditRecipientClear}
-                    >
-                      Clear
-                    </button>
+                    <div className="mt-3 flex space-x-2">
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        onClick={handleEditRecipientSave}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        onClick={handleEditRecipientClear}
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

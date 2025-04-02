@@ -2,22 +2,23 @@
 
 import {
   createContext,
-  type FC,
   PropsWithChildren,
   useCallback,
   useMemo,
   useState,
 } from "react";
-import { SourceType } from "bridge/types";
 import { CoinbaseChain, CosmosChainInfo } from "@repo/flame-types";
+import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
+import { SourceType } from "bridge/types";
+import { DropdownAdditionalOption } from "components/dropdown";
+import { useCoinbaseWallet } from "features/coinbase-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
-import { useCoinbaseWallet } from "features/coinbase-wallet";
-import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
 
 export interface DepositPageContextProps extends PropsWithChildren {
   selectedSourceType: SourceType;
   setSelectedSourceType: (value: SourceType) => void;
+  additionalSourceOptions: DropdownAdditionalOption[];
   handleSourceChainSelect: (
     chainValue: CosmosChainInfo | CoinbaseChain,
   ) => void;
@@ -35,6 +36,7 @@ export interface DepositPageContextProps extends PropsWithChildren {
   setRecipientAddressOverride: (value: string) => void;
   isRecipientAddressEditable: boolean;
   setIsRecipientAddressEditable: (value: boolean) => void;
+  isRecipientAddressValid: boolean;
   setIsRecipientAddressValid: (value: boolean) => void;
   handleEditRecipientClick: () => void;
   handleEditRecipientSave: () => void;
@@ -43,23 +45,10 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
   getActiveSourceAddress: () => string | null;
+  additionalAstriaChainOptions: DropdownAdditionalOption[];
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
   coinbaseWallet: ReturnType<typeof useCoinbaseWallet>;
-  additionalSourceOptions: Array<{
-    label: string;
-    action: () => void;
-    className: string;
-    LeftIcon?: FC<{ className?: string; size?: number }>;
-    RightIcon?: FC<{ className?: string; size?: number }>;
-  }>;
-  additionalEvmChainOptions: Array<{
-    label: string;
-    action: () => void;
-    className: string;
-    LeftIcon?: FC<{ className?: string; size?: number }>;
-    RightIcon?: FC<{ className?: string; size?: number }>;
-  }>;
 }
 
 export const DepositPageContext = createContext<
@@ -194,7 +183,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     [],
   );
 
-  const additionalEvmChainOptions = useMemo(() => {
+  const additionalAstriaChainOptions = useMemo(() => {
     return [
       {
         label: "Connect Astria Wallet",
@@ -275,6 +264,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         setRecipientAddressOverride,
         isRecipientAddressEditable,
         setIsRecipientAddressEditable,
+        isRecipientAddressValid,
         setIsRecipientAddressValid,
         handleEditRecipientClick,
         handleEditRecipientSave,
@@ -287,7 +277,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         evmWallet,
         coinbaseWallet,
         additionalSourceOptions,
-        additionalEvmChainOptions,
+        additionalAstriaChainOptions,
       }}
     >
       {children}
