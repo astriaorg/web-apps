@@ -1,9 +1,7 @@
 "use client";
 
 import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
-import { Decimal } from "@cosmjs/math";
 import React, { useMemo, useEffect, useCallback } from "react";
-import { useConfig } from "wagmi";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, BaseIcon, WalletIcon } from "@repo/ui/icons";
@@ -11,17 +9,11 @@ import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { SourceType } from "bridge/types";
 import { Dropdown } from "components/dropdown";
-import { sendIbcTransfer } from "features/cosmos-wallet";
 import {
   AddErc20ToWalletButton,
-  createErc20Service,
 } from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
 
 export const ContentSection = () => {
-  const { addNotification } = useNotifications();
-  const wagmiConfig = useConfig();
-
   const {
     selectedSourceType,
     handleSourceChainSelect,
@@ -32,9 +24,7 @@ export const ContentSection = () => {
     hasTouchedForm,
     setHasTouchedForm,
     isLoading,
-    setIsLoading,
     isAnimating,
-    setIsAnimating,
     recipientAddressOverride,
     isRecipientAddressEditable,
     handleEditRecipientClick,
@@ -45,12 +35,12 @@ export const ContentSection = () => {
     setRecipientAddressOverride,
     handleConnectEvmWallet,
     isDepositDisabled,
-    getActiveSourceAddress,
     additionalSourceOptions,
     additionalAstriaChainOptions,
     cosmosWallet,
     evmWallet,
     coinbaseWallet,
+    handleDeposit,
   } = useDepositPageContext();
 
   // source chains only cosmos or coinbase chains for now
@@ -87,6 +77,14 @@ export const ContentSection = () => {
       fiatCurrency: "USD",
     });
   }, [coinbaseWallet.coinbaseAccountAddress]);
+
+  // ensure evm wallet connection when selected EVM chain changes
+  useEffect(() => {
+    if (!evmWallet.selectedEvmChain) {
+      return;
+    }
+    handleConnectEvmWallet();
+  }, [evmWallet.selectedEvmChain, handleConnectEvmWallet]);
 
   // ensure cosmos wallet connection when selected ibc chain changes
   useEffect(() => {
@@ -184,149 +182,6 @@ export const ContentSection = () => {
     checkIsFormValid,
     setHasTouchedForm,
   ]);
-
-  // ensure evm wallet connection when selected EVM chain changes
-  useEffect(() => {
-    if (!evmWallet.selectedEvmChain) {
-      return;
-    }
-    console.log("useEffect handle connect evm wallet");
-    handleConnectEvmWallet();
-  }, [evmWallet.selectedEvmChain, handleConnectEvmWallet]);
-
-  const handleDeposit = async () => {
-    const activeSourceAddress = getActiveSourceAddress();
-    const recipientAddress =
-      recipientAddressOverride || evmWallet.evmAccountAddress;
-
-    // Common validation
-    if (!activeSourceAddress || !recipientAddress) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please connect your wallets first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setIsAnimating(true);
-
-    try {
-      // different deposit logic based on source type
-      if (selectedSourceType === SourceType.Cosmos) {
-        // Cosmos to Astria deposit
-        if (
-          !cosmosWallet.selectedCosmosChain ||
-          !cosmosWallet.selectedIbcCurrency
-        ) {
-          throw new Error(
-            "Please select a Cosmos chain and token to bridge first.",
-          );
-        }
-
-        const formattedAmount = Decimal.fromUserInput(
-          amount,
-          cosmosWallet.selectedIbcCurrency.coinDecimals,
-        ).atomics;
-
-        const signer = await cosmosWallet.getCosmosSigningClient();
-        await sendIbcTransfer(
-          signer,
-          cosmosWallet.cosmosAccountAddress!,
-          recipientAddress,
-          formattedAmount,
-          cosmosWallet.selectedIbcCurrency,
-        );
-      } else if (selectedSourceType === SourceType.Coinbase) {
-        // Coinbase to Astria deposit using intent bridge
-        if (
-          !coinbaseWallet.selectedCoinbaseChain ||
-          !coinbaseWallet.selectedCoinbaseCurrency
-        ) {
-          throw new Error(
-            "Please select a Coinbase chain and token to bridge first.",
-          );
-        }
-
-        if (
-          !coinbaseWallet.selectedCoinbaseCurrency.astriaIntentBridgeAddress
-        ) {
-          throw new Error(
-            "Intent bridge contract not configured for this token.",
-          );
-        }
-
-        // Convert amount to the proper format based on decimals
-        // FIXME - is this how the math is done in other places?
-        const formattedAmount = BigInt(
-          Math.floor(
-            parseFloat(amount) *
-              10 ** coinbaseWallet.selectedCoinbaseCurrency.coinDecimals,
-          ).toString(),
-        );
-
-        // send money via ERC20 contract
-        if (coinbaseWallet.selectedCoinbaseCurrency.erc20ContractAddress) {
-          const erc20Service = createErc20Service(
-            wagmiConfig,
-            coinbaseWallet.selectedCoinbaseCurrency.erc20ContractAddress,
-          );
-          // NOTE - right now will be sent to same address on the destination chain
-          await erc20Service.transfer({
-            recipient:
-              coinbaseWallet.selectedCoinbaseCurrency.astriaIntentBridgeAddress,
-            amount: formattedAmount,
-            chainId: coinbaseWallet.selectedCoinbaseChain.chainId,
-          });
-        }
-      } else {
-        throw new Error("Unsupported source type for deposit");
-      }
-
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.SUCCESS,
-          message: "Deposit successful!",
-          onAcknowledge: () => {},
-        },
-      });
-    } catch (e) {
-      setIsAnimating(false);
-      console.error("Deposit failed", e);
-      const message = e instanceof Error ? e.message : "Unknown error.";
-
-      // display appropriate error message
-      if (/failed to get account from keplr wallet/i.test(message)) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message:
-              "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
-            onAcknowledge: () => {},
-          },
-        });
-      } else {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            component: (
-              <>
-                <p className="mb-1">Deposit failed.</p>
-                <p className="message-body-inner">{message}</p>
-              </>
-            ),
-            onAcknowledge: () => {},
-          },
-        });
-      }
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 1000);
-    }
-  };
 
   const updateRecipientAddressOverride = (
     event: React.ChangeEvent<HTMLInputElement>,
