@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { ROUTES } from "../constants/routes";
+import { ROUTES } from "bridge/constants/routes";
 
 export default function BridgePage() {
   const router = useRouter();
