@@ -1,4 +1,4 @@
-import { BaseChainInfo, ChainType } from "@repo/flame-types";
+import { ChainType, GenericChain } from "@repo/flame-types";
 
 export enum BRIDGE_TYPE {
   IBC = "ibc",
@@ -46,8 +46,8 @@ export const SUPPORTED_BRIDGES: Record<
  * Gets the supported bridge types between two chains.
  */
 export function getSupportedBridgeTypes(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
+  sourceChain: GenericChain,
+  targetChain: GenericChain,
 ): BRIDGE_TYPE[] {
   return SUPPORTED_BRIDGES[sourceChain.chainType][targetChain.chainType];
 }
@@ -56,8 +56,8 @@ export function getSupportedBridgeTypes(
  * Checks if a specific bridge type is supported between two chains.
  */
 export function isBridgeTypeSupported(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
+  sourceChain: GenericChain,
+  targetChain: GenericChain,
   bridgeType: BRIDGE_TYPE,
 ): boolean {
   const supportedTypes = getSupportedBridgeTypes(sourceChain, targetChain);
@@ -68,8 +68,8 @@ export function isBridgeTypeSupported(
  * Creates a unique bridge key for a source and target chain pairing.
  */
 export function createBridgeKey(
-  sourceChain: BaseChainInfo,
-  targetChain: BaseChainInfo,
+  sourceChain: GenericChain,
+  targetChain: GenericChain,
 ): string {
   return `${sourceChain.chainType}-${sourceChain.chainName}-to-${targetChain.chainType}-${targetChain.chainName}`;
 }

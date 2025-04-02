@@ -6,24 +6,24 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig, useDisconnect } from "wagmi";
 
-import { CoinbaseChainInfo, EvmCurrency } from "@repo/flame-types";
+import { CoinbaseChain, EvmCurrency } from "@repo/flame-types";
 
 export interface CoinbaseWalletContextProps {
   connectCoinbaseWallet: () => void;
   defaultCoinbaseCurrencyOption: DropdownOption<EvmCurrency> | undefined;
   disconnectCoinbaseWallet: () => void;
   coinbaseAccountAddress: string | null;
-  coinbaseChainsOptions: DropdownOption<CoinbaseChainInfo>[];
+  coinbaseChainsOptions: DropdownOption<CoinbaseChain>[];
   coinbaseCurrencyOptions: DropdownOption<EvmCurrency>[];
   coinbaseNativeTokenBalance: { value: string; symbol: string } | null;
   isLoadingCoinbaseNativeTokenBalance: boolean;
   isLoadingSelectedCoinbaseCurrencyBalance: boolean;
   resetState: () => void;
-  selectedCoinbaseChain: CoinbaseChainInfo | null;
-  selectedCoinbaseChainOption: DropdownOption<CoinbaseChainInfo> | null;
+  selectedCoinbaseChain: CoinbaseChain | null;
+  selectedCoinbaseChainOption: DropdownOption<CoinbaseChain> | null;
   selectedCoinbaseCurrency: EvmCurrency | null;
   selectedCoinbaseCurrencyBalance: { value: string; symbol: string } | null;
-  selectCoinbaseChain: (chain: CoinbaseChainInfo | null) => void;
+  selectCoinbaseChain: (chain: CoinbaseChain | null) => void;
   selectCoinbaseCurrency: (currency: EvmCurrency) => void;
 }
 
@@ -52,7 +52,7 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
 
   // TODO - move this state to probably a deposit only context, or maybe just deposit-card for now
   const [selectedCoinbaseChain, setSelectedCoinbaseChain] =
-    useState<CoinbaseChainInfo | null>(null);
+    useState<CoinbaseChain | null>(null);
   const [selectedCoinbaseCurrency, setSelectedCoinbaseCurrency] =
     useState<EvmCurrency | null>(null);
 
@@ -153,7 +153,7 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
 
   const coinbaseChainsOptions = useMemo(() => {
     return Object.entries(coinbaseChains).map(
-      ([chainLabel, chain]): DropdownOption<CoinbaseChainInfo> => ({
+      ([chainLabel, chain]): DropdownOption<CoinbaseChain> => ({
         label: chainLabel,
         value: chain,
         LeftIcon: chain.IconComponent,
@@ -169,10 +169,10 @@ export const CoinbaseWalletProvider: React.FC<CoinbaseWalletProviderProps> = ({
       label: selectedCoinbaseChain?.chainName ?? "",
       value: selectedCoinbaseChain,
       LeftIcon: selectedCoinbaseChain?.IconComponent,
-    } as DropdownOption<CoinbaseChainInfo>;
+    } as DropdownOption<CoinbaseChain>;
   }, [selectedCoinbaseChain]);
 
-  const selectCoinbaseChain = useCallback((chain: CoinbaseChainInfo | null) => {
+  const selectCoinbaseChain = useCallback((chain: CoinbaseChain | null) => {
     setSelectedCoinbaseChain(chain);
   }, []);
 

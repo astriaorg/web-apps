@@ -13,7 +13,7 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
-  CoinbaseChainInfo,
+  CoinbaseChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -430,7 +430,7 @@ export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
 };
 
-const BaseChainInfo: CoinbaseChainInfo = {
+const BaseChainInfo: CoinbaseChain = {
   chainType: "coinbase",
   chainId: 8453,
   chainName: "Base",

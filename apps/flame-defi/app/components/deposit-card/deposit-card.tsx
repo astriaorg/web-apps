@@ -20,7 +20,7 @@ import { AddErc20ToWalletButton, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CoinbaseChainInfo, CosmosChainInfo } from "@repo/flame-types";
+import { CoinbaseChain, CosmosChainInfo } from "@repo/flame-types";
 import { createErc20Service } from "../../features/evm-wallet/services/erc-20-service/erc-20-service";
 
 // Define an enum for the source types
@@ -132,7 +132,7 @@ export default function DepositCard(): React.ReactElement {
   }, [coinbaseAccountAddress]);
 
   const handleSourceChainSelect = (
-    chainValue: CosmosChainInfo | CoinbaseChainInfo,
+    chainValue: CosmosChainInfo | CoinbaseChain,
   ) => {
     // determine which type of chain was selected
     const cosmosChain = cosmosChainsOptions.find(
@@ -150,7 +150,7 @@ export default function DepositCard(): React.ReactElement {
     );
     if (coinbaseChain) {
       setSelectedSourceType(SourceType.Coinbase);
-      selectCoinbaseChain(chainValue as CoinbaseChainInfo);
+      selectCoinbaseChain(chainValue as CoinbaseChain);
       // TODO - connect coinbase wallet?
       //   or are we just doing Coinbase OnRamp for now?
       return;

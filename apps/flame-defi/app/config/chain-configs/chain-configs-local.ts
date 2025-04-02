@@ -6,7 +6,7 @@ import {
   UsdcIcon,
 } from "@repo/ui/icons";
 import {
-  CoinbaseChainInfo,
+  CoinbaseChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -278,7 +278,7 @@ export const evmChains: EvmChains = {
   Fake: FakeChainInfo,
 };
 
-const BaseChainInfo: CoinbaseChainInfo = {
+const BaseChainInfo: CoinbaseChain = {
   chainType: "coinbase",
   chainId: 84532,
   chainName: "Base Sepolia",

@@ -10,15 +10,26 @@ import React from "react";
 import JSBI from "jsbi";
 import Big from "big.js";
 
-export type ChainType = "cosmos" | "astria" | "coinbase";
+/**
+ * ChainType describes the type of chain
+ */
+export type ChainType = "astria" | "cosmos" | "coinbase";
 
-// Base chain interface that all chain types extend
-export interface BaseChainInfo {
+/**
+ * GenericChain is the base chain type that other chain types extend
+ */
+export interface GenericChain {
+  // the type of the chain
   chainType: ChainType;
+  // the name of the chain
   chainName: string;
+  // a component to be displayed with the chain
   IconComponent?: React.FC;
 }
 
+/**
+ * IconProps passed to Icon component for styling
+ */
 export interface IconProps {
   className?: string;
   size?: number;
@@ -40,7 +51,7 @@ export interface BIP44 {
 /**
  * Represents information about a Cosmos chain.
  */
-export interface CosmosChainInfo extends BaseChainInfo {
+export interface CosmosChainInfo extends GenericChain {
   readonly chainType: "cosmos";
   readonly rpc: string;
   readonly rest: string;
@@ -363,7 +374,7 @@ export class EvmCurrency {
  *
  * TODO - rename to AstriaChainInfo
  */
-export interface EvmChainInfo extends BaseChainInfo {
+export interface EvmChainInfo extends GenericChain {
   readonly chainType: "astria";
   readonly chainId: number;
   readonly rpcUrls: string[];
@@ -377,11 +388,11 @@ export interface EvmChainInfo extends BaseChainInfo {
 }
 
 /**
- * Represents a chain on the Base network for Coinbase integration.
+ * CoinbaseChain describes a chain on the Base network.
  *
- * NOTE: `BaseChainInfo` was too ambiguous even if technically correct name.
+ * NOTE: `BaseChain` was too ambiguous even if technically correct name.
  */
-export interface CoinbaseChainInfo extends BaseChainInfo {
+export interface CoinbaseChain extends GenericChain {
   readonly chainType: "coinbase";
   readonly chainId: number;
   readonly rpcUrls: string[];
@@ -392,9 +403,9 @@ export interface CoinbaseChainInfo extends BaseChainInfo {
   readonly currencies: [EvmCurrency, ...EvmCurrency[]];
 }
 
-// CoinbaseChains type maps labels to CoinbaseChainInfo objects
+// CoinbaseChains type maps labels to CoinbaseChain objects
 export type CoinbaseChains = {
-  [label: string]: CoinbaseChainInfo;
+  [label: string]: CoinbaseChain;
 };
 
 /**
