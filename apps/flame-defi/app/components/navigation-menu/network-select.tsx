@@ -37,33 +37,26 @@ export const NetworkSelect = (): React.ReactElement => {
       value={selectedFlameNetwork}
       onValueChange={(value) => handleNetworkSelect(value as FlameNetwork)}
     >
-      <SelectTrigger className="w-[140px] capitalize border-border hover:border-orange-soft rounded-xl text-white transition text-base h-[40px]">
-        <SelectValue
-          placeholder={
-            <div className="flex items-center gap-2 text-base">
-              <FlameIcon size={16} />
-              {selectedFlameNetwork}
-            </div>
-          }
-        >
-          <div className="flex items-center gap-2 text-base">
+      <SelectTrigger>
+        <SelectValue>
+          <div className="flex items-center gap-2">
             <FlameIcon size={16} />
-            {selectedFlameNetwork}
+            <span className="capitalize">{selectedFlameNetwork}</span>
           </div>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="bg-radial-dark border-border">
+      <SelectContent>
         <SelectGroup>
-          <SelectLabel className="text-white text-base">Networks</SelectLabel>
+          <SelectLabel>Network</SelectLabel>
           {networksList.map((network) => (
             <SelectItem
               key={network}
               value={network}
-              className="capitalize cursor-pointer data-[state=checked]:bg-semi-white data-[state=checked]:text-orange-soft [&:hover]:bg-semi-white"
+              className="data-[state=checked]:bg-semi-white"
             >
-              <div className="flex items-center gap-1 text-white text-base">
+              <div className="flex items-center gap-2">
                 <FlameIcon size={16} />
-                <span>{network}</span>
+                <span className="capitalize">{network}</span>
               </div>
             </SelectItem>
           ))}
