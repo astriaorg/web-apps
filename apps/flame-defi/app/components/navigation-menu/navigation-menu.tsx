@@ -29,7 +29,7 @@ export const NavigationMenu = () => {
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
         <div className="items-center space-x-8 hidden lg:flex">
-          <NavigationMenuLink href="/" isActive={pathname === "/"}>
+          <NavigationMenuLink href="/" isActive={pathname.startsWith("/bridge")}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
