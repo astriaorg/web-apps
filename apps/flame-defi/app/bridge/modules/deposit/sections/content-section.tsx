@@ -9,9 +9,7 @@ import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { SourceType } from "bridge/types";
 import { Dropdown } from "components/dropdown";
-import {
-  AddErc20ToWalletButton,
-} from "features/evm-wallet";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
 
 export const ContentSection = () => {
   const {
