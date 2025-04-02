@@ -1,6 +1,6 @@
 "use client";
 
-import {
+import React, {
   createContext,
   PropsWithChildren,
   useCallback,
@@ -12,7 +12,9 @@ import { EditIcon, PlusIcon } from "@repo/ui/icons";
 import { DropdownAdditionalOption } from "components/dropdown";
 import { useCoinbaseWallet } from "features/coinbase-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { useEvmWallet } from "features/evm-wallet";
+import { createWithdrawerService, useEvmWallet } from "features/evm-wallet";
+import { NotificationType, useNotifications } from "features/notifications";
+import { useConfig } from "wagmi";
 
 export interface WithdrawPageContextProps extends PropsWithChildren {
   amount: string;
@@ -51,6 +53,9 @@ export const WithdrawPageContext = createContext<
 export const WithdrawPageContextProvider = ({
   children,
 }: PropsWithChildren) => {
+  const { addNotification } = useNotifications();
+  const wagmiConfig = useConfig();
+
   // Form state
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -99,17 +104,91 @@ export const WithdrawPageContextProvider = ({
   }, [cosmosWallet]);
 
   const handleWithdraw = async () => {
-    // Implementation kept in content-section.tsx for now
-    // This is a stub that will be completed in the content section
+    if (!evmWallet.selectedEvmChain || !evmWallet.selectedEvmCurrency) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please select a chain and token to bridge first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
+
     const fromAddress = evmWallet.evmAccountAddress;
     const recipientAddress =
       recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
+    if (!fromAddress || !recipientAddress) {
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.WARNING,
+          message: "Please connect your Keplr and EVM wallet first.",
+          onAcknowledge: () => {},
+        },
+      });
+      return;
+    }
 
-    console.log("Handle withdraw action", {
-      fromAddress,
-      recipientAddress,
-      amount,
-    });
+    if (
+      !evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress &&
+      !evmWallet.selectedEvmCurrency.erc20ContractAddress
+    ) {
+      console.error("Withdrawal cannot proceed: missing contract address");
+      return;
+    }
+
+    setIsLoading(true);
+    setIsAnimating(true);
+    try {
+      const contractAddress = evmWallet.selectedEvmCurrency.isNative
+        ? evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress
+        : evmWallet.selectedEvmCurrency.erc20ContractAddress;
+      if (!contractAddress) {
+        throw new Error("No contract address found");
+      }
+      if (!evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei) {
+        throw new Error("Base withdrawals coming soon but not yet supported.");
+      }
+      const withdrawerSvc = createWithdrawerService(
+        wagmiConfig,
+        contractAddress,
+        !evmWallet.selectedEvmCurrency.isNative,
+      );
+      await withdrawerSvc.withdrawToIbcChain(
+        evmWallet.selectedEvmChain.chainId,
+        recipientAddress,
+        amount,
+        evmWallet.selectedEvmCurrency.coinDecimals,
+        evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei,
+        "",
+      );
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Withdrawal successful!",
+          onAcknowledge: () => {},
+        },
+      });
+    } catch (e) {
+      setIsAnimating(false);
+      console.error("Withdrawal failed:", e);
+      const message = e instanceof Error ? e.message : "Unknown error.";
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.DANGER,
+          component: (
+            <>
+              <p className="mb-1">Withdrawal failed.</p>
+              <p className="message-body-inner">{message}</p>
+            </>
+          ),
+          onAcknowledge: () => {},
+        },
+      });
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setIsAnimating(false), 1000);
+    }
   };
 
   // dropdown options for additional Cosmos actions

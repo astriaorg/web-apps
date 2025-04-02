@@ -1,23 +1,15 @@
 "use client";
 
 import React, { useMemo, useEffect, useCallback } from "react";
-import { useConfig } from "wagmi";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { useWithdrawPageContext } from "bridge/modules/withdraw/hooks/use-withdraw-page-context";
 import { Dropdown } from "components/dropdown";
-import {
-  AddErc20ToWalletButton,
-  createWithdrawerService,
-} from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
-import { useWithdrawPageContext } from "../hooks/use-withdraw-page-context";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
 
 export const ContentSection = () => {
-  const { addNotification } = useNotifications();
-  const wagmiConfig = useConfig();
-
   const {
     amount,
     setAmount,
@@ -26,9 +18,7 @@ export const ContentSection = () => {
     hasTouchedForm,
     setHasTouchedForm,
     isLoading,
-    setIsLoading,
     isAnimating,
-    setIsAnimating,
     recipientAddressOverride,
     isRecipientAddressEditable,
     handleEditRecipientClick,
@@ -43,6 +33,7 @@ export const ContentSection = () => {
     additionalEvmOptions,
     cosmosWallet,
     evmWallet,
+    handleWithdraw,
   } = useWithdrawPageContext();
 
   // ensure evm wallet connection when selected EVM chain changes
@@ -129,94 +120,6 @@ export const ContentSection = () => {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRecipientAddressOverride(event.target.value);
-  };
-
-  const handleWithdraw = async () => {
-    if (!evmWallet.selectedEvmChain || !evmWallet.selectedEvmCurrency) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please select a chain and token to bridge first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    const fromAddress = evmWallet.evmAccountAddress;
-    const recipientAddress =
-      recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
-    if (!fromAddress || !recipientAddress) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please connect your Keplr and EVM wallet first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    if (
-      !evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress &&
-      !evmWallet.selectedEvmCurrency.erc20ContractAddress
-    ) {
-      console.error("Withdrawal cannot proceed: missing contract address");
-      return;
-    }
-
-    setIsLoading(true);
-    setIsAnimating(true);
-    try {
-      const contractAddress = evmWallet.selectedEvmCurrency.isNative
-        ? evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress
-        : evmWallet.selectedEvmCurrency.erc20ContractAddress;
-      if (!contractAddress) {
-        throw new Error("No contract address found");
-      }
-      if (!evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei) {
-        throw new Error("Base withdrawals coming soon but not yet supported.");
-      }
-      const withdrawerSvc = createWithdrawerService(
-        wagmiConfig,
-        contractAddress,
-        !evmWallet.selectedEvmCurrency.isNative,
-      );
-      await withdrawerSvc.withdrawToIbcChain(
-        evmWallet.selectedEvmChain.chainId,
-        recipientAddress,
-        amount,
-        evmWallet.selectedEvmCurrency.coinDecimals,
-        evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei,
-        "",
-      );
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.SUCCESS,
-          message: "Withdrawal successful!",
-          onAcknowledge: () => {},
-        },
-      });
-    } catch (e) {
-      setIsAnimating(false);
-      console.error("Withdrawal failed:", e);
-      const message = e instanceof Error ? e.message : "Unknown error.";
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.DANGER,
-          component: (
-            <>
-              <p className="mb-1">Withdrawal failed.</p>
-              <p className="message-body-inner">{message}</p>
-            </>
-          ),
-          onAcknowledge: () => {},
-        },
-      });
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 1000);
-    }
   };
 
   const formattedEvmBalanceValue = formatDecimalValues(

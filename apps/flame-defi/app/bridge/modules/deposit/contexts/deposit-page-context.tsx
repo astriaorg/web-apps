@@ -115,19 +115,16 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   // toggle ability to edit recipient address
   const handleEditRecipientClick = useCallback(() => {
-    console.log("handleEditRecipientClick");
     setIsRecipientAddressEditable((prev) => !prev);
   }, []);
   // save the recipient address
   const handleEditRecipientSave = () => {
-    console.log("handleEditRecipientSave");
     setIsRecipientAddressEditable(false);
     // reset wallet states when user manually enters address
     evmWallet.resetState();
   };
   // clear the manually inputted recipient address
   const handleEditRecipientClear = () => {
-    console.log("handleEditRecipientClear");
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
   };
