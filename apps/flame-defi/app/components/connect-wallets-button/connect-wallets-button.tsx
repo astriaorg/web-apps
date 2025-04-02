@@ -27,7 +27,7 @@ export default function ConnectWalletsButton() {
 
   return (
     <div>
-      {pathname === "/" ? (
+      {pathname.startsWith("/bridge") ? (
         <Popover>
           <PopoverTrigger asChild>
             <Button

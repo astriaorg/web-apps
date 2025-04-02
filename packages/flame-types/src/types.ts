@@ -8,12 +8,28 @@ import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract } from "viem";
 import React from "react";
 import JSBI from "jsbi";
-
 import Big from "big.js";
-// FIXME - i manually recreated types from keplr here as a stop gap.
-//  this will get refactored further when i update the config logic
-//  to support network switching
 
+/**
+ * ChainType describes the type of chain
+ */
+export type ChainType = "astria" | "cosmos" | "coinbase";
+
+/**
+ * GenericChain is the base chain type that other chain types extend
+ */
+export interface GenericChain {
+  // the type of the chain
+  chainType: ChainType;
+  // the name of the chain
+  chainName: string;
+  // a component to be displayed with the chain
+  IconComponent?: React.FC;
+}
+
+/**
+ * IconProps passed to Icon component for styling
+ */
 export interface IconProps {
   className?: string;
   size?: number;
@@ -33,13 +49,13 @@ export interface BIP44 {
 }
 
 /**
- * Represents information about a chain.
+ * Represents information about a Cosmos chain.
  */
-export interface CosmosChainInfo {
+export interface CosmosChainInfo extends GenericChain {
+  readonly chainType: "cosmos";
   readonly rpc: string;
   readonly rest: string;
   readonly chainId: string;
-  readonly chainName: string;
   /**
    * This indicates the type of coin that can be used for stake.
    * You can get actual currency information from Currencies.
@@ -57,9 +73,6 @@ export interface CosmosChainInfo {
    * You can get actual currency information from Currencies.
    */
   readonly feeCurrencies: CosmosFeeCurrency[];
-
-  // The icon to use for this chain in the ui
-  readonly IconComponent?: React.FC;
 }
 
 /**
@@ -262,13 +275,16 @@ export class EvmCurrency {
   public readonly coinDecimals: number;
 
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
-  public readonly ibcWithdrawalFeeWei: string;
+  public readonly ibcWithdrawalFeeWei?: string;
 
   /** ERC-20 contract address if this is a token, undefined for native currencies */
   public readonly erc20ContractAddress?: HexString;
 
   /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
   public readonly nativeTokenWithdrawerContractAddress?: HexString;
+
+  /** Contract address for intent bridge **/
+  public readonly astriaIntentBridgeAddress?: HexString;
 
   /** True if this is a wrapped native token (e.g., wTIA) */
   public readonly isWrappedNative: boolean;
@@ -284,9 +300,10 @@ export class EvmCurrency {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
-    ibcWithdrawalFeeWei: string;
+    ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: HexString;
     nativeTokenWithdrawerContractAddress?: HexString;
+    astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {
@@ -298,6 +315,7 @@ export class EvmCurrency {
     this.erc20ContractAddress = params.erc20ContractAddress;
     this.nativeTokenWithdrawerContractAddress =
       params.nativeTokenWithdrawerContractAddress;
+    this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
     this.IconComponent = params.IconComponent;
   }
@@ -352,16 +370,16 @@ export class EvmCurrency {
 }
 
 /**
- * Represents information about an EVM chain.
+ * Represents information about a Flame chain (which is EVM-compatible).
+ *
+ * TODO - rename to AstriaChainInfo
  */
-export type EvmChainInfo = {
-  chainId: number;
-  chainName: string;
-  currencies: [EvmCurrency, ...EvmCurrency[]];
-  rpcUrls: string[];
-  IconComponent?: React.FC;
-  blockExplorerUrl?: string;
-  contracts: {
+export interface EvmChainInfo extends GenericChain {
+  readonly chainType: "astria";
+  readonly chainId: number;
+  readonly rpcUrls: string[];
+  readonly blockExplorerUrl?: string;
+  readonly contracts: {
     [label: string]: ChainContract;
     wrappedNativeToken: ChainContract;
     swapRouter: ChainContract;
@@ -369,6 +387,28 @@ export type EvmChainInfo = {
     poolFactory: ChainContract;
     poolContract: ChainContract;
   };
+  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
+}
+
+/**
+ * CoinbaseChain describes a chain on the Base network.
+ *
+ * NOTE: `BaseChain` was too ambiguous even if technically correct name.
+ */
+export interface CoinbaseChain extends GenericChain {
+  readonly chainType: "coinbase";
+  readonly chainId: number;
+  readonly rpcUrls: string[];
+  readonly blockExplorerUrl?: string;
+  readonly contracts?: {
+    [label: string]: ChainContract;
+  };
+  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
+}
+
+// CoinbaseChains type maps labels to CoinbaseChain objects
+export type CoinbaseChains = {
+  [label: string]: CoinbaseChain;
 };
 
 /**

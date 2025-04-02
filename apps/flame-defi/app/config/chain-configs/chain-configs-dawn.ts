@@ -1,12 +1,16 @@
 import {
+  BaseIcon,
   CelestiaIcon,
   DropTiaIcon,
   FlameIcon,
   NeutronIcon,
   NobleIcon,
+  UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
+  CoinbaseChain,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -15,6 +19,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
   // The name of the chain to be displayed to the user.
@@ -97,6 +102,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "grand-1",
   chainName: "Noble Testnet",
   // RPC endpoint of the chain
@@ -179,6 +185,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "pion-1",
   chainName: "Neutron Testnet",
   // RPC endpoint of the chain
@@ -270,6 +277,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
+  chainType: "astria",
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
@@ -341,4 +349,30 @@ const FlameChainInfo: EvmChainInfo = {
 
 export const evmChains: EvmChains = {
   "Flame Dawn-1": FlameChainInfo,
+};
+
+const BaseChainInfo: CoinbaseChain = {
+  chainType: "coinbase",
+  chainId: 84532,
+  chainName: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorerUrl: "https://sepolia.basescan.org",
+  currencies: [
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      astriaIntentBridgeAddress: "0x",
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };

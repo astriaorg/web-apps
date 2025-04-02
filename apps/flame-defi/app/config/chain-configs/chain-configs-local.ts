@@ -1,5 +1,13 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
 import {
+  BaseIcon,
+  CelestiaIcon,
+  FlameIcon,
+  NobleIcon,
+  UsdcIcon,
+} from "@repo/ui/icons";
+import {
+  CoinbaseChain,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -8,6 +16,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   // Chain-id of the celestia chain.
   chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
@@ -99,6 +108,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
@@ -185,6 +195,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
+  chainType: "astria",
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -234,6 +245,7 @@ const FlameChainInfo: EvmChainInfo = {
 };
 
 const FakeChainInfo: EvmChainInfo = {
+  chainType: "astria",
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -284,4 +296,30 @@ const FakeChainInfo: EvmChainInfo = {
 export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
   Fake: FakeChainInfo,
+};
+
+const BaseChainInfo: CoinbaseChain = {
+  chainType: "coinbase",
+  chainId: 84532,
+  chainName: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorerUrl: "https://sepolia.basescan.org",
+  currencies: [
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      astriaIntentBridgeAddress: "0x",
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };

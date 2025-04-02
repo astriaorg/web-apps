@@ -1,4 +1,5 @@
 import {
+  BaseIcon,
   CelestiaIcon,
   DropTiaIcon,
   FlameIcon,
@@ -12,6 +13,8 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
+  CoinbaseChain,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -20,6 +23,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   // Chain-id of the celestia chain.
   chainId: "celestia",
   // The name of the chain to be displayed to the user.
@@ -102,6 +106,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "neutron-1",
   chainName: "Neutron",
   // RPC endpoint of the chain
@@ -185,6 +190,7 @@ const NeutronChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "noble-1",
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
@@ -232,6 +238,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const OsmosisChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "osmosis-1",
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
@@ -281,6 +288,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
 };
 
 const StrideChainInfo: CosmosChainInfo = {
+  chainType: "cosmos",
   chainId: "stride-1",
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
@@ -335,8 +343,9 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: EvmChainInfo = {
+  chainType: "astria",
   chainId: 253368190,
-  chainName: "Flame",
+  chainName: "astria",
   rpcUrls: ["https://rpc.flame.astria.org"],
   blockExplorerUrl: "https://explorer.flame.astria.org",
   contracts: {
@@ -431,4 +440,30 @@ const FlameChainInfo: EvmChainInfo = {
 
 export const evmChains: EvmChains = {
   Flame: FlameChainInfo,
+};
+
+const BaseChainInfo: CoinbaseChain = {
+  chainType: "coinbase",
+  chainId: 8453,
+  chainName: "Base",
+  rpcUrls: ["https://mainnet.base.org"],
+  blockExplorerUrl: "https://basescan.org/",
+  currencies: [
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      astriaIntentBridgeAddress: "0x",
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };
