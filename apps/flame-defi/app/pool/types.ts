@@ -1,4 +1,4 @@
-import { EvmCurrency, TXN_STATUS } from "@repo/flame-types";
+import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
@@ -6,12 +6,12 @@ export interface AddLiquidityInputsBlockProps {
   setInputOne: (value: string) => void;
   setInputTwo: (value: string) => void;
 }
-
-export interface StepProps {
-  step: number;
-  setStep: (thing: number) => void;
-  tokenPair: TokenPair;
-  selectedFeeTier: FeeData | undefined;
+export interface NewPositionInputsProps {
+  inputOne: TokenInputState;
+  inputTwo: TokenInputState;
+  setInputOne: (value: TokenInputState) => void;
+  setInputTwo: (value: TokenInputState) => void;
+  currencies: EvmCurrency[];
 }
 
 export interface TokenPair {
@@ -41,6 +41,7 @@ export interface PoolPositionsRecord {
     symbol: string;
     symbolTwo: string;
     percent: number;
+    apr: number;
   };
   positionStatus: string;
   inRange: boolean;
@@ -69,6 +70,10 @@ export type Positions = {
 export type PoolContextProps = {
   feeData: FeeData[];
   poolPositionsRecord: PoolPositionsRecord[];
+  modalOpen: boolean;
+  setModalOpen: (modalOpen: boolean) => void;
+  txnStatus: TXN_STATUS;
+  setTxnStatus: (txnStatus: TXN_STATUS) => void;
 };
 
 export type PoolPositionContextProps = {
@@ -80,10 +85,6 @@ export type PoolPositionContextProps = {
   handleReverseTokenData: (symbol: string) => void;
   collectAsNative: boolean;
   handleCollectAsNative: (collectAsNative: boolean) => void;
-  txnStatus: TXN_STATUS;
-  setTxnStatus: (txnStatus: TXN_STATUS) => void;
-  modalOpen: boolean;
-  setModalOpen: (modalOpen: boolean) => void;
   poolTokenOne: PoolToken;
   poolTokenTwo: PoolToken;
 };
@@ -94,17 +95,21 @@ export type PoolTxnStepsProps = {
   txnHash: string;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
+  selectedFeeTier?: string;
 };
 
 export enum POOL_TXN_TYPE {
   ADD_LIQUIDITY = "add-liquidity",
-  REMOVE_LIQUIDITY = "remove-liquidity",
   COLLECT_FEE = "collect-fee",
+  NEW_POSITION = "new-position",
+  REMOVE_LIQUIDITY = "remove-liquidity",
 }
 
 export const getTxnType = (pathname: string): POOL_TXN_TYPE => {
   if (pathname.includes(POOL_TXN_TYPE.ADD_LIQUIDITY))
     return POOL_TXN_TYPE.ADD_LIQUIDITY;
+  if (pathname.includes(POOL_TXN_TYPE.NEW_POSITION))
+    return POOL_TXN_TYPE.NEW_POSITION;
   if (pathname.includes(POOL_TXN_TYPE.REMOVE_LIQUIDITY))
     return POOL_TXN_TYPE.REMOVE_LIQUIDITY;
   return POOL_TXN_TYPE.COLLECT_FEE;
@@ -113,6 +118,7 @@ export const getTxnType = (pathname: string): POOL_TXN_TYPE => {
 export type TxnComponentProps = {
   poolTokens: PoolToken[];
   addLiquidityInputValues: string[] | null;
+  selectedFeeTier?: string;
 };
 
 export type TxnLoaderProps = {

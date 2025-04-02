@@ -20,6 +20,7 @@ export function TxnDetails({
   minimumReceived,
   oneToOneQuote,
   isQuoteLoading,
+  frontendFeeEstimate,
 }: TxnDetailsProps) {
   const {
     topTokenSymbol,
@@ -105,6 +106,21 @@ export function TxnDetails({
             {priceImpact}
           </span>
         </div>
+        {Boolean(frontendFeeEstimate) && (
+          <div className="flex justify-between">
+            <span className="text-grey-light flex items-center text-sm gap-1">
+              {/* TODO - show fee percentage from config */}
+              Fee (0.25%){" "}
+              <InfoTooltip
+                content="Fees are applied to ensure the best experience on Flame, and have already been factored into this quote."
+                side="right"
+              />
+            </span>
+            <span className="text-grey-light text-sm font-medium">
+              {frontendFeeEstimate} <span>{bottomToken.token?.coinDenom}</span>
+            </span>
+          </div>
+        )}
         <div className="flex justify-between">
           <div className="flex gap-1 items-center">
             <span className="w-[116px] md:w-full text-sm text-grey-light">
@@ -237,6 +253,7 @@ export function SwapTxnSteps({
           isTiaWtia={isTiaWtia}
           oneToOneQuote={oneToOneQuote}
           isQuoteLoading={isQuoteLoading}
+          frontendFeeEstimate={txnInfo.frontendFeeEstimate}
         />
       )}
       {txnStatus === TXN_STATUS.PENDING && (
