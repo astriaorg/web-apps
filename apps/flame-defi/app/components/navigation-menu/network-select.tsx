@@ -16,7 +16,7 @@ import {
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { useConfig } from "config";
 
-export default function NetworkSelector(): React.ReactElement {
+export const NetworkSelect = (): React.ReactElement => {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =
     useConfig();
 
@@ -71,4 +71,4 @@ export default function NetworkSelector(): React.ReactElement {
       </SelectContent>
     </Select>
   );
-}
+};
