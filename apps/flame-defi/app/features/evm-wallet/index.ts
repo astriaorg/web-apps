@@ -12,6 +12,7 @@ import {
   SwapRouterService,
   createSwapRouterService,
 } from "./services/swap-router-service";
+import { createErc20Service } from "./services/erc-20-service/erc-20-service";
 
 export {
   AddErc20ToWalletButton,
@@ -22,6 +23,7 @@ export {
   SwapRouterService,
   createSwapRouterService,
   useEvmWallet,
+  createErc20Service,
   createWethService,
   createWithdrawerService,
   createTradeFromQuote,
