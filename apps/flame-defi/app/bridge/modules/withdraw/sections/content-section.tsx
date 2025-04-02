@@ -1,5 +1,8 @@
 "use client";
 
+import React, { useMemo, useEffect, useCallback } from "react";
+import { useConfig } from "wagmi";
+
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
@@ -8,16 +11,20 @@ import {
   AddErc20ToWalletButton,
   createWithdrawerService,
 } from "features/evm-wallet";
-import { NotificationType } from "features/notifications";
+import { NotificationType, useNotifications } from "features/notifications";
 import { useWithdrawPageContext } from "../hooks/use-withdraw-page-context";
-import React, { useEffect } from "react";
 
 export const ContentSection = () => {
+  const { addNotification } = useNotifications();
+  const wagmiConfig = useConfig();
+
   const {
     amount,
     setAmount,
     isAmountValid,
+    setIsAmountValid,
     hasTouchedForm,
+    setHasTouchedForm,
     isLoading,
     setIsLoading,
     isAnimating,
@@ -27,62 +34,16 @@ export const ContentSection = () => {
     handleEditRecipientClick,
     handleEditRecipientSave,
     handleEditRecipientClear,
+    isRecipientAddressValid,
+    setIsRecipientAddressValid,
+    setRecipientAddressOverride,
     handleConnectCosmosWallet,
     isWithdrawDisabled,
+    additionalCosmosOptions,
+    additionalEvmOptions,
     cosmosWallet,
     evmWallet,
-    additionalIbcOptions,
-    additionalEvmOptions,
   } = useWithdrawPageContext();
-
-  // the ibc currency selection is controlled by the sender's chosen evm currency,
-  // and should be updated when an ibc currency or ibc chain is selected
-  const selectedIbcCurrencyOption = React.useMemo(() => {
-    if (!evmWallet.selectedEvmCurrency) {
-      return cosmosWallet.defaultIbcCurrencyOption;
-    }
-    const matchingIbcCurrency =
-      cosmosWallet.selectedCosmosChain?.currencies.find(
-        (currency) =>
-          currency.coinDenom === evmWallet.selectedEvmCurrency.coinDenom,
-      );
-    if (!matchingIbcCurrency) {
-      return null;
-    }
-    return {
-      label: matchingIbcCurrency.coinDenom,
-      value: matchingIbcCurrency,
-      LeftIcon: matchingIbcCurrency.IconComponent,
-    };
-  }, [
-    evmWallet.selectedEvmCurrency,
-    cosmosWallet.selectedCosmosChain,
-    cosmosWallet.defaultIbcCurrencyOption,
-  ]);
-
-  useEffect(() => {
-    if (
-      amount ||
-      cosmosWallet.cosmosAccountAddress ||
-      recipientAddressOverride
-    ) {
-      // setHasTouchedForm(true);
-    }
-    const recipientAddress =
-      recipientAddressOverride || cosmosWallet.cosmosAccountAddress || null;
-    checkIsFormValid(recipientAddress, amount);
-  }, [amount, cosmosWallet.cosmosAccountAddress, recipientAddressOverride]);
-
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
-  const checkIsFormValid = (
-    recipientAddressInput: string | null,
-    amountInput: string,
-  ) => {
-    // This is just a stub and would be implemented in the context
-  };
 
   // ensure evm wallet connection when selected EVM chain changes
   useEffect(() => {
@@ -90,9 +51,9 @@ export const ContentSection = () => {
       return;
     }
     evmWallet.connectEvmWallet();
-  }, [evmWallet]);
+  }, [evmWallet.selectedEvmChain, evmWallet]);
 
-  // ensure cosmos wallet connection when selected ibc chain changes
+  // ensure cosmos wallet connection when selected cosmos chain changes
   useEffect(() => {
     if (!cosmosWallet.selectedCosmosChain) {
       return;
@@ -100,9 +61,79 @@ export const ContentSection = () => {
     handleConnectCosmosWallet();
   }, [cosmosWallet.selectedCosmosChain, handleConnectCosmosWallet]);
 
+  // the cosmos currency selection is controlled by the sender's chosen evm currency,
+  // and should be updated when an evm currency or cosmos chain is selected
+  const selectedCosmosCurrencyOption = useMemo(() => {
+    if (!evmWallet.selectedEvmCurrency) {
+      return cosmosWallet.defaultIbcCurrencyOption;
+    }
+    const matchingCosmosCurrency =
+      cosmosWallet.selectedCosmosChain?.currencies.find(
+        (currency) =>
+          currency.coinDenom === evmWallet.selectedEvmCurrency?.coinDenom,
+      );
+    if (!matchingCosmosCurrency) {
+      return null;
+    }
+    return {
+      label: matchingCosmosCurrency.coinDenom,
+      value: matchingCosmosCurrency,
+      LeftIcon: matchingCosmosCurrency.IconComponent,
+    };
+  }, [
+    evmWallet.selectedEvmCurrency,
+    cosmosWallet.selectedCosmosChain,
+    cosmosWallet.defaultIbcCurrencyOption,
+  ]);
+
+  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(event.target.value);
+  };
+
+  const checkIsFormValid = useCallback(
+    (recipientAddressInput: string | null, amountInput: string) => {
+      if (recipientAddressInput === null) {
+        setIsRecipientAddressValid(false);
+        return;
+      }
+      const amount = Number.parseFloat(amountInput);
+      const amountValid = amount > 0;
+      setIsAmountValid(amountValid);
+      const isRecipientAddressValid = recipientAddressInput.length > 0;
+      setIsRecipientAddressValid(isRecipientAddressValid);
+    },
+    [setIsAmountValid, setIsRecipientAddressValid],
+  );
+
+  // check if form is valid whenever values change
+  useEffect(() => {
+    if (
+      amount ||
+      cosmosWallet.cosmosAccountAddress ||
+      recipientAddressOverride
+    ) {
+      setHasTouchedForm(true);
+    }
+    const recipientAddress =
+      recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
+    checkIsFormValid(recipientAddress, amount);
+  }, [
+    amount,
+    checkIsFormValid,
+    cosmosWallet.cosmosAccountAddress,
+    recipientAddressOverride,
+    setHasTouchedForm,
+  ]);
+
+  const updateRecipientAddressOverride = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRecipientAddressOverride(event.target.value);
+  };
+
   const handleWithdraw = async () => {
     if (!evmWallet.selectedEvmChain || !evmWallet.selectedEvmCurrency) {
-      evmWallet.addNotification({
+      addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
           message: "Please select a chain and token to bridge first.",
@@ -112,10 +143,11 @@ export const ContentSection = () => {
       return;
     }
 
+    const fromAddress = evmWallet.evmAccountAddress;
     const recipientAddress =
       recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
-    if (!evmWallet.evmAccountAddress || !recipientAddress) {
-      evmWallet.addNotification({
+    if (!fromAddress || !recipientAddress) {
+      addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
           message: "Please connect your Keplr and EVM wallet first.",
@@ -130,7 +162,6 @@ export const ContentSection = () => {
       !evmWallet.selectedEvmCurrency.erc20ContractAddress
     ) {
       console.error("Withdrawal cannot proceed: missing contract address");
-      // shouldn't really fall into this case
       return;
     }
 
@@ -144,12 +175,10 @@ export const ContentSection = () => {
         throw new Error("No contract address found");
       }
       if (!evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei) {
-        // NOTE - we started with only cosmos chains so they were all ibc withdrawals previously,
-        //  but we will be supporting Base withdrawals soon probably
         throw new Error("Base withdrawals coming soon but not yet supported.");
       }
       const withdrawerSvc = createWithdrawerService(
-        evmWallet.wagmiConfig,
+        wagmiConfig,
         contractAddress,
         !evmWallet.selectedEvmCurrency.isNative,
       );
@@ -161,7 +190,7 @@ export const ContentSection = () => {
         evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei,
         "",
       );
-      evmWallet.addNotification({
+      addNotification({
         toastOpts: {
           toastType: NotificationType.SUCCESS,
           message: "Withdrawal successful!",
@@ -172,7 +201,7 @@ export const ContentSection = () => {
       setIsAnimating(false);
       console.error("Withdrawal failed:", e);
       const message = e instanceof Error ? e.message : "Unknown error.";
-      evmWallet.addNotification({
+      addNotification({
         toastOpts: {
           toastType: NotificationType.DANGER,
           component: (
@@ -188,12 +217,6 @@ export const ContentSection = () => {
       setIsLoading(false);
       setTimeout(() => setIsAnimating(false), 1000);
     }
-  };
-
-  const updateRecipientAddressOverride = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    // This would be implemented in the context
   };
 
   const formattedEvmBalanceValue = formatDecimalValues(
@@ -297,7 +320,7 @@ export const ContentSection = () => {
                       options={cosmosWallet.cosmosChainsOptions}
                       onSelect={cosmosWallet.selectCosmosChain}
                       LeftIcon={WalletIcon}
-                      additionalOptions={additionalIbcOptions}
+                      additionalOptions={additionalCosmosOptions}
                       valueOverride={cosmosWallet.selectedCosmosChainOption}
                     />
                   </div>
@@ -309,7 +332,7 @@ export const ContentSection = () => {
                           options={cosmosWallet.ibcCurrencyOptions}
                           defaultOption={cosmosWallet.defaultIbcCurrencyOption}
                           onSelect={cosmosWallet.selectIbcCurrency}
-                          valueOverride={selectedIbcCurrencyOption}
+                          valueOverride={selectedCosmosCurrencyOption}
                           disabled={true}
                         />
                       </div>
@@ -320,7 +343,7 @@ export const ContentSection = () => {
               {cosmosWallet.cosmosAccountAddress &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
+                  <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                     {cosmosWallet.cosmosAccountAddress && (
                       <p
                         className="text-grey-light font-semibold cursor-pointer"
@@ -356,7 +379,7 @@ export const ContentSection = () => {
                 )}
 
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
+                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <p
                     className="text-grey-light font-semibold cursor-pointer"
                     onClick={handleEditRecipientClick}
@@ -367,7 +390,11 @@ export const ContentSection = () => {
                     </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
-                  {/* Form validation message would go here */}
+                  {!isRecipientAddressValid && hasTouchedForm && (
+                    <div className="mt-2 text-status-danger text-sm">
+                      Recipient address must be a valid address
+                    </div>
+                  )}
                   <p className="mt-2 text-grey-lighter font-semibold text-xs">
                     Connect via wallet to show balance
                   </p>
@@ -375,7 +402,7 @@ export const ContentSection = () => {
               )}
 
               {isRecipientAddressEditable && (
-                <div className="mt-3 py-2 px-3 rounded-xl bg-grey-dark">
+                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <div className="text-grey-light font-semibold">
                     <input
                       className="w-full p-2 bg-transparent border border-white rounded-sm text-white"
@@ -384,20 +411,22 @@ export const ContentSection = () => {
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
-                    <button
-                      type="button"
-                      className="mr-2 mt-2 text-white hover:opacity-75"
-                      onClick={handleEditRecipientSave}
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      className="mt-2 text-white hover:opacity-75"
-                      onClick={handleEditRecipientClear}
-                    >
-                      Clear
-                    </button>
+                    <div className="mt-3 flex space-x-2">
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        onClick={handleEditRecipientSave}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        onClick={handleEditRecipientClear}
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -426,7 +455,7 @@ export const ContentSection = () => {
                 </div>
               </div>
               {!isAmountValid && hasTouchedForm && (
-                <div className="mt-2 text-red-500 text-sm">
+                <div className="text-status-danger mt-2">
                   Amount must be a number greater than 0
                 </div>
               )}

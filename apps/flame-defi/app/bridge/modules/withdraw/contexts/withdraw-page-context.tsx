@@ -1,18 +1,26 @@
 "use client";
 
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
-import { useNotifications } from "features/notifications";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
+
+import { EditIcon, PlusIcon } from "@repo/ui/icons";
+import { DropdownAdditionalOption } from "components/dropdown";
+import { useCoinbaseWallet } from "features/coinbase-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
-import { useConfig as useWagmiConfig } from "wagmi";
-
-type Status = "error" | "empty" | "success";
 
 export interface WithdrawPageContextProps extends PropsWithChildren {
   amount: string;
   setAmount: (value: string) => void;
   isAmountValid: boolean;
+  setIsAmountValid: (value: boolean) => void;
   hasTouchedForm: boolean;
+  setHasTouchedForm: (value: boolean) => void;
   isLoading: boolean;
   setIsLoading: (value: boolean) => void;
   isAnimating: boolean;
@@ -21,27 +29,19 @@ export interface WithdrawPageContextProps extends PropsWithChildren {
   setRecipientAddressOverride: (value: string) => void;
   isRecipientAddressEditable: boolean;
   setIsRecipientAddressEditable: (value: boolean) => void;
+  isRecipientAddressValid: boolean;
+  setIsRecipientAddressValid: (value: boolean) => void;
   handleEditRecipientClick: () => void;
   handleEditRecipientSave: () => void;
   handleEditRecipientClear: () => void;
   handleConnectCosmosWallet: () => void;
   handleWithdraw: () => Promise<void>;
   isWithdrawDisabled: boolean;
+  additionalCosmosOptions: DropdownAdditionalOption[];
+  additionalEvmOptions: DropdownAdditionalOption[];
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
-  additionalIbcOptions: Array<{
-    label: string;
-    action: () => void;
-    className: string;
-    leftIconClass?: string;
-    rightIconClass?: string;
-  }>;
-  additionalEvmOptions: Array<{
-    label: string;
-    action: () => void;
-    className: string;
-    rightIconClass?: string;
-  }>;
+  coinbaseWallet: ReturnType<typeof useCoinbaseWallet>;
 }
 
 export const WithdrawPageContext = createContext<
@@ -51,9 +51,6 @@ export const WithdrawPageContext = createContext<
 export const WithdrawPageContextProvider = ({
   children,
 }: PropsWithChildren) => {
-  const wagmiConfig = useWagmiConfig();
-  const { addNotification } = useNotifications();
-
   // Form state
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -63,106 +60,113 @@ export const WithdrawPageContextProvider = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // Recipient address state
+  // recipient address manual override state
   const [recipientAddressOverride, setRecipientAddressOverride] =
     useState<string>("");
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
 
-  // Wallet contexts
+  // wallet contexts
   const cosmosWallet = useCosmosWallet();
   const evmWallet = useEvmWallet();
+  const { connectEvmWallet } = evmWallet;
+  const coinbaseWallet = useCoinbaseWallet();
 
-  // Handle editing recipient address
-  const handleEditRecipientClick = () => {
-    setIsRecipientAddressEditable(!isRecipientAddressEditable);
-  };
+  // toggle ability to edit recipient address
+  const handleEditRecipientClick = useCallback(() => {
+    setIsRecipientAddressEditable((prev) => !prev);
+  }, []);
 
+  // save the recipient address
   const handleEditRecipientSave = () => {
     setIsRecipientAddressEditable(false);
     // reset wallet states when user manually enters address
     cosmosWallet.resetState();
+    coinbaseWallet.resetState();
   };
 
+  // clear the manually inputted recipient address
   const handleEditRecipientClear = () => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
   };
 
-  // Handle connecting to Cosmos wallet
-  const handleConnectCosmosWallet = () => {
+  // handle connecting to Cosmos wallet
+  const handleConnectCosmosWallet = useCallback(() => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
     cosmosWallet.connectCosmosWallet();
-  };
+  }, [cosmosWallet]);
 
-  // Handle withdraw action
   const handleWithdraw = async () => {
+    // Implementation kept in content-section.tsx for now
+    // This is a stub that will be completed in the content section
+    const fromAddress = evmWallet.evmAccountAddress;
     const recipientAddress =
       recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
 
-    // Implementation kept in content-section.tsx for now
-    // This is a stub that will be completed in the content section
     console.log("Handle withdraw action", {
-      fromAddress: evmWallet.evmAccountAddress,
+      fromAddress,
       recipientAddress,
       amount,
     });
   };
 
-  // dropdown options
-  const additionalIbcOptions = useMemo(
-    () => [
+  // dropdown options for additional Cosmos actions
+  const additionalCosmosOptions = useMemo(() => {
+    return [
       {
         label: "Connect Keplr Wallet",
         action: handleConnectCosmosWallet,
         className: "has-text-primary",
         leftIconClass: "i-cosmos",
-        rightIconClass: "fas fa-plus",
+        RightIcon: PlusIcon,
       },
       {
         label: "Enter address manually",
         action: handleEditRecipientClick,
         className: "has-text-primary",
-        rightIconClass: "fas fa-pen-to-square",
+        RightIcon: EditIcon,
       },
-    ],
-    [handleConnectCosmosWallet, handleEditRecipientClick],
-  );
+    ];
+  }, [handleConnectCosmosWallet, handleEditRecipientClick]);
 
+  // dropdown options for additional EVM actions
   const additionalEvmOptions = useMemo(() => {
     return [
       {
         label: "Connect EVM Wallet",
-        action: evmWallet.connectEvmWallet,
+        action: connectEvmWallet,
         className: "has-text-primary",
-        rightIconClass: "fas fa-plus",
+        RightIcon: PlusIcon,
       },
     ];
-  }, [evmWallet.connectEvmWallet]);
+  }, [connectEvmWallet]);
 
-  // Calculate if withdraw button should be disabled
+  // calculate if withdraw button should be disabled
   const isWithdrawDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
-      // there won't be a selected ibc chain and currency if user manually enters a recipient address
+      // there won't be a selected cosmos chain and currency if user manually
+      // enters a recipient address
       return !(
         isAmountValid &&
         isRecipientAddressValid &&
         evmWallet.evmAccountAddress
       );
     }
+
     return !(
       cosmosWallet.cosmosAccountAddress &&
       isAmountValid &&
       isRecipientAddressValid &&
       evmWallet.evmAccountAddress &&
       evmWallet.selectedEvmCurrency?.coinDenom ===
-        cosmosWallet.selectedIbcCurrencyOption?.value?.coinDenom
+        cosmosWallet.selectedIbcCurrency?.coinDenom
     );
   }, [
     recipientAddressOverride,
     cosmosWallet.cosmosAccountAddress,
-    cosmosWallet.selectedIbcCurrencyOption,
+    cosmosWallet.selectedIbcCurrency,
     isAmountValid,
     isRecipientAddressValid,
     evmWallet.evmAccountAddress,
@@ -175,7 +179,9 @@ export const WithdrawPageContextProvider = ({
         amount,
         setAmount,
         isAmountValid,
+        setIsAmountValid,
         hasTouchedForm,
+        setHasTouchedForm,
         isLoading,
         setIsLoading,
         isAnimating,
@@ -184,6 +190,8 @@ export const WithdrawPageContextProvider = ({
         setRecipientAddressOverride,
         isRecipientAddressEditable,
         setIsRecipientAddressEditable,
+        isRecipientAddressValid,
+        setIsRecipientAddressValid,
         handleEditRecipientClick,
         handleEditRecipientSave,
         handleEditRecipientClear,
@@ -192,7 +200,8 @@ export const WithdrawPageContextProvider = ({
         isWithdrawDisabled,
         cosmosWallet,
         evmWallet,
-        additionalIbcOptions,
+        coinbaseWallet,
+        additionalCosmosOptions,
         additionalEvmOptions,
       }}
     >

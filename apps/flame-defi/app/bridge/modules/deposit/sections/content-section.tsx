@@ -2,22 +2,21 @@
 
 import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 import { Decimal } from "@cosmjs/math";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
+import { useConfig } from "wagmi";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, BaseIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { Dropdown } from "components/dropdown";
+import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { SourceType } from "bridge/types";
+import { Dropdown } from "components/dropdown";
+import { sendIbcTransfer } from "features/cosmos-wallet";
 import {
   AddErc20ToWalletButton,
   createErc20Service,
 } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
-
-import { useDepositPageContext } from "../hooks/use-deposit-page-context";
-import { sendIbcTransfer } from "features/cosmos-wallet";
-import { useConfig } from "wagmi";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
@@ -140,28 +139,28 @@ export const ContentSection = () => {
     setAmount(event.target.value);
   };
 
-  const checkIsFormValid = (
-    addressInput: string | null,
-    amountInput: string,
-  ) => {
-    if (addressInput === null) {
-      setIsRecipientAddressValid(false);
-      return;
-    }
-    // check that address is correct evm address format
-    if (!addressInput.startsWith("0x")) {
-      setIsRecipientAddressValid(false);
-      return;
-    }
+  const checkIsFormValid = useCallback(
+    (addressInput: string | null, amountInput: string) => {
+      if (addressInput === null) {
+        setIsRecipientAddressValid(false);
+        return;
+      }
+      // check that address is correct evm address format
+      if (!addressInput.startsWith("0x")) {
+        setIsRecipientAddressValid(false);
+        return;
+      }
 
-    // FIXME - parseFloat is not sufficient
-    const amount = Number.parseFloat(amountInput);
-    const amountValid = amount > 0;
-    setIsAmountValid(amountValid);
-    // TODO - what validation should we do?
-    const addressValid = addressInput.length > 0;
-    setIsRecipientAddressValid(addressValid);
-  };
+      // FIXME - parseFloat is not sufficient
+      const amount = Number.parseFloat(amountInput);
+      const amountValid = amount > 0;
+      setIsAmountValid(amountValid);
+      // TODO - what validation should we do?
+      const addressValid = addressInput.length > 0;
+      setIsRecipientAddressValid(addressValid);
+    },
+    [setIsAmountValid, setIsRecipientAddressValid],
+  );
 
   // check if form is valid whenever values change
   useEffect(() => {
