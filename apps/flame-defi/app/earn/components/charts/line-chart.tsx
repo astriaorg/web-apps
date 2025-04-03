@@ -274,7 +274,7 @@ export const LineChart = <
               </ReferenceLine>
               <Line
                 dataKey="y"
-                stroke="var(--color-orange)"
+                stroke="var(--color-brand)"
                 strokeWidth={1}
                 dot={false}
                 activeDot={{ r: 4.5 }}
