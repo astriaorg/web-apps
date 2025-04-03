@@ -13,8 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components";
-import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { useConfig } from "config";
+import { NetworkIcon } from "./network-icon";
 
 export const NetworkSelect = (): React.ReactElement => {
   const { selectedFlameNetwork, selectFlameNetwork, networksList } =
@@ -39,10 +39,10 @@ export const NetworkSelect = (): React.ReactElement => {
     >
       <SelectTrigger>
         <SelectValue>
-          <div className="flex items-center gap-2">
-            <FlameIcon size={16} />
+          <span className="flex items-center gap-2">
+            <NetworkIcon network={selectedFlameNetwork} size={16} />
             <span className="capitalize">{selectedFlameNetwork}</span>
-          </div>
+          </span>
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
@@ -54,10 +54,10 @@ export const NetworkSelect = (): React.ReactElement => {
               value={network}
               className="data-[state=checked]:bg-semi-white"
             >
-              <div className="flex items-center gap-2">
-                <FlameIcon size={16} />
+              <span className="flex items-center gap-2">
+                <NetworkIcon network={network} size={16} />
                 <span className="capitalize">{network}</span>
-              </div>
+              </span>
             </SelectItem>
           ))}
         </SelectGroup>
