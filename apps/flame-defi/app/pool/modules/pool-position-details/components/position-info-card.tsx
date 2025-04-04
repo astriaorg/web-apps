@@ -1,6 +1,6 @@
 import { InfoTooltip } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { PriceCardProps } from "pool/types";
+import { PriceRangeCardProps } from "pool/types";
 
 export function PositionInfoCard({
   leftLabel,
@@ -8,7 +8,7 @@ export function PositionInfoCard({
   tooltipText,
   value,
   className,
-}: PriceCardProps) {
+}: PriceRangeCardProps) {
   return (
     <div className={cn("flex-1 bg-surface-1 rounded-lg p-6", className)}>
       <div className="flex flex-col space-y-6">

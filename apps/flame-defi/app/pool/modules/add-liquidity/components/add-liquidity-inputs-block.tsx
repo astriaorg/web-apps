@@ -5,23 +5,19 @@ import {
   Skeleton,
 } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
-import { useGetPoolTokenBalances } from "pool/hooks";
 import { AddLiquidityInputsBlockProps, POOL_INPUT_ID } from "pool/types";
 import { useIntl } from "react-intl";
 
 export const AddLiquidityInputsBlock = ({
   inputOne,
   inputTwo,
-  poolTokenOneSymbol,
-  poolTokenTwoSymbol,
+  tokenOne,
+  tokenTwo,
+  tokenOneBalance,
+  tokenTwoBalance,
   handleInputChange,
 }: AddLiquidityInputsBlockProps) => {
   const { formatNumber } = useIntl();
-  const { tokenOne, tokenTwo, tokenOneBalance, tokenTwoBalance } =
-    useGetPoolTokenBalances(
-      poolTokenOne.token.coinDenom,
-      poolTokenTwo.token.coinDenom,
-    );
   const isLoading = tokenOne === null || tokenTwo === null;
 
   const inputsArray = [
@@ -91,7 +87,7 @@ export const AddLiquidityInputsBlock = ({
                                   maximumFractionDigits: token?.coinDecimals,
                                 }),
                                 id,
-                                token?.coinDecimals
+                                token?.coinDecimals,
                               );
                             }}
                             className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-white text-sm cursor-pointer transition"
@@ -104,7 +100,7 @@ export const AddLiquidityInputsBlock = ({
                 </Skeleton>
               </Card>
             );
-          }
+          },
         )}
       </div>
     </>

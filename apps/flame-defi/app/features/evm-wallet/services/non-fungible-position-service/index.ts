@@ -94,32 +94,74 @@ export class NonFungiblePositionService extends GenericContractService {
     fee: number,
     tickLower: number,
     tickUpper: number,
-    amount0Desired: number,
-    amount1Desired: number,
-    amount0Min: number,
-    amount1Min: number,
+    amount0Desired: bigint,
+    amount1Desired: bigint,
+    amount0Min: bigint,
+    amount1Min: bigint,
     recipient: Address,
     deadline: number,
+    value?: bigint,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(chainId, "mint", [
-      {
-        token0,
-        token1,
-        fee,
-        tickLower,
-        tickUpper,
-        amount0Desired,
-        amount1Desired,
-        amount0Min,
-        amount1Min,
-        recipient,
-        deadline,
-      },
-    ]);
+    return await this.writeContractMethod(
+      chainId,
+      "mint",
+      [
+        {
+          token0,
+          token1,
+          fee,
+          tickLower,
+          tickUpper,
+          amount0Desired,
+          amount1Desired,
+          amount0Min,
+          amount1Min,
+          recipient,
+          deadline,
+        },
+      ],
+      value,
+    );
+  }
 
-    console.log({ txHash });
-
-    return txHash;
+  /**
+   * Increases liquidity for an existing position.
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param tokenId - The ID of the NFT position to increase liquidity in
+   * @param amount0Desired - The desired amount of token0 to add
+   * @param amount1Desired - The desired amount of token1 to add
+   * @param amount0Min - The minimum amount of token0 to add (slippage protection)
+   * @param amount1Min - The minimum amount of token1 to add (slippage protection)
+   * @param deadline - The timestamp by which the transaction must be executed
+   * @param value - Optional value to send with the transaction (needed for native token operations)
+   * @returns Object containing transaction hash if successful, and the additional liquidity amount
+   */
+  async increaseLiquidity(
+    chainId: number,
+    tokenId: string,
+    amount0Desired: bigint,
+    amount1Desired: bigint,
+    amount0Min: bigint,
+    amount1Min: bigint,
+    deadline: number,
+    value?: bigint,
+  ): Promise<HexString> {
+    return await this.writeContractMethod(
+      chainId,
+      "increaseLiquidity",
+      [
+        {
+          tokenId: BigInt(tokenId),
+          amount0Desired,
+          amount1Desired,
+          amount0Min,
+          amount1Min,
+          deadline,
+        },
+      ],
+      value,
+    );
   }
 
   /**
@@ -141,13 +183,13 @@ export class NonFungiblePositionService extends GenericContractService {
     amount1Min: number,
     deadline: number,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(
-      chainId,
-      "decreaseLiquidity",
-      [tokenId, liquidity, amount0Min, amount1Min, deadline],
-    );
-
-    return txHash;
+    return await this.writeContractMethod(chainId, "decreaseLiquidity", [
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline,
+    ]);
   }
 
   /**
@@ -167,14 +209,12 @@ export class NonFungiblePositionService extends GenericContractService {
     amount0Max: number,
     amount1Max: number,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(chainId, "collect", [
+    return await this.writeContractMethod(chainId, "collect", [
       tokenId,
       recipient,
       amount0Max,
       amount1Max,
     ]);
-
-    return txHash;
   }
 
   /**

@@ -134,15 +134,15 @@ export const formatAbbreviatedNumber = (
  * @param decimals - The number of decimal places (default is 18 for most ERC20 tokens)
  * @returns A BigInt value representing the input with the appropriate decimal scaling
  */
-export function numberToBigInt(value: number, decimals: number = 18): bigint {
+export function numberToBigInt(value: number, decimals: number): bigint {
   if (!value) {
     return BigInt(0);
   }
-    // Convert the value to a Big.js instance for precise decimal math
-    const bigValue = new Big(value);
-    // Multiply by 10^decimals and round to get an integer value
-    const scaledValue = bigValue.times(new Big(10).pow(decimals)).round();
-    
-    // Convert to BigInt
-    return BigInt(scaledValue.toString());
+  // Convert the value to a Big.js instance for precise decimal math
+  const bigValue = new Big(value);
+  // Multiply by 10^decimals and round to get an integer value
+  const scaledValue = bigValue.times(new Big(10).pow(decimals)).round();
+
+  // Convert to BigInt
+  return BigInt(scaledValue.toString());
 }

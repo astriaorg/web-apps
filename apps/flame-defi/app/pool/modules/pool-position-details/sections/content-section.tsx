@@ -12,11 +12,15 @@ export const ContentSection = () => {
     selectedSymbol,
     handleReverseTokenData,
     symbols,
-    poolTokenOne,
-    poolTokenTwo,
+    poolToken0,
+    poolToken1,
     collectAsNative,
     handleCollectAsNative,
+    reversedPoolTokens,
   } = usePoolPositionContext();
+  const poolTokens = reversedPoolTokens
+    ? [poolToken1, poolToken0]
+    : [poolToken0, poolToken1];
 
   return (
     <div className="flex flex-col flex-1 mt-12">
@@ -37,23 +41,27 @@ export const ContentSection = () => {
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Liquidity" value="$-" />
-            <TokenInfoCard
-              poolTokenOne={poolTokenOne}
-              poolTokenTwo={poolTokenTwo}
-              showLiquidity={true}
-              showLiquidityPercentage
-            />
+            {poolTokens[0] && poolTokens[1] && (
+              <TokenInfoCard
+                poolToken0={poolTokens[0]}
+                poolToken1={poolTokens[1]}
+                showLiquidity={true}
+                showLiquidityPercentage
+              />
+            )}
           </div>
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             <PositionInfoCard leftLabel="Unclaimed fees" value="$-" />
-            <TokenInfoCard
-              poolTokenOne={poolTokenOne}
-              poolTokenTwo={poolTokenTwo}
-            />
+            {poolTokens[0] && poolTokens[1] && (
+              <TokenInfoCard
+                poolToken0={poolTokens[0]}
+                poolToken1={poolTokens[1]}
+              />
+            )}
           </div>
         </div>
         <div className="w-full md:w-2/4">
-          {poolTokenOne && poolTokenTwo && (
+          {poolTokens[0] && poolTokens[1] && (
             <ConfirmationModal
               open={modalOpen}
               buttonText={"Collect Fees"}
@@ -68,8 +76,8 @@ export const ContentSection = () => {
             >
               <PoolTxnSteps
                 txnStatus={txnStatus}
-                poolTokens={[poolTokenOne, poolTokenTwo]}
-                txnHash={""}
+                poolTokens={[poolTokens[0], poolTokens[1]]}
+                txnHash={"0x"}
                 txnMsg={""}
                 addLiquidityInputValues={null}
               />

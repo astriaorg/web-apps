@@ -30,6 +30,7 @@ import {
   evmCurrencyBelongsToChain,
   HexString,
   TokenAllowance,
+  tokenStateToBig,
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { useGetQuote } from "../../../hooks";
@@ -60,6 +61,22 @@ export interface EvmWalletContextProps {
   withdrawFeeDisplay: string;
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
+  getTokenNeedingApproval: (
+    token: EvmCurrency | null,
+    value: string,
+  ) => {
+    token: EvmCurrency;
+    value: string;
+  } | null;
+  getMultiTokenNeedingApproval: (
+    tokenOne: EvmCurrency | null,
+    tokenTwo: EvmCurrency | null,
+    inputOne: string,
+    inputTwo: string,
+  ) => {
+    token: EvmCurrency;
+    value: string;
+  } | null;
   approveToken: (
     token: EvmCurrency,
     value: string,
@@ -450,6 +467,50 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setTokenAllowances(newTokenAllowances);
   }, [userAccount.address, contracts, currencies, selectedChain, wagmiConfig]);
 
+  const getTokenNeedingApproval = useCallback(
+    (token: EvmCurrency | null, value: string) => {
+      if (!token) {
+        return null;
+      }
+      const existingAllowance = tokenAllowances.find(
+        (allowanceToken) => token.coinDenom === allowanceToken.symbol,
+      );
+
+      if (existingAllowance) {
+        const tokenInputGreaterThanAllowance = tokenStateToBig({
+          token,
+          value,
+        }).gt(existingAllowance.value);
+        if (tokenInputGreaterThanAllowance) {
+          return { token, value };
+        }
+      }
+
+      return null;
+    },
+    [tokenAllowances],
+  );
+
+  const getMultiTokenNeedingApproval = useCallback(
+    (
+      tokenOne: EvmCurrency | null,
+      tokenTwo: EvmCurrency | null,
+      inputOne: string,
+      inputTwo: string,
+    ) => {
+      let tokenNeedingApproval = null;
+      if (tokenOne) {
+        tokenNeedingApproval = getTokenNeedingApproval(tokenOne, inputOne);
+      }
+      if (tokenTwo) {
+        tokenNeedingApproval = getTokenNeedingApproval(tokenTwo, inputTwo);
+      }
+
+      return tokenNeedingApproval;
+    },
+    [getTokenNeedingApproval],
+  );
+
   useEffect(() => {
     if (userAccount.address && tokenAllowances.length === 0) {
       void getTokenAllowances();
@@ -476,6 +537,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectEvmCurrency,
     withdrawFeeDisplay,
     getTokenAllowances,
+    getTokenNeedingApproval,
+    getMultiTokenNeedingApproval,
     approveToken,
     tokenAllowances,
     usdcToNativeQuote,

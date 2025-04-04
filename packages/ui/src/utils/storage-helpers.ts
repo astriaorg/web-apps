@@ -20,7 +20,7 @@ export function setInLocalStorage(key: string, item: unknown) {
   }
 }
 
-export function getSwapSlippageTolerance() {
+export function getSlippageTolerance() {
   const settings = getFromLocalStorage("settings");
   return settings?.slippageTolerance;
 }

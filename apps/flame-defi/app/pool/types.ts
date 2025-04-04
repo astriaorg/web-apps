@@ -1,4 +1,9 @@
-import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  HexString,
+  TXN_STATUS,
+  TokenInputState,
+} from "@repo/flame-types";
 import { Address } from "viem";
 import { FeeTier } from "./constants/pool-constants";
 
@@ -9,9 +14,21 @@ export enum POOL_INPUT_ID {
 export interface AddLiquidityInputsBlockProps {
   inputOne: string;
   inputTwo: string;
-  handleInputChange: (value: string, id: POOL_INPUT_ID, coinDecimals?: number) => void;
-  poolTokenOneSymbol: string;
-  poolTokenTwoSymbol: string;
+  handleInputChange: (
+    value: string,
+    id: POOL_INPUT_ID,
+    coinDecimals?: number,
+  ) => void;
+  tokenOne: EvmCurrency | null;
+  tokenTwo: EvmCurrency | null;
+  tokenOneBalance: {
+    value: string;
+    symbol: string;
+  } | null;
+  tokenTwoBalance: {
+    value: string;
+    symbol: string;
+  } | null;
 }
 export interface NewPositionInputsProps {
   inputOne: TokenInputState;
@@ -26,6 +43,11 @@ export interface TokenPair {
   tokenTwo: EvmCurrency | null;
 }
 
+export interface TokenBalance {
+  value: string;
+  symbol: string;
+}
+
 export interface FeeData {
   id: number;
   feeTier: FeeTier;
@@ -34,12 +56,13 @@ export interface FeeData {
   selectPercent: string;
 }
 
-export interface PriceCardProps {
+export interface PriceRangeCardProps {
   leftLabel: string;
   value: string | number;
   rightLabel?: string;
   tooltipText?: string;
   className?: string;
+  variant?: "default" | "small";
 }
 
 export interface PoolToken {
@@ -95,18 +118,21 @@ export type PoolPositionContextProps = {
   handleReverseTokenData: (symbol: string) => void;
   collectAsNative: boolean;
   handleCollectAsNative: (collectAsNative: boolean) => void;
-  poolTokenOne: PoolToken | null;
-  poolTokenTwo: PoolToken | null;
+  poolToken0: PoolToken | null;
+  poolToken1: PoolToken | null;
   poolPosition: PoolPositionResponse | null;
   currentPrice: string;
   minPrice: string;
   maxPrice: string;
+  reversedPoolTokens: boolean;
+  positionClosed: boolean;
+  refreshPoolPosition: () => void;
 };
 
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
   poolTokens: PoolToken[];
-  txnHash: string;
+  txnHash: HexString | undefined;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
@@ -143,5 +169,5 @@ export type TxnLoaderProps = {
 
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
-  txnHash: string;
+  txnHash: HexString | undefined;
 };
