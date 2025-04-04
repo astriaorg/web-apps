@@ -60,7 +60,7 @@ export const useAddLiquidityTxn = (inputOne: string, inputTwo: string) => {
       : poolToken1.token.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      console.error("Token addresses are missing");
+      console.warn("Token addresses are missing");
       return;
     }
 

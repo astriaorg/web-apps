@@ -108,8 +108,6 @@ export const ContentSection = () => {
     }
   }, [handleCloseModal, addLiquidity, txnStatus]);
 
-  console.log("errorText", errorText);
-
   return (
     <div className="flex flex-col flex-1 mt-0 md:mt-12">
       <PriceRangeBlock
@@ -136,7 +134,7 @@ export const ContentSection = () => {
           <div className="hidden md:block md:w-1/2" />
           <div className="w-full md:w-1/2">
             {!validPoolInputs && (
-              <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-surface-1 border border-border mt-2">
+              <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-surface-1 mt-2">
                 {buttonText}
               </div>
             )}
@@ -158,14 +156,9 @@ export const ContentSection = () => {
                   poolTokens={[poolToken0, poolToken1]}
                   addLiquidityInputValues={[inputOne, inputTwo]}
                   txnHash={txnHash}
-                  txnMsg={""}
+                  txnMsg={errorText || ""}
                 />
               </ConfirmationModal>
-            )}
-            {errorText && (
-              <div className="flex items-center justify-center text-red text-sm mt-4">
-                {errorText}
-              </div>
             )}
           </div>
         </div>
