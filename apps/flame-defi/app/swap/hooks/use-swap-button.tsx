@@ -136,7 +136,7 @@ export function useSwapButton({
   }, [result.data, txnHash, addRecentTransaction, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wtiaAddress = selectedChain.contracts.wrappedNativeToken.address;
+    const wtiaAddress = selectedChain.contracts.wrappedNativeToken?.address;
     if (!selectedChain.chainId || !wtiaAddress) {
       return;
     }
@@ -188,7 +188,7 @@ export function useSwapButton({
     }
     setTxnStatus(TXN_STATUS.PENDING);
     try {
-      const swapRouterAddress = selectedChain.contracts.swapRouter.address;
+      const swapRouterAddress = selectedChain.contracts.swapRouter?.address;
       if (!swapRouterAddress) {
         console.warn("Swap router address is not defined. Cannot swap.");
         return;

@@ -435,6 +435,7 @@ const BaseChainInfo: EvmChainInfo = {
   chainName: "Base",
   rpcUrls: ["https://mainnet.base.org"],
   blockExplorerUrl: "https://basescan.org/",
+  contracts: {},
   currencies: [
     new EvmCurrency({
       coinDenom: "USDC",

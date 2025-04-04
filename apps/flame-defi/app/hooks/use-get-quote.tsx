@@ -53,7 +53,7 @@ export const useGetQuote = () => {
       // NOTE - we need to use the address of the wrapped native token
       //  when getting quotes using the native currency
       const tokenInAddress = tokenIn.token.isNative
-        ? chainContracts.wrappedNativeToken.address
+        ? chainContracts.wrappedNativeToken?.address
         : tokenIn.token.erc20ContractAddress;
       const tokenInDecimals = tokenIn.token.coinDecimals;
       // NOTE - this is an abuse of the fact that the swap-routing-api doesn't
@@ -62,7 +62,7 @@ export const useGetQuote = () => {
       const tokenInSymbol = tokenIn.token.coinDenom.toLocaleLowerCase();
 
       const tokenOutAddress = tokenOut.token.isNative
-        ? chainContracts.wrappedNativeToken.address
+        ? chainContracts.wrappedNativeToken?.address
         : tokenOut.token.erc20ContractAddress;
       const tokenOutDecimals = tokenOut.token.coinDecimals;
       const tokenOutSymbol = tokenOut.token.coinDenom.toLocaleLowerCase();
@@ -111,7 +111,7 @@ export const useGetQuote = () => {
         setLoading(false);
       }
     },
-    [chainId, chainContracts.wrappedNativeToken.address, swapQuoteAPIURL],
+    [chainId, chainContracts.wrappedNativeToken?.address, swapQuoteAPIURL],
   );
 
   const cancelGetQuote = useCallback(() => {

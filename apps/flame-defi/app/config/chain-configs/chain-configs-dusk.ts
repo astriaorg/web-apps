@@ -274,6 +274,7 @@ const BaseChainInfo: EvmChainInfo = {
   chainName: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],
   blockExplorerUrl: "https://sepolia.basescan.org",
+  contracts: {},
   currencies: [
     new EvmCurrency({
       coinDenom: "USDC",

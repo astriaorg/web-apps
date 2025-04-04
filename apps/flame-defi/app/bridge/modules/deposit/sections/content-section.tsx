@@ -10,6 +10,7 @@ import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-
 import { SourceType } from "bridge/types";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
+import { EvmChainInfo } from "@repo/flame-types";
 
 export const ContentSection = () => {
   const {
@@ -100,7 +101,7 @@ export const ContentSection = () => {
     }
     return {
       label: selectedDestinationChain.chainName,
-      value: selectedDestinationChain,
+      value: selectedDestinationChain as EvmChainInfo,
       LeftIcon: selectedDestinationChain.IconComponent,
     };
   }, [selectedDestinationChain]);

@@ -383,7 +383,7 @@ export interface EvmChainInfo extends GenericChain {
   readonly chainId: number;
   readonly rpcUrls: string[];
   readonly blockExplorerUrl?: string;
-  readonly contracts?: {
+  readonly contracts: {
     [label: string]: ChainContract;
   };
   readonly currencies: [EvmCurrency, ...EvmCurrency[]];
