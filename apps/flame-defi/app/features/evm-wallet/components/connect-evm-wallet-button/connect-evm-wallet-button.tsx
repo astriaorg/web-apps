@@ -12,7 +12,7 @@ import {
 import { PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
 interface ConnectEvmWalletButtonProps {
@@ -26,7 +26,7 @@ interface ConnectEvmWalletButtonProps {
 export default function ConnectEvmWalletButton({
   labelBeforeConnected,
 }: ConnectEvmWalletButtonProps) {
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const {
     connectEvmWallet,
     disconnectEvmWallet,

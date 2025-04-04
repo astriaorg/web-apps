@@ -2,7 +2,7 @@
 
 import { usePoolContext } from "pool/hooks";
 import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useState } from "react";
 import {
   NewPositionInputs,
@@ -16,7 +16,7 @@ import { PoolTxnSteps } from "pool/components";
 export const ContentSection = () => {
   const { feeData, modalOpen, setModalOpen, setTxnStatus, txnStatus } =
     usePoolContext();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { currencies } = selectedChain;
   const defaultFeeData = feeData[2] as FeeData;
   const [selectedFeeTier, setSelectedFeeTier] =

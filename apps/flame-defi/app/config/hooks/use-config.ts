@@ -15,10 +15,10 @@ export const useConfig = () => {
   return context;
 };
 
-export const useEvmChainData = () => {
-  const { evmChains } = useConfig();
-  const evmChainsData = Object.values(evmChains);
-  const selectedChain = evmChainsData[0] as EvmChainInfo;
+export const useAstriaChainData = () => {
+  const { astriaChains } = useConfig();
+  const astriaChainsData = Object.values(astriaChains);
+  const selectedChain = astriaChainsData[0] as EvmChainInfo;
 
   return { selectedChain };
 };

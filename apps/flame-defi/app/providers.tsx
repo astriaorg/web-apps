@@ -21,7 +21,6 @@ import {
   getAllChainConfigs,
   getEnvVariable,
 } from "./config";
-import { CoinbaseWalletProvider } from "./features/coinbase-wallet";
 import { CosmosWalletProvider } from "./features/cosmos-wallet";
 import { EvmWalletProvider } from "./features/evm-wallet";
 import { NotificationsContextProvider } from "./features/notifications";
@@ -35,13 +34,20 @@ const CDP_PROJECT_ID = getEnvVariable("NEXT_PUBLIC_CDP_PROJECT_ID");
 
 const queryClient = new QueryClient();
 
-const { evmChains, cosmosChains } = getAllChainConfigs();
+// FIXME - getting chains across ALL Astria networks (dusk, dawn, mainnet)
+//  so we only have to generate wagmi, rainbowKitConfig, and cosmos kit config once,
+//  BUT this could be avoided if we defined these providers a level under ConfigContextProvider,
+//  so the wagmi, rainbowkit, and cosmoskit providers would rerender with up to date chains
+//  when the selected network (dusk, dawn, mainnet) was changed.
+const { astriaChains, cosmosChains, coinbaseChains } = getAllChainConfigs();
 
+// for the wagmi and rainbowkit config
+const allEvmChains = [...astriaChains, ...coinbaseChains];
 // wagmi and rainbowkit config, for evm chains
 const rainbowKitConfig = getDefaultConfig({
   appName: "Flame Bridge",
   projectId: WALLET_CONNECT_PROJECT_ID,
-  chains: evmChainsToRainbowKitChains(evmChains),
+  chains: evmChainsToRainbowKitChains(allEvmChains),
 });
 
 const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
@@ -79,11 +85,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     chain={base}
                   >
                     <CosmosWalletProvider>
-                      <EvmWalletProvider>
-                        <CoinbaseWalletProvider>
-                          {children}
-                        </CoinbaseWalletProvider>
-                      </EvmWalletProvider>
+                      <EvmWalletProvider>{children}</EvmWalletProvider>
                     </CosmosWalletProvider>
                   </OnchainKitProvider>
                 </ChainProvider>

@@ -13,12 +13,11 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
-  CoinbaseChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
-  EvmChains,
+  AstriaChains,
   EvmCurrency,
 } from "@repo/flame-types";
 
@@ -426,12 +425,12 @@ const FlameChainInfo: EvmChainInfo = {
   IconComponent: FlameIcon,
 };
 
-export const evmChains: EvmChains = {
+export const astriaChains: AstriaChains = {
   Flame: FlameChainInfo,
 };
 
-const BaseChainInfo: CoinbaseChain = {
-  chainType: "coinbase",
+const BaseChainInfo: EvmChainInfo = {
+  chainType: "evm",
   chainId: 8453,
   chainName: "Base",
   rpcUrls: ["https://mainnet.base.org"],

@@ -11,9 +11,16 @@ import JSBI from "jsbi";
 import Big from "big.js";
 
 /**
- * ChainType describes the type of chain
+ * ChainType describes the type of chain.
+ *
+ * There are three types of chain. Astria, Cosmos, and Evm.
+ * Plans to add a fourth, Solana.
+ *
+ * An Astria chain is technically an EVM chain, but it is useful
+ * to have a mechanism to distinguish between Astria (fka Flame) and
+ * other EVM based chains (Arbitrum, Base, Optimism).
  */
-export type ChainType = "astria" | "cosmos" | "coinbase";
+export type ChainType = "astria" | "cosmos" | "evm";
 
 /**
  * GenericChain is the base chain type that other chain types extend
@@ -117,12 +124,12 @@ function cosmosChainInfoToCosmosKitChain(
  * Converts a map of IBC chains to an array of CosmosChain objects for use with CosmosKit.
  */
 export function cosmosChainInfosToCosmosKitChains(
-  cosmosChains: CosmosChains,
+  cosmosChains: CosmosChainInfo[],
 ): [CosmosKitChain, ...CosmosKitChain[]] {
-  if (!cosmosChains || Object.keys(cosmosChains).length === 0) {
+  if (cosmosChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return Object.values(cosmosChains).map((cosmosChain) =>
+  return cosmosChains.map((cosmosChain) =>
     cosmosChainInfoToCosmosKitChain(cosmosChain),
   ) as [CosmosKitChain, ...CosmosKitChain[]];
 }
@@ -173,9 +180,9 @@ export interface IbcCurrency extends CosmosCurrency {
  * Converts a map of cosmos chains to an array of AssetList objects for use with CosmosKit.
  */
 export function cosmosChainInfosToCosmosKitAssetLists(
-  cosmosChains: CosmosChains,
+  cosmosChains: CosmosChainInfo[],
 ): AssetList[] {
-  return Object.values(cosmosChains).map((chain) => {
+  return cosmosChains.map((chain) => {
     return ibcCurrenciesToCosmosKitAssetList(
       cosmosChainNameFromId(chain.chainId),
       chain.currencies,
@@ -370,30 +377,9 @@ export class EvmCurrency {
 }
 
 /**
- * Represents information about a Flame chain (which is EVM-compatible).
- *
- * TODO - rename to AstriaChainInfo
+ * Represents information about an EVM compatible chain.
  */
 export interface EvmChainInfo extends GenericChain {
-  readonly chainType: "astria";
-  readonly chainId: number;
-  readonly rpcUrls: string[];
-  readonly blockExplorerUrl?: string;
-  readonly contracts: {
-    [label: string]: ChainContract;
-    wrappedNativeToken: ChainContract;
-    swapRouter: ChainContract;
-  };
-  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
-}
-
-/**
- * CoinbaseChain describes a chain on the Base network.
- *
- * NOTE: `BaseChain` was too ambiguous even if technically correct name.
- */
-export interface CoinbaseChain extends GenericChain {
-  readonly chainType: "coinbase";
   readonly chainId: number;
   readonly rpcUrls: string[];
   readonly blockExplorerUrl?: string;
@@ -405,7 +391,7 @@ export interface CoinbaseChain extends GenericChain {
 
 // CoinbaseChains type maps labels to CoinbaseChain objects
 export type CoinbaseChains = {
-  [label: string]: CoinbaseChain;
+  [label: string]: EvmChainInfo;
 };
 
 /**
@@ -448,14 +434,15 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
  * @param evmChains
  */
 export function evmChainsToRainbowKitChains(
-  evmChains: EvmChains,
+  evmChains: EvmChainInfo[],
 ): readonly [Chain, ...Chain[]] {
-  if (!evmChains || Object.keys(evmChains).length === 0) {
+  if (evmChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return Object.values(evmChains).map((evmChain) =>
-    evmChainToRainbowKitChain(evmChain),
-  ) as [Chain, ...Chain[]];
+  return evmChains.map((evmChain) => evmChainToRainbowKitChain(evmChain)) as [
+    Chain,
+    ...Chain[],
+  ];
 }
 
 /**
@@ -469,8 +456,8 @@ export function evmCurrencyBelongsToChain(
 }
 
 // Map of environment labels to their chain configurations
-// EvmChains type maps labels to EvmChainInfo objects
-export type EvmChains = {
+// AstriaChains type maps labels to EvmChainInfo objects
+export type AstriaChains = {
   [label: string]: EvmChainInfo;
 };
 

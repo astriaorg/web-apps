@@ -1,13 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
-import { useConfig, useEvmChainData } from "config";
+import { useConfig, useAstriaChainData } from "config";
 import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 
 export const useGetQuote = () => {
   const { swapQuoteAPIURL } = useConfig();
   const {
     selectedChain: { chainId, contracts: chainContracts },
-  } = useEvmChainData();
+  } = useAstriaChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

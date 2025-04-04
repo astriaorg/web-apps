@@ -6,9 +6,9 @@ export enum BRIDGE_TYPE {
 }
 
 export enum SourceType {
-  Cosmos = "cosmos",
   Astria = "astria",
-  Coinbase = "coinbase",
+  Cosmos = "cosmos",
+  Evm = "evm",
 }
 
 export interface BridgeInfo {
@@ -27,25 +27,25 @@ export const SUPPORTED_BRIDGES: Record<
   ChainType,
   Record<ChainType, BRIDGE_TYPE[]>
 > = {
-  cosmos: {
-    // deposit to astria
-    astria: [BRIDGE_TYPE.IBC],
-    cosmos: [],
-    coinbase: [],
-  },
   astria: {
     astria: [],
     // withdraw to cosmos
     cosmos: [BRIDGE_TYPE.IBC],
     // TODO - withdraw to coinbase
     // coinbase: [BRIDGE_TYPE.INTENT],
-    coinbase: [],
+    evm: [],
   },
-  coinbase: {
+  cosmos: {
+    // deposit to astria
+    astria: [BRIDGE_TYPE.IBC],
+    cosmos: [],
+    evm: [],
+  },
+  evm: {
     // deposit to astria
     astria: [BRIDGE_TYPE.INTENT],
     cosmos: [],
-    coinbase: [],
+    evm: [],
   },
 };
 

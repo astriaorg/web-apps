@@ -8,7 +8,7 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { usePathname } from "next/navigation";
 import { usePoolPositionContext } from "pool/hooks";
 import {
@@ -204,7 +204,7 @@ const TxnLoader = ({
 };
 
 const TxnSuccess = ({ txnHash }: TxnSuccessProps) => {
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
 
   return (
     <div className="flex flex-col items-center justify-center h-full">

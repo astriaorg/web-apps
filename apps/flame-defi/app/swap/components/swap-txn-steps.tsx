@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/components";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { SwapTxnStepsProps, TxnDetailsProps, TxnStepsProps } from "../types";
 
 export function TxnDetails({
@@ -180,7 +180,7 @@ function TxnSuccess({
   isTiaWtia,
   txnHash,
 }: TxnStepsProps) {
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />

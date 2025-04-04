@@ -9,7 +9,7 @@ import {
 import { PowerIcon, UpRightSquareIcon } from "@repo/ui/icons";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useAccount } from "wagmi";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
@@ -21,7 +21,7 @@ export function SingleWalletContent({
   handleClose?: () => void;
 }) {
   //   const [showTransactions, setShowTransactions] = useState(false);
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const {
     disconnectEvmWallet,
     evmNativeTokenBalance,

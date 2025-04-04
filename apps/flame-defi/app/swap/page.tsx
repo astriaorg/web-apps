@@ -10,7 +10,7 @@ import React, {
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { Button } from "@repo/ui/components";
 import {
@@ -28,7 +28,7 @@ import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
 export default function SwapPage(): React.ReactElement {
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { currencies } = selectedChain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);

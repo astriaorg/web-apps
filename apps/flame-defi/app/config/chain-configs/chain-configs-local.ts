@@ -6,12 +6,11 @@ import {
   UsdcIcon,
 } from "@repo/ui/icons";
 import {
-  CoinbaseChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
-  EvmChains,
+  AstriaChains,
   EvmCurrency,
 } from "@repo/flame-types";
 
@@ -273,13 +272,13 @@ const FakeChainInfo: EvmChainInfo = {
   IconComponent: FlameIcon,
 };
 
-export const evmChains: EvmChains = {
-  Flame: FlameChainInfo,
+export const astriaChains: AstriaChains = {
+  "Flame(local)": FlameChainInfo,
   Fake: FakeChainInfo,
 };
 
-const BaseChainInfo: CoinbaseChain = {
-  chainType: "coinbase",
+const BaseChainInfo: EvmChainInfo = {
+  chainType: "evm",
   chainId: 84532,
   chainName: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],

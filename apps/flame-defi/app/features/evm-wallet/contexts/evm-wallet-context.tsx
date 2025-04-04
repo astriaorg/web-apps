@@ -4,7 +4,7 @@ import {
   getFlameChainId,
   getFlameNetworkByChainId,
   useConfig as useAppConfig,
-  useEvmChainData,
+  useAstriaChainData,
 } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 import React, {
@@ -79,8 +79,12 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { evmChains, selectedFlameNetwork, selectFlameNetwork } =
-    useAppConfig();
+  const {
+    astriaChains,
+    coinbaseChains,
+    selectedFlameNetwork,
+    selectFlameNetwork,
+  } = useAppConfig();
   // creating a ref here to use current selectedFlameNetwork value in useEffects without
   // its change triggering the useEffect
   const selectedFlameNetworkRef = useRef(selectedFlameNetwork);
@@ -90,7 +94,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const wagmiConfig = useConfig();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { currencies, contracts } = selectedChain;
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();
   const { formatNumber } = useIntl();
@@ -299,14 +303,14 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
 
   const evmChainsOptions = useMemo(() => {
-    return Object.entries(evmChains).map(
+    return Object.entries({ ...astriaChains, ...coinbaseChains }).map(
       ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
         label: chainLabel,
         value: chain,
         LeftIcon: chain.IconComponent,
       }),
     );
-  }, [evmChains]);
+  }, [astriaChains, coinbaseChains]);
 
   const selectedEvmChainOption = useMemo(() => {
     if (!selectedEvmChain) {
@@ -374,7 +378,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     async (token: EvmCurrency, value: string) => {
       if (
         !wagmiConfig ||
-        !contracts?.swapRouter.address ||
+        !contracts?.swapRouter?.address ||
         !currencies ||
         !selectedChain.chainId ||
         !token?.erc20ContractAddress
@@ -409,7 +413,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     },
     [
       wagmiConfig,
-      contracts?.swapRouter.address,
+      contracts?.swapRouter?.address,
       currencies,
       selectedChain,
       tokenAllowances,
@@ -420,7 +424,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     if (
       !userAccount.address ||
       !wagmiConfig ||
-      !contracts?.swapRouter.address ||
+      !contracts?.swapRouter?.address ||
       !currencies ||
       !selectedChain.chainId
     ) {

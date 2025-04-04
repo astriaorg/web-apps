@@ -53,7 +53,10 @@ export const MobileNavigationMenu = () => {
             <DialogTitle className="sr-only">Flame Apps</DialogTitle>
             <DialogDescription className="sr-only"></DialogDescription>
             <div className="flex flex-col items-center justify-center h-full space-y-8">
-              <MobileNavigationMenuLink href="/" isActive={pathname.startsWith("/")}>
+              <MobileNavigationMenuLink
+                href="/"
+                isActive={pathname.startsWith("/")}
+              >
                 Bridge
               </MobileNavigationMenuLink>
               <MobileNavigationMenuLink

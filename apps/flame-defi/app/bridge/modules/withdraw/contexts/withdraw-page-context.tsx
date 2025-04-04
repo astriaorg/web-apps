@@ -10,7 +10,6 @@ import React, {
 
 import { EditIcon, PlusIcon } from "@repo/ui/icons";
 import { DropdownAdditionalOption } from "components/dropdown";
-import { useCoinbaseWallet } from "features/coinbase-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { createWithdrawerService, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -43,7 +42,6 @@ export interface WithdrawPageContextProps extends PropsWithChildren {
   additionalEvmOptions: DropdownAdditionalOption[];
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
-  coinbaseWallet: ReturnType<typeof useCoinbaseWallet>;
 }
 
 export const WithdrawPageContext = createContext<
@@ -75,7 +73,6 @@ export const WithdrawPageContextProvider = ({
   const cosmosWallet = useCosmosWallet();
   const evmWallet = useEvmWallet();
   const { connectEvmWallet } = evmWallet;
-  const coinbaseWallet = useCoinbaseWallet();
 
   // toggle ability to edit recipient address
   const handleEditRecipientClick = useCallback(() => {
@@ -87,7 +84,9 @@ export const WithdrawPageContextProvider = ({
     setIsRecipientAddressEditable(false);
     // reset wallet states when user manually enters address
     cosmosWallet.resetState();
-    coinbaseWallet.resetState();
+    // TODO - only reset evm wallet state if recipient had previously
+    //  been set from evm wallet connection?
+    evmWallet.resetState();
   };
 
   // clear the manually inputted recipient address
@@ -279,7 +278,6 @@ export const WithdrawPageContextProvider = ({
         isWithdrawDisabled,
         cosmosWallet,
         evmWallet,
-        coinbaseWallet,
         additionalCosmosOptions,
         additionalEvmOptions,
       }}

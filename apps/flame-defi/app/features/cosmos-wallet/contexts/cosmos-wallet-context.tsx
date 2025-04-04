@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SigningStargateClient } from "@cosmjs/stargate";
 import type { DropdownOption } from "components/dropdown";
-import { useConfig, useEvmChainData } from "config";
+import { useConfig, useAstriaChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 
 import {
@@ -56,7 +56,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     useState<IbcCurrency | null>(null);
   const {
     selectedChain: { currencies },
-  } = useEvmChainData();
+  } = useAstriaChainData();
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();
 
   // use first chain as default chain

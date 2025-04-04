@@ -5,7 +5,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import {
   useEvmWallet,
   createTradeFromQuote,
@@ -75,7 +75,7 @@ export function useSwapButton({
   quoteError,
   tradeType,
 }: SwapButtonProps) {
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { approveToken, tokenAllowances } = useEvmWallet();
   const { tokenApprovalAmount, feeRecipient } = useConfig();
   const wagmiConfig = useWagmiConfig();

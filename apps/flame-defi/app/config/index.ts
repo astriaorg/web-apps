@@ -1,7 +1,7 @@
 import type {
   CoinbaseChains,
   CosmosChains,
-  EvmChains,
+  AstriaChains,
   FlameNetwork,
   HexString,
 } from "@repo/flame-types";
@@ -12,8 +12,8 @@ import type {
 export interface AppConfig {
   // The configurations for Cosmos chains.
   cosmosChains: CosmosChains;
-  // The configurations for EVM chains.
-  evmChains: EvmChains;
+  // The configurations for Astria chains.
+  astriaChains: AstriaChains;
   // The configurations for Base chains.
   coinbaseChains: CoinbaseChains;
   // The selected Flame network.
@@ -56,4 +56,4 @@ export {
 } from "./chain-configs";
 export { ConfigContextProvider } from "./contexts/config-context";
 export { getEnvVariable, getOptionalEnvVariable } from "./env";
-export { useConfig, useEvmChainData } from "./hooks/use-config";
+export { useConfig, useAstriaChainData } from "./hooks/use-config";

@@ -1,6 +1,6 @@
 import { useTokenBalances } from "features/evm-wallet";
 import { useAccount } from "wagmi";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useEffect } from "react";
 
 export const useGetPoolTokenBalances = (
@@ -8,7 +8,7 @@ export const useGetPoolTokenBalances = (
   poolTokenTwoSymbol: string,
 ) => {
   const userAccount = useAccount();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { currencies } = selectedChain;
 
   const tokenOne =
