@@ -4,7 +4,7 @@ import { PositionInfoCard } from "../components";
 import { usePoolPositionContext, usePoolContext } from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { Switch } from "@repo/ui/components";
+import { Skeleton, Switch } from "@repo/ui/components";
 
 export const ContentSection = () => {
   const { modalOpen, setModalOpen, txnStatus } = usePoolContext();
@@ -21,6 +21,8 @@ export const ContentSection = () => {
   const poolTokens = reversedPoolTokens
     ? [poolToken1, poolToken0]
     : [poolToken0, poolToken1];
+  const token0 = poolTokens[0] || null;
+  const token1 = poolTokens[1] || null;
 
   return (
     <div className="flex flex-col flex-1 mt-12">
@@ -40,49 +42,46 @@ export const ContentSection = () => {
         </div>
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
+            {/* TODO: Add liquidity value */}
             <PositionInfoCard leftLabel="Liquidity" value="$-" />
-            {poolTokens[0] && poolTokens[1] && (
-              <TokenInfoCard
-                poolToken0={poolTokens[0]}
-                poolToken1={poolTokens[1]}
-                showLiquidity={true}
-                showLiquidityPercentage
-              />
-            )}
+            <TokenInfoCard
+              poolToken0={token0}
+              poolToken1={token1}
+              showLiquidity={true}
+              showLiquidityPercentage
+            />
           </div>
           <div className="flex flex-col gap-2 w-full md:w-2/4">
+            {/* TODO: Add unclaimed fees value */}
             <PositionInfoCard leftLabel="Unclaimed fees" value="$-" />
-            {poolTokens[0] && poolTokens[1] && (
-              <TokenInfoCard
-                poolToken0={poolTokens[0]}
-                poolToken1={poolTokens[1]}
-              />
-            )}
+            <TokenInfoCard poolToken0={token0} poolToken1={token1} />
           </div>
         </div>
         <div className="w-full md:w-2/4">
-          {poolTokens[0] && poolTokens[1] && (
-            <ConfirmationModal
-              open={modalOpen}
-              buttonText={"Collect Fees"}
-              actionButtonText={"Collect"}
-              showOpenButton={true}
-              handleOpenModal={() => setModalOpen(true)}
-              handleModalActionButton={() =>
-                console.log("handle action button")
-              }
-              handleCloseModal={() => setModalOpen(false)}
-              title={"Claim Fees"}
-            >
-              <PoolTxnSteps
-                txnStatus={txnStatus}
-                poolTokens={[poolTokens[0], poolTokens[1]]}
-                txnHash={"0x"}
-                txnMsg={""}
-                addLiquidityInputValues={null}
-              />
-            </ConfirmationModal>
-          )}
+          <Skeleton className="w-full h-[40px]" isLoading={!token0 || !token1}>
+            {token0 && token1 && (
+              <ConfirmationModal
+                open={modalOpen}
+                buttonText={"Collect Fees"}
+                actionButtonText={"Collect"}
+                showOpenButton={true}
+                handleOpenModal={() => setModalOpen(true)}
+                handleModalActionButton={() =>
+                  console.log("handle action button")
+                }
+                handleCloseModal={() => setModalOpen(false)}
+                title={"Claim Fees"}
+              >
+                <PoolTxnSteps
+                  txnStatus={txnStatus}
+                  poolTokens={[token0, token1]}
+                  txnHash={"0x"}
+                  txnMsg={""}
+                  addLiquidityInputValues={null}
+                />
+              </ConfirmationModal>
+            )}
+          </Skeleton>
         </div>
       </div>
     </div>

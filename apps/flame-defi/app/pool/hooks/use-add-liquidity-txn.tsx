@@ -76,7 +76,6 @@ export const useAddLiquidityTxn = (inputOne: string, inputTwo: string) => {
 
     if (!orderedTokenAmounts) {
       console.warn("Invalid token amounts");
-      setErrorText("Invalid token amounts");
       return;
     }
 
@@ -90,16 +89,16 @@ export const useAddLiquidityTxn = (inputOne: string, inputTwo: string) => {
       );
 
       if (poolToken0.token.isNative && !reverseTokenOrder) {
-        // If token0 is native and not reversed
+        // If token0 is native and token order is not reversed
         value = orderedTokenAmounts.amount0Desired;
       } else if (poolToken1.token.isNative && reverseTokenOrder) {
-        // If token0 is native after reversing
+        // If token1 is native and token order is reversed
         value = orderedTokenAmounts.amount0Desired;
       } else if (poolToken1.token.isNative && !reverseTokenOrder) {
-        // If token1 is native and not reversed
+        // If token1 is native and token order is not reversed
         value = orderedTokenAmounts.amount1Desired;
       } else if (poolToken0.token.isNative && reverseTokenOrder) {
-        // If token1 is native after reversing
+        // If token0 is native and token order is reversed
         value = orderedTokenAmounts.amount1Desired;
       }
 
@@ -125,7 +124,6 @@ export const useAddLiquidityTxn = (inputOne: string, inputTwo: string) => {
         console.warn(error);
         setErrorText("User rejected transaction");
         setTxnStatus(TXN_STATUS.FAILED);
-        return null;
       } else {
         console.warn(error);
         setErrorText("Error increasing liquidity");
