@@ -6,6 +6,7 @@ import {
   formatNumberAsPercent,
   isDustAmount,
   removeNonNumeric,
+  numberToBigInt,
 } from "./number-helpers";
 
 describe("formatAbbreviatedNumber", () => {
@@ -178,5 +179,33 @@ describe("removeNonNumeric", () => {
 
   it("should return empty string for non-numeric input", () => {
     expect(removeNonNumeric("abc")).toBe("");
+  });
+});
+
+describe("numberToBigInt", () => {
+  it("should convert number to bigint with default decimals", () => {
+    expect(numberToBigInt(123.456, 18)).toBe(123456000000000000000n);
+  });
+
+  it("should handle zero correctly", () => {
+    expect(numberToBigInt(0, 18)).toBe(0n);
+  });
+
+  it("should handle different decimal values", () => {
+    expect(numberToBigInt(123.456, 6)).toBe(123456000n);
+    expect(numberToBigInt(123.456, 0)).toBe(123n);
+  });
+
+  it("should round correctly", () => {
+    expect(numberToBigInt(123.4567, 2)).toBe(12346n);
+    expect(numberToBigInt(123.4543, 2)).toBe(12345n);
+  });
+
+  it("should handle very small numbers", () => {
+    expect(numberToBigInt(0.000123, 6)).toBe(123n);
+  });
+
+  it("should handle very large numbers", () => {
+    expect(numberToBigInt(1234567.89, 2)).toBe(123456789n);
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { PoolToken } from "pool/types";
+import { PoolPositionResponse, PoolToken } from "pool/types";
 import { useParams } from "next/navigation";
 import { PoolPositionContextProps } from "pool/types";
 import {
@@ -49,32 +49,40 @@ export const PoolPositionContextProvider = ({
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [invertedPrice, setInvertedPrice] = useState<boolean>(false);
+  const [reversedPoolTokens, setReversedPoolTokens] = useState<boolean>(false);
   const [symbols, setSymbols] = useState<string[]>([]);
   const [poolTokens, setPoolTokens] = useState<PoolToken[] | []>([]);
+  const [poolPosition, setPoolPosition] = useState<PoolPositionResponse | null>(
+    null,
+  );
   const [feeTier, setFeeTier] = useState<string>("");
-
-  const poolTokenOne = poolTokens[0] || null;
-  const poolTokenTwo = poolTokens[1] || null;
+  const [rawFeeTier, setRawFeeTier] = useState<number>(0);
+  const [positionClosed, setPositionClosed] = useState<boolean>(false);
+  const poolToken0 = poolTokens[0] || null;
+  const poolToken1 = poolTokens[1] || null;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
 
   const handleReverseTokenData = (symbol: string) => {
-    const reversedTokenData = [...poolTokens].reverse();
-    setPoolTokens(reversedTokenData);
     setSelectedSymbol(symbol);
     setInvertedPrice(!invertedPrice);
+    setReversedPoolTokens(!reversedPoolTokens);
   };
   const nonFungiblePositionService = createNonFungiblePositionService(
     wagmiConfig,
     selectedChain.contracts.nonfungiblePositionManager.address,
   );
 
-  const getPoolTokens = async () => {
+  const getPoolTokens = useCallback(async () => {
     try {
       const position = await nonFungiblePositionService.positions(
         selectedChain.chainId,
         tokenId,
       );
+      const positionIsClosed = position.liquidity === 0n;
+      setPositionClosed(positionIsClosed);
+      setPoolPosition(position);
+
       const token0 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
@@ -132,9 +140,17 @@ export const PoolPositionContextProvider = ({
     } catch (error) {
       console.error("Error fetching pool tokens:", error);
     }
-  };
+  }, [
+    currencies,
+    nonFungiblePositionService,
+    selectedChain.chainId,
+    selectedChain.contracts.poolFactory.address,
+    selectedChain.contracts.wrappedNativeToken.address,
+    tokenId,
+    wagmiConfig,
+  ]);
 
-  const getFeeTier = async () => {
+  const getFeeTier = useCallback(async () => {
     const position = await nonFungiblePositionService.positions(
       selectedChain.chainId,
       tokenId,
@@ -144,7 +160,13 @@ export const PoolPositionContextProvider = ({
       maximumFractionDigits: 2,
     });
     setFeeTier(feeTier);
-  };
+    setRawFeeTier(position.fee);
+  }, [
+    formatNumber,
+    nonFungiblePositionService,
+    selectedChain.chainId,
+    tokenId,
+  ]);
 
   const getPriceRange = useCallback(async () => {
     if (!address) {
@@ -228,10 +250,17 @@ export const PoolPositionContextProvider = ({
     invertedPrice,
   ]);
 
-  if (poolTokens.length === 0) {
+  useEffect(() => {
+    if (poolTokens.length === 0) {
+      getPoolTokens();
+      getFeeTier();
+    }
+  }, [poolTokens.length, getPoolTokens, getFeeTier]);
+
+  const refreshPoolPosition = useCallback(() => {
     getPoolTokens();
     getFeeTier();
-  }
+  }, [getPoolTokens, getFeeTier]);
 
   useEffect(() => {
     getPriceRange();
@@ -268,16 +297,21 @@ export const PoolPositionContextProvider = ({
     <PoolPositionContext.Provider
       value={{
         feeTier,
+        rawFeeTier,
         symbols,
         selectedSymbol,
         handleReverseTokenData,
         collectAsNative,
         handleCollectAsNative,
-        poolTokenOne,
-        poolTokenTwo,
+        poolToken0,
+        poolToken1,
         currentPrice,
         minPrice,
         maxPrice,
+        poolPosition,
+        reversedPoolTokens,
+        positionClosed,
+        refreshPoolPosition,
       }}
     >
       {children}

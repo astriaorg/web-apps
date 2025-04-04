@@ -35,14 +35,14 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const tokenApprovalAmount =
     "115792089237316195423570985008687907853269984665640564039457";
 
-  const swapSlippageToleranceDefault = 0.1;
+  const defaultSlippageTolerance = 0.1;
 
   const currentSettings = getFromLocalStorage("settings") || {};
 
   if (!currentSettings.slippageTolerance) {
     setInLocalStorage("settings", {
       ...currentSettings,
-      slippageTolerance: swapSlippageToleranceDefault,
+      slippageTolerance: defaultSlippageTolerance,
     });
   }
 
@@ -102,7 +102,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         swapQuoteAPIURL,
         networksList,
         tokenApprovalAmount,
-        swapSlippageToleranceDefault,
+        defaultSlippageTolerance,
         featureFlags: {
           earnEnabled,
           poolEnabled,

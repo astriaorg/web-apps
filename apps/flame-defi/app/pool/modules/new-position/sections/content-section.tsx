@@ -33,6 +33,22 @@ export const ContentSection = () => {
     isQuoteValue: true,
   });
 
+  // TODO: Finishing this in my next PR
+  // const { getMultiTokenNeedingApproval } = useEvmWallet();
+  // const tokenNeedingApproval = getMultiTokenNeedingApproval(
+  //   tokenOne,
+  //   tokenTwo,
+  //   inputOne,
+  //   inputTwo
+  // );
+
+  // const { handleTokenApproval } = useTokenApproval({
+  //   tokenNeedingApproval,
+  //   setTxnStatus,
+  //   setTxnHash,
+  //   setErrorText,
+  // });
+
   const feeTier = selectedFeeTier.feeTier / 1_000_000;
 
   return (
@@ -94,7 +110,7 @@ export const ContentSection = () => {
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 2,
               })}
-              txnHash={""}
+              txnHash={"0x"}
               txnMsg={""}
             />
           )}

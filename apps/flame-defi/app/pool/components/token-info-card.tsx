@@ -4,14 +4,14 @@ import { PoolToken } from "pool/types";
 import { useIntl } from "react-intl";
 
 export function TokenInfoCard({
-  poolTokenOne,
-  poolTokenTwo,
+  poolToken0,
+  poolToken1,
   showLiquidity = false,
   showLiquidityPercentage = false,
   className,
 }: {
-  poolTokenOne: PoolToken | null;
-  poolTokenTwo: PoolToken | null;
+  poolToken0: PoolToken | null;
+  poolToken1: PoolToken | null;
   showLiquidity?: boolean;
   showLiquidityPercentage?: boolean;
   className?: string;
@@ -23,12 +23,12 @@ export function TokenInfoCard({
       <div className="flex flex-col space-y-4">
         <Skeleton
           className="w-full h-[64px]"
-          isLoading={!poolTokenOne || !poolTokenTwo}
+          isLoading={!poolToken0 || !poolToken1}
         >
           <div className="flex flex-col gap-4">
-            {poolTokenOne &&
-              poolTokenTwo &&
-              [poolTokenOne, poolTokenTwo].map(
+            {poolToken0 &&
+              poolToken1 &&
+              [poolToken0, poolToken1].map(
                 (
                   { token, liquidity, unclaimedFees, liquidityPercentage },
                   index,
