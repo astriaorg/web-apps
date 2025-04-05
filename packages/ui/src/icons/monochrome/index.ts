@@ -2,6 +2,7 @@ export * from "./arrow-down-icon";
 export * from "./arrow-left-icon";
 export * from "./arrow-right-icon";
 export * from "./arrow-up-down-icon";
+export * from "./check-icon";
 export * from "./check-mark-icon";
 export * from "./chevron-down-icon";
 export * from "./chevron-down-small-icon";

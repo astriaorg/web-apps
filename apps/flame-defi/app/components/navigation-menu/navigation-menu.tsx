@@ -5,9 +5,9 @@ import ConnectWalletsButton from "components/connect-wallets-button/connect-wall
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
-import NetworkSelector from "../network-selector/network-selector";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
+import { NetworkSelect } from "./network-select";
 
 export const NavigationMenu = () => {
   const pathname = usePathname();
@@ -66,7 +66,7 @@ export const NavigationMenu = () => {
         </div>
       </div>
       <div className="hidden lg:flex gap-6 items-center">
-        <NetworkSelector />
+        <NetworkSelect />
         <ConnectWalletsButton />
       </div>
       <MobileNavigationMenu />
