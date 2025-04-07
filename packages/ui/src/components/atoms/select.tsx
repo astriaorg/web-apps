@@ -22,7 +22,7 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       buttonVariants({ variant: "secondary", size: "sm" }),
-      "flex w-full items-center justify-between whitespace-nowrap placeholder:text-muted-foreground rounded-md [&[data-state=open]>svg]:rotate-180",
+      "flex w-full items-center justify-between whitespace-nowrap placeholder:text-muted-foreground [&[data-state=open]>svg]:rotate-180",
       className,
     )}
     {...props}

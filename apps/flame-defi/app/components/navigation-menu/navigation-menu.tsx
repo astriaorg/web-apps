@@ -1,10 +1,10 @@
 "use client";
 
 import { FlameIcon } from "@repo/ui/icons";
-import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
+import { ConnectWalletButton } from "./connect-wallet-button";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
 import { NetworkSelect } from "./network-select";
@@ -65,9 +65,9 @@ export const NavigationMenu = () => {
           )}
         </div>
       </div>
-      <div className="hidden lg:flex gap-6 items-center">
+      <div className="hidden lg:flex gap-2 items-center">
         <NetworkSelect />
-        <ConnectWalletsButton />
+        <ConnectWalletButton />
       </div>
       <MobileNavigationMenu />
     </nav>
