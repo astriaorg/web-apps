@@ -297,6 +297,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -307,6 +308,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "wtia",
       coinDecimals: 18,
       erc20ContractAddress: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",
+      isNative: false,
       isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: WrappedTiaIcon,
@@ -317,6 +319,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: NobleIcon,
@@ -328,6 +331,7 @@ const FlameChainInfo: EvmChainInfo = {
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 18,
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: DropTiaIcon,
@@ -348,6 +352,17 @@ const BaseChainInfo: EvmChainInfo = {
   blockExplorerUrl: "https://sepolia.basescan.org",
   contracts: {},
   currencies: [
+    // NOTE - this is really only here to satisfy the config needed
+    //  for wagmi and rainbowkit providers. it's not used atm.
+    new EvmCurrency({
+      title: "Ether",
+      coinDenom: "ETH",
+      // is gwei correct?
+      coinMinimalDenom: "gwei",
+      coinDecimals: 18,
+      isNative: true,
+      isWrappedNative: false,
+    }),
     new EvmCurrency({
       coinDenom: "USDC",
       title: "USDC",
@@ -355,6 +370,7 @@ const BaseChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
       astriaIntentBridgeAddress: "0x",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: UsdcIcon,

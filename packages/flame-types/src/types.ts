@@ -293,7 +293,10 @@ export class EvmCurrency {
   /** Contract address for intent bridge **/
   public readonly astriaIntentBridgeAddress?: HexString;
 
-  /** True if this is a wrapped native token (e.g., wTIA) */
+  /** True if this is the native token (e.g., wTIA) */
+  public readonly isNative: boolean;
+
+  /** True if this is a wrapped native token (e.g., TIA) */
   public readonly isWrappedNative: boolean;
 
   /** Component to render the token's icon */
@@ -312,6 +315,7 @@ export class EvmCurrency {
     nativeTokenWithdrawerContractAddress?: HexString;
     astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
+    isNative: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {
     this.title = params.title;
@@ -324,18 +328,8 @@ export class EvmCurrency {
       params.nativeTokenWithdrawerContractAddress;
     this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
+    this.isNative = params.isNative;
     this.IconComponent = params.IconComponent;
-  }
-
-  /**
-   * Determines if this currency is a native token (e.g., TIA, ETH)
-   * @returns true if this is a native token, false if it's an ERC-20 token
-   */
-  public get isNative(): boolean {
-    return (
-      this.nativeTokenWithdrawerContractAddress !== undefined &&
-      !this.erc20ContractAddress
-    );
   }
 
   /**
@@ -399,7 +393,12 @@ export type CoinbaseChains = {
  * @param evmChain
  */
 export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
-  const nativeCurrency = evmChain.currencies[0];
+  const nativeCurrency = evmChain.currencies.find(
+    (currency) => currency.isNative,
+  );
+  if (!nativeCurrency) {
+    throw new Error("EVM chain must define native currency.");
+  }
   const chain: Chain = {
     id: evmChain.chainId,
     name: evmChain.chainName,
@@ -407,7 +406,7 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
       default: { http: evmChain.rpcUrls },
     },
     nativeCurrency: {
-      name: nativeCurrency.coinDenom,
+      name: nativeCurrency.title,
       symbol: nativeCurrency.coinDenom,
       decimals: nativeCurrency.coinDecimals,
     },

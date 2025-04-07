@@ -214,6 +214,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -225,6 +226,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -252,6 +254,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -264,6 +267,7 @@ const FakeChainInfo: EvmChainInfo = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: FlameIcon,
@@ -285,6 +289,17 @@ const BaseChainInfo: EvmChainInfo = {
   blockExplorerUrl: "https://sepolia.basescan.org",
   contracts: {},
   currencies: [
+    // NOTE - this is really only here to satisfy the config needed
+    //  for wagmi and rainbowkit providers. it's not used atm.
+    new EvmCurrency({
+      title: "Ether",
+      coinDenom: "ETH",
+      // is gwei correct?
+      coinMinimalDenom: "gwei",
+      coinDecimals: 18,
+      isNative: true,
+      isWrappedNative: false,
+    }),
     new EvmCurrency({
       coinDenom: "USDC",
       title: "USDC",
@@ -292,6 +307,7 @@ const BaseChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
       astriaIntentBridgeAddress: "0x",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: UsdcIcon,
