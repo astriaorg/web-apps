@@ -18,7 +18,7 @@ import { useAccount } from "wagmi";
 /**
  * Button with dropdown to connect to multiple wallets.
  */
-export const ConnectWalletButton = () => {
+export const ConnectWalletsButton = () => {
   const pathname = usePathname();
   const { cosmosAccountAddress } = useCosmosWallet();
   const userAccount = useAccount();
@@ -35,15 +35,11 @@ export const ConnectWalletButton = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="flex flex-col mr-4 gap-3 p-6 bg-surface-1"
+            className="hidden flex-col w-min mr-4 p-3 gap-1 w-48 lg:flex"
             side="bottom"
           >
-            <div className="hover:text-orange-soft transition">
-              <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
-            </div>
-            <div className="hover:text-orange-soft transition">
-              <ConnectCosmosWalletButton labelBeforeConnected="Connect to Cosmos wallet" />
-            </div>
+            <ConnectEvmWalletButton labelBeforeConnected="Flame Wallet" />
+            <ConnectCosmosWalletButton labelBeforeConnected="Cosmos Wallet" />
           </PopoverContent>
         </Popover>
       ) : (
