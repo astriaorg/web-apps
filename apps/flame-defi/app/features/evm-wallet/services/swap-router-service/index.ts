@@ -272,7 +272,6 @@ export class SwapRouterService extends GenericContractService {
     }
 
     // add swap
-    console.log("encoding swap", swapParams);
     calls.push(this.encodeSwapCall(swapParams.functionName, swapParams.args));
 
     // add unwrap WETH or sweepTokenWithFee if needed
@@ -302,7 +301,6 @@ export class SwapRouterService extends GenericContractService {
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
 
-      console.log("pushing encodeSweepTokenWithFeeCall");
       calls.push(
         this.encodeSweepTokenWithFeeCall(
           tokenOut,
