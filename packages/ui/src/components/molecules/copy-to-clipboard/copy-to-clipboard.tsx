@@ -27,35 +27,12 @@ export const CopyToClipboard = ({
     navigator.clipboard.writeText(value);
   }, [value]);
 
-  // TODO: Call existing events, if any, before we overwrite.
-  // TODO: Fix janky animations on hovering over the border of the trigger.
-  const children = useMemo(() => {
-    return React.cloneElement(props.children as React.ReactElement, {
-      onClick: () => {
-        onCopy();
-        setHasCopied(true);
-        setIsOpen(true);
-
-        setTimeout(() => setIsOpen(false), 2500);
-      },
-      onMouseEnter: () => {
-        setHasCopied(false);
-        setIsOpen(true);
-      },
-      onMouseLeave: () => setIsOpen(false),
-    });
-  }, [onCopy, props.children]);
-
   const tooltipContent = useMemo(() => {
     if (hasCopied) {
       return <span className="text-success">Copied!</span>;
     }
-    return content;
+    return content ?? "Copy";
   }, [hasCopied, content]);
-
-  if (!content) {
-    return children;
-  }
 
   return (
     <div
@@ -68,7 +45,24 @@ export const CopyToClipboard = ({
       <TooltipProvider>
         <Tooltip open={isOpen} onOpenChange={setIsOpen}>
           <TooltipTrigger asChild onClick={() => setIsOpen(true)}>
-            {children}
+            <div
+              onClick={() => {
+                onCopy();
+                setHasCopied(true);
+                setIsOpen(true);
+                setTimeout(() => {
+                  setIsOpen(false);
+                }, 2500);
+              }}
+              onMouseEnter={() => {
+                setIsOpen(true);
+              }}
+              onMouseLeave={() => {
+                setHasCopied(false);
+              }}
+            >
+              {props.children}
+            </div>
           </TooltipTrigger>
           <TooltipContent side={side || "top"}>{tooltipContent}</TooltipContent>
         </Tooltip>
