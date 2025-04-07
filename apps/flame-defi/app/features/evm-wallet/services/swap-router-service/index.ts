@@ -47,9 +47,14 @@ export class SwapRouterService extends GenericContractService {
   ): {
     functionName: "exactInputSingle" | "exactInput";
     args: readonly [ExactInputSingleParams] | readonly [ExactInputParams];
+    isRequiresMulticall: boolean;
   } {
     const isMultiHop = trade.route.pools.length > 1;
     const recipient = this.determineRecipient(options);
+
+    const isRequiresMulticall = Boolean(
+      options.isNativeIn || options.isNativeOut || options.feeRecipient,
+    );
 
     if (isMultiHop) {
       return {
@@ -67,6 +72,7 @@ export class SwapRouterService extends GenericContractService {
             deadline,
           },
         ],
+        isRequiresMulticall,
       };
     }
 
@@ -96,6 +102,7 @@ export class SwapRouterService extends GenericContractService {
           deadline,
         },
       ],
+      isRequiresMulticall,
     };
   }
 
@@ -107,9 +114,14 @@ export class SwapRouterService extends GenericContractService {
   ): {
     functionName: "exactOutputSingle" | "exactOutput";
     args: readonly [ExactOutputSingleParams] | readonly [ExactOutputParams];
+    isRequiresMulticall: boolean;
   } {
     const isMultiHop = trade.route.pools.length > 1;
     const recipient = this.determineRecipient(options);
+
+    const isRequiresMulticall = Boolean(
+      options.isNativeIn || options.isNativeOut || options.feeRecipient,
+    );
 
     if (isMultiHop) {
       return {
@@ -127,6 +139,7 @@ export class SwapRouterService extends GenericContractService {
             deadline,
           },
         ],
+        isRequiresMulticall,
       };
     }
 
@@ -156,6 +169,7 @@ export class SwapRouterService extends GenericContractService {
           deadline,
         },
       ],
+      isRequiresMulticall,
     };
   }
 
@@ -232,8 +246,8 @@ export class SwapRouterService extends GenericContractService {
           );
 
     // For simple erc20 token swaps with no fee recipient, we can use direct contract call
-    // Otherwise, we need to use multicall to handle fees
-    if (!options.isNativeIn && !options.isNativeOut && !options.feeRecipient) {
+    // Otherwise, we need to use multicall to handle fees or token wraps/unwraps
+    if (!swapParams.isRequiresMulticall) {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
