@@ -231,8 +231,9 @@ export class SwapRouterService extends GenericContractService {
             options.deadline,
           );
 
-    // for simple erc20 token swaps
-    if (!options.isNativeIn && !options.isNativeOut) {
+    // For simple erc20 token swaps with no fee recipient, we can use direct contract call
+    // Otherwise, we need to use multicall to handle fees
+    if (!options.isNativeIn && !options.isNativeOut && !options.feeRecipient) {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
@@ -271,6 +272,7 @@ export class SwapRouterService extends GenericContractService {
     }
 
     // add swap
+    console.log("encoding swap", swapParams);
     calls.push(this.encodeSwapCall(swapParams.functionName, swapParams.args));
 
     // add unwrap WETH or sweepTokenWithFee if needed
@@ -300,6 +302,7 @@ export class SwapRouterService extends GenericContractService {
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
 
+      console.log("pushing encodeSweepTokenWithFeeCall");
       calls.push(
         this.encodeSweepTokenWithFeeCall(
           tokenOut,
