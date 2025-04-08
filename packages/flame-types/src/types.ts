@@ -383,6 +383,39 @@ export interface EvmChainInfo extends GenericChain {
   readonly currencies: [EvmCurrency, ...EvmCurrency[]];
 }
 
+/**
+ * Represents an Astria (fka Flame) chain. This is just an evm
+ * chain with specific contracts guaranteed to be defined.
+ */
+export interface AstriaChain extends EvmChainInfo {
+  contracts: {
+    [label: string]: ChainContract;
+    wrappedNativeToken: ChainContract;
+    swapRouter: ChainContract;
+    nonfungiblePositionManager: ChainContract;
+    poolFactory: ChainContract;
+    poolContract: ChainContract;
+  };
+}
+
+export function isPoolEvmChain(chain: EvmChainInfo): chain is AstriaChain {
+  return (
+    !!chain.contracts?.wrappedNativeToken &&
+    !!chain.contracts?.swapRouter &&
+    !!chain.contracts?.nonfungiblePositionManager &&
+    !!chain.contracts?.poolFactory &&
+    !!chain.contracts?.poolContract
+  );
+}
+
+export function assertPoolEvmChain(
+  chain: EvmChainInfo,
+): asserts chain is AstriaChain {
+  if (!isPoolEvmChain(chain)) {
+    throw new Error("Chain is missing required contracts for pool operations");
+  }
+}
+
 // CoinbaseChains type maps labels to CoinbaseChain objects
 export type CoinbaseChains = {
   [label: string]: EvmChainInfo;
@@ -455,9 +488,9 @@ export function evmCurrencyBelongsToChain(
 }
 
 // Map of environment labels to their chain configurations
-// AstriaChains type maps labels to EvmChainInfo objects
+// AstriaChains type maps labels to AstriaChain objects
 export type AstriaChains = {
-  [label: string]: EvmChainInfo;
+  [label: string]: AstriaChain;
 };
 
 // TODO - consolidate with `TokenAmount` type
