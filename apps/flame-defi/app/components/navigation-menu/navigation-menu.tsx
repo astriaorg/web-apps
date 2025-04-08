@@ -31,7 +31,7 @@ export const NavigationMenu = () => {
         </a>
         <div className="items-center space-x-8 hidden lg:flex">
           <NavigationMenuLink
-            href="/"
+            href={LINKS.BRIDGE}
             isActive={pathname.startsWith(LINKS.BRIDGE)}
           >
             Bridge
