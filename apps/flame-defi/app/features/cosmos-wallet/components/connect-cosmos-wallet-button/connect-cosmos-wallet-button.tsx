@@ -11,9 +11,9 @@ interface ConnectCosmosWalletButtonProps {
 /**
  * Button with information dropdown to connect to a Cosmos wallet.
  */
-export default function ConnectCosmosWalletButton({
+export const ConnectCosmosWalletButton = ({
   onDisconnectWallet,
-}: ConnectCosmosWalletButtonProps) {
+}: ConnectCosmosWalletButtonProps) => {
   const {
     connectCosmosWallet,
     cosmosAccountAddress,
@@ -68,4 +68,4 @@ export default function ConnectCosmosWalletButton({
       }}
     />
   );
-}
+};

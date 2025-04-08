@@ -1,8 +1,5 @@
 import AddErc20ToWalletButton from "./components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
-import ConnectEvmWalletButton from "./components/connect-evm-wallet-button/connect-evm-wallet-button";
-import SingleWalletConnect, {
-  SingleWalletContent,
-} from "./components/single-wallet-connect/single-wallet-connect";
+import { ConnectEvmWalletButton } from "./components/connect-evm-wallet-button";
 import { EvmWalletProvider } from "./contexts/evm-wallet-context";
 import { useEvmWallet } from "./hooks/use-evm-wallet";
 import { useTokenBalances } from "./hooks/use-token-balances";
@@ -21,8 +18,6 @@ export {
   AddErc20ToWalletButton,
   ConnectEvmWalletButton,
   EvmWalletProvider,
-  SingleWalletConnect,
-  SingleWalletContent,
   SwapRouterService,
   createNonFungiblePositionService,
   createPoolFactoryService,

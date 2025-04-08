@@ -13,9 +13,9 @@ interface ConnectEvmWalletButtonProps {
 /**
  * Button with information dropdown to connect to an EVM wallet.
  */
-export default function ConnectEvmWalletButton({
+export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
-}: ConnectEvmWalletButtonProps) {
+}: ConnectEvmWalletButtonProps) => {
   const { selectedChain } = useEvmChainData();
   const {
     connectEvmWallet,
@@ -59,4 +59,4 @@ export default function ConnectEvmWalletButton({
       }}
     />
   );
-}
+};
