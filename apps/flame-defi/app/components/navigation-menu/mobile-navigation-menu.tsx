@@ -60,10 +60,6 @@ export const MobileNavigationMenu = () => {
   const isConnected = account.address || cosmosAccountAddress;
   const isSingleConnectWallet = pathname !== "/";
 
-  const handleClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
-
   const handleNetworkSelect = useCallback(
     (network: FlameNetwork) => {
       selectFlameNetwork(network);
