@@ -1,4 +1,7 @@
-import { ConnectWalletButton } from "@repo/ui/components";
+import {
+  ConnectMultipleWalletButton,
+  ConnectWalletContent,
+} from "@repo/ui/components";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
@@ -38,9 +41,8 @@ export default function ConnectEvmWalletButton({
     return labelBeforeConnected ?? "Connect";
   }, [labelBeforeConnected, userAccount?.address]);
 
-  return (
-    <ConnectWalletButton
-      isConnected={!!userAccount.address}
+  return userAccount.address ? (
+    <ConnectWalletContent
       isLoading={
         (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
         quoteLoading
@@ -53,8 +55,14 @@ export default function ConnectEvmWalletButton({
       }}
       label={label}
       icon={<FlameIcon />}
-      onConnectWallet={connectEvmWallet}
       onDisconnectWallet={disconnectEvmWallet}
+      collapsible
+    />
+  ) : (
+    <ConnectMultipleWalletButton
+      label={label}
+      icon={<FlameIcon />}
+      onConnectWallet={connectEvmWallet}
     />
   );
 }

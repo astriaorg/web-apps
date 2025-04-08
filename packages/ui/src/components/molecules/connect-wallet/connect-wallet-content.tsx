@@ -1,18 +1,18 @@
+import type { AccordionSingleProps } from "@radix-ui/react-accordion";
 import { FormattedNumber } from "react-intl";
 import { CopyIcon, PowerIcon, ShareRightIcon } from "../../../icons";
+import { cn } from "../../../utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../../atoms/accordion";
-import { type ButtonProps } from "../../atoms/button";
 import { Skeleton } from "../../atoms/skeleton";
 import { CopyToClipboard } from "../copy-to-clipboard";
 
-interface ConnectWalletButtonProps extends ButtonProps {
+interface ConnectWalletContentProps extends Omit<AccordionSingleProps, "type"> {
   label: React.ReactNode;
-  isConnected: boolean;
   isLoading: boolean;
   account?: {
     address?: string;
@@ -33,23 +33,28 @@ interface ConnectWalletButtonProps extends ButtonProps {
   onDisconnectWallet: () => void;
 }
 
-export const ConnectWalletButton = ({
+export const ConnectWalletContent = ({
   account,
   balance,
   explorer,
   fiat,
   icon,
-  isConnected,
   isLoading,
   label,
-  onConnectWallet,
   onDisconnectWallet,
-}: ConnectWalletButtonProps) => {
-  return isConnected ? (
-    <Accordion type="single" collapsible>
+  ...props
+}: ConnectWalletContentProps) => {
+  return (
+    <Accordion type="single" {...props}>
       <AccordionItem value="wallet">
         <div className="flex items-center justify-between w-full md:w-[300px]">
-          <AccordionTrigger className="p-2 text-typography-subdued font-medium [&_svg]:size-4">
+          <AccordionTrigger
+            className={cn(
+              "p-2 text-typography-subdued font-medium",
+              // Hide the caret icon if the wallet is not collapsible, in the case of single wallets.
+              !props.collapsible && "[&>svg]:hidden",
+            )}
+          >
             <div className="flex items-center gap-2 mr-2 [&_svg]:size-6">
               {icon}
               <span>{label}</span>
@@ -114,13 +119,5 @@ export const ConnectWalletButton = ({
         </AccordionContent>
       </AccordionItem>
     </Accordion>
-  ) : (
-    <button
-      className="flex items-center justify-start gap-2 p-2 rounded-lg text-sm text-typography-subdued font-medium hover:bg-surface-3 hover:text-typography-default [&_svg]:size-6"
-      onClick={onConnectWallet}
-    >
-      {icon}
-      {label}
-    </button>
   );
 };
