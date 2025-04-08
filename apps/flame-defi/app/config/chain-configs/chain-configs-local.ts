@@ -207,6 +207,16 @@ const FlameChainInfo: EvmChainInfo = {
       address: "0x",
       blockCreated: 42069,
     },
+    // TODO - add these addresses
+    poolFactory: {
+      address: "0x",
+    },
+    poolContract: {
+      address: "0x",
+    },
+    nonfungiblePositionManager: {
+      address: "0x",
+    },
   },
   currencies: [
     new EvmCurrency({
@@ -245,6 +255,16 @@ const FakeChainInfo: EvmChainInfo = {
       address: "0x",
     },
     swapRouter: {
+      address: "0x",
+    },
+    // TODO - add these addresses
+    poolFactory: {
+      address: "0x",
+    },
+    poolContract: {
+      address: "0x",
+    },
+    nonfungiblePositionManager: {
       address: "0x",
     },
   },

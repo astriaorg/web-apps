@@ -356,6 +356,18 @@ const FlameChainInfo: EvmChainInfo = {
     swapRouter: {
       address: "0x29bBaFf21695fA41e446c4f37c07C699d9f08021",
     },
+    // from https://explorer.flame.astria.org/address/0xE1EE203f374EE6CA6B72420844796c7acDf16A8b?tab=contract
+    poolFactory: {
+      address: "0xE1EE203f374EE6CA6B72420844796c7acDf16A8b",
+    },
+    // from https://explorer.flame.astria.org/address/0x0aDe7a8790D8537C620001F4A0DCb5CCF404a684?tab=contract
+    poolContract: {
+      address: "0x0aDe7a8790D8537C620001F4A0DCb5CCF404a684",
+    },
+    // from https://explorer.flame.astria.org/token/0x1dAfd262A228571125f36f1a1333389dB0444edA?tab=contract
+    nonfungiblePositionManager: {
+      address: "0x1dAfd262A228571125f36f1a1333389dB0444edA",
+    },
   },
   currencies: [
     new EvmCurrency({

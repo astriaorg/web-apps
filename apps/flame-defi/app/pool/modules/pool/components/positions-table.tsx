@@ -16,9 +16,11 @@ import {
 import { usePositionsTable } from "pool/hooks";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "pool/constants/routes";
+import { usePoolContext } from "pool/hooks";
 
 export const PositionsTable = () => {
   const router = useRouter();
+  const { poolPositionsLoading } = usePoolContext();
   const { tableData, columns, hideClosedPositions, setHideClosedPositions } =
     usePositionsTable();
   const table = useReactTable({
@@ -65,7 +67,7 @@ export const PositionsTable = () => {
           <TableRow
             key={row.id}
             className="group cursor-pointer"
-            onClick={() => router.push(`${ROUTES.POOL}${row.id}`)}
+            onClick={() => router.push(`${ROUTES.POOL}${row.original.tokenId}`)}
           >
             {row.getVisibleCells().map((cell) => (
               <TableCell
@@ -74,10 +76,10 @@ export const PositionsTable = () => {
                   "h-[72px] px-3 first:pl-6 last:pr-6 text-sm group-hover:bg-surface-2 transition",
                   Number(row.id) === table.getRowModel().rows.length - 1 &&
                     "last:rounded-b-xl first:rounded-bl-xl",
+                  poolPositionsLoading && "pointer-events-none",
                 )}
               >
-                {/* TODO: Add loading state when ready */}
-                <Skeleton className="h-8" isLoading={false}>
+                <Skeleton className="h-8" isLoading={poolPositionsLoading}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Skeleton>
               </TableCell>

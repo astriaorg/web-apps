@@ -28,17 +28,17 @@ export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg gap-2">
-            {poolTokens.map((token) => (
+            {poolTokens.map(({ token, unclaimedFees }) => (
               <div
-                key={token.symbol}
+                key={token.coinDenom}
                 className="flex items-center justify-between"
               >
                 <span className="flex items-center gap-2">
-                  <TokenIcon symbol={token.symbol} size={20} />
-                  {token.symbol}
+                  <TokenIcon symbol={token.coinDenom} size={20} />
+                  {token.coinDenom}
                 </span>
                 <span>
-                  {formatNumber(token.unclaimedFees, {
+                  {formatNumber(unclaimedFees, {
                     minimumFractionDigits: 6,
                     maximumFractionDigits: 6,
                   })}
@@ -68,14 +68,14 @@ export const AddLiquidityTxnSummary = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map((token, index) => (
+            {poolTokens.map(({ token }, index) => (
               <div
-                key={token.symbol}
+                key={token.coinDenom}
                 className="flex items-center justify-between"
               >
                 <span className="flex items-center gap-2">
-                  <TokenIcon symbol={token.symbol} size={20} />
-                  {token.symbol}
+                  <TokenIcon symbol={token.coinDenom} size={20} />
+                  {token.coinDenom}
                 </span>
                 <span>
                   {addLiquidityInputValues &&
@@ -108,44 +108,44 @@ export const RemoveLiquidityTxnSummary = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map((token) => (
+            {poolTokens.map(({ token, liquidity }) => (
               <div
-                key={token.symbol}
+                key={token.coinDenom}
                 className="flex items-center justify-between"
               >
                 <span className="flex items-center gap-2">
-                  Pooled {token.symbol}:
+                  Pooled {token.coinDenom}:
                 </span>
                 <span className="flex items-center gap-2">
                   <span>
-                    {formatNumber(token.liquidity, {
+                    {formatNumber(liquidity, {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
                     })}
                   </span>
-                  <TokenIcon symbol={token.symbol} size={20} />
+                  <TokenIcon symbol={token.coinDenom} size={20} />
                 </span>
               </div>
             ))}
           </div>
           <hr className="border-t border-border mt-2 mb-2 w-full" />
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map((token) => (
+            {poolTokens.map(({ token, unclaimedFees }) => (
               <div
-                key={token.symbol}
+                key={token.coinDenom}
                 className="flex items-center justify-between"
               >
                 <span className="flex items-center gap-2">
-                  {token.symbol} Fees Earned:
+                  {token.coinDenom} Fees Earned:
                 </span>
                 <span className="flex items-center gap-2">
                   <span>
-                    {formatNumber(token.unclaimedFees, {
+                    {formatNumber(unclaimedFees, {
                       minimumFractionDigits: 6,
                       maximumFractionDigits: 6,
                     })}
                   </span>
-                  <TokenIcon symbol={token.symbol} size={20} />
+                  <TokenIcon symbol={token.coinDenom} size={20} />
                 </span>
               </div>
             ))}
@@ -185,7 +185,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens[0]?.symbol}</span>
+                <span>{poolTokens[0]?.token.coinDenom}</span>
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
@@ -193,7 +193,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens[1]?.symbol}</span>
+                <span>{poolTokens[1]?.token.coinDenom}</span>
               </span>
             </>
           )}

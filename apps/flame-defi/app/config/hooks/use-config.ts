@@ -20,5 +20,12 @@ export const useAstriaChainData = () => {
   const astriaChainsData = Object.values(astriaChains);
   const selectedChain = astriaChainsData[0] as EvmChainInfo;
 
-  return { selectedChain };
+  const nativeToken = selectedChain.currencies.find(
+    (currency) => currency.isNative,
+  );
+  const wrappedNativeToken = selectedChain.currencies.find(
+    (currency) => currency.isWrappedNative,
+  );
+
+  return { selectedChain, nativeToken, wrappedNativeToken };
 };

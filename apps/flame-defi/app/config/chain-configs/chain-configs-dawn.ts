@@ -288,6 +288,16 @@ const FlameChainInfo: EvmChainInfo = {
     swapRouter: {
       address: "0x0DA34E6C6361f5B8f5Bdb6276fEE16dD241108c8",
     },
+    // TODO - add these addresses
+    poolFactory: {
+      address: "0x",
+    },
+    poolContract: {
+      address: "0x",
+    },
+    nonfungiblePositionManager: {
+      address: "0x",
+    },
   },
   currencies: [
     new EvmCurrency({

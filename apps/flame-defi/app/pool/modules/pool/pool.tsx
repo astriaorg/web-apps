@@ -1,16 +1,17 @@
 "use client";
 
-import { Button } from "@repo/ui/components";
-import { PlusIcon } from "@repo/ui/icons";
-// import { useEvmWallet } from "features/evm-wallet";
+import { Button, Skeleton } from "@repo/ui/components";
+import { InboxIcon, PlusIcon } from "@repo/ui/icons";
 import type React from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { PositionsTable } from "./components";
 import { ROUTES } from "../../constants/routes";
-
+import { useEvmWallet } from "features/evm-wallet";
+import { usePoolContext } from "pool/hooks";
 export const Pool = (): React.ReactElement => {
-  //   const { connectEvmWallet } = useEvmWallet();
+  const { connectEvmWallet } = useEvmWallet();
+  const { poolPositions, poolPositionsLoading } = usePoolContext();
   const router = useRouter();
   const userAccount = useAccount();
 
@@ -29,20 +30,26 @@ export const Pool = (): React.ReactElement => {
         )}
       </div>
       <div className="flex flex-col bg-surface-1 w-full rounded-lg">
-        <PositionsTable />
-        {/* <div className="flex flex-col items-center justify-center h-[250px]">
-                <InboxIcon size={50} className="mb-2 text-text-subdued" />
-                <p className="mb-10 text-lg text-text-subdued">
-                  Your active V3 liquidity positions will appear here.
-                </p>
-                {!userAccount.address && (
-                  <Button
-                    buttonText="Connect Wallet"
-                    className="mt-0"
-                    callback={() => connectEvmWallet()}
-                  />
-                )}
-              </div> */}
+        {poolPositions.length > 0 && (
+          <Skeleton isLoading={poolPositionsLoading}>
+            <PositionsTable />
+          </Skeleton>
+        )}
+        {poolPositions.length === 0 && (
+          <Skeleton isLoading={poolPositionsLoading}>
+            <div className="flex flex-col items-center justify-center h-[250px]">
+              <InboxIcon size={50} className="mb-2 text-text-subdued" />
+              <p className="mb-10 text-lg text-text-subdued">
+                Your active V3 liquidity positions will appear here.
+              </p>
+              {!userAccount.address && (
+                <Button className="mt-0" onClick={() => connectEvmWallet()}>
+                  Connect Wallet
+                </Button>
+              )}
+            </div>
+          </Skeleton>
+        )}
       </div>
     </div>
   );

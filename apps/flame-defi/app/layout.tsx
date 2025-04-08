@@ -1,6 +1,6 @@
 import "@interchain-ui/react/styles";
 import "@rainbow-me/rainbowkit/styles.css";
-import { Footer } from "@repo/ui/components";
+import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
 import localFont from "next/font/local";
