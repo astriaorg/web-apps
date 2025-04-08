@@ -30,7 +30,6 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";
-import { MobileWalletConnect } from "./mobile-wallet-connect";
 import { NavigationMenuButton } from "./navigation-menu-button";
 import { NetworkIcon } from "./network-icon";
 
@@ -92,8 +91,7 @@ export const MobileNavigationMenu = () => {
   }, [pathname]);
 
   return (
-    <div className="flex items-center gap-4 lg:hidden">
-      <MobileWalletConnect handleClose={handleClose} />
+    <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="ghost" className="p-0 hover:text-initial">
@@ -266,6 +264,6 @@ export const MobileNavigationMenu = () => {
           </div>
         </DrawerContent>
       </Drawer>
-    </div>
+    </>
   );
 };

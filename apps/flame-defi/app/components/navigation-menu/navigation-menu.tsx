@@ -69,7 +69,9 @@ export const NavigationMenu = () => {
         <NetworkSelect />
         <ConnectWalletsButton />
       </div>
-      <MobileNavigationMenu />
+      <div className="lg:hidden">
+        <MobileNavigationMenu />
+      </div>
     </nav>
   );
 };
