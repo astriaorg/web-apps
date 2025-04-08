@@ -1,11 +1,11 @@
 import { PoolToken } from "pool/types";
 import { useState, useEffect } from "react";
 import { usePoolPositionContext } from ".";
-import { useEvmChainData } from "config/hooks/use-config";
+import { useAstriaChainData } from "config/hooks/use-config";
 export const useRemoveLiquidity = () => {
   const { poolTokenOne, poolTokenTwo, collectAsNative } =
     usePoolPositionContext();
-  const { wrappedNativeToken, nativeToken } = useEvmChainData();
+  const { wrappedNativeToken, nativeToken } = useAstriaChainData();
   const poolTokens =
     poolTokenOne && poolTokenTwo ? [poolTokenOne, poolTokenTwo] : [];
 

@@ -18,7 +18,7 @@ import {
   createPoolService,
 } from "features/evm-wallet";
 import { useAccount, useConfig } from "wagmi";
-import { useEvmChainData } from "config/hooks/use-config";
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   getTokensLiquidityAmounts,
   getMinMaxTick,
@@ -39,7 +39,7 @@ export const PoolPositionContextProvider = ({
   const { address } = useAccount();
   const { formatNumber } = useIntl();
   const tokenId = params["token-id"] as string;
-  const { selectedChain, nativeToken, wrappedNativeToken } = useEvmChainData();
+  const { selectedChain, nativeToken, wrappedNativeToken } = useAstriaChainData();
   const { currencies } = selectedChain;
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
   const [collectAsNative, setCollectAsNative] = useState<boolean>(

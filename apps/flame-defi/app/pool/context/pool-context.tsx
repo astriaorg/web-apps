@@ -1,7 +1,7 @@
 "use client";
 
 import { useConfig, useAccount } from "wagmi";
-import { useEvmChainData } from "config/hooks/use-config";
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonFungiblePositionService,
   createPoolFactoryService,
@@ -49,7 +49,7 @@ const feeData = [
 
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const wagmiConfig = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { currencies } = selectedChain;
   const { address } = useAccount();
   const [poolPositions, setPoolPositions] = useState<PoolPosition[]>([]);
