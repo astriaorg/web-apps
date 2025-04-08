@@ -1,6 +1,6 @@
-import { ConnectMultipleWallets } from "@repo/ui/components";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
+import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useEvmChainData } from "config";
 import { useMemo } from "react";
 import { useAccount } from "wagmi";

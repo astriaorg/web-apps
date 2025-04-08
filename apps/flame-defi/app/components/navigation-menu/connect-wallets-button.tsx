@@ -1,12 +1,12 @@
 import {
   Button,
-  ConnectWalletContent,
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
+import { ConnectWalletContent } from "components/connect-wallet";
 import { useEvmChainData } from "config";
 import {
   ConnectCosmosWalletButton,

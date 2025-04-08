@@ -1,15 +1,15 @@
 import type { AccordionSingleProps } from "@radix-ui/react-accordion";
-import { FormattedNumber } from "react-intl";
-import { CopyIcon, PowerIcon, ShareRightIcon } from "../../../icons";
-import { cn } from "../../../utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../../atoms/accordion";
-import { Skeleton } from "../../atoms/skeleton";
-import { CopyToClipboard } from "../copy-to-clipboard";
+  CopyToClipboard,
+  Skeleton,
+} from "@repo/ui/components";
+import { CopyIcon, PowerIcon, ShareRightIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/utils";
+import { FormattedNumber } from "react-intl";
 import type { ConnectWalletProps } from "./connect-wallet.types";
 
 interface ConnectWalletContentProps

@@ -3,7 +3,6 @@ export * from "./animated-down-arrow-spacer";
 export * from "./asset-amount-input";
 export * from "./block-loader";
 export * from "./card";
-export * from "./connect-wallet";
 export * from "./copy-to-clipboard";
 export * from "./copy-to-clipboard-button";
 export * from "./info-tooltip";
