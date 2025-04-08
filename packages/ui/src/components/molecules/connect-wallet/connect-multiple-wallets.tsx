@@ -1,34 +1,18 @@
+import { cn } from "../../../utils";
 import { ConnectWalletContent } from "./connect-wallet-content";
+import type { ConnectWalletProps } from "./connect-wallet.types";
 
-interface ConnectMultipleWalletsProps {
-  isConnected: boolean;
-  isLoading: boolean;
-  account?: {
-    address?: string;
-  };
-  balance?: {
-    value: string;
-    symbol: string;
-  };
-  fiat?: {
-    value: string;
-    symbol: string;
-  };
-  explorer?: {
-    url: string;
-  };
-  label: React.ReactNode;
-  icon: React.ReactNode;
-  onConnectWallet?: () => void;
-  onDisconnectWallet: () => void;
-}
-
-export const ConnectMultipleWallets = (props: ConnectMultipleWalletsProps) => {
+export const ConnectMultipleWallets = (props: ConnectWalletProps) => {
   return props.isConnected ? (
     <ConnectWalletContent {...props} collapsible />
   ) : (
+    // On large screens, this is shown in a popover so should match the network select popover styling.
+    // On small screens, this is shown in a drawer so should match the network select drawer styling.
     <button
-      className="flex items-center justify-start gap-2 whitespace-nowrap p-2 rounded-lg text-sm text-typography-subdued font-medium hover:bg-surface-3 hover:text-typography-default [&_svg]:size-6"
+      className={cn(
+        "flex items-center justify-start gap-2 whitespace-nowrap px-6 py-3 rounded-md text-sm  font-medium hover:bg-surface-3 [&_svg]:size-4",
+        "lg:px-2 lg:py-2 lg:rounded-lg lg:[&_svg]:size-6",
+      )}
       onClick={props.onConnectWallet}
     >
       {props.icon}

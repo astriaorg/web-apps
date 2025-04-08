@@ -22,9 +22,8 @@ import { useAccount } from "wagmi";
 export const ConnectWalletsButton = () => {
   const pathname = usePathname();
   const { cosmosAccountAddress } = useCosmosWallet();
-  const { address } = useAccount();
   const { selectedChain } = useEvmChainData();
-  const userAccount = useAccount();
+  const account = useAccount();
   const {
     connectEvmWallet,
     disconnectEvmWallet,
@@ -34,10 +33,10 @@ export const ConnectWalletsButton = () => {
     quoteLoading,
   } = useEvmWallet();
 
-  const isConnected = address || cosmosAccountAddress;
-  const isSingleWalletConnect = pathname !== "/";
+  const isConnected = account.address || cosmosAccountAddress;
+  const isSingleConnectWallet = pathname !== "/";
 
-  if (isSingleWalletConnect && !isConnected) {
+  if (isSingleConnectWallet && !isConnected) {
     return (
       <Button size="sm" onClick={connectEvmWallet}>
         Connect Wallet
@@ -51,8 +50,8 @@ export const ConnectWalletsButton = () => {
         <Button size="sm">
           <span>
             {isConnected
-              ? isSingleWalletConnect
-                ? shortenAddress(address as string)
+              ? isSingleConnectWallet
+                ? shortenAddress(account.address as string)
                 : "Connected"
               : "Connect Wallet"}
           </span>
@@ -62,20 +61,22 @@ export const ConnectWalletsButton = () => {
         className="hidden flex-col w-min p-3 gap-1 mr-4 lg:flex"
         side="bottom"
       >
-        {isSingleWalletConnect ? (
+        {isSingleConnectWallet ? (
           <ConnectWalletContent
+            isConnected={!!account.address}
             isLoading={
               (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
               quoteLoading
             }
-            account={userAccount}
+            account={account}
             balance={evmNativeTokenBalance ?? undefined}
             fiat={usdcToNativeQuote}
             explorer={{
-              url: `${selectedChain.blockExplorerUrl}/address/${userAccount.address}`,
+              url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
             }}
-            label={shortenAddress(userAccount.address as string)}
+            label={shortenAddress(account.address as string)}
             icon={<FlameIcon />}
+            onConnectWallet={connectEvmWallet}
             onDisconnectWallet={disconnectEvmWallet}
             // Force the accordion to stay opened.
             value="wallet"

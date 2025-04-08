@@ -6,10 +6,16 @@ import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
+interface ConnectEvmWalletButtonProps {
+  onDisconnectWallet?: () => void;
+}
+
 /**
  * Button with information dropdown to connect to an EVM wallet.
  */
-export default function ConnectEvmWalletButton() {
+export default function ConnectEvmWalletButton({
+  onDisconnectWallet,
+}: ConnectEvmWalletButtonProps) {
   const { selectedChain } = useEvmChainData();
   const {
     connectEvmWallet,
@@ -47,7 +53,10 @@ export default function ConnectEvmWalletButton() {
       label={label}
       icon={<FlameIcon />}
       onConnectWallet={connectEvmWallet}
-      onDisconnectWallet={disconnectEvmWallet}
+      onDisconnectWallet={() => {
+        disconnectEvmWallet();
+        onDisconnectWallet?.();
+      }}
     />
   );
 }

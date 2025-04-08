@@ -10,28 +10,7 @@ import {
 } from "../../atoms/accordion";
 import { Skeleton } from "../../atoms/skeleton";
 import { CopyToClipboard } from "../copy-to-clipboard";
-
-interface ConnectWalletContentProps extends Omit<AccordionSingleProps, "type"> {
-  label: React.ReactNode;
-  isLoading: boolean;
-  account?: {
-    address?: string;
-  };
-  balance?: {
-    value: string;
-    symbol: string;
-  };
-  fiat?: {
-    value: string;
-    symbol: string;
-  };
-  icon: React.ReactNode;
-  explorer?: {
-    url: string;
-  };
-  onConnectWallet?: () => void;
-  onDisconnectWallet: () => void;
-}
+import type { ConnectWalletProps } from "./connect-wallet.types";
 
 export const ConnectWalletContent = ({
   account,
@@ -43,7 +22,7 @@ export const ConnectWalletContent = ({
   label,
   onDisconnectWallet,
   ...props
-}: ConnectWalletContentProps) => {
+}: ConnectWalletProps & Omit<AccordionSingleProps, "type">) => {
   return (
     <Accordion type="single" {...props}>
       <AccordionItem value="wallet">
@@ -55,7 +34,7 @@ export const ConnectWalletContent = ({
               !props.collapsible && "[&>svg]:hidden",
             )}
           >
-            <div className="flex items-center gap-2 mr-2 [&_svg]:size-6">
+            <div className="flex items-center gap-2 mr-2 [&_svg]:size-4 lg:[&_svg]:size-6">
               {icon}
               <span>{label}</span>
             </div>
@@ -76,7 +55,7 @@ export const ConnectWalletContent = ({
             </button>
           </div>
         </div>
-        <AccordionContent className="pl-10">
+        <AccordionContent className="pl-8 lg:pl-10">
           <div className="flex flex-col gap-2">
             <Skeleton isLoading={isLoading}>
               <span className="text-4xl font-dot">
