@@ -8,7 +8,7 @@ import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
 interface ConnectEvmWalletButtonProps {
   // Label to show before the user is connected to a wallet.
-  labelBeforeConnected?: string;
+  labelBeforeConnected: string;
 }
 
 /**
@@ -35,7 +35,7 @@ export default function ConnectEvmWalletButton({
     if (userAccount?.address) {
       return shortenAddress(userAccount.address);
     }
-    return labelBeforeConnected ?? "Connect";
+    return labelBeforeConnected;
   }, [labelBeforeConnected, userAccount?.address]);
 
   return (

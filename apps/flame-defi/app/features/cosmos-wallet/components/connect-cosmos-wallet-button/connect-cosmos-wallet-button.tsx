@@ -1,12 +1,12 @@
 import { ConnectMultipleWallets } from "@repo/ui/components";
 import { CosmosIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useCosmosWallet } from "../../hooks/use-cosmos-wallet";
 
 interface ConnectCosmosWalletButtonProps {
   // Label to show before the user is connected to a wallet.
-  labelBeforeConnected?: string;
+  labelBeforeConnected: string;
 }
 
 /**
@@ -27,34 +27,17 @@ export default function ConnectCosmosWalletButton({
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   // const [showTransactions, setShowTransactions] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const toggleDropdown = useCallback(() => {
     setIsDropdownActive(!isDropdownActive);
   }, [isDropdownActive]);
-
-  // handle clicking outside dropdown to close it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownActive(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   // ui
   const label = useMemo(() => {
     if (cosmosAccountAddress) {
       return shortenAddress(cosmosAccountAddress);
     }
-    return labelBeforeConnected ?? "Connect";
+    return labelBeforeConnected;
   }, [labelBeforeConnected, cosmosAccountAddress]);
 
   // connect to wallet or show information dropdown
