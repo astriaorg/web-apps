@@ -38,7 +38,7 @@ export const ConnectWalletContent = ({
       {...props}
     >
       <AccordionItem value="wallet">
-        <div className="flex items-center justify-between w-full lg:min-w-[300px]">
+        <div className="flex items-center justify-between w-full md:min-w-[300px]">
           <AccordionTrigger
             className={cn(
               "p-2 text-typography-subdued font-medium",
@@ -46,7 +46,7 @@ export const ConnectWalletContent = ({
               !props.collapsible && "[&>svg]:hidden",
             )}
           >
-            <div className="flex items-center gap-2 mr-2 [&_svg]:size-4 lg:[&_svg]:size-6">
+            <div className="flex items-center gap-2 mr-2 [&_svg]:size-4 md:[&_svg]:size-6">
               {icon}
               <span>{label}</span>
             </div>
@@ -67,7 +67,7 @@ export const ConnectWalletContent = ({
             </button>
           </div>
         </div>
-        <AccordionContent className="pl-8 lg:pl-10">
+        <AccordionContent className="pl-8 md:pl-10">
           <div className="flex flex-col gap-2">
             <Skeleton isLoading={isLoading}>
               <span className="text-4xl font-dot">

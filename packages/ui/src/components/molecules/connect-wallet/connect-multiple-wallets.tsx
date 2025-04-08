@@ -11,7 +11,7 @@ export const ConnectMultipleWallets = (props: ConnectWalletProps) => {
     <button
       className={cn(
         "flex items-center justify-start gap-2 whitespace-nowrap px-2 py-3 rounded-md text-sm  font-medium [&_svg]:size-4",
-        "lg:py-2 lg:rounded-lg lg:hover:bg-surface-3 lg:[&_svg]:size-6",
+        "md:py-2 md:rounded-lg md:hover:bg-surface-3 md:[&_svg]:size-6",
       )}
       onClick={props.onConnectWallet}
     >

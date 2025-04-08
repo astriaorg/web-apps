@@ -29,7 +29,7 @@ export const NavigationMenu = () => {
         >
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
-        <div className="items-center space-x-8 hidden lg:flex">
+        <div className="items-center space-x-8 hidden md:flex">
           <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
             Bridge
           </NavigationMenuLink>
@@ -65,11 +65,11 @@ export const NavigationMenu = () => {
           )}
         </div>
       </div>
-      <div className="hidden lg:flex gap-2 items-center">
+      <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
         <ConnectWalletsButton />
       </div>
-      <div className="lg:hidden">
+      <div className="md:hidden">
         <MobileNavigationMenu />
       </div>
     </nav>
