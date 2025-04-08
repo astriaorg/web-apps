@@ -82,8 +82,8 @@ export const ConnectWalletsButton = () => {
           />
         ) : (
           <>
-            <ConnectEvmWalletButton labelBeforeConnected="Flame Wallet" />
-            <ConnectCosmosWalletButton labelBeforeConnected="Cosmos Wallet" />
+            <ConnectEvmWalletButton />
+            <ConnectCosmosWalletButton />
           </>
         )}
       </PopoverContent>

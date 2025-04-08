@@ -6,17 +6,10 @@ import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 
-interface ConnectEvmWalletButtonProps {
-  // Label to show before the user is connected to a wallet.
-  labelBeforeConnected: string;
-}
-
 /**
  * Button with information dropdown to connect to an EVM wallet.
  */
-export default function ConnectEvmWalletButton({
-  labelBeforeConnected,
-}: ConnectEvmWalletButtonProps) {
+export default function ConnectEvmWalletButton() {
   const { selectedChain } = useEvmChainData();
   const {
     connectEvmWallet,
@@ -35,8 +28,8 @@ export default function ConnectEvmWalletButton({
     if (userAccount?.address) {
       return shortenAddress(userAccount.address);
     }
-    return labelBeforeConnected;
-  }, [labelBeforeConnected, userAccount?.address]);
+    return "Flame Wallet";
+  }, [userAccount?.address]);
 
   return (
     <ConnectMultipleWallets

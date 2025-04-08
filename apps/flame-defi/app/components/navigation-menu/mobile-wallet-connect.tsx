@@ -82,11 +82,11 @@ export const MobileWalletConnect = ({
           {isBridgePage ? (
             <>
               <div className="hover:text-orange-soft transition w-full">
-                <ConnectEvmWalletButton labelBeforeConnected="Connect to Flame wallet" />
+                <ConnectEvmWalletButton />
               </div>
               <hr className="border-border w-full my-4" />
               <div className="hover:text-orange-soft transition w-full">
-                <ConnectCosmosWalletButton labelBeforeConnected="Connect to Cosmos wallet" />
+                <ConnectCosmosWalletButton />
               </div>
             </>
           ) : userAccount.address ? (

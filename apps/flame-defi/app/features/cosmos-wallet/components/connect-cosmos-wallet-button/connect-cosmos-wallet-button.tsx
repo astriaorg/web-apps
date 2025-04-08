@@ -4,17 +4,10 @@ import { shortenAddress } from "@repo/ui/utils";
 import { useCallback, useMemo, useState } from "react";
 import { useCosmosWallet } from "../../hooks/use-cosmos-wallet";
 
-interface ConnectCosmosWalletButtonProps {
-  // Label to show before the user is connected to a wallet.
-  labelBeforeConnected: string;
-}
-
 /**
  * Button with information dropdown to connect to a Cosmos wallet.
  */
-export default function ConnectCosmosWalletButton({
-  labelBeforeConnected,
-}: ConnectCosmosWalletButtonProps) {
+export default function ConnectCosmosWalletButton() {
   const {
     connectCosmosWallet,
     cosmosAccountAddress,
@@ -37,8 +30,8 @@ export default function ConnectCosmosWalletButton({
     if (cosmosAccountAddress) {
       return shortenAddress(cosmosAccountAddress);
     }
-    return labelBeforeConnected;
-  }, [labelBeforeConnected, cosmosAccountAddress]);
+    return "Cosmos Wallet";
+  }, [cosmosAccountAddress]);
 
   // connect to wallet or show information dropdown
   const handleConnectWallet = useCallback(() => {
