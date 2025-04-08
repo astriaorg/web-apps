@@ -98,7 +98,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     <ConfigContext.Provider
       value={{
         cosmosChains,
-        astriaChains: astriaChains,
+        astriaChains,
         coinbaseChains,
         selectedFlameNetwork,
         selectFlameNetwork,
