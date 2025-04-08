@@ -12,6 +12,12 @@ import { Skeleton } from "../../atoms/skeleton";
 import { CopyToClipboard } from "../copy-to-clipboard";
 import type { ConnectWalletProps } from "./connect-wallet.types";
 
+interface ConnectWalletContentProps
+  extends ConnectWalletProps,
+    Omit<AccordionSingleProps, "type" | "value"> {
+  isCollapsible?: boolean;
+}
+
 export const ConnectWalletContent = ({
   account,
   balance,
@@ -21,12 +27,18 @@ export const ConnectWalletContent = ({
   isLoading,
   label,
   onDisconnectWallet,
+  isCollapsible = true,
   ...props
-}: ConnectWalletProps & Omit<AccordionSingleProps, "type">) => {
+}: ConnectWalletContentProps) => {
   return (
-    <Accordion type="single" {...props}>
+    <Accordion
+      type="single"
+      // Force the accordion to stay opened for single wallets.
+      value={!isCollapsible ? "wallet" : undefined}
+      {...props}
+    >
       <AccordionItem value="wallet">
-        <div className="flex items-center justify-between w-full md:min-w-[300px]">
+        <div className="flex items-center justify-between w-full lg:min-w-[300px]">
           <AccordionTrigger
             className={cn(
               "p-2 text-typography-subdued font-medium",
@@ -39,7 +51,7 @@ export const ConnectWalletContent = ({
               <span>{label}</span>
             </div>
           </AccordionTrigger>
-          <div className="flex items-center gap-3 text-icon-subdued [&_svg]:cursor-pointer [&_svg]:size-4 [&_svg]:hover:text-typography-default">
+          <div className="flex items-center gap-3 text-icon-subdued mr-2 [&_svg]:cursor-pointer [&_svg]:size-4 [&_svg]:hover:text-typography-default">
             {account?.address && (
               <CopyToClipboard value={account.address}>
                 <CopyIcon aria-label="Copy" />

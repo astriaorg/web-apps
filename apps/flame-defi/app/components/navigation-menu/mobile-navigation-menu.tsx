@@ -244,8 +244,7 @@ export const MobileNavigationMenu = () => {
                   setIsConnectWalletOpen(false);
                   disconnectEvmWallet();
                 }}
-                // Force the accordion to stay opened.
-                value="wallet"
+                isCollapsible={false}
               />
             ) : (
               <>

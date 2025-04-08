@@ -78,8 +78,7 @@ export const ConnectWalletsButton = () => {
             icon={<FlameIcon />}
             onConnectWallet={connectEvmWallet}
             onDisconnectWallet={disconnectEvmWallet}
-            // Force the accordion to stay opened.
-            value="wallet"
+            isCollapsible={false}
           />
         ) : (
           <>
