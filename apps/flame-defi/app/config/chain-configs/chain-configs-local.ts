@@ -7,6 +7,7 @@ import {
 } from "@repo/ui/icons";
 import {
   AstriaChain,
+  ChainType,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -16,7 +17,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   // Chain-id of the celestia chain.
   chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
@@ -108,7 +109,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
@@ -195,7 +196,7 @@ export const cosmosChains: CosmosChains = {
 };
 
 const FlameChainInfo: AstriaChain = {
-  chainType: "astria",
+  chainType: ChainType.ASTRIA,
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -247,7 +248,7 @@ const FlameChainInfo: AstriaChain = {
 };
 
 const FakeChainInfo: AstriaChain = {
-  chainType: "astria",
+  chainType: ChainType.ASTRIA,
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -303,7 +304,7 @@ export const astriaChains: AstriaChains = {
 };
 
 const BaseChainInfo: EvmChainInfo = {
-  chainType: "evm",
+  chainType: ChainType.EVM,
   chainId: 84532,
   chainName: "Base Sepolia",
   rpcUrls: ["https://sepolia.base.org"],

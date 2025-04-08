@@ -80,6 +80,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
+    console.log("selectFlameNetwork called with:", network);
     const { astriaChains, cosmosChains, coinbaseChains } =
       getChainConfigs(network);
     setAstriaChains(astriaChains);

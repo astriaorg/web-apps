@@ -1,23 +1,31 @@
 "use client";
 
 import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
-import React, { useMemo, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, BaseIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
-import { SourceType } from "bridge/types";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
-import { EvmChainInfo } from "@repo/flame-types";
+import {
+  AstriaChain,
+  ChainType,
+  EvmCurrency,
+  IbcCurrency,
+} from "@repo/flame-types";
 
 export const ContentSection = () => {
   const {
-    selectedSourceChain,
+    sourceChain,
     handleSourceChainSelect,
-    selectedDestinationChain,
+    sourceCurrency,
+    setSourceCurrency,
+    destinationChain,
     handleDestinationChainSelect,
+    destinationCurrency,
+    setDestinationCurrency,
     amount,
     setAmount,
     isAmountValid,
@@ -42,21 +50,6 @@ export const ContentSection = () => {
     evmWallet,
     handleDeposit,
   } = useDepositPageContext();
-
-  // source chains only cosmos or coinbase chains for now
-  const sourceChainOptions = useMemo(() => {
-    const evmGroup = evmWallet.evmChainsOptions.filter(
-      (option) => option.value.chainType !== SourceType.Astria,
-    );
-
-    return [...cosmosWallet.cosmosChainsOptions, ...evmGroup];
-  }, [cosmosWallet.cosmosChainsOptions, evmWallet.evmChainsOptions]);
-
-  const destinationChainOptions = useMemo(() => {
-    return evmWallet.evmChainsOptions.filter(
-      (option) => option.value.chainType === SourceType.Astria,
-    );
-  }, [evmWallet.evmChainsOptions]);
 
   // TODO - implement FundButton correctly somewhere.
   //   right now i'm just showing it in arbitrary spot for testing.
@@ -88,47 +81,139 @@ export const ContentSection = () => {
   useEffect(() => {
     if (
       !cosmosWallet.selectedCosmosChain ||
-      selectedSourceChain?.chainType !== SourceType.Cosmos
+      sourceChain.chain?.chainType !== ChainType.COSMOS
     ) {
       return;
     }
     cosmosWallet.connectCosmosWallet();
-  }, [cosmosWallet, selectedSourceChain?.chainType]);
+  }, [cosmosWallet, sourceChain.chain?.chainType]);
 
-  const selectedDestinationChainOption = useMemo(() => {
-    if (!selectedDestinationChain) {
+  // source chains only cosmos or coinbase chains for now
+  const sourceChainOptions = useMemo(() => {
+    const evmChains = evmWallet.coinbaseChains.map((c) => ({
+      label: c.chainName,
+      value: c,
+      LeftIcon: c.IconComponent,
+    }));
+    return [...cosmosWallet.cosmosChainsOptions, ...evmChains];
+  }, [cosmosWallet.cosmosChainsOptions, evmWallet.coinbaseChains]);
+
+  const sourceChainOption = useMemo(() => {
+    if (!sourceChain.chain) {
       return null;
     }
     return {
-      label: selectedDestinationChain.chainName,
-      value: selectedDestinationChain as EvmChainInfo,
-      LeftIcon: selectedDestinationChain.IconComponent,
+      label: sourceChain.chain.chainName,
+      value: sourceChain.chain as AstriaChain,
+      LeftIcon: sourceChain.chain.IconComponent,
     };
-  }, [selectedDestinationChain]);
+  }, [sourceChain.chain]);
 
-  // the evm currency selection is controlled by the chosen source currency,
-  // and should be updated when an ibc currency or evm chain is selected
-  // TODO - update to change when selectedCoinbaseCurrency is updated
-  const selectedDestinationCurrencyOption = useMemo(() => {
-    if (!cosmosWallet.selectedIbcCurrency) {
-      return evmWallet.defaultEvmCurrencyOption;
+  const defaultSourceCurrencyOption = useMemo(() => {
+    if (!sourceChain.chain || !sourceChain.chain.currencies) {
+      return;
     }
-    const matchingEvmCurrency = evmWallet.selectedEvmChain?.currencies.find(
-      (currency) =>
-        currency.coinDenom === cosmosWallet.selectedIbcCurrency?.coinDenom,
+    // use the first currency from the source chain as default
+    let defaultCurrency = sourceChain.chain.currencies[0] as IbcCurrency;
+    if (sourceChain.chain.chainType === ChainType.EVM) {
+      defaultCurrency = sourceChain.chain.currencies.find(
+        (c) => c.astriaIntentBridgeAddress,
+      ) as EvmCurrency;
+    }
+    return {
+      label: defaultCurrency.coinDenom,
+      value: defaultCurrency,
+      LeftIcon: defaultCurrency.IconComponent,
+    };
+  }, [sourceChain.chain]);
+
+  const sourceCurrencyOptions = useMemo(() => {
+    if (!sourceChain.chain) {
+      return [];
+    }
+    if (sourceChain.chain.chainType === ChainType.COSMOS) {
+      return cosmosWallet.ibcCurrencyOptions || [];
+    }
+    if (sourceChain.chain.chainType === ChainType.EVM) {
+      return (
+        sourceChain.chain.currencies
+          ?.filter((c) => c.astriaIntentBridgeAddress)
+          .map((c) => ({
+            label: c.coinDenom,
+            value: c,
+            LeftIcon: c.IconComponent,
+          })) || []
+      );
+    }
+    return [];
+  }, [cosmosWallet.ibcCurrencyOptions, sourceChain.chain]);
+
+  const destinationChainOptions = useMemo(() => {
+    return evmWallet.astriaChains.map((c) => ({
+      label: c.chainName,
+      value: c,
+      LeftIcon: c.IconComponent,
+    }));
+  }, [evmWallet.astriaChains]);
+
+  const destinationChainOption = useMemo(() => {
+    if (!destinationChain.chain) {
+      return null;
+    }
+    return {
+      label: destinationChain.chain.chainName,
+      value: destinationChain.chain as AstriaChain,
+      LeftIcon: destinationChain.chain.IconComponent,
+    };
+  }, [destinationChain.chain]);
+
+  const defaultDestinationCurrencyOption = useMemo(() => {
+    if (!destinationChain.chain || !destinationChain.chain.currencies) {
+      return;
+    }
+    // use the first currency from the source chain as default
+    const defaultCurrency = destinationChain.chain.currencies[0];
+    return {
+      label: defaultCurrency.coinDenom,
+      value: defaultCurrency as EvmCurrency,
+      LeftIcon: defaultCurrency.IconComponent,
+    };
+  }, [destinationChain.chain]);
+
+  const destinationCurrencyOptions = useMemo(() => {
+    if (!destinationChain.chain) {
+      return [];
+    }
+    return (
+      destinationChain.chain.currencies?.map((currency) => ({
+        label: currency.coinDenom,
+        value: currency as EvmCurrency,
+        LeftIcon: currency.IconComponent,
+      })) || []
+    );
+  }, [destinationChain.chain]);
+
+  // the evm currency selection is controlled by the chosen source currency
+  const destinationCurrencyOption = useMemo(() => {
+    if (!sourceChain.chain || !sourceCurrency) {
+      return defaultDestinationCurrencyOption;
+    }
+    const matchingEvmCurrency = destinationChain.chain?.currencies.find(
+      (currency) => currency.coinDenom === sourceCurrency.coinDenom,
     );
     if (!matchingEvmCurrency) {
       return null;
     }
     return {
       label: matchingEvmCurrency.coinDenom,
-      value: matchingEvmCurrency,
+      value: matchingEvmCurrency as EvmCurrency,
       LeftIcon: matchingEvmCurrency.IconComponent,
     };
   }, [
-    cosmosWallet.selectedIbcCurrency,
-    evmWallet.selectedEvmChain,
-    evmWallet.defaultEvmCurrencyOption,
+    sourceChain.chain,
+    sourceCurrency,
+    destinationChain.chain?.currencies,
+    defaultDestinationCurrencyOption,
   ]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,9 +271,8 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  const formattedEvmBalanceValue = formatDecimalValues(
-    evmWallet.selectedEvmCurrencyBalance?.value,
-  );
+  // FIXME - show balance correctly
+  const formattedEvmBalanceValue = formatDecimalValues("0");
   const formattedCosmosBalanceValue = formatDecimalValues(
     cosmosWallet.cosmosBalance?.value,
   );
@@ -216,47 +300,27 @@ export const ContentSection = () => {
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
                       onSelect={handleSourceChainSelect}
-                      valueOverride={
-                        selectedSourceChain?.chainType === SourceType.Cosmos
-                          ? cosmosWallet.selectedCosmosChainOption
-                          : evmWallet.selectedEvmChainOption
-                      }
+                      valueOverride={sourceChainOption}
                       LeftIcon={WalletIcon}
                     />
                   </div>
 
-                  {/* Currency selection based on source type */}
-                  {selectedSourceChain?.chainType === SourceType.Cosmos &&
-                    cosmosWallet.selectedCosmosChain &&
-                    cosmosWallet.ibcCurrencyOptions && (
-                      <div className="w-full sm:w-auto">
-                        <Dropdown
-                          placeholder="Select a token"
-                          options={cosmosWallet.ibcCurrencyOptions}
-                          defaultOption={cosmosWallet.defaultIbcCurrencyOption}
-                          onSelect={cosmosWallet.selectIbcCurrency}
-                          LeftIcon={WalletIcon}
-                        />
-                      </div>
-                    )}
-                  {selectedSourceChain?.chainType === SourceType.Evm &&
-                    evmWallet.selectedEvmChain &&
-                    evmWallet.evmCurrencyOptions && (
-                      <div className="w-full sm:w-auto">
-                        <Dropdown
-                          placeholder="Select a token"
-                          options={evmWallet.evmCurrencyOptions}
-                          defaultOption={evmWallet.defaultEvmCurrencyOption}
-                          onSelect={evmWallet.selectEvmCurrency}
-                          LeftIcon={BaseIcon}
-                        />
-                      </div>
-                    )}
+                  {sourceChain.chain && (
+                    <div className="w-full sm:w-auto">
+                      <Dropdown
+                        placeholder="Select a token"
+                        options={sourceCurrencyOptions}
+                        defaultOption={defaultSourceCurrencyOption}
+                        onSelect={setSourceCurrency}
+                        LeftIcon={WalletIcon}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Source wallet info display based on source type */}
-              {selectedSourceChain?.chainType === SourceType.Cosmos &&
+              {sourceChain.chain?.chainType === ChainType.COSMOS &&
                 cosmosWallet.cosmosAccountAddress && (
                   <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                     <p className="text-grey-light font-semibold">
@@ -280,17 +344,18 @@ export const ContentSection = () => {
                   </div>
                 )}
 
-              {selectedSourceChain?.chainType === SourceType.Evm &&
-                evmWallet.evmAccountAddress && (
+              {sourceChain.chain?.chainType === ChainType.EVM &&
+                sourceChain.address && (
                   <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                     <p className="text-grey-light font-semibold">
-                      Address: {shortenAddress(evmWallet.evmAccountAddress)}
+                      Address: {shortenAddress(sourceChain.address)}
                     </p>
-                    {evmWallet.selectedEvmCurrency &&
+                    {sourceCurrency &&
                       !evmWallet.isLoadingSelectedEvmCurrencyBalance && (
                         <p className="mt-2 text-grey-lighter font-semibold">
+                          {/* FIXME - get balance correctly */}
                           Balance: {formattedEvmBalanceValue}{" "}
-                          {evmWallet.selectedEvmCurrencyBalance?.symbol}
+                          {sourceCurrency.coinDenom}
                         </p>
                       )}
                     {evmWallet.isLoadingSelectedEvmCurrencyBalance && (
@@ -328,47 +393,46 @@ export const ContentSection = () => {
                       options={destinationChainOptions}
                       onSelect={handleDestinationChainSelect}
                       additionalOptions={additionalAstriaChainOptions}
-                      valueOverride={selectedDestinationChainOption}
+                      valueOverride={destinationChainOption}
                       LeftIcon={WalletIcon}
                     />
                   </div>
-                  {evmWallet.selectedEvmChain &&
-                    evmWallet.evmCurrencyOptions && (
-                      <div className="w-full sm:w-auto">
-                        <Dropdown
-                          placeholder="No matching token"
-                          options={evmWallet.evmCurrencyOptions}
-                          defaultOption={evmWallet.defaultEvmCurrencyOption}
-                          onSelect={evmWallet.selectEvmCurrency}
-                          valueOverride={selectedDestinationCurrencyOption}
-                          disabled={true}
-                        />
-                      </div>
-                    )}
+                  {destinationChain.chain && (
+                    <div className="w-full sm:w-auto">
+                      <Dropdown
+                        placeholder="No matching token"
+                        options={destinationCurrencyOptions}
+                        defaultOption={defaultDestinationCurrencyOption}
+                        onSelect={setDestinationCurrency}
+                        valueOverride={destinationCurrencyOption}
+                        disabled={true}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
-              {evmWallet.evmAccountAddress &&
+              {destinationChain.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
                   <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
-                    {evmWallet.evmAccountAddress && (
+                    {destinationChain.address && (
                       <p
                         className="text-grey-light font-semibold cursor-pointer"
                         onKeyDown={handleEditRecipientClick}
                         onClick={handleEditRecipientClick}
                       >
                         <span className="mr-2">
-                          Address: {shortenAddress(evmWallet.evmAccountAddress)}
+                          Address: {shortenAddress(destinationChain.address)}
                         </span>
                         <i className="fas fa-pen-to-square" />
                       </p>
                     )}
-                    {evmWallet.evmAccountAddress &&
-                      evmWallet.selectedEvmChain &&
+                    {destinationChain.chain &&
+                      destinationCurrency &&
                       !evmWallet.isLoadingSelectedEvmCurrencyBalance && (
                         <p className="mt-2 text-grey-lighter font-semibold">
                           Balance: {formattedEvmBalanceValue}{" "}
-                          {evmWallet.selectedEvmCurrencyBalance?.symbol}
+                          {destinationCurrency.coinDenom}
                         </p>
                       )}
                     {evmWallet.evmAccountAddress &&
@@ -377,14 +441,11 @@ export const ContentSection = () => {
                           Balance: <i className="fas fa-spinner fa-pulse" />
                         </p>
                       )}
-                    {selectedDestinationCurrencyOption?.value
-                      ?.erc20ContractAddress &&
+                    {destinationCurrencyOption?.value?.erc20ContractAddress &&
                       evmWallet.evmAccountAddress && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
-                            evmCurrency={
-                              selectedDestinationCurrencyOption.value
-                            }
+                            evmCurrency={destinationCurrencyOption.value}
                           />
                         </div>
                       )}

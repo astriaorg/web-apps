@@ -10,20 +10,35 @@ import React, {
 } from "react";
 import { useConfig } from "wagmi";
 
-import { CosmosChainInfo, EvmChainInfo, GenericChain } from "@repo/flame-types";
+import {
+  ChainType,
+  CosmosChainInfo,
+  EvmChainInfo,
+  EvmCurrency,
+  IbcCurrency,
+} from "@repo/flame-types";
 import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
-import { SourceType } from "bridge/types";
 import { DropdownAdditionalOption } from "components/dropdown";
 import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
 import { createErc20Service, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 
+interface ChainSelection {
+  chain: EvmChainInfo | CosmosChainInfo | null;
+  currency: EvmCurrency | IbcCurrency | null;
+  address: string | null;
+}
+
 export interface DepositPageContextProps extends PropsWithChildren {
-  selectedSourceChain?: GenericChain;
-  additionalSourceOptions: DropdownAdditionalOption[];
+  sourceChain: ChainSelection;
+  destinationChain: ChainSelection;
   handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
-  selectedDestinationChain?: GenericChain;
   handleDestinationChainSelect: (chainValue: EvmChainInfo) => void;
+  additionalSourceOptions: DropdownAdditionalOption[];
+  sourceCurrency: EvmCurrency | IbcCurrency | null;
+  setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
+  destinationCurrency: EvmCurrency | null;
+  setDestinationCurrency: (currency: EvmCurrency | null) => void;
   amount: string;
   setAmount: (value: string) => void;
   isAmountValid: boolean;
@@ -46,7 +61,6 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleConnectEvmWallet: () => void;
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
-  getActiveSourceAddress: () => string | null;
   additionalAstriaChainOptions: DropdownAdditionalOption[];
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
@@ -60,12 +74,22 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const { addNotification } = useNotifications();
   const wagmiConfig = useConfig();
 
-  const [selectedSourceChain, setSelectedSourceChain] = useState<
-    GenericChain | undefined
-  >();
-  const [selectedDestinationChain, setSelectedDestinationChain] = useState<
-    GenericChain | undefined
-  >();
+  const [sourceChain, setSourceChain] = useState<ChainSelection>({
+    chain: null,
+    currency: null,
+    address: null,
+  });
+  const [destinationChain, setDestinationChain] = useState<ChainSelection>({
+    chain: null,
+    currency: null,
+    address: null,
+  });
+
+  const [sourceCurrency, setSourceCurrency] = useState<
+    EvmCurrency | IbcCurrency | null
+  >(null);
+  const [destinationCurrency, setDestinationCurrency] =
+    useState<EvmCurrency | null>(null);
 
   // Form state
   const [amount, setAmount] = useState<string>("");
@@ -87,42 +111,138 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const evmWallet = useEvmWallet();
   const { connectEvmWallet } = evmWallet;
 
-  const handleSourceChainSelect = (
-    chainValue: CosmosChainInfo | EvmChainInfo,
-  ) => {
-    setSelectedSourceChain(chainValue);
+  const handleConnectEvmWallet = useCallback(
+    (isSource: boolean = false) => {
+      // clear recipient address override when connecting
+      // FIXME - is this still what we want to do here?
+      setIsRecipientAddressEditable(false);
+      setRecipientAddressOverride("");
 
-    // NOTE - still setting selected chain in global wallet contexts
-    //  so that we can show correct balance in the navbar dropdown
-    const cosmosChain = cosmosWallet.cosmosChainsOptions.find(
-      (option) => option.value === chainValue,
-    );
-    if (cosmosChain) {
-      cosmosWallet.selectCosmosChain(chainValue as CosmosChainInfo);
-      return;
-    }
-    const evmChain = evmWallet.evmChainsOptions.find(
-      (option) => option.value === chainValue,
-    );
-    if (evmChain) {
-      evmWallet.selectEvmChain(chainValue as EvmChainInfo);
-      return;
-    }
-  };
+      // If connecting for source, update source chain
+      if (isSource && sourceChain.chain?.chainType === ChainType.EVM) {
+        evmWallet.connectToSpecificChain(sourceChain.chain.chainId);
+        return;
+      }
 
-  const handleDestinationChainSelect = (chainValue: EvmChainInfo) => {
-    setSelectedDestinationChain(chainValue);
+      // Otherwise connect for destination (Flame)
+      connectEvmWallet();
+    },
+    [connectEvmWallet, sourceChain.chain],
+  );
 
-    const evmChain = evmWallet.evmChainsOptions.find(
-      (option) => option.value === chainValue,
-    );
-    // FIXME - do we want to set the parent context evmChain whenever they select
-    //  from either source or destination?
-    if (evmChain) {
-      evmWallet.selectEvmChain(chainValue as EvmChainInfo);
-      return;
-    }
-  };
+  const handleSourceChainSelect = useCallback(
+    (chainValue: CosmosChainInfo | EvmChainInfo) => {
+      console.log(
+        "Source chain selected:",
+        chainValue.chainName,
+        chainValue.chainType,
+      );
+      setSourceChain((prev) => ({
+        ...prev,
+        chain: chainValue,
+        // we'll set address after connection
+        address: null,
+      }));
+
+      // Handle wallet connection based on chain type
+      if (chainValue.chainType === ChainType.COSMOS) {
+        // For Cosmos chains, update global context and connect if needed
+        cosmosWallet.selectCosmosChain(chainValue as CosmosChainInfo);
+
+        // If we already have a Cosmos address, use it
+        if (cosmosWallet.cosmosAccountAddress) {
+          setSourceChain((prev) => ({
+            ...prev,
+            address: cosmosWallet.cosmosAccountAddress,
+          }));
+        } else {
+          // Trigger Cosmos wallet connection
+          cosmosWallet.connectCosmosWallet();
+        }
+      } else if (chainValue.chainType === ChainType.EVM) {
+        // For EVM chains (like Base), we need to:
+        // 1. Check if we're already connected to this chain
+        // 2. If not, prompt for connection to this specific chain
+
+        // Don't update global EVM context for source selection
+        // Instead, trigger connection to this specific chain
+
+        // If we have an EVM address and it's for the right chain, use it
+        if (
+          evmWallet.evmAccountAddress &&
+          evmWallet.selectedEvmChain?.chainId === chainValue.chainId
+        ) {
+          setSourceChain((prev) => ({
+            ...prev,
+            address: evmWallet.evmAccountAddress,
+          }));
+        } else {
+          // We need to connect to this specific chain
+          // This requires enhancing the EVM wallet context to support
+          // connecting to a specific chain
+          handleConnectEvmWallet(true);
+        }
+      }
+    },
+    [
+      cosmosWallet,
+      evmWallet.evmAccountAddress,
+      evmWallet.selectedEvmChain?.chainId,
+      handleConnectEvmWallet,
+    ],
+  );
+
+  const handleDestinationChainSelect = useCallback(
+    (chainValue: EvmChainInfo) => {
+      console.log(
+        "Destination chain selected:",
+        chainValue.chainName,
+        chainValue.chainType,
+      );
+      setDestinationChain((prev) => ({
+        ...prev,
+        chain: chainValue,
+      }));
+
+      if (!sourceChain.chain) {
+        if (chainValue.chainType === ChainType.ASTRIA) {
+          handleConnectEvmWallet();
+        }
+        return;
+      }
+
+      if (sourceChain.chain.chainType === ChainType.COSMOS) {
+        // Coming from Cosmos - need to connect EVM wallet for destination
+        if (
+          chainValue.chainType === ChainType.ASTRIA &&
+          !evmWallet.evmAccountAddress
+        ) {
+          handleConnectEvmWallet();
+        }
+      } else if (sourceChain.chain.chainType === ChainType.EVM) {
+        // Coming from EVM chain (like Base)
+
+        // If user is already connected to an EVM wallet, try to use that address
+        if (evmWallet.evmAccountAddress && !isRecipientAddressEditable) {
+          setDestinationChain((prev) => ({
+            ...prev,
+            address: evmWallet.evmAccountAddress,
+          }));
+        }
+
+        // only update global context if this is Flame chain
+        if (chainValue.chainType === ChainType.ASTRIA) {
+          evmWallet.selectEvmChain(chainValue);
+        }
+      }
+    },
+    [
+      evmWallet,
+      handleConnectEvmWallet,
+      isRecipientAddressEditable,
+      sourceChain.chain,
+    ],
+  );
 
   // toggle ability to edit recipient address
   const handleEditRecipientClick = useCallback(() => {
@@ -140,32 +260,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setRecipientAddressOverride("");
   };
 
-  // get the current source address based on the selected source type
-  const getActiveSourceAddress = useCallback((): string | null => {
-    switch (selectedSourceChain?.chainType) {
-      case SourceType.Cosmos:
-        return cosmosWallet.cosmosAccountAddress;
-      case SourceType.Evm:
-        return evmWallet.evmAccountAddress;
-      default:
-        return null;
-    }
-  }, [
-    selectedSourceChain?.chainType,
-    cosmosWallet.cosmosAccountAddress,
-    evmWallet.evmAccountAddress,
-  ]);
-
-  // handle connecting to EVM wallet
-  const handleConnectEvmWallet = useCallback(() => {
-    // clear recipient address override values when user attempts to connect evm wallet
-    setIsRecipientAddressEditable(false);
-    setRecipientAddressOverride("");
-    connectEvmWallet();
-  }, [connectEvmWallet]);
-
   const handleDeposit = async () => {
-    const activeSourceAddress = getActiveSourceAddress();
+    const activeSourceAddress = sourceChain.address;
     const recipientAddress =
       recipientAddressOverride || evmWallet.evmAccountAddress;
 
@@ -186,7 +282,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
     try {
       // different deposit logic based on source type
-      if (selectedSourceChain?.chainType === SourceType.Cosmos) {
+      if (sourceChain.chain?.chainType === ChainType.COSMOS) {
         // Cosmos to Astria deposit
         if (
           !cosmosWallet.selectedCosmosChain ||
@@ -210,15 +306,18 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
           formattedAmount,
           cosmosWallet.selectedIbcCurrency,
         );
-      } else if (selectedSourceChain?.chainType === SourceType.Evm) {
+      } else if (sourceChain.chain?.chainType === ChainType.EVM) {
         // evm to Astria deposit using intent bridge
-        if (!evmWallet.selectedEvmChain || !evmWallet.selectedEvmCurrency) {
+        if (!sourceChain.chain || !sourceCurrency) {
           throw new Error(
             "Please select a Coinbase chain and token to bridge first.",
           );
         }
 
-        if (!evmWallet.selectedEvmCurrency.astriaIntentBridgeAddress) {
+        if (
+          !("astriaIntentBridgeAddress" in sourceCurrency) ||
+          !sourceCurrency.astriaIntentBridgeAddress
+        ) {
           throw new Error(
             "Intent bridge contract not configured for this token.",
           );
@@ -228,22 +327,21 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         // FIXME - is this how the math is done in other places?
         const formattedAmount = BigInt(
           Math.floor(
-            parseFloat(amount) *
-              10 ** evmWallet.selectedEvmCurrency.coinDecimals,
+            parseFloat(amount) * 10 ** sourceCurrency.coinDecimals,
           ).toString(),
         );
 
         // send money via ERC20 contract
-        if (evmWallet.selectedEvmCurrency.erc20ContractAddress) {
+        if (sourceCurrency.erc20ContractAddress) {
           const erc20Service = createErc20Service(
             wagmiConfig,
-            evmWallet.selectedEvmCurrency.erc20ContractAddress,
+            sourceCurrency.erc20ContractAddress,
           );
-          // NOTE - right now will be sent to same address on the destination chain
+          // FIXME - need to call the astriaIntentBridge contract
           await erc20Service.transfer({
-            recipient: evmWallet.selectedEvmCurrency.astriaIntentBridgeAddress,
+            recipient: sourceCurrency.astriaIntentBridgeAddress,
             amount: formattedAmount,
-            chainId: evmWallet.selectedEvmChain.chainId,
+            chainId: sourceChain.chain.chainId,
           });
         }
       } else {
@@ -329,53 +427,36 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   // calculate if deposit button should be disabled
   const isDepositDisabled = useMemo<boolean>((): boolean => {
-    const activeSourceAddress = getActiveSourceAddress();
-
     if (recipientAddressOverride) {
-      return !(isAmountValid && isRecipientAddressValid && activeSourceAddress);
+      return !(isAmountValid && isRecipientAddressValid);
     }
 
-    if (selectedSourceChain?.chainType === SourceType.Cosmos) {
-      return !(
-        evmWallet.evmAccountAddress &&
-        isAmountValid &&
-        isRecipientAddressValid &&
-        cosmosWallet.cosmosAccountAddress &&
-        cosmosWallet.selectedIbcCurrency?.coinDenom ===
-          evmWallet.selectedEvmCurrency?.coinDenom
-      );
-    }
-
-    if (selectedSourceChain?.chainType === SourceType.Evm) {
-      return !(
-        evmWallet.evmAccountAddress &&
-        isAmountValid &&
-        isRecipientAddressValid &&
-        evmWallet.evmAccountAddress &&
-        evmWallet.selectedEvmCurrency !== null
-      );
-    }
-
-    return true;
+    return !(
+      isAmountValid &&
+      isRecipientAddressValid &&
+      sourceChain.address &&
+      sourceCurrency?.coinDenom === destinationCurrency?.coinDenom
+    );
   }, [
-    getActiveSourceAddress,
-    recipientAddressOverride,
-    selectedSourceChain?.chainType,
+    destinationCurrency?.coinDenom,
     isAmountValid,
     isRecipientAddressValid,
-    evmWallet.evmAccountAddress,
-    evmWallet.selectedEvmCurrency,
-    cosmosWallet.cosmosAccountAddress,
-    cosmosWallet.selectedIbcCurrency?.coinDenom,
+    recipientAddressOverride,
+    sourceChain.address,
+    sourceCurrency?.coinDenom,
   ]);
 
   return (
     <DepositPageContext.Provider
       value={{
-        selectedSourceChain,
+        sourceChain,
         handleSourceChainSelect,
-        selectedDestinationChain,
+        destinationChain,
         handleDestinationChainSelect,
+        sourceCurrency,
+        setSourceCurrency,
+        destinationCurrency,
+        setDestinationCurrency,
         amount,
         setAmount,
         isAmountValid,
@@ -398,7 +479,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         handleConnectEvmWallet,
         handleDeposit,
         isDepositDisabled,
-        getActiveSourceAddress,
         cosmosWallet,
         evmWallet,
         additionalSourceOptions,

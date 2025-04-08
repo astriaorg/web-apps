@@ -25,6 +25,7 @@ import {
 } from "wagmi";
 
 import {
+  AstriaChain,
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
@@ -41,22 +42,20 @@ import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
-  defaultEvmCurrencyOption: DropdownOption<EvmCurrency> | undefined;
+  connectToSpecificChain: (chainId: number) => void;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
-  evmChainsOptions: DropdownOption<EvmChainInfo>[];
-  evmCurrencyOptions: DropdownOption<EvmCurrency>[];
+  astriaChains: AstriaChain[];
+  coinbaseChains: EvmChainInfo[];
   evmNativeTokenBalance: { value: string; symbol: string } | null;
   isLoadingEvmNativeTokenBalance: boolean;
   isLoadingSelectedEvmCurrencyBalance: boolean;
   resetState: () => void;
+  // FIXME - should i refactor this to only care about Astria connection?
   selectedEvmChain: EvmChainInfo | null;
   selectedEvmChainNativeToken: EvmCurrency | undefined;
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
-  selectedEvmCurrency: EvmCurrency | null;
-  selectedEvmCurrencyBalance: { value: string; symbol: string } | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
-  selectEvmCurrency: (currency: EvmCurrency) => void;
   ibcWithdrawFeeDisplay: string;
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
@@ -184,38 +183,43 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
 
   // set the selectedFlameNetwork if user switches from their wallet
-  useEffect(() => {
-    if (!userAccount?.chainId) {
-      return;
-    }
-    try {
-      const network = getFlameNetworkByChainId(userAccount.chainId);
-      selectFlameNetwork(network);
-    } catch (error) {
-      console.warn(
-        "User selected non Flame chain. Switching to selected Flame chain.",
-        error,
-      );
-      const chainId = getFlameChainId(selectedFlameNetworkRef.current);
-      switchChain({ chainId });
-    }
-  }, [selectFlameNetwork, userAccount.chainId, switchChain]);
+  // useEffect(() => {
+  //   if (!userAccount?.chainId) {
+  //     return;
+  //   }
+  //   try {
+  //     const network = getFlameNetworkByChainId(userAccount.chainId);
+  //     selectFlameNetwork(network);
+  //   } catch (error) {
+  //     console.warn(
+  //       "User selected non Flame chain. Switching to selected Flame chain.",
+  //       error,
+  //     );
+  //     const chainId = getFlameChainId(selectedFlameNetworkRef.current);
+  //     switchChain({ chainId });
+  //   }
+  // }, [selectFlameNetwork, userAccount.chainId, switchChain]);
 
   const resetState = useCallback(() => {
+    console.log("EVM wallet state reset called");
     setSelectedEvmChain(null);
     setSelectedEvmCurrency(null);
     setEvmAccountAddress(null);
   }, []);
 
   // deselect chain and currency when network is changed and switch chains in wallet
-  useEffect(() => {
-    if (selectedFlameNetwork) {
-      resetState();
-      const chainId = getFlameChainId(selectedFlameNetwork);
-      switchChain({ chainId });
-      selectedFlameNetworkRef.current = selectedFlameNetwork;
-    }
-  }, [selectedFlameNetwork, switchChain, resetState]);
+  // FIXME - no longer correct ux, because user can connect to other evm chains for deposit source
+  // useEffect(() => {
+  //   if (selectedFlameNetwork) {
+  //     console.log("Flame network changed, resetting state and switching chains",
+  //       selectedFlameNetwork,
+  //       "Current chain:", selectedEvmChain?.chainName);
+  //     resetState();
+  //     const chainId = getFlameChainId(selectedFlameNetwork);
+  //     switchChain({ chainId });
+  //     selectedFlameNetworkRef.current = selectedFlameNetwork;
+  //   }
+  // }, [selectedFlameNetwork, switchChain, resetState, selectedEvmChain]);
 
   // polling get balance
   const getBalanceCallback = useCallback(async () => {
@@ -284,9 +288,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   } = useBalancePolling(getBalanceCallback, pollingConfig);
 
   const selectedEvmChainNativeToken = useMemo(() => {
-    return selectedEvmChain?.currencies[0];
+    return selectedEvmChain?.currencies.find((currency) => currency.isNative);
   }, [selectedEvmChain]);
 
+  // TODO - move to deposit-page-context
   const ibcWithdrawFeeDisplay = useMemo(() => {
     if (
       !selectedEvmChainNativeToken ||
@@ -303,9 +308,9 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
 
   const evmChainsOptions = useMemo(() => {
-    return Object.entries({ ...astriaChains, ...coinbaseChains }).map(
-      ([chainLabel, chain]): DropdownOption<EvmChainInfo> => ({
-        label: chainLabel,
+    return Object.values({ ...astriaChains, ...coinbaseChains }).map(
+      (chain): DropdownOption<EvmChainInfo> => ({
+        label: chain.chainName,
         value: chain,
         LeftIcon: chain.IconComponent,
       }),
@@ -324,35 +329,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [selectedEvmChain]);
 
   const selectEvmChain = useCallback((chain: EvmChainInfo | null) => {
+    console.log("EVM chain selected:", chain?.chainName, chain?.chainType);
     setSelectedEvmChain(chain);
-  }, []);
-
-  const evmCurrencyOptions = useMemo(() => {
-    if (!selectedEvmChain) {
-      return [];
-    }
-
-    const withdrawableTokens = selectedEvmChain.currencies?.filter(
-      (currency) =>
-        currency.erc20ContractAddress ||
-        currency.nativeTokenWithdrawerContractAddress,
-    );
-
-    return withdrawableTokens.map(
-      (currency): DropdownOption<EvmCurrency> => ({
-        label: currency.coinDenom,
-        value: currency,
-        LeftIcon: currency.IconComponent,
-      }),
-    );
-  }, [selectedEvmChain]);
-
-  const defaultEvmCurrencyOption = useMemo(() => {
-    return evmCurrencyOptions[0] ?? undefined;
-  }, [evmCurrencyOptions]);
-
-  const selectEvmCurrency = useCallback((currency: EvmCurrency) => {
-    setSelectedEvmCurrency(currency);
   }, []);
 
   const connectEvmWallet = useCallback(() => {
@@ -368,6 +346,13 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       openConnectModal();
     }
   }, [selectedEvmChain, openConnectModal, evmChainsOptions]);
+
+  const connectToSpecificChain = (chainId: number) => {
+    if (openConnectModal) {
+      switchChain({ chainId });
+      openConnectModal();
+    }
+  };
 
   const disconnectEvmWallet = useCallback(() => {
     disconnect();
@@ -465,11 +450,11 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
 
   const value = {
     connectEvmWallet,
-    defaultEvmCurrencyOption,
+    connectToSpecificChain,
     disconnectEvmWallet,
     evmAccountAddress,
-    evmChainsOptions,
-    evmCurrencyOptions,
+    astriaChains: Object.values(astriaChains),
+    coinbaseChains: Object.values(coinbaseChains),
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
     isLoadingSelectedEvmCurrencyBalance,
@@ -480,7 +465,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectedEvmCurrency,
     selectedEvmCurrencyBalance,
     selectEvmChain,
-    selectEvmCurrency,
     ibcWithdrawFeeDisplay,
     getTokenAllowances,
     approveToken,

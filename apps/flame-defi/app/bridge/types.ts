@@ -5,12 +5,6 @@ export enum BRIDGE_TYPE {
   INTENT = "intent",
 }
 
-export enum SourceType {
-  Astria = "astria",
-  Cosmos = "cosmos",
-  Evm = "evm",
-}
-
 export interface BridgeInfo {
   type: BRIDGE_TYPE;
   sourceChainType: ChainType;

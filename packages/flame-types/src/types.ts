@@ -20,7 +20,11 @@ import Big from "big.js";
  * to have a mechanism to distinguish between Astria (fka Flame) and
  * other EVM based chains (Arbitrum, Base, Optimism).
  */
-export type ChainType = "astria" | "cosmos" | "evm";
+export enum ChainType {
+  ASTRIA = "astria",
+  COSMOS = "cosmos",
+  EVM = "evm",
+}
 
 /**
  * GenericChain is the base chain type that other chain types extend
@@ -59,7 +63,7 @@ export interface BIP44 {
  * Represents information about a Cosmos chain.
  */
 export interface CosmosChainInfo extends GenericChain {
-  readonly chainType: "cosmos";
+  readonly chainType: ChainType.COSMOS;
   readonly rpc: string;
   readonly rest: string;
   readonly chainId: string;

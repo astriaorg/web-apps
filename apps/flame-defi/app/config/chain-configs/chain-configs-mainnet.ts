@@ -14,6 +14,7 @@ import {
 } from "@repo/ui/icons";
 import {
   AstriaChain,
+  ChainType,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -23,7 +24,7 @@ import {
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   // Chain-id of the celestia chain.
   chainId: "celestia",
   // The name of the chain to be displayed to the user.
@@ -106,7 +107,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   chainId: "neutron-1",
   chainName: "Neutron",
   // RPC endpoint of the chain
@@ -190,7 +191,7 @@ const NeutronChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   chainId: "noble-1",
   chainName: "Noble",
   rpc: "https://noble-rpc.polkachu.com:443",
@@ -238,7 +239,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const OsmosisChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   chainId: "osmosis-1",
   chainName: "Osmosis",
   rpc: "https://osmosis-rpc.polkachu.com/",
@@ -288,7 +289,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
 };
 
 const StrideChainInfo: CosmosChainInfo = {
-  chainType: "cosmos",
+  chainType: ChainType.COSMOS,
   chainId: "stride-1",
   chainName: "Stride",
   rpc: "https://stride-rpc.polkachu.com",
@@ -342,10 +343,10 @@ export const cosmosChains: CosmosChains = {
   Stride: StrideChainInfo,
 };
 
-const FlameChainInfo: AstriaChain = {
-  chainType: "astria",
+const AstriaChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 253368190,
-  chainName: "astria",
+  chainName: "Astria",
   rpcUrls: ["https://rpc.flame.astria.org"],
   blockExplorerUrl: "https://explorer.flame.astria.org",
   contracts: {
@@ -445,11 +446,11 @@ const FlameChainInfo: AstriaChain = {
 };
 
 export const astriaChains: AstriaChains = {
-  Flame: FlameChainInfo,
+  Astria: AstriaChainInfo,
 };
 
 const BaseChainInfo: EvmChainInfo = {
-  chainType: "evm",
+  chainType: ChainType.EVM,
   chainId: 8453,
   chainName: "Base",
   rpcUrls: ["https://mainnet.base.org"],
