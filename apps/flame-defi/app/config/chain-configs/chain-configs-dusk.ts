@@ -7,6 +7,7 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
+  AstriaChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -200,7 +201,7 @@ export const cosmosChains: CosmosChains = {
   "Noble Testnet": NobleChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const FlameChainInfo: AstriaChain = {
   chainType: "astria",
   chainId: 912559,
   chainName: "Flame Dusk-11",

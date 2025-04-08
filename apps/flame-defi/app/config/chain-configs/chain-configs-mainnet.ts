@@ -13,6 +13,7 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons";
 import {
+  AstriaChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -341,7 +342,7 @@ export const cosmosChains: CosmosChains = {
   Stride: StrideChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const FlameChainInfo: AstriaChain = {
   chainType: "astria",
   chainId: 253368190,
   chainName: "astria",

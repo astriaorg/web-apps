@@ -6,6 +6,7 @@ import {
   UsdcIcon,
 } from "@repo/ui/icons";
 import {
+  AstriaChain,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
@@ -193,7 +194,7 @@ export const cosmosChains: CosmosChains = {
   "Noble Local": NobleChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const FlameChainInfo: AstriaChain = {
   chainType: "astria",
   chainId: 53,
   chainName: "Flame (local)",
@@ -245,7 +246,7 @@ const FlameChainInfo: EvmChainInfo = {
   IconComponent: FlameIcon,
 };
 
-const FakeChainInfo: EvmChainInfo = {
+const FakeChainInfo: AstriaChain = {
   chainType: "astria",
   chainId: 530,
   chainName: "FakeChain (local)",
