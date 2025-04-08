@@ -1,2 +1,2 @@
-export { ConnectMultipleWalletButton } from "./connect-multiple-wallet-button";
+export { ConnectMultipleWallets } from "./connect-multiple-wallets";
 export { ConnectWalletContent } from "./connect-wallet-content";

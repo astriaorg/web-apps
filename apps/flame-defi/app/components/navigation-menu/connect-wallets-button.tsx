@@ -59,7 +59,7 @@ export const ConnectWalletsButton = () => {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="hidden flex-col w-min p-3 gap-1 lg:flex"
+        className="hidden flex-col w-min p-3 gap-1 mr-4 lg:flex"
         side="bottom"
       >
         {isSingleWalletConnect ? (

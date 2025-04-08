@@ -1,7 +1,4 @@
-import {
-  ConnectMultipleWalletButton,
-  ConnectWalletContent,
-} from "@repo/ui/components";
+import { ConnectMultipleWallets } from "@repo/ui/components";
 import { CosmosIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -71,8 +68,9 @@ export default function ConnectCosmosWalletButton({
     }
   }, [connectCosmosWallet, toggleDropdown, cosmosAccountAddress]);
 
-  return cosmosAccountAddress ? (
-    <ConnectWalletContent
+  return (
+    <ConnectMultipleWallets
+      isConnected={!!cosmosAccountAddress}
       isLoading={isLoadingCosmosBalance || !cosmosBalance || quoteLoading}
       account={
         cosmosAccountAddress ? { address: cosmosAccountAddress } : undefined
@@ -81,14 +79,8 @@ export default function ConnectCosmosWalletButton({
       fiat={usdcToNativeQuote}
       label={label}
       icon={<CosmosIcon />}
-      onDisconnectWallet={disconnectCosmosWallet}
-      collapsible
-    />
-  ) : (
-    <ConnectMultipleWalletButton
-      label={label}
-      icon={<CosmosIcon />}
       onConnectWallet={handleConnectWallet}
+      onDisconnectWallet={disconnectCosmosWallet}
     />
   );
 }
