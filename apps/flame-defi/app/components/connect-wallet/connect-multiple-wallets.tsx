@@ -10,8 +10,8 @@ export const ConnectMultipleWallets = (props: ConnectWalletProps) => {
     // On small screens, this is shown in a drawer so should match the network select drawer styling.
     <button
       className={cn(
-        "flex items-center justify-start gap-2 whitespace-nowrap px-2 py-3 rounded-md text-sm  font-medium [&_svg]:size-4",
-        "md:py-2 md:rounded-lg md:hover:bg-surface-3 md:[&_svg]:size-6",
+        "flex items-center justify-start gap-2 whitespace-nowrap px-2 py-3 rounded-md text-sm  font-medium text-typography-subdued [&_svg]:size-4",
+        "md:py-2 md:rounded-lg md:hover:bg-surface-3 md:text-typography-default md:[&_svg]:size-6",
       )}
       onClick={props.onConnectWallet}
     >

@@ -15,7 +15,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@repo/ui/components";
-import { CheckIcon, ChevronDownSmallIcon, CloseIcon } from "@repo/ui/icons";
+import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
@@ -156,8 +156,7 @@ export const MobileNavigationMenu = () => {
                     <NetworkIcon network={selectedFlameNetwork} size={16} />
                     <span className="capitalize">{selectedFlameNetwork}</span>
                   </div>
-                  {/* TODO: Replace with big icon. */}
-                  <ChevronDownSmallIcon />
+                  <ChevronDownIcon />
                 </Button>
                 <Button
                   variant={isConnected ? "secondary" : "default"}
@@ -170,8 +169,7 @@ export const MobileNavigationMenu = () => {
                         : "Connected"
                       : "Connect Wallet"}
                   </div>
-                  {/* TODO: Replace with big icon. */}
-                  <ChevronDownSmallIcon />
+                  <ChevronDownIcon />
                 </Button>
               </div>
             </div>

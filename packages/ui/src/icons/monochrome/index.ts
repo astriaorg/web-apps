@@ -29,6 +29,5 @@ export * from "./search-icon";
 export * from "./share-right-icon";
 export * from "./stride-icon";
 export * from "./table-icon";
-export * from "./up-right-square-icon";
 export * from "./wallet-icon";
 export * from "./warning-triangle-icon";

@@ -22,6 +22,7 @@ export const PowerIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M12.25 11.25V2.25"
@@ -29,6 +30,7 @@ export const PowerIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
