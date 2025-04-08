@@ -35,7 +35,7 @@ export const ConnectWalletsButton = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="hidden flex-col w-min mr-4 p-3 gap-1 w-48 lg:flex"
+            className="hidden flex-col w-min mr-4 p-3 gap-1 min-w-48 lg:flex"
             side="bottom"
           >
             <ConnectEvmWalletButton labelBeforeConnected="Flame Wallet" />

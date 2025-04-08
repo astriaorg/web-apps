@@ -26,6 +26,7 @@ export * from "./plus-icon";
 export * from "./power-icon";
 export * from "./reset-icon";
 export * from "./search-icon";
+export * from "./share-right-icon";
 export * from "./stride-icon";
 export * from "./table-icon";
 export * from "./up-right-square-icon";
