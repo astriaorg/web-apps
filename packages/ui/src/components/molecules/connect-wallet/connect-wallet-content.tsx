@@ -47,7 +47,7 @@ export const ConnectWalletContent = ({
   return (
     <Accordion type="single" {...props}>
       <AccordionItem value="wallet">
-        <div className="flex items-center justify-between w-full md:w-[300px]">
+        <div className="flex items-center justify-between w-full md:min-w-[300px]">
           <AccordionTrigger
             className={cn(
               "p-2 text-typography-subdued font-medium",
