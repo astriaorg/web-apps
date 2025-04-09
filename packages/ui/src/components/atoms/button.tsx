@@ -11,7 +11,7 @@ const buttonStyles = {
 };
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -21,14 +21,14 @@ const buttonVariants = cva(
         secondary: `bg-surface-3 text-typography-default ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
         ghost: "hover:text-typography-light",
         gradient:
-          "rounded-xl bg-button-gradient text-white transition border border-orange-soft hover:border-white",
+          "bg-button-gradient text-white transition border border-orange-soft hover:border-white",
         link: "",
       },
       size: {
-        default: "h-10 px-4 py-3 text-base/4 font-semibold",
-        sm: "h-8 px-2 py-1.5 text-sm font-medium",
+        default: "h-10 rounded-xl px-4 py-3 text-base/4 font-semibold",
+        sm: "h-8 rounded-lg px-2 py-1.5 text-sm font-medium",
         lg: "",
-        icon: "h-10 w-10",
+        icon: "h-10 w-10 rounded-lg",
       },
     },
     defaultVariants: {

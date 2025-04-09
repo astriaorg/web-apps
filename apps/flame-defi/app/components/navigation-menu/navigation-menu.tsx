@@ -1,10 +1,10 @@
 "use client";
 
 import { FlameIcon } from "@repo/ui/icons";
-import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
+import { ConnectWalletsButton } from "./connect-wallets-button";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
 import { NetworkSelect } from "./network-select";
@@ -29,7 +29,7 @@ export const NavigationMenu = () => {
         >
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
-        <div className="items-center space-x-8 hidden lg:flex">
+        <div className="items-center space-x-8 hidden md:flex">
           <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
             Bridge
           </NavigationMenuLink>
@@ -65,11 +65,13 @@ export const NavigationMenu = () => {
           )}
         </div>
       </div>
-      <div className="hidden lg:flex gap-6 items-center">
+      <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
         <ConnectWalletsButton />
       </div>
-      <MobileNavigationMenu />
+      <div className="md:hidden">
+        <MobileNavigationMenu />
+      </div>
     </nav>
   );
 };

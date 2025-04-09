@@ -49,11 +49,7 @@ export const NetworkSelect = (): React.ReactElement => {
         <SelectGroup>
           <SelectLabel>Network</SelectLabel>
           {networksList.map((network) => (
-            <SelectItem
-              key={network}
-              value={network}
-              className="data-[state=checked]:bg-semi-white"
-            >
+            <SelectItem key={network} value={network}>
               <span className="flex items-center gap-2">
                 <NetworkIcon network={network} size={16} />
                 <span className="capitalize">{network}</span>
