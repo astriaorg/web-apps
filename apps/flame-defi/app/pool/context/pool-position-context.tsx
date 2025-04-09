@@ -39,7 +39,8 @@ export const PoolPositionContextProvider = ({
   const { address } = useAccount();
   const { formatNumber } = useIntl();
   const positionNftId = params["position-nft-id"] as string;
-  const { selectedChain, nativeToken, wrappedNativeToken } = useAstriaChainData();
+  const { selectedChain, nativeToken, wrappedNativeToken } =
+    useAstriaChainData();
   const { currencies } = selectedChain;
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
   const [collectAsNative, setCollectAsNative] = useState<boolean>(
