@@ -1,5 +1,5 @@
 import { HexString, TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useEffect, useState } from "react";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import { useConfig as useAppConfig } from "config";
@@ -18,7 +18,7 @@ export const useAddLiquidityTxn = (
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
 
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const { poolToken0, poolToken1, positionNftId } = usePoolPositionContext();
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;

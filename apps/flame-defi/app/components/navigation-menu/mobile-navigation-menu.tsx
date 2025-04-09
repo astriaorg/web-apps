@@ -20,7 +20,7 @@ import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
-import { useConfig, useEvmChainData } from "config";
+import { useAstriaChainData, useConfig } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
@@ -43,7 +43,7 @@ export const MobileNavigationMenu = () => {
     selectedFlameNetwork,
     selectFlameNetwork,
   } = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const {
     connectEvmWallet,
     disconnectEvmWallet,

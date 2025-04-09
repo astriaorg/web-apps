@@ -7,7 +7,7 @@ import {
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
@@ -22,7 +22,7 @@ import { useAccount } from "wagmi";
 export const ConnectWalletsButton = () => {
   const pathname = usePathname();
   const { cosmosAccountAddress } = useCosmosWallet();
-  const { selectedChain } = useEvmChainData();
+  const { selectedChain } = useAstriaChainData();
   const account = useAccount();
   const {
     connectEvmWallet,
