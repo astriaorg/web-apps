@@ -1,9 +1,15 @@
 import type { Config } from "@wagmi/core";
 import { type Address, Abi } from "viem";
-import { HexString } from "@repo/flame-types";
+import {
+  EvmChainInfo,
+  HexString,
+  TokenInputState,
+  tokenInputStateToTokenAmount,
+} from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
+import { needToReverseTokenOrder } from "../services.utils";
 
 type PositionResponseTuple = [
   bigint, // nonce
@@ -20,9 +26,19 @@ type PositionResponseTuple = [
   bigint, // tokensOwed1
 ];
 
-export class NonFungiblePositionService extends GenericContractService {
+export interface IncreaseLiquidityParams {
+  chainId: number;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+  value: bigint;
+}
+
+export class NonfungiblePositionManagerService extends GenericContractService {
   /**
-   * Creates a new NonFungiblePositionService instance
+   * Creates a new NonfungiblePositionManagerService instance
    *
    * @param wagmiConfig - The wagmi configuration object
    * @param contractAddress - The address of the NonFungiblePositionManager contract
@@ -94,28 +110,138 @@ export class NonFungiblePositionService extends GenericContractService {
     fee: number,
     tickLower: number,
     tickUpper: number,
-    amount0Desired: number,
-    amount1Desired: number,
-    amount0Min: number,
-    amount1Min: number,
+    amount0Desired: bigint,
+    amount1Desired: bigint,
+    amount0Min: bigint,
+    amount1Min: bigint,
     recipient: Address,
     deadline: number,
+    value: bigint,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(chainId, "mint", [
-      token0,
-      token1,
-      fee,
-      tickLower,
-      tickUpper,
+    return await this.writeContractMethod(
+      chainId,
+      "mint",
+      [
+        {
+          token0,
+          token1,
+          fee,
+          tickLower,
+          tickUpper,
+          amount0Desired,
+          amount1Desired,
+          amount0Min,
+          amount1Min,
+          recipient,
+          deadline,
+        },
+      ],
+      value,
+    );
+  }
+
+  /**
+   * Increases liquidity for an existing position.
+   *
+   * @param tokenId - The ID of the NFT position to increase liquidity in
+   * @param chainId - The chain ID of the EVM chain
+   * @param amount0Desired - The desired amount of token0 to add
+   * @param amount1Desired - The desired amount of token1 to add
+   * @param amount0Min - The minimum amount of token0 to add (slippage protection)
+   * @param amount1Min - The minimum amount of token1 to add (slippage protection)
+   * @param deadline - The timestamp by which the transaction must be executed
+   * @param value - Optional value to send with the transaction (needed for native token operations)
+   * @returns Object containing transaction hash if successful, and the additional liquidity amount
+   */
+  async increaseLiquidity(
+    tokenId: string,
+    {
+      chainId,
       amount0Desired,
       amount1Desired,
       amount0Min,
       amount1Min,
-      recipient,
       deadline,
-    ]);
+      value,
+    }: IncreaseLiquidityParams,
+  ): Promise<HexString> {
+    return await this.writeContractMethod(
+      chainId,
+      "increaseLiquidity",
+      [
+        {
+          tokenId: BigInt(tokenId),
+          amount0Desired,
+          amount1Desired,
+          amount0Min,
+          amount1Min,
+          deadline,
+        },
+      ],
+      value,
+    );
+  }
 
-    return txHash;
+  public static getIncreaseLiquidityParams(
+    tokenInput0: TokenInputState,
+    tokenInput1: TokenInputState,
+    slippageTolerance: number,
+    chain: EvmChainInfo,
+  ): IncreaseLiquidityParams {
+    const token0Address = tokenInput0.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput0.token?.erc20ContractAddress;
+    const token1Address = tokenInput1.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput1.token?.erc20ContractAddress;
+
+    if (!token0Address || !token1Address) {
+      throw new Error("Token addresses are missing");
+    }
+
+    const shouldReverseOrder = needToReverseTokenOrder(
+      token0Address,
+      token1Address,
+    );
+
+    let tokens = [
+      tokenInputStateToTokenAmount(tokenInput0, chain.chainId),
+      tokenInputStateToTokenAmount(tokenInput1, chain.chainId),
+    ];
+    if (shouldReverseOrder) {
+      tokens = tokens.reverse();
+    }
+
+    if (!tokens[0] || !tokens[1]) {
+      throw new Error("Must have both tokens set");
+    }
+
+    let value = 0n;
+    const nativeTokenInput = [tokenInput0, tokenInput1].find(
+      (tInput) => tInput.token?.isNative,
+    );
+    if (nativeTokenInput) {
+      value =
+        tokenInputStateToTokenAmount(
+          nativeTokenInput,
+          chain.chainId,
+        )?.amountAsBigInt() ?? 0n;
+    }
+
+    return {
+      chainId: chain.chainId,
+      amount0Desired: tokens[0].amountAsBigInt(),
+      amount1Desired: tokens[1].amountAsBigInt(),
+      amount0Min: tokens[0]
+        .withSlippage(slippageTolerance, true)
+        .amountAsBigInt(),
+      amount1Min: tokens[1]
+        .withSlippage(slippageTolerance, true)
+        .amountAsBigInt(),
+      // TODO - probably move to constant
+      deadline: Math.floor(Date.now() / 1000) + 10 * 60,
+      value,
+    };
   }
 
   /**
@@ -137,13 +263,13 @@ export class NonFungiblePositionService extends GenericContractService {
     amount1Min: number,
     deadline: number,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(
-      chainId,
-      "decreaseLiquidity",
-      [tokenId, liquidity, amount0Min, amount1Min, deadline],
-    );
-
-    return txHash;
+    return await this.writeContractMethod(chainId, "decreaseLiquidity", [
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline,
+    ]);
   }
 
   /**
@@ -163,14 +289,12 @@ export class NonFungiblePositionService extends GenericContractService {
     amount0Max: number,
     amount1Max: number,
   ): Promise<HexString> {
-    const txHash = await this.writeContractMethod(chainId, "collect", [
+    return await this.writeContractMethod(chainId, "collect", [
       tokenId,
       recipient,
       amount0Max,
       amount1Max,
     ]);
-
-    return txHash;
   }
 
   /**
@@ -229,15 +353,15 @@ export class NonFungiblePositionService extends GenericContractService {
 }
 
 /**
- * Factory function to create a new NonFungiblePositionService instance
+ * Factory function to create a new NonfungiblePositionManagerService instance
  *
  * @param wagmiConfig - The wagmi configuration object
  * @param contractAddress - The address of the NonFungiblePositionManager contract
- * @returns A new NonFungiblePositionService instance
+ * @returns A new NonfungiblePositionManagerService instance
  */
-export function createNonFungiblePositionService(
+export function createNonfungiblePositionManagerService(
   wagmiConfig: Config,
   contractAddress: Address,
-): NonFungiblePositionService {
-  return new NonFungiblePositionService(wagmiConfig, contractAddress);
+): NonfungiblePositionManagerService {
+  return new NonfungiblePositionManagerService(wagmiConfig, contractAddress);
 }

@@ -5,6 +5,7 @@ import {
   BlockLoader,
   Skeleton,
   SuccessCheck,
+  ToggleSwitch,
   TokenIcon,
 } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
@@ -20,6 +21,7 @@ import {
   getTxnType,
 } from "pool/types";
 import { useIntl } from "react-intl";
+import { PriceRangeCard } from "./price-range-card";
 
 export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
@@ -61,7 +63,14 @@ export const AddLiquidityTxnSummary = ({
   selectedFeeTier,
 }: TxnComponentProps) => {
   const { formatNumber } = useIntl();
-  const { feeTier } = usePoolPositionContext();
+  const {
+    feeTier,
+    currentPrice,
+    minPrice,
+    maxPrice,
+    selectedSymbol,
+    handleReverseTokenData,
+  } = usePoolPositionContext();
 
   return (
     <>
@@ -88,12 +97,47 @@ export const AddLiquidityTxnSummary = ({
               </div>
             ))}
           </div>
-          <hr className="border-t border-border mt-2 mb-2 w-full" />
           <div className="flex justify-between w-full gap-2">
             <span>Fee Tier</span>
             <span>{selectedFeeTier || feeTier}</span>
           </div>
         </Skeleton>
+
+        <hr className="border-t border-border mt-2 mb-2 w-full" />
+
+        <div className="flex gap-4 mb-2 w-full justify-between items-center">
+          <h2 className="text-base font-medium">Selected Range</h2>
+          <Skeleton
+            className="w-[200px] h-[40px]"
+            isLoading={poolTokens.length === 0}
+          >
+            <ToggleSwitch
+              toggleOptions={poolTokens.map(({ token }) => token.coinDenom)}
+              className="text-sm w-[200px] h-[40px]"
+              selectedOption={selectedSymbol}
+              setSelectedOption={handleReverseTokenData}
+            />
+          </Skeleton>
+        </div>
+        <div className="flex flex-col gap-4 w-full">
+          <PriceRangeCard
+            leftLabel="Current price"
+            value={currentPrice}
+            variant="small"
+          />
+          <PriceRangeCard
+            leftLabel="Min price"
+            tooltipText={`Your position will be 100% ${selectedSymbol} at this price.`}
+            value={minPrice}
+            variant="small"
+          />
+          <PriceRangeCard
+            leftLabel="Max price"
+            tooltipText={`Your position will be 100% ${poolTokens[0]?.token.coinDenom === selectedSymbol ? poolTokens[1]?.token.coinDenom : poolTokens[0]?.token.coinDenom} at this price.`}
+            value={maxPrice}
+            variant="small"
+          />
+        </div>
       </div>
     </>
   );
@@ -203,33 +247,29 @@ const TxnLoader = ({
   );
 };
 
-const TxnSuccess = ({ txnHash }: TxnSuccessProps) => {
+const TxnSuccess = ({ poolTokens, txnHash }: TxnSuccessProps) => {
   const { selectedChain } = useAstriaChainData();
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
       <div className="text-white font-medium mt-6 mb-6 text-center w-full">
-        <span className="mb-2 text-base md:text-lg">Success</span>
         <div className="flex flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
-          {/* <div className="flex items-center gap-1">
-            <span>Swapped</span>
-            <span>
-              {formatDecimalValues(topToken.value || "0", 6)}{" "}
-              <span>{topToken.token?.coinDenom}</span>
-            </span>
-          </div>
-          <span>for</span>
-          <div className="flex items-center gap-1">
-            0<span>{bottomToken.token?.coinDenom}</span>
-          </div> */}
+          {poolTokens[0] && poolTokens[1] && (
+            <div className="flex items-center gap-1">
+              <span>
+                Successfully added {poolTokens[0].token.coinDenom} /{" "}
+                {poolTokens[1].token.coinDenom} liquidity
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
             href={`${selectedChain.blockExplorerUrl}/tx/${txnHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 text-orange-soft hover:text-orange-soft/80 transition text-base md:text-lg underline"
+            className="mt-2 text-orange hover:text-orange/80 transition text-base md:text-lg underline"
           >
             View on Explorer
           </a>
@@ -242,7 +282,7 @@ const TxnSuccess = ({ txnHash }: TxnSuccessProps) => {
 const TxnFailed = ({ txnMsg }: TxnFailedProps) => {
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      <ErrorIcon size={170} className="text-orange-soft" />
+      <ErrorIcon size={170} className="text-orange" />
       <div className="text-white font-medium mt-6 text-center">
         <div className="flex items-center gap-1 justify-center text-base">
           <span>{txnMsg || "An error occurred"}</span>
@@ -287,7 +327,7 @@ export function PoolTxnSteps({
           addLiquidityInputValues={addLiquidityInputValues}
         />
       )}
-      {txnStatus === TXN_STATUS.SUCCESS && (
+      {txnStatus === TXN_STATUS.SUCCESS && txnHash && (
         <TxnSuccess poolTokens={poolTokens} txnHash={txnHash} />
       )}
       {txnStatus === TXN_STATUS.FAILED && <TxnFailed txnMsg={txnMsg} />}

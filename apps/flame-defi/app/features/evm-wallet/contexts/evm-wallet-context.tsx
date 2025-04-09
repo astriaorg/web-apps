@@ -31,6 +31,8 @@ import {
   evmCurrencyBelongsToChain,
   HexString,
   TokenAllowance,
+  TokenInputState,
+  tokenStateToBig,
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { useGetQuote } from "../../../hooks";
@@ -59,10 +61,14 @@ export interface EvmWalletContextProps {
   ibcWithdrawFeeDisplay: string;
   tokenAllowances: TokenAllowance[];
   getTokenAllowances: () => void;
-  approveToken: (
-    token: EvmCurrency,
-    value: string,
-  ) => Promise<HexString | null>;
+  getTokenNeedingApproval: (
+    tokenInputState: TokenInputState,
+  ) => TokenInputState | null;
+  getMultiTokenNeedingApproval: (
+    tokenInputStateOne: TokenInputState,
+    tokenInputStateTwo: TokenInputState,
+  ) => TokenInputState | null;
+  approveToken: (tokenInputState: TokenInputState) => Promise<HexString | null>;
   usdcToNativeQuote: { value: string; symbol: string };
   quoteLoading: boolean;
 }
@@ -360,13 +366,15 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, [disconnect, resetState]);
 
   const approveToken = useCallback(
-    async (token: EvmCurrency, value: string) => {
+    async (tokenInputState: TokenInputState): Promise<HexString | null> => {
+      const token = tokenInputState.token;
       if (
+        !token ||
         !wagmiConfig ||
         !contracts?.swapRouter?.address ||
         !currencies ||
         !selectedChain.chainId ||
-        !token?.erc20ContractAddress
+        !token.erc20ContractAddress
       ) {
         return null;
       }
@@ -378,7 +386,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
       const txHash = await erc20Service.approveToken(
         selectedChain.chainId,
         contracts.swapRouter.address,
-        value,
+        tokenInputState.value,
         token.coinDecimals,
       );
 
@@ -386,7 +394,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
         if (data.symbol === token.coinDenom) {
           return {
             symbol: token.coinDenom,
-            value: parseUnits(value, token.coinDecimals).toString(),
+            value: parseUnits(
+              tokenInputState.value,
+              token.coinDecimals,
+            ).toString(),
           };
         }
         return data;
@@ -442,6 +453,50 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setTokenAllowances(newTokenAllowances);
   }, [userAccount.address, contracts, currencies, selectedChain, wagmiConfig]);
 
+  const getTokenNeedingApproval = useCallback(
+    (tokenInputState: TokenInputState): TokenInputState | null => {
+      const token = tokenInputState.token;
+
+      if (!token) {
+        return null;
+      }
+
+      const existingAllowance = tokenAllowances.find(
+        (allowanceToken) => token.coinDenom === allowanceToken.symbol,
+      );
+
+      if (existingAllowance) {
+        const tokenInputGreaterThanAllowance = tokenStateToBig(
+          tokenInputState,
+        ).gt(existingAllowance.value);
+        if (tokenInputGreaterThanAllowance) {
+          return { token: token, value: tokenInputState.value };
+        }
+      }
+
+      return null;
+    },
+    [tokenAllowances],
+  );
+
+  const getMultiTokenNeedingApproval = useCallback(
+    (
+      tokenInputStateOne: TokenInputState,
+      tokenInputStateTwo: TokenInputState,
+    ): TokenInputState | null => {
+      let tokenNeedingApproval = null;
+      if (tokenInputStateOne) {
+        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateOne);
+      }
+      if (tokenInputStateTwo) {
+        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateTwo);
+      }
+
+      return tokenNeedingApproval;
+    },
+    [getTokenNeedingApproval],
+  );
+
   useEffect(() => {
     if (userAccount.address && tokenAllowances.length === 0) {
       void getTokenAllowances();
@@ -467,6 +522,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectEvmChain,
     ibcWithdrawFeeDisplay,
     getTokenAllowances,
+    getTokenNeedingApproval,
+    getMultiTokenNeedingApproval,
     approveToken,
     tokenAllowances,
     usdcToNativeQuote,

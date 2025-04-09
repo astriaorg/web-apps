@@ -5,7 +5,7 @@ import {
   TokenAmount,
   TokenInputState,
 } from "@repo/flame-types";
-import { getSwapSlippageTolerance } from "@repo/ui/utils";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
@@ -151,7 +151,7 @@ export const useTxnInfo = ({
     topToken,
     bottomToken,
   );
-  const swapSlippageTolerance = getSwapSlippageTolerance();
+  const swapSlippageTolerance = getSlippageTolerance();
 
   useEffect(() => {
     if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
