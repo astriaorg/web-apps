@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/components";
-import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
+import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 import { GetQuoteResult } from "@repo/flame-types";
 import { OneToOneQuoteProps, TransactionInfo } from "../types";
 import { RoutePath } from "./route-path";
@@ -29,7 +29,7 @@ export function TxnInfo({
   oneToOneQuote,
   quote,
 }: TxnInfoProps) {
-  const swapSlippageTolerance = getSwapSlippageTolerance();
+  const slippageTolerance = getSlippageTolerance();
 
   return (
     <Accordion type="single" collapsible>
@@ -132,7 +132,7 @@ export function TxnInfo({
             <div className="flex justify-between">
               <div className="flex gap-1 items-center">
                 <span className="w-[116px] md:w-full text-sm text-grey-light">
-                  Min received after slippage ({swapSlippageTolerance}%)
+                  Min received after slippage ({slippageTolerance}%)
                 </span>
                 <InfoTooltip
                   className="max-w-[250px]"

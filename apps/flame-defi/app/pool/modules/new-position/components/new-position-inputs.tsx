@@ -5,20 +5,20 @@ import { NewPositionInputsProps } from "pool/types";
 import { useIntl } from "react-intl";
 
 export const NewPositionInputs = ({
-  inputOne,
-  inputTwo,
-  setInputOne,
-  setInputTwo,
+  input0,
+  input1,
+  setInput0,
+  setInput1,
   currencies,
 }: NewPositionInputsProps) => {
   const { formatNumber } = useIntl();
-  const { tokenOneBalance, tokenTwoBalance } = useGetPoolTokenBalances(
-    inputOne.token?.coinDenom || "",
-    inputTwo.token?.coinDenom || "",
+  const { token0Balance, token1Balance } = useGetPoolTokenBalances(
+    input0.token?.coinDenom || "",
+    input1.token?.coinDenom || "",
   );
   const inputsArray = [
-    { input: inputOne, setInput: setInputOne, tokenBalance: tokenOneBalance },
-    { input: inputTwo, setInput: setInputTwo, tokenBalance: tokenTwoBalance },
+    { input: input0, setInput: setInput0, tokenBalance: token0Balance },
+    { input: input1, setInput: setInput1, tokenBalance: token1Balance },
   ];
 
   return (
@@ -47,7 +47,7 @@ export const NewPositionInputs = ({
               <TokenSelector
                 tokens={currencies}
                 selectedToken={input.token}
-                unavailableToken={inputTwo.token}
+                unavailableToken={input1.token}
                 setSelectedToken={(token) => setInput({ ...input, token })}
               />
               {maxInputValue &&
