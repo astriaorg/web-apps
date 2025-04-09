@@ -113,6 +113,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   const handleConnectEvmWallet = useCallback(
     (isSource: boolean = false) => {
+      console.log("handleConnectEvmWallet");
       // clear recipient address override when connecting
       // FIXME - is this still what we want to do here?
       setIsRecipientAddressEditable(false);
@@ -120,6 +121,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
       // If connecting for source, update source chain
       if (isSource && sourceChain.chain?.chainType === ChainType.EVM) {
+        console.log("connect to specific chain");
         evmWallet.connectToSpecificChain(sourceChain.chain.chainId);
         return;
       }

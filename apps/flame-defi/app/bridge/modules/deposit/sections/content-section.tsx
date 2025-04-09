@@ -51,6 +51,11 @@ export const ContentSection = () => {
     handleDeposit,
   } = useDepositPageContext();
 
+  console.log({
+    sourceChain,
+    destinationChain,
+  });
+
   // TODO - implement FundButton correctly somewhere.
   //   right now i'm just showing it in arbitrary spot for testing.
   const coinbaseOnrampBuyUrl = useMemo(() => {
