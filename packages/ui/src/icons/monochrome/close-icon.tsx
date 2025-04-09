@@ -22,6 +22,7 @@ export const CloseIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M19.25 5.25L5.25 19.25"
@@ -29,6 +30,7 @@ export const CloseIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

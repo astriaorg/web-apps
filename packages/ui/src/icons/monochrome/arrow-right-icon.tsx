@@ -22,6 +22,7 @@ export const ArrowRightIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M14.25 19.25L21.25 12.25L14.25 5.25"
@@ -29,6 +30,7 @@ export const ArrowRightIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { UpRightSquareIcon } from "@repo/ui/icons";
+import { ShareRightIcon } from "@repo/ui/icons";
 import { useConfig } from "config";
 
 interface SideTagProps {
@@ -23,7 +23,7 @@ export const SideTag = ({ label }: SideTagProps) => {
         className="flex items-center gap-2 transition px-3 py-2 text-white hover:bg-black/10 text-base"
       >
         <span className="w-5 h-5 flex items-center justify-center">
-          <UpRightSquareIcon />
+          <ShareRightIcon />
         </span>
         <span>{label}</span>
       </a>

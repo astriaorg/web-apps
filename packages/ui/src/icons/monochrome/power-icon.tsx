@@ -12,17 +12,25 @@ export const PowerIcon: React.FC<IconProps> = ({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9"
+        d="M7.75 4.4541C5.05989 6.01024 3.25 8.91879 3.25 12.25C3.25 17.2206 7.27944 21.25 12.25 21.25C17.2206 21.25 21.25 17.2206 21.25 12.25C21.25 8.91879 19.4401 6.01024 16.75 4.4541"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
+      />
+      <path
+        d="M12.25 11.25V2.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

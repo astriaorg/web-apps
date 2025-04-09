@@ -10,11 +10,9 @@ export const CopyIcon: React.FC<IconProps> = ({
     <svg
       width={size}
       height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
@@ -24,6 +22,7 @@ export const CopyIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M15.25 4.25V3.75C15.25 2.92157 14.5784 2.25 13.75 2.25H4.75C3.92157 2.25 3.25 2.92157 3.25 3.75V14.75C3.25 15.5784 3.92157 16.25 4.75 16.25H5.25"
@@ -31,6 +30,7 @@ export const CopyIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
