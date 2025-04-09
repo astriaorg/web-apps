@@ -715,5 +715,5 @@ export enum TXN_STATUS {
 }
 
 export type TxnFailedProps = {
-  txnMsg: string | undefined;
+  txnMsg?: string;
 };

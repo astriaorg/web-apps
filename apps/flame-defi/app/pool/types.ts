@@ -138,7 +138,7 @@ export type PoolPositionContextProps = {
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
   poolTokens: PoolToken[];
-  txnHash: HexString;
+  txnHash: HexString | undefined;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
