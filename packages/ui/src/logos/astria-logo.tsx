@@ -1,4 +1,4 @@
-export const Logo = (props: React.HTMLAttributes<SVGSVGElement>) => {
+export const AstriaLogo = (props: React.HTMLAttributes<SVGSVGElement>) => {
   return (
     <svg
       width="104"

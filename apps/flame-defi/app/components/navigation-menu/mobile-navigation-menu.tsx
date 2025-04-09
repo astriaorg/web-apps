@@ -17,6 +17,7 @@ import {
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
 import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
@@ -38,6 +39,7 @@ export const MobileNavigationMenu = () => {
   const account = useAccount();
   const { cosmosAccountAddress } = useCosmosWallet();
   const {
+    brandURL,
     featureFlags,
     networksList,
     selectedFlameNetwork,
@@ -104,11 +106,28 @@ export const MobileNavigationMenu = () => {
               "w-[calc(100vw-var(--removed-body-scroll-bar-size,0px))]",
             )}
           >
-            <DialogTitle className="sr-only">Flame Apps</DialogTitle>
+            <DialogTitle className="sr-only"></DialogTitle>
             <DialogDescription className="sr-only"></DialogDescription>
-            <div className="flex flex-col px-6 py-8 h-full">
+            <div className="flex flex-col px-6 pb-8 h-full">
+              <div className="flex items-center justify-between w-full h-14">
+                {/* Align with the logo and button in the navigation menu for seamless transitions. */}
+                <a
+                  target="_blank"
+                  href={brandURL}
+                  className="flex items-center h-5 -ml-2"
+                  rel="noreferrer"
+                  aria-label="Astria Logo"
+                >
+                  <AstriaLogo />
+                </a>
+                <DialogClose className="absolute right-4 top-4.5">
+                  <NavigationMenuButton size={20} isOpen={isOpen} />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+              </div>
+
               <div className="flex-1" />
-              <div className="flex flex-col items-center space-y-8">
+              <div className="flex flex-col items-center py-8 space-y-8">
                 <MobileNavigationMenuLink
                   href={LINKS.BRIDGE}
                   isActive={pathname === LINKS.BRIDGE}
@@ -173,12 +192,6 @@ export const MobileNavigationMenu = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Align with the button in the navigation menu for seamless transitions. */}
-            <DialogClose className="absolute right-4 top-4.5">
-              <NavigationMenuButton size={20} isOpen={isOpen} />
-              <span className="sr-only">Close</span>
-            </DialogClose>
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>

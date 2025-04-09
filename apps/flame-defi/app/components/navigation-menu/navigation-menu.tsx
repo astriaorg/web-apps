@@ -1,6 +1,6 @@
 "use client";
 
-import { Logo } from "@repo/ui/logos";
+import { AstriaLogo } from "@repo/ui/logos";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
@@ -27,7 +27,7 @@ export const NavigationMenu = () => {
           rel="noreferrer"
           aria-label="Astria Logo"
         >
-          <Logo className="text-typography-default" />
+          <AstriaLogo />
         </a>
         <div className="items-center space-x-8 hidden md:flex">
           <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
