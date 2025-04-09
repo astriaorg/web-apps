@@ -4,39 +4,39 @@ import { TokenInfoCard } from "pool/components";
 import { PoolToken } from "pool/types";
 
 export const TokenLiquidityBlock = ({
-  poolTokenOne,
-  poolTokenTwo,
+  poolToken0,
+  poolToken1,
   feeTier,
 }: {
-  poolTokenOne: PoolToken | null;
-  poolTokenTwo: PoolToken | null;
+  poolToken0: PoolToken | null;
+  poolToken1: PoolToken | null;
   feeTier: string;
 }) => {
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4 justify-center">
         <Skeleton
-          isLoading={!poolTokenOne || !poolTokenTwo}
+          isLoading={!poolToken0 || !poolToken1}
           className="w-full h-[64px]"
         >
-          {poolTokenOne && poolTokenTwo && (
+          {poolToken0 && poolToken1 && (
             <div className="flex flex-col space-x-2">
               <MultiTokenIcon
                 symbols={[
-                  poolTokenOne.token.coinDenom,
-                  poolTokenTwo.token.coinDenom,
+                  poolToken0.token.coinDenom,
+                  poolToken1.token.coinDenom,
                 ]}
                 size={24}
               />
               <h1 className="text-2xl/8">
-                {poolTokenOne.token.coinDenom}/{poolTokenTwo.token.coinDenom}
+                {poolToken0.token.coinDenom}/{poolToken1.token.coinDenom}
               </h1>
             </div>
           )}
         </Skeleton>
         <div className="flex space-x-2">
           <Skeleton
-            isLoading={!poolTokenOne || !poolTokenTwo}
+            isLoading={!poolToken0 || !poolToken1}
             className="w-full h-[24px]"
           >
             <Badge
@@ -54,14 +54,14 @@ export const TokenLiquidityBlock = ({
       </div>
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4">
         <TokenInfoCard
-          poolTokenOne={poolTokenOne}
-          poolTokenTwo={poolTokenTwo}
+          poolToken0={poolToken0}
+          poolToken1={poolToken1}
           className="p-0"
           showLiquidity={true}
         />
         <hr className="border-t border-border mt-2 mb-2" />
         <Skeleton
-          isLoading={!poolTokenOne || !poolTokenTwo}
+          isLoading={!poolToken0 || !poolToken1}
           className="w-full h-[24px]"
         >
           <div className="flex justify-between">

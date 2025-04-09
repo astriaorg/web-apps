@@ -12,14 +12,14 @@ export function SuccessCheck() {
             cx="12"
             cy="12"
             r="11.5"
-            className="fill-none [stroke-width:1px] stroke-[#F09727] [stroke-dasharray:72px,72px] [stroke-dashoffset:72px] animate-success-circle-outline opacity-0"
+            className="fill-none [stroke-width:1px] stroke-orange [stroke-dasharray:72px,72px] [stroke-dashoffset:72px] animate-success-circle-outline opacity-0"
           />
           {/* Filled Circle */}
           <circle
             cx="12"
             cy="12"
             r="11.5"
-            className="fill-[#F09727] stroke-none opacity-0 animate-success-circle-fill"
+            className="fill-orange stroke-none opacity-0 animate-success-circle-fill"
           />
           {/* Tick Mark */}
           <polyline

@@ -53,7 +53,7 @@ export const ContentSection = () => {
               <PoolTxnSteps
                 txnStatus={txnStatus}
                 poolTokens={liquidityToRemove}
-                txnHash={""}
+                txnHash={"0x"}
                 txnMsg={""}
                 addLiquidityInputValues={null}
               />

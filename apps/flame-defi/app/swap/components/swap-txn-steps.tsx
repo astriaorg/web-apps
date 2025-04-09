@@ -8,7 +8,7 @@ import {
   SuccessCheck,
 } from "@repo/ui/components";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
-import { formatDecimalValues, getSwapSlippageTolerance } from "@repo/ui/utils";
+import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 import { useEvmChainData } from "config";
 import { SwapTxnStepsProps, TxnDetailsProps, TxnStepsProps } from "../types";
 
@@ -30,7 +30,7 @@ export function TxnDetails({
     setFlipDirection,
     flipDirection,
   } = oneToOneQuote;
-  const swapSlippageTolerance = getSwapSlippageTolerance();
+  const slippageTolerance = getSlippageTolerance();
 
   return (
     <>
@@ -124,7 +124,7 @@ export function TxnDetails({
         <div className="flex justify-between">
           <div className="flex gap-1 items-center">
             <span className="w-[116px] md:w-full text-sm text-grey-light">
-              Min received after slippage ({swapSlippageTolerance}%)
+              Min received after slippage ({slippageTolerance}%)
             </span>
             <InfoTooltip
               className="max-w-[250px]"
@@ -185,7 +185,7 @@ function TxnSuccess({
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
       <div className="text-white font-medium mt-6 mb-6 text-center w-full">
-        <span className="mb-2 text-base md:text-lg">Success</span>
+        <span className="mb-2 text-base md:text-lg">Success!</span>
         <div className="flex flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
           <div className="flex items-center gap-1">
             <span>Swapped</span>
@@ -207,7 +207,7 @@ function TxnSuccess({
             href={`${selectedChain.blockExplorerUrl}/tx/${txnHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 text-orange-soft hover:text-orange-soft/80 transition text-base md:text-lg underline"
+            className="mt-2 text-orange hover:text-orange/80  transition text-base md:text-lg underline"
           >
             View on Explorer
           </a>

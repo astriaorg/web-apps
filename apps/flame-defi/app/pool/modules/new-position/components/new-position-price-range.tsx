@@ -1,20 +1,35 @@
 import { Button, Input, Slider } from "@repo/ui/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AreaChartWithRange } from "./area-chart-with-range";
 
-export const NewPositionPriceRange = () => {
-  const [minValue, setMinValue] = useState<string>("");
-  const [maxValue, setMaxValue] = useState<string>("∞");
+export const NewPositionPriceRange = ({
+  minPrice,
+  maxPrice,
+}: {
+  minPrice: string;
+  maxPrice: string;
+}) => {
+  const [minValue, setMinValue] = useState<string>(minPrice);
+  const [maxValue, setMaxValue] = useState<string>(maxPrice);
+
+  useEffect(() => {
+    setMinValue(minPrice);
+    setMaxValue(maxPrice);
+  }, [minPrice, maxPrice]);
 
   const getPriceRangeArray = (): number[] => {
-    const min = Number(minValue) || 0;
-    const max = Number(maxValue) || 30;
+    const min = Number(minValue);
+    const max = Number(maxValue);
+    console.log("min", min);
+    console.log("max", max);
+
     return [min, max];
   };
 
   const handleSliderChange = (newValues: number[]) => {
-    setMinValue(String(newValues[0] ?? 0));
-    setMaxValue(String(newValues[1] ?? 30));
+    console.log("newValues", newValues);
+    setMinValue(String(newValues[0]));
+    setMaxValue(String(newValues[1]));
   };
 
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,9 +41,15 @@ export const NewPositionPriceRange = () => {
   };
 
   const handleReset = () => {
-    setMinValue("");
-    setMaxValue("∞");
+    setMinValue(minPrice);
+    setMaxValue(maxPrice);
   };
+
+  console.log("getPriceRangeArray()", getPriceRangeArray());
+  console.log("minPrice", minPrice);
+  console.log("maxPrice", maxPrice);
+  console.log("minValue", minValue);
+  console.log("maxValue", maxValue);
 
   return (
     <div className="bg-surface-1 rounded-xl p-6 w-full">
@@ -47,8 +68,8 @@ export const NewPositionPriceRange = () => {
         <Slider
           value={getPriceRangeArray()}
           onValueChange={handleSliderChange}
-          min={0}
-          max={30}
+          min={Number(minPrice)}
+          max={Number(maxPrice)}
           step={1}
           className="w-full"
         />

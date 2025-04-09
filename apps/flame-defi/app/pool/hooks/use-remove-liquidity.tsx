@@ -3,11 +3,9 @@ import { useState, useEffect } from "react";
 import { usePoolPositionContext } from ".";
 import { useEvmChainData } from "config/hooks/use-config";
 export const useRemoveLiquidity = () => {
-  const { poolTokenOne, poolTokenTwo, collectAsNative } =
-    usePoolPositionContext();
+  const { poolToken0, poolToken1, collectAsNative } = usePoolPositionContext();
   const { wrappedNativeToken, nativeToken } = useEvmChainData();
-  const poolTokens =
-    poolTokenOne && poolTokenTwo ? [poolTokenOne, poolTokenTwo] : [];
+  const poolTokens = poolToken0 && poolToken1 ? [poolToken0, poolToken1] : [];
 
   const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>(() =>
     poolTokens.map((token) => ({

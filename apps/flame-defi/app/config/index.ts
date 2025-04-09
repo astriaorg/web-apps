@@ -35,8 +35,8 @@ export interface AppConfig {
   networksList: FlameNetwork[];
   // The default approval amount for tokens.
   tokenApprovalAmount: string;
-  // The default slippage tolerance for swaps.
-  swapSlippageToleranceDefault: number;
+  // The default slippage tolerance.
+  defaultSlippageTolerance: number;
   // The fee recipient address for swaps.
   feeRecipient?: HexString;
   // Feature flags
