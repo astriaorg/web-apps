@@ -97,6 +97,7 @@
   --color-surface-2: ;
   --color-surface-3: ;
   --color-surface-inverted: ;
+  --color-surface-inverted-subdued: ;
 
   --color-brand: ;
   --color-orange: ;
@@ -128,6 +129,7 @@ html[data-theme="light"] {
   --color-surface-2: hsl(var(--color-gray-100));
   --color-surface-3: hsl(var(--color-gray-150));
   --color-surface-inverted: hsl(var(--color-gray-1000));
+  --color-surface-inverted-subdued: hsl(var(--color-gray-800));
 
   --color-brand: hsl(var(--color-orange-500));
   --color-orange: hsl(var(--color-orange-500));
@@ -160,6 +162,7 @@ html[data-theme="dark"] {
   --color-surface-2: hsl(var(--color-gray-850));
   --color-surface-3: hsl(var(--color-gray-800));
   --color-surface-inverted: hsl(var(--color-gray-0));
+  --color-surface-inverted-subdued: hsl(var(--color-gray-250));
 
   --color-brand: hsl(var(--color-orange-500));
   --color-orange: hsl(var(--color-orange-500));

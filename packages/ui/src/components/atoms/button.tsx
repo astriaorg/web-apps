@@ -4,21 +4,17 @@ import * as React from "react";
 
 import { cn } from "../../utils";
 
-const buttonStyles = {
-  default: "shadow-[2px_2px_2px_0px_hsla(0,0%,100%,0.2)_inset]",
-  hover: `hover:shadow-[-2px_-2px_2px_0px_hsla(0,0%,0%,0.2)_inset,2px_2px_2px_0px_hsla(0,0%,100%,0.2)_inset]`,
-  active: "active:shadow-[2px_2px_2px_0px_hsla(0,0%,0%,0.2)_inset]",
-};
-
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: `bg-brand text-typography-black ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
+        default:
+          "bg-brand text-typography-black hover:bg-surface-inverted hover:text-typography-inverted active:bg-surface-inverted-subdued active:text-typography-inverted",
         destructive: "",
         outline: "",
-        secondary: `bg-surface-3 text-typography-default ${buttonStyles.default} ${buttonStyles.hover} ${buttonStyles.active}`,
+        secondary:
+          "bg-surface-3 text-typography-default hover:bg-surface-1 active:bg-surface-3",
         ghost: "hover:text-typography-light",
         gradient:
           "bg-button-gradient text-white transition border border-orange-soft hover:border-white",
