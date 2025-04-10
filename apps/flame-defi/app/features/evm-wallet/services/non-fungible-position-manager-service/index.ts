@@ -1,7 +1,7 @@
 import type { Config } from "@wagmi/core";
 import { type Address, Abi } from "viem";
 import {
-  EvmChainInfo,
+  AstriaChain,
   HexString,
   TokenInputState,
   tokenInputStateToTokenAmount,
@@ -101,6 +101,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * @param amount1Min - The minimum amount of token1 to deposit
    * @param recipient - The address that will receive the NFT
    * @param deadline - The timestamp by which the transaction must be executed
+   * @param value
    * @returns Object containing transaction hash if successful
    */
   async mint(
@@ -186,7 +187,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     tokenInput0: TokenInputState,
     tokenInput1: TokenInputState,
     slippageTolerance: number,
-    chain: EvmChainInfo,
+    chain: AstriaChain,
   ): IncreaseLiquidityParams {
     const token0Address = tokenInput0.token?.isNative
       ? chain.contracts.wrappedNativeToken.address
