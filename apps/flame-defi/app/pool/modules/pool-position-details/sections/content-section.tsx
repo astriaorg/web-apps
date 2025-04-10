@@ -71,34 +71,32 @@ export const ContentSection = () => {
             <TokenInfoCard poolToken0={token0} poolToken1={token1} />
           </div>
         </div>
-        {hasUnclaimedFees && (
+        {hasUnclaimedFees && token0 && token1 && (
           <div className="w-full md:w-2/4">
             <Skeleton
               className="w-full h-[40px]"
               isLoading={!token0 || !token1}
             >
-              {token0 && token1 && (
-                <ConfirmationModal
-                  open={modalOpen}
-                  buttonText={"Collect Fees"}
-                  actionButtonText={"Collect"}
-                  showOpenButton={true}
-                  handleOpenModal={() => setModalOpen(true)}
-                  handleModalActionButton={() =>
-                    console.log("handle action button")
-                  }
-                  handleCloseModal={() => setModalOpen(false)}
-                  title={"Claim Fees"}
-                >
-                  <PoolTxnSteps
-                    txnStatus={TXN_STATUS.IDLE}
-                    poolTokens={[token0, token1]}
-                    txnHash={"0x"}
-                    txnMsg={""}
-                    addLiquidityInputValues={null}
-                  />
-                </ConfirmationModal>
-              )}
+              <ConfirmationModal
+                open={modalOpen}
+                buttonText={"Collect Fees"}
+                actionButtonText={"Collect"}
+                showOpenButton={true}
+                handleOpenModal={() => setModalOpen(true)}
+                handleModalActionButton={() =>
+                  console.log("handle action button")
+                }
+                handleCloseModal={() => setModalOpen(false)}
+                title={"Claim Fees"}
+              >
+                <PoolTxnSteps
+                  txnStatus={TXN_STATUS.IDLE}
+                  poolTokens={[token0, token1]}
+                  txnHash={"0x"}
+                  txnMsg={""}
+                  addLiquidityInputValues={null}
+                />
+              </ConfirmationModal>
             </Skeleton>
           </div>
         )}

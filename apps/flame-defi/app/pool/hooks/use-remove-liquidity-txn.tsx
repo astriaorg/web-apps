@@ -1,8 +1,4 @@
-import {
-  ErrorWithMessage,
-  TokenInputState,
-  TXN_STATUS,
-} from "@repo/flame-types";
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { HexString } from "@repo/flame-types";
 import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
@@ -75,20 +71,15 @@ export const useRemoveLiquidityTxn = (
       return;
     }
 
-    // Make sure the percentage is valid
-    const safePercentage = Math.max(0, Math.min(100, percentageToRemove));
-
-    // Calculate the liquidity to remove based on percentage
-    // For 100%, use the full liquidity amount to avoid rounding errors
     const rawLiquidityToRemove =
-      safePercentage === 100
+      percentageToRemove === 100
         ? poolPosition.liquidity
-        : (poolPosition.liquidity * BigInt(Math.round(safePercentage))) / 100n;
+        : (poolPosition.liquidity * BigInt(Math.round(percentageToRemove))) /
+          100n;
 
     try {
       setTxnStatus(TXN_STATUS.PENDING);
 
-      // Create the service
       const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
           wagmiConfig,
@@ -112,7 +103,7 @@ export const useRemoveLiquidityTxn = (
 
       setTxnHash(tx);
     } catch (error) {
-      if ((error as ErrorWithMessage).message.includes("User rejected")) {
+      if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
         setTxnStatus(TXN_STATUS.FAILED);
         setErrorText("Transaction rejected");

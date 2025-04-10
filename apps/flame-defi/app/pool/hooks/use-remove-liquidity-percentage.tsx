@@ -24,7 +24,6 @@ export const useRemoveLiquidityPercentage = () => {
     [poolTokens, percentageToRemove],
   );
 
-  // Initialize liquidityToRemove or update when poolTokens change
   useEffect(() => {
     if (poolTokens.length > 0) {
       setLiquidityToRemove(defaultLiquidityToRemove);
