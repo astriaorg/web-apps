@@ -1,5 +1,5 @@
 import { useConfig } from "config";
-import { useAstriaWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "./use-astria-wallet";
 import { HexString, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 
 export const useTokenApproval = ({

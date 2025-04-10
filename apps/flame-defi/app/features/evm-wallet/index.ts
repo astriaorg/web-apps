@@ -4,6 +4,8 @@ import { AstriaWalletContextProvider } from "./contexts/astria-wallet-context";
 import { EvmWalletProvider } from "./contexts/evm-wallet-context";
 import { useAstriaWallet } from "./hooks/use-astria-wallet";
 import { useEvmWallet } from "./hooks/use-evm-wallet";
+import { useGetQuote } from "./hooks/use-get-quote";
+import { useTokenApproval } from "./hooks/use-token-approval";
 import { useTokenBalances } from "./hooks/use-token-balances";
 import { createWithdrawerService } from "./services/astria-withdrawer-service/astria-withdrawer-service";
 import { createNonfungiblePositionManagerService } from "./services/non-fungible-position-manager-service";
@@ -33,5 +35,7 @@ export {
   createWithdrawerService,
   useAstriaWallet,
   useEvmWallet,
+  useGetQuote,
+  useTokenApproval,
   useTokenBalances,
 };

@@ -16,7 +16,7 @@ import {
 } from "@repo/flame-types";
 import { removeNonNumeric } from "@repo/ui/utils";
 import { useIntl } from "react-intl";
-import { useGetQuote } from "hooks";
+import { useGetQuote } from "features/evm-wallet";
 import { getBalanceFromChain } from "../services/cosmos";
 
 export interface CosmosWalletContextProps {

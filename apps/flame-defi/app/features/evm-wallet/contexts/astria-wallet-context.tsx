@@ -19,7 +19,7 @@ import {
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { useAstriaChainData, useConfig } from "config";
-import { useGetQuote } from "hooks";
+import { useGetQuote } from "../hooks/use-get-quote";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 export interface AstriaWalletContextProps {

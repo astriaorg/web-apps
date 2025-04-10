@@ -36,7 +36,7 @@ import {
   tokenStateToBig,
   TRADE_TYPE,
 } from "@repo/flame-types";
-import { useGetQuote } from "hooks";
+import { useGetQuote } from "../hooks/use-get-quote";
 import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,

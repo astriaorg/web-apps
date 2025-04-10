@@ -20,10 +20,9 @@ import {
   TRADE_TYPE_OPPOSITES,
   TXN_STATUS,
 } from "@repo/flame-types";
-import { useGetQuote } from "hooks";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useTokenBalances } from "features/evm-wallet";
+import { useGetQuote, useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 

@@ -11,6 +11,7 @@ import {
   createTradeFromQuote,
   createWethService,
   createSwapRouterService,
+  useTokenApproval,
 } from "features/evm-wallet";
 import {
   evmChainToRainbowKitChain,
@@ -23,7 +24,6 @@ import { getSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import { Chain } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { useTokenApproval } from "hooks";
 
 interface SwapButtonProps {
   topToken: TokenInputState;

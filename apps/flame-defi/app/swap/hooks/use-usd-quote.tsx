@@ -3,7 +3,7 @@ import debounce from "lodash.debounce";
 
 import { useAstriaChainData } from "config";
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
-import { useGetQuote } from "hooks";
+import { useGetQuote } from "features/evm-wallet";
 
 export const useUsdQuote = (inputToken: TokenInputState) => {
   const { chain } = useAstriaChainData();
