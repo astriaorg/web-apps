@@ -18,11 +18,27 @@ type TokenApprovalProps = {
   setErrorText: (error: string) => void;
 };
 
+/**
+ * Return type for the useTokenApproval hook
+ */
+export type TokenApprovalReturn = {
+  /** Checks if a token needs approval based on its input state */
+  getTokenNeedingApproval: (
+    tokenInputState: TokenInputState,
+  ) => TokenInputState | null;
+
+  /** Approves a token for spending by a contract */
+  approveToken: (tokenInputState: TokenInputState) => Promise<HexString | null>;
+
+  /** Handles the token approval flow including transaction status updates */
+  handleTokenApproval: (tokenInputToApprove: TokenInputState) => Promise<void>;
+};
+
 export const useTokenApproval = ({
   setTxnStatus,
   setTxnHash,
   setErrorText,
-}: TokenApprovalProps) => {
+}: TokenApprovalProps): TokenApprovalReturn => {
   const { chain } = useAstriaChainData();
   const { currencies, contracts } = chain;
   const { tokenApprovalAmount } = useConfig();
@@ -33,15 +49,8 @@ export const useTokenApproval = ({
 
   const approveToken = useCallback(
     async (tokenInputState: TokenInputState): Promise<HexString | null> => {
-      const token = tokenInputState.token;
-      if (
-        !token ||
-        !wagmiConfig ||
-        !contracts?.swapRouter?.address ||
-        !currencies ||
-        !chain.chainId ||
-        !token.erc20ContractAddress
-      ) {
+      const { token } = tokenInputState;
+      if (!token || !token.erc20ContractAddress) {
         return null;
       }
       const erc20Service = createErc20Service(
@@ -75,8 +84,7 @@ export const useTokenApproval = ({
     },
     [
       wagmiConfig,
-      contracts?.swapRouter?.address,
-      currencies,
+      contracts.swapRouter.address,
       chain,
       tokenAllowances,
       tokenApprovalAmount,
@@ -84,13 +92,7 @@ export const useTokenApproval = ({
   );
 
   const getTokenAllowances = useCallback(async () => {
-    if (
-      !userAccount.address ||
-      !wagmiConfig ||
-      !contracts?.swapRouter?.address ||
-      !currencies ||
-      !chain.chainId
-    ) {
+    if (!userAccount.address) {
       return;
     }
     const newTokenAllowances: TokenAllowance[] = [];
@@ -112,7 +114,7 @@ export const useTokenApproval = ({
             value: allowance ?? "0",
           });
         } catch (error) {
-          console.warn("Failed to get token allowance:", error);
+          console.error("Failed to get token allowance:", error);
         }
       }
     }
@@ -122,7 +124,7 @@ export const useTokenApproval = ({
 
   const getTokenNeedingApproval = useCallback(
     (tokenInputState: TokenInputState): TokenInputState | null => {
-      const token = tokenInputState.token;
+      const { token } = tokenInputState;
 
       if (!token) {
         return null;
@@ -144,24 +146,6 @@ export const useTokenApproval = ({
       return null;
     },
     [tokenAllowances],
-  );
-
-  const getMultiTokenNeedingApproval = useCallback(
-    (
-      tokenInputStateOne: TokenInputState,
-      tokenInputStateTwo: TokenInputState,
-    ): TokenInputState | null => {
-      let tokenNeedingApproval = null;
-      if (tokenInputStateOne) {
-        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateOne);
-      }
-      if (tokenInputStateTwo && !tokenNeedingApproval) {
-        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateTwo);
-      }
-
-      return tokenNeedingApproval;
-    },
-    [getTokenNeedingApproval],
   );
 
   useEffect(() => {
@@ -203,10 +187,7 @@ export const useTokenApproval = ({
 
   return {
     approveToken,
-    getMultiTokenNeedingApproval,
-    getTokenAllowances,
     getTokenNeedingApproval,
     handleTokenApproval,
-    tokenAllowances,
   };
 };
