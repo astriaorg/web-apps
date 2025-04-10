@@ -1,13 +1,23 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
 import {
+  BaseIcon,
+  CelestiaIcon,
+  FlameIcon,
+  NobleIcon,
+  UsdcIcon,
+} from "@repo/ui/icons";
+import {
+  AstriaChain,
+  ChainType,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
-  EvmChains,
+  AstriaChains,
   EvmCurrency,
 } from "@repo/flame-types";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   // Chain-id of the celestia chain.
   chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
@@ -99,6 +109,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
@@ -184,7 +195,8 @@ export const cosmosChains: CosmosChains = {
   "Noble Local": NobleChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const FlameChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -214,6 +226,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -225,6 +238,7 @@ const FlameChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       nativeTokenWithdrawerContractAddress:
         "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -233,7 +247,8 @@ const FlameChainInfo: EvmChainInfo = {
   IconComponent: FlameIcon,
 };
 
-const FakeChainInfo: EvmChainInfo = {
+const FakeChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -261,6 +276,7 @@ const FakeChainInfo: EvmChainInfo = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: CelestiaIcon,
@@ -273,6 +289,7 @@ const FakeChainInfo: EvmChainInfo = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       IconComponent: FlameIcon,
@@ -281,7 +298,46 @@ const FakeChainInfo: EvmChainInfo = {
   IconComponent: FlameIcon,
 };
 
-export const evmChains: EvmChains = {
-  Flame: FlameChainInfo,
+export const astriaChains: AstriaChains = {
+  "Flame(local)": FlameChainInfo,
   Fake: FakeChainInfo,
+};
+
+const BaseChainInfo: EvmChainInfo = {
+  chainType: ChainType.EVM,
+  chainId: 84532,
+  chainName: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorerUrl: "https://sepolia.basescan.org",
+  contracts: {},
+  currencies: [
+    // NOTE - this is really only here to satisfy the config needed
+    //  for wagmi and rainbowkit providers. it's not used atm.
+    new EvmCurrency({
+      title: "Ether",
+      coinDenom: "ETH",
+      // is gwei correct?
+      coinMinimalDenom: "gwei",
+      coinDecimals: 18,
+      isNative: true,
+      isWrappedNative: false,
+    }),
+    new EvmCurrency({
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      astriaIntentBridgeAddress: "0x",
+      isNative: false,
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };

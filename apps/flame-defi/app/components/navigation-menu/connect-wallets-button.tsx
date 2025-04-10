@@ -7,12 +7,12 @@ import {
 import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
+import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
@@ -22,23 +22,23 @@ import { useAccount } from "wagmi";
 export const ConnectWalletsButton = () => {
   const pathname = usePathname();
   const { cosmosAccountAddress } = useCosmosWallet();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const account = useAccount();
   const {
-    connectEvmWallet,
-    disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
+    connectWallet,
+    disconnectWallet,
+    nativeTokenBalance,
+    isLoadingNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
-  } = useEvmWallet();
+  } = useAstriaWallet();
 
   const isConnected = account.address || cosmosAccountAddress;
   const isSingleConnectWallet = pathname !== "/";
 
   if (isSingleConnectWallet && !isConnected) {
     return (
-      <Button size="sm" onClick={connectEvmWallet}>
+      <Button size="sm" onClick={connectWallet}>
         Connect Wallet
       </Button>
     );
@@ -65,19 +65,19 @@ export const ConnectWalletsButton = () => {
           <ConnectWalletContent
             isConnected={!!account.address}
             isLoading={
-              (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+              (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
               quoteLoading
             }
             account={account}
-            balance={evmNativeTokenBalance ?? undefined}
+            balance={nativeTokenBalance ?? undefined}
             fiat={usdcToNativeQuote}
             explorer={{
-              url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
+              url: `${chain.blockExplorerUrl}/address/${account.address}`,
             }}
             label={shortenAddress(account.address as string)}
             icon={<FlameIcon />}
-            onConnectWallet={connectEvmWallet}
-            onDisconnectWallet={disconnectEvmWallet}
+            onConnectWallet={connectWallet}
+            onDisconnectWallet={disconnectWallet}
             isCollapsible={false}
           />
         ) : (

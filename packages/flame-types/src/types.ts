@@ -8,12 +8,39 @@ import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract, parseUnits } from "viem";
 import React from "react";
 import JSBI from "jsbi";
-
 import Big from "big.js";
-// FIXME - i manually recreated types from keplr here as a stop gap.
-//  this will get refactored further when i update the config logic
-//  to support network switching
 
+/**
+ * ChainType describes the type of chain.
+ *
+ * There are three types of chain. Astria, Cosmos, and Evm.
+ * Plans to add a fourth, Solana.
+ *
+ * An Astria chain is technically an EVM chain, but it is useful
+ * to have a mechanism to distinguish between Astria (fka Flame) and
+ * other EVM based chains (Arbitrum, Base, Optimism).
+ */
+export enum ChainType {
+  ASTRIA = "astria",
+  COSMOS = "cosmos",
+  EVM = "evm",
+}
+
+/**
+ * GenericChain is the base chain type that other chain types extend
+ */
+export interface GenericChain {
+  // the type of the chain
+  chainType: ChainType;
+  // the name of the chain
+  chainName: string;
+  // a component to be displayed with the chain
+  IconComponent?: React.FC;
+}
+
+/**
+ * IconProps passed to Icon component for styling
+ */
 export interface IconProps {
   className?: string;
   size?: number;
@@ -33,13 +60,13 @@ export interface BIP44 {
 }
 
 /**
- * Represents information about a chain.
+ * Represents information about a Cosmos chain.
  */
-export interface CosmosChainInfo {
+export interface CosmosChainInfo extends GenericChain {
+  readonly chainType: ChainType.COSMOS;
   readonly rpc: string;
   readonly rest: string;
   readonly chainId: string;
-  readonly chainName: string;
   /**
    * This indicates the type of coin that can be used for stake.
    * You can get actual currency information from Currencies.
@@ -57,9 +84,6 @@ export interface CosmosChainInfo {
    * You can get actual currency information from Currencies.
    */
   readonly feeCurrencies: CosmosFeeCurrency[];
-
-  // The icon to use for this chain in the ui
-  readonly IconComponent?: React.FC;
 }
 
 /**
@@ -104,12 +128,12 @@ function cosmosChainInfoToCosmosKitChain(
  * Converts a map of IBC chains to an array of CosmosChain objects for use with CosmosKit.
  */
 export function cosmosChainInfosToCosmosKitChains(
-  cosmosChains: CosmosChains,
+  cosmosChains: CosmosChainInfo[],
 ): [CosmosKitChain, ...CosmosKitChain[]] {
-  if (!cosmosChains || Object.keys(cosmosChains).length === 0) {
+  if (cosmosChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return Object.values(cosmosChains).map((cosmosChain) =>
+  return cosmosChains.map((cosmosChain) =>
     cosmosChainInfoToCosmosKitChain(cosmosChain),
   ) as [CosmosKitChain, ...CosmosKitChain[]];
 }
@@ -160,9 +184,9 @@ export interface IbcCurrency extends CosmosCurrency {
  * Converts a map of cosmos chains to an array of AssetList objects for use with CosmosKit.
  */
 export function cosmosChainInfosToCosmosKitAssetLists(
-  cosmosChains: CosmosChains,
+  cosmosChains: CosmosChainInfo[],
 ): AssetList[] {
-  return Object.values(cosmosChains).map((chain) => {
+  return cosmosChains.map((chain) => {
     return ibcCurrenciesToCosmosKitAssetList(
       cosmosChainNameFromId(chain.chainId),
       chain.currencies,
@@ -262,7 +286,7 @@ export class EvmCurrency {
   public readonly coinDecimals: number;
 
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
-  public readonly ibcWithdrawalFeeWei: string;
+  public readonly ibcWithdrawalFeeWei?: string;
 
   /** ERC-20 contract address if this is a token, undefined for native currencies */
   public readonly erc20ContractAddress?: HexString;
@@ -270,7 +294,13 @@ export class EvmCurrency {
   /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
   public readonly nativeTokenWithdrawerContractAddress?: HexString;
 
-  /** True if this is a wrapped native token (e.g., wTIA) */
+  /** Contract address for intent bridge **/
+  public readonly astriaIntentBridgeAddress?: HexString;
+
+  /** True if this is the native token (e.g., wTIA) */
+  public readonly isNative: boolean;
+
+  /** True if this is a wrapped native token (e.g., TIA) */
   public readonly isWrappedNative: boolean;
 
   /** Component to render the token's icon */
@@ -284,10 +314,12 @@ export class EvmCurrency {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
-    ibcWithdrawalFeeWei: string;
+    ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: HexString;
     nativeTokenWithdrawerContractAddress?: HexString;
+    astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
+    isNative: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {
     this.title = params.title;
@@ -298,19 +330,10 @@ export class EvmCurrency {
     this.erc20ContractAddress = params.erc20ContractAddress;
     this.nativeTokenWithdrawerContractAddress =
       params.nativeTokenWithdrawerContractAddress;
+    this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
+    this.isNative = params.isNative;
     this.IconComponent = params.IconComponent;
-  }
-
-  /**
-   * Determines if this currency is a native token (e.g., TIA, ETH)
-   * @returns true if this is a native token, false if it's an ERC-20 token
-   */
-  public get isNative(): boolean {
-    return (
-      this.nativeTokenWithdrawerContractAddress !== undefined &&
-      !this.erc20ContractAddress
-    );
   }
 
   /**
@@ -352,15 +375,23 @@ export class EvmCurrency {
 }
 
 /**
- * Represents information about an EVM chain.
+ * Represents information about an EVM compatible chain.
  */
-export type EvmChainInfo = {
-  chainId: number;
-  chainName: string;
-  currencies: [EvmCurrency, ...EvmCurrency[]];
-  rpcUrls: string[];
-  IconComponent?: React.FC;
-  blockExplorerUrl?: string;
+export interface EvmChainInfo extends GenericChain {
+  readonly chainId: number;
+  readonly rpcUrls: string[];
+  readonly blockExplorerUrl?: string;
+  readonly contracts: {
+    [label: string]: ChainContract;
+  };
+  readonly currencies: [EvmCurrency, ...EvmCurrency[]];
+}
+
+/**
+ * Represents an Astria (fka Flame) chain. This is just an evm
+ * chain with specific contracts guaranteed to be defined.
+ */
+export interface AstriaChain extends EvmChainInfo {
   contracts: {
     [label: string]: ChainContract;
     wrappedNativeToken: ChainContract;
@@ -369,6 +400,29 @@ export type EvmChainInfo = {
     poolFactory: ChainContract;
     poolContract: ChainContract;
   };
+}
+
+export function isPoolEvmChain(chain: EvmChainInfo): chain is AstriaChain {
+  return (
+    !!chain.contracts?.wrappedNativeToken &&
+    !!chain.contracts?.swapRouter &&
+    !!chain.contracts?.nonfungiblePositionManager &&
+    !!chain.contracts?.poolFactory &&
+    !!chain.contracts?.poolContract
+  );
+}
+
+export function assertPoolEvmChain(
+  chain: EvmChainInfo,
+): asserts chain is AstriaChain {
+  if (!isPoolEvmChain(chain)) {
+    throw new Error("Chain is missing required contracts for pool operations");
+  }
+}
+
+// CoinbaseChains type maps labels to CoinbaseChain objects
+export type CoinbaseChains = {
+  [label: string]: EvmChainInfo;
 };
 
 /**
@@ -376,7 +430,12 @@ export type EvmChainInfo = {
  * @param evmChain
  */
 export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
-  const nativeCurrency = evmChain.currencies[0];
+  const nativeCurrency = evmChain.currencies.find(
+    (currency) => currency.isNative,
+  );
+  if (!nativeCurrency) {
+    throw new Error("EVM chain must define native currency.");
+  }
   const chain: Chain = {
     id: evmChain.chainId,
     name: evmChain.chainName,
@@ -384,7 +443,7 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
       default: { http: evmChain.rpcUrls },
     },
     nativeCurrency: {
-      name: nativeCurrency.coinDenom,
+      name: nativeCurrency.title,
       symbol: nativeCurrency.coinDenom,
       decimals: nativeCurrency.coinDecimals,
     },
@@ -411,14 +470,15 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
  * @param evmChains
  */
 export function evmChainsToRainbowKitChains(
-  evmChains: EvmChains,
+  evmChains: EvmChainInfo[],
 ): readonly [Chain, ...Chain[]] {
-  if (!evmChains || Object.keys(evmChains).length === 0) {
+  if (evmChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return Object.values(evmChains).map((evmChain) =>
-    evmChainToRainbowKitChain(evmChain),
-  ) as [Chain, ...Chain[]];
+  return evmChains.map((evmChain) => evmChainToRainbowKitChain(evmChain)) as [
+    Chain,
+    ...Chain[],
+  ];
 }
 
 /**
@@ -432,9 +492,9 @@ export function evmCurrencyBelongsToChain(
 }
 
 // Map of environment labels to their chain configurations
-// EvmChains type maps labels to EvmChainInfo objects
-export type EvmChains = {
-  [label: string]: EvmChainInfo;
+// AstriaChains type maps labels to AstriaChain objects
+export type AstriaChains = {
+  [label: string]: AstriaChain;
 };
 
 // TODO - consolidate with `TokenAmount` type
@@ -716,4 +776,9 @@ export enum TXN_STATUS {
 
 export type TxnFailedProps = {
   txnMsg?: string;
+};
+
+export type Balance = {
+  value: string;
+  symbol: string;
 };

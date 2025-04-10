@@ -30,7 +30,10 @@ export const NavigationMenu = () => {
           <FlameIcon size={32} className="text-typography-default scale-175" />
         </a>
         <div className="items-center space-x-8 hidden md:flex">
-          <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
+          <NavigationMenuLink
+            href="/"
+            isActive={pathname.startsWith(LINKS.BRIDGE)}
+          >
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink

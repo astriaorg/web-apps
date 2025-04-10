@@ -20,12 +20,12 @@ import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
-import { useConfig, useEvmChainData } from "config";
+import { useAstriaChainData, useConfig } from "config";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
+import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -43,15 +43,15 @@ export const MobileNavigationMenu = () => {
     selectedFlameNetwork,
     selectFlameNetwork,
   } = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const {
-    connectEvmWallet,
-    disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
+    connectWallet,
+    disconnectWallet,
+    nativeTokenBalance,
+    isLoadingNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
-  } = useEvmWallet();
+  } = useAstriaWallet();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
@@ -75,12 +75,12 @@ export const MobileNavigationMenu = () => {
 
   const handleOnConnectWalletOpen = useCallback(() => {
     if (isSingleConnectWallet && !isConnected) {
-      connectEvmWallet();
+      connectWallet();
     } else {
       setIsConnectWalletOpen(true);
     }
     setIsOpen(false);
-  }, [isSingleConnectWallet, isConnected, connectEvmWallet]);
+  }, [isSingleConnectWallet, isConnected, connectWallet]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -111,7 +111,7 @@ export const MobileNavigationMenu = () => {
               <div className="flex flex-col items-center space-y-8">
                 <MobileNavigationMenuLink
                   href={LINKS.BRIDGE}
-                  isActive={pathname === LINKS.BRIDGE}
+                  isActive={pathname.startsWith(LINKS.BRIDGE)}
                 >
                   Bridge
                 </MobileNavigationMenuLink>
@@ -226,21 +226,21 @@ export const MobileNavigationMenu = () => {
               <ConnectWalletContent
                 isConnected={!!account.address}
                 isLoading={
-                  (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+                  (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
                   quoteLoading
                 }
                 account={account}
-                balance={evmNativeTokenBalance ?? undefined}
+                balance={nativeTokenBalance ?? undefined}
                 fiat={usdcToNativeQuote}
                 explorer={{
-                  url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
+                  url: `${chain.blockExplorerUrl}/address/${account.address}`,
                 }}
                 label={shortenAddress(account.address as string)}
                 icon={<FlameIcon />}
-                onConnectWallet={connectEvmWallet}
+                onConnectWallet={connectWallet}
                 onDisconnectWallet={() => {
                   setIsConnectWalletOpen(false);
-                  disconnectEvmWallet();
+                  disconnectWallet();
                 }}
                 isCollapsible={false}
               />

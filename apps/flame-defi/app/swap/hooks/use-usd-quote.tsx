@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
-import { useGetQuote } from "../../hooks";
+import { useGetQuote } from "features/evm-wallet";
 
 export const useUsdQuote = (inputToken: TokenInputState) => {
-  const { selectedChain } = useEvmChainData();
-  const usdcToken = selectedChain.currencies.find(
+  const { chain } = useAstriaChainData();
+  const usdcToken = chain.currencies.find(
     (currency) => currency.coinDenom === "USDC",
   );
   const { quote, loading, quoteError, getQuote } = useGetQuote();
