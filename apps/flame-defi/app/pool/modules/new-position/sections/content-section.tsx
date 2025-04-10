@@ -16,13 +16,8 @@ import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
-  const {
-    feeData,
-    modalOpen,
-    setModalOpen,
-    maxPrice,
-    updateMaxPrice,
-  } = usePoolContext();
+  const { feeData, modalOpen, setModalOpen, maxPrice, updateMaxPrice } =
+    usePoolContext();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;

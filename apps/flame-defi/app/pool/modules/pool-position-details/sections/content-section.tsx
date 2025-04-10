@@ -23,9 +23,16 @@ export const ContentSection = () => {
     : [poolToken0, poolToken1];
   const token0 = poolTokens[0] || null;
   const token1 = poolTokens[1] || null;
+  const hasUnclaimedFees =
+    token0?.unclaimedFees &&
+    token1?.unclaimedFees &&
+    token0.unclaimedFees > 0 &&
+    token1.unclaimedFees > 0
+      ? true
+      : false;
 
   return (
-    <div className="flex flex-col flex-1 mt-12">
+    <div className="flex flex-col flex-1 mt-8">
       <PriceRangeBlock
         symbols={[
           poolToken0?.token.coinDenom ?? "",
@@ -35,16 +42,18 @@ export const ContentSection = () => {
         handleReverseTokenData={handleReverseTokenData}
       />
       <div className="flex flex-col gap-4 mt-4 items-end">
-        <div className="flex items-center gap-2 justify-end">
-          <span className="text-sm">Collect as WTIA</span>
-          <Switch
-            checked={collectAsWrappedNative}
-            onCheckedChange={() =>
-              handleCollectAsWrappedNative(!collectAsWrappedNative)
-            }
-            className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
-          />
-        </div>
+        {hasUnclaimedFees && (
+          <div className="flex items-center gap-2 justify-end">
+            <span className="text-sm">Collect as WTIA</span>
+            <Switch
+              checked={collectAsWrappedNative}
+              onCheckedChange={() =>
+                handleCollectAsWrappedNative(!collectAsWrappedNative)
+              }
+              className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+            />
+          </div>
+        )}
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             {/* TODO: Add liquidity value */}
@@ -62,32 +71,37 @@ export const ContentSection = () => {
             <TokenInfoCard poolToken0={token0} poolToken1={token1} />
           </div>
         </div>
-        <div className="w-full md:w-2/4">
-          <Skeleton className="w-full h-[40px]" isLoading={!token0 || !token1}>
-            {token0 && token1 && (
-              <ConfirmationModal
-                open={modalOpen}
-                buttonText={"Collect Fees"}
-                actionButtonText={"Collect"}
-                showOpenButton={true}
-                handleOpenModal={() => setModalOpen(true)}
-                handleModalActionButton={() =>
-                  console.log("handle action button")
-                }
-                handleCloseModal={() => setModalOpen(false)}
-                title={"Claim Fees"}
-              >
-                <PoolTxnSteps
-                  txnStatus={TXN_STATUS.IDLE}
-                  poolTokens={[token0, token1]}
-                  txnHash={"0x"}
-                  txnMsg={""}
-                  addLiquidityInputValues={null}
-                />
-              </ConfirmationModal>
-            )}
-          </Skeleton>
-        </div>
+        {hasUnclaimedFees && (
+          <div className="w-full md:w-2/4">
+            <Skeleton
+              className="w-full h-[40px]"
+              isLoading={!token0 || !token1}
+            >
+              {token0 && token1 && (
+                <ConfirmationModal
+                  open={modalOpen}
+                  buttonText={"Collect Fees"}
+                  actionButtonText={"Collect"}
+                  showOpenButton={true}
+                  handleOpenModal={() => setModalOpen(true)}
+                  handleModalActionButton={() =>
+                    console.log("handle action button")
+                  }
+                  handleCloseModal={() => setModalOpen(false)}
+                  title={"Claim Fees"}
+                >
+                  <PoolTxnSteps
+                    txnStatus={TXN_STATUS.IDLE}
+                    poolTokens={[token0, token1]}
+                    txnHash={"0x"}
+                    txnMsg={""}
+                    addLiquidityInputValues={null}
+                  />
+                </ConfirmationModal>
+              )}
+            </Skeleton>
+          </div>
+        )}
       </div>
     </div>
   );

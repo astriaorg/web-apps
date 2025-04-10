@@ -11,7 +11,6 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
@@ -41,10 +40,8 @@ export const PoolPositionContextProvider = ({
   const positionNftId = params["position-nft-id"] as string;
   const { selectedChain, nativeToken, wrappedNativeToken } = useEvmChainData();
   const { currencies } = selectedChain;
-  const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
-  const [collectAsWrappedNative, setCollectAsWrappedNative] = useState<boolean>(
-    currentPoolSettings.collectAsWrappedNative || false,
-  );
+  const [collectAsWrappedNative, setCollectAsWrappedNative] =
+    useState<boolean>(false);
   const [currentPrice, setCurrentPrice] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -268,10 +265,6 @@ export const PoolPositionContextProvider = ({
 
   const handleCollectAsWrappedNative = (collectAsWrappedNative: boolean) => {
     setCollectAsWrappedNative(collectAsWrappedNative);
-    setInLocalStorage("poolSettings", {
-      collectAsWrappedNative: collectAsWrappedNative,
-    });
-
     if (collectAsWrappedNative) {
       poolTokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {

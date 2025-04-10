@@ -67,7 +67,7 @@ export interface DecreaseLiquidityAndCollectParams {
   amount1Min: bigint;
   deadline: number;
   recipient: Address;
-  shouldCollectAsWrappedNative: boolean;
+  collectAsWrappedNative: boolean;
   isToken1Native?: boolean;
   isToken0Native?: boolean;
   gasLimit?: bigint;
@@ -598,7 +598,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Min,
       deadline,
       recipient,
-      shouldCollectAsWrappedNative,
+      collectAsWrappedNative,
       isToken1Native,
       isToken0Native,
     } = params;
@@ -616,7 +616,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
     calls.push(decreaseCall);
 
-    if (shouldCollectAsWrappedNative) {
+    if (collectAsWrappedNative) {
       // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
       const collectCall = this.encodeCollectCall(
         tokenId,
@@ -721,17 +721,6 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       chain,
     );
 
-    // Determine if either token is native
-    const hasNativeToken = Boolean(
-      tokenInput0.token.isNative || tokenInput1.token.isNative,
-    );
-
-    // The contract defaults to collecting the native token as the wrapped native version
-    // We want to default to returning the native token to the user
-    // If collectAsWrappedNative is true that means the user wants to collect as the wrapped token
-    const shouldCollectAsWrappedNative =
-      collectAsWrappedNative && hasNativeToken;
-
     return {
       chainId: decreaseParams.chainId,
       tokenId,
@@ -740,7 +729,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Min: decreaseParams.amount1Min,
       deadline: decreaseParams.deadline,
       recipient,
-      shouldCollectAsWrappedNative,
+      collectAsWrappedNative,
       isToken1Native: Boolean(tokenInput1.token.isNative),
       isToken0Native: Boolean(tokenInput0.token.isNative),
     };
