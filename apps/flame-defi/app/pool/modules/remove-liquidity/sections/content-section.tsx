@@ -17,6 +17,8 @@ import { useCallback } from "react";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const {
+    poolToken0,
+    poolToken1,
     collectAsWrappedNative,
     handleCollectAsWrappedNative,
     refreshPoolPosition,
@@ -39,6 +41,11 @@ export const ContentSection = () => {
     collectAsWrappedNative,
     percentageToRemove,
   );
+  const isNativeToken =
+    poolToken0?.token.isNative ||
+    poolToken1?.token.isNative ||
+    poolToken0?.token.isWrappedNative ||
+    poolToken1?.token.isWrappedNative;
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
@@ -71,16 +78,18 @@ export const ContentSection = () => {
         <div className="flex items-center justify-between mt-8">
           <h2 className="text-lg font-medium">Amount to Remove</h2>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm">Collect as WTIA</span>
-            <Switch
-              checked={collectAsWrappedNative}
-              onCheckedChange={() =>
-                handleCollectAsWrappedNative(!collectAsWrappedNative)
-              }
-              className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
-            />
-          </div>
+          {isNativeToken && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Collect as WTIA</span>
+              <Switch
+                checked={collectAsWrappedNative}
+                onCheckedChange={() =>
+                  handleCollectAsWrappedNative(!collectAsWrappedNative)
+                }
+                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+              />
+            </div>
+          )}
         </div>
         <div className="flex gap-4 w-full bg-surface-1 rounded-lg p-4">
           <RemoveAmountSlider handlePercentToRemove={handlePercentToRemove} />

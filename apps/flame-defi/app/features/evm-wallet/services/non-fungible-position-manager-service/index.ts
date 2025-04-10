@@ -68,6 +68,7 @@ export interface DecreaseLiquidityAndCollectParams {
   deadline: number;
   recipient: Address;
   collectAsWrappedNative: boolean;
+  collectNonNativeTokens: boolean;
   isToken1Native?: boolean;
   isToken0Native?: boolean;
   gasLimit?: bigint;
@@ -601,6 +602,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       collectAsWrappedNative,
       isToken1Native,
       isToken0Native,
+      collectNonNativeTokens,
     } = params;
     const position = await this.positions(chainId, tokenId);
     const MAX_UINT128 = BigInt("0xffffffffffffffffffffffffffffffff");
@@ -616,7 +618,16 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
     calls.push(decreaseCall);
 
-    if (collectAsWrappedNative) {
+    const collectCall = this.encodeCollectCall(
+      tokenId,
+      recipient,
+      MAX_UINT128,
+      MAX_UINT128,
+    );
+
+    calls.push(collectCall);
+
+    if (collectAsWrappedNative || collectNonNativeTokens) {
       // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
       const collectCall = this.encodeCollectCall(
         tokenId,
@@ -721,6 +732,12 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       chain,
     );
 
+    const collectNonNativeTokens =
+      !tokenInput0.token.isNative &&
+      !tokenInput1.token.isNative &&
+      !tokenInput1.token.isWrappedNative &&
+      !tokenInput0.token.isWrappedNative;
+
     return {
       chainId: decreaseParams.chainId,
       tokenId,
@@ -730,6 +747,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       deadline: decreaseParams.deadline,
       recipient,
       collectAsWrappedNative,
+      collectNonNativeTokens,
       isToken1Native: Boolean(tokenInput1.token.isNative),
       isToken0Native: Boolean(tokenInput0.token.isNative),
     };
