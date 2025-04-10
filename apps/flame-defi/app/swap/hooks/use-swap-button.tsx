@@ -50,20 +50,19 @@ export function useSwapButton({
   const userAccount = useAccount();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
-  const { connectWallet, getTokenNeedingApproval } = useAstriaWallet();
+  const { connectWallet } = useAstriaWallet();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const tokenNeedingApproval = getTokenNeedingApproval(topToken);
 
-  const { handleTokenApproval } = useTokenApproval({
-    tokenNeedingApproval,
+  const { handleTokenApproval, getTokenNeedingApproval } = useTokenApproval({
     setTxnStatus,
     setTxnHash,
     setErrorText,
   });
+  const tokenNeedingApproval = getTokenNeedingApproval(topToken);
 
   const wrapTia =
     topToken.token?.isNative && bottomToken.token?.isWrappedNative;

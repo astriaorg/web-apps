@@ -15,7 +15,7 @@ import React, {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import {
   useAccount,
   useBalance,
@@ -30,10 +30,6 @@ import {
   EvmChainInfo,
   EvmCurrency,
   evmCurrencyBelongsToChain,
-  HexString,
-  TokenAllowance,
-  TokenInputState,
-  tokenStateToBig,
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { useGetQuote } from "../hooks/use-get-quote";
@@ -41,7 +37,6 @@ import {
   type AstriaErc20WithdrawerService,
   createWithdrawerService,
 } from "../services/astria-withdrawer-service/astria-withdrawer-service";
-import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
@@ -60,16 +55,6 @@ export interface EvmWalletContextProps {
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   ibcWithdrawFeeDisplay: string;
-  tokenAllowances: TokenAllowance[];
-  getTokenAllowances: () => void;
-  getTokenNeedingApproval: (
-    tokenInputState: TokenInputState,
-  ) => TokenInputState | null;
-  getMultiTokenNeedingApproval: (
-    tokenInputStateOne: TokenInputState,
-    tokenInputStateTwo: TokenInputState,
-  ) => TokenInputState | null;
-  approveToken: (tokenInputState: TokenInputState) => Promise<HexString | null>;
   usdcToNativeQuote: Balance;
   quoteLoading: boolean;
 }
@@ -101,7 +86,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
   const { chain } = useAstriaChainData();
-  const { currencies, contracts } = chain;
+  const { currencies } = chain;
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();
   const { formatNumber } = useIntl();
 
@@ -179,8 +164,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   const [evmAccountAddress, setEvmAccountAddress] = useState<string | null>(
     null,
   );
-
-  const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
   // set the address when the address, chain, or currency changes
   useEffect(() => {
@@ -366,144 +349,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     resetState();
   }, [disconnect, resetState]);
 
-  const approveToken = useCallback(
-    async (tokenInputState: TokenInputState): Promise<HexString | null> => {
-      const token = tokenInputState.token;
-      if (
-        !token ||
-        !wagmiConfig ||
-        !contracts?.swapRouter?.address ||
-        !currencies ||
-        !chain.chainId ||
-        !token.erc20ContractAddress
-      ) {
-        return null;
-      }
-      const erc20Service = createErc20Service(
-        wagmiConfig,
-        token.erc20ContractAddress as HexString,
-      );
-
-      const txHash = await erc20Service.approveToken(
-        chain.chainId,
-        contracts.swapRouter.address,
-        tokenInputState.value,
-        token.coinDecimals,
-      );
-
-      const newTokenAllowances = tokenAllowances.map((data) => {
-        if (data.symbol === token.coinDenom) {
-          return {
-            symbol: token.coinDenom,
-            value: parseUnits(
-              tokenInputState.value,
-              token.coinDecimals,
-            ).toString(),
-          };
-        }
-        return data;
-      });
-
-      setTokenAllowances(newTokenAllowances);
-
-      return txHash;
-    },
-    [
-      wagmiConfig,
-      contracts?.swapRouter?.address,
-      currencies,
-      chain,
-      tokenAllowances,
-    ],
-  );
-
-  const getTokenAllowances = useCallback(async () => {
-    if (
-      !userAccount.address ||
-      !wagmiConfig ||
-      !contracts?.swapRouter?.address ||
-      !currencies ||
-      !chain.chainId
-    ) {
-      return;
-    }
-    const newTokenAllowances: TokenAllowance[] = [];
-    for (const currency of currencies) {
-      if (currency.erc20ContractAddress) {
-        const erc20Service = createErc20Service(
-          wagmiConfig,
-          currency.erc20ContractAddress as HexString,
-        );
-        try {
-          const allowance = await erc20Service.getTokenAllowance(
-            chain.chainId,
-            userAccount.address,
-            contracts.swapRouter.address,
-          );
-
-          newTokenAllowances.push({
-            symbol: currency.coinDenom,
-            value: allowance ?? "0",
-          });
-        } catch (error) {
-          console.warn("Failed to get token allowance:", error);
-        }
-      }
-    }
-
-    setTokenAllowances(newTokenAllowances);
-  }, [userAccount.address, contracts, currencies, chain, wagmiConfig]);
-
-  const getTokenNeedingApproval = useCallback(
-    (tokenInputState: TokenInputState): TokenInputState | null => {
-      const token = tokenInputState.token;
-
-      if (!token) {
-        return null;
-      }
-
-      const existingAllowance = tokenAllowances.find(
-        (allowanceToken) => token.coinDenom === allowanceToken.symbol,
-      );
-
-      if (existingAllowance) {
-        const tokenInputGreaterThanAllowance = tokenStateToBig(
-          tokenInputState,
-        ).gt(existingAllowance.value);
-        if (tokenInputGreaterThanAllowance) {
-          return { token: token, value: tokenInputState.value };
-        }
-      }
-
-      return null;
-    },
-    [tokenAllowances],
-  );
-
-  const getMultiTokenNeedingApproval = useCallback(
-    (
-      tokenInputStateOne: TokenInputState,
-      tokenInputStateTwo: TokenInputState,
-    ): TokenInputState | null => {
-      let tokenNeedingApproval = null;
-      if (tokenInputStateOne) {
-        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateOne);
-      }
-      if (tokenInputStateTwo) {
-        tokenNeedingApproval = getTokenNeedingApproval(tokenInputStateTwo);
-      }
-
-      return tokenNeedingApproval;
-    },
-    [getTokenNeedingApproval],
-  );
-
-  useEffect(() => {
-    if (userAccount.address && tokenAllowances.length === 0) {
-      void getTokenAllowances();
-    }
-  }, [getTokenAllowances, userAccount.address, tokenAllowances]);
-
   const value = {
     connectEvmWallet,
     connectToSpecificChain,
@@ -522,11 +367,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     selectedEvmCurrencyBalance,
     selectEvmChain,
     ibcWithdrawFeeDisplay,
-    getTokenAllowances,
-    getTokenNeedingApproval,
-    getMultiTokenNeedingApproval,
-    approveToken,
-    tokenAllowances,
     usdcToNativeQuote,
     quoteLoading,
   };
