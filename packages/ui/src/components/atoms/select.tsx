@@ -22,7 +22,8 @@ const SelectTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       buttonVariants({ variant: "secondary", size: "sm" }),
-      "flex w-full items-center justify-between whitespace-nowrap placeholder:text-muted-foreground [&[data-state=open]>svg]:rotate-180",
+      "hover:bg-initial",
+      "flex w-full items-center justify-between whitespace-nowrap [&[data-state=open]>svg]:rotate-180",
       className,
     )}
     {...props}
@@ -89,7 +90,7 @@ const SelectContent = React.forwardRef<
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={cn(
-          "p-1",
+          "p-0.5",
           position === "popper" &&
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
         )}
