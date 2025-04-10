@@ -6,7 +6,7 @@ import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 export const useGetQuote = () => {
   const { swapQuoteAPIURL } = useConfig();
   const {
-    selectedChain: { chainId, contracts: chainContracts },
+    chain: { chainId, contracts: chainContracts },
   } = useAstriaChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);

@@ -4,10 +4,9 @@ import React, { useMemo, useEffect, useCallback } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { shortenAddress } from "@repo/ui/utils";
 import { useWithdrawPageContext } from "bridge/modules/withdraw/hooks/use-withdraw-page-context";
 import { Dropdown } from "components/dropdown";
-import { AddErc20ToWalletButton } from "features/evm-wallet";
 
 export const ContentSection = () => {
   const {
@@ -27,60 +26,26 @@ export const ContentSection = () => {
     isRecipientAddressValid,
     setIsRecipientAddressValid,
     setRecipientAddressOverride,
-    handleConnectCosmosWallet,
+    // handleConnectCosmosWallet,
     isWithdrawDisabled,
     additionalCosmosOptions,
-    additionalEvmOptions,
     cosmosWallet,
-    evmWallet,
     handleWithdraw,
   } = useWithdrawPageContext();
 
-  // ensure evm wallet connection when selected EVM chain changes
-  useEffect(() => {
-    if (!evmWallet.selectedEvmChain) {
-      return;
-    }
-    evmWallet.connectEvmWallet();
-  }, [evmWallet.selectedEvmChain, evmWallet]);
-
-  // ensure cosmos wallet connection when selected cosmos chain changes
-  useEffect(() => {
-    if (!cosmosWallet.selectedCosmosChain) {
-      return;
-    }
-    handleConnectCosmosWallet();
-  }, [cosmosWallet.selectedCosmosChain, handleConnectCosmosWallet]);
-
-  // the cosmos currency selection is controlled by the sender's chosen evm currency,
-  // and should be updated when an evm currency or cosmos chain is selected
+  // Simplified selected cosmos currency option
   const selectedCosmosCurrencyOption = useMemo(() => {
-    if (!evmWallet.selectedEvmCurrency) {
+    if (cosmosWallet.defaultIbcCurrencyOption) {
       return cosmosWallet.defaultIbcCurrencyOption;
     }
-    const matchingCosmosCurrency =
-      cosmosWallet.selectedCosmosChain?.currencies.find(
-        (currency) =>
-          currency.coinDenom === evmWallet.selectedEvmCurrency?.coinDenom,
-      );
-    if (!matchingCosmosCurrency) {
-      return null;
-    }
-    return {
-      label: matchingCosmosCurrency.coinDenom,
-      value: matchingCosmosCurrency,
-      LeftIcon: matchingCosmosCurrency.IconComponent,
-    };
-  }, [
-    evmWallet.selectedEvmCurrency,
-    cosmosWallet.selectedCosmosChain,
-    cosmosWallet.defaultIbcCurrencyOption,
-  ]);
+    return null;
+  }, [cosmosWallet.defaultIbcCurrencyOption]);
 
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
   };
 
+  // Simplified form validation
   const checkIsFormValid = useCallback(
     (recipientAddressInput: string | null, amountInput: string) => {
       if (recipientAddressInput === null) {
@@ -96,25 +61,14 @@ export const ContentSection = () => {
     [setIsAmountValid, setIsRecipientAddressValid],
   );
 
-  // check if form is valid whenever values change
+  // Form validation effect
   useEffect(() => {
-    if (
-      amount ||
-      cosmosWallet.cosmosAccountAddress ||
-      recipientAddressOverride
-    ) {
+    if (amount || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
-    const recipientAddress =
-      recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
+    const recipientAddress = recipientAddressOverride || "mock-address";
     checkIsFormValid(recipientAddress, amount);
-  }, [
-    amount,
-    checkIsFormValid,
-    cosmosWallet.cosmosAccountAddress,
-    recipientAddressOverride,
-    setHasTouchedForm,
-  ]);
+  }, [amount, checkIsFormValid, recipientAddressOverride, setHasTouchedForm]);
 
   const updateRecipientAddressOverride = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -122,12 +76,8 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  const formattedEvmBalanceValue = formatDecimalValues(
-    evmWallet.selectedEvmCurrencyBalance?.value,
-  );
-  const formattedCosmosBalanceValue = formatDecimalValues(
-    cosmosWallet.cosmosBalance?.value,
-  );
+  // Mock formatted values for display
+  const formattedCosmosBalanceValue = "5.678";
 
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
@@ -143,58 +93,14 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Connect EVM Wallet"
-                      options={evmWallet.evmChainsOptions}
-                      onSelect={evmWallet.selectEvmChain}
+                      placeholder="Connect Wallet"
+                      options={[]}
+                      onSelect={() => {}}
                       LeftIcon={WalletIcon}
-                      additionalOptions={additionalEvmOptions}
-                      valueOverride={evmWallet.selectedEvmChainOption}
                     />
                   </div>
-                  {evmWallet.selectedEvmChain &&
-                    evmWallet.evmCurrencyOptions && (
-                      <div className="w-full sm:w-auto">
-                        <Dropdown
-                          placeholder="Select a token"
-                          options={evmWallet.evmCurrencyOptions}
-                          defaultOption={evmWallet.defaultEvmCurrencyOption}
-                          onSelect={evmWallet.selectEvmCurrency}
-                        />
-                      </div>
-                    )}
                 </div>
               </div>
-              {evmWallet.evmAccountAddress && (
-                <div className="mt-4 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
-                  {evmWallet.evmAccountAddress && (
-                    <p className="text-grey-light font-semibold">
-                      Address: {shortenAddress(evmWallet.evmAccountAddress)}
-                    </p>
-                  )}
-                  {evmWallet.evmAccountAddress &&
-                    evmWallet.selectedEvmCurrency &&
-                    !evmWallet.isLoadingSelectedEvmCurrencyBalance && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {formattedEvmBalanceValue}{" "}
-                        {evmWallet.selectedEvmCurrencyBalance?.symbol}
-                      </p>
-                    )}
-                  {evmWallet.evmAccountAddress &&
-                    evmWallet.isLoadingSelectedEvmCurrencyBalance && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: <i className="fas fa-spinner fa-pulse" />
-                      </p>
-                    )}
-                  {evmWallet.selectedEvmCurrency?.erc20ContractAddress &&
-                    evmWallet.evmAccountAddress && (
-                      <div className="mt-3">
-                        <AddErc20ToWalletButton
-                          evmCurrency={evmWallet.selectedEvmCurrency}
-                        />
-                      </div>
-                    )}
-                </div>
-              )}
             </div>
           </div>
 
@@ -251,7 +157,6 @@ export const ContentSection = () => {
                       <p
                         className="text-grey-light font-semibold cursor-pointer"
                         onClick={handleEditRecipientClick}
-                        onKeyDown={handleEditRecipientClick}
                       >
                         <span className="mr-2">
                           Address:{" "}
@@ -260,24 +165,15 @@ export const ContentSection = () => {
                         <i className="fas fa-pen-to-square" />
                       </p>
                     )}
-                    {cosmosWallet.cosmosAccountAddress &&
-                      !cosmosWallet.isLoadingCosmosBalance && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
-                          Balance: {formattedCosmosBalanceValue}{" "}
-                          {cosmosWallet.cosmosBalance?.symbol}
-                        </p>
-                      )}
-                    {cosmosWallet.cosmosAccountAddress &&
-                      cosmosWallet.isLoadingCosmosBalance && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
-                          Balance: <i className="fas fa-spinner fa-pulse" />
-                        </p>
-                      )}
-                    {evmWallet.ibcWithdrawFeeDisplay && (
-                      <div className="mt-2 text-grey-light text-sm">
-                        Withdrawal fee: {evmWallet.ibcWithdrawFeeDisplay}
-                      </div>
+                    {cosmosWallet.cosmosAccountAddress && (
+                      <p className="mt-2 text-grey-lighter font-semibold">
+                        Balance: {formattedCosmosBalanceValue}{" "}
+                        {cosmosWallet.selectedIbcCurrency?.coinDenom || "TIA"}
+                      </p>
                     )}
+                    <div className="mt-2 text-grey-light text-sm">
+                      Withdrawal fee: 0.001 FLAME
+                    </div>
                   </div>
                 )}
 
@@ -286,7 +182,6 @@ export const ContentSection = () => {
                   <p
                     className="text-grey-light font-semibold cursor-pointer"
                     onClick={handleEditRecipientClick}
-                    onKeyDown={handleEditRecipientClick}
                   >
                     <span className="mr-2">
                       Address: {recipientAddressOverride}

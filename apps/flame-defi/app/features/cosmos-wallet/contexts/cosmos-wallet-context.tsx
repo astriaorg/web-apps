@@ -7,6 +7,7 @@ import { useConfig, useAstriaChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 
 import {
+  Balance,
   CosmosChainInfo,
   cosmosChainNameFromId,
   IbcCurrency,
@@ -15,13 +16,13 @@ import {
 } from "@repo/flame-types";
 import { removeNonNumeric } from "@repo/ui/utils";
 import { useIntl } from "react-intl";
-import { useGetQuote } from "../../../hooks";
+import { useGetQuote } from "hooks";
 import { getBalanceFromChain } from "../services/cosmos";
 
 export interface CosmosWalletContextProps {
   connectCosmosWallet: () => void;
   cosmosAccountAddress: string | null;
-  cosmosBalance: { value: string; symbol: string } | null;
+  cosmosBalance: Balance | null;
   cosmosChainsOptions: DropdownOption<CosmosChainInfo>[];
   defaultIbcCurrencyOption: DropdownOption<IbcCurrency> | undefined;
   disconnectCosmosWallet: () => void;
@@ -34,7 +35,7 @@ export interface CosmosWalletContextProps {
   selectedIbcCurrency: IbcCurrency | null;
   selectCosmosChain: (chain: CosmosChainInfo | null) => void;
   selectIbcCurrency: (currency: IbcCurrency) => void;
-  usdcToNativeQuote: { value: string; symbol: string };
+  usdcToNativeQuote: Balance;
   quoteLoading: boolean;
 }
 
@@ -55,7 +56,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   const [selectedIbcCurrency, setSelectedIbcCurrency] =
     useState<IbcCurrency | null>(null);
   const {
-    selectedChain: { currencies },
+    chain: { currencies },
   } = useAstriaChainData();
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();
 

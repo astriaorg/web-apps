@@ -129,7 +129,12 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
       // Otherwise connect for destination (Flame)
       connectEvmWallet();
     },
-    [connectEvmWallet, sourceChain.chain],
+    [
+      connectEvmWallet,
+      evmWallet,
+      sourceChain.chain?.chainId,
+      sourceChain.chain?.chainType,
+    ],
   );
 
   const handleSourceChainSelect = useCallback(

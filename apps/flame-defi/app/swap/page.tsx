@@ -20,7 +20,7 @@ import {
   TRADE_TYPE_OPPOSITES,
   TXN_STATUS,
 } from "@repo/flame-types";
-import { useGetQuote } from "../hooks";
+import { useGetQuote } from "hooks";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
 import { useTokenBalances } from "features/evm-wallet";
@@ -28,8 +28,8 @@ import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
 export default function SwapPage(): React.ReactElement {
-  const { selectedChain } = useAstriaChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputOne, setInputOne] = useState<TokenInputState>({
@@ -57,7 +57,7 @@ export default function SwapPage(): React.ReactElement {
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
-    selectedChain,
+    chain,
   );
 
   const swapInputs: SwapPairProps[] = [

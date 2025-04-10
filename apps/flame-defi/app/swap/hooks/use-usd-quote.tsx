@@ -3,11 +3,11 @@ import debounce from "lodash.debounce";
 
 import { useAstriaChainData } from "config";
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
-import { useGetQuote } from "../../hooks";
+import { useGetQuote } from "hooks";
 
 export const useUsdQuote = (inputToken: TokenInputState) => {
-  const { selectedChain } = useAstriaChainData();
-  const usdcToken = selectedChain.currencies.find(
+  const { chain } = useAstriaChainData();
+  const usdcToken = chain.currencies.find(
     (currency) => currency.coinDenom === "USDC",
   );
   const { quote, loading, quoteError, getQuote } = useGetQuote();

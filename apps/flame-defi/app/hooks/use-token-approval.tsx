@@ -1,5 +1,5 @@
 import { useConfig } from "config";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { HexString, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 
 export const useTokenApproval = ({
@@ -14,7 +14,7 @@ export const useTokenApproval = ({
   setErrorText: (error: string) => void;
 }) => {
   const { tokenApprovalAmount } = useConfig();
-  const { approveToken } = useEvmWallet();
+  const { approveToken } = useAstriaWallet();
 
   const handleTokenApproval = async (
     tokenNeedingApproval: TokenInputState,

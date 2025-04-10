@@ -20,10 +20,10 @@ import {
   ConfigContextProvider,
   getAllChainConfigs,
   getEnvVariable,
-} from "./config";
-import { CosmosWalletProvider } from "./features/cosmos-wallet";
-import { EvmWalletProvider } from "./features/evm-wallet";
-import { NotificationsContextProvider } from "./features/notifications";
+} from "config";
+import { CosmosWalletProvider } from "features/cosmos-wallet";
+import { AstriaWalletContextProvider } from "features/evm-wallet";
+import { NotificationsContextProvider } from "features/notifications";
 
 const WALLET_CONNECT_PROJECT_ID = getEnvVariable(
   "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID",
@@ -85,7 +85,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     chain={base}
                   >
                     <CosmosWalletProvider>
-                      <EvmWalletProvider>{children}</EvmWalletProvider>
+                      <AstriaWalletContextProvider>
+                        {children}
+                      </AstriaWalletContextProvider>
                     </CosmosWalletProvider>
                   </OnchainKitProvider>
                 </ChainProvider>

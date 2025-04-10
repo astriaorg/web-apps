@@ -16,6 +16,7 @@ export const useConfig = () => {
   return context;
 };
 
+// FIXME - probably move this to AstriaWalletContext
 export const useAstriaChainData = () => {
   const { astriaChains } = useConfig();
   const astriaChainsData = Object.values(astriaChains);
@@ -28,5 +29,5 @@ export const useAstriaChainData = () => {
     (currency) => currency.isWrappedNative,
   );
 
-  return { selectedChain, nativeToken, wrappedNativeToken };
+  return { chain: selectedChain, nativeToken, wrappedNativeToken };
 };

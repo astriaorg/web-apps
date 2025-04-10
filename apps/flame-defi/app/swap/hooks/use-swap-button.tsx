@@ -7,7 +7,7 @@ import {
 
 import { useAstriaChainData } from "config";
 import {
-  useEvmWallet,
+  useAstriaWallet,
   createTradeFromQuote,
   createWethService,
   createSwapRouterService,
@@ -44,19 +44,18 @@ export function useSwapButton({
   quoteError,
   tradeType,
 }: SwapButtonProps) {
-  const { selectedChain } = useAstriaChainData();
+  const { chain } = useAstriaChainData();
   const { feeRecipient } = useConfig();
   const wagmiConfig = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
-  const { connectEvmWallet } = useEvmWallet();
+  const { connectWallet, getTokenNeedingApproval } = useAstriaWallet();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
-  const { getTokenNeedingApproval } = useEvmWallet();
   const tokenNeedingApproval = getTokenNeedingApproval(topToken);
 
   const { handleTokenApproval } = useTokenApproval({
@@ -109,8 +108,8 @@ export function useSwapButton({
   }, [result.data, txnHash, addRecentTransaction, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
-    const wtiaAddress = selectedChain.contracts.wrappedNativeToken?.address;
-    if (!selectedChain.chainId || !wtiaAddress) {
+    const wtiaAddress = chain.contracts.wrappedNativeToken?.address;
+    if (!chain.chainId || !wtiaAddress) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
@@ -120,7 +119,7 @@ export function useSwapButton({
     if (type === "wrap") {
       try {
         const tx = await wethService.deposit(
-          selectedChain.chainId,
+          chain.chainId,
           topToken.value,
           topToken.token?.coinDecimals || 18,
         );
@@ -134,7 +133,7 @@ export function useSwapButton({
     } else {
       try {
         const tx = await wethService.withdraw(
-          selectedChain.chainId,
+          chain.chainId,
           bottomToken.value,
           bottomToken.token?.coinDecimals || 18,
         );
@@ -156,12 +155,12 @@ export function useSwapButton({
   }, [quote, tradeType]);
 
   const handleSwap = useCallback(async () => {
-    if (!trade || !userAccount.address || !selectedChain.chainId) {
+    if (!trade || !userAccount.address || !chain.chainId) {
       return;
     }
     setTxnStatus(TXN_STATUS.PENDING);
     try {
-      const swapRouterAddress = selectedChain.contracts.swapRouter?.address;
+      const swapRouterAddress = chain.contracts.swapRouter?.address;
       if (!swapRouterAddress) {
         console.warn("Swap router address is not defined. Cannot swap.");
         return;
@@ -170,7 +169,7 @@ export function useSwapButton({
       const swapRouterService = createSwapRouterService(
         wagmiConfig,
         swapRouterAddress as HexString,
-        evmChainToRainbowKitChain(selectedChain) as Chain,
+        evmChainToRainbowKitChain(chain) as Chain,
       );
 
       const options = {
@@ -183,7 +182,7 @@ export function useSwapButton({
       };
 
       const tx = await swapRouterService.executeSwap(
-        selectedChain.chainId,
+        chain.chainId,
         trade,
         options,
       );
@@ -199,7 +198,7 @@ export function useSwapButton({
     topToken.token?.coinDenom,
     bottomToken.token?.coinDenom,
     userAccount,
-    selectedChain,
+    chain,
     wagmiConfig,
     slippageTolerance,
     feeRecipient,
@@ -222,7 +221,7 @@ export function useSwapButton({
   const onSubmitCallback = () => {
     switch (true) {
       case !userAccount.address:
-        return connectEvmWallet();
+        return connectWallet();
       case tokenNeedingApproval !== null:
         return handleTokenApproval(tokenNeedingApproval);
       case unwrapTia:

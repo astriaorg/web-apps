@@ -25,8 +25,8 @@ export const ContentSection = () => {
     maxPrice,
     updateMaxPrice,
   } = usePoolContext();
-  const { selectedChain } = useAstriaChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
   const defaultFeeData = feeData[2] as FeeData;
   const [selectedFeeTier, setSelectedFeeTier] =
     useState<FeeData>(defaultFeeData);

@@ -4,7 +4,8 @@ import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 import React, { useCallback, useEffect, useMemo } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
-import { ArrowUpDownIcon, BaseIcon, WalletIcon } from "@repo/ui/icons";
+// import { ArrowUpDownIcon, BaseIcon, WalletIcon } from "@repo/ui/icons";
+import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { Dropdown } from "components/dropdown";

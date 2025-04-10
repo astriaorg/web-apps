@@ -10,7 +10,7 @@ import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
-import { useGetQuote } from "../../hooks";
+import { useGetQuote } from "hooks";
 import { TransactionInfo } from "../types";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the

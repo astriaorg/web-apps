@@ -4,7 +4,7 @@ import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
 import { useMemo } from "react";
 import { useAccount } from "wagmi";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
+import { useAstriaWallet } from "../../hooks/use-astria-wallet";
 
 interface ConnectEvmWalletButtonProps {
   onDisconnectWallet?: () => void;
@@ -16,15 +16,15 @@ interface ConnectEvmWalletButtonProps {
 export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
 }: ConnectEvmWalletButtonProps) => {
-  const { selectedChain } = useAstriaChainData();
+  const { chain } = useAstriaChainData();
   const {
-    connectEvmWallet,
-    disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
+    connectWallet,
+    disconnectWallet,
+    nativeTokenBalance,
+    isLoadingNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
-  } = useEvmWallet();
+  } = useAstriaWallet();
   const userAccount = useAccount();
 
   // const [showTransactions, setShowTransactions] = useState(false);
@@ -41,20 +41,19 @@ export const ConnectEvmWalletButton = ({
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}
       isLoading={
-        (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
-        quoteLoading
+        (isLoadingNativeTokenBalance && !nativeTokenBalance) || quoteLoading
       }
       account={userAccount}
-      balance={evmNativeTokenBalance ?? undefined}
+      balance={nativeTokenBalance ?? undefined}
       fiat={usdcToNativeQuote}
       explorer={{
-        url: `${selectedChain.blockExplorerUrl}/address/${userAccount.address}`,
+        url: `${chain.blockExplorerUrl}/address/${userAccount.address}`,
       }}
       label={label}
       icon={<FlameIcon />}
-      onConnectWallet={connectEvmWallet}
+      onConnectWallet={connectWallet}
       onDisconnectWallet={() => {
-        disconnectEvmWallet();
+        disconnectWallet();
         onDisconnectWallet?.();
       }}
     />

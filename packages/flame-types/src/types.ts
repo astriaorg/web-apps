@@ -777,3 +777,8 @@ export enum TXN_STATUS {
 export type TxnFailedProps = {
   txnMsg?: string;
 };
+
+export type Balance = {
+  value: string;
+  symbol: string;
+};

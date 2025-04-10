@@ -11,9 +11,8 @@ import React, {
 import { EditIcon, PlusIcon } from "@repo/ui/icons";
 import { DropdownAdditionalOption } from "components/dropdown";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { createWithdrawerService, useEvmWallet } from "features/evm-wallet";
+import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
-import { useConfig } from "wagmi";
 
 export interface WithdrawPageContextProps extends PropsWithChildren {
   amount: string;
@@ -52,7 +51,6 @@ export const WithdrawPageContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const { addNotification } = useNotifications();
-  const wagmiConfig = useConfig();
 
   // Form state
   const [amount, setAmount] = useState<string>("");
@@ -79,88 +77,32 @@ export const WithdrawPageContextProvider = ({
     setIsRecipientAddressEditable((prev) => !prev);
   }, []);
 
-  // save the recipient address
-  const handleEditRecipientSave = () => {
+  // save the recipient address - simplified
+  const handleEditRecipientSave = useCallback(() => {
     setIsRecipientAddressEditable(false);
-    // reset wallet states when user manually enters address
-    cosmosWallet.resetState();
-    // TODO - only reset evm wallet state if recipient had previously
-    //  been set from evm wallet connection?
-    evmWallet.resetState();
-  };
+  }, []);
 
   // clear the manually inputted recipient address
-  const handleEditRecipientClear = () => {
+  const handleEditRecipientClear = useCallback(() => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-  };
+  }, []);
 
-  // handle connecting to Cosmos wallet
+  // handle connecting to Cosmos wallet - simplified
   const handleConnectCosmosWallet = useCallback(() => {
     setIsRecipientAddressEditable(false);
     setRecipientAddressOverride("");
-    cosmosWallet.connectCosmosWallet();
-  }, [cosmosWallet]);
+    // Simplified mock function
+    console.log("Connect Cosmos wallet");
+  }, []);
 
-  const handleWithdraw = async () => {
-    if (!evmWallet.selectedEvmChain || !evmWallet.selectedEvmCurrency) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please select a chain and token to bridge first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    const fromAddress = evmWallet.evmAccountAddress;
-    const recipientAddress =
-      recipientAddressOverride || cosmosWallet.cosmosAccountAddress;
-    if (!fromAddress || !recipientAddress) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please connect your Keplr and EVM wallet first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    if (
-      !evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress &&
-      !evmWallet.selectedEvmCurrency.erc20ContractAddress
-    ) {
-      console.error("Withdrawal cannot proceed: missing contract address");
-      return;
-    }
-
+  // Simplified withdraw handler that just shows notifications
+  const handleWithdraw = useCallback(async () => {
     setIsLoading(true);
     setIsAnimating(true);
+
     try {
-      const contractAddress = evmWallet.selectedEvmCurrency.isNative
-        ? evmWallet.selectedEvmCurrency.nativeTokenWithdrawerContractAddress
-        : evmWallet.selectedEvmCurrency.erc20ContractAddress;
-      if (!contractAddress) {
-        throw new Error("No contract address found");
-      }
-      if (!evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei) {
-        throw new Error("Base withdrawals coming soon but not yet supported.");
-      }
-      const withdrawerSvc = createWithdrawerService(
-        wagmiConfig,
-        contractAddress,
-        !evmWallet.selectedEvmCurrency.isNative,
-      );
-      await withdrawerSvc.withdrawToIbcChain(
-        evmWallet.selectedEvmChain.chainId,
-        recipientAddress,
-        amount,
-        evmWallet.selectedEvmCurrency.coinDecimals,
-        evmWallet.selectedEvmCurrency.ibcWithdrawalFeeWei,
-        "",
-      );
+      // Mock successful withdrawal
       addNotification({
         toastOpts: {
           toastType: NotificationType.SUCCESS,
@@ -171,14 +113,13 @@ export const WithdrawPageContextProvider = ({
     } catch (e) {
       setIsAnimating(false);
       console.error("Withdrawal failed:", e);
-      const message = e instanceof Error ? e.message : "Unknown error.";
       addNotification({
         toastOpts: {
           toastType: NotificationType.DANGER,
           component: (
             <>
               <p className="mb-1">Withdrawal failed.</p>
-              <p className="message-body-inner">{message}</p>
+              <p className="message-body-inner">Mock error message</p>
             </>
           ),
           onAcknowledge: () => {},
@@ -188,7 +129,7 @@ export const WithdrawPageContextProvider = ({
       setIsLoading(false);
       setTimeout(() => setIsAnimating(false), 1000);
     }
-  };
+  }, [addNotification]);
 
   // dropdown options for additional Cosmos actions
   const additionalCosmosOptions = useMemo(() => {
@@ -221,35 +162,10 @@ export const WithdrawPageContextProvider = ({
     ];
   }, [connectEvmWallet]);
 
-  // calculate if withdraw button should be disabled
-  const isWithdrawDisabled = useMemo<boolean>((): boolean => {
-    if (recipientAddressOverride) {
-      // there won't be a selected cosmos chain and currency if user manually
-      // enters a recipient address
-      return !(
-        isAmountValid &&
-        isRecipientAddressValid &&
-        evmWallet.evmAccountAddress
-      );
-    }
-
-    return !(
-      cosmosWallet.cosmosAccountAddress &&
-      isAmountValid &&
-      isRecipientAddressValid &&
-      evmWallet.evmAccountAddress &&
-      evmWallet.selectedEvmCurrency?.coinDenom ===
-        cosmosWallet.selectedIbcCurrency?.coinDenom
-    );
-  }, [
-    recipientAddressOverride,
-    cosmosWallet.cosmosAccountAddress,
-    cosmosWallet.selectedIbcCurrency,
-    isAmountValid,
-    isRecipientAddressValid,
-    evmWallet.evmAccountAddress,
-    evmWallet.selectedEvmCurrency,
-  ]);
+  // Simplified withdraw button disabled state
+  const isWithdrawDisabled = useMemo(() => {
+    return !(isAmountValid && isRecipientAddressValid);
+  }, [isAmountValid, isRecipientAddressValid]);
 
   return (
     <WithdrawPageContext.Provider

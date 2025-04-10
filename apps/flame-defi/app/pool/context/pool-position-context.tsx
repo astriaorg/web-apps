@@ -39,9 +39,8 @@ export const PoolPositionContextProvider = ({
   const { address } = useAccount();
   const { formatNumber } = useIntl();
   const positionNftId = params["position-nft-id"] as string;
-  const { selectedChain, nativeToken, wrappedNativeToken } =
-    useAstriaChainData();
-  const { currencies } = selectedChain;
+  const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
+  const { currencies } = chain;
   const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
   const [collectAsNative, setCollectAsNative] = useState<boolean>(
     currentPoolSettings.collectAsNative || false,
@@ -72,13 +71,13 @@ export const PoolPositionContextProvider = ({
   const NonfungiblePositionManagerService =
     createNonfungiblePositionManagerService(
       wagmiConfig,
-      selectedChain.contracts.nonfungiblePositionManager.address,
+      chain.contracts.nonfungiblePositionManager.address,
     );
 
   const getPoolTokens = useCallback(async () => {
     try {
       const position = await NonfungiblePositionManagerService.positions(
-        selectedChain.chainId,
+        chain.chainId,
         positionNftId,
       );
       const isisPositionClosed = position.liquidity === 0n;
@@ -88,12 +87,12 @@ export const PoolPositionContextProvider = ({
       const token0 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
-        selectedChain.contracts.wrappedNativeToken.address,
+        chain.contracts.wrappedNativeToken.address,
       );
       const token1 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress1,
-        selectedChain.contracts.wrappedNativeToken.address,
+        chain.contracts.wrappedNativeToken.address,
       );
 
       if (token0 && token1) {
@@ -103,16 +102,16 @@ export const PoolPositionContextProvider = ({
           Number(position.tokensOwed1) / 10 ** token1.coinDecimals;
         const factoryService = createPoolFactoryService(
           wagmiConfig,
-          selectedChain.contracts.poolFactory.address,
+          chain.contracts.poolFactory.address,
         );
         const poolAddress = await factoryService.getPool(
-          selectedChain.chainId,
+          chain.chainId,
           position.tokenAddress0,
           position.tokenAddress1,
           position.fee,
         );
         const poolService = createPoolService(wagmiConfig, poolAddress);
-        const slot0 = await poolService.getSlot0(selectedChain.chainId);
+        const slot0 = await poolService.getSlot0(chain.chainId);
 
         const { amount0, amount1 } = getTokensLiquidityAmounts(
           position,
@@ -144,16 +143,16 @@ export const PoolPositionContextProvider = ({
   }, [
     currencies,
     NonfungiblePositionManagerService,
-    selectedChain.chainId,
-    selectedChain.contracts.poolFactory.address,
-    selectedChain.contracts.wrappedNativeToken.address,
+    chain.chainId,
+    chain.contracts.poolFactory.address,
+    chain.contracts.wrappedNativeToken.address,
     positionNftId,
     wagmiConfig,
   ]);
 
   const getFeeTier = useCallback(async () => {
     const position = await NonfungiblePositionManagerService.positions(
-      selectedChain.chainId,
+      chain.chainId,
       positionNftId,
     );
     const feeTier = formatNumber(position.fee / 1_000_000, {
@@ -165,7 +164,7 @@ export const PoolPositionContextProvider = ({
   }, [
     formatNumber,
     NonfungiblePositionManagerService,
-    selectedChain.chainId,
+    chain.chainId,
     positionNftId,
   ]);
 
@@ -176,34 +175,34 @@ export const PoolPositionContextProvider = ({
 
     try {
       const position = await NonfungiblePositionManagerService.positions(
-        selectedChain.chainId,
+        chain.chainId,
         positionNftId,
       );
       const factoryService = createPoolFactoryService(
         wagmiConfig,
-        selectedChain.contracts.poolFactory.address,
+        chain.contracts.poolFactory.address,
       );
 
       const token0 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress0,
-        selectedChain.contracts.wrappedNativeToken.address,
+        chain.contracts.wrappedNativeToken.address,
       );
 
       const token1 = getTokenDataFromCurrencies(
         currencies,
         position.tokenAddress1,
-        selectedChain.contracts.wrappedNativeToken.address,
+        chain.contracts.wrappedNativeToken.address,
       );
 
       const poolAddress = await factoryService.getPool(
-        selectedChain.chainId,
+        chain.chainId,
         position.tokenAddress0,
         position.tokenAddress1,
         position.fee,
       );
       const poolService = createPoolService(wagmiConfig, poolAddress);
-      const slot0 = await poolService.getSlot0(selectedChain.chainId);
+      const slot0 = await poolService.getSlot0(chain.chainId);
       const pricePerToken = sqrtPriceX96ToPrice(
         slot0.sqrtPriceX96,
         invertedPrice,
@@ -244,7 +243,7 @@ export const PoolPositionContextProvider = ({
   }, [
     address,
     NonfungiblePositionManagerService,
-    selectedChain,
+    chain,
     positionNftId,
     currencies,
     wagmiConfig,

@@ -59,8 +59,8 @@ const feeData = [
 
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const wagmiConfig = useConfig();
-  const { selectedChain } = useAstriaChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
   const { address } = useAccount();
   const [poolPositions, setPoolPositions] = useState<PoolPosition[]>([]);
   const [poolPositionsLoading, setPoolPositionsLoading] = useState(false);
@@ -93,7 +93,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
       }
       const factoryService = createPoolFactoryService(
         wagmiConfig,
-        selectedChain.contracts.poolFactory.address,
+        chain.contracts.poolFactory.address,
       );
 
       setPoolPositionsLoading(true);
@@ -102,12 +102,12 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
         const NonfungiblePositionManagerService =
           createNonfungiblePositionManagerService(
             wagmiConfig,
-            selectedChain.contracts.nonfungiblePositionManager.address,
+            chain.contracts.nonfungiblePositionManager.address,
           );
 
         const positions =
           await NonfungiblePositionManagerService.getAllPositions(
-            selectedChain.chainId,
+            chain.chainId,
             address,
           );
 
@@ -118,17 +118,17 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
           const tokenOne = getTokenDataFromCurrencies(
             currencies,
             position.tokenAddress0,
-            selectedChain.contracts.wrappedNativeToken.address,
+            chain.contracts.wrappedNativeToken.address,
           );
 
           const tokenTwo = getTokenDataFromCurrencies(
             currencies,
             position.tokenAddress1,
-            selectedChain.contracts.wrappedNativeToken.address,
+            chain.contracts.wrappedNativeToken.address,
           );
 
           const poolAddress = await factoryService.getPool(
-            selectedChain.chainId,
+            chain.chainId,
             position.tokenAddress0,
             position.tokenAddress1,
             position.fee,
@@ -155,7 +155,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
     };
 
     getPoolPositions();
-  }, [address, currencies, wagmiConfig, selectedChain]);
+  }, [address, currencies, wagmiConfig, chain]);
 
   return (
     <PoolContext.Provider

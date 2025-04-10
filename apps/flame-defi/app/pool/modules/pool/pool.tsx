@@ -7,10 +7,10 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { PositionsTable } from "./components";
 import { ROUTES } from "../../constants/routes";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { usePoolContext } from "pool/hooks";
 export const Pool = (): React.ReactElement => {
-  const { connectEvmWallet } = useEvmWallet();
+  const { connectWallet } = useAstriaWallet();
   const { poolPositions, poolPositionsLoading } = usePoolContext();
   const router = useRouter();
   const userAccount = useAccount();
@@ -43,7 +43,7 @@ export const Pool = (): React.ReactElement => {
                 Your active V3 liquidity positions will appear here.
               </p>
               {!userAccount.address && (
-                <Button className="mt-0" onClick={() => connectEvmWallet()}>
+                <Button className="mt-0" onClick={() => connectWallet()}>
                   Connect Wallet
                 </Button>
               )}

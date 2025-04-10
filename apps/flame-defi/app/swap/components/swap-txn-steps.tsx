@@ -180,7 +180,7 @@ function TxnSuccess({
   isTiaWtia,
   txnHash,
 }: TxnStepsProps) {
-  const { selectedChain } = useAstriaChainData();
+  const { chain } = useAstriaChainData();
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <SuccessCheck />
@@ -204,7 +204,7 @@ function TxnSuccess({
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
-            href={`${selectedChain.blockExplorerUrl}/tx/${txnHash}`}
+            href={`${chain.blockExplorerUrl}/tx/${txnHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-orange hover:text-orange/80  transition text-base md:text-lg underline"

@@ -102,6 +102,7 @@ const config: Config = {
     "^components/(.*)$": "<rootDir>/app/components/$1",
     "^config": "<rootDir>/app/config/$1",
     "^features/(.*)$": "<rootDir>/app/features/$1",
+    "^hooks": "<rootDir>/app/hooks/$1",
     "^testing/(.*)$": "<rootDir>/app/testing/$1",
   },
 
