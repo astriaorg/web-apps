@@ -14,7 +14,6 @@ import {
   useState,
   useCallback,
 } from "react";
-import { TXN_STATUS } from "@repo/flame-types";
 import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
 import {
   getTokenDataFromCurrencies,
@@ -65,7 +64,6 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const [poolPositions, setPoolPositions] = useState<PoolPosition[]>([]);
   const [poolPositionsLoading, setPoolPositionsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
 
   // Simplified state - only keep what's needed
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -165,8 +163,6 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
         poolPositionsLoading,
         modalOpen,
         setModalOpen,
-        txnStatus,
-        setTxnStatus,
         maxPrice,
         updateMaxPrice,
       }}
