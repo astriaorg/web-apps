@@ -16,7 +16,7 @@ import {
   DrawerTitle,
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
-import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
@@ -252,7 +252,7 @@ export const MobileNavigationMenu = () => {
                   url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
                 }}
                 label={shortenAddress(account.address as string)}
-                icon={<FlameIcon />}
+                icon={<AstriaIcon />}
                 onConnectWallet={connectEvmWallet}
                 onDisconnectWallet={() => {
                   setIsConnectWalletOpen(false);

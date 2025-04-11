@@ -1,18 +1,18 @@
 import {
-  CelestiaIcon,
-  DropTiaIcon,
-  FlameIcon,
-  NeutronIcon,
-  NobleIcon,
-  WrappedTiaIcon,
-} from "@repo/ui/icons";
-import {
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
   EvmChains,
   EvmCurrency,
 } from "@repo/flame-types";
+import {
+  AstriaIcon,
+  CelestiaIcon,
+  DropTiaIcon,
+  NeutronIcon,
+  NobleIcon,
+  WrappedTiaIcon,
+} from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
@@ -336,7 +336,7 @@ const FlameChainInfo: EvmChainInfo = {
       IconComponent: DropTiaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
 export const evmChains: EvmChains = {

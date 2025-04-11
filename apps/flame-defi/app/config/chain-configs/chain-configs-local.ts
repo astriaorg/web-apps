@@ -1,4 +1,3 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
 import {
   CosmosChainInfo,
   CosmosChains,
@@ -6,6 +5,7 @@ import {
   EvmChains,
   EvmCurrency,
 } from "@repo/flame-types";
+import { AstriaIcon, CelestiaIcon, NobleIcon } from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   // Chain-id of the celestia chain.
@@ -230,7 +230,7 @@ const FlameChainInfo: EvmChainInfo = {
       IconComponent: CelestiaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
 const FakeChainInfo: EvmChainInfo = {
@@ -275,10 +275,10 @@ const FakeChainInfo: EvmChainInfo = {
         "0x0000000000000000000000000000000000000000",
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: FlameIcon,
+      IconComponent: AstriaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
 export const evmChains: EvmChains = {
