@@ -20,7 +20,7 @@ export const ContentSection = () => {
     poolToken0,
     poolToken1,
     isCollectAsWrappedNative,
-    handleIsCollectAsWrappedNative,
+    handleCollectAsWrappedNative,
     refreshPoolPosition,
   } = usePoolPositionContext();
   const {
@@ -53,14 +53,14 @@ export const ContentSection = () => {
     setErrorText(null);
     refreshPoolPosition();
     refreshLiquidityToRemove();
-    handleIsCollectAsWrappedNative(false);
+    handleCollectAsWrappedNative(false);
   }, [
     setModalOpen,
     setTxnStatus,
     setErrorText,
     refreshPoolPosition,
     refreshLiquidityToRemove,
-    handleIsCollectAsWrappedNative,
+    handleCollectAsWrappedNative,
   ]);
 
   const handleModalActionButton = useCallback(() => {
@@ -84,7 +84,7 @@ export const ContentSection = () => {
               <Switch
                 checked={isCollectAsWrappedNative}
                 onCheckedChange={() =>
-                  handleIsCollectAsWrappedNative(!isCollectAsWrappedNative)
+                  handleCollectAsWrappedNative(!isCollectAsWrappedNative)
                 }
                 className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
               />

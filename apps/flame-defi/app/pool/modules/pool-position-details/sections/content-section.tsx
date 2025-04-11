@@ -15,7 +15,7 @@ export const ContentSection = () => {
     poolToken0,
     poolToken1,
     isCollectAsWrappedNative,
-    handleIsCollectAsWrappedNative,
+    handleCollectAsWrappedNative,
     isReversedPoolTokens,
   } = usePoolPositionContext();
   const poolTokens = isReversedPoolTokens
@@ -23,13 +23,12 @@ export const ContentSection = () => {
     : [poolToken0, poolToken1];
   const token0 = poolTokens[0] || null;
   const token1 = poolTokens[1] || null;
-  const hasUnclaimedFees =
+  const hasUnclaimedFees = Boolean(
     token0?.unclaimedFees &&
-    token1?.unclaimedFees &&
-    token0.unclaimedFees > 0 &&
-    token1.unclaimedFees > 0
-      ? true
-      : false;
+      token1?.unclaimedFees &&
+      token0.unclaimedFees > 0 &&
+      token1.unclaimedFees > 0,
+  );
 
   return (
     <div className="flex flex-col flex-1 mt-8">
@@ -48,7 +47,7 @@ export const ContentSection = () => {
             <Switch
               checked={isCollectAsWrappedNative}
               onCheckedChange={() =>
-                handleIsCollectAsWrappedNative(!isCollectAsWrappedNative)
+                handleCollectAsWrappedNative(!isCollectAsWrappedNative)
               }
               className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
             />

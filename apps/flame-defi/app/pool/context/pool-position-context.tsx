@@ -263,9 +263,7 @@ export const PoolPositionContextProvider = ({
     void getPriceRange();
   }, [invertedPrice, getPriceRange]);
 
-  const handleIsCollectAsWrappedNative = (
-    isCollectAsWrappedNative: boolean,
-  ) => {
+  const handleCollectAsWrappedNative = (isCollectAsWrappedNative: boolean) => {
     setIsCollectAsWrappedNative(isCollectAsWrappedNative);
     if (isCollectAsWrappedNative) {
       poolTokens.map((poolToken) => {
@@ -292,7 +290,7 @@ export const PoolPositionContextProvider = ({
         selectedSymbol,
         handleReverseTokenData,
         isCollectAsWrappedNative,
-        handleIsCollectAsWrappedNative,
+        handleCollectAsWrappedNative,
         poolToken0,
         poolToken1,
         currentPrice,

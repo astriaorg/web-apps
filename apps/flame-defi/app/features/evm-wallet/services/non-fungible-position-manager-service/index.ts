@@ -62,8 +62,8 @@ export interface DecreaseLiquidityAndCollectParams {
   recipient: Address;
   isCollectAsWrappedNative: boolean;
   isCollectNonNativeTokens: boolean;
-  isToken1Native: boolean;
   isToken0Native: boolean;
+  isToken1Native: boolean;
   gasLimit?: bigint;
 }
 
@@ -505,8 +505,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       deadline,
       recipient,
       isCollectAsWrappedNative,
-      isToken1Native,
       isToken0Native,
+      isToken1Native,
       isCollectNonNativeTokens,
     } = params;
     const position = await this.positions(chainId, tokenId);
@@ -645,8 +645,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       recipient,
       isCollectAsWrappedNative,
       isCollectNonNativeTokens,
-      isToken1Native: Boolean(tokenInput1.token.isNative),
-      isToken0Native: Boolean(tokenInput0.token.isNative),
+      isToken0Native: tokenInput0.token.isNative,
+      isToken1Native: tokenInput1.token.isNative,
     };
   }
 }

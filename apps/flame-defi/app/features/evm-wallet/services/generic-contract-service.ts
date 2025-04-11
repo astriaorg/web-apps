@@ -63,9 +63,8 @@ export class GenericContractService {
     value?: bigint,
     gasLimit?: bigint,
   ): Promise<Hash> {
-    const walletClient = await this.getWalletClient(chainId);
-
     try {
+      const walletClient = await this.getWalletClient(chainId);
       return await walletClient.writeContract({
         address: this.contractAddress,
         abi: this.abi,

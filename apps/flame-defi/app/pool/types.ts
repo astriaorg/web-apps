@@ -120,7 +120,7 @@ export type PoolPositionContextProps = {
   selectedSymbol: string; // The symbol of the token that is currently in the ToggleSwitch. Controls which set of token liquidity and price data is displayed
   handleReverseTokenData: (symbol: string) => void;
   isCollectAsWrappedNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
-  handleIsCollectAsWrappedNative: (isCollectAsWrappedNative: boolean) => void;
+  handleCollectAsWrappedNative: (isCollectAsWrappedNative: boolean) => void;
   poolToken0: PoolToken | null;
   poolToken1: PoolToken | null;
   poolPosition: PoolPositionResponse | null;
