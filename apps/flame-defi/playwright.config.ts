@@ -7,7 +7,9 @@ import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: path.resolve("./e2e-tests/wallet-setup/.env.e2e-tests") });
+dotenv.config({
+  path: path.resolve("./e2e-tests/wallet-setup/.env.e2e-tests"),
+});
 
 /**
  * See https://playwright.dev/docs/test-configuration.

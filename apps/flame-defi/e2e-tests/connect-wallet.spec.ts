@@ -30,13 +30,13 @@ test("should connect wallet using navigation menu wallet connector button", asyn
   // Click the Connect Wallet button in the navigation menu
   // The button is inside a nav element with the "Connect Wallet" text
   await page.locator('nav button:has-text("Connect Wallet")').click();
-  
+
   // In the popover, click the EVM wallet connect button
   await page.locator('button:has-text("Flame Wallet")').click();
-  
+
   // RainbowKit modal opens - click on the MetaMask button
   await page.locator('button:has-text("MetaMask")').click();
-  
+
   // Connect MetaMask to the dapp (this handles the MetaMask approval popup)
   await metamask.connectToDapp();
 
@@ -46,7 +46,7 @@ test("should connect wallet using navigation menu wallet connector button", asyn
 
   // Verify that we're now connected (button text should change to "Connected")
   await expect(page.locator('nav button:has-text("Connected")')).toBeVisible();
-  
+
   // Additional test steps can be added here, such as:
   // - Sending transactions
   // - Interacting with smart contracts
