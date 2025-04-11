@@ -30,7 +30,6 @@ export {
   createTradeFromQuote,
   createWethService,
   createWithdrawerService,
-  NonfungiblePositionManagerService,
   useEvmWallet,
   useTokenBalances,
 };
