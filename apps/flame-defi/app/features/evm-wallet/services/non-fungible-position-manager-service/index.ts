@@ -405,6 +405,14 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       undefined,
       gasLimit,
     );
+
+    return await walletClient.writeContract({
+      address: this.contractAddress,
+      abi: this.abi,
+      functionName: "multicall",
+      args: [collectCalls],
+      gas: gasLimit,
+    });
   }
 
   /**
@@ -636,7 +644,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     } = params;
 
     const calls: string[] = [];
-    const decreaseCall = this.encodeDecreaseLiquidityCall(
+    const decreaseCall = await this.encodeDecreaseLiquidityCall(
       tokenId,
       liquidity,
       amount0Min,
