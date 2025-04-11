@@ -25,6 +25,7 @@ import {
   sqrtPriceX96ToPrice,
   tickToPrice,
 } from "./pool-position-helpers";
+import { formatUnits } from "viem";
 
 export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined
@@ -93,10 +94,13 @@ export const PoolPositionContextProvider = ({
       );
 
       if (token0 && token1) {
-        const unclaimedFees0 =
-          Number(position.tokensOwed0) / 10 ** token0.coinDecimals;
-        const unclaimedFees1 =
-          Number(position.tokensOwed1) / 10 ** token1.coinDecimals;
+        const unclaimedFees0 = Number(
+          formatUnits(position.tokensOwed0, token0.coinDecimals),
+        );
+        const unclaimedFees1 = Number(
+          formatUnits(position.tokensOwed1, token1.coinDecimals),
+        );
+
         const factoryService = createPoolFactoryService(
           wagmiConfig,
           selectedChain.contracts.poolFactory.address,
