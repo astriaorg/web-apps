@@ -67,6 +67,18 @@ export interface DecreaseLiquidityAndCollectParams {
   gasLimit?: bigint;
 }
 
+export interface CollectFeesParams {
+  calls?: string[];
+  chainId: number;
+  tokenId: string;
+  recipient: Address;
+  isCollectAsWrappedNative: boolean;
+  isCollectNonNativeTokens: boolean;
+  isToken0Native: boolean;
+  isToken1Native: boolean;
+  gasLimit?: bigint;
+}
+
 export class NonfungiblePositionManagerService extends GenericContractService {
   /**
    * Creates a new NonfungiblePositionManagerService instance
@@ -323,30 +335,142 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Collect fees and/or tokens from a position.
-   * By default, collects all available fees unless specific amounts are provided.
+   * Collect fees and tokens from a position with support for wrapped native tokens and multicall operations.
+   * This method handles both wrapped native token collection and non-native token collection scenarios.
    *
-   * @param tokenId - The ID of the token
-   * @param params - Parameters for the collect operation
+   * @param params - Parameters for the collect fees operation
    * @returns Transaction hash if successful
    */
-  async collect(
-    tokenId: string,
-    { chainId, recipient, amount0Max, amount1Max, gasLimit }: CollectParams,
-  ): Promise<HexString> {
-    const params = {
-      tokenId: BigInt(tokenId),
-      recipient,
-      amount0Max: amount0Max,
-      amount1Max: amount1Max,
-    };
-
-    return await this.writeContractMethod(
+  async collectFees(params: CollectFeesParams): Promise<HexString> {
+    const {
+      calls,
       chainId,
-      "collect",
-      [params],
-      gasLimit,
+      tokenId,
+      recipient,
+      isCollectAsWrappedNative,
+      isCollectNonNativeTokens,
+      isToken0Native,
+      isToken1Native,
+    } = params;
+
+    const position = await this.positions(chainId, tokenId);
+    const MAX_UINT128 = BigInt("0xffffffffffffffffffffffffffffffff");
+    const collectCalls: string[] = calls ?? [];
+
+    if (isCollectAsWrappedNative || isCollectNonNativeTokens) {
+      // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
+      const collectCall = this.encodeCollectCall(
+        tokenId,
+        recipient,
+        MAX_UINT128,
+        MAX_UINT128,
+      );
+      collectCalls.push(collectCall);
+    } else {
+      // Collects wrappedNativeToken and other token values to contract so we can unwrap the values after
+      const collectCall = this.encodeCollectCall(
+        tokenId,
+        this.contractAddress, // Collect to the contract itself
+        MAX_UINT128,
+        MAX_UINT128,
+      );
+      collectCalls.push(collectCall);
+
+      // Unwraps wrappedNativeToken to nativeToken and sends it to the recipient
+      const unwrapCall = this.encodeUnwrapWETHCall(1n, recipient);
+      collectCalls.push(unwrapCall);
+
+      // Sweeps non-native tokens to the recipient
+      if (!isToken0Native) {
+        const sweepToken0Call = this.encodeSweepTokenCall(
+          position.tokenAddress0,
+          0n,
+          recipient,
+        );
+        collectCalls.push(sweepToken0Call);
+      }
+
+      // Sweeps non-native tokens to the recipient
+      if (!isToken1Native) {
+        const sweepToken1Call = this.encodeSweepTokenCall(
+          position.tokenAddress1,
+          0n,
+          recipient,
+        );
+        collectCalls.push(sweepToken1Call);
+      }
+    }
+
+    const walletClient = await this.getWalletClient(chainId);
+    const gasLimit = await this.estimateMulticallGasLimit(
+      chainId,
+      collectCalls,
     );
+
+    return await walletClient.writeContract({
+      address: this.contractAddress,
+      abi: this.abi,
+      functionName: "multicall",
+      args: [collectCalls],
+      gas: gasLimit,
+    });
+  }
+
+  /**
+   * Helper method to generate parameters for collecting fees from a position
+   * Determines if native tokens are involved and sets the appropriate flags
+   * to handle automatic unwrapping of wrapped native token to native token and proper token collection.
+   */
+  public static getCollectFeesParams(
+    chain: EvmChainInfo,
+    tokenId: string,
+    tokenInput0: TokenInputState,
+    tokenInput1: TokenInputState,
+    recipient: Address,
+    isCollectAsWrappedNative: boolean = false,
+  ): CollectFeesParams {
+    if (!tokenInput0.token || !tokenInput1.token) {
+      throw new Error("Token input is null");
+    }
+
+    const token0Address = tokenInput0.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput0.token?.erc20ContractAddress;
+    const token1Address = tokenInput1.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput1.token?.erc20ContractAddress;
+
+    if (!token0Address || !token1Address) {
+      throw new Error("Token addresses are missing");
+    }
+
+    const shouldReverseOrder = needToReverseTokenOrder(
+      token0Address,
+      token1Address,
+    );
+
+    const isToken0Native = shouldReverseOrder
+      ? tokenInput1.token.isNative
+      : tokenInput0.token.isNative;
+    const isToken1Native = shouldReverseOrder
+      ? tokenInput0.token.isNative
+      : tokenInput1.token.isNative;
+
+    const isCollectNonNativeTokens =
+      !tokenInput0.token.isNative &&
+      !tokenInput1.token.isNative &&
+      !tokenInput1.token.isWrappedNative &&
+      !tokenInput0.token.isWrappedNative;
+
+    return {
+      chainId: chain.chainId,
+      tokenId,
+      recipient,
+      isCollectAsWrappedNative,
+      isCollectNonNativeTokens,
+      isToken0Native,
+      isToken1Native,
+    };
   }
 
   /**
@@ -509,11 +633,9 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       isToken1Native,
       isCollectNonNativeTokens,
     } = params;
-    const position = await this.positions(chainId, tokenId);
-    const MAX_UINT128 = BigInt("0xffffffffffffffffffffffffffffffff");
 
     const calls: string[] = [];
-    const decreaseCall = this.encodeDecreaseLiquidityCall(
+    const decreaseCall = await this.encodeDecreaseLiquidityCall(
       tokenId,
       liquidity,
       amount0Min,
@@ -523,89 +645,22 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
     calls.push(decreaseCall);
 
-    if (isCollectAsWrappedNative || isCollectNonNativeTokens) {
-      // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
-      const collectCall = this.encodeCollectCall(
-        tokenId,
-        recipient,
-        MAX_UINT128,
-        MAX_UINT128,
-      );
-
-      calls.push(collectCall);
-    } else {
-      // Collects wrappedNativeToken and other token values to contract so we can unwrap the values after
-      const collectCall = this.encodeCollectCall(
-        tokenId,
-        this.contractAddress, // Collect to the contract itself
-        MAX_UINT128,
-        MAX_UINT128,
-      );
-
-      calls.push(collectCall);
-
-      // Unwraps wrappedNativeToken to nativeToken and sends it to the recipient
-      const unwrapCall = this.encodeUnwrapWETHCall(1n, recipient);
-      calls.push(unwrapCall);
-
-      // Sweeps non-native tokens to the recipient
-      if (!isToken0Native) {
-        const sweepToken0Call = this.encodeSweepTokenCall(
-          position.tokenAddress0,
-          0n,
-          recipient,
-        );
-        calls.push(sweepToken0Call);
-      }
-
-      // Sweeps non-native tokens to the recipient
-      if (!isToken1Native) {
-        const sweepToken1Call = this.encodeSweepTokenCall(
-          position.tokenAddress1,
-          0n,
-          recipient,
-        );
-        calls.push(sweepToken1Call);
-      }
-    }
-
-    const DEFAULT_GAS_LIMIT = 300000n;
-    const walletClient = await this.getWalletClient(chainId);
-    const publicClient = await this.getPublicClient(chainId);
-    const signerAddress = walletClient.account?.address as HexString;
-
-    let gasLimit: bigint;
-    try {
-      gasLimit = await publicClient.estimateContractGas({
-        address: this.contractAddress,
-        abi: this.abi,
-        functionName: "multicall",
-        args: [calls],
-        account: signerAddress,
-      });
-      // Increase the estimated gas by 20%
-      gasLimit = (gasLimit * 120n) / 100n;
-    } catch (err) {
-      console.warn(
-        "Gas estimation failed for decreaseLiquidityAndCollect, using default limit",
-        err,
-      );
-      gasLimit = DEFAULT_GAS_LIMIT;
-    }
-
-    return await walletClient.writeContract({
-      address: this.contractAddress,
-      abi: this.abi,
-      functionName: "multicall",
-      args: [calls],
-      gas: gasLimit,
+    return await this.collectFees({
+      calls,
+      chainId,
+      tokenId,
+      recipient,
+      isCollectAsWrappedNative,
+      isCollectNonNativeTokens,
+      isToken0Native,
+      isToken1Native,
     });
   }
 
   /**
    * Helper method to generate parameters for a decreaseLiquidityAndCollect operation
-   should* Determines if native tokens are involved (TIA) and sets the isCollectAsWrappedNative flag
-   * accordingly to handle automatic unwrapping of WTIA to TIA.
+   * Determines if native tokens are involved and sets the isCollectAsWrappedNative flag
+   * accordingly to handle automatic unwrapping of wrapped native token to native token.
    */
   public static getDecreaseLiquidityAndCollectParams(
     tokenId: string,
@@ -629,11 +684,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       chain,
     );
 
-    const isCollectNonNativeTokens =
-      !tokenInput0.token.isNative &&
-      !tokenInput1.token.isNative &&
-      !tokenInput1.token.isWrappedNative &&
-      !tokenInput0.token.isWrappedNative;
+    const collectFeesParams = this.getCollectFeesParams(
+      chain,
+      tokenId,
+      tokenInput0,
+      tokenInput1,
+      recipient,
+    );
 
     return {
       chainId: decreaseParams.chainId,
@@ -644,9 +701,9 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       deadline: decreaseParams.deadline,
       recipient,
       isCollectAsWrappedNative,
-      isCollectNonNativeTokens,
-      isToken0Native: tokenInput0.token.isNative,
-      isToken1Native: tokenInput1.token.isNative,
+      isCollectNonNativeTokens: collectFeesParams.isCollectNonNativeTokens,
+      isToken0Native: collectFeesParams.isToken0Native,
+      isToken1Native: collectFeesParams.isToken1Native,
     };
   }
 }
