@@ -1,13 +1,6 @@
 import { Config } from "@wagmi/core";
 import { type Address, Abi, encodeFunctionData } from "viem";
 import {
-  type Address,
-  Abi,
-  encodeFunctionData,
-  PublicClient,
-  WalletClient,
-} from "viem";
-import {
   EvmChainInfo,
   HexString,
   TokenInputState,
@@ -17,7 +10,6 @@ import { GenericContractService } from "../generic-contract-service";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 import { needToReverseTokenOrder } from "../services.utils";
-import { getPublicClient } from "@wagmi/core";
 
 type PositionResponseTuple = [
   bigint, // nonce
