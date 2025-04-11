@@ -1,3 +1,4 @@
+import { HexString } from "@repo/flame-types";
 import {
   type Config,
   getPublicClient,
@@ -35,6 +36,37 @@ export class GenericContractService {
       throw new Error("No public client available");
     }
     return publicClient;
+  }
+
+  /**
+   * Estimates gas limit for a multicall operation with a 20% buffer
+   * @param chainId - The chain ID
+   * @param calls - Array of encoded function calls
+   * @returns Estimated gas limit with 20% buffer
+   */
+  protected async estimateMulticallGasLimit(
+    chainId: number,
+    calls: string[],
+  ): Promise<bigint> {
+    const DEFAULT_GAS_LIMIT = 300000n;
+
+    try {
+      const walletClient = await this.getWalletClient(chainId);
+      const publicClient = await this.getPublicClient(chainId);
+      const signerAddress = walletClient.account?.address as HexString;
+      const estimatedGas = await publicClient.estimateContractGas({
+        address: this.contractAddress,
+        abi: this.abi,
+        functionName: "multicall",
+        args: [calls],
+        account: signerAddress,
+      });
+      // Increase the estimated gas by 20%
+      return (estimatedGas * 120n) / 100n;
+    } catch (err) {
+      console.warn("Gas estimation failed, using default limit", err);
+      return DEFAULT_GAS_LIMIT;
+    }
   }
 
   protected async readContractMethod<T>(
