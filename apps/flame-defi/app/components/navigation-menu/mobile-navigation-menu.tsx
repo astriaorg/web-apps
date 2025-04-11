@@ -92,7 +92,10 @@ export const MobileNavigationMenu = () => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" className="p-0 hover:text-initial">
+          <Button
+            variant="ghost"
+            className="p-0 [&_svg]:size-5 hover:text-initial"
+          >
             <NavigationMenuButton size={20} isOpen={isOpen} />
           </Button>
         </DialogTrigger>
@@ -109,7 +112,7 @@ export const MobileNavigationMenu = () => {
             <DialogTitle className="sr-only"></DialogTitle>
             <DialogDescription className="sr-only"></DialogDescription>
             <div className="flex flex-col px-6 pb-8 h-full">
-              <div className="flex items-center justify-between w-full h-14">
+              <div className="flex items-center justify-between w-full h-14 shrink-0">
                 {/* Align with the logo and button in the navigation menu for seamless transitions. */}
                 <a
                   target="_blank"
