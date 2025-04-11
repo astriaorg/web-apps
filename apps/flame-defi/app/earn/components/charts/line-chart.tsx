@@ -195,19 +195,22 @@ export const LineChart = <
               {options?.length && (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="secondary">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="hover:bg-initial"
+                    >
                       {renderSelectedOption?.(selectedOption as OptionType)}
                       <ChevronDownSmallIcon />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-surface-3">
+                  <DropdownMenuContent align="start">
                     {options.map((option) => (
                       <DropdownMenuItem
                         key={option}
                         onSelect={() => {
                           setSelectedOption?.(option);
                         }}
-                        className="focus:bg-surface-2"
                       >
                         {renderSelectedOption?.(option)}
                       </DropdownMenuItem>

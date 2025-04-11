@@ -1,5 +1,5 @@
-import type { Config } from "@wagmi/core";
-import { type Address, Abi } from "viem";
+import { Config } from "@wagmi/core";
+import { type Address, Abi, encodeFunctionData } from "viem";
 import {
   EvmChainInfo,
   HexString,
@@ -34,6 +34,37 @@ export interface IncreaseLiquidityParams {
   amount1Min: bigint;
   deadline: number;
   value: bigint;
+}
+
+export interface DecreaseLiquidityParams {
+  chainId: number;
+  liquidity: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+}
+
+export interface CollectParams {
+  chainId: number;
+  recipient: Address;
+  amount0Max: bigint;
+  amount1Max: bigint;
+  gasLimit?: bigint;
+}
+
+export interface DecreaseLiquidityAndCollectParams {
+  chainId: number;
+  tokenId: string;
+  liquidity: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+  recipient: Address;
+  isCollectAsWrappedNative: boolean;
+  isCollectNonNativeTokens: boolean;
+  isToken0Native: boolean;
+  isToken1Native: boolean;
+  gasLimit?: bigint;
 }
 
 export class NonfungiblePositionManagerService extends GenericContractService {
@@ -238,63 +269,84 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Min: tokens[1]
         .withSlippage(slippageTolerance, true)
         .amountAsBigInt(),
-      // TODO - probably move to constant
       deadline: Math.floor(Date.now() / 1000) + 10 * 60,
       value,
     };
   }
 
-  /**
-   * Decreases the amount of liquidity in a position and accounts it to the position.
-   *
-   * @param chainId - The chain ID of the EVM chain
-   * @param tokenId - The ID of the NFT position to decrease liquidity in
-   * @param liquidity - The amount by which liquidity will be decreased
-   * @param amount0Min - The minimum amount of token0 that should be accounted for the burned liquidity
-   * @param amount1Min - The minimum amount of token1 that should be accounted for the burned liquidity
-   * @param deadline - The time by which the transaction must be included to effect the change
-   * @returns Object containing transaction hash if successful
-   */
-  async decreaseLiquidity(
-    chainId: number,
-    tokenId: string,
-    liquidity: number,
-    amount0Min: number,
-    amount1Min: number,
-    deadline: number,
-  ): Promise<HexString> {
-    return await this.writeContractMethod(chainId, "decreaseLiquidity", [
-      tokenId,
+  public static getDecreaseLiquidityParams(
+    liquidity: bigint,
+    tokenInput0: TokenInputState,
+    tokenInput1: TokenInputState,
+    slippageTolerance: number,
+    chain: EvmChainInfo,
+  ): DecreaseLiquidityParams {
+    const token0Address = tokenInput0.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput0.token?.erc20ContractAddress;
+    const token1Address = tokenInput1.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput1.token?.erc20ContractAddress;
+
+    if (!token0Address || !token1Address) {
+      throw new Error("Token addresses are missing");
+    }
+
+    const shouldReverseOrder = needToReverseTokenOrder(
+      token0Address,
+      token1Address,
+    );
+
+    let tokens = [
+      tokenInputStateToTokenAmount(tokenInput0, chain.chainId),
+      tokenInputStateToTokenAmount(tokenInput1, chain.chainId),
+    ];
+    if (shouldReverseOrder) {
+      tokens = tokens.reverse();
+    }
+
+    if (!tokens[0] || !tokens[1]) {
+      throw new Error("Must have both tokens set");
+    }
+
+    return {
+      chainId: chain.chainId,
       liquidity,
-      amount0Min,
-      amount1Min,
-      deadline,
-    ]);
+      amount0Min: tokens[0]
+        .withSlippage(slippageTolerance, true)
+        .amountAsBigInt(),
+      amount1Min: tokens[1]
+        .withSlippage(slippageTolerance, true)
+        .amountAsBigInt(),
+      deadline: Math.floor(Date.now() / 1000) + 10 * 60,
+    };
   }
 
   /**
    * Collect fees and/or tokens from a position.
+   * By default, collects all available fees unless specific amounts are provided.
    *
-   * @param chainId - The chain ID of the EVM chain
    * @param tokenId - The ID of the token
-   * @param recipient - The address that will receive the collected tokens
-   * @param amount0Max - The maximum amount of token0 to collect
-   * @param amount1Max - The maximum amount of token1 to collect
-   * @returns Object containing transaction hash if successful
+   * @param params - Parameters for the collect operation
+   * @returns Transaction hash if successful
    */
   async collect(
-    chainId: number,
     tokenId: string,
-    recipient: Address,
-    amount0Max: number,
-    amount1Max: number,
+    { chainId, recipient, amount0Max, amount1Max, gasLimit }: CollectParams,
   ): Promise<HexString> {
-    return await this.writeContractMethod(chainId, "collect", [
-      tokenId,
+    const params = {
+      tokenId: BigInt(tokenId),
       recipient,
-      amount0Max,
-      amount1Max,
-    ]);
+      amount0Max: amount0Max,
+      amount1Max: amount1Max,
+    };
+
+    return await this.writeContractMethod(
+      chainId,
+      "collect",
+      [params],
+      gasLimit,
+    );
   }
 
   /**
@@ -349,6 +401,253 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     return positions;
+  }
+
+  /**
+   * Encodes a decreaseLiquidity function call to be used in a multicall transaction.
+   * @private
+   */
+  private encodeDecreaseLiquidityCall(
+    tokenId: string,
+    liquidity: bigint,
+    amount0Min: bigint,
+    amount1Min: bigint,
+    deadline: number,
+  ): HexString {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "decreaseLiquidity",
+      args: [
+        {
+          tokenId: BigInt(tokenId),
+          liquidity,
+          amount0Min,
+          amount1Min,
+          deadline,
+        },
+      ],
+    });
+  }
+
+  /**
+   * Encodes a collect function call to be used in a multicall transaction.
+   * @private
+   */
+  private encodeCollectCall(
+    tokenId: string,
+    recipient: Address,
+    amount0Max: bigint,
+    amount1Max: bigint,
+  ): HexString {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "collect",
+      args: [
+        {
+          tokenId: BigInt(tokenId),
+          recipient,
+          amount0Max,
+          amount1Max,
+        },
+      ],
+    });
+  }
+
+  /**
+   * Encodes an unwrapWETH9 function call to be used in a multicall transaction.
+   * This method is used to unwrap WETH (wrapped native token) back to the native token (e.g., TIA)
+   * @private
+   */
+  private encodeUnwrapWETHCall(
+    amountMinimum: bigint,
+    recipient: Address,
+  ): HexString {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "unwrapWETH9",
+      args: [amountMinimum, recipient],
+    });
+  }
+
+  /**
+   * Encodes a sweepToken function call to be used in a multicall transaction.
+   * This method sweeps all of the specified token from the contract to the recipient.
+   * @private
+   */
+  private encodeSweepTokenCall(
+    token: Address,
+    amountMinimum: bigint,
+    recipient: Address,
+  ): HexString {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "sweepToken",
+      args: [token, amountMinimum, recipient],
+    });
+  }
+
+  /**
+   * Performs a multicall that combines decreaseLiquidity, collect, unwrap, and sweep operations in a single transaction.
+   * By default, it will collect all available fees and tokens released by decreaseLiquidity.
+   *
+   * @param params - Parameters for the multicall operation
+   * @returns The transaction hash
+   */
+  async decreaseLiquidityAndCollect(
+    params: DecreaseLiquidityAndCollectParams,
+  ): Promise<HexString> {
+    const {
+      chainId,
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline,
+      recipient,
+      isCollectAsWrappedNative,
+      isToken0Native,
+      isToken1Native,
+      isCollectNonNativeTokens,
+    } = params;
+    const position = await this.positions(chainId, tokenId);
+    const MAX_UINT128 = BigInt("0xffffffffffffffffffffffffffffffff");
+
+    const calls: string[] = [];
+    const decreaseCall = this.encodeDecreaseLiquidityCall(
+      tokenId,
+      liquidity,
+      amount0Min,
+      amount1Min,
+      deadline,
+    );
+
+    calls.push(decreaseCall);
+
+    if (isCollectAsWrappedNative || isCollectNonNativeTokens) {
+      // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
+      const collectCall = this.encodeCollectCall(
+        tokenId,
+        recipient,
+        MAX_UINT128,
+        MAX_UINT128,
+      );
+
+      calls.push(collectCall);
+    } else {
+      // Collects wrappedNativeToken and other token values to contract so we can unwrap the values after
+      const collectCall = this.encodeCollectCall(
+        tokenId,
+        this.contractAddress, // Collect to the contract itself
+        MAX_UINT128,
+        MAX_UINT128,
+      );
+
+      calls.push(collectCall);
+
+      // Unwraps wrappedNativeToken to nativeToken and sends it to the recipient
+      const unwrapCall = this.encodeUnwrapWETHCall(1n, recipient);
+      calls.push(unwrapCall);
+
+      // Sweeps non-native tokens to the recipient
+      if (!isToken0Native) {
+        const sweepToken0Call = this.encodeSweepTokenCall(
+          position.tokenAddress0,
+          0n,
+          recipient,
+        );
+        calls.push(sweepToken0Call);
+      }
+
+      // Sweeps non-native tokens to the recipient
+      if (!isToken1Native) {
+        const sweepToken1Call = this.encodeSweepTokenCall(
+          position.tokenAddress1,
+          0n,
+          recipient,
+        );
+        calls.push(sweepToken1Call);
+      }
+    }
+
+    const DEFAULT_GAS_LIMIT = 300000n;
+    const walletClient = await this.getWalletClient(chainId);
+    const publicClient = await this.getPublicClient(chainId);
+    const signerAddress = walletClient.account?.address as HexString;
+
+    let gasLimit: bigint;
+    try {
+      gasLimit = await publicClient.estimateContractGas({
+        address: this.contractAddress,
+        abi: this.abi,
+        functionName: "multicall",
+        args: [calls],
+        account: signerAddress,
+      });
+      // Increase the estimated gas by 20%
+      gasLimit = (gasLimit * 120n) / 100n;
+    } catch (err) {
+      console.warn(
+        "Gas estimation failed for decreaseLiquidityAndCollect, using default limit",
+        err,
+      );
+      gasLimit = DEFAULT_GAS_LIMIT;
+    }
+
+    return await walletClient.writeContract({
+      address: this.contractAddress,
+      abi: this.abi,
+      functionName: "multicall",
+      args: [calls],
+      gas: gasLimit,
+    });
+  }
+
+  /**
+   * Helper method to generate parameters for a decreaseLiquidityAndCollect operation
+   should* Determines if native tokens are involved (TIA) and sets the isCollectAsWrappedNative flag
+   * accordingly to handle automatic unwrapping of WTIA to TIA.
+   */
+  public static getDecreaseLiquidityAndCollectParams(
+    tokenId: string,
+    liquidity: bigint,
+    tokenInput0: TokenInputState,
+    tokenInput1: TokenInputState,
+    recipient: Address,
+    slippageTolerance: number,
+    chain: EvmChainInfo,
+    isCollectAsWrappedNative: boolean = false,
+  ): DecreaseLiquidityAndCollectParams {
+    if (!tokenInput0.token || !tokenInput1.token) {
+      throw new Error("Token input is null");
+    }
+
+    const decreaseParams = this.getDecreaseLiquidityParams(
+      liquidity,
+      tokenInput0,
+      tokenInput1,
+      slippageTolerance,
+      chain,
+    );
+
+    const isCollectNonNativeTokens =
+      !tokenInput0.token.isNative &&
+      !tokenInput1.token.isNative &&
+      !tokenInput1.token.isWrappedNative &&
+      !tokenInput0.token.isWrappedNative;
+
+    return {
+      chainId: decreaseParams.chainId,
+      tokenId,
+      liquidity: decreaseParams.liquidity,
+      amount0Min: decreaseParams.amount0Min,
+      amount1Min: decreaseParams.amount1Min,
+      deadline: decreaseParams.deadline,
+      recipient,
+      isCollectAsWrappedNative,
+      isCollectNonNativeTokens,
+      isToken0Native: tokenInput0.token.isNative,
+      isToken1Native: tokenInput1.token.isNative,
+    };
   }
 }
 

@@ -5,16 +5,17 @@ import { usePoolPositionContext, usePoolContext } from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { Skeleton, Switch } from "@repo/ui/components";
+import { TXN_STATUS } from "@repo/flame-types";
 
 export const ContentSection = () => {
-  const { modalOpen, setModalOpen, txnStatus } = usePoolContext();
+  const { modalOpen, setModalOpen } = usePoolContext();
   const {
     selectedSymbol,
     handleReverseTokenData,
     poolToken0,
     poolToken1,
-    collectAsNative,
-    handleCollectAsNative,
+    isCollectAsWrappedNative,
+    handleCollectAsWrappedNative,
     isReversedPoolTokens,
   } = usePoolPositionContext();
   const poolTokens = isReversedPoolTokens
@@ -22,9 +23,15 @@ export const ContentSection = () => {
     : [poolToken0, poolToken1];
   const token0 = poolTokens[0] || null;
   const token1 = poolTokens[1] || null;
+  const hasUnclaimedFees = Boolean(
+    token0?.unclaimedFees &&
+      token1?.unclaimedFees &&
+      token0.unclaimedFees > 0 &&
+      token1.unclaimedFees > 0,
+  );
 
   return (
-    <div className="flex flex-col flex-1 mt-12">
+    <div className="flex flex-col flex-1 mt-8">
       <PriceRangeBlock
         symbols={[
           poolToken0?.token.coinDenom ?? "",
@@ -34,14 +41,18 @@ export const ContentSection = () => {
         handleReverseTokenData={handleReverseTokenData}
       />
       <div className="flex flex-col gap-4 mt-4 items-end">
-        <div className="flex items-center gap-2 justify-end">
-          <span className="text-sm">Collect as WTIA</span>
-          <Switch
-            checked={collectAsNative}
-            onCheckedChange={() => handleCollectAsNative(!collectAsNative)}
-            className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
-          />
-        </div>
+        {hasUnclaimedFees && (
+          <div className="flex items-center gap-2 justify-end">
+            <span className="text-sm">Collect as WTIA</span>
+            <Switch
+              checked={isCollectAsWrappedNative}
+              onCheckedChange={() =>
+                handleCollectAsWrappedNative(!isCollectAsWrappedNative)
+              }
+              className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+            />
+          </div>
+        )}
         <div className="flex flex-col md:flex-row gap-2 w-full">
           <div className="flex flex-col gap-2 w-full md:w-2/4">
             {/* TODO: Add liquidity value */}
@@ -59,9 +70,12 @@ export const ContentSection = () => {
             <TokenInfoCard poolToken0={token0} poolToken1={token1} />
           </div>
         </div>
-        <div className="w-full md:w-2/4">
-          <Skeleton className="w-full h-[40px]" isLoading={!token0 || !token1}>
-            {token0 && token1 && (
+        {hasUnclaimedFees && token0 && token1 && (
+          <div className="w-full md:w-2/4">
+            <Skeleton
+              className="w-full h-[40px]"
+              isLoading={!token0 || !token1}
+            >
               <ConfirmationModal
                 open={modalOpen}
                 buttonText={"Collect Fees"}
@@ -75,16 +89,16 @@ export const ContentSection = () => {
                 title={"Claim Fees"}
               >
                 <PoolTxnSteps
-                  txnStatus={txnStatus}
+                  txnStatus={TXN_STATUS.IDLE}
                   poolTokens={[token0, token1]}
                   txnHash={"0x"}
                   txnMsg={""}
                   addLiquidityInputValues={null}
                 />
               </ConfirmationModal>
-            )}
-          </Skeleton>
-        </div>
+            </Skeleton>
+          </div>
+        )}
       </div>
     </div>
   );

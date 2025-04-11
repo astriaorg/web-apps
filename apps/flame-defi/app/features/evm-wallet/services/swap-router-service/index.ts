@@ -1,12 +1,5 @@
-import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
-import {
-  Chain,
-  encodeFunctionData,
-  type Address,
-  type PublicClient,
-  type WalletClient,
-  Abi,
-} from "viem";
+import { type Config } from "@wagmi/core";
+import { Chain, encodeFunctionData, type Address, Abi } from "viem";
 import {
   GetQuoteResult,
   HexString,
@@ -414,28 +407,6 @@ export class SwapRouterService extends GenericContractService {
       functionName,
       args,
     });
-  }
-
-  /**
-   * Helper to get the wallet client
-   */
-  private async getWalletClient(chainId: number): Promise<WalletClient> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
-    if (!walletClient) {
-      throw new Error("No wallet client available");
-    }
-    return walletClient;
-  }
-
-  /**
-   * Helper to get the public client
-   */
-  private async getPublicClient(chainId: number): Promise<PublicClient> {
-    const publicClient = getPublicClient(this.wagmiConfig, { chainId });
-    if (!publicClient) {
-      throw new Error("No public client available");
-    }
-    return publicClient;
   }
 
   /**
