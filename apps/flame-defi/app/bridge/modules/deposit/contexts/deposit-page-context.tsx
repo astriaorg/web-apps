@@ -7,10 +7,12 @@ import React, {
   useCallback,
   useMemo,
   useState,
+  useEffect,
 } from "react";
 import { useConfig } from "wagmi";
 
 import {
+  AstriaChain,
   ChainType,
   CosmosChainInfo,
   EvmChainInfo,
@@ -18,13 +20,14 @@ import {
   IbcCurrency,
 } from "@repo/flame-types";
 import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
-import { DropdownAdditionalOption } from "components/dropdown";
+import { DropdownAdditionalOption, DropdownOption } from "components/dropdown";
 import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
 import { createErc20Service, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
+import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
 
 interface ChainSelection {
-  chain: EvmChainInfo | CosmosChainInfo | null;
+  chain: AstriaChain | EvmChainInfo | CosmosChainInfo | null;
   currency: EvmCurrency | IbcCurrency | null;
   address: string | null;
 }
@@ -33,12 +36,14 @@ export interface DepositPageContextProps extends PropsWithChildren {
   sourceChain: ChainSelection;
   destinationChain: ChainSelection;
   handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
-  handleDestinationChainSelect: (chainValue: EvmChainInfo) => void;
+  handleDestinationChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
   additionalSourceOptions: DropdownAdditionalOption[];
+  sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
+  destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   sourceCurrency: EvmCurrency | IbcCurrency | null;
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
-  destinationCurrency: EvmCurrency | null;
-  setDestinationCurrency: (currency: EvmCurrency | null) => void;
+  destinationCurrency: EvmCurrency | IbcCurrency | null;
+  setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   amount: string;
   setAmount: (value: string) => void;
   isAmountValid: boolean;
@@ -74,22 +79,69 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const { addNotification } = useNotifications();
   const wagmiConfig = useConfig();
 
+  // Use our new bridge connections hook
+  const bridgeConnections = useBridgeConnections();
+  const { 
+    sourceConnection,
+    destinationConnection,
+    connectSource,
+    connectDestination,
+    setSourceCurrency: setSourceCurrencyFromHook,
+    setDestinationCurrency: setDestinationCurrencyFromHook,
+    recipientAddress,
+    setRecipientAddress: setRecipientAddressFromHook,
+    isManualAddressMode,
+    enableManualAddressMode,
+    disableManualAddressMode,
+    cosmosWallet,
+    evmWallet
+  } = bridgeConnections;
+
+  // Map hook connections to our existing interface
   const [sourceChain, setSourceChain] = useState<ChainSelection>({
     chain: null,
     currency: null,
     address: null,
   });
+  
   const [destinationChain, setDestinationChain] = useState<ChainSelection>({
     chain: null,
     currency: null,
     address: null,
   });
 
+  // Keep our local state synced with bridge connections state
+  useEffect(() => {
+    console.log("setting source chain in useEffect");
+    setSourceChain({
+      chain: sourceConnection.chain,
+      currency: sourceConnection.currency,
+      address: sourceConnection.address
+    });
+  }, [sourceConnection]);
+
+  useEffect(() => {
+    setDestinationChain({
+      chain: destinationConnection.chain,
+      currency: destinationConnection.currency,
+      address: destinationConnection.address
+    });
+  }, [destinationConnection]);
+
   const [sourceCurrency, setSourceCurrency] = useState<
     EvmCurrency | IbcCurrency | null
   >(null);
   const [destinationCurrency, setDestinationCurrency] =
-    useState<EvmCurrency | null>(null);
+    useState<EvmCurrency | IbcCurrency | null>(null);
+
+  // Keep currency state in sync with bridge connections
+  useEffect(() => {
+    setSourceCurrency(sourceConnection.currency);
+  }, [sourceConnection.currency]);
+
+  useEffect(() => {
+    setDestinationCurrency(destinationConnection.currency);
+  }, [destinationConnection.currency]);
 
   // Form state
   const [amount, setAmount] = useState<string>("");
@@ -106,9 +158,40 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
 
-  // wallet contexts
-  const cosmosWallet = useCosmosWallet();
-  const evmWallet = useEvmWallet();
+  // Sync manual address state with hook state
+  useEffect(() => {
+    setRecipientAddressOverride(recipientAddress);
+  }, [recipientAddress]);
+
+  useEffect(() => {
+    setIsRecipientAddressEditable(isManualAddressMode);
+  }, [isManualAddressMode]);
+
+  // When our internal state changes, update the hook
+  const setRecipientAddressOverrideHandler = useCallback((value: string) => {
+    setRecipientAddressOverride(value);
+    setRecipientAddressFromHook(value);
+  }, [setRecipientAddressFromHook]);
+
+  const setSourceCurrencyHandler = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
+    setSourceCurrency(currency);
+    setSourceCurrencyFromHook(currency);
+  }, [setSourceCurrencyFromHook]);
+
+  const setDestinationCurrencyHandler = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
+    setDestinationCurrency(currency);
+    setDestinationCurrencyFromHook(currency);
+  }, [setDestinationCurrencyFromHook]);
+
+  const setIsRecipientAddressEditableHandler = useCallback((value: boolean) => {
+    setIsRecipientAddressEditable(value);
+    if (value) {
+      enableManualAddressMode();
+    } else {
+      disableManualAddressMode();
+    }
+  }, [enableManualAddressMode, disableManualAddressMode]);
+
   const { connectEvmWallet } = evmWallet;
 
   const handleConnectEvmWallet = useCallback(
@@ -116,8 +199,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
       console.log("handleConnectEvmWallet");
       // clear recipient address override when connecting
       // FIXME - is this still what we want to do here?
-      setIsRecipientAddressEditable(false);
-      setRecipientAddressOverride("");
+      setIsRecipientAddressEditableHandler(false);
+      setRecipientAddressOverrideHandler("");
 
       // If connecting for source, update source chain
       if (isSource && sourceChain.chain?.chainType === ChainType.EVM) {
@@ -134,6 +217,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
       evmWallet,
       sourceChain.chain?.chainId,
       sourceChain.chain?.chainType,
+      setIsRecipientAddressEditableHandler,
+      setRecipientAddressOverrideHandler
     ],
   );
 
@@ -144,128 +229,40 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         chainValue.chainName,
         chainValue.chainType,
       );
-      setSourceChain((prev) => ({
-        ...prev,
-        chain: chainValue,
-        // we'll set address after connection
-        address: null,
-      }));
-
-      // Handle wallet connection based on chain type
-      if (chainValue.chainType === ChainType.COSMOS) {
-        // For Cosmos chains, update global context and connect if needed
-        cosmosWallet.selectCosmosChain(chainValue as CosmosChainInfo);
-
-        // If we already have a Cosmos address, use it
-        if (cosmosWallet.cosmosAccountAddress) {
-          setSourceChain((prev) => ({
-            ...prev,
-            address: cosmosWallet.cosmosAccountAddress,
-          }));
-        } else {
-          // Trigger Cosmos wallet connection
-          cosmosWallet.connectCosmosWallet();
-        }
-      } else if (chainValue.chainType === ChainType.EVM) {
-        // For EVM chains (like Base), we need to:
-        // 1. Check if we're already connected to this chain
-        // 2. If not, prompt for connection to this specific chain
-
-        // Don't update global EVM context for source selection
-        // Instead, trigger connection to this specific chain
-
-        // If we have an EVM address and it's for the right chain, use it
-        if (
-          evmWallet.evmAccountAddress &&
-          evmWallet.selectedEvmChain?.chainId === chainValue.chainId
-        ) {
-          setSourceChain((prev) => ({
-            ...prev,
-            address: evmWallet.evmAccountAddress,
-          }));
-        } else {
-          // We need to connect to this specific chain
-          // This requires enhancing the EVM wallet context to support
-          // connecting to a specific chain
-          handleConnectEvmWallet(true);
-        }
-      }
+      connectSource(chainValue);
     },
-    [
-      cosmosWallet,
-      evmWallet.evmAccountAddress,
-      evmWallet.selectedEvmChain?.chainId,
-      handleConnectEvmWallet,
-    ],
+    [connectSource],
   );
 
   const handleDestinationChainSelect = useCallback(
-    (chainValue: EvmChainInfo) => {
+    (chainValue: CosmosChainInfo | EvmChainInfo) => {
       console.log(
         "Destination chain selected:",
         chainValue.chainName,
         chainValue.chainType,
       );
-      setDestinationChain((prev) => ({
-        ...prev,
-        chain: chainValue,
-      }));
-
-      if (!sourceChain.chain) {
-        if (chainValue.chainType === ChainType.ASTRIA) {
-          handleConnectEvmWallet();
-        }
-        return;
-      }
-
-      if (sourceChain.chain.chainType === ChainType.COSMOS) {
-        // Coming from Cosmos - need to connect EVM wallet for destination
-        if (
-          chainValue.chainType === ChainType.ASTRIA &&
-          !evmWallet.evmAccountAddress
-        ) {
-          handleConnectEvmWallet();
-        }
-      } else if (sourceChain.chain.chainType === ChainType.EVM) {
-        // Coming from EVM chain (like Base)
-
-        // If user is already connected to an EVM wallet, try to use that address
-        if (evmWallet.evmAccountAddress && !isRecipientAddressEditable) {
-          setDestinationChain((prev) => ({
-            ...prev,
-            address: evmWallet.evmAccountAddress,
-          }));
-        }
-
-        // only update global context if this is Flame chain
-        if (chainValue.chainType === ChainType.ASTRIA) {
-          evmWallet.selectEvmChain(chainValue);
-        }
-      }
+      connectDestination(chainValue);
     },
-    [
-      evmWallet,
-      handleConnectEvmWallet,
-      isRecipientAddressEditable,
-      sourceChain.chain,
-    ],
+    [connectDestination],
   );
 
   // toggle ability to edit recipient address
   const handleEditRecipientClick = useCallback(() => {
-    setIsRecipientAddressEditable((prev) => !prev);
-  }, []);
+    setIsRecipientAddressEditableHandler(!isRecipientAddressEditable);
+  }, [isRecipientAddressEditable, setIsRecipientAddressEditableHandler]);
+  
   // save the recipient address
-  const handleEditRecipientSave = () => {
-    setIsRecipientAddressEditable(false);
+  const handleEditRecipientSave = useCallback(() => {
+    setIsRecipientAddressEditableHandler(false);
     // reset wallet states when user manually enters address
     evmWallet.resetState();
-  };
+  }, [evmWallet, setIsRecipientAddressEditableHandler]);
+  
   // clear the manually inputted recipient address
-  const handleEditRecipientClear = () => {
-    setIsRecipientAddressEditable(false);
-    setRecipientAddressOverride("");
-  };
+  const handleEditRecipientClear = useCallback(() => {
+    setIsRecipientAddressEditableHandler(false);
+    setRecipientAddressOverrideHandler("");
+  }, [setIsRecipientAddressEditableHandler, setRecipientAddressOverrideHandler]);
 
   const handleDeposit = async () => {
     const activeSourceAddress = sourceChain.address;
@@ -397,7 +394,30 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  // dropdown options
+  // Chain and dropdown options
+  const sourceChainOptions = useMemo(() => {
+    // Get Cosmos chains from cosmos wallet
+    const cosmosChains = cosmosWallet.cosmosChainsOptions || [];
+    
+    // Get Coinbase/Base chains from EVM wallet
+    const evmChains = evmWallet.coinbaseChains.map((c) => ({
+      label: c.chainName,
+      value: c,
+      LeftIcon: c.IconComponent,
+    }));
+    
+    return [...cosmosChains, ...evmChains];
+  }, [cosmosWallet.cosmosChainsOptions, evmWallet.coinbaseChains]);
+  
+  const destinationChainOptions = useMemo(() => {
+    return (evmWallet.astriaChains || []).map((c) => ({
+      label: c.chainName,
+      value: c,
+      LeftIcon: c.IconComponent,
+    }));
+  }, [evmWallet.astriaChains]);
+
+  // Additional dropdown options
   const additionalSourceOptions = useMemo(
     () => [
       {
@@ -461,9 +481,9 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         destinationChain,
         handleDestinationChainSelect,
         sourceCurrency,
-        setSourceCurrency,
+        setSourceCurrency: setSourceCurrencyHandler,
         destinationCurrency,
-        setDestinationCurrency,
+        setDestinationCurrency: setDestinationCurrencyHandler,
         amount,
         setAmount,
         isAmountValid,
@@ -475,9 +495,9 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         isAnimating,
         setIsAnimating,
         recipientAddressOverride,
-        setRecipientAddressOverride,
+        setRecipientAddressOverride: setRecipientAddressOverrideHandler,
         isRecipientAddressEditable,
-        setIsRecipientAddressEditable,
+        setIsRecipientAddressEditable: setIsRecipientAddressEditableHandler,
         isRecipientAddressValid,
         setIsRecipientAddressValid,
         handleEditRecipientClick,
@@ -488,6 +508,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         isDepositDisabled,
         cosmosWallet,
         evmWallet,
+        sourceChainOptions,
+        destinationChainOptions,
         additionalSourceOptions,
         additionalAstriaChainOptions,
       }}

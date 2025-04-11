@@ -21,7 +21,6 @@ import {
   getAllChainConfigs,
   getEnvVariable,
 } from "config";
-import { CosmosWalletProvider } from "features/cosmos-wallet";
 import { AstriaWalletContextProvider } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
 
@@ -50,17 +49,12 @@ const rainbowKitConfig = getDefaultConfig({
   chains: evmChainsToRainbowKitChains(allEvmChains),
 });
 
+// TODO - refactor to same level as the cosmos wallet context provider
 const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
 const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
 
+// Common providers for the entire app
 export function Providers({ children }: { children: React.ReactNode }) {
-  // cosmoskit config
-  const cosmosWalletConnectOptions = {
-    signClient: {
-      projectId: WALLET_CONNECT_PROJECT_ID,
-    },
-  };
-
   return (
     <ConfigContextProvider>
       <IntlProvider locale="en">
@@ -72,11 +66,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
                   assetLists={[...assets, ...cosmosKitAssetLists]}
                   chains={[...chains, ...cosmosKitChains]}
                   wallets={[...keplrWallets, ...leapWallets]}
-                  walletConnectOptions={cosmosWalletConnectOptions}
-                  signerOptions={{
-                    preferredSignType: () => {
-                      return "amino";
+                  walletConnectOptions={{
+                    signClient: {
+                      projectId: WALLET_CONNECT_PROJECT_ID,
                     },
+                  }}
+                  signerOptions={{
+                    preferredSignType: () => "amino",
                   }}
                 >
                   <OnchainKitProvider
@@ -84,11 +80,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     projectId={CDP_PROJECT_ID}
                     chain={base}
                   >
-                    <CosmosWalletProvider>
-                      <AstriaWalletContextProvider>
-                        {children}
-                      </AstriaWalletContextProvider>
-                    </CosmosWalletProvider>
+                    {/* AstriaWalletContextProvider is used by multiple pages, so it stays at the app level */}
+                    <AstriaWalletContextProvider>
+                      {children}
+                    </AstriaWalletContextProvider>
                   </OnchainKitProvider>
                 </ChainProvider>
               </RainbowKitProvider>
