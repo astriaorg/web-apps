@@ -53,14 +53,14 @@ export const ContentSection = () => {
     setErrorText(null);
     refreshPoolPosition();
     refreshLiquidityToRemove();
-    handleIsCollectAsWrappedNative(false);
+    handleCollectAsWrappedNative(false);
   }, [
     setModalOpen,
     setTxnStatus,
     setErrorText,
     refreshPoolPosition,
     refreshLiquidityToRemove,
-    handleIsCollectAsWrappedNative,
+    handleCollectAsWrappedNative,
   ]);
 
   const handleModalActionButton = useCallback(() => {

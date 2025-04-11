@@ -8,7 +8,7 @@ export const PoolFeesAndLiquidityCard = ({
   className,
   liquidityToRemove,
 }: {
-  poolTokens: PoolToken[] | [];
+  poolTokens: PoolToken[];
   className: string;
   liquidityToRemove: PoolToken[];
 }) => {
