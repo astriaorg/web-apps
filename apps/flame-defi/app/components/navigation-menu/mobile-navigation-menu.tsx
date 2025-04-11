@@ -21,7 +21,6 @@ import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useConfig, useEvmChainData } from "config";
-import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -33,7 +32,6 @@ import { NetworkIcon } from "./network-icon";
 export const MobileNavigationMenu = () => {
   const pathname = usePathname();
   const account = useAccount();
-  const { cosmosAccountAddress } = useCosmosWallet();
   const {
     featureFlags,
     networksList,

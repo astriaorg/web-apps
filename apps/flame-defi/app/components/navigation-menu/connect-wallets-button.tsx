@@ -8,17 +8,13 @@ import { FlameIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { useEvmChainData } from "config";
-import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
-import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
 export const ConnectWalletsButton = () => {
-  const pathname = usePathname();
-  const { cosmosAccountAddress } = useCosmosWallet();
   const { selectedChain } = useEvmChainData();
   const account = useAccount();
   const {
