@@ -48,8 +48,10 @@
   "devDependencies": {
     "@grafana/faro-webpack-plugin": "^0.1.2",
     "@graphql-codegen/cli": "^5.0.4",
+    "@playwright/test": "^1.51.1",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@synthetixio/synpress": "^4.0.10",
     "@tailwindcss/postcss": "^4.0.9",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
