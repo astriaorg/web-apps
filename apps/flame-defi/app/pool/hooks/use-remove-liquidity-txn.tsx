@@ -13,7 +13,7 @@ import { getSlippageTolerance } from "@repo/ui/utils";
 
 export const useRemoveLiquidityTxn = (
   liquidityToRemove: PoolToken[],
-  collectAsWrappedNative: boolean,
+  isCollectAsWrappedNative: boolean,
   percentageToRemove: number,
 ) => {
   const { positionNftId, poolPosition } = usePoolPositionContext();
@@ -95,7 +95,7 @@ export const useRemoveLiquidityTxn = (
           address,
           slippageTolerance,
           selectedChain,
-          collectAsWrappedNative,
+          isCollectAsWrappedNative,
         );
 
       const tx =

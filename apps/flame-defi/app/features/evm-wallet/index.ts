@@ -21,6 +21,7 @@ export {
   AddErc20ToWalletButton,
   ConnectEvmWalletButton,
   EvmWalletProvider,
+  NonfungiblePositionManagerService,
   SwapRouterService,
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
@@ -29,7 +30,6 @@ export {
   createTradeFromQuote,
   createWethService,
   createWithdrawerService,
-  NonfungiblePositionManagerService,
   useEvmWallet,
   useTokenBalances,
 };

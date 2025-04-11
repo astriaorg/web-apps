@@ -14,8 +14,8 @@ export const ContentSection = () => {
     handleReverseTokenData,
     poolToken0,
     poolToken1,
-    collectAsWrappedNative,
-    handleCollectAsWrappedNative,
+    isCollectAsWrappedNative,
+    handleIsCollectAsWrappedNative,
     isReversedPoolTokens,
   } = usePoolPositionContext();
   const poolTokens = isReversedPoolTokens
@@ -46,9 +46,9 @@ export const ContentSection = () => {
           <div className="flex items-center gap-2 justify-end">
             <span className="text-sm">Collect as WTIA</span>
             <Switch
-              checked={collectAsWrappedNative}
+              checked={isCollectAsWrappedNative}
               onCheckedChange={() =>
-                handleCollectAsWrappedNative(!collectAsWrappedNative)
+                handleIsCollectAsWrappedNative(!isCollectAsWrappedNative)
               }
               className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
             />

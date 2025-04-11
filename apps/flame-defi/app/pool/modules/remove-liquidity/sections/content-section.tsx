@@ -19,8 +19,8 @@ export const ContentSection = () => {
   const {
     poolToken0,
     poolToken1,
-    collectAsWrappedNative,
-    handleCollectAsWrappedNative,
+    isCollectAsWrappedNative,
+    handleIsCollectAsWrappedNative,
     refreshPoolPosition,
   } = usePoolPositionContext();
   const {
@@ -38,10 +38,10 @@ export const ContentSection = () => {
     setErrorText,
   } = useRemoveLiquidityTxn(
     liquidityToRemove,
-    collectAsWrappedNative,
+    isCollectAsWrappedNative,
     percentageToRemove,
   );
-  const isNativeToken =
+  const poolContainsNativeOrWrappedToken =
     poolToken0?.token.isNative ||
     poolToken1?.token.isNative ||
     poolToken0?.token.isWrappedNative ||
@@ -53,14 +53,14 @@ export const ContentSection = () => {
     setErrorText(null);
     refreshPoolPosition();
     refreshLiquidityToRemove();
-    handleCollectAsWrappedNative(false);
+    handleIsCollectAsWrappedNative(false);
   }, [
     setModalOpen,
     setTxnStatus,
     setErrorText,
     refreshPoolPosition,
     refreshLiquidityToRemove,
-    handleCollectAsWrappedNative,
+    handleIsCollectAsWrappedNative,
   ]);
 
   const handleModalActionButton = useCallback(() => {
@@ -78,13 +78,13 @@ export const ContentSection = () => {
         <div className="flex items-center justify-between mt-8">
           <h2 className="text-lg font-medium">Amount to Remove</h2>
 
-          {isNativeToken && (
+          {poolContainsNativeOrWrappedToken && (
             <div className="flex items-center gap-2">
               <span className="text-sm">Collect as WTIA</span>
               <Switch
-                checked={collectAsWrappedNative}
+                checked={isCollectAsWrappedNative}
                 onCheckedChange={() =>
-                  handleCollectAsWrappedNative(!collectAsWrappedNative)
+                  handleIsCollectAsWrappedNative(!isCollectAsWrappedNative)
                 }
                 className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
               />

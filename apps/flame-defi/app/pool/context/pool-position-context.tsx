@@ -40,7 +40,7 @@ export const PoolPositionContextProvider = ({
   const positionNftId = params["position-nft-id"] as string;
   const { selectedChain, nativeToken, wrappedNativeToken } = useEvmChainData();
   const { currencies } = selectedChain;
-  const [collectAsWrappedNative, setCollectAsWrappedNative] =
+  const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(false);
   const [currentPrice, setCurrentPrice] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
@@ -77,8 +77,8 @@ export const PoolPositionContextProvider = ({
         selectedChain.chainId,
         positionNftId,
       );
-      const isisPositionClosed = position.liquidity === 0n;
-      setIsPositionClosed(isisPositionClosed);
+      const isPositionClosed = position.liquidity === 0n;
+      setIsPositionClosed(isPositionClosed);
       setPoolPosition(position);
 
       const token0 = getTokenDataFromCurrencies(
@@ -263,9 +263,11 @@ export const PoolPositionContextProvider = ({
     void getPriceRange();
   }, [invertedPrice, getPriceRange]);
 
-  const handleCollectAsWrappedNative = (collectAsWrappedNative: boolean) => {
-    setCollectAsWrappedNative(collectAsWrappedNative);
-    if (collectAsWrappedNative) {
+  const handleIsCollectAsWrappedNative = (
+    isCollectAsWrappedNative: boolean,
+  ) => {
+    setIsCollectAsWrappedNative(isCollectAsWrappedNative);
+    if (isCollectAsWrappedNative) {
       poolTokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {
           poolToken.token = wrappedNativeToken;
@@ -289,8 +291,8 @@ export const PoolPositionContextProvider = ({
         rawFeeTier,
         selectedSymbol,
         handleReverseTokenData,
-        collectAsWrappedNative,
-        handleCollectAsWrappedNative,
+        isCollectAsWrappedNative,
+        handleIsCollectAsWrappedNative,
         poolToken0,
         poolToken1,
         currentPrice,

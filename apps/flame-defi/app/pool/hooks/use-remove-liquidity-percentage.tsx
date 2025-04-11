@@ -4,7 +4,7 @@ import { usePoolPositionContext } from ".";
 import { useEvmChainData } from "config/hooks/use-config";
 
 export const useRemoveLiquidityPercentage = () => {
-  const { poolToken0, poolToken1, collectAsWrappedNative } =
+  const { poolToken0, poolToken1, isCollectAsWrappedNative } =
     usePoolPositionContext();
   const { wrappedNativeToken, nativeToken } = useEvmChainData();
   const poolTokens = useMemo(
@@ -36,14 +36,14 @@ export const useRemoveLiquidityPercentage = () => {
         let updatedToken = poolToken.token;
 
         if (
-          collectAsWrappedNative &&
+          isCollectAsWrappedNative &&
           updatedToken.isNative &&
           wrappedNativeToken
         ) {
           updatedToken = wrappedNativeToken;
         }
         if (
-          !collectAsWrappedNative &&
+          !isCollectAsWrappedNative &&
           updatedToken.isWrappedNative &&
           nativeToken
         ) {
@@ -56,7 +56,7 @@ export const useRemoveLiquidityPercentage = () => {
         };
       }),
     );
-  }, [collectAsWrappedNative, wrappedNativeToken, nativeToken]);
+  }, [isCollectAsWrappedNative, wrappedNativeToken, nativeToken]);
 
   const handlePercentToRemove = (percent: number) => {
     setPercentageToRemove(percent);

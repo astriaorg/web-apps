@@ -14,7 +14,7 @@
 // // NOTE - THIS IS ALL A WIP
 // export const useCollectFeesTxn = (
 //   feesToCollect: PoolToken[],
-//   collectAsWrappedNative: boolean,
+//   isCollectAsWrappedNative: boolean,
 // ) => {
 //   const { positionNftId } = usePoolPositionContext();
 //   const { address } = useAccount();
@@ -88,7 +88,7 @@
 //       console.log("Collecting fees for position:", {
 //         positionNftId,
 //         feesToCollect,
-//         collectAsWrappedNative,
+//         isCollectAsWrappedNative,
 //         recipient: address,
 //       });
 

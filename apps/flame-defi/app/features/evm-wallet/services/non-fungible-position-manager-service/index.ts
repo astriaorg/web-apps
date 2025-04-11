@@ -1,11 +1,5 @@
-import { Config, getWalletClient } from "@wagmi/core";
-import {
-  type Address,
-  Abi,
-  encodeFunctionData,
-  PublicClient,
-  WalletClient,
-} from "viem";
+import { Config } from "@wagmi/core";
+import { type Address, Abi, encodeFunctionData } from "viem";
 import {
   EvmChainInfo,
   HexString,
@@ -16,7 +10,6 @@ import { GenericContractService } from "../generic-contract-service";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 import { needToReverseTokenOrder } from "../services.utils";
-import { getPublicClient } from "@wagmi/core";
 
 type PositionResponseTuple = [
   bigint, // nonce
@@ -67,10 +60,10 @@ export interface DecreaseLiquidityAndCollectParams {
   amount1Min: bigint;
   deadline: number;
   recipient: Address;
-  collectAsWrappedNative: boolean;
-  collectNonNativeTokens: boolean;
-  isToken1Native?: boolean;
-  isToken0Native?: boolean;
+  isCollectAsWrappedNative: boolean;
+  isCollectNonNativeTokens: boolean;
+  isToken1Native: boolean;
+  isToken0Native: boolean;
   gasLimit?: bigint;
 }
 
@@ -348,18 +341,12 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Max: amount1Max,
     };
 
-    if (gasLimit) {
-      // Use gas-limited method if a gas limit is provided
-      return await this.writeContractWithGasLimit(
-        chainId,
-        "collect",
-        [params],
-        gasLimit,
-      );
-    } else {
-      // Use standard method if no gas limit
-      return await this.writeContractMethod(chainId, "collect", [params]);
-    }
+    return await this.writeContractMethod(
+      chainId,
+      "collect",
+      [params],
+      gasLimit,
+    );
   }
 
   /**
@@ -414,36 +401,6 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     return positions;
-  }
-
-  /**
-   * Extended write contract method that allows specifying gas limit
-   * @private
-   */
-  private async writeContractWithGasLimit(
-    chainId: number,
-    methodName: string,
-    args: unknown[] = [],
-    gasLimit?: bigint,
-  ): Promise<HexString> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
-    if (!walletClient || !walletClient.account?.address) {
-      throw new Error("No wallet client available");
-    }
-
-    try {
-      return await walletClient.writeContract({
-        address: this.contractAddress,
-        abi: this.abi,
-        functionName: methodName,
-        args,
-        gas: gasLimit,
-        account: walletClient.account?.address,
-      });
-    } catch (e) {
-      console.error(`Error in ${methodName}:`, e);
-      throw e;
-    }
   }
 
   /**
@@ -530,58 +487,6 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Extended write contract method that allows specifying gas limit
-   * @private
-   */
-  private async writeContractMethodWithGas(
-    chainId: number,
-    methodName: string,
-    args: unknown[] = [],
-    gas?: bigint,
-  ): Promise<HexString> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
-    if (!walletClient) {
-      throw new Error("No wallet client available");
-    }
-
-    try {
-      return await walletClient.writeContract({
-        address: this.contractAddress,
-        abi: this.abi,
-        functionName: methodName,
-        args,
-        gas,
-        account: walletClient.account?.address ?? null,
-      });
-    } catch (e) {
-      console.error(`Error in ${methodName}:`, e);
-      throw e;
-    }
-  }
-
-  /**
-   * Helper to get the wallet client
-   */
-  private async getWalletClient(chainId: number): Promise<WalletClient> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
-    if (!walletClient) {
-      throw new Error("No wallet client available");
-    }
-    return walletClient;
-  }
-
-  /**
-   * Helper to get the public client
-   */
-  private async getPublicClient(chainId: number): Promise<PublicClient> {
-    const publicClient = getPublicClient(this.wagmiConfig, { chainId });
-    if (!publicClient) {
-      throw new Error("No public client available");
-    }
-    return publicClient;
-  }
-
-  /**
    * Performs a multicall that combines decreaseLiquidity, collect, unwrap, and sweep operations in a single transaction.
    * By default, it will collect all available fees and tokens released by decreaseLiquidity.
    *
@@ -599,10 +504,10 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Min,
       deadline,
       recipient,
-      collectAsWrappedNative,
+      isCollectAsWrappedNative,
       isToken1Native,
       isToken0Native,
-      collectNonNativeTokens,
+      isCollectNonNativeTokens,
     } = params;
     const position = await this.positions(chainId, tokenId);
     const MAX_UINT128 = BigInt("0xffffffffffffffffffffffffffffffff");
@@ -618,16 +523,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
     calls.push(decreaseCall);
 
-    const collectCall = this.encodeCollectCall(
-      tokenId,
-      recipient,
-      MAX_UINT128,
-      MAX_UINT128,
-    );
-
-    calls.push(collectCall);
-
-    if (collectAsWrappedNative || collectNonNativeTokens) {
+    if (isCollectAsWrappedNative || isCollectNonNativeTokens) {
       // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
       const collectCall = this.encodeCollectCall(
         tokenId,
@@ -697,17 +593,18 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       gasLimit = DEFAULT_GAS_LIMIT;
     }
 
-    return await this.writeContractMethodWithGas(
-      chainId,
-      "multicall",
-      [calls],
-      gasLimit,
-    );
+    return await walletClient.writeContract({
+      address: this.contractAddress,
+      abi: this.abi,
+      functionName: "multicall",
+      args: [calls],
+      gas: gasLimit,
+    });
   }
 
   /**
    * Helper method to generate parameters for a decreaseLiquidityAndCollect operation
-   * Determines if native tokens are involved (TIA) and sets the collectAsWrappedNative flag
+   should* Determines if native tokens are involved (TIA) and sets the isCollectAsWrappedNative flag
    * accordingly to handle automatic unwrapping of WTIA to TIA.
    */
   public static getDecreaseLiquidityAndCollectParams(
@@ -718,7 +615,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient: Address,
     slippageTolerance: number,
     chain: EvmChainInfo,
-    collectAsWrappedNative: boolean = false,
+    isCollectAsWrappedNative: boolean = false,
   ): DecreaseLiquidityAndCollectParams {
     if (!tokenInput0.token || !tokenInput1.token) {
       throw new Error("Token input is null");
@@ -732,7 +629,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       chain,
     );
 
-    const collectNonNativeTokens =
+    const isCollectNonNativeTokens =
       !tokenInput0.token.isNative &&
       !tokenInput1.token.isNative &&
       !tokenInput1.token.isWrappedNative &&
@@ -746,8 +643,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       amount1Min: decreaseParams.amount1Min,
       deadline: decreaseParams.deadline,
       recipient,
-      collectAsWrappedNative,
-      collectNonNativeTokens,
+      isCollectAsWrappedNative,
+      isCollectNonNativeTokens,
       isToken1Native: Boolean(tokenInput1.token.isNative),
       isToken0Native: Boolean(tokenInput0.token.isNative),
     };
