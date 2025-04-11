@@ -659,8 +659,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
   /**
    * Helper method to generate parameters for a decreaseLiquidityAndCollect operation
-   * Determines if native tokens are involved and sets the isCollectAsWrappedNative flag
-   * accordingly to handle automatic unwrapping of wrapped native token to native token.
+   * Combines decreaseLiquidityParams and collectFeesParams
    */
   public static getDecreaseLiquidityAndCollectParams(
     tokenId: string,
