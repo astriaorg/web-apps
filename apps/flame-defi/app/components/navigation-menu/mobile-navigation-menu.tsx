@@ -21,11 +21,7 @@ import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useConfig, useEvmChainData } from "config";
-import {
-  ConnectCosmosWalletButton,
-  useCosmosWallet,
-} from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
+import { useEvmWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -36,7 +32,6 @@ import { NetworkIcon } from "./network-icon";
 export const MobileNavigationMenu = () => {
   const pathname = usePathname();
   const account = useAccount();
-  const { cosmosAccountAddress } = useCosmosWallet();
   const {
     featureFlags,
     networksList,
@@ -57,8 +52,7 @@ export const MobileNavigationMenu = () => {
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
   const [isConnectWalletOpen, setIsConnectWalletOpen] = useState(false);
 
-  const isConnected = account.address || cosmosAccountAddress;
-  const isSingleConnectWallet = pathname !== "/";
+  const isConnected = !!account.address;
 
   const handleNetworkSelect = useCallback(
     (network: FlameNetwork) => {
@@ -74,13 +68,13 @@ export const MobileNavigationMenu = () => {
   }, []);
 
   const handleOnConnectWalletOpen = useCallback(() => {
-    if (isSingleConnectWallet && !isConnected) {
+    if (!isConnected) {
       connectEvmWallet();
     } else {
       setIsConnectWalletOpen(true);
     }
     setIsOpen(false);
-  }, [isSingleConnectWallet, isConnected, connectEvmWallet]);
+  }, [isConnected, connectEvmWallet]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -164,9 +158,7 @@ export const MobileNavigationMenu = () => {
                 >
                   <div className="flex items-center gap-2 flex-1">
                     {isConnected
-                      ? isSingleConnectWallet
-                        ? shortenAddress(account.address as string)
-                        : "Connected"
+                      ? shortenAddress(account.address as string)
                       : "Connect Wallet"}
                   </div>
                   <ChevronDownIcon />
@@ -222,38 +214,27 @@ export const MobileNavigationMenu = () => {
             </DrawerClose>
           </DrawerHeader>
           <div className="flex flex-col p-6">
-            {isSingleConnectWallet ? (
-              <ConnectWalletContent
-                isConnected={!!account.address}
-                isLoading={
-                  (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
-                  quoteLoading
-                }
-                account={account}
-                balance={evmNativeTokenBalance ?? undefined}
-                fiat={usdcToNativeQuote}
-                explorer={{
-                  url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
-                }}
-                label={shortenAddress(account.address as string)}
-                icon={<FlameIcon />}
-                onConnectWallet={connectEvmWallet}
-                onDisconnectWallet={() => {
-                  setIsConnectWalletOpen(false);
-                  disconnectEvmWallet();
-                }}
-                isCollapsible={false}
-              />
-            ) : (
-              <>
-                <ConnectEvmWalletButton
-                  onDisconnectWallet={() => setIsConnectWalletOpen(false)}
-                />
-                <ConnectCosmosWalletButton
-                  onDisconnectWallet={() => setIsConnectWalletOpen(false)}
-                />
-              </>
-            )}
+            <ConnectWalletContent
+              isConnected={!!account.address}
+              isLoading={
+                (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+                quoteLoading
+              }
+              account={account}
+              balance={evmNativeTokenBalance ?? undefined}
+              fiat={usdcToNativeQuote}
+              explorer={{
+                url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
+              }}
+              label={shortenAddress(account.address as string)}
+              icon={<FlameIcon />}
+              onConnectWallet={connectEvmWallet}
+              onDisconnectWallet={() => {
+                setIsConnectWalletOpen(false);
+                disconnectEvmWallet();
+              }}
+              isCollapsible={false}
+            />
           </div>
         </DrawerContent>
       </Drawer>
