@@ -10,7 +10,7 @@ export const useTokenApproval = ({
 }: {
   tokenNeedingApproval: TokenInputState | null;
   setTxnStatus: (status: TXN_STATUS) => void;
-  setTxnHash: (hash: HexString | undefined) => void;
+  setTxnHash: (hash?: HexString) => void;
   setErrorText: (error: string) => void;
 }) => {
   const { tokenApprovalAmount } = useConfig();

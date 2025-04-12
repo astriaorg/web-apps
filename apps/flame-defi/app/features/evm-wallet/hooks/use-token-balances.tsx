@@ -6,8 +6,8 @@ import { formatUnits } from "viem";
 import { useConfig, useBalance } from "wagmi";
 
 export const useTokenBalances = (
-  userAddress: HexString | undefined,
-  evmChain: EvmChainInfo | undefined,
+  userAddress?: HexString,
+  evmChain?: EvmChainInfo,
 ) => {
   const wagmiConfig = useConfig();
   const [balances, setBalances] = useState<

@@ -20,7 +20,7 @@ import {
 import { TokenIcon } from "../token-icon";
 
 interface TokenSelectorProps {
-  tokens: EvmCurrency[] | undefined;
+  tokens?: EvmCurrency[];
   defaultTitle?: string;
   setSelectedToken: (token: EvmCurrency) => void;
   selectedToken?: EvmCurrency | null;

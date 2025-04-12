@@ -323,7 +323,7 @@ export class EvmCurrency {
    * @param other The other currency to compare with
    * @returns true if the currencies are equal, false otherwise
    */
-  public equals(other: EvmCurrency | null | undefined): boolean {
+  public equals(other?: EvmCurrency | null): boolean {
     if (!other) {
       return false;
     }
