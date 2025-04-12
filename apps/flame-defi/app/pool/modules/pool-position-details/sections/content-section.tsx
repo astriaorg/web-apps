@@ -25,7 +25,8 @@ export const ContentSection = () => {
     isReversedPoolTokens,
     refreshPoolPosition,
   } = usePoolPositionContext();
-  const poolTokens = poolToken0 && poolToken1 ? [poolToken0, poolToken1] : [];
+  const hasValidTokens = poolToken0 && poolToken1;
+  const poolTokens = hasValidTokens ? [poolToken0, poolToken1] : [];
   const {
     txnStatus,
     txnHash,
@@ -34,11 +35,14 @@ export const ContentSection = () => {
     setErrorText,
     collectFees,
   } = useCollectFeesTxn(poolTokens, isCollectAsWrappedNative);
+
+  // NOTE: This poolTokensForDisplay is necessary for the pool position details page to be able to reverse the token order in all components on the page.
+  // All other pages only reverse the values of the price range block when this happens.
   const poolTokensForDisplay = isReversedPoolTokens
-    ? [poolToken1, poolToken0]
-    : [poolToken0, poolToken1];
-  const token0ForDisplay = poolTokensForDisplay[0] || null;
-  const token1ForDisplay = poolTokensForDisplay[1] || null;
+    ? [...poolTokens].reverse()
+    : poolTokens;
+  const token0ForDisplay = poolTokensForDisplay[0] ?? null;
+  const token1ForDisplay = poolTokensForDisplay[1] ?? null;
 
   const hasUnclaimedFees = Boolean(
     token0ForDisplay?.unclaimedFees &&

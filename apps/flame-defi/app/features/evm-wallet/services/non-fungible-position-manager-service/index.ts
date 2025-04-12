@@ -44,14 +44,6 @@ export interface DecreaseLiquidityParams {
   deadline: number;
 }
 
-export interface CollectParams {
-  chainId: number;
-  recipient: Address;
-  amount0Max: bigint;
-  amount1Max: bigint;
-  gasLimit?: bigint;
-}
-
 export interface DecreaseLiquidityAndCollectParams {
   chainId: number;
   tokenId: string;
@@ -401,19 +393,18 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       }
     }
 
-    const walletClient = await this.getWalletClient(chainId);
     const gasLimit = await this.estimateMulticallGasLimit(
       chainId,
       collectCalls,
     );
 
-    return await walletClient.writeContract({
-      address: this.contractAddress,
-      abi: this.abi,
-      functionName: "multicall",
-      args: [collectCalls],
-      gas: gasLimit,
-    });
+    return await this.writeContractMethod(
+      chainId,
+      "multicall",
+      [collectCalls],
+      undefined,
+      gasLimit,
+    );
   }
 
   /**
@@ -449,18 +440,28 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       token1Address,
     );
 
-    const isToken0Native = shouldReverseOrder
-      ? tokenInput1.token.isNative
-      : tokenInput0.token.isNative;
-    const isToken1Native = shouldReverseOrder
-      ? tokenInput0.token.isNative
-      : tokenInput1.token.isNative;
+    let tokens = [tokenInput0, tokenInput1];
 
-    const isCollectNonNativeTokens =
-      !tokenInput0.token.isNative &&
-      !tokenInput1.token.isNative &&
-      !tokenInput1.token.isWrappedNative &&
-      !tokenInput0.token.isWrappedNative;
+    if (shouldReverseOrder) {
+      tokens = tokens.reverse();
+    }
+
+    if (!tokens[0] || !tokens[1] || !tokens[0].token || !tokens[1].token) {
+      throw new Error("Must have both tokens set");
+    }
+
+    const isToken0Native = tokens[0].token.isNative;
+    const isToken1Native = tokens[1].token.isNative;
+
+    let isCollectNonNativeTokens = true;
+
+    tokens.forEach((token) => {
+      if (token.token?.isNative) {
+        isCollectNonNativeTokens = false;
+      } else if (token.token?.isWrappedNative) {
+        isCollectNonNativeTokens = false;
+      }
+    });
 
     return {
       chainId: chain.chainId,
@@ -635,7 +636,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     } = params;
 
     const calls: string[] = [];
-    const decreaseCall = await this.encodeDecreaseLiquidityCall(
+    const decreaseCall = this.encodeDecreaseLiquidityCall(
       tokenId,
       liquidity,
       amount0Min,

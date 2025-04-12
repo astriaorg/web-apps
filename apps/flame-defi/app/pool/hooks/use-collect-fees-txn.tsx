@@ -54,7 +54,6 @@ export const useCollectFeesTxn = (
   const collectFees = async () => {
     if (
       !address ||
-      !poolTokens ||
       poolTokens.length === 0 ||
       !positionNftId ||
       !tokenInputs[0] ||
