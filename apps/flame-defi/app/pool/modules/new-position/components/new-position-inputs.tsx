@@ -1,6 +1,5 @@
 import { Card, CardFigureInput, TokenSelector } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
-import { useGetPoolTokenBalances } from "pool/hooks";
 import { NewPositionInputsProps } from "pool/types";
 import { useIntl } from "react-intl";
 
@@ -10,12 +9,11 @@ export const NewPositionInputs = ({
   setInput0,
   setInput1,
   currencies,
+  token0Balance,
+  token1Balance,
 }: NewPositionInputsProps) => {
   const { formatNumber } = useIntl();
-  const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    input0.token?.coinDenom || "",
-    input1.token?.coinDenom || "",
-  );
+
   const inputsArray = [
     { input: input0, setInput: setInput0, tokenBalance: token0Balance },
     { input: input1, setInput: setInput1, tokenBalance: token1Balance },

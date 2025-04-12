@@ -36,6 +36,22 @@ export interface IncreaseLiquidityParams {
   value: bigint;
 }
 
+export interface MintParams {
+  chainId: number;
+  token0: Address;
+  token1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  recipient: Address;
+  deadline: number;
+  value: bigint;
+}
+
 export interface DecreaseLiquidityParams {
   chainId: number;
   liquidity: bigint;
@@ -122,56 +138,31 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Creates a new position in a Uniswap V3 pool
+   * Creates a new position in a Uniswap V3 pool using the MintParams object
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param token0 - The address of the first token in the pair
-   * @param token1 - The address of the second token in the pair
-   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
-   * @param tickLower - The lower tick boundary of the position
-   * @param tickUpper - The upper tick boundary of the position
-   * @param amount0Desired - The desired amount of token0 to deposit
-   * @param amount1Desired - The desired amount of token1 to deposit
-   * @param amount0Min - The minimum amount of token0 to deposit
-   * @param amount1Min - The minimum amount of token1 to deposit
-   * @param recipient - The address that will receive the NFT
-   * @param deadline - The timestamp by which the transaction must be executed
-   * @returns Object containing transaction hash if successful
+   * @param params - Object containing all mint parameters
+   * @returns Transaction hash if successful
    */
-  async mint(
-    chainId: number,
-    token0: Address,
-    token1: Address,
-    fee: number,
-    tickLower: number,
-    tickUpper: number,
-    amount0Desired: bigint,
-    amount1Desired: bigint,
-    amount0Min: bigint,
-    amount1Min: bigint,
-    recipient: Address,
-    deadline: number,
-    value: bigint,
-  ): Promise<HexString> {
+  async mintPosition(params: MintParams): Promise<HexString> {
     return await this.writeContractMethod(
-      chainId,
+      params.chainId,
       "mint",
       [
         {
-          token0,
-          token1,
-          fee,
-          tickLower,
-          tickUpper,
-          amount0Desired,
-          amount1Desired,
-          amount0Min,
-          amount1Min,
-          recipient,
-          deadline,
+          token0: params.token0,
+          token1: params.token1,
+          fee: params.fee,
+          tickLower: params.tickLower,
+          tickUpper: params.tickUpper,
+          amount0Desired: params.amount0Desired,
+          amount1Desired: params.amount1Desired,
+          amount0Min: params.amount0Min,
+          amount1Min: params.amount1Min,
+          recipient: params.recipient,
+          deadline: params.deadline,
         },
       ],
-      value,
+      params.value,
     );
   }
 
@@ -274,6 +265,105 @@ export class NonfungiblePositionManagerService extends GenericContractService {
         .withSlippage(slippageTolerance, true)
         .amountAsBigInt(),
       deadline: Math.floor(Date.now() / 1000) + 10 * 60,
+      value,
+    };
+  }
+
+  /**
+   * Helper method to generate parameters for minting a new position
+   * Handles token direction logic and prepares all required mint parameters
+   *
+   * @param tokenInput0 - The first token input state
+   * @param tokenInput1 - The second token input state
+   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
+   * @param tickLower - The lower tick boundary of the position
+   * @param tickUpper - The upper tick boundary of the position
+   * @param slippageTolerance - The slippage tolerance percentage
+   * @param recipient - The address that will receive the NFT
+   * @param chain - The EVM chain information
+   * @returns All parameters needed for the mint operation
+   */
+  public static getMintParams(
+    tokenInput0: TokenInputState,
+    tokenInput1: TokenInputState,
+    fee: number,
+    tickLower: number,
+    tickUpper: number,
+    slippageTolerance: number,
+    recipient: Address,
+    chain: EvmChainInfo,
+  ): MintParams {
+    const token0Address = tokenInput0.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput0.token?.erc20ContractAddress;
+    const token1Address = tokenInput1.token?.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : tokenInput1.token?.erc20ContractAddress;
+
+    if (!token0Address || !token1Address) {
+      throw new Error("Token addresses are missing");
+    }
+
+    const shouldReverseOrder = needToReverseTokenOrder(
+      token0Address,
+      token1Address,
+    );
+
+    let finalToken0Address = token0Address;
+    let finalToken1Address = token1Address;
+
+    let tokens = [
+      tokenInputStateToTokenAmount(tokenInput0, chain.chainId),
+      tokenInputStateToTokenAmount(tokenInput1, chain.chainId),
+    ];
+
+    console.log({ tokens });
+
+    if (shouldReverseOrder) {
+      tokens = tokens.reverse();
+      finalToken0Address = token1Address;
+      finalToken1Address = token0Address;
+    }
+
+    if (!tokens[0] || !tokens[1]) {
+      throw new Error("Must have both tokens set");
+    }
+
+    let value = 0n;
+    const nativeTokenInput = [tokenInput0, tokenInput1].find(
+      (tInput) => tInput.token?.isNative,
+    );
+    if (nativeTokenInput) {
+      value =
+        tokenInputStateToTokenAmount(
+          nativeTokenInput,
+          chain.chainId,
+        )?.amountAsBigInt() ?? 0n;
+    }
+
+    const amount0Desired = tokens[0].amountAsBigInt();
+    const amount1Desired = tokens[1].amountAsBigInt();
+    const amount0Min = tokens[0]
+      .withSlippage(slippageTolerance, true)
+      .amountAsBigInt();
+    const amount1Min = tokens[1]
+      .withSlippage(slippageTolerance, true)
+      .amountAsBigInt();
+    const deadline = Math.floor(Date.now() / 1000) + 10 * 60;
+
+    return {
+      chainId: chain.chainId,
+      token0: finalToken0Address,
+      token1: finalToken1Address,
+      fee,
+      tickLower,
+      tickUpper,
+      amount0Desired,
+      amount1Desired,
+      amount0Min,
+      amount1Min,
+      recipient,
+      deadline,
       value,
     };
   }

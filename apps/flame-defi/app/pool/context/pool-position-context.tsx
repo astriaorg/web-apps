@@ -286,6 +286,8 @@ export const PoolPositionContextProvider = ({
     setSelectedSymbol(poolTokens[0]?.token.coinDenom ?? "");
   };
 
+  console.log({ rawFeeTier });
+
   return (
     <PoolPositionContext.Provider
       value={{

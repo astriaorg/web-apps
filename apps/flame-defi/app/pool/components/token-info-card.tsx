@@ -47,12 +47,12 @@ export function TokenInfoCard({
                       <span className="text-base text-text-subdued">
                         {showLiquidity
                           ? formatNumber(liquidity, {
-                              minimumFractionDigits: 5,
-                              maximumFractionDigits: 5,
+                              minimumFractionDigits: 6,
+                              maximumFractionDigits: 6,
                             })
                           : formatNumber(unclaimedFees, {
-                              minimumFractionDigits: 5,
-                              maximumFractionDigits: 5,
+                              minimumFractionDigits: 6,
+                              maximumFractionDigits: 6,
                             })}
                       </span>
                       {showLiquidityPercentage && (

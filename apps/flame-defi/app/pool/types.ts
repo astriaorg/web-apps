@@ -36,6 +36,8 @@ export interface NewPositionInputsProps {
   setInput0: (value: TokenInputState) => void;
   setInput1: (value: TokenInputState) => void;
   currencies: EvmCurrency[];
+  token0Balance: TokenBalance | null;
+  token1Balance: TokenBalance | null;
 }
 
 export interface TokenPair {
@@ -54,6 +56,8 @@ export interface FeeData {
   text: string;
   tvl: string;
   selectPercent: string;
+  tickLower: number;
+  tickUpper: number;
 }
 
 export interface PriceRangeCardProps {
@@ -107,11 +111,17 @@ export type PoolContextProps = {
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
   maxPrice: string;
+  currentPrice: string;
   updateMaxPrice: (
     feeTier: number,
     token0Decimals: number,
     token1Decimals: number,
   ) => void;
+  calculateCurrentPrice: (
+    feeTier: number,
+    input0: TokenInputState,
+    input1: TokenInputState,
+  ) => Promise<string>;
 };
 
 export type PoolPositionContextProps = {
