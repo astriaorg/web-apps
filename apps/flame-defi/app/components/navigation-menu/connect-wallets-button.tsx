@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components";
-import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { useEvmChainData } from "config";
@@ -64,7 +64,7 @@ export const ConnectWalletsButton = () => {
             url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
           }}
           label={shortenAddress(account.address as string)}
-          icon={<FlameIcon />}
+          icon={<AstriaIcon />}
           onConnectWallet={connectEvmWallet}
           onDisconnectWallet={disconnectEvmWallet}
           isCollapsible={false}

@@ -1,4 +1,4 @@
-import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useEvmChainData } from "config";
@@ -51,7 +51,7 @@ export const ConnectEvmWalletButton = ({
         url: `${selectedChain.blockExplorerUrl}/address/${userAccount.address}`,
       }}
       label={label}
-      icon={<FlameIcon />}
+      icon={<AstriaIcon />}
       onConnectWallet={connectEvmWallet}
       onDisconnectWallet={() => {
         disconnectEvmWallet();

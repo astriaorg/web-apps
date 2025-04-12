@@ -1,5 +1,5 @@
 export * from "./monochrome";
 export * from "./polychrome";
 
-// There are multiple `FlameIcon` components. Keep monochrome as the default.
-export { FlameIcon } from "./monochrome/flame-icon";
+// TODO: Only export monochrome icons as default, others have to be imported via the specific path.
+export { AstriaIcon } from "./monochrome/astria-icon";
