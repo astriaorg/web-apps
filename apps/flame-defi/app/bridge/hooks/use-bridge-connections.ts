@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChainType, CosmosChainInfo, EvmChainInfo, EvmCurrency, IbcCurrency } from "@repo/flame-types";
+import {
+  ChainType,
+  CosmosChainInfo,
+  EvmChainInfo,
+  EvmCurrency,
+  IbcCurrency,
+} from "@repo/flame-types";
 import { BRIDGE_TYPE, getSupportedBridgeTypes } from "../types";
 import { useAstriaWallet } from "features/evm-wallet/hooks/use-astria-wallet";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
@@ -65,12 +71,13 @@ export function useBridgeConnections(): BridgeConnections {
     isConnected: false,
   });
 
-  const [destinationConnection, setDestinationConnection] = useState<ChainConnection>({
-    chain: null,
-    currency: null,
-    address: null,
-    isConnected: false,
-  });
+  const [destinationConnection, setDestinationConnection] =
+    useState<ChainConnection>({
+      chain: null,
+      currency: null,
+      address: null,
+      isConnected: false,
+    });
 
   // Manual address mode
   const [isManualAddressMode, setIsManualAddressMode] = useState(false);
@@ -99,135 +106,154 @@ export function useBridgeConnections(): BridgeConnections {
   }, [sourceConnection.chain, destinationConnection.chain]);
 
   // Handle source chain connection
-  const connectSource = useCallback((chain: CosmosChainInfo | EvmChainInfo) => {
-    console.log("connect source");
-    
-    // Skip if already connecting to avoid infinite loops
-    if (isSourceConnecting) {
-      console.log("Already connecting source, skipping");
-      return;
-    }
-    
-    setIsSourceConnecting(true);
+  const connectSource = useCallback(
+    (chain: CosmosChainInfo | EvmChainInfo) => {
+      console.log("connect source");
 
-    // Determine connection details up front
-    let address = null;
-    let isConnected = false;
-    let needsWalletConnection = false;
-    
-    if (chain.chainType === ChainType.COSMOS) {
-      // Connect Cosmos wallet
-      cosmosWallet.selectCosmosChain(chain as CosmosChainInfo);
-      
-      if (cosmosWallet.cosmosAccountAddress) {
-        address = cosmosWallet.cosmosAccountAddress;
-        isConnected = true;
-      } else {
-        needsWalletConnection = true;
+      // Skip if already connecting to avoid infinite loops
+      if (isSourceConnecting) {
+        console.log("Already connecting source, skipping");
+        return;
       }
-    } else if (chain.chainType === ChainType.EVM || chain.chainType === ChainType.ASTRIA) {
-      // Check if we can reuse the Astria wallet address for EVM connections
-      if (astriaWallet.accountAddress) {
-        address = astriaWallet.accountAddress;
-        isConnected = true;
-      }
-      // If no Astria wallet connection, fall back to regular EVM wallet
-      else if (evmWallet.evmAccountAddress &&
-               evmWallet.selectedEvmChain?.chainId === chain.chainId) {
-        address = evmWallet.evmAccountAddress;
-        isConnected = true;
-      } else {
-        needsWalletConnection = true;
-      }
-    }
-    
-    // Always update the chain selection first
-    setSourceConnection(prev => ({
-      ...prev,
-      chain,
-      address,
-      isConnected,
-    }));
-    
-    // After setting state, initiate wallet connection if needed
-    if (needsWalletConnection) {
+
+      setIsSourceConnecting(true);
+
+      // Determine connection details up front
+      let address = null;
+      let isConnected = false;
+      let needsWalletConnection = false;
+
       if (chain.chainType === ChainType.COSMOS) {
-        cosmosWallet.connectCosmosWallet();
-      } else if (chain.chainType === ChainType.ASTRIA) {
-        astriaWallet.connectWallet();
-      } else {
-        evmWallet.connectToSpecificChain(chain.chainId);
-      }
-    }
+        // Connect Cosmos wallet
+        cosmosWallet.selectCosmosChain(chain as CosmosChainInfo);
 
-    setIsSourceConnecting(false);
-  }, [isSourceConnecting, cosmosWallet, astriaWallet, evmWallet]);
+        if (cosmosWallet.cosmosAccountAddress) {
+          address = cosmosWallet.cosmosAccountAddress;
+          isConnected = true;
+        } else {
+          needsWalletConnection = true;
+        }
+      } else if (
+        chain.chainType === ChainType.EVM ||
+        chain.chainType === ChainType.ASTRIA
+      ) {
+        // Check if we can reuse the Astria wallet address for EVM connections
+        if (astriaWallet.accountAddress) {
+          address = astriaWallet.accountAddress;
+          isConnected = true;
+        }
+        // If no Astria wallet connection, fall back to regular EVM wallet
+        else if (
+          evmWallet.evmAccountAddress &&
+          evmWallet.selectedEvmChain?.chainId === chain.chainId
+        ) {
+          address = evmWallet.evmAccountAddress;
+          isConnected = true;
+        } else {
+          needsWalletConnection = true;
+        }
+      }
+
+      // Always update the chain selection first
+      setSourceConnection((prev) => ({
+        ...prev,
+        chain,
+        address,
+        isConnected,
+      }));
+
+      // After setting state, initiate wallet connection if needed
+      if (needsWalletConnection) {
+        if (chain.chainType === ChainType.COSMOS) {
+          cosmosWallet.connectCosmosWallet();
+        } else if (chain.chainType === ChainType.ASTRIA) {
+          astriaWallet.connectWallet();
+        } else {
+          evmWallet.connectToSpecificChain(chain.chainId);
+        }
+      }
+
+      setIsSourceConnecting(false);
+    },
+    [isSourceConnecting, cosmosWallet, astriaWallet, evmWallet],
+  );
 
   // Handle destination chain connection
-  const connectDestination = useCallback((chain: CosmosChainInfo | EvmChainInfo) => {
-    // Skip if already connecting to avoid infinite loops
-    if (isDestinationConnecting) {
-      console.log("Already connecting destination, skipping");
-      return;
-    }
-    
-    setIsDestinationConnecting(true);
+  const connectDestination = useCallback(
+    (chain: CosmosChainInfo | EvmChainInfo) => {
+      // Skip if already connecting to avoid infinite loops
+      if (isDestinationConnecting) {
+        console.log("Already connecting destination, skipping");
+        return;
+      }
 
-    let address = null;
-    let isConnected = false;
-    let needsWalletConnection = false;
-    
-    if (chain.chainType === ChainType.COSMOS) {
-      // For Cosmos chains
-      cosmosWallet.selectCosmosChain(chain as CosmosChainInfo);
-      
-      if (cosmosWallet.cosmosAccountAddress) {
-        address = cosmosWallet.cosmosAccountAddress;
-        isConnected = true;
-      } else {
-        needsWalletConnection = true;
-      }
-    } else if (chain.chainType === ChainType.ASTRIA || chain.chainType === ChainType.EVM) {
-      // For Astria and EVM chains, prioritize Astria wallet if available
-      if (astriaWallet.accountAddress) {
-        address = astriaWallet.accountAddress;
-        isConnected = true;
-      } 
-      // For EVM chains, fall back to EVM wallet if Astria wallet not available
-      else if (chain.chainType === ChainType.EVM && evmWallet.evmAccountAddress) {
-        address = evmWallet.evmAccountAddress;
-        isConnected = true;
-      } else {
-        needsWalletConnection = true;
-      }
-    }
-    
-    setDestinationConnection(prev => ({
-      ...prev,
-      chain,
-      address,
-      isConnected,
-    }));
-    
-    // After setting state, initiate wallet connection if needed
-    if (needsWalletConnection) {
+      setIsDestinationConnecting(true);
+
+      let address = null;
+      let isConnected = false;
+      let needsWalletConnection = false;
+
       if (chain.chainType === ChainType.COSMOS) {
-        cosmosWallet.connectCosmosWallet();
-      } else if (chain.chainType === ChainType.ASTRIA) {
-        astriaWallet.connectWallet();
-      } else {
-        evmWallet.connectEvmWallet();
-      }
-    }
+        // For Cosmos chains
+        cosmosWallet.selectCosmosChain(chain as CosmosChainInfo);
 
-    setIsDestinationConnecting(false);
-  }, [isDestinationConnecting, astriaWallet, cosmosWallet, evmWallet]);
+        if (cosmosWallet.cosmosAccountAddress) {
+          address = cosmosWallet.cosmosAccountAddress;
+          isConnected = true;
+        } else {
+          needsWalletConnection = true;
+        }
+      } else if (
+        chain.chainType === ChainType.ASTRIA ||
+        chain.chainType === ChainType.EVM
+      ) {
+        // For Astria and EVM chains, prioritize Astria wallet if available
+        if (astriaWallet.accountAddress) {
+          address = astriaWallet.accountAddress;
+          isConnected = true;
+        }
+        // For EVM chains, fall back to EVM wallet if Astria wallet not available
+        else if (
+          chain.chainType === ChainType.EVM &&
+          evmWallet.evmAccountAddress
+        ) {
+          address = evmWallet.evmAccountAddress;
+          isConnected = true;
+        } else {
+          needsWalletConnection = true;
+        }
+      }
+
+      setDestinationConnection((prev) => ({
+        ...prev,
+        chain,
+        address,
+        isConnected,
+      }));
+
+      // After setting state, initiate wallet connection if needed
+      if (needsWalletConnection) {
+        if (chain.chainType === ChainType.COSMOS) {
+          cosmosWallet.connectCosmosWallet();
+        } else if (chain.chainType === ChainType.ASTRIA) {
+          astriaWallet.connectWallet();
+        } else {
+          evmWallet.connectEvmWallet();
+        }
+      }
+
+      setIsDestinationConnecting(false);
+    },
+    [isDestinationConnecting, astriaWallet, cosmosWallet, evmWallet],
+  );
 
   // Update connections when wallet states change
   useEffect(() => {
-    if (sourceConnection.chain?.chainType === ChainType.COSMOS &&
-      cosmosWallet.cosmosAccountAddress) {
-      setSourceConnection(prev => ({
+    if (
+      sourceConnection.chain?.chainType === ChainType.COSMOS &&
+      cosmosWallet.cosmosAccountAddress
+    ) {
+      setSourceConnection((prev) => ({
         ...prev,
         address: cosmosWallet.cosmosAccountAddress,
         isConnected: true,
@@ -235,20 +261,24 @@ export function useBridgeConnections(): BridgeConnections {
     }
 
     // For EVM and ASTRIA chains, prioritize Astria wallet if available
-    if ((sourceConnection.chain?.chainType === ChainType.EVM || 
-         sourceConnection.chain?.chainType === ChainType.ASTRIA) &&
-        astriaWallet.accountAddress) {
-      setSourceConnection(prev => ({
+    if (
+      (sourceConnection.chain?.chainType === ChainType.EVM ||
+        sourceConnection.chain?.chainType === ChainType.ASTRIA) &&
+      astriaWallet.accountAddress
+    ) {
+      setSourceConnection((prev) => ({
         ...prev,
         address: astriaWallet.accountAddress,
         isConnected: true,
       }));
     }
     // Fall back to regular EVM wallet if Astria wallet not available
-    else if (sourceConnection.chain?.chainType === ChainType.EVM &&
+    else if (
+      sourceConnection.chain?.chainType === ChainType.EVM &&
       evmWallet.evmAccountAddress &&
-      evmWallet.selectedEvmChain?.chainId === sourceConnection.chain.chainId) {
-      setSourceConnection(prev => ({
+      evmWallet.selectedEvmChain?.chainId === sourceConnection.chain.chainId
+    ) {
+      setSourceConnection((prev) => ({
         ...prev,
         address: evmWallet.evmAccountAddress,
         isConnected: true,
@@ -263,9 +293,11 @@ export function useBridgeConnections(): BridgeConnections {
   ]);
 
   useEffect(() => {
-    if (destinationConnection.chain?.chainType === ChainType.COSMOS &&
-      cosmosWallet.cosmosAccountAddress) {
-      setDestinationConnection(prev => ({
+    if (
+      destinationConnection.chain?.chainType === ChainType.COSMOS &&
+      cosmosWallet.cosmosAccountAddress
+    ) {
+      setDestinationConnection((prev) => ({
         ...prev,
         address: cosmosWallet.cosmosAccountAddress,
         isConnected: true,
@@ -273,20 +305,25 @@ export function useBridgeConnections(): BridgeConnections {
     }
 
     // For EVM and ASTRIA chains, prioritize Astria wallet if available
-    if ((destinationConnection.chain?.chainType === ChainType.EVM ||
-         destinationConnection.chain?.chainType === ChainType.ASTRIA) &&
-        astriaWallet.accountAddress) {
-      setDestinationConnection(prev => ({
+    if (
+      (destinationConnection.chain?.chainType === ChainType.EVM ||
+        destinationConnection.chain?.chainType === ChainType.ASTRIA) &&
+      astriaWallet.accountAddress
+    ) {
+      setDestinationConnection((prev) => ({
         ...prev,
         address: astriaWallet.accountAddress,
         isConnected: true,
       }));
     }
     // Fall back to regular EVM wallet if Astria wallet not available
-    else if (destinationConnection.chain?.chainType === ChainType.EVM &&
+    else if (
+      destinationConnection.chain?.chainType === ChainType.EVM &&
       evmWallet.evmAccountAddress &&
-      evmWallet.selectedEvmChain?.chainId === destinationConnection.chain.chainId) {
-      setDestinationConnection(prev => ({
+      evmWallet.selectedEvmChain?.chainId ===
+        destinationConnection.chain.chainId
+    ) {
+      setDestinationConnection((prev) => ({
         ...prev,
         address: evmWallet.evmAccountAddress,
         isConnected: true,
@@ -301,19 +338,25 @@ export function useBridgeConnections(): BridgeConnections {
   ]);
 
   // Currency selection
-  const setSourceCurrency = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
-    setSourceConnection(prev => ({
-      ...prev,
-      currency,
-    }));
-  }, []);
+  const setSourceCurrency = useCallback(
+    (currency: EvmCurrency | IbcCurrency | null) => {
+      setSourceConnection((prev) => ({
+        ...prev,
+        currency,
+      }));
+    },
+    [],
+  );
 
-  const setDestinationCurrency = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
-    setDestinationConnection(prev => ({
-      ...prev,
-      currency,
-    }));
-  }, []);
+  const setDestinationCurrency = useCallback(
+    (currency: EvmCurrency | IbcCurrency | null) => {
+      setDestinationConnection((prev) => ({
+        ...prev,
+        currency,
+      }));
+    },
+    [],
+  );
 
   // Manual address mode
   const enableManualAddressMode = useCallback(() => {
@@ -346,7 +389,10 @@ export function useBridgeConnections(): BridgeConnections {
     }
 
     // For valid currencies, they should have matching symbols
-    return sourceConnection.currency.coinDenom === destinationConnection.currency.coinDenom;
+    return (
+      sourceConnection.currency.coinDenom ===
+      destinationConnection.currency.coinDenom
+    );
   }, [sourceConnection.currency, destinationConnection.currency]);
 
   return {

@@ -9,9 +9,7 @@ import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
-import {
-  EvmCurrency,
-} from "@repo/flame-types";
+import { EvmCurrency } from "@repo/flame-types";
 
 export const ContentSection = () => {
   const {
@@ -74,17 +72,19 @@ export const ContentSection = () => {
 
     console.log(sourceChain.chain.currencies);
 
-    return sourceChain.chain.currencies.filter((c) => {
-      // only include bridgeable tokens
-      if ("isBridgeable" in c) {
-        return c.isBridgeable;
-      }
-      return true;
-    }).map((c) => ({
-      label: c.coinDenom,
-      value: c,
-      LeftIcon: c.IconComponent,
-    }));
+    return sourceChain.chain.currencies
+      .filter((c) => {
+        // only include bridgeable tokens
+        if ("isBridgeable" in c) {
+          return c.isBridgeable;
+        }
+        return true;
+      })
+      .map((c) => ({
+        label: c.coinDenom,
+        value: c,
+        LeftIcon: c.IconComponent,
+      }));
   }, [sourceChain.chain]);
 
   // Destination currency options setup
@@ -101,8 +101,11 @@ export const ContentSection = () => {
   }, [destinationChain.chain]);
 
   const defaultDestinationCurrencyOption = useMemo(() => {
-    if (!destinationChain.chain || !destinationChain.chain.currencies ||
-      destinationChain.chain.currencies.length === 0) {
+    if (
+      !destinationChain.chain ||
+      !destinationChain.chain.currencies ||
+      destinationChain.chain.currencies.length === 0
+    ) {
       return undefined;
     }
 
@@ -116,8 +119,12 @@ export const ContentSection = () => {
 
   // The destination currency selection is controlled by the chosen source currency
   const destinationCurrencyOption = useMemo(() => {
-    if (!sourceChain.chain || !sourceCurrency || !destinationChain.chain ||
-      !destinationChain.chain.currencies) {
+    if (
+      !sourceChain.chain ||
+      !sourceCurrency ||
+      !destinationChain.chain ||
+      !destinationChain.chain.currencies
+    ) {
       return defaultDestinationCurrencyOption;
     }
 
@@ -177,7 +184,8 @@ export const ContentSection = () => {
     }
 
     // Use the recipient address from either override or destination chain
-    const recipientAddress = recipientAddressOverride || destinationChain.address;
+    const recipientAddress =
+      recipientAddressOverride || destinationChain.address;
     checkIsFormValid(recipientAddress, amount);
   }, [
     sourceChain.address,
@@ -200,8 +208,7 @@ export const ContentSection = () => {
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
-        <div
-          className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+        <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div>
             <div className="flex flex-col">
               <div className="mb-2 sm:hidden">From</div>
@@ -211,7 +218,7 @@ export const ContentSection = () => {
                 </div>
                 {Boolean(coinbaseOnrampBuyUrl) && (
                   <div>
-                    <FundButton fundingUrl={coinbaseOnrampBuyUrl}/>
+                    <FundButton fundingUrl={coinbaseOnrampBuyUrl} />
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row w-full gap-3">
@@ -221,7 +228,10 @@ export const ContentSection = () => {
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
                       onSelect={(val) => {
-                        console.log("Dropdown onSelect called with:", val.chainName);
+                        console.log(
+                          "Dropdown onSelect called with:",
+                          val.chainName,
+                        );
                         handleSourceChainSelect(val);
                       }}
                       LeftIcon={WalletIcon}
@@ -260,13 +270,13 @@ export const ContentSection = () => {
           </div>
 
           {isAnimating ? (
-            <AnimatedArrowSpacer isAnimating={isAnimating}/>
+            <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
             <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4 h-[40px]">
               <div>
-                <ArrowUpDownIcon size={32}/>
+                <ArrowUpDownIcon size={32} />
               </div>
-              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full"/>
+              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
             </div>
           )}
 
@@ -306,8 +316,7 @@ export const ContentSection = () => {
               {destinationChain.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div
-                    className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
                     <p
                       className="text-grey-light font-semibold cursor-pointer"
                       onKeyDown={handleEditRecipientClick}
@@ -316,7 +325,7 @@ export const ContentSection = () => {
                       <span className="mr-2">
                         Address: {shortenAddress(destinationChain.address)}
                       </span>
-                      <i className="fas fa-pen-to-square"/>
+                      <i className="fas fa-pen-to-square" />
                     </p>
                     {destinationCurrency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
@@ -325,11 +334,14 @@ export const ContentSection = () => {
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&
-                      "erc20ContractAddress" in destinationCurrencyOption.value &&
+                      "erc20ContractAddress" in
+                        destinationCurrencyOption.value &&
                       evmWallet.evmAccountAddress && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
-                            evmCurrency={destinationCurrencyOption.value as EvmCurrency}
+                            evmCurrency={
+                              destinationCurrencyOption.value as EvmCurrency
+                            }
                           />
                         </div>
                       )}
@@ -338,8 +350,7 @@ export const ContentSection = () => {
 
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div
-                  className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
                   <p
                     className="text-grey-light font-semibold cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
@@ -348,7 +359,7 @@ export const ContentSection = () => {
                     <span className="mr-2">
                       Address: {shortenAddress(recipientAddressOverride)}
                     </span>
-                    <i className="fas fa-pen-to-square"/>
+                    <i className="fas fa-pen-to-square" />
                   </p>
                   {!isRecipientAddressValid && hasTouchedForm && (
                     <div className="text-status-danger mt-2">
@@ -395,7 +406,7 @@ export const ContentSection = () => {
           </div>
 
           <div className="flex flex-row items-center">
-            <div className="border-t border-grey-dark my-4 w-full"/>
+            <div className="border-t border-grey-dark my-4 w-full" />
           </div>
 
           <div className="mb-4">

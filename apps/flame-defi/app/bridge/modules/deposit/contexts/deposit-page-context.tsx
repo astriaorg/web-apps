@@ -36,7 +36,9 @@ export interface DepositPageContextProps extends PropsWithChildren {
   sourceChain: ChainSelection;
   destinationChain: ChainSelection;
   handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
-  handleDestinationChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
+  handleDestinationChainSelect: (
+    chainValue: CosmosChainInfo | EvmChainInfo,
+  ) => void;
   additionalSourceOptions: DropdownAdditionalOption[];
   sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
@@ -80,7 +82,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   // Use our new bridge connections hook
   const bridgeConnections = useBridgeConnections();
-  const { 
+  const {
     sourceConnection,
     destinationConnection,
     connectSource,
@@ -93,7 +95,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     enableManualAddressMode,
     disableManualAddressMode,
     cosmosWallet,
-    evmWallet
+    evmWallet,
   } = bridgeConnections;
 
   // Map hook connections to our existing interface
@@ -102,7 +104,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     currency: null,
     address: null,
   });
-  
+
   const [destinationChain, setDestinationChain] = useState<ChainSelection>({
     chain: null,
     currency: null,
@@ -114,7 +116,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setSourceChain({
       chain: sourceConnection.chain,
       currency: sourceConnection.currency,
-      address: sourceConnection.address
+      address: sourceConnection.address,
     });
   }, [sourceConnection]);
 
@@ -122,15 +124,16 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setDestinationChain({
       chain: destinationConnection.chain,
       currency: destinationConnection.currency,
-      address: destinationConnection.address
+      address: destinationConnection.address,
     });
   }, [destinationConnection]);
 
   const [sourceCurrency, setSourceCurrency] = useState<
     EvmCurrency | IbcCurrency | null
   >(null);
-  const [destinationCurrency, setDestinationCurrency] =
-    useState<EvmCurrency | IbcCurrency | null>(null);
+  const [destinationCurrency, setDestinationCurrency] = useState<
+    EvmCurrency | IbcCurrency | null
+  >(null);
 
   // Keep currency state in sync with bridge connections
   useEffect(() => {
@@ -166,29 +169,41 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   }, [isManualAddressMode]);
 
   // When our internal state changes, update the hook
-  const setRecipientAddressOverrideHandler = useCallback((value: string) => {
-    setRecipientAddressOverride(value);
-    setRecipientAddressFromHook(value);
-  }, [setRecipientAddressFromHook]);
+  const setRecipientAddressOverrideHandler = useCallback(
+    (value: string) => {
+      setRecipientAddressOverride(value);
+      setRecipientAddressFromHook(value);
+    },
+    [setRecipientAddressFromHook],
+  );
 
-  const setSourceCurrencyHandler = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
-    setSourceCurrency(currency);
-    setSourceCurrencyFromHook(currency);
-  }, [setSourceCurrencyFromHook]);
+  const setSourceCurrencyHandler = useCallback(
+    (currency: EvmCurrency | IbcCurrency | null) => {
+      setSourceCurrency(currency);
+      setSourceCurrencyFromHook(currency);
+    },
+    [setSourceCurrencyFromHook],
+  );
 
-  const setDestinationCurrencyHandler = useCallback((currency: EvmCurrency | IbcCurrency | null) => {
-    setDestinationCurrency(currency);
-    setDestinationCurrencyFromHook(currency);
-  }, [setDestinationCurrencyFromHook]);
+  const setDestinationCurrencyHandler = useCallback(
+    (currency: EvmCurrency | IbcCurrency | null) => {
+      setDestinationCurrency(currency);
+      setDestinationCurrencyFromHook(currency);
+    },
+    [setDestinationCurrencyFromHook],
+  );
 
-  const setIsRecipientAddressEditableHandler = useCallback((value: boolean) => {
-    setIsRecipientAddressEditable(value);
-    if (value) {
-      enableManualAddressMode();
-    } else {
-      disableManualAddressMode();
-    }
-  }, [enableManualAddressMode, disableManualAddressMode]);
+  const setIsRecipientAddressEditableHandler = useCallback(
+    (value: boolean) => {
+      setIsRecipientAddressEditable(value);
+      if (value) {
+        enableManualAddressMode();
+      } else {
+        disableManualAddressMode();
+      }
+    },
+    [enableManualAddressMode, disableManualAddressMode],
+  );
 
   const handleSourceChainSelect = useCallback(
     (chainValue: CosmosChainInfo | EvmChainInfo) => {
@@ -208,17 +223,20 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditableHandler(!isRecipientAddressEditable);
   }, [isRecipientAddressEditable, setIsRecipientAddressEditableHandler]);
-  
+
   // save the recipient address
   const handleEditRecipientSave = useCallback(() => {
     setIsRecipientAddressEditableHandler(false);
   }, [setIsRecipientAddressEditableHandler]);
-  
+
   // clear the manually inputted recipient address
   const handleEditRecipientClear = useCallback(() => {
     setIsRecipientAddressEditableHandler(false);
     setRecipientAddressOverrideHandler("");
-  }, [setIsRecipientAddressEditableHandler, setRecipientAddressOverrideHandler]);
+  }, [
+    setIsRecipientAddressEditableHandler,
+    setRecipientAddressOverrideHandler,
+  ]);
 
   const handleDeposit = async () => {
     const activeSourceAddress = sourceChain.address;
@@ -354,17 +372,17 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const sourceChainOptions = useMemo(() => {
     // Get Cosmos chains from cosmos wallet
     const cosmosChains = cosmosWallet.cosmosChainsOptions || [];
-    
+
     // Get Coinbase/Base chains from EVM wallet
     const evmChains = evmWallet.coinbaseChains.map((c) => ({
       label: c.chainName,
       value: c,
       LeftIcon: c.IconComponent,
     }));
-    
+
     return [...cosmosChains, ...evmChains];
   }, [cosmosWallet.cosmosChainsOptions, evmWallet.coinbaseChains]);
-  
+
   const destinationChainOptions = useMemo(() => {
     return (evmWallet.astriaChains || []).map((c) => ({
       label: c.chainName,
