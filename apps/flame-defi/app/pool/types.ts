@@ -33,8 +33,15 @@ export interface AddLiquidityInputsBlockProps {
 export interface NewPositionInputsProps {
   input0: TokenInputState;
   input1: TokenInputState;
-  setInput0: (value: TokenInputState) => void;
-  setInput1: (value: TokenInputState) => void;
+  handleInputChange: (
+    value: string,
+    id: POOL_INPUT_ID,
+    coinDecimals?: number,
+  ) => void;
+  handleTokenChange: (
+    token: EvmCurrency,
+    id: POOL_INPUT_ID,
+  ) => void;
   currencies: EvmCurrency[];
   token0Balance: TokenBalance | null;
   token1Balance: TokenBalance | null;

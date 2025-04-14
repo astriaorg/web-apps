@@ -97,7 +97,6 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
     [],
   );
 
-  // Calculate current price for new positions where pool doesn't exist yet
   const calculateCurrentPrice = useCallback(
     async (
       feeTier: number,

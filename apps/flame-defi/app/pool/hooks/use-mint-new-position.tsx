@@ -103,5 +103,6 @@ export const useMintNewPosition = (
     txnHash,
     mintNewPosition,
     errorText,
+    setErrorText,
   };
 };

@@ -20,14 +20,11 @@ export const NewPositionPriceRange = ({
   const getPriceRangeArray = (): number[] => {
     const min = Number(minValue);
     const max = Number(maxValue);
-    console.log("min", min);
-    console.log("max", max);
 
     return [min, max];
   };
 
   const handleSliderChange = (newValues: number[]) => {
-    console.log("newValues", newValues);
     setMinValue(String(newValues[0]));
     setMaxValue(String(newValues[1]));
   };
@@ -44,12 +41,7 @@ export const NewPositionPriceRange = ({
     setMinValue(minPrice);
     setMaxValue(maxPrice);
   };
-
-  console.log("getPriceRangeArray()", getPriceRangeArray());
-  console.log("minPrice", minPrice);
-  console.log("maxPrice", maxPrice);
-  console.log("minValue", minValue);
-  console.log("maxValue", maxValue);
+  
 
   return (
     <div className="bg-surface-1 rounded-xl p-6 w-full">

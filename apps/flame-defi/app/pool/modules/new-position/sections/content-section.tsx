@@ -14,14 +14,15 @@ import {
   NewPositionPriceRange,
   FeeRange,
 } from "../components";
-import { FeeData } from "pool/types";
+import { FeeData, POOL_INPUT_ID } from "pool/types";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { PoolTxnSteps } from "pool/components";
 import { useIntl } from "react-intl";
+import { getTokenCalculatedTokenValue } from "pool/modules/utils";
 
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
-  const { feeData, modalOpen, setModalOpen, maxPrice, updateMaxPrice } =
+  const { feeData, modalOpen, setModalOpen, maxPrice, updateMaxPrice, currentPrice, calculateCurrentPrice } =
     usePoolContext();
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
@@ -52,19 +53,30 @@ export const ContentSection = () => {
     token1Balance,
   );
 
-  const { txnStatus, txnHash, setTxnStatus, mintNewPosition, errorText } =
+  const { txnStatus, txnHash, setTxnStatus, mintNewPosition, errorText, setErrorText } =
     useMintNewPosition(input0, input1, selectedFeeTier);
 
-  // Update max price when fee tier or tokens change
   useEffect(() => {
-    if (input0.token && input1.token) {
-      updateMaxPrice(
+    if (input0.token && input1.token && selectedFeeTier.feeTier) {
+      calculateCurrentPrice(
         selectedFeeTier.feeTier,
-        input0.token.coinDecimals,
-        input1.token.coinDecimals,
+        input0,
+        input1,
       );
     }
-  }, [selectedFeeTier.feeTier, updateMaxPrice, input0.token, input1.token]);
+  }, [calculateCurrentPrice, input0, input1, selectedFeeTier.feeTier]);
+
+
+  // useEffect(() => {
+  //   if (input0.token && input1.token) {
+  //     updateMaxPrice(
+  //       selectedFeeTier.feeTier,
+  //       input0.token.coinDecimals,
+  //       input1.token.coinDecimals,
+  //     );
+  //   }
+  // }, [selectedFeeTier.feeTier, updateMaxPrice, input0.token, input1.token]);
+
   const displayFeeTier = selectedFeeTier.feeTier / 1_000_000;
 
   const handleCloseModal = useCallback(() => {
@@ -90,14 +102,41 @@ export const ContentSection = () => {
     }
   }, [handleCloseModal, mintNewPosition, txnStatus]);
 
+  const handleInputChange = useCallback(
+    (value: string, id: POOL_INPUT_ID, coinDecimals?: number) => {
+      if (!coinDecimals) return;
+      setErrorText(null);
+      if (id === POOL_INPUT_ID.INPUT_ZERO) {
+        setInput0({ ...input0, value });
+        setInput1({ ...input1, value: getTokenCalculatedTokenValue(value, id, coinDecimals, currentPrice) });
+      } else {
+        setInput1({ ...input1, value });
+        setInput0({ ...input0, value: getTokenCalculatedTokenValue(value, id, coinDecimals, currentPrice) });
+      }
+    },
+    [currentPrice, setErrorText, input0, input1],
+  );
+
+  const handleTokenChange = useCallback(
+    (token: EvmCurrency, id: POOL_INPUT_ID) => {
+      setErrorText(null);
+      if (id === POOL_INPUT_ID.INPUT_ZERO) {
+        setInput0({ ...input0, token });
+      } else {
+        setInput1({ ...input1, token });
+      }
+    },
+    [input0, input1, setErrorText],
+  );
+
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-0 md:mt-12 h-fit">
       <div className="flex flex-col gap-4 w-full md:w-1/2">
         <NewPositionInputs
           input0={input0}
           input1={input1}
-          setInput0={setInput0}
-          setInput1={setInput1}
+          handleInputChange={handleInputChange}
+          handleTokenChange={handleTokenChange}
           currencies={currencies}
           token0Balance={token0Balance}
           token1Balance={token1Balance}

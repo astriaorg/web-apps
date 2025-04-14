@@ -17,27 +17,3 @@ export const getTokenCalculatedTokenValue = (
 
   return tokenValue.toFixed(coinDecimals);
 };
-
-export const handleInputChange = (
-  value: string,
-  id: POOL_INPUT_ID,
-  setErrorText: (errorText: string | null) => void,
-  setInput0: (input0: string) => void,
-  setInput1: (input1: string) => void,
-  currentPrice: string,
-  coinDecimals?: number,
-) => {
-  if (!coinDecimals) return;
-  setErrorText(null);
-  if (id === POOL_INPUT_ID.INPUT_ZERO) {
-    setInput0(value);
-    setInput1(
-      getTokenCalculatedTokenValue(value, id, coinDecimals, currentPrice),
-    );
-  } else {
-    setInput1(value);
-    setInput0(
-      getTokenCalculatedTokenValue(value, id, coinDecimals, currentPrice),
-    );
-  }
-};
