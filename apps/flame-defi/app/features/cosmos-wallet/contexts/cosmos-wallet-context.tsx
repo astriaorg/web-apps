@@ -23,7 +23,7 @@ export interface CosmosWalletContextProps {
   cosmosAccountAddress: string | null;
   cosmosBalance: { value: string; symbol: string } | null;
   cosmosChainsOptions: DropdownOption<CosmosChainInfo>[];
-  defaultIbcCurrencyOption: DropdownOption<IbcCurrency> | undefined;
+  defaultIbcCurrencyOption?: DropdownOption<IbcCurrency>;
   disconnectCosmosWallet: () => void;
   getCosmosSigningClient: () => Promise<SigningStargateClient>;
   ibcCurrencyOptions: DropdownOption<IbcCurrency>[];

@@ -43,7 +43,7 @@ import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 export interface EvmWalletContextProps {
   connectEvmWallet: () => void;
-  defaultEvmCurrencyOption: DropdownOption<EvmCurrency> | undefined;
+  defaultEvmCurrencyOption?: DropdownOption<EvmCurrency>;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
   evmChainsOptions: DropdownOption<EvmChainInfo>[];
@@ -53,7 +53,7 @@ export interface EvmWalletContextProps {
   isLoadingSelectedEvmCurrencyBalance: boolean;
   resetState: () => void;
   selectedEvmChain: EvmChainInfo | null;
-  selectedEvmChainNativeToken: EvmCurrency | undefined;
+  selectedEvmChainNativeToken?: EvmCurrency;
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
   selectedEvmCurrency: EvmCurrency | null;
   selectedEvmCurrencyBalance: { value: string; symbol: string } | null;
