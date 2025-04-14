@@ -303,6 +303,9 @@ export class EvmCurrency {
   /** True if this is a wrapped native token (e.g., TIA) */
   public readonly isWrappedNative: boolean;
 
+  /** True if this token should be shown in bridge page dropdowns */
+  public readonly isBridgeable: boolean;
+
   /** Component to render the token's icon */
   public readonly IconComponent?: React.FC<IconProps>;
 
@@ -320,6 +323,7 @@ export class EvmCurrency {
     astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
     isNative: boolean;
+    isBridgeable: boolean;
     IconComponent?: React.FC<IconProps>;
   }) {
     this.title = params.title;
@@ -333,6 +337,7 @@ export class EvmCurrency {
     this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
     this.isNative = params.isNative;
+    this.isBridgeable = params.isBridgeable;
     this.IconComponent = params.IconComponent;
   }
 

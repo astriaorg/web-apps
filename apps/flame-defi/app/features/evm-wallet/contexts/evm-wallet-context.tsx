@@ -165,12 +165,13 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     null,
   );
 
-  // set the address when the address, chain, or currency changes
+  // set the address when the address or chain changes
   useEffect(() => {
-    if (selectedEvmChain && selectedEvmCurrency && userAccount?.address) {
+    if (userAccount?.address) {
+      console.log("setEvmAccountAddress");
       setEvmAccountAddress(userAccount.address);
     }
-  }, [userAccount.address, selectedEvmChain, selectedEvmCurrency]);
+  }, [userAccount.address]);
 
   // set the selectedFlameNetwork if user switches from their wallet
   // useEffect(() => {

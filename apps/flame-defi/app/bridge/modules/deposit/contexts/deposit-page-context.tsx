@@ -63,7 +63,6 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleEditRecipientClick: () => void;
   handleEditRecipientSave: () => void;
   handleEditRecipientClear: () => void;
-  handleConnectEvmWallet: () => void;
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
   additionalAstriaChainOptions: DropdownAdditionalOption[];
@@ -112,7 +111,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   // Keep our local state synced with bridge connections state
   useEffect(() => {
-    console.log("setting source chain in useEffect");
     setSourceChain({
       chain: sourceConnection.chain,
       currency: sourceConnection.currency,
@@ -192,43 +190,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     }
   }, [enableManualAddressMode, disableManualAddressMode]);
 
-  const { connectEvmWallet } = evmWallet;
-
-  const handleConnectEvmWallet = useCallback(
-    (isSource: boolean = false) => {
-      console.log("handleConnectEvmWallet");
-      // clear recipient address override when connecting
-      // FIXME - is this still what we want to do here?
-      setIsRecipientAddressEditableHandler(false);
-      setRecipientAddressOverrideHandler("");
-
-      // If connecting for source, update source chain
-      if (isSource && sourceChain.chain?.chainType === ChainType.EVM) {
-        console.log("connect to specific chain");
-        evmWallet.connectToSpecificChain(sourceChain.chain.chainId);
-        return;
-      }
-
-      // Otherwise connect for destination (Flame)
-      connectEvmWallet();
-    },
-    [
-      connectEvmWallet,
-      evmWallet,
-      sourceChain.chain?.chainId,
-      sourceChain.chain?.chainType,
-      setIsRecipientAddressEditableHandler,
-      setRecipientAddressOverrideHandler
-    ],
-  );
-
   const handleSourceChainSelect = useCallback(
     (chainValue: CosmosChainInfo | EvmChainInfo) => {
-      console.log(
-        "Source chain selected:",
-        chainValue.chainName,
-        chainValue.chainType,
-      );
       connectSource(chainValue);
     },
     [connectSource],
@@ -236,11 +199,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   const handleDestinationChainSelect = useCallback(
     (chainValue: CosmosChainInfo | EvmChainInfo) => {
-      console.log(
-        "Destination chain selected:",
-        chainValue.chainName,
-        chainValue.chainType,
-      );
       connectDestination(chainValue);
     },
     [connectDestination],
@@ -254,9 +212,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   // save the recipient address
   const handleEditRecipientSave = useCallback(() => {
     setIsRecipientAddressEditableHandler(false);
-    // reset wallet states when user manually enters address
-    evmWallet.resetState();
-  }, [evmWallet, setIsRecipientAddressEditableHandler]);
+  }, [setIsRecipientAddressEditableHandler]);
   
   // clear the manually inputted recipient address
   const handleEditRecipientClear = useCallback(() => {
@@ -438,19 +394,13 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const additionalAstriaChainOptions = useMemo(() => {
     return [
       {
-        label: "Connect Astria Wallet",
-        action: handleConnectEvmWallet,
-        className: "has-text-primary",
-        RightIcon: PlusIcon,
-      },
-      {
         label: "Enter address manually",
         action: handleEditRecipientClick,
         className: "has-text-primary",
         RightIcon: EditIcon,
       },
     ];
-  }, [handleConnectEvmWallet, handleEditRecipientClick]);
+  }, [handleEditRecipientClick]);
 
   // calculate if deposit button should be disabled
   const isDepositDisabled = useMemo<boolean>((): boolean => {
@@ -503,7 +453,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         handleEditRecipientClick,
         handleEditRecipientSave,
         handleEditRecipientClear,
-        handleConnectEvmWallet,
         handleDeposit,
         isDepositDisabled,
         cosmosWallet,

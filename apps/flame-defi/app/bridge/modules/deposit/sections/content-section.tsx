@@ -56,6 +56,7 @@ export const ContentSection = () => {
 
     return getOnrampBuyUrl({
       projectId: "5e9f4c41-a90f-4eb5-b6a4-676eaf0f836d", // TODO - get from config
+      // FIXME - does passing in address here mean we have to create the account first?
       addresses: {
         [evmWallet.evmAccountAddress]: ["base"],
       },
@@ -65,54 +66,26 @@ export const ContentSection = () => {
     });
   }, [evmWallet.evmAccountAddress]);
 
-  const sourceChainOption = useMemo(() => {
-    if (!sourceChain.chain) {
-      return null;
-    }
-    console.log("new source chain option");
-    return {
-      label: sourceChain.chain.chainName,
-      value: sourceChain.chain,
-      LeftIcon: sourceChain.chain.IconComponent,
-    };
-  }, [sourceChain.chain]);
-
   // Source currency options setup
   const sourceCurrencyOptions = useMemo(() => {
     if (!sourceChain.chain || !sourceChain.chain.currencies) {
       return [];
     }
 
-    return sourceChain.chain.currencies.map((c) => ({
+    console.log(sourceChain.chain.currencies);
+
+    return sourceChain.chain.currencies.filter((c) => {
+      // only include bridgeable tokens
+      if ("isBridgeable" in c) {
+        return c.isBridgeable;
+      }
+      return true;
+    }).map((c) => ({
       label: c.coinDenom,
       value: c,
       LeftIcon: c.IconComponent,
     }));
   }, [sourceChain.chain]);
-
-  const defaultSourceCurrencyOption = useMemo(() => {
-    if (!sourceChain.chain || !sourceChain.chain.currencies || sourceChain.chain.currencies.length === 0) {
-      return undefined;
-    }
-
-    const defaultCurrency = sourceChain.chain.currencies[0];
-    return {
-      label: defaultCurrency.coinDenom,
-      value: defaultCurrency,
-      LeftIcon: defaultCurrency.IconComponent,
-    };
-  }, [sourceChain.chain]);
-
-  const destinationChainOption = useMemo(() => {
-    if (!destinationChain.chain) {
-      return null;
-    }
-    return {
-      label: destinationChain.chain.chainName,
-      value: destinationChain.chain,
-      LeftIcon: destinationChain.chain.IconComponent,
-    };
-  }, [destinationChain.chain]);
 
   // Destination currency options setup
   const destinationCurrencyOptions = useMemo(() => {
@@ -247,8 +220,10 @@ export const ContentSection = () => {
                       placeholder="Select chain..."
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
-                      onSelect={handleSourceChainSelect}
-                      valueOverride={sourceChainOption}
+                      onSelect={(val) => {
+                        console.log("Dropdown onSelect called with:", val.chainName);
+                        handleSourceChainSelect(val);
+                      }}
                       LeftIcon={WalletIcon}
                     />
                   </div>
@@ -258,7 +233,7 @@ export const ContentSection = () => {
                       <Dropdown
                         placeholder="Select a token"
                         options={sourceCurrencyOptions}
-                        defaultOption={defaultSourceCurrencyOption}
+                        defaultOption={sourceCurrencyOptions[0]}
                         onSelect={setSourceCurrency}
                         LeftIcon={WalletIcon}
                       />
@@ -309,7 +284,6 @@ export const ContentSection = () => {
                       options={destinationChainOptions}
                       onSelect={handleDestinationChainSelect}
                       additionalOptions={additionalAstriaChainOptions}
-                      valueOverride={destinationChainOption}
                       LeftIcon={WalletIcon}
                     />
                   </div>

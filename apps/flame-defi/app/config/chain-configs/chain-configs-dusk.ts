@@ -235,6 +235,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
@@ -246,6 +247,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: true,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: WrappedTiaIcon,
     }),
     new EvmCurrency({
@@ -260,6 +262,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
@@ -274,6 +277,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
   ],
@@ -302,6 +306,7 @@ const BaseChainInfo: EvmChainInfo = {
       coinDecimals: 18,
       isNative: true,
       isWrappedNative: false,
+      isBridgeable: false,
     }),
     new EvmCurrency({
       coinDenom: "USDC",
@@ -313,6 +318,7 @@ const BaseChainInfo: EvmChainInfo = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: UsdcIcon,
     }),
   ],
