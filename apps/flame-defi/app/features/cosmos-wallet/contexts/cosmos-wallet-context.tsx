@@ -83,12 +83,11 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   >(null);
 
   useEffect(() => {
-    // make sure the address is set when
-    // the address, chain, or currency change
-    if (selectedCosmosChain && selectedIbcCurrency && cosmosAddressFromWallet) {
+    // make sure the address is set when the address changes
+    if (cosmosAddressFromWallet) {
       setCosmosAccountAddress(cosmosAddressFromWallet);
     }
-  }, [cosmosAddressFromWallet, selectedCosmosChain, selectedIbcCurrency]);
+  }, [cosmosAddressFromWallet]);
 
   const resetState = useCallback(() => {
     setSelectedCosmosChain(null);

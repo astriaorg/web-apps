@@ -108,8 +108,6 @@ export function useBridgeConnections(): BridgeConnections {
   // Handle source chain connection
   const connectSource = useCallback(
     (chain: CosmosChainInfo | EvmChainInfo) => {
-      console.log("connect source");
-
       // Skip if already connecting to avoid infinite loops
       if (isSourceConnecting) {
         console.log("Already connecting source, skipping");

@@ -168,7 +168,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   // set the address when the address or chain changes
   useEffect(() => {
     if (userAccount?.address) {
-      console.log("setEvmAccountAddress");
       setEvmAccountAddress(userAccount.address);
     }
   }, [userAccount.address]);
