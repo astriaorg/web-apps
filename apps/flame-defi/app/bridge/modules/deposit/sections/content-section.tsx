@@ -70,8 +70,6 @@ export const ContentSection = () => {
       return [];
     }
 
-    console.log(sourceChain.chain.currencies);
-
     return sourceChain.chain.currencies
       .filter((c) => {
         // only include bridgeable tokens
@@ -93,29 +91,20 @@ export const ContentSection = () => {
       return [];
     }
 
-    return destinationChain.chain.currencies.map((currency) => ({
+    return destinationChain.chain.currencies.filter((c) => {
+      // only include bridgeable tokens
+      if ("isBridgeable" in c) {
+        return c.isBridgeable;
+      }
+      return true;
+    }).map((currency) => ({
       label: currency.coinDenom,
       value: currency,
       LeftIcon: currency.IconComponent,
     }));
   }, [destinationChain.chain]);
 
-  const defaultDestinationCurrencyOption = useMemo(() => {
-    if (
-      !destinationChain.chain ||
-      !destinationChain.chain.currencies ||
-      destinationChain.chain.currencies.length === 0
-    ) {
-      return undefined;
-    }
-
-    const defaultCurrency = destinationChain.chain.currencies[0];
-    return {
-      label: defaultCurrency.coinDenom,
-      value: defaultCurrency,
-      LeftIcon: defaultCurrency.IconComponent,
-    };
-  }, [destinationChain.chain]);
+  const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
 
   // The destination currency selection is controlled by the chosen source currency
   const destinationCurrencyOption = useMemo(() => {
