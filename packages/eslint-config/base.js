@@ -3,6 +3,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 import onlyWarn from "eslint-plugin-only-warn";
+import { rules as customRules } from "./rules/index.js";
 
 /**
  * A shared ESLint configuration for the repository.
@@ -28,5 +29,15 @@ export const config = [
   },
   {
     ignores: ["dist/**", "coverage/**"],
+  },
+  {
+    plugins: {
+      "@repo": {
+        rules: customRules,
+      },
+    },
+    rules: {
+      "@repo/prefer-optional-syntax": "warn",
+    },
   },
 ];

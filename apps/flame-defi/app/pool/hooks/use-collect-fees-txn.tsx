@@ -1,28 +1,26 @@
-import { HexString, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { HexString } from "@repo/flame-types";
+import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
-import { useAstriaChainData, useConfig as useAppConfig } from "config";
-import { getSlippageTolerance } from "@repo/ui/utils";
+import { usePoolPositionContext } from ".";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
-import { usePoolPositionContext } from "./use-pool-position-context";
+import { useEvmChainData } from "config";
 
-export const useAddLiquidityTxn = (
-  input0Amount: string,
-  input1Amount: string,
+export const useCollectFeesTxn = (
+  poolTokens: PoolToken[],
+  isCollectAsWrappedNative: boolean,
 ) => {
+  const { positionNftId } = usePoolPositionContext();
   const { address } = useAccount();
   const wagmiConfig = useConfig();
+  const { selectedChain } = useEvmChainData();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
-
-  const { chain } = useAstriaChainData();
-  const { poolToken0, poolToken1, positionNftId } = usePoolPositionContext();
-  const { defaultSlippageTolerance } = useAppConfig();
-  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
     hash: txnHash,
   });
@@ -40,48 +38,51 @@ export const useAddLiquidityTxn = (
     }
   }, [transactionData, txnHash, setTxnStatus]);
 
-  const addLiquidity = async () => {
+  const formatFeesToCollectToTokenInputState = (
+    poolTokens: PoolToken[],
+  ): TokenInputState[] => {
+    return poolTokens.map((data) => {
+      return {
+        token: data.token,
+        value: data.unclaimedFees?.toString() || "0",
+      };
+    });
+  };
+
+  const tokenInputs = formatFeesToCollectToTokenInputState(poolTokens);
+
+  const collectFees = async () => {
     if (
       !address ||
-      !poolToken0 ||
-      !poolToken1 ||
+      poolTokens.length === 0 ||
       !positionNftId ||
-      parseFloat(input0Amount) <= 0 ||
-      parseFloat(input1Amount) <= 0
+      !tokenInputs[0] ||
+      !tokenInputs[1]
     ) {
-      console.warn("Missing required data for increasing liquidity");
+      console.warn("Missing required data for collecting fees");
       return;
     }
 
-    const tokenInput0: TokenInputState = {
-      token: poolToken0.token,
-      value: input0Amount,
-    };
-    const tokenInput1: TokenInputState = {
-      token: poolToken1.token,
-      value: input1Amount,
-    };
-
-    const increaseLiquidityParams =
-      NonfungiblePositionManagerService.getIncreaseLiquidityParams(
-        tokenInput0,
-        tokenInput1,
-        slippageTolerance,
-        chain,
-      );
-
     try {
       setTxnStatus(TXN_STATUS.PENDING);
-      const NonfungiblePositionManagerService =
+      const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
           wagmiConfig,
-          chain.contracts.nonfungiblePositionManager.address,
+          selectedChain.contracts.nonfungiblePositionManager.address,
         );
 
-      const tx = await NonfungiblePositionManagerService.increaseLiquidity(
-        positionNftId,
-        increaseLiquidityParams,
-      );
+      const collectFeesParams =
+        NonfungiblePositionManagerService.getCollectFeesParams(
+          selectedChain,
+          positionNftId,
+          tokenInputs[0],
+          tokenInputs[1],
+          address,
+          isCollectAsWrappedNative,
+        );
+
+      const tx =
+        await nonfungiblePositionService.collectFees(collectFeesParams);
       setTxnHash(tx);
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
@@ -90,7 +91,7 @@ export const useAddLiquidityTxn = (
         setTxnStatus(TXN_STATUS.FAILED);
       } else {
         console.warn(error);
-        setErrorText("Error increasing liquidity");
+        setErrorText("Error collecting fees");
         setTxnStatus(TXN_STATUS.FAILED);
       }
     }
@@ -100,8 +101,8 @@ export const useAddLiquidityTxn = (
     txnStatus,
     txnHash,
     errorText,
-    setErrorText,
     setTxnStatus,
-    addLiquidity,
+    setErrorText,
+    collectFees,
   };
 };

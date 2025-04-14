@@ -1,8 +1,5 @@
 import {
   BaseIcon,
-  CelestiaIcon,
-  FlameIcon,
-  NobleIcon,
   UsdcIcon,
 } from "@repo/ui/icons";
 import {
@@ -15,6 +12,7 @@ import {
   AstriaChains,
   EvmCurrency,
 } from "@repo/flame-types";
+import { AstriaIcon, CelestiaIcon, NobleIcon } from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,
@@ -246,7 +244,7 @@ const FlameChainInfo: AstriaChain = {
       IconComponent: CelestiaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
 const FakeChainInfo: AstriaChain = {
@@ -296,10 +294,10 @@ const FakeChainInfo: AstriaChain = {
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       isBridgeable: true,
-      IconComponent: FlameIcon,
+      IconComponent: AstriaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
 export const astriaChains: AstriaChains = {

@@ -51,7 +51,7 @@ export interface EvmWalletContextProps {
   resetState: () => void;
   // FIXME - should i refactor this to only care about Astria connection?
   selectedEvmChain: EvmChainInfo | null;
-  selectedEvmChainNativeToken: EvmCurrency | undefined;
+  selectedEvmChainNativeToken?: EvmCurrency;
   selectedEvmChainOption: DropdownOption<EvmChainInfo> | null;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
   ibcWithdrawFeeDisplay: string;

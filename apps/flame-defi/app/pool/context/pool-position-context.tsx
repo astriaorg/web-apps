@@ -11,7 +11,6 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
-import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
@@ -26,6 +25,7 @@ import {
   sqrtPriceX96ToPrice,
   tickToPrice,
 } from "./pool-position-helpers";
+import { formatUnits } from "viem";
 
 export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined
@@ -41,10 +41,8 @@ export const PoolPositionContextProvider = ({
   const positionNftId = params["position-nft-id"] as string;
   const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
   const { currencies } = chain;
-  const currentPoolSettings = getFromLocalStorage("poolSettings") || {};
-  const [collectAsNative, setCollectAsNative] = useState<boolean>(
-    currentPoolSettings.collectAsNative || false,
-  );
+  const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
+    useState<boolean>(false);
   const [currentPrice, setCurrentPrice] = useState<string>("");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -80,8 +78,8 @@ export const PoolPositionContextProvider = ({
         chain.chainId,
         positionNftId,
       );
-      const isisPositionClosed = position.liquidity === 0n;
-      setIsPositionClosed(isisPositionClosed);
+      const isPositionClosed = position.liquidity === 0n;
+      setIsPositionClosed(isPositionClosed);
       setPoolPosition(position);
 
       const token0 = getTokenDataFromCurrencies(
@@ -96,10 +94,13 @@ export const PoolPositionContextProvider = ({
       );
 
       if (token0 && token1) {
-        const unclaimedFees0 =
-          Number(position.tokensOwed0) / 10 ** token0.coinDecimals;
-        const unclaimedFees1 =
-          Number(position.tokensOwed1) / 10 ** token1.coinDecimals;
+        const unclaimedFees0 = Number(
+          formatUnits(position.tokensOwed0, token0.coinDecimals),
+        );
+        const unclaimedFees1 = Number(
+          formatUnits(position.tokensOwed1, token1.coinDecimals),
+        );
+
         const factoryService = createPoolFactoryService(
           wagmiConfig,
           chain.contracts.poolFactory.address,
@@ -266,13 +267,9 @@ export const PoolPositionContextProvider = ({
     void getPriceRange();
   }, [invertedPrice, getPriceRange]);
 
-  const handleCollectAsNative = (collectAsNative: boolean) => {
-    setCollectAsNative(collectAsNative);
-    setInLocalStorage("poolSettings", {
-      collectAsNative: collectAsNative,
-    });
-
-    if (collectAsNative) {
+  const handleCollectAsWrappedNative = (isCollectAsWrappedNative: boolean) => {
+    setIsCollectAsWrappedNative(isCollectAsWrappedNative);
+    if (isCollectAsWrappedNative) {
       poolTokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {
           poolToken.token = wrappedNativeToken;
@@ -296,8 +293,8 @@ export const PoolPositionContextProvider = ({
         rawFeeTier,
         selectedSymbol,
         handleReverseTokenData,
-        collectAsNative,
-        handleCollectAsNative,
+        isCollectAsWrappedNative,
+        handleCollectAsWrappedNative,
         poolToken0,
         poolToken1,
         currentPrice,

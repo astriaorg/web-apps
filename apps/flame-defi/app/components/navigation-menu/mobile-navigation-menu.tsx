@@ -16,16 +16,13 @@ import {
   DrawerTitle,
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
-import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaIcon } from "@repo/ui/icons/polychrome";
+import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useAstriaChainData, useConfig } from "config";
-import {
-  ConnectCosmosWalletButton,
-  useCosmosWallet,
-} from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -36,8 +33,8 @@ import { NetworkIcon } from "./network-icon";
 export const MobileNavigationMenu = () => {
   const pathname = usePathname();
   const account = useAccount();
-  const { cosmosAccountAddress } = useCosmosWallet();
   const {
+    brandURL,
     featureFlags,
     networksList,
     selectedFlameNetwork,
@@ -57,8 +54,7 @@ export const MobileNavigationMenu = () => {
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
   const [isConnectWalletOpen, setIsConnectWalletOpen] = useState(false);
 
-  const isConnected = account.address || cosmosAccountAddress;
-  const isSingleConnectWallet = pathname !== "/";
+  const isConnected = !!account.address;
 
   const handleNetworkSelect = useCallback(
     (network: FlameNetwork) => {
@@ -74,13 +70,13 @@ export const MobileNavigationMenu = () => {
   }, []);
 
   const handleOnConnectWalletOpen = useCallback(() => {
-    if (isSingleConnectWallet && !isConnected) {
+    if (!isConnected) {
       connectWallet();
     } else {
       setIsConnectWalletOpen(true);
     }
     setIsOpen(false);
-  }, [isSingleConnectWallet, isConnected, connectWallet]);
+  }, [isConnected, connectWallet]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -90,7 +86,10 @@ export const MobileNavigationMenu = () => {
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="ghost" className="p-0 hover:text-initial">
+          <Button
+            variant="ghost"
+            className="p-0 [&_svg]:size-5 hover:text-initial"
+          >
             <NavigationMenuButton size={20} isOpen={isOpen} />
           </Button>
         </DialogTrigger>
@@ -104,11 +103,28 @@ export const MobileNavigationMenu = () => {
               "w-[calc(100vw-var(--removed-body-scroll-bar-size,0px))]",
             )}
           >
-            <DialogTitle className="sr-only">Flame Apps</DialogTitle>
+            <DialogTitle className="sr-only"></DialogTitle>
             <DialogDescription className="sr-only"></DialogDescription>
-            <div className="flex flex-col px-6 py-8 h-full">
+            <div className="flex flex-col px-6 pb-8 h-full">
+              <div className="flex items-center justify-between w-full h-14 shrink-0">
+                {/* Align with the logo and button in the navigation menu for seamless transitions. */}
+                <a
+                  target="_blank"
+                  href={brandURL}
+                  className="flex items-center h-5 -ml-2"
+                  rel="noreferrer"
+                  aria-label="Astria Logo"
+                >
+                  <AstriaLogo />
+                </a>
+                <DialogClose className="absolute right-4 top-4.5">
+                  <NavigationMenuButton size={20} isOpen={isOpen} />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+              </div>
+
               <div className="flex-1" />
-              <div className="flex flex-col items-center space-y-8">
+              <div className="flex flex-col items-center py-8 space-y-8">
                 <MobileNavigationMenuLink
                   href={LINKS.BRIDGE}
                   isActive={pathname.startsWith(LINKS.BRIDGE)}
@@ -164,21 +180,13 @@ export const MobileNavigationMenu = () => {
                 >
                   <div className="flex items-center gap-2 flex-1">
                     {isConnected
-                      ? isSingleConnectWallet
-                        ? shortenAddress(account.address as string)
-                        : "Connected"
+                      ? shortenAddress(account.address as string)
                       : "Connect Wallet"}
                   </div>
                   <ChevronDownIcon />
                 </Button>
               </div>
             </div>
-
-            {/* Align with the button in the navigation menu for seamless transitions. */}
-            <DialogClose className="absolute right-4 top-4.5">
-              <NavigationMenuButton size={20} isOpen={isOpen} />
-              <span className="sr-only">Close</span>
-            </DialogClose>
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>
@@ -222,38 +230,27 @@ export const MobileNavigationMenu = () => {
             </DrawerClose>
           </DrawerHeader>
           <div className="flex flex-col p-6">
-            {isSingleConnectWallet ? (
-              <ConnectWalletContent
-                isConnected={!!account.address}
-                isLoading={
-                  (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
-                  quoteLoading
-                }
-                account={account}
-                balance={nativeTokenBalance ?? undefined}
-                fiat={usdcToNativeQuote}
-                explorer={{
-                  url: `${chain.blockExplorerUrl}/address/${account.address}`,
-                }}
-                label={shortenAddress(account.address as string)}
-                icon={<FlameIcon />}
-                onConnectWallet={connectWallet}
-                onDisconnectWallet={() => {
-                  setIsConnectWalletOpen(false);
-                  disconnectWallet();
-                }}
-                isCollapsible={false}
-              />
-            ) : (
-              <>
-                <ConnectEvmWalletButton
-                  onDisconnectWallet={() => setIsConnectWalletOpen(false)}
-                />
-                <ConnectCosmosWalletButton
-                  onDisconnectWallet={() => setIsConnectWalletOpen(false)}
-                />
-              </>
-            )}
+            <ConnectWalletContent
+              isConnected={!!account.address}
+              isLoading={
+                (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
+                quoteLoading
+              }
+              account={account}
+              balance={nativeTokenBalance ?? undefined}
+              fiat={usdcToNativeQuote}
+              explorer={{
+                url: `${chain.blockExplorerUrl}/address/${account.address}`,
+              }}
+              label={shortenAddress(account.address as string)}
+              icon={<AstriaIcon />}
+              onConnectWallet={connectWallet}
+              onDisconnectWallet={() => {
+                setIsConnectWalletOpen(false);
+                disconnectWallet();
+              }}
+              isCollapsible={false}
+            />
           </div>
         </DrawerContent>
       </Drawer>

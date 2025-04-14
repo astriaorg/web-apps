@@ -16,15 +16,9 @@ import { useIntl } from "react-intl";
 
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
-  const {
-    feeData,
-    modalOpen,
-    setModalOpen,
-    setTxnStatus,
-    txnStatus,
-    maxPrice,
-    updateMaxPrice,
-  } = usePoolContext();
+  const { feeData, modalOpen, setModalOpen, maxPrice, updateMaxPrice } =
+    usePoolContext();
+  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const { chain } = useAstriaChainData();
   const { currencies } = chain;
   const defaultFeeData = feeData[2] as FeeData;

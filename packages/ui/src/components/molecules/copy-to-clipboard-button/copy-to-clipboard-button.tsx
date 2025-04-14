@@ -6,7 +6,7 @@ import { ClipboardIcon } from "../../../icons";
 export const CopyToClipboardButton = ({
   textToCopy,
 }: {
-  textToCopy: string | undefined;
+  textToCopy?: string;
 }) => {
   const [copyStatus, setCopyStatus] = useState("");
   const copyToClipboard = (text: string) => {

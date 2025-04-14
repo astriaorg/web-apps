@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components";
-import { FlameIcon } from "@repo/ui/icons/polychrome";
+import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
@@ -14,12 +14,15 @@ import {
 } from "features/cosmos-wallet";
 import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
+import { useEvmChainData } from "config";
+import { useEvmWallet } from "features/evm-wallet";
 import { useAccount } from "wagmi";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
 export const ConnectWalletsButton = () => {
+  const { selectedChain } = useEvmChainData();
   const pathname = usePathname();
   const { cosmosAccountAddress } = useCosmosWallet();
   const { chain } = useAstriaChainData();
@@ -33,10 +36,9 @@ export const ConnectWalletsButton = () => {
     quoteLoading,
   } = useAstriaWallet();
 
-  const isConnected = account.address || cosmosAccountAddress;
-  const isSingleConnectWallet = pathname !== "/";
+  const isConnected = !!account.address;
 
-  if (isSingleConnectWallet && !isConnected) {
+  if (!isConnected) {
     return (
       <Button size="sm" onClick={connectWallet}>
         Connect Wallet
@@ -50,9 +52,7 @@ export const ConnectWalletsButton = () => {
         <Button size="sm">
           <span>
             {isConnected
-              ? isSingleConnectWallet
-                ? shortenAddress(account.address as string)
-                : "Connected"
+              ? shortenAddress(account.address as string)
               : "Connect Wallet"}
           </span>
         </Button>
@@ -61,31 +61,24 @@ export const ConnectWalletsButton = () => {
         className="hidden flex-col w-min p-3 gap-1 mr-4 md:flex"
         side="bottom"
       >
-        {isSingleConnectWallet ? (
-          <ConnectWalletContent
-            isConnected={!!account.address}
-            isLoading={
-              (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
-              quoteLoading
-            }
-            account={account}
-            balance={nativeTokenBalance ?? undefined}
-            fiat={usdcToNativeQuote}
-            explorer={{
-              url: `${chain.blockExplorerUrl}/address/${account.address}`,
-            }}
-            label={shortenAddress(account.address as string)}
-            icon={<FlameIcon />}
-            onConnectWallet={connectWallet}
-            onDisconnectWallet={disconnectWallet}
-            isCollapsible={false}
-          />
-        ) : (
-          <>
-            <ConnectEvmWalletButton />
-            <ConnectCosmosWalletButton />
-          </>
-        )}
+        <ConnectWalletContent
+          isConnected={!!account.address}
+          isLoading={
+            (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
+            quoteLoading
+          }
+          account={account}
+          balance={nativeTokenBalance ?? undefined}
+          fiat={usdcToNativeQuote}
+          explorer={{
+            url: `${chain.blockExplorerUrl}/address/${account.address}`,
+          }}
+          label={shortenAddress(account.address as string)}
+          icon={<AstriaIcon />}
+          onConnectWallet={connectWallet}
+          onDisconnectWallet={disconnectWallet}
+          isCollapsible={false}
+        />
       </PopoverContent>
     </Popover>
   );
