@@ -1,8 +1,4 @@
 import {
-  BaseIcon,
-  UsdcIcon,
-} from "@repo/ui/icons";
-import {
   AstriaChain,
   ChainType,
   CoinbaseChains,
@@ -14,8 +10,10 @@ import {
 } from "@repo/flame-types";
 import {
   AstriaIcon,
+  BaseIcon,
   CelestiaIcon,
   NobleIcon,
+  UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons/polychrome";
 

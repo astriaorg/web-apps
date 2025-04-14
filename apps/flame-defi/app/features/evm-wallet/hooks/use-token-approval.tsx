@@ -14,7 +14,7 @@ import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 type TokenApprovalProps = {
   setTxnStatus: (status: TXN_STATUS) => void;
-  setTxnHash: (hash: HexString | undefined) => void;
+  setTxnHash: (hash?: HexString) => void;
   setErrorText: (error: string) => void;
 };
 

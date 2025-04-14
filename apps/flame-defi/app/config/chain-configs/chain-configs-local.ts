@@ -1,8 +1,4 @@
 import {
-  BaseIcon,
-  UsdcIcon,
-} from "@repo/ui/icons";
-import {
   AstriaChain,
   ChainType,
   CoinbaseChains,
@@ -12,7 +8,13 @@ import {
   AstriaChains,
   EvmCurrency,
 } from "@repo/flame-types";
-import { AstriaIcon, CelestiaIcon, NobleIcon } from "@repo/ui/icons/polychrome";
+import {
+  AstriaIcon,
+  BaseIcon,
+  CelestiaIcon,
+  NobleIcon,
+  UsdcIcon,
+} from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,

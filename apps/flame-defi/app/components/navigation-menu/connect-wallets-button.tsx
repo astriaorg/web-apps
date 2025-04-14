@@ -8,23 +8,13 @@ import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
-import {
-  ConnectCosmosWalletButton,
-  useCosmosWallet,
-} from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
-import { usePathname } from "next/navigation";
-import { useEvmChainData } from "config";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { useAccount } from "wagmi";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
 export const ConnectWalletsButton = () => {
-  const { selectedChain } = useEvmChainData();
-  const pathname = usePathname();
-  const { cosmosAccountAddress } = useCosmosWallet();
   const { chain } = useAstriaChainData();
   const account = useAccount();
   const {
@@ -64,8 +54,7 @@ export const ConnectWalletsButton = () => {
         <ConnectWalletContent
           isConnected={!!account.address}
           isLoading={
-            (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
-            quoteLoading
+            (isLoadingNativeTokenBalance && !nativeTokenBalance) || quoteLoading
           }
           account={account}
           balance={nativeTokenBalance ?? undefined}

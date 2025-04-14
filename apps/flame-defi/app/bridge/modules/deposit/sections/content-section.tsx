@@ -91,17 +91,19 @@ export const ContentSection = () => {
       return [];
     }
 
-    return destinationChain.chain.currencies.filter((c) => {
-      // only include bridgeable tokens
-      if ("isBridgeable" in c) {
-        return c.isBridgeable;
-      }
-      return true;
-    }).map((currency) => ({
-      label: currency.coinDenom,
-      value: currency,
-      LeftIcon: currency.IconComponent,
-    }));
+    return destinationChain.chain.currencies
+      .filter((c) => {
+        // only include bridgeable tokens
+        if ("isBridgeable" in c) {
+          return c.isBridgeable;
+        }
+        return true;
+      })
+      .map((currency) => ({
+        label: currency.coinDenom,
+        value: currency,
+        LeftIcon: currency.IconComponent,
+      }));
   }, [destinationChain.chain]);
 
   const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
