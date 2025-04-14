@@ -218,13 +218,7 @@ export const ContentSection = () => {
                       placeholder="Select chain..."
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
-                      onSelect={(val) => {
-                        console.log(
-                          "Dropdown onSelect called with:",
-                          val.chainName,
-                        );
-                        handleSourceChainSelect(val);
-                      }}
+                      onSelect={handleSourceChainSelect}
                       LeftIcon={WalletIcon}
                     />
                   </div>
