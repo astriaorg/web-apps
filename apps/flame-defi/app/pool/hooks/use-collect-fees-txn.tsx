@@ -8,7 +8,7 @@ import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 
 export const useCollectFeesTxn = (
   poolTokens: PoolToken[],
@@ -17,7 +17,7 @@ export const useCollectFeesTxn = (
   const { positionNftId } = usePoolPositionContext();
   const { address } = useAccount();
   const wagmiConfig = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -68,12 +68,12 @@ export const useCollectFeesTxn = (
       const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
           wagmiConfig,
-          selectedChain.contracts.nonfungiblePositionManager.address,
+          chain.contracts.nonfungiblePositionManager.address,
         );
 
       const collectFeesParams =
         NonfungiblePositionManagerService.getCollectFeesParams(
-          selectedChain,
+          chain,
           positionNftId,
           tokenInputs[0],
           tokenInputs[1],
