@@ -98,11 +98,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     address: userAccount.address,
   });
 
-  // FIXME - this could show a balance for a chain that is not the "selected" chain,
-  //  e.g. when a user refreshes the page and the selected chain is not set. tho i guess
-  //  when a user selects a chain the balance will be updated, maybe not an issue actually?
-  //  it's not an issue right now because there is only flame atm, but this will be an issue
-  //  for CosmosWalletContext since there are multiple chains.
   const evmNativeTokenBalance = useMemo(() => {
     if (nativeBalanceStatus !== "success") {
       return null;
