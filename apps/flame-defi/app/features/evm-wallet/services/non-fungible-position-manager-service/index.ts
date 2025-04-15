@@ -1,7 +1,8 @@
 import { Config } from "@wagmi/core";
 import { type Address, Abi, encodeFunctionData } from "viem";
 import {
-  AstriaChain, EvmChainInfo,
+  AstriaChain,
+  EvmChainInfo,
   HexString,
   TokenInputState,
   tokenInputStateToTokenAmount,
