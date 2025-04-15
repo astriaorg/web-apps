@@ -41,6 +41,7 @@ export interface DepositPageContextProps extends PropsWithChildren {
   ) => void;
   additionalSourceOptions: DropdownAdditionalOption[];
   sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
+  additionalDestinationOptions: DropdownAdditionalOption[];
   destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   sourceCurrency: EvmCurrency | IbcCurrency | null;
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
@@ -67,7 +68,6 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleEditRecipientClear: () => void;
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
-  additionalAstriaChainOptions: DropdownAdditionalOption[];
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
 }
@@ -478,7 +478,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         sourceChainOptions,
         destinationChainOptions,
         additionalSourceOptions,
-        additionalAstriaChainOptions,
+        additionalDestinationOptions: additionalAstriaChainOptions,
       }}
     >
       {children}

@@ -39,7 +39,7 @@ export const ContentSection = () => {
     setRecipientAddressOverride,
     isDepositDisabled,
     additionalSourceOptions,
-    additionalAstriaChainOptions,
+    additionalDestinationOptions,
     sourceChainOptions,
     destinationChainOptions,
     evmWallet,
@@ -280,7 +280,7 @@ export const ContentSection = () => {
                       placeholder="Connect Astria wallet or enter address"
                       options={destinationChainOptions}
                       onSelect={handleDestinationChainSelect}
-                      additionalOptions={additionalAstriaChainOptions}
+                      additionalOptions={additionalDestinationOptions}
                       LeftIcon={WalletIcon}
                     />
                   </div>

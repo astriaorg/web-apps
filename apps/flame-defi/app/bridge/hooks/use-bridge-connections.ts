@@ -9,7 +9,6 @@ import {
   IbcCurrency,
 } from "@repo/flame-types";
 import { BRIDGE_TYPE, getSupportedBridgeTypes } from "../types";
-import { useAstriaWallet } from "features/evm-wallet/hooks/use-astria-wallet";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
 
@@ -54,12 +53,10 @@ export interface BridgeConnections {
   // Access to wallet contexts (for compatibility with current implementation)
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
-  astriaWallet: ReturnType<typeof useAstriaWallet>;
 }
 
 export function useBridgeConnections(): BridgeConnections {
   // Access all wallet contexts
-  const astriaWallet = useAstriaWallet();
   const evmWallet = useEvmWallet();
   const cosmosWallet = useCosmosWallet();
 
@@ -135,13 +132,7 @@ export function useBridgeConnections(): BridgeConnections {
         chain.chainType === ChainType.EVM ||
         chain.chainType === ChainType.ASTRIA
       ) {
-        // Check if we can reuse the Astria wallet address for EVM connections
-        if (astriaWallet.accountAddress) {
-          address = astriaWallet.accountAddress;
-          isConnected = true;
-        }
-        // If no Astria wallet connection, fall back to regular EVM wallet
-        else if (
+        if (
           evmWallet.evmAccountAddress &&
           evmWallet.selectedEvmChain?.chainId === chain.chainId
         ) {
@@ -164,8 +155,6 @@ export function useBridgeConnections(): BridgeConnections {
       if (needsWalletConnection) {
         if (chain.chainType === ChainType.COSMOS) {
           cosmosWallet.connectCosmosWallet();
-        } else if (chain.chainType === ChainType.ASTRIA) {
-          astriaWallet.connectWallet();
         } else {
           evmWallet.connectToSpecificChain(chain.chainId);
         }
@@ -173,7 +162,7 @@ export function useBridgeConnections(): BridgeConnections {
 
       setIsSourceConnecting(false);
     },
-    [isSourceConnecting, cosmosWallet, astriaWallet, evmWallet],
+    [isSourceConnecting, cosmosWallet, evmWallet],
   );
 
   // Handle destination chain connection
@@ -205,16 +194,7 @@ export function useBridgeConnections(): BridgeConnections {
         chain.chainType === ChainType.ASTRIA ||
         chain.chainType === ChainType.EVM
       ) {
-        // For Astria and EVM chains, prioritize Astria wallet if available
-        if (astriaWallet.accountAddress) {
-          address = astriaWallet.accountAddress;
-          isConnected = true;
-        }
-        // For EVM chains, fall back to EVM wallet if Astria wallet not available
-        else if (
-          chain.chainType === ChainType.EVM &&
-          evmWallet.evmAccountAddress
-        ) {
+        if (chain.chainType === ChainType.EVM && evmWallet.evmAccountAddress) {
           address = evmWallet.evmAccountAddress;
           isConnected = true;
         } else {
@@ -233,8 +213,6 @@ export function useBridgeConnections(): BridgeConnections {
       if (needsWalletConnection) {
         if (chain.chainType === ChainType.COSMOS) {
           cosmosWallet.connectCosmosWallet();
-        } else if (chain.chainType === ChainType.ASTRIA) {
-          astriaWallet.connectWallet();
         } else {
           evmWallet.connectEvmWallet();
         }
@@ -242,7 +220,7 @@ export function useBridgeConnections(): BridgeConnections {
 
       setIsDestinationConnecting(false);
     },
-    [isDestinationConnecting, astriaWallet, cosmosWallet, evmWallet],
+    [isDestinationConnecting, cosmosWallet, evmWallet],
   );
 
   // Update connections when wallet states change
@@ -258,23 +236,10 @@ export function useBridgeConnections(): BridgeConnections {
       }));
     }
 
-    // For EVM and ASTRIA chains, prioritize Astria wallet if available
     if (
       (sourceConnection.chain?.chainType === ChainType.EVM ||
         sourceConnection.chain?.chainType === ChainType.ASTRIA) &&
-      astriaWallet.accountAddress
-    ) {
-      setSourceConnection((prev) => ({
-        ...prev,
-        address: astriaWallet.accountAddress,
-        isConnected: true,
-      }));
-    }
-    // Fall back to regular EVM wallet if Astria wallet not available
-    else if (
-      sourceConnection.chain?.chainType === ChainType.EVM &&
-      evmWallet.evmAccountAddress &&
-      evmWallet.selectedEvmChain?.chainId === sourceConnection.chain.chainId
+      evmWallet.evmAccountAddress
     ) {
       setSourceConnection((prev) => ({
         ...prev,
@@ -284,7 +249,6 @@ export function useBridgeConnections(): BridgeConnections {
     }
   }, [
     cosmosWallet.cosmosAccountAddress,
-    astriaWallet.accountAddress,
     evmWallet.evmAccountAddress,
     evmWallet.selectedEvmChain?.chainId,
     sourceConnection.chain,
@@ -302,24 +266,10 @@ export function useBridgeConnections(): BridgeConnections {
       }));
     }
 
-    // For EVM and ASTRIA chains, prioritize Astria wallet if available
     if (
       (destinationConnection.chain?.chainType === ChainType.EVM ||
         destinationConnection.chain?.chainType === ChainType.ASTRIA) &&
-      astriaWallet.accountAddress
-    ) {
-      setDestinationConnection((prev) => ({
-        ...prev,
-        address: astriaWallet.accountAddress,
-        isConnected: true,
-      }));
-    }
-    // Fall back to regular EVM wallet if Astria wallet not available
-    else if (
-      destinationConnection.chain?.chainType === ChainType.EVM &&
-      evmWallet.evmAccountAddress &&
-      evmWallet.selectedEvmChain?.chainId ===
-        destinationConnection.chain.chainId
+      evmWallet.evmAccountAddress
     ) {
       setDestinationConnection((prev) => ({
         ...prev,
@@ -328,7 +278,6 @@ export function useBridgeConnections(): BridgeConnections {
       }));
     }
   }, [
-    astriaWallet.accountAddress,
     cosmosWallet.cosmosAccountAddress,
     evmWallet.evmAccountAddress,
     evmWallet.selectedEvmChain?.chainId,
@@ -412,6 +361,5 @@ export function useBridgeConnections(): BridgeConnections {
     areCurrenciesValid,
     cosmosWallet,
     evmWallet,
-    astriaWallet,
   };
 }
