@@ -4,7 +4,11 @@ import { type Abi, type Address, parseUnits } from "viem";
 import { GenericContractService } from "../generic-contract-service";
 import { HexString } from "@repo/flame-types";
 
-// AstriaWithdrawerService.ts
+/**
+ * AstriaWithdrawerService extends the GenericContractService and provides
+ * functionality to initiate withdrawals for a native currency from a given
+ * contract address to a destination chain address on an IBC-compatible chain.
+ */
 export class AstriaWithdrawerService extends GenericContractService {
   private static readonly ABI = [
     {
@@ -43,7 +47,11 @@ export class AstriaWithdrawerService extends GenericContractService {
   }
 }
 
-// AstriaErc20WithdrawerService.ts
+/**
+ * AstriaErc20WithdrawerService extends the GenericContractService and provides
+ * functionality to initiate ERC-20 token withdrawals from a given contract
+ * address to a destination chain address on an IBC-compatible chain.
+ */
 export class AstriaErc20WithdrawerService extends GenericContractService {
   private static readonly ABI = [
     {
