@@ -38,6 +38,8 @@ export class AstriaBridgeSourceService extends GenericContractService {
   async bridgeTokens({
     recipientAddress,
     amount,
+    // FIXME - could totally refactor the GenericService so we don't
+    //  have to always pass in chain id at method call time
     chainId,
   }: BridgeTokensParams): Promise<HexString> {
     return await this.writeContractMethod(chainId, "bridgeTokens", [

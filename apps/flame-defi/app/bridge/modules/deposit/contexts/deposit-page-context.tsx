@@ -17,6 +17,7 @@ import {
   CosmosChainInfo,
   EvmChainInfo,
   EvmCurrency,
+  HexString,
   IbcCurrency,
 } from "@repo/flame-types";
 import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
@@ -25,6 +26,7 @@ import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
 import { createErc20Service, useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
+import { createAstriaBridgeSourceService } from "features/evm-wallet/services/astria-bridge-source-service/astria-bridge-source-service";
 
 interface ChainSelection {
   chain: AstriaChain | EvmChainInfo | CosmosChainInfo | null;
@@ -240,8 +242,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   const handleDeposit = async () => {
     const activeSourceAddress = sourceChain.address;
-    const recipientAddress =
-      recipientAddressOverride || evmWallet.evmAccountAddress;
+    const recipientAddress = (recipientAddressOverride ||
+      evmWallet.evmAccountAddress) as HexString;
 
     // Common validation
     if (!activeSourceAddress || !recipientAddress) {
@@ -309,15 +311,28 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
           ).toString(),
         );
 
-        // send money via ERC20 contract
+        // handle bridging via AstriaBridgeSourceService
         if (sourceCurrency.erc20ContractAddress) {
+          // approve the bridge contract to spend tokens
           const erc20Service = createErc20Service(
             wagmiConfig,
             sourceCurrency.erc20ContractAddress,
           );
-          // FIXME - need to call the astriaIntentBridge contract
-          await erc20Service.transfer({
-            recipient: sourceCurrency.astriaIntentBridgeAddress,
+          await erc20Service.approveToken(
+            sourceChain.chain.chainId,
+            sourceCurrency.astriaIntentBridgeAddress,
+            amount,
+            sourceCurrency.coinDecimals,
+          );
+
+          // use intent bridge contract
+          const bridgeService = createAstriaBridgeSourceService(
+            wagmiConfig,
+            sourceCurrency.astriaIntentBridgeAddress,
+          );
+          // this will initiate transfer of the erc20 to AstriaBridgeSource
+          await bridgeService.bridgeTokens({
+            recipientAddress,
             amount: formattedAmount,
             chainId: sourceChain.chain.chainId,
           });
