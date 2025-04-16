@@ -39,7 +39,8 @@ export const ConnectEvmWalletButton = ({
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}
       isLoading={
-        (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) || quoteLoading
+        (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+        quoteLoading
       }
       account={userAccount}
       balance={evmNativeTokenBalance ?? undefined}
@@ -49,7 +50,7 @@ export const ConnectEvmWalletButton = ({
       }}
       label={label}
       icon={<AstriaIcon />}
-      onConnectWallet={connectEvmWallet}
+      onConnectWallet={() => connectEvmWallet()}
       onDisconnectWallet={() => {
         disconnectEvmWallet();
         onDisconnectWallet?.();

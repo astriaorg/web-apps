@@ -7,6 +7,7 @@ import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
+import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { EvmCurrency } from "@repo/flame-types";
@@ -422,13 +423,19 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            <Button
-              variant="gradient"
-              onClick={handleDeposit}
-              disabled={isDepositDisabled}
-            >
-              {isLoading ? "Processing..." : "Deposit"}
-            </Button>
+            {!sourceChain.address || !destinationChain.address ? (
+              <BridgeConnectionsModal>
+                <Button variant="gradient">Connect Wallet</Button>
+              </BridgeConnectionsModal>
+            ) : (
+              <Button
+                variant="gradient"
+                onClick={handleDeposit}
+                disabled={isDepositDisabled}
+              >
+                {isLoading ? "Processing..." : "Deposit"}
+              </Button>
+            )}
           </div>
         </div>
       </div>

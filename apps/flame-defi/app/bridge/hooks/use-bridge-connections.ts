@@ -214,7 +214,7 @@ export function useBridgeConnections(): BridgeConnections {
         if (chain.chainType === ChainType.COSMOS) {
           cosmosWallet.connectCosmosWallet();
         } else {
-          evmWallet.connectEvmWallet();
+          evmWallet.connectEvmWallet(chain);
         }
       }
 
@@ -308,9 +308,12 @@ export function useBridgeConnections(): BridgeConnections {
   // Manual address mode
   const enableManualAddressMode = useCallback(() => {
     setIsManualAddressMode(true);
-    // Reset wallet states when switching to manual mode
-    evmWallet.resetState();
-  }, [evmWallet]);
+    // clear destination address
+    setDestinationConnection((prev) => ({
+      ...prev,
+      address: null,
+    }));
+  }, []);
 
   const disableManualAddressMode = useCallback(() => {
     setIsManualAddressMode(false);

@@ -6,6 +6,7 @@ import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { useWithdrawPageContext } from "bridge/modules/withdraw/hooks/use-withdraw-page-context";
+import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { Dropdown } from "components/dropdown";
 
 export const ContentSection = () => {
@@ -261,13 +262,19 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            <Button
-              variant="gradient"
-              onClick={handleWithdraw}
-              disabled={isWithdrawDisabled}
-            >
-              {isLoading ? "Processing..." : "Withdraw"}
-            </Button>
+            {!cosmosWallet.cosmosAccountAddress ? (
+              <BridgeConnectionsModal>
+                <Button variant="gradient">Connect Wallet</Button>
+              </BridgeConnectionsModal>
+            ) : (
+              <Button
+                variant="gradient"
+                onClick={handleWithdraw}
+                disabled={isWithdrawDisabled}
+              >
+                {isLoading ? "Processing..." : "Withdraw"}
+              </Button>
+            )}
           </div>
         </div>
       </div>
