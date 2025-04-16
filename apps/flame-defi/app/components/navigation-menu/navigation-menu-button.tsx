@@ -47,7 +47,7 @@ export const NavigationMenuButton = ({
 
   return (
     <motion.svg
-      viewBox={`0 0 ${viewBoxWidth} ${4}`}
+      viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
       overflow="visible"
       width={size}
       height={size}
