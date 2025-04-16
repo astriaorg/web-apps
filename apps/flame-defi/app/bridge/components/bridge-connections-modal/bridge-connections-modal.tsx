@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 import { ConnectCosmosWalletButton } from "features/cosmos-wallet/components/connect-cosmos-wallet-button";
 import { ConnectEvmWalletButton } from "features/evm-wallet/components/connect-evm-wallet-button";
 import { useBridgeConnections } from "../../hooks/use-bridge-connections";
@@ -26,9 +25,9 @@ export function BridgeConnectionsModal({
   const [open, setOpen] = useState(false);
   const { evmWallet, cosmosWallet } = useBridgeConnections();
 
-  const handleOpenModal = () => {
-    setOpen(true);
-  };
+  // const handleOpenModal = () => {
+  //   setOpen(true);
+  // };
 
   const handleCloseModal = () => {
     setOpen(false);

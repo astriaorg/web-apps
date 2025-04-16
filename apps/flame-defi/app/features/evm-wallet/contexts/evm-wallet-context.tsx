@@ -1,8 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import type { DropdownOption } from "components/dropdown";
 import {
-  // getFlameChainId,
-  // getFlameNetworkByChainId,
   useConfig as useAppConfig,
   useAstriaChainData,
 } from "config";

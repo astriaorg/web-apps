@@ -1,6 +1,6 @@
 "use client";
 
-import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
+// import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 import React, { useCallback, useEffect, useMemo } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
@@ -49,7 +49,6 @@ export const ContentSection = () => {
 
   // TODO - coinbase onramp url
   // Set up Coinbase onramp button URL
-  const coinbaseOnrampBuyUrl = "";
   // const coinbaseOnrampBuyUrl = useMemo(() => {
   //   if (!evmWallet.evmAccountAddress) {
   //     return undefined;
@@ -210,11 +209,11 @@ export const ContentSection = () => {
                 <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
                   From
                 </div>
-                {Boolean(coinbaseOnrampBuyUrl) && (
-                  <div>
-                    <FundButton fundingUrl={coinbaseOnrampBuyUrl} />
-                  </div>
-                )}
+                {/*{Boolean(coinbaseOnrampBuyUrl) && (*/}
+                {/*  <div>*/}
+                {/*    <FundButton fundingUrl={coinbaseOnrampBuyUrl} />*/}
+                {/*  </div>*/}
+                {/*)}*/}
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
