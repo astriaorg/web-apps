@@ -1,23 +1,23 @@
 "use client";
 
-import { useConfig, useAccount } from "wagmi";
 import { useEvmChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
+import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
 import { PoolContextProps, PoolPosition } from "pool/types";
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useEffect,
   useState,
-  useCallback,
 } from "react";
-import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
+import { useAccount, useConfig } from "wagmi";
 import {
-  getTokenDataFromCurrencies,
   getMinMaxTick,
+  getTokenDataFromCurrencies,
   tickToPrice,
 } from "./pool-position-helpers";
 
@@ -29,7 +29,7 @@ const feeData = [
   {
     id: 0,
     feeTier: FEE_TIER.LOWEST,
-    text: "Best for very stable pairs",
+    text: "Best for very stable pairs.",
     tvl: "100M",
     selectPercent: "0.01%",
   },
@@ -137,7 +137,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
             symbolTwo: tokenTwo?.coinDenom ?? "",
             feePercent,
             inRange: !isClosed,
-            positionStatus: isClosed ? "Closed" : "In range",
+            positionStatus: isClosed ? "Closed" : "In Range",
             poolAddress,
             ...position,
           };
