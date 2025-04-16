@@ -1,8 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import {
-  useConfig as useAppConfig,
-  useAstriaChainData,
-} from "config";
+import { useConfig as useAppConfig, useAstriaChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 import React, {
   useCallback,
