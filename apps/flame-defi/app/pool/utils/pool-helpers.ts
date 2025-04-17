@@ -17,7 +17,16 @@ export const getPoolExchangeRate = ({
   token0: EvmCurrency;
   token1: EvmCurrency;
   slot0: Slot0Data;
-}) => {
+}): {
+  /**
+   * 1 Token 0 = _ Token 1
+   */
+  rateToken0ToToken1: string;
+  /**
+   * 1 Token 1 = _ Token 0
+   */
+  rateToken1ToToken0: string;
+} => {
   const sqrtPriceX96 = new Big(slot0.sqrtPriceX96.toString());
   const decimal0 = token0.coinDecimals;
   const decimal1 = token1.coinDecimals;
@@ -27,11 +36,11 @@ export const getPoolExchangeRate = ({
   // Calculate the denominator: 10**Decimal1 / 10**Decimal0
   const denominator = Big(10).pow(decimal1).div(Big(10).pow(decimal0));
 
-  const buyOneOfToken0 = numerator.div(denominator).toFixed(decimal1);
-  const buyOneOfToken1 = Big(1).div(buyOneOfToken0).toFixed(decimal0);
+  const buyOneOfToken0 = numerator.div(denominator).toFixed();
+  const buyOneOfToken1 = Big(1).div(buyOneOfToken0).toFixed();
 
   return {
-    token0ToToken1: buyOneOfToken1,
-    token1ToToken0: buyOneOfToken0,
+    rateToken0ToToken1: buyOneOfToken0,
+    rateToken1ToToken0: buyOneOfToken1,
   };
 };
