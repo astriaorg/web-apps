@@ -1,6 +1,5 @@
 "use client";
 
-import { Decimal } from "@cosmjs/math";
 import React, {
   createContext,
   PropsWithChildren,
@@ -22,11 +21,15 @@ import {
 } from "@repo/flame-types";
 import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
 import { DropdownAdditionalOption, DropdownOption } from "components/dropdown";
-import { sendIbcTransfer, useCosmosWallet } from "features/cosmos-wallet";
-import { createErc20Service, useEvmWallet } from "features/evm-wallet";
+import { useCosmosWallet } from "features/cosmos-wallet";
+import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
-import { createAstriaBridgeSourceService } from "features/evm-wallet/services/astria-bridge-source-service/astria-bridge-source-service";
+import {
+  DepositStrategy,
+  CosmosIbcDepositStrategy,
+  EvmIntentDepositStrategy,
+} from "../strategies/deposit-strategies";
 
 interface ChainSelection {
   chain: AstriaChain | EvmChainInfo | CosmosChainInfo | null;
@@ -89,8 +92,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     destinationConnection,
     connectSource,
     connectDestination,
-    setSourceCurrency: setSourceCurrencyFromHook,
-    setDestinationCurrency: setDestinationCurrencyFromHook,
+    setSourceCurrency: setBridgeConnectionsSourceCurrency,
+    setDestinationCurrency: setBridgeConnectionsDestinationCurrency,
     recipientAddress,
     setRecipientAddress: setRecipientAddressFromHook,
     isManualAddressMode,
@@ -146,7 +149,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setDestinationCurrency(destinationConnection.currency);
   }, [destinationConnection.currency]);
 
-  // Form state
+  // form state
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
@@ -182,17 +185,17 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const setSourceCurrencyHandler = useCallback(
     (currency: EvmCurrency | IbcCurrency | null) => {
       setSourceCurrency(currency);
-      setSourceCurrencyFromHook(currency);
+      setBridgeConnectionsSourceCurrency(currency);
     },
-    [setSourceCurrencyFromHook],
+    [setBridgeConnectionsSourceCurrency],
   );
 
   const setDestinationCurrencyHandler = useCallback(
     (currency: EvmCurrency | IbcCurrency | null) => {
       setDestinationCurrency(currency);
-      setDestinationCurrencyFromHook(currency);
+      setBridgeConnectionsDestinationCurrency(currency);
     },
-    [setDestinationCurrencyFromHook],
+    [setBridgeConnectionsDestinationCurrency],
   );
 
   const setIsRecipientAddressEditableHandler = useCallback(
@@ -240,6 +243,30 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setRecipientAddressOverrideHandler,
   ]);
 
+  // strategy pattern implementation for deposits
+  const getDepositStrategy = useCallback((): DepositStrategy | null => {
+    if (!sourceChain.chain) return null;
+
+    switch (sourceChain.chain.chainType) {
+      case ChainType.COSMOS:
+        return new CosmosIbcDepositStrategy({
+          cosmosWallet,
+          amount,
+          selectedIbcCurrency: cosmosWallet.selectedIbcCurrency,
+          cosmosAccountAddress: cosmosWallet.cosmosAccountAddress,
+        });
+      case ChainType.EVM:
+        return new EvmIntentDepositStrategy({
+          wagmiConfig,
+          sourceChain: sourceChain.chain as EvmChainInfo,
+          sourceCurrency: sourceCurrency as EvmCurrency,
+          amount,
+        });
+      default:
+        return null;
+    }
+  }, [sourceChain.chain, cosmosWallet, amount, sourceCurrency, wagmiConfig]);
+
   const handleDeposit = async () => {
     const activeSourceAddress = sourceChain.address;
     const recipientAddress = (recipientAddressOverride ||
@@ -261,85 +288,13 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setIsAnimating(true);
 
     try {
-      // different deposit logic based on source type
-      if (sourceChain.chain?.chainType === ChainType.COSMOS) {
-        // Cosmos to Astria deposit
-        if (
-          !cosmosWallet.selectedCosmosChain ||
-          !cosmosWallet.selectedIbcCurrency
-        ) {
-          throw new Error(
-            "Please select a Cosmos chain and token to bridge first.",
-          );
-        }
+      const depositStrategy = getDepositStrategy();
 
-        const formattedAmount = Decimal.fromUserInput(
-          amount,
-          cosmosWallet.selectedIbcCurrency.coinDecimals,
-        ).atomics;
-
-        const signer = await cosmosWallet.getCosmosSigningClient();
-        await sendIbcTransfer(
-          signer,
-          cosmosWallet.cosmosAccountAddress!,
-          recipientAddress,
-          formattedAmount,
-          cosmosWallet.selectedIbcCurrency,
-        );
-      } else if (sourceChain.chain?.chainType === ChainType.EVM) {
-        // evm to Astria deposit using intent bridge
-        if (!sourceChain.chain || !sourceCurrency) {
-          throw new Error(
-            "Please select a Coinbase chain and token to bridge first.",
-          );
-        }
-
-        if (
-          !("astriaIntentBridgeAddress" in sourceCurrency) ||
-          !sourceCurrency.astriaIntentBridgeAddress
-        ) {
-          throw new Error(
-            "Intent bridge contract not configured for this token.",
-          );
-        }
-
-        // Convert amount to the proper format based on decimals
-        // FIXME - is this how the math is done in other places?
-        const formattedAmount = BigInt(
-          Math.floor(
-            parseFloat(amount) * 10 ** sourceCurrency.coinDecimals,
-          ).toString(),
-        );
-
-        // handle bridging via AstriaBridgeSourceService
-        if (sourceCurrency.erc20ContractAddress) {
-          // approve the bridge contract to spend tokens
-          const erc20Service = createErc20Service(
-            wagmiConfig,
-            sourceCurrency.erc20ContractAddress,
-          );
-          await erc20Service.approveToken(
-            sourceChain.chain.chainId,
-            sourceCurrency.astriaIntentBridgeAddress,
-            amount,
-            sourceCurrency.coinDecimals,
-          );
-
-          // use intent bridge contract
-          const bridgeService = createAstriaBridgeSourceService(
-            wagmiConfig,
-            sourceCurrency.astriaIntentBridgeAddress,
-          );
-          // this will initiate transfer of the erc20 to AstriaBridgeSource
-          await bridgeService.bridgeTokens({
-            recipientAddress,
-            amount: formattedAmount,
-            chainId: sourceChain.chain.chainId,
-          });
-        }
-      } else {
+      if (!depositStrategy) {
         throw new Error("Unsupported source type for deposit");
       }
+
+      await depositStrategy.execute(recipientAddress);
 
       addNotification({
         toastOpts: {
