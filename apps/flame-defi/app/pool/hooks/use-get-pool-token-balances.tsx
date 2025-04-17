@@ -1,8 +1,10 @@
-import { useTokenBalances } from "features/evm-wallet";
-import { useAccount } from "wagmi";
 import { useEvmChainData } from "config";
-import { useEffect, useCallback } from "react";
+import { useTokenBalances } from "features/evm-wallet";
+import { useCallback, useEffect } from "react";
+import { useAccount } from "wagmi";
 
+// TODO: Refactor, use address instead of symbol when fetching balances.
+// Use query for caching.
 export const useGetPoolTokenBalances = (
   poolToken0Symbol: string,
   poolToken1Symbol: string,
@@ -11,6 +13,7 @@ export const useGetPoolTokenBalances = (
   const { selectedChain } = useEvmChainData();
   const { currencies } = selectedChain;
 
+  // TODO: Don't need to return the tokens since the function caller already has this info when passing in the symbols.
   const token0 =
     currencies.find(
       (currency) =>
