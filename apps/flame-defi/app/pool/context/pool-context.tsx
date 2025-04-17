@@ -5,7 +5,7 @@ import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
-import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
+import { FeeTier } from "pool/constants/pool-constants";
 import { PoolContextProps, PoolPosition } from "pool/types";
 import {
   createContext,
@@ -24,37 +24,6 @@ import {
 export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
 );
-
-const feeData = [
-  {
-    id: 0,
-    feeTier: FEE_TIER.LOWEST,
-    text: "Best for very stable pairs.",
-    tvl: "100M",
-    selectPercent: "0.01%",
-  },
-  {
-    id: 1,
-    feeTier: FEE_TIER.LOW,
-    text: "Best for stable pairs.",
-    tvl: "100M",
-    selectPercent: "0.05%",
-  },
-  {
-    id: 2,
-    feeTier: FEE_TIER.MEDIUM,
-    text: "Best for most pairs.",
-    tvl: "100M",
-    selectPercent: "0.3%",
-  },
-  {
-    id: 3,
-    feeTier: FEE_TIER.HIGH,
-    text: "Best for exotic pairs.",
-    tvl: "100M",
-    selectPercent: "1%",
-  },
-];
 
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const wagmiConfig = useConfig();
@@ -158,7 +127,6 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   return (
     <PoolContext.Provider
       value={{
-        feeData,
         poolPositions,
         poolPositionsLoading,
         modalOpen,

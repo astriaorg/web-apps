@@ -101,7 +101,6 @@ export interface PoolPosition extends GetAllPoolPositionsResponse {
 }
 
 export type PoolContextProps = {
-  feeData: FeeData[];
   poolPositions: PoolPosition[];
   poolPositionsLoading: boolean;
   modalOpen: boolean;

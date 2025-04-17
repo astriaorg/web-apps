@@ -9,11 +9,20 @@ import {
   useAssetAmountInput,
 } from "@repo/ui/components";
 import { useEvmChainData } from "config";
+import { createPoolFactoryService } from "features/evm-wallet";
+import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
 import { useGetPoolTokenBalances } from "pool/hooks";
-import { useState } from "react";
+import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
+import { useEffect, useState } from "react";
+import { useConfig } from "wagmi";
 
 export const ContentSection = () => {
+  const config = useConfig();
   const { selectedChain } = useEvmChainData();
+
+  const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>(
+    FEE_TIER.MEDIUM,
+  );
 
   const [input0Token, setInput0Token] = useState<EvmCurrency>(
     selectedChain.currencies[0],
@@ -28,7 +37,7 @@ export const ContentSection = () => {
   const {
     amount: amount0,
     onInput: onInput0,
-    isValid: isValid0,
+    // isValid: isValid0,
   } = useAssetAmountInput({
     balance: token0Balance?.symbol,
     minimum: "0",
@@ -41,7 +50,7 @@ export const ContentSection = () => {
   const {
     amount: amount1,
     onInput: onInput1,
-    isValid: isValid1,
+    // isValid: isValid1,
   } = useAssetAmountInput({
     balance: token1Balance?.symbol,
     minimum: "0",
@@ -52,6 +61,37 @@ export const ContentSection = () => {
         }
       : undefined,
   });
+
+  // TODO: Debounce.
+  useEffect(() => {
+    if (!input0Token || !input1Token) {
+      return;
+    }
+
+    (async () => {
+      const poolFactoryService = createPoolFactoryService(
+        config,
+        selectedChain.contracts.poolFactory.address,
+      );
+
+      // TODO: Handle native tokens. If one of the tokens is native, we need to get the wrapped token address.
+      const address = await poolFactoryService.getPool(
+        selectedChain.chainId,
+        input0Token.erc20ContractAddress as `0x${string}`,
+        input1Token.erc20ContractAddress as `0x${string}`,
+        selectedFeeTier,
+      );
+
+      // TODO: Handle if pool doesn't exist.
+    })();
+  }, [
+    config,
+    input0Token,
+    input1Token,
+    selectedChain.chainId,
+    selectedChain.contracts.poolFactory.address,
+    selectedFeeTier,
+  ]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -88,6 +128,8 @@ export const ContentSection = () => {
           </div>
         </CardContent>
       </Card>
+
+      <FeeTierSelect value={selectedFeeTier} onChange={setSelectedFeeTier} />
     </div>
   );
 };

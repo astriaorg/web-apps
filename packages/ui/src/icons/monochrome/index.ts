@@ -3,6 +3,7 @@ export * from "./arrow-left-icon";
 export * from "./arrow-right-icon";
 export * from "./arrow-up-down-icon";
 export * from "./astria-icon";
+export * from "./check-circle-icon";
 export * from "./check-icon";
 export * from "./check-mark-icon";
 export * from "./chevron-down-icon";
