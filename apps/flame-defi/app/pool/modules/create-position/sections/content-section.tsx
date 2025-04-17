@@ -5,15 +5,15 @@ import {
   Card,
   CardContent,
   CardFigureInput,
-  TokenSelector,
   useAssetAmountInput,
 } from "@repo/ui/components";
 import { useEvmChainData } from "config";
-import { createPoolFactoryService } from "features/evm-wallet";
+import { TokenSelect } from "pool/components/token-select";
 import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
 import { useGetPoolTokenBalances } from "pool/hooks";
+import { useGetPool } from "pool/hooks/use-get-pool";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
-import { useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useConfig } from "wagmi";
 
 export const ContentSection = () => {
@@ -24,15 +24,31 @@ export const ContentSection = () => {
     FEE_TIER.MEDIUM,
   );
 
-  const [input0Token, setInput0Token] = useState<EvmCurrency>(
-    selectedChain.currencies[0],
+  const [token0, setToken0] = useState<EvmCurrency>(
+    selectedChain.currencies.find((it) => it.coinDenom === "TIA")!,
   );
-  const [input1Token, setInput1Token] = useState<EvmCurrency>();
+  const [token1, setToken1] = useState<EvmCurrency>(
+    selectedChain.currencies.find((it) => it.coinDenom === "dTIA")!,
+  );
 
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    input0Token.coinDenom ?? "",
-    input1Token?.coinDenom ?? "",
+    token0.coinDenom ?? "",
+    token1?.coinDenom ?? "",
   );
+
+  const token0Options = useMemo(() => {
+    return selectedChain.currencies.filter(
+      (currency) =>
+        currency.erc20ContractAddress !== token1.erc20ContractAddress,
+    );
+  }, [selectedChain.currencies, token1]);
+
+  const token1Options = useMemo(() => {
+    return selectedChain.currencies.filter(
+      (currency) =>
+        currency.erc20ContractAddress !== token0.erc20ContractAddress,
+    );
+  }, [selectedChain.currencies, token0]);
 
   const {
     amount: amount0,
@@ -42,8 +58,8 @@ export const ContentSection = () => {
     balance: token0Balance?.symbol,
     minimum: "0",
     asset: {
-      symbol: input0Token.coinDenom,
-      decimals: input0Token.coinDecimals,
+      symbol: token0.coinDenom,
+      decimals: token0.coinDecimals,
     },
   });
 
@@ -54,10 +70,10 @@ export const ContentSection = () => {
   } = useAssetAmountInput({
     balance: token1Balance?.symbol,
     minimum: "0",
-    asset: input1Token
+    asset: token1
       ? {
-          symbol: input1Token.coinDenom,
-          decimals: input1Token.coinDecimals,
+          symbol: token1.coinDenom,
+          decimals: token1.coinDecimals,
         }
       : undefined,
   });
@@ -97,16 +113,12 @@ export const ContentSection = () => {
     <div className="flex flex-col gap-4">
       <Card>
         <CardContent className="flex items-center justify-between">
-          <CardFigureInput
-            value={amount0.value}
-            onInput={(event) => onInput0({ value: event.currentTarget.value })}
-          />
+          <CardFigureInput value={amount0.value} onInput={handleInput0Change} />
           <div>
-            <TokenSelector
-              tokens={selectedChain.currencies}
-              selectedToken={input0Token}
-              unavailableToken={input1Token}
-              setSelectedToken={(token) => setInput0Token(token)}
+            <TokenSelect
+              options={token0Options}
+              value={token0}
+              onValueChange={setToken0}
             />
           </div>
         </CardContent>
@@ -119,11 +131,10 @@ export const ContentSection = () => {
             onInput={(event) => onInput1({ value: event.currentTarget.value })}
           />
           <div>
-            <TokenSelector
-              tokens={selectedChain.currencies}
-              selectedToken={input1Token}
-              unavailableToken={input0Token}
-              setSelectedToken={(token) => setInput1Token(token)}
+            <TokenSelect
+              options={token1Options}
+              value={token1}
+              onValueChange={setToken1}
             />
           </div>
         </CardContent>
