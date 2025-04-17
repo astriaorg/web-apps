@@ -144,26 +144,3 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
     }
   }
 }
-
-/**
- * Factory function to create appropriate deposit strategy
- */
-export function createDepositStrategy(
-  chainType: ChainType | null,
-  props: CosmosIbcDepositStrategyProps | EvmIntentDepositStrategyProps,
-): DepositStrategy | null {
-  if (!chainType) return null;
-
-  switch (chainType) {
-    case ChainType.COSMOS:
-      return new CosmosIbcDepositStrategy(
-        props as CosmosIbcDepositStrategyProps,
-      );
-    case ChainType.EVM:
-      return new EvmIntentDepositStrategy(
-        props as EvmIntentDepositStrategyProps,
-      );
-    default:
-      return null;
-  }
-}

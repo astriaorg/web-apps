@@ -245,7 +245,9 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
 
   // strategy pattern implementation for deposits
   const getDepositStrategy = useCallback((): DepositStrategy | null => {
-    if (!sourceChain.chain) return null;
+    if (!sourceChain.chain) {
+      return null;
+    }
 
     switch (sourceChain.chain.chainType) {
       case ChainType.COSMOS:
