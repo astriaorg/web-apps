@@ -1,5 +1,4 @@
 import Big from "big.js";
-import type { Slot0Data } from "features/evm-wallet";
 
 /**
  * Implements the calculation to get the exchange rate of the pool.
@@ -11,11 +10,11 @@ import type { Slot0Data } from "features/evm-wallet";
 export const calculatePoolExchangeRate = ({
   decimal0,
   decimal1,
-  slot0,
+  sqrtPriceX96,
 }: {
   decimal0: number;
   decimal1: number;
-  slot0: Slot0Data;
+  sqrtPriceX96: bigint;
 }): {
   /**
    * 1 Token 0 = _ Token 1
@@ -26,10 +25,10 @@ export const calculatePoolExchangeRate = ({
    */
   rateToken1ToToken0: string;
 } => {
-  const sqrtPriceX96 = new Big(slot0.sqrtPriceX96.toString());
-
   // Calculate the numerator: (sqrtPriceX96 / 2**96)**2
-  const numerator = sqrtPriceX96.div(new Big(2).pow(96)).pow(2);
+  const numerator = new Big(sqrtPriceX96.toString())
+    .div(new Big(2).pow(96))
+    .pow(2);
   // Calculate the denominator: 10**Decimal1 / 10**Decimal0
   const denominator = new Big(10 ** Math.abs(decimal1 - decimal0));
 

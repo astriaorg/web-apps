@@ -41,7 +41,7 @@ export const useGetPool = ({
         : (token0.erc20ContractAddress as Address);
       const token1Address = token1.isNative
         ? selectedChain.contracts.wrappedNativeToken.address
-        : (token0.erc20ContractAddress as Address);
+        : (token1.erc20ContractAddress as Address);
       const address = await poolFactoryService.getPool(
         selectedChain.chainId,
         token0Address,
@@ -62,7 +62,7 @@ export const useGetPool = ({
         calculatePoolExchangeRate({
           decimal0: token0.coinDecimals,
           decimal1: token1.coinDecimals,
-          slot0,
+          sqrtPriceX96: slot0.sqrtPriceX96,
         });
 
       return { address, slot0, rateToken0ToToken1, rateToken1ToToken0 };

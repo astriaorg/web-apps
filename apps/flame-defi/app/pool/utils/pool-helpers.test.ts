@@ -20,15 +20,7 @@ describe("calculatePoolExchangeRate", () => {
     const result = calculatePoolExchangeRate({
       decimal0: TOKEN_0.coinDecimals,
       decimal1: TOKEN_1.coinDecimals,
-      slot0: {
-        sqrtPriceX96: 2018382873588440326581633304624437n,
-        tick: 0,
-        observationIndex: 0,
-        observationCardinality: 0,
-        observationCardinalityNext: 0,
-        feeProtocol: 0,
-        unlocked: true,
-      },
+      sqrtPriceX96: 2018382873588440326581633304624437n,
     });
 
     expect(
