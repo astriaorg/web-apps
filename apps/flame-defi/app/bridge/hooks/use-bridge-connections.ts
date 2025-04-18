@@ -8,7 +8,6 @@ import {
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
-import { BRIDGE_TYPE, getSupportedBridgeTypes } from "../types";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
 
@@ -31,9 +30,6 @@ export interface BridgeConnections {
   // Currency selection
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
-
-  // Bridge type
-  bridgeType: BRIDGE_TYPE | null;
 
   // Manual destination address management
   recipientAddress: string;
@@ -83,24 +79,6 @@ export function useBridgeConnections(): BridgeConnections {
   // Loading states
   const [isSourceConnecting, setIsSourceConnecting] = useState(false);
   const [isDestinationConnecting, setIsDestinationConnecting] = useState(false);
-
-  // Determine which bridge type is active based on source and destination chains
-  const bridgeType = useMemo(() => {
-    if (!sourceConnection.chain || !destinationConnection.chain) {
-      return null;
-    }
-
-    const supportedTypes = getSupportedBridgeTypes(
-      sourceConnection.chain,
-      destinationConnection.chain,
-    );
-
-    if (supportedTypes.length > 0) {
-      return supportedTypes[0] ?? null;
-    }
-
-    return null;
-  }, [sourceConnection.chain, destinationConnection.chain]);
 
   // Handle source chain connection
   const connectSource = useCallback(
@@ -352,7 +330,6 @@ export function useBridgeConnections(): BridgeConnections {
     connectDestination,
     setSourceCurrency,
     setDestinationCurrency,
-    bridgeType,
     recipientAddress,
     setRecipientAddress,
     isManualAddressMode,
