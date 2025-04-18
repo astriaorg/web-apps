@@ -38,9 +38,9 @@ export const TokenSelect = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bottom-0 translate-y-0 rounded-b-none border-b-transparent md:-top-1/2 md:-translate-y-1/2 md:rounded-b-xl md:border-b-stroke-default">
         <DialogHeader>
-          <DialogTitle>Select a Token</DialogTitle>
+          <DialogTitle className="text-left">Select a Token</DialogTitle>
           <DialogDescription className="sr-only"></DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-1">
@@ -48,7 +48,7 @@ export const TokenSelect = ({
             <Button
               key={option.coinDenom}
               variant="secondary"
-              className="w-full h-auto py-2 justify-start bg-transparent"
+              className="w-full h-auto py-2 justify-start bg-transparent disabled:opacity-100"
               disabled={
                 option.erc20ContractAddress === value?.erc20ContractAddress
               }
