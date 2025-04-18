@@ -24,11 +24,11 @@ import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
 import { createDepositStrategy } from "../strategies/deposit-strategies";
-import { ChainSelection } from "../../../types";
+import { ChainConnection } from "../../../types";
 
 export interface DepositPageContextProps extends PropsWithChildren {
-  sourceChainSelection: ChainSelection;
-  destinationChainSelection: ChainSelection;
+  sourceChainSelection: ChainConnection;
+  destinationChainSelection: ChainConnection;
   handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
   handleDestinationChainSelect: (
     chainValue: CosmosChainInfo | EvmChainInfo,
@@ -37,9 +37,7 @@ export interface DepositPageContextProps extends PropsWithChildren {
   sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   additionalDestinationOptions: DropdownAdditionalOption[];
   destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
-  sourceCurrency: EvmCurrency | IbcCurrency | null;
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
-  destinationCurrency: EvmCurrency | IbcCurrency | null;
   setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   amount: string;
   setAmount: (value: string) => void;
@@ -81,8 +79,8 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     destinationConnection,
     connectSource,
     connectDestination,
-    setSourceCurrency: setBridgeConnectionsSourceCurrency,
-    setDestinationCurrency: setBridgeConnectionsDestinationCurrency,
+    setSourceCurrency,
+    setDestinationCurrency,
     // TODO - can probably cleanup the manual address override logic and state
     recipientAddress,
     setRecipientAddress: setBridgeConnectionsRecipientAddress,
@@ -92,54 +90,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     cosmosWallet,
     evmWallet,
   } = bridgeConnections;
-
-  // Map hook connections to our existing interface
-  const [sourceChainSelection, setSourceChainSelection] =
-    useState<ChainSelection>({
-      chain: null,
-      currency: null,
-      address: null,
-    });
-
-  const [destinationChainSelection, setDestinationChainSelection] =
-    useState<ChainSelection>({
-      chain: null,
-      currency: null,
-      address: null,
-    });
-
-  // Keep our local state synced with bridge connections state
-  useEffect(() => {
-    setSourceChainSelection({
-      chain: sourceConnection.chain,
-      currency: sourceConnection.currency,
-      address: sourceConnection.address,
-    });
-  }, [sourceConnection]);
-
-  useEffect(() => {
-    setDestinationChainSelection({
-      chain: destinationConnection.chain,
-      currency: destinationConnection.currency,
-      address: destinationConnection.address,
-    });
-  }, [destinationConnection]);
-
-  const [sourceCurrency, setSourceCurrency] = useState<
-    EvmCurrency | IbcCurrency | null
-  >(null);
-  const [destinationCurrency, setDestinationCurrency] = useState<
-    EvmCurrency | IbcCurrency | null
-  >(null);
-
-  // Keep currency state in sync with bridge connections
-  useEffect(() => {
-    setSourceCurrency(sourceConnection.currency);
-  }, [sourceConnection.currency]);
-
-  useEffect(() => {
-    setDestinationCurrency(destinationConnection.currency);
-  }, [destinationConnection.currency]);
 
   // form state
   const [amount, setAmount] = useState<string>("");
@@ -174,22 +124,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     [setBridgeConnectionsRecipientAddress],
   );
 
-  const setSourceCurrencyHandler = useCallback(
-    (currency: EvmCurrency | IbcCurrency | null) => {
-      setSourceCurrency(currency);
-      setBridgeConnectionsSourceCurrency(currency);
-    },
-    [setBridgeConnectionsSourceCurrency],
-  );
-
-  const setDestinationCurrencyHandler = useCallback(
-    (currency: EvmCurrency | IbcCurrency | null) => {
-      setDestinationCurrency(currency);
-      setBridgeConnectionsDestinationCurrency(currency);
-    },
-    [setBridgeConnectionsDestinationCurrency],
-  );
-
   const setIsRecipientAddressEditableHandler = useCallback(
     (value: boolean) => {
       setIsRecipientAddressEditable(value);
@@ -200,20 +134,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
       }
     },
     [enableManualAddressMode, disableManualAddressMode],
-  );
-
-  const handleSourceChainSelect = useCallback(
-    (chainValue: CosmosChainInfo | EvmChainInfo) => {
-      connectSource(chainValue);
-    },
-    [connectSource],
-  );
-
-  const handleDestinationChainSelect = useCallback(
-    (chainValue: CosmosChainInfo | EvmChainInfo) => {
-      connectDestination(chainValue);
-    },
-    [connectDestination],
   );
 
   // toggle ability to edit recipient address
@@ -240,7 +160,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
       evmWallet.evmAccountAddress) as HexString;
 
     // common validation
-    if (!sourceChainSelection.address || !recipientAddress) {
+    if (!sourceConnection.address || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -257,7 +177,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     try {
       const depositStrategy = createDepositStrategy({
         amount,
-        sourceChainSelection,
+        sourceConnection,
         cosmosWallet,
         wagmiConfig,
       });
@@ -367,29 +287,28 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     return !(
       isAmountValid &&
       isRecipientAddressValid &&
-      sourceChainSelection.address &&
-      sourceCurrency?.coinDenom === destinationCurrency?.coinDenom
+      sourceConnection.address &&
+      sourceConnection.currency?.coinDenom ===
+        destinationConnection.currency?.coinDenom
     );
   }, [
-    destinationCurrency?.coinDenom,
+    destinationConnection.currency?.coinDenom,
     isAmountValid,
     isRecipientAddressValid,
     recipientAddressOverride,
-    sourceChainSelection.address,
-    sourceCurrency?.coinDenom,
+    sourceConnection.address,
+    sourceConnection.currency?.coinDenom,
   ]);
 
   return (
     <DepositPageContext.Provider
       value={{
-        sourceChainSelection,
-        handleSourceChainSelect,
-        destinationChainSelection,
-        handleDestinationChainSelect,
-        sourceCurrency,
-        setSourceCurrency: setSourceCurrencyHandler,
-        destinationCurrency,
-        setDestinationCurrency: setDestinationCurrencyHandler,
+        sourceChainSelection: sourceConnection,
+        handleSourceChainSelect: connectSource,
+        destinationChainSelection: destinationConnection,
+        handleDestinationChainSelect: connectDestination,
+        setSourceCurrency,
+        setDestinationCurrency,
         amount,
         setAmount,
         isAmountValid,

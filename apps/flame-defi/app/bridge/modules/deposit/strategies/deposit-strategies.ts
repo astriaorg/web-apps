@@ -13,7 +13,7 @@ import {
 import { sendIbcTransfer } from "features/cosmos-wallet";
 import { createErc20Service } from "features/evm-wallet";
 import { createAstriaBridgeSourceService } from "features/evm-wallet/services/astria-bridge-source-service/astria-bridge-source-service";
-import { ChainSelection } from "../../../types";
+import { ChainConnection } from "../../../types";
 
 /**
  * Base deposit strategy interface
@@ -32,7 +32,7 @@ export interface DepositStrategy {
 export interface DepositContext {
   // Common properties
   amount: string;
-  sourceChainSelection: ChainSelection;
+  sourceConnection: ChainConnection;
 
   // Cosmos-specific properties
   cosmosWallet: {
@@ -55,7 +55,7 @@ export class CosmosIbcDepositStrategy implements DepositStrategy {
 
   constructor(context: DepositContext) {
     const {
-      sourceChainSelection: { address, chain, currency },
+      sourceConnection: { address, chain, currency },
     } = context;
     if (!address || !chain || !currency) {
       throw new Error(
@@ -104,7 +104,7 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
 
   constructor(context: DepositContext) {
     const {
-      sourceChainSelection: { address, chain, currency },
+      sourceConnection: { address, chain, currency },
     } = context;
     if (!address || !chain || !currency) {
       throw new Error(
@@ -114,8 +114,8 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
 
     this.wagmiConfig = context.wagmiConfig;
     this.amount = context.amount;
-    this.sourceChain = context.sourceChainSelection.chain as EvmChainInfo;
-    this.sourceCurrency = context.sourceChainSelection.currency as EvmCurrency;
+    this.sourceChain = context.sourceConnection.chain as EvmChainInfo;
+    this.sourceCurrency = context.sourceConnection.currency as EvmCurrency;
   }
 
   async execute(recipientAddress: HexString): Promise<void> {
@@ -180,16 +180,16 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
 export function createDepositStrategy(
   context: DepositContext,
 ): DepositStrategy {
-  const { sourceChainSelection } = context;
+  const { sourceConnection } = context;
 
-  switch (sourceChainSelection.chain?.chainType) {
+  switch (sourceConnection.chain?.chainType) {
     case ChainType.COSMOS:
       return new CosmosIbcDepositStrategy(context);
     case ChainType.EVM:
       return new EvmIntentDepositStrategy(context);
     default:
       throw new Error(
-        `Error creating deposit strategy. No source chain selected or unsupported source chain type: ${sourceChainSelection.chain?.chainType}`,
+        `Error creating deposit strategy. No source chain selected or unsupported source chain type: ${sourceConnection.chain?.chainType}`,
       );
   }
 }

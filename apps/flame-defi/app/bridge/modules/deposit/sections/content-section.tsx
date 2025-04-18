@@ -16,11 +16,9 @@ export const ContentSection = () => {
   const {
     sourceChainSelection,
     handleSourceChainSelect,
-    sourceCurrency,
     setSourceCurrency,
     destinationChainSelection,
     handleDestinationChainSelect,
-    destinationCurrency,
     setDestinationCurrency,
     amount,
     setAmount,
@@ -117,7 +115,7 @@ export const ContentSection = () => {
   const destinationCurrencyOption = useMemo(() => {
     if (
       !sourceChainSelection.chain ||
-      !sourceCurrency ||
+      !sourceChainSelection.currency ||
       !destinationChainSelection.chain ||
       !destinationChainSelection.chain.currencies
     ) {
@@ -125,7 +123,8 @@ export const ContentSection = () => {
     }
 
     const matchingCurrency = destinationChainSelection.chain.currencies.find(
-      (currency) => currency.coinDenom === sourceCurrency.coinDenom,
+      (currency) =>
+        currency.coinDenom === sourceChainSelection.currency?.coinDenom,
     );
 
     if (!matchingCurrency) {
@@ -139,7 +138,7 @@ export const ContentSection = () => {
     };
   }, [
     sourceChainSelection.chain,
-    sourceCurrency,
+    sourceChainSelection.currency,
     destinationChainSelection.chain,
     defaultDestinationCurrencyOption,
   ]);
@@ -248,10 +247,10 @@ export const ContentSection = () => {
                   <p className="text-grey-light font-semibold">
                     Address: {shortenAddress(sourceChainSelection.address)}
                   </p>
-                  {sourceCurrency && (
+                  {sourceChainSelection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
                       Balance: {formattedBalanceValue}{" "}
-                      {sourceCurrency.coinDenom}
+                      {sourceChainSelection.currency.coinDenom}
                     </p>
                   )}
                 </div>
@@ -318,10 +317,10 @@ export const ContentSection = () => {
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
-                    {destinationCurrency && (
+                    {destinationChainSelection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
                         Balance: {formattedBalanceValue}{" "}
-                        {destinationCurrency.coinDenom}
+                        {destinationChainSelection.currency.coinDenom}
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&
