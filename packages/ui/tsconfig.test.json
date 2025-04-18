@@ -1,10 +1,7 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "moduleResolution": "bundler",
-    "module": "ESNext",
+    "rootDir": ".",
     "types": [
       "@radix-ui/react-tooltip",
       "@radix-ui/react-dialog",
@@ -14,9 +11,15 @@
       "@radix-ui/react-alert-dialog",
       "@radix-ui/react-accordion",
       "@radix-ui/react-select",
-      "@testing-library/jest-dom"
+      "@testing-library/jest-dom",
+      "jest"
     ]
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "**/*.test.tsx",
+    "**/*.test.ts"
+  ]
 }

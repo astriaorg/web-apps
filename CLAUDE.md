@@ -21,3 +21,4 @@
 - Component organization: atoms → molecules → organisms
 - Error handling via try/catch and notifications context
 - Test with React Testing Library
+- Prefer explicit `Boolean(someVar)` over shorthand `!!someVar`

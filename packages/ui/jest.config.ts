@@ -29,7 +29,16 @@ const config: Config = {
 
   // A map from regular expressions to paths to transformers
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        tsconfig: "tsconfig.test.json",
+        diagnostics: {
+          warnOnly: true,
+          pretty: true,
+        },
+      },
+    ],
   },
 };
 
