@@ -257,7 +257,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     try {
       const depositStrategy = createDepositStrategy({
         amount,
-        sourceChainSelection: sourceChainSelection,
+        sourceChainSelection,
         cosmosWallet,
         wagmiConfig,
       });
