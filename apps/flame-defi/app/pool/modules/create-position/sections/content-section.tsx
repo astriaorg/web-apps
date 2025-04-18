@@ -1,12 +1,13 @@
 "use client";
 
 import Big from "big.js";
+import { useEvmChainData } from "config";
 import { useGetPool } from "pool/hooks/use-get-pool";
 import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 enum INPUT {
   INPUT_0 = "INPUT_0",
@@ -14,6 +15,7 @@ enum INPUT {
 }
 
 export const ContentSection = () => {
+  const { selectedChain } = useEvmChainData();
   const {
     amount0,
     amount1,
@@ -139,6 +141,20 @@ export const ContentSection = () => {
     ],
   );
 
+  const optionsToken0 = useMemo(() => {
+    return selectedChain.currencies.filter(
+      (currency) =>
+        currency.erc20ContractAddress !== token1?.erc20ContractAddress,
+    );
+  }, [selectedChain.currencies, token1]);
+
+  const optionsToken1 = useMemo(() => {
+    return selectedChain.currencies.filter(
+      (currency) =>
+        currency.erc20ContractAddress !== token0?.erc20ContractAddress,
+    );
+  }, [selectedChain.currencies, token0]);
+
   // TODO: Clean up repeated code.
   return (
     <div className="flex flex-col gap-4">
@@ -161,6 +177,7 @@ export const ContentSection = () => {
               input: INPUT.INPUT_0,
             });
           }}
+          options={optionsToken0}
         />
         <SwapButton onClick={handleInputSwap} />
         <TokenAmountInput
@@ -181,6 +198,7 @@ export const ContentSection = () => {
               input: INPUT.INPUT_1,
             });
           }}
+          options={optionsToken1}
         />
       </div>
       <FeeTierSelect

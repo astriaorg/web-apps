@@ -1,14 +1,13 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import { Card, CardContent, CardFigureInput } from "@repo/ui/components";
-import { useEvmChainData } from "config";
 import { TokenSelect } from "pool/components/token-select";
-import { useMemo } from "react";
 
 interface TokenAmountInputProps {
   value: string;
   onInput: ({ value }: { value: string }) => void;
   selectedToken?: EvmCurrency;
   setSelectedToken: (value?: EvmCurrency) => void;
+  options: EvmCurrency[];
 }
 
 export const TokenAmountInput = ({
@@ -16,16 +15,8 @@ export const TokenAmountInput = ({
   onInput,
   selectedToken,
   setSelectedToken,
+  options,
 }: TokenAmountInputProps) => {
-  const { selectedChain } = useEvmChainData();
-
-  const options = useMemo(() => {
-    return selectedChain.currencies.filter(
-      (currency) =>
-        currency.erc20ContractAddress !== selectedToken?.erc20ContractAddress,
-    );
-  }, [selectedChain.currencies, selectedToken]);
-
   return (
     <Card>
       <CardContent className="flex items-center justify-between gap-6">

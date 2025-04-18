@@ -51,7 +51,8 @@ export const TokenSelect = ({
               variant="secondary"
               className="w-full h-auto py-2 justify-start bg-transparent disabled:opacity-100"
               disabled={
-                option.erc20ContractAddress === value?.erc20ContractAddress
+                !!value &&
+                option.erc20ContractAddress === value.erc20ContractAddress
               }
               onClick={() => {
                 onValueChange(option);

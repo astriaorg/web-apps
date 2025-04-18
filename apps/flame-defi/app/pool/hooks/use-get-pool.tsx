@@ -34,6 +34,7 @@ export const useGetPool = ({
   const { selectedChain } = useEvmChainData();
 
   return useQuery({
+    // TODO: For better caching, don't care what order the tokens are passed in.
     queryKey: ["useGetPool", token0, token1, selectedFeeTier, selectedChain],
     queryFn: async () => {
       if (!token0 || !token1) {
