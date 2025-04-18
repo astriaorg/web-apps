@@ -13,6 +13,7 @@ import {
 import { sendIbcTransfer } from "features/cosmos-wallet";
 import { createErc20Service } from "features/evm-wallet";
 import { createAstriaBridgeSourceService } from "features/evm-wallet/services/astria-bridge-source-service/astria-bridge-source-service";
+import { ChainSelection } from "../../../types";
 
 /**
  * Base deposit strategy interface
@@ -22,35 +23,55 @@ export interface DepositStrategy {
 }
 
 /**
- * Cosmos to Astria (IBC) deposit strategy
+ * Unified deposit context that contains all possible parameters
+ * needed by any strategy implementation.
+ *
+ * FIXME: This approach has a drawback of passing potentially unused properties
+ *  to strategies that don't need them. Consider refactoring.
  */
-export interface CosmosIbcDepositStrategyProps {
+export interface DepositContext {
+  // Common properties
+  amount: string;
+  sourceChainSelection: ChainSelection;
+
+  // Cosmos-specific properties
   cosmosWallet: {
     getCosmosSigningClient: () => Promise<SigningStargateClient>;
-    cosmosAccountAddress: string | null;
-    selectedCosmosChain: CosmosChainInfo | null;
-    selectedIbcCurrency: IbcCurrency | null;
   };
-  amount: string;
-  selectedIbcCurrency: IbcCurrency | null;
-  cosmosAccountAddress: string | null;
+
+  // EVM-specific properties
+  wagmiConfig: Config;
 }
 
+/**
+ * Implementation of IBC Bridge deposit strategy (Cosmos to Astria)
+ */
 export class CosmosIbcDepositStrategy implements DepositStrategy {
-  private cosmosWallet: CosmosIbcDepositStrategyProps["cosmosWallet"];
+  private cosmosWallet: DepositContext["cosmosWallet"];
   private amount: string;
-  private readonly selectedIbcCurrency: IbcCurrency | null;
-  private readonly cosmosAccountAddress: string | null;
+  private readonly sourceAddress: string;
+  private readonly sourceChain: CosmosChainInfo;
+  private readonly sourceCurrency: IbcCurrency;
 
-  constructor(props: CosmosIbcDepositStrategyProps) {
-    this.cosmosWallet = props.cosmosWallet;
-    this.amount = props.amount;
-    this.selectedIbcCurrency = props.selectedIbcCurrency;
-    this.cosmosAccountAddress = props.cosmosAccountAddress;
+  constructor(context: DepositContext) {
+    const {
+      sourceChainSelection: { address, chain, currency },
+    } = context;
+    if (!address || !chain || !currency) {
+      throw new Error(
+        "Source chain, currency, and address are required to create a deposit strategy",
+      );
+    }
+
+    this.cosmosWallet = context.cosmosWallet;
+    this.amount = context.amount;
+    this.sourceAddress = address;
+    this.sourceChain = chain as CosmosChainInfo;
+    this.sourceCurrency = currency as IbcCurrency;
   }
 
   async execute(recipientAddress: HexString): Promise<void> {
-    if (!this.cosmosWallet.selectedCosmosChain || !this.selectedIbcCurrency) {
+    if (!this.sourceChain || !this.sourceCurrency) {
       throw new Error(
         "Please select a Cosmos chain and token to bridge first.",
       );
@@ -58,41 +79,43 @@ export class CosmosIbcDepositStrategy implements DepositStrategy {
 
     const formattedAmount = Decimal.fromUserInput(
       this.amount,
-      this.selectedIbcCurrency.coinDecimals,
+      this.sourceCurrency.coinDecimals,
     ).atomics;
 
     const signer = await this.cosmosWallet.getCosmosSigningClient();
     await sendIbcTransfer(
       signer,
-      this.cosmosAccountAddress!,
+      this.sourceAddress,
       recipientAddress,
       formattedAmount,
-      this.selectedIbcCurrency,
+      this.sourceCurrency,
     );
   }
 }
 
 /**
- * EVM to Astria (Intent Bridge) deposit strategy
+ * Implementation of Intent Bridge deposit strategy (EVM to Astria)
  */
-export interface EvmIntentDepositStrategyProps {
-  wagmiConfig: Config;
-  sourceChain: EvmChainInfo;
-  sourceCurrency: EvmCurrency;
-  amount: string;
-}
-
 export class EvmIntentDepositStrategy implements DepositStrategy {
   private readonly wagmiConfig: Config;
+  private readonly amount: string;
   private readonly sourceChain: EvmChainInfo;
   private readonly sourceCurrency: EvmCurrency;
-  private readonly amount: string;
 
-  constructor(props: EvmIntentDepositStrategyProps) {
-    this.wagmiConfig = props.wagmiConfig;
-    this.sourceChain = props.sourceChain;
-    this.sourceCurrency = props.sourceCurrency;
-    this.amount = props.amount;
+  constructor(context: DepositContext) {
+    const {
+      sourceChainSelection: { address, chain, currency },
+    } = context;
+    if (!address || !chain || !currency) {
+      throw new Error(
+        "Source chain, currency, and address are required to create a deposit strategy",
+      );
+    }
+
+    this.wagmiConfig = context.wagmiConfig;
+    this.amount = context.amount;
+    this.sourceChain = context.sourceChainSelection.chain as EvmChainInfo;
+    this.sourceCurrency = context.sourceChainSelection.currency as EvmCurrency;
   }
 
   async execute(recipientAddress: HexString): Promise<void> {
@@ -142,5 +165,25 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
         chainId: this.sourceChain.chainId,
       });
     }
+  }
+}
+
+/**
+ * Creates the appropriate deposit strategy based on the source chain type
+ */
+export function createDepositStrategy(
+  context: DepositContext,
+): DepositStrategy {
+  const { sourceChainSelection } = context;
+
+  switch (sourceChainSelection.chain?.chainType) {
+    case ChainType.COSMOS:
+      return new CosmosIbcDepositStrategy(context);
+    case ChainType.EVM:
+      return new EvmIntentDepositStrategy(context);
+    default:
+      throw new Error(
+        `Error creating deposit strategy. No source chain selected or unsupported source chain type: ${sourceChainSelection.chain?.chainType}`,
+      );
   }
 }

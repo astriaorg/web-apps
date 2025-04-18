@@ -1,4 +1,18 @@
-import { ChainType, GenericChain } from "@repo/flame-types";
+import {
+  AstriaChain,
+  ChainType,
+  CosmosChainInfo,
+  EvmChainInfo,
+  EvmCurrency,
+  GenericChain,
+  IbcCurrency,
+} from "@repo/flame-types";
+
+export interface ChainSelection {
+  chain: AstriaChain | EvmChainInfo | CosmosChainInfo | null;
+  currency: EvmCurrency | IbcCurrency | null;
+  address: string | null;
+}
 
 export enum BRIDGE_TYPE {
   IBC = "ibc",

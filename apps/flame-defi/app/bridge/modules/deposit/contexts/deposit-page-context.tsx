@@ -11,8 +11,6 @@ import React, {
 import { useConfig } from "wagmi";
 
 import {
-  AstriaChain,
-  ChainType,
   CosmosChainInfo,
   EvmChainInfo,
   EvmCurrency,
@@ -25,17 +23,8 @@ import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
-import {
-  DepositStrategy,
-  CosmosIbcDepositStrategy,
-  EvmIntentDepositStrategy,
-} from "../strategies/deposit-strategies";
-
-interface ChainSelection {
-  chain: AstriaChain | EvmChainInfo | CosmosChainInfo | null;
-  currency: EvmCurrency | IbcCurrency | null;
-  address: string | null;
-}
+import { createDepositStrategy } from "../strategies/deposit-strategies";
+import { ChainSelection } from "../../../types";
 
 export interface DepositPageContextProps extends PropsWithChildren {
   sourceChain: ChainSelection;
@@ -243,39 +232,12 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setRecipientAddressOverrideHandler,
   ]);
 
-  // strategy pattern implementation for deposits
-  const getDepositStrategy = useCallback((): DepositStrategy | null => {
-    if (!sourceChain.chain) {
-      return null;
-    }
-
-    switch (sourceChain.chain.chainType) {
-      case ChainType.COSMOS:
-        return new CosmosIbcDepositStrategy({
-          cosmosWallet,
-          amount,
-          selectedIbcCurrency: cosmosWallet.selectedIbcCurrency,
-          cosmosAccountAddress: cosmosWallet.cosmosAccountAddress,
-        });
-      case ChainType.EVM:
-        return new EvmIntentDepositStrategy({
-          wagmiConfig,
-          sourceChain: sourceChain.chain as EvmChainInfo,
-          sourceCurrency: sourceCurrency as EvmCurrency,
-          amount,
-        });
-      default:
-        return null;
-    }
-  }, [sourceChain.chain, cosmosWallet, amount, sourceCurrency, wagmiConfig]);
-
   const handleDeposit = async () => {
-    const activeSourceAddress = sourceChain.address;
     const recipientAddress = (recipientAddressOverride ||
       evmWallet.evmAccountAddress) as HexString;
 
-    // Common validation
-    if (!activeSourceAddress || !recipientAddress) {
+    // common validation
+    if (!sourceChain.address || !recipientAddress) {
       addNotification({
         toastOpts: {
           toastType: NotificationType.WARNING,
@@ -290,11 +252,12 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setIsAnimating(true);
 
     try {
-      const depositStrategy = getDepositStrategy();
-
-      if (!depositStrategy) {
-        throw new Error("Unsupported source type for deposit");
-      }
+      const depositStrategy = createDepositStrategy({
+        amount,
+        sourceChainSelection: sourceChain,
+        cosmosWallet,
+        wagmiConfig,
+      });
 
       await depositStrategy.execute(recipientAddress);
 
