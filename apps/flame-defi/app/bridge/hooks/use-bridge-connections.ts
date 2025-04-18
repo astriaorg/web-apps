@@ -10,13 +10,7 @@ import {
 } from "@repo/flame-types";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
-
-export interface ChainConnection {
-  chain: EvmChainInfo | CosmosChainInfo | null;
-  currency: EvmCurrency | IbcCurrency | null;
-  address: string | null;
-  isConnected: boolean;
-}
+import { ChainConnection } from "../types";
 
 export interface BridgeConnections {
   // Chain connections
