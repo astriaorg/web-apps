@@ -4,37 +4,13 @@ import React, {
   createContext,
   PropsWithChildren,
   useCallback,
-  useMemo,
   useState,
   useEffect,
 } from "react";
-import { useConfig } from "wagmi";
 
-import {
-  CosmosChainInfo,
-  EvmChainInfo,
-  EvmCurrency,
-  HexString,
-  IbcCurrency,
-} from "@repo/flame-types";
-import { useCosmosWallet } from "features/cosmos-wallet";
-import { useEvmWallet } from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
-
-import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
-import { createDepositStrategy } from "bridge/modules/deposit/strategies/deposit-strategies";
-import { ChainConnection } from "bridge/types";
+import { useBridgeConnections } from "bridge/hooks";
 
 export interface DepositPageContextProps extends PropsWithChildren {
-  // TODO - refactor content-section to just use useBridgeConnections directly
-  sourceChainSelection: ChainConnection;
-  destinationChainSelection: ChainConnection;
-  handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
-  handleDestinationChainSelect: (
-    chainValue: CosmosChainInfo | EvmChainInfo,
-  ) => void;
-  setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
-  setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   // TODO - move to useDepositForm hook or similar
   amount: string;
   setAmount: (value: string) => void;
@@ -56,9 +32,6 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleEditRecipientClick: () => void;
   handleEditRecipientSave: () => void;
   handleEditRecipientClear: () => void;
-  // TODO - move to hook useDepositTransaction
-  handleDeposit: () => Promise<void>;
-  isDepositDisabled: boolean;
 }
 
 export const DepositPageContext = createContext<
@@ -66,16 +39,7 @@ export const DepositPageContext = createContext<
 >(undefined);
 
 export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
-  const { addNotification } = useNotifications();
-  const wagmiConfig = useConfig();
-
   const {
-    sourceConnection,
-    destinationConnection,
-    connectSource,
-    connectDestination,
-    setSourceCurrency,
-    setDestinationCurrency,
     // TODO - can probably cleanup the manual address override logic and state
     recipientAddress,
     setRecipientAddress: setBridgeConnectionsRecipientAddress,
@@ -83,8 +47,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     enableManualAddressMode,
     disableManualAddressMode,
   } = useBridgeConnections();
-  const cosmosWallet = useCosmosWallet();
-  const evmWallet = useEvmWallet();
 
   // form state
   const [amount, setAmount] = useState<string>("");
@@ -150,110 +112,9 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     setRecipientAddressOverrideHandler,
   ]);
 
-  const handleDeposit = async () => {
-    const recipientAddress = (recipientAddressOverride ||
-      evmWallet.evmAccountAddress) as HexString;
-
-    // common validation
-    if (!sourceConnection.address || !recipientAddress) {
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.WARNING,
-          message: "Please connect your wallets first.",
-          onAcknowledge: () => {},
-        },
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setIsAnimating(true);
-
-    try {
-      const depositStrategy = createDepositStrategy({
-        amount,
-        sourceConnection,
-        cosmosWallet,
-        wagmiConfig,
-      });
-
-      await depositStrategy.execute(recipientAddress);
-
-      addNotification({
-        toastOpts: {
-          toastType: NotificationType.SUCCESS,
-          message: "Deposit successful!",
-          onAcknowledge: () => {},
-        },
-      });
-    } catch (e) {
-      setIsAnimating(false);
-      console.error("Deposit failed", e);
-      const message = e instanceof Error ? e.message : "Unknown error.";
-
-      // display appropriate error message
-      if (/failed to get account from keplr wallet/i.test(message)) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message:
-              "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
-            onAcknowledge: () => {},
-          },
-        });
-      } else {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            component: (
-              <>
-                <p className="mb-1">Deposit failed.</p>
-                <p className="message-body-inner">{message}</p>
-              </>
-            ),
-            onAcknowledge: () => {},
-          },
-        });
-      }
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => setIsAnimating(false), 1000);
-    }
-  };
-
-  // We no longer define options here, instead using useDepositOptions in the components
-
-  // calculate if deposit button should be disabled
-  const isDepositDisabled = useMemo<boolean>((): boolean => {
-    if (recipientAddressOverride) {
-      return !(isAmountValid && isRecipientAddressValid);
-    }
-
-    return !(
-      isAmountValid &&
-      isRecipientAddressValid &&
-      sourceConnection.address &&
-      sourceConnection.currency?.coinDenom ===
-        destinationConnection.currency?.coinDenom
-    );
-  }, [
-    destinationConnection.currency?.coinDenom,
-    isAmountValid,
-    isRecipientAddressValid,
-    recipientAddressOverride,
-    sourceConnection.address,
-    sourceConnection.currency?.coinDenom,
-  ]);
-
   return (
     <DepositPageContext.Provider
       value={{
-        sourceChainSelection: sourceConnection,
-        handleSourceChainSelect: connectSource,
-        destinationChainSelection: destinationConnection,
-        handleDestinationChainSelect: connectDestination,
-        setSourceCurrency,
-        setDestinationCurrency,
         amount,
         setAmount,
         isAmountValid,
@@ -273,8 +134,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         handleEditRecipientClick,
         handleEditRecipientSave,
         handleEditRecipientClear,
-        handleDeposit,
-        isDepositDisabled,
       }}
     >
       {children}

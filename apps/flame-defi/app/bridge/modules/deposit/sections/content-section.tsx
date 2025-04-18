@@ -1,8 +1,9 @@
 "use client";
 
-// import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 import React, { useCallback, useEffect, useMemo } from "react";
+// import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
+import { EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -12,29 +13,24 @@ import {
   WalletIcon,
 } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { useBridgeConnections } from "bridge/hooks";
+import {
+  useDepositOptions,
+  useDepositTransaction,
+  useDepositPageContext,
+} from "bridge/modules/deposit/hooks";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
-import { EvmCurrency } from "@repo/flame-types";
-import { useDepositOptions } from "../../../hooks/use-deposit-options";
 
 export const ContentSection = () => {
   const {
-    sourceChainSelection,
-    handleSourceChainSelect,
-    setSourceCurrency,
-    destinationChainSelection,
-    handleDestinationChainSelect,
-    setDestinationCurrency,
     amount,
     setAmount,
     isAmountValid,
     setIsAmountValid,
     hasTouchedForm,
     setHasTouchedForm,
-    isLoading,
-    isAnimating,
     recipientAddressOverride,
     isRecipientAddressEditable,
     handleEditRecipientClick,
@@ -43,9 +39,18 @@ export const ContentSection = () => {
     isRecipientAddressValid,
     setIsRecipientAddressValid,
     setRecipientAddressOverride,
-    isDepositDisabled,
-    handleDeposit,
   } = useDepositPageContext();
+
+  const {
+    connectSource,
+    connectDestination,
+    setSourceCurrency,
+    setDestinationCurrency,
+    sourceConnection,
+    destinationConnection,
+  } = useBridgeConnections();
+
+  const { isLoading, isAnimating, executeDeposit } = useDepositTransaction();
 
   const {
     sourceChainOptions,
@@ -56,6 +61,7 @@ export const ContentSection = () => {
   } = useDepositOptions();
 
   // additional options
+  // TODO - where should this button actually go?
   const additionalSourceOptions = useMemo(
     () => [
       {
@@ -71,6 +77,8 @@ export const ContentSection = () => {
     [],
   );
 
+  // FIXME - should this be an edit button next to the input or something instead?
+  //  kinda hard to find as an additional dropdown option
   const additionalDestinationOptions = useMemo(() => {
     return [
       {
@@ -101,22 +109,33 @@ export const ContentSection = () => {
   //   });
   // }, [evmWallet.evmAccountAddress]);
 
-  // Use the utility functions from useDepositOptions
-  const sourceCurrencyOptions = getSourceCurrencyOptions(
-    sourceChainSelection.chain,
+  const sourceCurrencyOptions = useMemo(
+    () => getSourceCurrencyOptions(sourceConnection.chain),
+    [getSourceCurrencyOptions, sourceConnection.chain],
   );
-  const destinationCurrencyOptions = getDestinationCurrencyOptions(
-    destinationChainSelection.chain,
+  const defaultSourceCurrencyOption = sourceCurrencyOptions[0];
+  const destinationCurrencyOptions = useMemo(
+    () => getDestinationCurrencyOptions(destinationConnection.chain),
+    [getDestinationCurrencyOptions, destinationConnection.chain],
   );
   const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
 
-  // Find matching destination currency using the helper function
-  const destinationCurrencyOption =
-    findMatchingDestinationCurrency(
-      sourceChainSelection.chain,
-      sourceChainSelection.currency,
-      destinationChainSelection.chain,
-    ) || defaultDestinationCurrencyOption;
+  // find matching destination currency
+  const destinationCurrencyOption = useMemo(
+    () =>
+      findMatchingDestinationCurrency(
+        sourceConnection.chain,
+        sourceConnection.currency,
+        destinationConnection.chain,
+      ) || defaultDestinationCurrencyOption,
+    [
+      findMatchingDestinationCurrency,
+      sourceConnection.chain,
+      sourceConnection.currency,
+      destinationConnection.chain,
+      defaultDestinationCurrencyOption,
+    ],
+  );
 
   // Form handling
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,17 +168,17 @@ export const ContentSection = () => {
   // Check if form is valid whenever values change
   useEffect(() => {
     // Mark form as touched when any values change or wallet connects
-    if (sourceChainSelection.address || amount || recipientAddressOverride) {
+    if (sourceConnection.address || amount || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
 
     // Use the recipient address from either override or destination chain
     const recipientAddress =
-      recipientAddressOverride || destinationChainSelection.address;
+      recipientAddressOverride || destinationConnection.address;
     checkIsFormValid(recipientAddress, amount);
   }, [
-    sourceChainSelection.address,
-    destinationChainSelection.address,
+    sourceConnection.address,
+    destinationConnection.address,
     amount,
     recipientAddressOverride,
     checkIsFormValid,
@@ -173,7 +192,29 @@ export const ContentSection = () => {
   };
 
   // Format balance values - simplified for now
+  // TODO - get balances
   const formattedBalanceValue = formatDecimalValues("0");
+
+  const isDepositDisabled = useMemo<boolean>((): boolean => {
+    if (recipientAddressOverride) {
+      return !(isAmountValid && isRecipientAddressValid);
+    }
+
+    return !(
+      isAmountValid &&
+      isRecipientAddressValid &&
+      sourceConnection.address &&
+      sourceConnection.currency?.coinDenom ===
+        destinationConnection.currency?.coinDenom
+    );
+  }, [
+    destinationConnection.currency?.coinDenom,
+    isAmountValid,
+    isRecipientAddressValid,
+    recipientAddressOverride,
+    sourceConnection.address,
+    sourceConnection.currency?.coinDenom,
+  ]);
 
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
@@ -197,17 +238,17 @@ export const ContentSection = () => {
                       placeholder="Select chain..."
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
-                      onSelect={handleSourceChainSelect}
+                      onSelect={connectSource}
                       LeftIcon={WalletIcon}
                     />
                   </div>
 
-                  {sourceChainSelection.chain && (
+                  {sourceConnection.chain && (
                     <div className="w-full sm:w-auto">
                       <Dropdown
                         placeholder="Select a token"
                         options={sourceCurrencyOptions}
-                        defaultOption={sourceCurrencyOptions[0]}
+                        defaultOption={defaultSourceCurrencyOption}
                         onSelect={setSourceCurrency}
                         LeftIcon={WalletIcon}
                       />
@@ -217,15 +258,15 @@ export const ContentSection = () => {
               </div>
 
               {/* Source wallet info - unified display regardless of chain type */}
-              {sourceChainSelection.address && (
+              {sourceConnection.address && (
                 <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <p className="text-grey-light font-semibold">
-                    Address: {shortenAddress(sourceChainSelection.address)}
+                    Address: {shortenAddress(sourceConnection.address)}
                   </p>
-                  {sourceChainSelection.currency && (
+                  {sourceConnection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
                       Balance: {formattedBalanceValue}{" "}
-                      {sourceChainSelection.currency.coinDenom}
+                      {sourceConnection.currency.coinDenom}
                     </p>
                   )}
                 </div>
@@ -256,12 +297,12 @@ export const ContentSection = () => {
                     <Dropdown
                       placeholder="Connect Astria wallet or enter address"
                       options={destinationChainOptions}
-                      onSelect={handleDestinationChainSelect}
+                      onSelect={connectDestination}
                       additionalOptions={additionalDestinationOptions}
                       LeftIcon={WalletIcon}
                     />
                   </div>
-                  {destinationChainSelection.chain && (
+                  {destinationConnection.chain && (
                     <div className="w-full sm:w-auto">
                       <Dropdown
                         placeholder="No matching token"
@@ -277,7 +318,7 @@ export const ContentSection = () => {
               </div>
 
               {/* Destination address display - when using wallet address */}
-              {destinationChainSelection.address &&
+              {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
                   <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
@@ -287,21 +328,20 @@ export const ContentSection = () => {
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
-                        Address:{" "}
-                        {shortenAddress(destinationChainSelection.address)}
+                        Address: {shortenAddress(destinationConnection.address)}
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
-                    {destinationChainSelection.currency && (
+                    {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
                         Balance: {formattedBalanceValue}{" "}
-                        {destinationChainSelection.currency.coinDenom}
+                        {destinationConnection.currency.coinDenom}
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&
                       "erc20ContractAddress" in
                         destinationCurrencyOption.value &&
-                      destinationChainSelection.address && (
+                      destinationConnection.address && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
                             evmCurrency={
@@ -400,15 +440,22 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            {!sourceChainSelection.address ||
-            !destinationChainSelection.address ? (
+            {!sourceConnection.address || !destinationConnection.address ? (
               <BridgeConnectionsModal>
                 <Button variant="gradient">Connect Wallet</Button>
               </BridgeConnectionsModal>
             ) : (
               <Button
                 variant="gradient"
-                onClick={handleDeposit}
+                onClick={() => {
+                  void executeDeposit({
+                    amount,
+                    sourceConnection,
+                    destinationConnection,
+                    recipientAddressOverride:
+                      recipientAddressOverride || undefined,
+                  });
+                }}
                 disabled={isDepositDisabled}
               >
                 {isLoading ? "Processing..." : "Deposit"}
