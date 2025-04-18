@@ -269,10 +269,7 @@ export function useBridgeConnections(): BridgeConnections {
       Boolean(sourceConnection.address) &&
       Boolean(destinationConnection.address)
     );
-  }, [
-    sourceConnection.address,
-    destinationConnection.address,
-  ]);
+  }, [sourceConnection.address, destinationConnection.address]);
 
   const areCurrenciesValid = useMemo(() => {
     if (!sourceConnection.currency || !destinationConnection.currency) {

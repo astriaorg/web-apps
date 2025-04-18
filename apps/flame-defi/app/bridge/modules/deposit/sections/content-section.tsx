@@ -27,11 +27,14 @@ export const ContentSection = () => {
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
-  
+
   // Local state for recipient address management
-  const [recipientAddressOverride, setRecipientAddressOverride] = useState<string>("");
-  const [isRecipientAddressEditable, setIsRecipientAddressEditable] = useState<boolean>(false);
-  const [isRecipientAddressValid, setIsRecipientAddressValid] = useState<boolean>(false);
+  const [recipientAddressOverride, setRecipientAddressOverride] =
+    useState<string>("");
+  const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
+    useState<boolean>(false);
+  const [isRecipientAddressValid, setIsRecipientAddressValid] =
+    useState<boolean>(false);
 
   const {
     connectSource,
