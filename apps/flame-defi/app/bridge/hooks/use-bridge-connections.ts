@@ -39,10 +39,6 @@ export interface BridgeConnections {
   // Validation
   areConnectionsValid: boolean;
   areCurrenciesValid: boolean;
-
-  // Access to wallet contexts (for compatibility with current implementation)
-  cosmosWallet: ReturnType<typeof useCosmosWallet>;
-  evmWallet: ReturnType<typeof useEvmWallet>;
 }
 
 export function useBridgeConnections(): BridgeConnections {
@@ -333,7 +329,5 @@ export function useBridgeConnections(): BridgeConnections {
     isDestinationConnecting,
     areConnectionsValid,
     areCurrenciesValid,
-    cosmosWallet,
-    evmWallet,
   };
 }

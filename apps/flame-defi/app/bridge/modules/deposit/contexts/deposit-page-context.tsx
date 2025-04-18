@@ -20,9 +20,10 @@ import {
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
-import { useBridgeConnections } from "../../../hooks/use-bridge-connections";
-import { createDepositStrategy } from "../strategies/deposit-strategies";
-import { ChainConnection } from "../../../types";
+
+import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
+import { createDepositStrategy } from "bridge/modules/deposit/strategies/deposit-strategies";
+import { ChainConnection } from "bridge/types";
 
 export interface DepositPageContextProps extends PropsWithChildren {
   // TODO - refactor content-section to just use useBridgeConnections directly
@@ -58,9 +59,6 @@ export interface DepositPageContextProps extends PropsWithChildren {
   // TODO - move to hook useDepositTransaction
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
-  // TODO - remove wallets from this context
-  cosmosWallet: ReturnType<typeof useCosmosWallet>;
-  evmWallet: ReturnType<typeof useEvmWallet>;
 }
 
 export const DepositPageContext = createContext<
@@ -86,9 +84,9 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     isManualAddressMode,
     enableManualAddressMode,
     disableManualAddressMode,
-    cosmosWallet,
-    evmWallet,
   } = bridgeConnections;
+  const cosmosWallet = useCosmosWallet();
+  const evmWallet = useEvmWallet();
 
   // form state
   const [amount, setAmount] = useState<string>("");
@@ -279,8 +277,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         handleEditRecipientClear,
         handleDeposit,
         isDepositDisabled,
-        cosmosWallet,
-        evmWallet,
       }}
     >
       {children}
