@@ -9,15 +9,13 @@ import {
   NonfungiblePositionManagerService,
 } from "./services/non-fungible-position-manager-service";
 import { createPoolFactoryService } from "./services/pool-factory-service";
-import { createPoolService, type Slot0Data } from "./services/pool-service";
+import { createPoolService } from "./services/pool-service";
 import {
   createSwapRouterService,
   createTradeFromQuote,
   SwapRouterService,
 } from "./services/swap-router-service";
 import { createWethService } from "./services/weth-service";
-
-export type { Slot0Data };
 
 export {
   AddErc20ToWalletButton,

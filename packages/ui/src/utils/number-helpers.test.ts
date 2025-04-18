@@ -2,6 +2,7 @@ import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
   formatDecimalValues,
+  formatNumberWithoutTrailingZeros,
   isDustAmount,
   removeNonNumeric,
 } from "./number-helpers";
@@ -106,6 +107,40 @@ describe("formatDecimalValues", () => {
 
   it("should handle integers", () => {
     expect(formatDecimalValues("123")).toBe("123.0000");
+  });
+});
+
+describe("formatNumberWithoutTrailingZeros", () => {
+  it("should remove trailing zeros after the decimal point", () => {
+    expect(formatNumberWithoutTrailingZeros("1.10000")).toBe("1.1");
+  });
+
+  it("should handle numbers with multiple trailing zeros", () => {
+    expect(formatNumberWithoutTrailingZeros("1.100100")).toBe("1.1001");
+  });
+
+  it("should remove the decimal point if the number is an integer", () => {
+    expect(formatNumberWithoutTrailingZeros("1.000")).toBe("1");
+  });
+
+  it("should not modify numbers without trailing zeros", () => {
+    expect(formatNumberWithoutTrailingZeros("1.123")).toBe("1.123");
+  });
+
+  it("should handle integers without decimals", () => {
+    expect(formatNumberWithoutTrailingZeros("1")).toBe("1");
+  });
+
+  it("should handle edge cases with no decimal point", () => {
+    expect(formatNumberWithoutTrailingZeros("0")).toBe("0");
+  });
+
+  it("should handle negative numbers with trailing zeros", () => {
+    expect(formatNumberWithoutTrailingZeros("-1.23000")).toBe("-1.23");
+  });
+
+  it("should handle numbers with no fractional part", () => {
+    expect(formatNumberWithoutTrailingZeros("1000.000")).toBe("1000");
   });
 });
 

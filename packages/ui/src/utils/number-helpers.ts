@@ -104,3 +104,6 @@ export const formatAbbreviatedNumber = (
     suffix: "",
   };
 };
+
+export const formatNumberWithoutTrailingZeros = (value: string) =>
+  value.replace(/(\.\d*?[1-9])0+$/g, "$1").replace(/\.0+$/, "");

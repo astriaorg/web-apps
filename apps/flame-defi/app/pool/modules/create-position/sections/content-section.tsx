@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@repo/ui/utils";
+import { cn, formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useEvmChainData } from "config";
 import { useGetPool } from "pool/hooks/use-get-pool";
@@ -8,7 +8,7 @@ import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 enum INPUT {
   INPUT_0 = "INPUT_0",
@@ -30,96 +30,53 @@ export const ContentSection = () => {
     setSelectedFeeTier,
   } = usePageContext();
 
+  // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
   const [currentInput, setCurrentInput] = useState<INPUT>(INPUT.INPUT_0);
+  // Handles the click of the swap button. Instead of swapping state, handle via CSS.
   const [isInverted, setIsInverted] = useState(false);
-
-  const handleInputError = useCallback(
-    (input: INPUT) => {
-      const onInput = input === INPUT.INPUT_0 ? onInput1 : onInput0;
-      onInput({ value: "" });
-    },
-    [onInput0, onInput1],
-  );
-
-  const handleInputSuccess = useCallback(
-    (
-      input: INPUT,
-      {
-        rateToken1ToToken0,
-        rateToken0ToToken1,
-        amount0,
-        amount1,
-        token0Decimals,
-        token1Decimals,
-      }: {
-        rateToken1ToToken0: string;
-        rateToken0ToToken1: string;
-        amount0: string;
-        amount1: string;
-        token0Decimals?: number;
-        token1Decimals?: number;
-      },
-    ) => {
-      if (input === INPUT.INPUT_0 && token1Decimals && amount0) {
-        onInput1({
-          value: new Big(amount0)
-            .mul(rateToken1ToToken0)
-            .toFixed(token1Decimals),
-        });
-      }
-
-      if (input === INPUT.INPUT_1 && token0Decimals && amount1) {
-        onInput0({
-          value: new Big(amount1)
-            .mul(rateToken0ToToken1)
-            .toFixed(token0Decimals),
-        });
-      }
-    },
-    [onInput0, onInput1],
-  );
 
   const { data: pool, isPending } = useGetPool({
     token0,
     token1,
     selectedFeeTier,
-    onError: () => {
-      handleInputError(currentInput);
-    },
-    onSuccess: ({ rateToken0ToToken1, rateToken1ToToken0 }) => {
-      handleInputSuccess(currentInput, {
-        amount0: amount0.value,
-        amount1: amount1.value,
-        rateToken1ToToken0,
-        rateToken0ToToken1,
-        token0Decimals: token0?.coinDecimals,
-        token1Decimals: token1?.coinDecimals,
-      });
-    },
   });
 
-  const updateExchangeRate = useCallback(
-    ({ value, input }: { value: string; input: INPUT }) => {
-      if (isPending) {
-        return;
-      }
+  const derivedValues = useMemo(() => {
+    // TODO: Handle manual mode: if there is no pool, the user should be able to edit both inputs with no derivation.
+    if (!pool || isPending) {
+      return { derivedAmount0: "", derivedAmount1: "" };
+    }
 
-      if (!pool) {
-        handleInputError(input);
-        return;
-      }
+    if (currentInput === INPUT.INPUT_0 && amount0.value) {
+      const derivedAmount1 = new Big(amount0.value)
+        .mul(pool.rateToken1ToToken0)
+        .toFixed(token1?.coinDecimals || 0);
+      return {
+        derivedAmount0: amount0.value,
+        derivedAmount1: formatNumberWithoutTrailingZeros(derivedAmount1),
+      };
+    }
 
-      handleInputSuccess(input, {
-        amount0: input === INPUT.INPUT_0 ? value : "",
-        amount1: input === INPUT.INPUT_1 ? value : "",
-        rateToken1ToToken0: pool.rateToken1ToToken0,
-        rateToken0ToToken1: pool.rateToken0ToToken1,
-        token0Decimals: token0?.coinDecimals,
-        token1Decimals: token1?.coinDecimals,
-      });
-    },
-    [isPending, pool, token0, token1, handleInputError, handleInputSuccess],
-  );
+    if (currentInput === INPUT.INPUT_1 && amount1.value) {
+      const derivedAmount0 = new Big(amount1.value)
+        .mul(pool.rateToken0ToToken1)
+        .toFixed(token0?.coinDecimals || 0);
+      return {
+        derivedAmount0: formatNumberWithoutTrailingZeros(derivedAmount0),
+        derivedAmount1: amount1.value,
+      };
+    }
+
+    return { derivedAmount0: "", derivedAmount1: "" };
+  }, [
+    pool,
+    isPending,
+    currentInput,
+    amount0.value,
+    amount1.value,
+    token0,
+    token1,
+  ]);
 
   const optionsToken0 = useMemo(() => {
     return selectedChain.currencies.filter(
@@ -142,14 +99,10 @@ export const ContentSection = () => {
         className={cn("flex flex-col gap-2", isInverted && "flex-col-reverse")}
       >
         <TokenAmountInput
-          value={amount0.value}
+          value={derivedValues.derivedAmount0}
           onInput={({ value }) => {
             onInput0({ value });
             setCurrentInput(INPUT.INPUT_0);
-            updateExchangeRate({
-              value,
-              input: INPUT.INPUT_0,
-            });
           }}
           selectedToken={token0}
           setSelectedToken={(value) => {
@@ -161,14 +114,10 @@ export const ContentSection = () => {
         />
         <SwapButton onClick={() => setIsInverted((value) => !value)} />
         <TokenAmountInput
-          value={amount1.value}
+          value={derivedValues.derivedAmount1}
           onInput={({ value }) => {
             onInput1({ value });
             setCurrentInput(INPUT.INPUT_1);
-            updateExchangeRate({
-              value,
-              input: INPUT.INPUT_1,
-            });
           }}
           selectedToken={token1}
           setSelectedToken={(value) => {
