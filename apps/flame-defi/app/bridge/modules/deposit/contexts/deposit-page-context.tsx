@@ -94,17 +94,19 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   } = bridgeConnections;
 
   // Map hook connections to our existing interface
-  const [sourceChainSelection, setSourceChainSelection] = useState<ChainSelection>({
-    chain: null,
-    currency: null,
-    address: null,
-  });
+  const [sourceChainSelection, setSourceChainSelection] =
+    useState<ChainSelection>({
+      chain: null,
+      currency: null,
+      address: null,
+    });
 
-  const [destinationChainSelection, setDestinationChainSelection] = useState<ChainSelection>({
-    chain: null,
-    currency: null,
-    address: null,
-  });
+  const [destinationChainSelection, setDestinationChainSelection] =
+    useState<ChainSelection>({
+      chain: null,
+      currency: null,
+      address: null,
+    });
 
   // Keep our local state synced with bridge connections state
   useEffect(() => {

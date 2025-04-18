@@ -89,7 +89,10 @@ export const ContentSection = () => {
 
   // Destination currency options setup
   const destinationCurrencyOptions = useMemo(() => {
-    if (!destinationChainSelection.chain || !destinationChainSelection.chain.currencies) {
+    if (
+      !destinationChainSelection.chain ||
+      !destinationChainSelection.chain.currencies
+    ) {
       return [];
     }
 
@@ -310,7 +313,8 @@ export const ContentSection = () => {
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
-                        Address: {shortenAddress(destinationChainSelection.address)}
+                        Address:{" "}
+                        {shortenAddress(destinationChainSelection.address)}
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
@@ -422,7 +426,8 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            {!sourceChainSelection.address || !destinationChainSelection.address ? (
+            {!sourceChainSelection.address ||
+            !destinationChainSelection.address ? (
               <BridgeConnectionsModal>
                 <Button variant="gradient">Connect Wallet</Button>
               </BridgeConnectionsModal>
