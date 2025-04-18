@@ -125,6 +125,12 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
       );
     }
 
+    if (!this.sourceCurrency.erc20ContractAddress) {
+      throw new Error(
+        "ERC20 contract address is missing for the selected token. Intent bridge only supports ERC20 tokens."
+      );
+    }
+
     if (
       !("astriaIntentBridgeAddress" in this.sourceCurrency) ||
       !this.sourceCurrency.astriaIntentBridgeAddress

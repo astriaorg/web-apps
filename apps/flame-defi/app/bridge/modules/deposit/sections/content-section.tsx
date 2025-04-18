@@ -14,11 +14,11 @@ import { EvmCurrency } from "@repo/flame-types";
 
 export const ContentSection = () => {
   const {
-    sourceChain,
+    sourceChainSelection,
     handleSourceChainSelect,
     sourceCurrency,
     setSourceCurrency,
-    destinationChain,
+    destinationChainSelection,
     handleDestinationChainSelect,
     destinationCurrency,
     setDestinationCurrency,
@@ -68,11 +68,11 @@ export const ContentSection = () => {
 
   // Source currency options setup
   const sourceCurrencyOptions = useMemo(() => {
-    if (!sourceChain.chain || !sourceChain.chain.currencies) {
+    if (!sourceChainSelection.chain || !sourceChainSelection.chain.currencies) {
       return [];
     }
 
-    return sourceChain.chain.currencies
+    return sourceChainSelection.chain.currencies
       .filter((c) => {
         // only include bridgeable tokens
         if ("isBridgeable" in c) {
@@ -85,15 +85,15 @@ export const ContentSection = () => {
         value: c,
         LeftIcon: c.IconComponent,
       }));
-  }, [sourceChain.chain]);
+  }, [sourceChainSelection.chain]);
 
   // Destination currency options setup
   const destinationCurrencyOptions = useMemo(() => {
-    if (!destinationChain.chain || !destinationChain.chain.currencies) {
+    if (!destinationChainSelection.chain || !destinationChainSelection.chain.currencies) {
       return [];
     }
 
-    return destinationChain.chain.currencies
+    return destinationChainSelection.chain.currencies
       .filter((c) => {
         // only include bridgeable tokens
         if ("isBridgeable" in c) {
@@ -106,22 +106,22 @@ export const ContentSection = () => {
         value: currency,
         LeftIcon: currency.IconComponent,
       }));
-  }, [destinationChain.chain]);
+  }, [destinationChainSelection.chain]);
 
   const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
 
   // The destination currency selection is controlled by the chosen source currency
   const destinationCurrencyOption = useMemo(() => {
     if (
-      !sourceChain.chain ||
+      !sourceChainSelection.chain ||
       !sourceCurrency ||
-      !destinationChain.chain ||
-      !destinationChain.chain.currencies
+      !destinationChainSelection.chain ||
+      !destinationChainSelection.chain.currencies
     ) {
       return defaultDestinationCurrencyOption;
     }
 
-    const matchingCurrency = destinationChain.chain.currencies.find(
+    const matchingCurrency = destinationChainSelection.chain.currencies.find(
       (currency) => currency.coinDenom === sourceCurrency.coinDenom,
     );
 
@@ -135,9 +135,9 @@ export const ContentSection = () => {
       LeftIcon: matchingCurrency.IconComponent,
     };
   }, [
-    sourceChain.chain,
+    sourceChainSelection.chain,
     sourceCurrency,
-    destinationChain.chain,
+    destinationChainSelection.chain,
     defaultDestinationCurrencyOption,
   ]);
 
@@ -172,17 +172,17 @@ export const ContentSection = () => {
   // Check if form is valid whenever values change
   useEffect(() => {
     // Mark form as touched when any values change or wallet connects
-    if (sourceChain.address || amount || recipientAddressOverride) {
+    if (sourceChainSelection.address || amount || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
 
     // Use the recipient address from either override or destination chain
     const recipientAddress =
-      recipientAddressOverride || destinationChain.address;
+      recipientAddressOverride || destinationChainSelection.address;
     checkIsFormValid(recipientAddress, amount);
   }, [
-    sourceChain.address,
-    destinationChain.address,
+    sourceChainSelection.address,
+    destinationChainSelection.address,
     amount,
     recipientAddressOverride,
     checkIsFormValid,
@@ -225,7 +225,7 @@ export const ContentSection = () => {
                     />
                   </div>
 
-                  {sourceChain.chain && (
+                  {sourceChainSelection.chain && (
                     <div className="w-full sm:w-auto">
                       <Dropdown
                         placeholder="Select a token"
@@ -240,10 +240,10 @@ export const ContentSection = () => {
               </div>
 
               {/* Source wallet info - unified display regardless of chain type */}
-              {sourceChain.address && (
+              {sourceChainSelection.address && (
                 <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <p className="text-grey-light font-semibold">
-                    Address: {shortenAddress(sourceChain.address)}
+                    Address: {shortenAddress(sourceChainSelection.address)}
                   </p>
                   {sourceCurrency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
@@ -284,7 +284,7 @@ export const ContentSection = () => {
                       LeftIcon={WalletIcon}
                     />
                   </div>
-                  {destinationChain.chain && (
+                  {destinationChainSelection.chain && (
                     <div className="w-full sm:w-auto">
                       <Dropdown
                         placeholder="No matching token"
@@ -300,7 +300,7 @@ export const ContentSection = () => {
               </div>
 
               {/* Destination address display - when using wallet address */}
-              {destinationChain.address &&
+              {destinationChainSelection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
                   <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
@@ -310,7 +310,7 @@ export const ContentSection = () => {
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
-                        Address: {shortenAddress(destinationChain.address)}
+                        Address: {shortenAddress(destinationChainSelection.address)}
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
@@ -422,7 +422,7 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            {!sourceChain.address || !destinationChain.address ? (
+            {!sourceChainSelection.address || !destinationChainSelection.address ? (
               <BridgeConnectionsModal>
                 <Button variant="gradient">Connect Wallet</Button>
               </BridgeConnectionsModal>
