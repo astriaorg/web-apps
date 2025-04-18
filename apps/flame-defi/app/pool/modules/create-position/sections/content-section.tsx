@@ -172,10 +172,8 @@ export const ContentSection = () => {
           selectedToken={token0}
           setSelectedToken={(value) => {
             setToken0(value);
-            updateExchangeRate({
-              value: amount0.value,
-              input: INPUT.INPUT_0,
-            });
+            onInput0({ value: "" });
+            onInput1({ value: "" });
           }}
           options={optionsToken0}
         />
@@ -193,10 +191,8 @@ export const ContentSection = () => {
           selectedToken={token1}
           setSelectedToken={(value) => {
             setToken1(value);
-            updateExchangeRate({
-              value: amount1.value,
-              input: INPUT.INPUT_1,
-            });
+            onInput0({ value: "" });
+            onInput1({ value: "" });
           }}
           options={optionsToken1}
         />
