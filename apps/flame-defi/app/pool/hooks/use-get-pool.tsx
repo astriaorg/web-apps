@@ -5,6 +5,7 @@ import { useEvmChainData } from "config";
 import {
   createPoolFactoryService,
   createPoolService,
+  type Slot0Data,
 } from "features/evm-wallet";
 import type { FeeTier } from "pool/constants";
 import { calculatePoolExchangeRate } from "pool/utils";
@@ -15,10 +16,19 @@ export const useGetPool = ({
   token0,
   token1,
   selectedFeeTier,
+  onError,
+  onSuccess,
 }: {
   token0?: EvmCurrency;
   token1?: EvmCurrency;
   selectedFeeTier: FeeTier;
+  onError?: () => void;
+  onSuccess?: (params: {
+    address: string;
+    slot0: Slot0Data;
+    rateToken0ToToken1: string;
+    rateToken1ToToken0: string;
+  }) => void;
 }) => {
   const config = useConfig();
   const { selectedChain } = useEvmChainData();
@@ -50,7 +60,7 @@ export const useGetPool = ({
       );
 
       if (!address || isZeroAddress(address)) {
-        // TODO: Handle if pool doesn't exist.
+        onError?.();
         return null;
       }
 
@@ -64,6 +74,8 @@ export const useGetPool = ({
           decimal1: token1.coinDecimals,
           sqrtPriceX96: slot0.sqrtPriceX96,
         });
+
+      onSuccess?.({ address, slot0, rateToken0ToToken1, rateToken1ToToken0 });
 
       return { address, slot0, rateToken0ToToken1, rateToken1ToToken0 };
     },
