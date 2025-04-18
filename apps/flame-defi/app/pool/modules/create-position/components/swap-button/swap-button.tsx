@@ -1,7 +1,20 @@
 import { Button, type ButtonProps } from "@repo/ui/components";
 import { SwapVerticalIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/utils";
+import { motion } from "motion/react";
+import { useCallback, useState } from "react";
 
-export const SwapButton = (props: ButtonProps) => {
+export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
+  const [isRotated, setIsRotated] = useState(false);
+
+  const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
+    (event) => {
+      setIsRotated((prev) => !prev);
+      onClick?.(event);
+    },
+    [onClick],
+  );
+
   return (
     <div className="relative flex items-center justify-center">
       <div className="absolute">
@@ -21,10 +34,16 @@ export const SwapButton = (props: ButtonProps) => {
       </div>
       <Button
         size="icon"
-        className="absolute rounded-full [&_svg]:size-6"
+        className={cn("absolute rounded-full [&_svg]:size-6", className)}
+        onClick={handleClick}
         {...props}
       >
-        <SwapVerticalIcon />
+        <motion.div
+          transition={{ duration: 0.5 }}
+          animate={{ rotate: isRotated ? 0 : 180 }}
+        >
+          <SwapVerticalIcon />
+        </motion.div>
       </Button>
     </div>
   );

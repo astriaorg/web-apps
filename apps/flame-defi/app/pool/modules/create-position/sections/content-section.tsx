@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@repo/ui/utils";
 import Big from "big.js";
 import { useEvmChainData } from "config";
 import { useGetPool } from "pool/hooks/use-get-pool";
@@ -30,6 +31,7 @@ export const ContentSection = () => {
   } = usePageContext();
 
   const [currentInput, setCurrentInput] = useState<INPUT>(INPUT.INPUT_0);
+  const [isInverted, setIsInverted] = useState(false);
 
   const handleInputError = useCallback(
     (input: INPUT) => {
@@ -119,28 +121,6 @@ export const ContentSection = () => {
     [isPending, pool, token0, token1, handleInputError, handleInputSuccess],
   );
 
-  const handleInputSwap = useCallback(
-    () => {
-      // TODO.
-      // onInput0({ value: amount1.value });
-      // onInput1({ value: amount0.value });
-      // setToken0(token1);
-      // setToken1(token0);
-      // setCurrentInput(currentInput === INPUT.INPUT_0 ? INPUT.INPUT_1 : INPUT.INPUT_);
-    },
-    [
-      // amount0,
-      // amount1,
-      // token0,
-      // token1,
-      // setToken0,
-      // setToken1,
-      // onInput0,
-      // onInput1,
-      // currentInput,
-    ],
-  );
-
   const optionsToken0 = useMemo(() => {
     return selectedChain.currencies.filter(
       (currency) =>
@@ -158,7 +138,9 @@ export const ContentSection = () => {
   // TODO: Clean up repeated code.
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
+      <div
+        className={cn("flex flex-col gap-2", isInverted && "flex-col-reverse")}
+      >
         <TokenAmountInput
           value={amount0.value}
           onInput={({ value }) => {
@@ -177,7 +159,7 @@ export const ContentSection = () => {
           }}
           options={optionsToken0}
         />
-        <SwapButton onClick={handleInputSwap} />
+        <SwapButton onClick={() => setIsInverted((value) => !value)} />
         <TokenAmountInput
           value={amount1.value}
           onInput={({ value }) => {
