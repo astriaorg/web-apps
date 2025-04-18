@@ -17,8 +17,6 @@ import {
   HexString,
   IbcCurrency,
 } from "@repo/flame-types";
-import { BaseIcon, EditIcon, PlusIcon } from "@repo/ui/icons";
-import { DropdownAdditionalOption, DropdownOption } from "components/dropdown";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { useEvmWallet } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -27,18 +25,16 @@ import { createDepositStrategy } from "../strategies/deposit-strategies";
 import { ChainConnection } from "../../../types";
 
 export interface DepositPageContextProps extends PropsWithChildren {
+  // TODO - refactor content-section to just use useBridgeConnections directly
   sourceChainSelection: ChainConnection;
   destinationChainSelection: ChainConnection;
   handleSourceChainSelect: (chainValue: CosmosChainInfo | EvmChainInfo) => void;
   handleDestinationChainSelect: (
     chainValue: CosmosChainInfo | EvmChainInfo,
   ) => void;
-  additionalSourceOptions: DropdownAdditionalOption[];
-  sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
-  additionalDestinationOptions: DropdownAdditionalOption[];
-  destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
+  // TODO - move to useDepositForm hook or similar
   amount: string;
   setAmount: (value: string) => void;
   isAmountValid: boolean;
@@ -49,6 +45,7 @@ export interface DepositPageContextProps extends PropsWithChildren {
   setIsLoading: (value: boolean) => void;
   isAnimating: boolean;
   setIsAnimating: (value: boolean) => void;
+  // TODO - either refactor into useDepositForm or useBridgeConnections
   recipientAddressOverride: string;
   setRecipientAddressOverride: (value: string) => void;
   isRecipientAddressEditable: boolean;
@@ -58,8 +55,10 @@ export interface DepositPageContextProps extends PropsWithChildren {
   handleEditRecipientClick: () => void;
   handleEditRecipientSave: () => void;
   handleEditRecipientClear: () => void;
+  // TODO - move to hook useDepositTransaction
   handleDeposit: () => Promise<void>;
   isDepositDisabled: boolean;
+  // TODO - remove wallets from this context
   cosmosWallet: ReturnType<typeof useCosmosWallet>;
   evmWallet: ReturnType<typeof useEvmWallet>;
 }
@@ -226,57 +225,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  // Chain and dropdown options
-  const sourceChainOptions = useMemo(() => {
-    // Get Cosmos chains from cosmos wallet
-    const cosmosChains = cosmosWallet.cosmosChainsOptions || [];
-
-    // Get Coinbase/Base chains from EVM wallet
-    const evmChains = evmWallet.coinbaseChains.map((c) => ({
-      label: c.chainName,
-      value: c,
-      LeftIcon: c.IconComponent,
-    }));
-
-    return [...cosmosChains, ...evmChains];
-  }, [cosmosWallet.cosmosChainsOptions, evmWallet.coinbaseChains]);
-
-  const destinationChainOptions = useMemo(() => {
-    return (evmWallet.astriaChains || []).map((c) => ({
-      label: c.chainName,
-      value: c,
-      LeftIcon: c.IconComponent,
-    }));
-  }, [evmWallet.astriaChains]);
-
-  // Additional dropdown options
-  const additionalSourceOptions = useMemo(
-    () => [
-      {
-        label: "Fund with Coinbase OnRamp",
-        // TODO - probably need to refactor dropdown to allow passing in of a component.
-        //  can then pass in FundCard
-        action: () => {
-          console.log("Coinbase OnRamp clicked");
-        },
-        className: "text-white",
-        LeftIcon: BaseIcon,
-        RightIcon: PlusIcon,
-      },
-    ],
-    [],
-  );
-
-  const additionalAstriaChainOptions = useMemo(() => {
-    return [
-      {
-        label: "Enter address manually",
-        action: handleEditRecipientClick,
-        className: "has-text-primary",
-        RightIcon: EditIcon,
-      },
-    ];
-  }, [handleEditRecipientClick]);
+  // We no longer define options here, instead using useDepositOptions in the components
 
   // calculate if deposit button should be disabled
   const isDepositDisabled = useMemo<boolean>((): boolean => {
@@ -332,10 +281,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
         isDepositDisabled,
         cosmosWallet,
         evmWallet,
-        sourceChainOptions,
-        destinationChainOptions,
-        additionalSourceOptions,
-        additionalDestinationOptions: additionalAstriaChainOptions,
       }}
     >
       {children}

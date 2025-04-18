@@ -4,13 +4,20 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
-import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
+import {
+  ArrowUpDownIcon,
+  BaseIcon,
+  EditIcon,
+  PlusIcon,
+  WalletIcon,
+} from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { useDepositPageContext } from "bridge/modules/deposit/hooks/use-deposit-page-context";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { EvmCurrency } from "@repo/flame-types";
+import { useDepositOptions } from "../../../hooks/use-deposit-options";
 
 export const ContentSection = () => {
   const {
@@ -37,13 +44,43 @@ export const ContentSection = () => {
     setIsRecipientAddressValid,
     setRecipientAddressOverride,
     isDepositDisabled,
-    additionalSourceOptions,
-    additionalDestinationOptions,
-    sourceChainOptions,
-    destinationChainOptions,
-    evmWallet,
     handleDeposit,
   } = useDepositPageContext();
+
+  const {
+    sourceChainOptions,
+    destinationChainOptions,
+    getSourceCurrencyOptions,
+    getDestinationCurrencyOptions,
+    findMatchingDestinationCurrency,
+  } = useDepositOptions();
+
+  // additional options
+  const additionalSourceOptions = useMemo(
+    () => [
+      {
+        label: "Fund with Coinbase OnRamp",
+        action: () => {
+          console.log("Coinbase OnRamp clicked");
+        },
+        className: "text-white",
+        LeftIcon: BaseIcon,
+        RightIcon: PlusIcon,
+      },
+    ],
+    [],
+  );
+
+  const additionalDestinationOptions = useMemo(() => {
+    return [
+      {
+        label: "Enter address manually",
+        action: handleEditRecipientClick,
+        className: "has-text-primary",
+        RightIcon: EditIcon,
+      },
+    ];
+  }, [handleEditRecipientClick]);
 
   // TODO - coinbase onramp url
   // Set up Coinbase onramp button URL
@@ -64,84 +101,22 @@ export const ContentSection = () => {
   //   });
   // }, [evmWallet.evmAccountAddress]);
 
-  // Source currency options setup
-  const sourceCurrencyOptions = useMemo(() => {
-    if (!sourceChainSelection.chain || !sourceChainSelection.chain.currencies) {
-      return [];
-    }
-
-    return sourceChainSelection.chain.currencies
-      .filter((c) => {
-        // only include bridgeable tokens
-        if ("isBridgeable" in c) {
-          return c.isBridgeable;
-        }
-        return true;
-      })
-      .map((c) => ({
-        label: c.coinDenom,
-        value: c,
-        LeftIcon: c.IconComponent,
-      }));
-  }, [sourceChainSelection.chain]);
-
-  // Destination currency options setup
-  const destinationCurrencyOptions = useMemo(() => {
-    if (
-      !destinationChainSelection.chain ||
-      !destinationChainSelection.chain.currencies
-    ) {
-      return [];
-    }
-
-    return destinationChainSelection.chain.currencies
-      .filter((c) => {
-        // only include bridgeable tokens
-        if ("isBridgeable" in c) {
-          return c.isBridgeable;
-        }
-        return true;
-      })
-      .map((currency) => ({
-        label: currency.coinDenom,
-        value: currency,
-        LeftIcon: currency.IconComponent,
-      }));
-  }, [destinationChainSelection.chain]);
-
+  // Use the utility functions from useDepositOptions
+  const sourceCurrencyOptions = getSourceCurrencyOptions(
+    sourceChainSelection.chain,
+  );
+  const destinationCurrencyOptions = getDestinationCurrencyOptions(
+    destinationChainSelection.chain,
+  );
   const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
 
-  // The destination currency selection is controlled by the chosen source currency
-  const destinationCurrencyOption = useMemo(() => {
-    if (
-      !sourceChainSelection.chain ||
-      !sourceChainSelection.currency ||
-      !destinationChainSelection.chain ||
-      !destinationChainSelection.chain.currencies
-    ) {
-      return defaultDestinationCurrencyOption;
-    }
-
-    const matchingCurrency = destinationChainSelection.chain.currencies.find(
-      (currency) =>
-        currency.coinDenom === sourceChainSelection.currency?.coinDenom,
-    );
-
-    if (!matchingCurrency) {
-      return null;
-    }
-
-    return {
-      label: matchingCurrency.coinDenom,
-      value: matchingCurrency,
-      LeftIcon: matchingCurrency.IconComponent,
-    };
-  }, [
-    sourceChainSelection.chain,
-    sourceChainSelection.currency,
-    destinationChainSelection.chain,
-    defaultDestinationCurrencyOption,
-  ]);
+  // Find matching destination currency using the helper function
+  const destinationCurrencyOption =
+    findMatchingDestinationCurrency(
+      sourceChainSelection.chain,
+      sourceChainSelection.currency,
+      destinationChainSelection.chain,
+    ) || defaultDestinationCurrencyOption;
 
   // Form handling
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,7 +301,7 @@ export const ContentSection = () => {
                     {destinationCurrencyOption?.value &&
                       "erc20ContractAddress" in
                         destinationCurrencyOption.value &&
-                      evmWallet.evmAccountAddress && (
+                      destinationChainSelection.address && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
                             evmCurrency={
