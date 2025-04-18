@@ -12,10 +12,10 @@ export interface PageContextProps extends PropsWithChildren {
   amount1: Amount;
   onInput0: ({ value }: { value: string }) => void;
   onInput1: ({ value }: { value: string }) => void;
-  token0: EvmCurrency;
-  token1: EvmCurrency;
-  setToken0: (value: EvmCurrency) => void;
-  setToken1: (value: EvmCurrency) => void;
+  token0?: EvmCurrency;
+  token1?: EvmCurrency;
+  setToken0: (value?: EvmCurrency) => void;
+  setToken1: (value?: EvmCurrency) => void;
   selectedFeeTier: FeeTier;
   setSelectedFeeTier: (value: FeeTier) => void;
 }
@@ -31,15 +31,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     FEE_TIER.MEDIUM,
   );
 
-  const [token0, setToken0] = useState<EvmCurrency>(
-    selectedChain.currencies.find((it) => it.coinDenom === "TIA")!,
+  const [token0, setToken0] = useState<EvmCurrency | undefined>(
+    selectedChain.currencies[0],
   );
-  const [token1, setToken1] = useState<EvmCurrency>(
-    selectedChain.currencies.find((it) => it.coinDenom === "dTIA")!,
-  );
+  const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    token0.coinDenom ?? "",
+    token0?.coinDenom ?? "",
     token1?.coinDenom ?? "",
   );
 
@@ -50,10 +48,12 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   } = useAssetAmountInput({
     balance: token0Balance?.symbol,
     minimum: "0",
-    asset: {
-      symbol: token0.coinDenom,
-      decimals: token0.coinDecimals,
-    },
+    asset: token0
+      ? {
+          symbol: token0?.coinDenom,
+          decimals: token0?.coinDecimals,
+        }
+      : undefined,
   });
 
   const {

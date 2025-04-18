@@ -39,7 +39,7 @@ export const TokenSelect = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="bottom-0 translate-y-0 rounded-b-none border-b-transparent md:-top-1/2 md:-translate-y-1/2 md:rounded-b-xl md:border-b-stroke-default">
+      <DialogContent className="bottom-0 translate-y-0 rounded-b-none border-b-transparent md:-translate-y-1/2 md:rounded-b-xl md:border-b-stroke-default">
         <DialogHeader>
           <DialogTitle className="text-left">Select a Token</DialogTitle>
           <DialogDescription className="sr-only"></DialogDescription>

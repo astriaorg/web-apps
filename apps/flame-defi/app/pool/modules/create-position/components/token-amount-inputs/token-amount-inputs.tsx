@@ -42,7 +42,7 @@ export const TokenAmountInputs = () => {
     }: {
       value: string;
       rate?: string;
-      decimals: number;
+      decimals?: number;
       /**
        * The active input being changed.
        */
@@ -54,7 +54,7 @@ export const TokenAmountInputs = () => {
     }) => {
       onInputActive({ value });
 
-      if (!pool || isPending || !value || !rate) {
+      if (!pool || isPending || !value || !rate || !decimals) {
         return;
       }
 
@@ -89,7 +89,7 @@ export const TokenAmountInputs = () => {
           handleInputChange({
             value,
             rate: pool?.rateToken1ToToken0,
-            decimals: token1.coinDecimals,
+            decimals: token1?.coinDecimals,
             onInputActive: onInput0,
             onInputInactive: onInput1,
           })
@@ -104,7 +104,7 @@ export const TokenAmountInputs = () => {
           handleInputChange({
             value,
             rate: pool?.rateToken0ToToken1,
-            decimals: token0.coinDecimals,
+            decimals: token0?.coinDecimals,
             onInputActive: onInput1,
             onInputInactive: onInput0,
           })

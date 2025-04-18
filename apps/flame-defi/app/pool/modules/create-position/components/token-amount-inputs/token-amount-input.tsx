@@ -7,8 +7,8 @@ import { useMemo } from "react";
 interface TokenAmountInputProps {
   value: string;
   onInput: ({ value }: { value: string }) => void;
-  selectedToken: EvmCurrency;
-  setSelectedToken: (token: EvmCurrency) => void;
+  selectedToken?: EvmCurrency;
+  setSelectedToken: (value?: EvmCurrency) => void;
 }
 
 export const TokenAmountInput = ({
@@ -22,7 +22,7 @@ export const TokenAmountInput = ({
   const options = useMemo(() => {
     return selectedChain.currencies.filter(
       (currency) =>
-        currency.erc20ContractAddress !== selectedToken.erc20ContractAddress,
+        currency.erc20ContractAddress !== selectedToken?.erc20ContractAddress,
     );
   }, [selectedChain.currencies, selectedToken]);
 
