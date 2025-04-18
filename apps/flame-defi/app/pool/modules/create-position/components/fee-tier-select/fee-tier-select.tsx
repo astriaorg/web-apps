@@ -1,12 +1,8 @@
 import { CheckCircleIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
+import { usePageContext } from "pool/hooks/use-page-context";
 import { useIntl } from "react-intl";
-
-export interface FeeTierSelectProps {
-  value: FeeTier;
-  onChange: (value: FeeTier) => void;
-}
 
 const TIERS = [FEE_TIER.LOWEST, FEE_TIER.LOW, FEE_TIER.MEDIUM, FEE_TIER.HIGH];
 
@@ -25,8 +21,9 @@ const DATA: { [key in FeeTier]: { label: string } } = {
   },
 };
 
-export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
+export const FeeTierSelect = () => {
   const { formatNumber } = useIntl();
+  const { selectedFeeTier, setSelectedFeeTier } = usePageContext();
 
   return (
     <div className="flex flex-col gap-1">
@@ -35,16 +32,16 @@ export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
           key={`fee-tier-select_${index}`}
           className={cn(
             "w-full flex bg-surface-1 items-center justify-between border border-solid border-transparent rounded-xl p-4 cursor-pointer transition",
-            it === value && "border-orange",
+            it === selectedFeeTier && "border-orange",
           )}
-          onClick={() => onChange(it)}
+          onClick={() => setSelectedFeeTier(it)}
         >
           <div className="flex items-center">
             <CheckCircleIcon
               size={18}
               className={cn(
                 "text-orange",
-                it === value ? "opacity-100" : "opacity-0",
+                it === selectedFeeTier ? "opacity-100" : "opacity-0",
               )}
             />
             <span className="text-white font-medium flex items-center w-24 mx-4">
