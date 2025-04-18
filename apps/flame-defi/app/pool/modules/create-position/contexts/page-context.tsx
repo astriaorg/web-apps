@@ -3,7 +3,7 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import { useAssetAmountInput, type Amount } from "@repo/ui/components";
 import { useEvmChainData } from "config";
-import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
+import { FEE_TIER, type FeeTier } from "pool/constants";
 import { useGetPoolTokenBalances } from "pool/hooks";
 import { createContext, PropsWithChildren, useState } from "react";
 

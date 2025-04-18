@@ -6,7 +6,7 @@ import {
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
-import type { FeeTier } from "pool/constants/pool-constants";
+import type { FeeTier } from "pool/constants";
 import { calculatePoolExchangeRate } from "pool/utils";
 import type { Address } from "viem";
 import { useConfig } from "wagmi";

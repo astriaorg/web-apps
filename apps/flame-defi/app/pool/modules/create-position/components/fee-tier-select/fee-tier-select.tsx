@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
+import { FEE_TIER, type FeeTier } from "pool/constants";
 import { usePageContext } from "pool/hooks/use-page-context";
 import { useIntl } from "react-intl";
 

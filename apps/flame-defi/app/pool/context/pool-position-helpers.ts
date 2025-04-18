@@ -1,9 +1,5 @@
 import { EvmCurrency, HexString } from "@repo/flame-types";
-import {
-  FEE_TIER,
-  TICK_BOUNDARIES,
-  TICK_SPACING_BY_FEE,
-} from "../constants/pool-constants";
+import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE } from "../constants";
 
 export const sqrtPriceX96ToPrice = (
   sqrtPriceX96: bigint,
