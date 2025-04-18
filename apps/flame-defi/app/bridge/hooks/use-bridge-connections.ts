@@ -292,9 +292,12 @@ export function useBridgeConnections(): BridgeConnections {
   // Validation
   const areConnectionsValid = useMemo(() => {
     if (isManualAddressMode) {
-      return !!sourceConnection.address && !!recipientAddress;
+      return Boolean(sourceConnection.address) && Boolean(recipientAddress);
     }
-    return !!sourceConnection.address && !!destinationConnection.address;
+    return (
+      Boolean(sourceConnection.address) &&
+      Boolean(destinationConnection.address)
+    );
   }, [
     isManualAddressMode,
     recipientAddress,
