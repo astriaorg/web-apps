@@ -1,5 +1,3 @@
-"use client";
-
 import { CheckCircleIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
