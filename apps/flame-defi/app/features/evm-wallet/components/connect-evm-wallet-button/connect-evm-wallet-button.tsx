@@ -16,6 +16,8 @@ interface ConnectEvmWalletButtonProps {
 export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
 }: ConnectEvmWalletButtonProps) => {
+  // FIXME - this won't work to show Base connection.
+  //  too tired to wrap my head around this rn. come back to this
   const { chain } = useAstriaChainData();
   const {
     connectEvmWallet,
@@ -35,6 +37,7 @@ export const ConnectEvmWalletButton = ({
     return "EVM Wallet";
   }, [userAccount?.address]);
 
+  // TODO - show correct icon based on connected chain, could be Base
   return (
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}

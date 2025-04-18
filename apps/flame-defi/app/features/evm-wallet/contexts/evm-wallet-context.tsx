@@ -39,6 +39,9 @@ export interface EvmWalletContextProps {
   evmAccountAddress: string | null;
   astriaChains: AstriaChain[];
   coinbaseChains: EvmChainInfo[];
+  // FIXME - can probably refactor all this junk out of here,
+  //  but it is still used to show the balance in the bridge-connections-modal,
+  //  but even that needs to be refactored to show Base balances possibly
   evmNativeTokenBalance: Balance | null;
   isLoadingEvmNativeTokenBalance: boolean;
   isLoadingSelectedEvmCurrencyBalance: boolean;

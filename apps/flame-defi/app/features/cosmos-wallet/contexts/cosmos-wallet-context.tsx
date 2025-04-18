@@ -30,6 +30,8 @@ export interface CosmosWalletContextProps {
   ibcCurrencyOptions: DropdownOption<IbcCurrency>[];
   isLoadingCosmosBalance: boolean;
   resetState: () => void;
+  // TODO - probably don't need this now that there is useBridgeConnections.
+  //  will need to refactor how we get balances, but it shouldn't be done here.
   selectedCosmosChain: CosmosChainInfo | null;
   selectedCosmosChainOption: DropdownOption<CosmosChainInfo> | null;
   selectedIbcCurrency: IbcCurrency | null;
@@ -223,27 +225,12 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
 
   // opens CosmosKit modal for user to connect their Cosmos wallet
   const connectCosmosWallet = useCallback(() => {
-    // if no chain is set, set the first one and return
-    // FIXME - the caller has to to re-trigger the connect function
-    //  by watching the selectedEvmChain value. this is a foot gun for sure.
-    if (!selectedCosmosChain) {
-      // FIXME - just doing || null to get past type issues while refactoring into nextjs app
-      selectCosmosChain(cosmosChainsOptions[0]?.value || null);
-      return;
-    }
-
-    // if already connected, don't open modal
+    // only open modal if not already connected
     if (!isWalletConnected) {
       console.log("opening cosmos wallet modal");
       openCosmosWalletModal();
     }
-  }, [
-    selectCosmosChain,
-    selectedCosmosChain,
-    cosmosChainsOptions,
-    openCosmosWalletModal,
-    isWalletConnected,
-  ]);
+  }, [openCosmosWalletModal, isWalletConnected]);
 
   const disconnectCosmosWallet = useCallback(() => {
     disconnect().then(() => {});
