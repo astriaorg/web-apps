@@ -14,6 +14,7 @@ export const useGetPoolTokenBalances = (
   const { currencies } = selectedChain;
 
   // TODO: Don't need to return the tokens since the function caller already has this info when passing in the symbols.
+  // I think this is a hack to handle the network selector returning currency data for mainnet on first render.
   const token0 =
     currencies.find(
       (currency) =>

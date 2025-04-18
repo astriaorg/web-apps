@@ -7,17 +7,16 @@ import {
   CardFigureInput,
   useAssetAmountInput,
 } from "@repo/ui/components";
+import Big from "big.js";
 import { useEvmChainData } from "config";
 import { TokenSelect } from "pool/components/token-select";
 import { FEE_TIER, type FeeTier } from "pool/constants/pool-constants";
 import { useGetPoolTokenBalances } from "pool/hooks";
 import { useGetPool } from "pool/hooks/use-get-pool";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
-import { useCallback, useMemo, useState } from "react";
-import { useConfig } from "wagmi";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const ContentSection = () => {
-  const config = useConfig();
   const { selectedChain } = useEvmChainData();
 
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>(
@@ -78,42 +77,70 @@ export const ContentSection = () => {
       : undefined,
   });
 
-  // TODO: Debounce.
-  useEffect(() => {
-    if (!input0Token || !input1Token) {
-      return;
-    }
-
-    (async () => {
-      const poolFactoryService = createPoolFactoryService(
-        config,
-        selectedChain.contracts.poolFactory.address,
-      );
-
-      // TODO: Handle native tokens. If one of the tokens is native, we need to get the wrapped token address.
-      const address = await poolFactoryService.getPool(
-        selectedChain.chainId,
-        input0Token.erc20ContractAddress as `0x${string}`,
-        input1Token.erc20ContractAddress as `0x${string}`,
-        selectedFeeTier,
-      );
-
-      // TODO: Handle if pool doesn't exist.
-    })();
-  }, [
-    config,
-    input0Token,
-    input1Token,
-    selectedChain.chainId,
-    selectedChain.contracts.poolFactory.address,
+  const { data: pool, isPending } = useGetPool({
+    token0,
+    token1,
     selectedFeeTier,
-  ]);
+  });
+
+  useEffect(() => {
+    if (!pool) {
+      onInput0({ value: "" });
+      onInput1({ value: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pool]);
+
+  const handleInputChange = useCallback(
+    ({
+      value,
+      rate,
+      decimals,
+      onInputA,
+      onInputB,
+    }: {
+      value: string;
+      rate?: string;
+      decimals: number;
+      /**
+       * The active input being changed.
+       */
+      onInputA: ({ value }: { value: string }) => void;
+      /**
+       * The inactive input, which will be auto-populated based on the active input.
+       */
+      onInputB: ({ value }: { value: string }) => void;
+    }) => {
+      onInputA({ value });
+
+      if (!pool || isPending || !value || !rate) {
+        // onInputB({ value: "" });
+        return;
+      }
+
+      onInputB({
+        value: new Big(value).mul(rate).toFixed(decimals),
+      });
+    },
+    [isPending, pool],
+  );
 
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <CardContent className="flex items-center justify-between">
-          <CardFigureInput value={amount0.value} onInput={handleInput0Change} />
+        <CardContent className="flex items-center justify-between gap-6">
+          <CardFigureInput
+            value={amount0.value}
+            onInput={(event) =>
+              handleInputChange({
+                value: event.currentTarget.value,
+                rate: pool?.rateToken1ToToken0,
+                decimals: token1.coinDecimals,
+                onInputA: onInput0,
+                onInputB: onInput1,
+              })
+            }
+          />
           <div>
             <TokenSelect
               options={token0Options}
@@ -125,10 +152,18 @@ export const ContentSection = () => {
       </Card>
 
       <Card>
-        <CardContent className="flex items-center justify-between">
+        <CardContent className="flex items-center justify-between gap-6">
           <CardFigureInput
             value={amount1.value}
-            onInput={(event) => onInput1({ value: event.currentTarget.value })}
+            onInput={(event) =>
+              handleInputChange({
+                value: event.currentTarget.value,
+                rate: pool?.rateToken0ToToken1,
+                decimals: token0.coinDecimals,
+                onInputA: onInput1,
+                onInputB: onInput0,
+              })
+            }
           />
           <div>
             <TokenSelect
