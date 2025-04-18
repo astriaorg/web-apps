@@ -18,6 +18,7 @@ interface TokenSelectProps {
   options: EvmCurrency[];
 }
 
+// TODO: Add filter.
 export const TokenSelect = ({
   value,
   options,

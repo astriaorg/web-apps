@@ -3,7 +3,7 @@ import { type Address, Abi } from "viem";
 import { GenericContractService } from "../generic-contract-service";
 import POOL_ABI from "./pool-contract-abi.json";
 
-export type Slot0Data = {
+type Slot0Data = {
   sqrtPriceX96: bigint;
   tick: number;
   observationIndex: number;
