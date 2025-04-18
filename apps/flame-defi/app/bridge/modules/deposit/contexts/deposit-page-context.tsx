@@ -69,8 +69,6 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
   const { addNotification } = useNotifications();
   const wagmiConfig = useConfig();
 
-  // Use our new bridge connections hook
-  const bridgeConnections = useBridgeConnections();
   const {
     sourceConnection,
     destinationConnection,
@@ -84,7 +82,7 @@ export const DepositPageContextProvider = ({ children }: PropsWithChildren) => {
     isManualAddressMode,
     enableManualAddressMode,
     disableManualAddressMode,
-  } = bridgeConnections;
+  } = useBridgeConnections();
   const cosmosWallet = useCosmosWallet();
   const evmWallet = useEvmWallet();
 
