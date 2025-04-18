@@ -172,6 +172,7 @@ export const ContentSection = () => {
                         {cosmosWallet.selectedIbcCurrency?.coinDenom || "TIA"}
                       </p>
                     )}
+                    {/* TODO - ibcWithdrawFeeDisplay */}
                     <div className="mt-2 text-grey-light text-sm">
                       Withdrawal fee: 0.001 FLAME
                     </div>

@@ -124,13 +124,11 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
         "Please select a Coinbase chain and token to bridge first.",
       );
     }
-
     if (!this.sourceCurrency.erc20ContractAddress) {
       throw new Error(
         "ERC20 contract address is missing for the selected token. Intent bridge only supports ERC20 tokens.",
       );
     }
-
     if (
       !("astriaIntentBridgeAddress" in this.sourceCurrency) ||
       !this.sourceCurrency.astriaIntentBridgeAddress
@@ -139,38 +137,35 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
     }
 
     // Convert amount to the proper format based on decimals
+    // FIXME - parseFloat not sufficient?
     const formattedAmount = BigInt(
       Math.floor(
         parseFloat(this.amount) * 10 ** this.sourceCurrency.coinDecimals,
       ).toString(),
     );
 
-    // Handle bridging via AstriaBridgeSourceService
-    if (this.sourceCurrency.erc20ContractAddress) {
-      // Approve the bridge contract to spend tokens
-      const erc20Service = createErc20Service(
-        this.wagmiConfig,
-        this.sourceCurrency.erc20ContractAddress,
-      );
-      await erc20Service.approveToken(
-        this.sourceChain.chainId,
-        this.sourceCurrency.astriaIntentBridgeAddress,
-        this.amount,
-        this.sourceCurrency.coinDecimals,
-      );
+    // approve the bridge contract to spend tokens
+    const erc20Service = createErc20Service(
+      this.wagmiConfig,
+      this.sourceCurrency.erc20ContractAddress,
+    );
+    await erc20Service.approveToken(
+      this.sourceChain.chainId,
+      this.sourceCurrency.astriaIntentBridgeAddress,
+      this.amount,
+      this.sourceCurrency.coinDecimals,
+    );
 
-      // Use intent bridge contract
-      const bridgeService = createAstriaBridgeSourceService(
-        this.wagmiConfig,
-        this.sourceCurrency.astriaIntentBridgeAddress,
-      );
-      // Initiate transfer of the erc20 to AstriaBridgeSource
-      await bridgeService.bridgeTokens({
-        recipientAddress,
-        amount: formattedAmount,
-        chainId: this.sourceChain.chainId,
-      });
-    }
+    // handle bridging via AstriaBridgeSourceService
+    const bridgeService = createAstriaBridgeSourceService(
+      this.wagmiConfig,
+      this.sourceCurrency.astriaIntentBridgeAddress,
+    );
+    await bridgeService.bridgeTokens({
+      recipientAddress,
+      amount: formattedAmount,
+      chainId: this.sourceChain.chainId,
+    });
   }
 }
 

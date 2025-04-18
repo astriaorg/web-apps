@@ -228,7 +228,7 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     return selectedEvmChain?.currencies.find((currency) => currency.isNative);
   }, [selectedEvmChain]);
 
-  // TODO - move to deposit-page-context
+  // TODO - move to withdraw content-section
   const ibcWithdrawFeeDisplay = useMemo(() => {
     if (
       !selectedEvmChainNativeToken ||

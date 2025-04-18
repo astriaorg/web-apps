@@ -26,13 +26,6 @@ export interface BridgeConnections {
   setSourceCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
   setDestinationCurrency: (currency: EvmCurrency | IbcCurrency | null) => void;
 
-  // Manual destination address management
-  recipientAddress: string;
-  setRecipientAddress: (address: string) => void;
-  isManualAddressMode: boolean;
-  enableManualAddressMode: () => void;
-  disableManualAddressMode: () => void;
-
   // Status
   isSourceConnecting: boolean;
   isDestinationConnecting: boolean;
@@ -62,10 +55,6 @@ export function useBridgeConnections(): BridgeConnections {
       address: null,
       isConnected: false,
     });
-
-  // Manual address mode
-  const [isManualAddressMode, setIsManualAddressMode] = useState(false);
-  const [recipientAddress, setRecipientAddress] = useState("");
 
   // Loading states
   const [isSourceConnecting, setIsSourceConnecting] = useState(false);
@@ -274,33 +263,13 @@ export function useBridgeConnections(): BridgeConnections {
     [],
   );
 
-  // Manual address mode
-  const enableManualAddressMode = useCallback(() => {
-    setIsManualAddressMode(true);
-    // clear destination address
-    setDestinationConnection((prev) => ({
-      ...prev,
-      address: null,
-    }));
-  }, []);
-
-  const disableManualAddressMode = useCallback(() => {
-    setIsManualAddressMode(false);
-    setRecipientAddress("");
-  }, []);
-
   // Validation
   const areConnectionsValid = useMemo(() => {
-    if (isManualAddressMode) {
-      return Boolean(sourceConnection.address) && Boolean(recipientAddress);
-    }
     return (
       Boolean(sourceConnection.address) &&
       Boolean(destinationConnection.address)
     );
   }, [
-    isManualAddressMode,
-    recipientAddress,
     sourceConnection.address,
     destinationConnection.address,
   ]);
@@ -324,11 +293,6 @@ export function useBridgeConnections(): BridgeConnections {
     connectDestination,
     setSourceCurrency,
     setDestinationCurrency,
-    recipientAddress,
-    setRecipientAddress,
-    isManualAddressMode,
-    enableManualAddressMode,
-    disableManualAddressMode,
     isSourceConnecting,
     isDestinationConnecting,
     areConnectionsValid,

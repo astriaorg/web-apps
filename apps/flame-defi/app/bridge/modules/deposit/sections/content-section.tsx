@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
 import { EvmCurrency } from "@repo/flame-types";
@@ -18,28 +18,20 @@ import { useBridgeConnections } from "bridge/hooks";
 import {
   useDepositOptions,
   useDepositTransaction,
-  useDepositPageContext,
 } from "bridge/modules/deposit/hooks";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 
 export const ContentSection = () => {
-  const {
-    amount,
-    setAmount,
-    isAmountValid,
-    setIsAmountValid,
-    hasTouchedForm,
-    setHasTouchedForm,
-    recipientAddressOverride,
-    isRecipientAddressEditable,
-    handleEditRecipientClick,
-    handleEditRecipientSave,
-    handleEditRecipientClear,
-    isRecipientAddressValid,
-    setIsRecipientAddressValid,
-    setRecipientAddressOverride,
-  } = useDepositPageContext();
+  // Local state for form
+  const [amount, setAmount] = useState<string>("");
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
+  
+  // Local state for recipient address management
+  const [recipientAddressOverride, setRecipientAddressOverride] = useState<string>("");
+  const [isRecipientAddressEditable, setIsRecipientAddressEditable] = useState<boolean>(false);
+  const [isRecipientAddressValid, setIsRecipientAddressValid] = useState<boolean>(false);
 
   const {
     connectSource,
@@ -59,6 +51,20 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useDepositOptions();
+
+  // Recipient address editing handlers
+  const handleEditRecipientClick = useCallback(() => {
+    setIsRecipientAddressEditable(true);
+  }, []);
+
+  const handleEditRecipientSave = useCallback(() => {
+    setIsRecipientAddressEditable(false);
+  }, []);
+
+  const handleEditRecipientClear = useCallback(() => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride("");
+  }, []);
 
   // additional options
   // TODO - where should this button actually go?
