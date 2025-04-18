@@ -1,32 +1,9 @@
 import Big from "big.js";
-const allCommas = /,/g;
 
 /**
  * Use `removeNonNumeric` to remove non-numeric characters from a string that you desire to be all numbers or decimals.
  */
 export const removeNonNumeric = (str: string) => str.replace(/[^0-9.]/g, "");
-
-/**
- * @deprecated Use `formatNumber` from `react-intl` instead.
- * Specify `minimumFractionDigits`/`maximumFractionDigits` in the `options` parameter to format decimal places.
- */
-export function formatNumber(num: string | number, decimals = 4) {
-  const cleanedNumber =
-    typeof num === "string" ? num.replace(allCommas, "") : num;
-
-  return parseFloat(`${cleanedNumber}`).toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-}
-
-/**
- * @deprecated Use `formatNumber` from `react-intl` instead.
- * Specify `style: "percent"` in the `options` parameter to format as a percentage.
- */
-export function formatNumberAsPercent(num: number | string, decimals = 2) {
-  return `${formatNumber(num, decimals)}%`;
-}
 
 /**
  * Checks if an amount is considered "dust" (negligible or close to zero).

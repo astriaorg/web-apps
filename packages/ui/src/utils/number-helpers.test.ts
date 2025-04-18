@@ -2,8 +2,6 @@ import {
   FORMAT_ABBREVIATED_NUMBER_SUFFIX,
   formatAbbreviatedNumber,
   formatDecimalValues,
-  formatNumber,
-  formatNumberAsPercent,
   isDustAmount,
   removeNonNumeric,
 } from "./number-helpers";
@@ -57,54 +55,6 @@ describe("formatAbbreviatedNumber", () => {
       value: "7500",
       suffix: "",
     });
-  });
-});
-
-describe("formatNumber", () => {
-  it("should format numbers with default decimal places", () => {
-    expect(formatNumber(1234.5678)).toBe("1,234.5678");
-  });
-
-  it("should format string numbers properly", () => {
-    expect(formatNumber("1234.5678")).toBe("1,234.5678");
-  });
-
-  it("should format with custom decimal places", () => {
-    expect(formatNumber(1234.5678, 2)).toBe("1,234.57");
-  });
-
-  it("should remove commas from string input", () => {
-    expect(formatNumber("1,234.5678")).toBe("1,234.5678");
-  });
-
-  it("should handle negative numbers", () => {
-    expect(formatNumber(-1234.5678, 2)).toBe("-1,234.57");
-  });
-
-  it("should handle zero", () => {
-    expect(formatNumber(0, 2)).toBe("0.00");
-  });
-});
-
-describe("formatNumberAsPercent", () => {
-  it("should format numbers as percentage with default 2 decimal places", () => {
-    expect(formatNumberAsPercent(12.3456)).toBe("12.35%");
-  });
-
-  it("should format with custom decimal places", () => {
-    expect(formatNumberAsPercent(12.3456, 3)).toBe("12.346%");
-  });
-
-  it("should handle string input", () => {
-    expect(formatNumberAsPercent("12.3456")).toBe("12.35%");
-  });
-
-  it("should handle negative percentages", () => {
-    expect(formatNumberAsPercent(-12.3456)).toBe("-12.35%");
-  });
-
-  it("should handle zero", () => {
-    expect(formatNumberAsPercent(0)).toBe("0.00%");
   });
 });
 
