@@ -14,6 +14,8 @@ export interface PageContextProps extends PropsWithChildren {
   onInput1: ({ value }: { value: string }) => void;
   token0?: EvmCurrency;
   token1?: EvmCurrency;
+  token0Balance: { symbol: string; value: string } | null;
+  token1Balance: { symbol: string; value: string } | null;
   setToken0: (value?: EvmCurrency) => void;
   setToken1: (value?: EvmCurrency) => void;
   selectedFeeTier: FeeTier;
@@ -37,8 +39,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    token0?.coinDenom ?? "",
-    token1?.coinDenom ?? "",
+    token0?.coinDenom,
+    token1?.coinDenom,
   );
 
   const {
@@ -82,6 +84,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         token1,
         setToken0,
         setToken1,
+        token0Balance,
+        token1Balance,
         selectedFeeTier,
         setSelectedFeeTier,
       }}

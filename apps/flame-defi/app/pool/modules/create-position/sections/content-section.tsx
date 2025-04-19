@@ -35,6 +35,8 @@ export const ContentSection = () => {
     token1,
     setToken0,
     setToken1,
+    token0Balance,
+    token1Balance,
     selectedFeeTier,
     setSelectedFeeTier,
   } = usePageContext();
@@ -141,6 +143,7 @@ export const ContentSection = () => {
               onInput1({ value: "" });
             }}
             options={optionsToken0}
+            balance={token0Balance}
           />
         </motion.div>
         <motion.div style={{ order: 1 }}>
@@ -164,6 +167,7 @@ export const ContentSection = () => {
               onInput1({ value: "" });
             }}
             options={optionsToken1}
+            balance={token1Balance}
           />
         </motion.div>
       </div>

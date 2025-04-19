@@ -6,8 +6,8 @@ import { useAccount } from "wagmi";
 // TODO: Refactor, use address instead of symbol when fetching balances.
 // Use query for caching.
 export const useGetPoolTokenBalances = (
-  poolToken0Symbol: string,
-  poolToken1Symbol: string,
+  poolToken0Symbol?: string,
+  poolToken1Symbol?: string,
 ) => {
   const userAccount = useAccount();
   const { selectedChain } = useEvmChainData();
@@ -18,12 +18,12 @@ export const useGetPoolTokenBalances = (
   const token0 =
     currencies.find(
       (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken0Symbol.toLowerCase(),
+        currency.coinDenom.toLowerCase() === poolToken0Symbol?.toLowerCase(),
     ) || null;
   const token1 =
     currencies.find(
       (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken1Symbol.toLowerCase(),
+        currency.coinDenom.toLowerCase() === poolToken1Symbol?.toLowerCase(),
     ) || null;
 
   const { balances, fetchBalances } = useTokenBalances(
