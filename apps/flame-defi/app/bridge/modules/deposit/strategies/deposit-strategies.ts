@@ -144,8 +144,8 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
     );
 
     // approve the bridge contract to spend tokens
-    // FIXME - would prefer to use the useTokenApproval hook,
-    //  but it only works with `useAstriaChainData` right now
+    // TODO - replace this logic by using useTokenApproval in
+    //  content-section
     const erc20Service = createErc20Service(
       this.wagmiConfig,
       this.sourceCurrency.erc20ContractAddress,
