@@ -1,5 +1,6 @@
 import { Decimal } from "@cosmjs/math";
 import { SigningStargateClient } from "@cosmjs/stargate";
+import { parseUnits } from "viem";
 import { Config } from "wagmi";
 
 import {
@@ -136,15 +137,15 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
       throw new Error("Intent bridge contract not configured for this token.");
     }
 
-    // Convert amount to the proper format based on decimals
-    // FIXME - parseFloat not sufficient?
-    const formattedAmount = BigInt(
-      Math.floor(
-        parseFloat(this.amount) * 10 ** this.sourceCurrency.coinDecimals,
-      ).toString(),
+    // parse amount format based on decimals
+    const parsedAmount = parseUnits(
+      this.amount,
+      this.sourceCurrency.coinDecimals,
     );
 
     // approve the bridge contract to spend tokens
+    // FIXME - would prefer to use the useTokenApproval hook,
+    //  but it only works with `useAstriaChainData` right now
     const erc20Service = createErc20Service(
       this.wagmiConfig,
       this.sourceCurrency.erc20ContractAddress,
@@ -163,7 +164,7 @@ export class EvmIntentDepositStrategy implements DepositStrategy {
     );
     await bridgeService.bridgeTokens({
       recipientAddress,
-      amount: formattedAmount,
+      amount: parsedAmount,
       chainId: this.sourceChain.chainId,
     });
   }

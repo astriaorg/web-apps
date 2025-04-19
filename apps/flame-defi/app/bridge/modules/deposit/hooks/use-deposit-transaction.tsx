@@ -12,7 +12,6 @@ import { ChainConnection } from "bridge/types";
 
 export interface DepositTransactionState {
   isLoading: boolean;
-  isAnimating: boolean;
 }
 
 export interface DepositTransactionHook extends DepositTransactionState {
@@ -21,8 +20,9 @@ export interface DepositTransactionHook extends DepositTransactionState {
     sourceConnection: ChainConnection;
     destinationConnection: ChainConnection;
     recipientAddressOverride?: string;
+    onSuccess?: () => void;
+    onError?: () => void;
   }) => Promise<void>;
-  setIsAnimating: (state: boolean) => void;
 }
 
 export function useDepositTransaction(): DepositTransactionHook {
@@ -30,9 +30,7 @@ export function useDepositTransaction(): DepositTransactionHook {
   const wagmiConfig = useConfig();
   const cosmosWallet = useCosmosWallet();
 
-  // Transaction state
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const executeDeposit = useCallback(
     async ({
@@ -40,11 +38,15 @@ export function useDepositTransaction(): DepositTransactionHook {
       sourceConnection,
       destinationConnection,
       recipientAddressOverride,
+      onSuccess,
+      onError,
     }: {
       amount: string;
       sourceConnection: ChainConnection;
       destinationConnection: ChainConnection;
       recipientAddressOverride?: string;
+      onSuccess?: () => void;
+      onError?: () => void;
     }): Promise<void> => {
       // Use either manual recipient address or the destination chain address
       const recipientAddress = (recipientAddressOverride ||
@@ -63,7 +65,6 @@ export function useDepositTransaction(): DepositTransactionHook {
       }
 
       setIsLoading(true);
-      setIsAnimating(true);
 
       try {
         const depositStrategy = createDepositStrategy({
@@ -83,9 +84,15 @@ export function useDepositTransaction(): DepositTransactionHook {
           },
         });
 
+        if (onSuccess) {
+          onSuccess();
+        }
+
         return;
       } catch (e) {
-        setIsAnimating(false);
+        if (onError) {
+          onError();
+        }
         console.error("Deposit failed", e);
         const message = e instanceof Error ? e.message : "Unknown error.";
 
@@ -117,7 +124,6 @@ export function useDepositTransaction(): DepositTransactionHook {
         return;
       } finally {
         setIsLoading(false);
-        setTimeout(() => setIsAnimating(false), 1000);
       }
     },
     [addNotification, cosmosWallet, wagmiConfig],
@@ -125,8 +131,6 @@ export function useDepositTransaction(): DepositTransactionHook {
 
   return {
     isLoading,
-    isAnimating,
     executeDeposit,
-    setIsAnimating,
   };
 }

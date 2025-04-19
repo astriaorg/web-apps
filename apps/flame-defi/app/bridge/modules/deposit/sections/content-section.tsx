@@ -1,6 +1,8 @@
 "use client";
 
+import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
 import { EvmCurrency } from "@repo/flame-types";
@@ -29,8 +31,9 @@ export const ContentSection = () => {
   const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
 
   // Local state for recipient address management
-  const [recipientAddressOverride, setRecipientAddressOverride] =
-    useState<string>("");
+  const [recipientAddressOverride, setRecipientAddressOverride] = useState<
+    string | undefined
+  >(undefined);
   const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
     useState<boolean>(false);
   const [isRecipientAddressValid, setIsRecipientAddressValid] =
@@ -45,7 +48,8 @@ export const ContentSection = () => {
     destinationConnection,
   } = useBridgeConnections();
 
-  const { isLoading, isAnimating, executeDeposit } = useDepositTransaction();
+  const { isLoading, executeDeposit } = useDepositTransaction();
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   const {
     sourceChainOptions,
@@ -66,14 +70,37 @@ export const ContentSection = () => {
 
   const handleEditRecipientClear = useCallback(() => {
     setIsRecipientAddressEditable(false);
-    setRecipientAddressOverride("");
+    setRecipientAddressOverride(undefined);
   }, []);
 
+  const handleDepositClick = useCallback(() => {
+    setIsAnimating(true);
+    void executeDeposit({
+      amount,
+      sourceConnection,
+      destinationConnection,
+      recipientAddressOverride,
+      onSuccess: () => {
+        // keep animation for a bit after success
+        setTimeout(() => setIsAnimating(false), 1000);
+      },
+      onError: () => {
+        setIsAnimating(false);
+      },
+    });
+  }, [
+    amount,
+    executeDeposit,
+    sourceConnection,
+    destinationConnection,
+    recipientAddressOverride,
+  ]);
+
   // additional options
-  // TODO - where should this button actually go?
   const additionalSourceOptions = useMemo(
     () => [
       {
+        // TODO - where should the Fund button actually go?
         label: "Fund with Coinbase OnRamp",
         action: () => {
           console.log("Coinbase OnRamp clicked");
@@ -164,8 +191,8 @@ export const ContentSection = () => {
         return;
       }
 
-      const amount = Number.parseFloat(amountInput);
-      const amountValid = amount > 0;
+      const amount = new Big(amountInput || "0");
+      const amountValid = amount.gt(0);
       setIsAmountValid(amountValid);
 
       const addressValid = addressInput.length > 0;
@@ -456,15 +483,7 @@ export const ContentSection = () => {
             ) : (
               <Button
                 variant="gradient"
-                onClick={() => {
-                  void executeDeposit({
-                    amount,
-                    sourceConnection,
-                    destinationConnection,
-                    recipientAddressOverride:
-                      recipientAddressOverride || undefined,
-                  });
-                }}
+                onClick={handleDepositClick}
                 disabled={isDepositDisabled}
               >
                 {isLoading ? "Processing..." : "Deposit"}
