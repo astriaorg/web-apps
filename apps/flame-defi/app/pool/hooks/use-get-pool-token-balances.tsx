@@ -26,6 +26,7 @@ export const useGetPoolTokenBalances = (
         currency.coinDenom.toLowerCase() === poolToken1Symbol?.toLowerCase(),
     ) || null;
 
+  // TODO: Balances aren't cleared on disconnect wallet.
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
     selectedChain,

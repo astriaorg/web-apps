@@ -106,22 +106,6 @@ export const ContentSection = () => {
     );
   }, [selectedChain.currencies, token0]);
 
-  const isValid = useMemo(() => {
-    return (
-      amount0.validation.isValid &&
-      amount1.validation.isValid &&
-      token0 &&
-      token1 &&
-      !isPending
-    );
-  }, [
-    amount0.validation.isValid,
-    amount1.validation.isValid,
-    token0,
-    token1,
-    isPending,
-  ]);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col">
