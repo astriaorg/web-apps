@@ -129,7 +129,6 @@ export const useTokenApproval = ({
     setTokenAllowances(newTokenAllowances);
   }, [
     userAccount.address,
-    userAccount.chainId,
     currencies,
     wagmiConfig,
     chain.chainId,
