@@ -180,9 +180,8 @@ export const ContentSection = () => {
           }
         }}
       />
-      {(currentInput === INPUT.INPUT_0
-        ? amount0.validation.isValid
-        : amount1.validation.isValid) &&
+      {/* TODO: Figure out why validation is always false. */}
+      {(currentInput === INPUT.INPUT_0 ? !!amount0.value : !!amount1.value) &&
         token0 &&
         token1 &&
         !pool && <UninitializedPoolWarning />}
