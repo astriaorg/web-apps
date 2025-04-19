@@ -1,8 +1,9 @@
 "use client";
 
-import { cn, formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
+import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useEvmChainData } from "config";
+import { motion, type Transition } from "motion/react";
 import { useGetPool } from "pool/hooks/use-get-pool";
 import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
@@ -15,6 +16,13 @@ enum INPUT {
   INPUT_0 = "INPUT_0",
   INPUT_1 = "INPUT_1",
 }
+
+const TRANSITION: Transition = {
+  duration: 0.1,
+  type: "spring",
+  damping: 30,
+  stiffness: 500,
+};
 
 export const ContentSection = () => {
   const { selectedChain } = useEvmChainData();
@@ -96,42 +104,68 @@ export const ContentSection = () => {
     );
   }, [selectedChain.currencies, token0]);
 
+  const isValid = useMemo(() => {
+    return (
+      amount0.validation.isValid &&
+      amount1.validation.isValid &&
+      token0 &&
+      token1 &&
+      !isPending
+    );
+  }, [
+    amount0.validation.isValid,
+    amount1.validation.isValid,
+    token0,
+    token1,
+    isPending,
+  ]);
+
   return (
     <div className="flex flex-col gap-4">
-      <div
-        className={cn("flex flex-col gap-2", isInverted && "flex-col-reverse")}
-      >
-        <TokenAmountInput
-          value={derivedValues.derivedAmount0}
-          onInput={({ value }) => {
-            onInput0({ value });
-            setCurrentInput(INPUT.INPUT_0);
-          }}
-          selectedToken={token0}
-          setSelectedToken={(value) => {
-            setToken0(value);
-            onInput0({ value: "" });
-            onInput1({ value: "" });
-          }}
-          options={optionsToken0}
-          isLoading={currentInput !== INPUT.INPUT_0 && isPending}
-        />
-        <SwapButton onClick={() => setIsInverted((value) => !value)} />
-        <TokenAmountInput
-          value={derivedValues.derivedAmount1}
-          onInput={({ value }) => {
-            onInput1({ value });
-            setCurrentInput(INPUT.INPUT_1);
-          }}
-          selectedToken={token1}
-          setSelectedToken={(value) => {
-            setToken1(value);
-            onInput0({ value: "" });
-            onInput1({ value: "" });
-          }}
-          options={optionsToken1}
-          isLoading={currentInput !== INPUT.INPUT_1 && isPending}
-        />
+      <div className="flex flex-col">
+        <motion.div
+          layout
+          style={{ order: isInverted ? 2 : 0 }}
+          transition={TRANSITION}
+        >
+          <TokenAmountInput
+            value={derivedValues.derivedAmount0}
+            onInput={({ value }) => {
+              onInput0({ value });
+              setCurrentInput(INPUT.INPUT_0);
+            }}
+            selectedToken={token0}
+            setSelectedToken={(value) => {
+              setToken0(value);
+              onInput0({ value: "" });
+              onInput1({ value: "" });
+            }}
+            options={optionsToken0}
+          />
+        </motion.div>
+        <motion.div style={{ order: 1 }}>
+          <SwapButton onClick={() => setIsInverted((value) => !value)} />
+        </motion.div>
+        <motion.div
+          layout
+          style={{ order: isInverted ? 0 : 2 }}
+          transition={TRANSITION}
+        >
+          <TokenAmountInput
+            value={derivedValues.derivedAmount1}
+            onInput={({ value }) => {
+              onInput1({ value });
+              setCurrentInput(INPUT.INPUT_1);
+            }}
+            selectedToken={token1}
+            setSelectedToken={(value) => {
+              setToken1(value);
+              onInput0({ value: "" });
+              onInput1({ value: "" });
+            }}
+            options={optionsToken1}
+          />
+        </motion.div>
       </div>
       <FeeTierSelect
         value={selectedFeeTier}
@@ -139,12 +173,19 @@ export const ContentSection = () => {
           setSelectedFeeTier(value);
           // If the pool exists, the derived value will replace the empty string.
           // Otherwise, don't persist values from previous edits.
-          currentInput === INPUT.INPUT_0
-            ? onInput1({ value: "" })
-            : onInput0({ value: "" });
+          if (currentInput === INPUT.INPUT_0) {
+            onInput1({ value: "" });
+          } else {
+            onInput0({ value: "" });
+          }
         }}
       />
-      {!pool && !isPending && <UninitializedPoolWarning />}
+      {(currentInput === INPUT.INPUT_0
+        ? amount0.validation.isValid
+        : amount1.validation.isValid) &&
+        token0 &&
+        token1 &&
+        !pool && <UninitializedPoolWarning />}
     </div>
   );
 };

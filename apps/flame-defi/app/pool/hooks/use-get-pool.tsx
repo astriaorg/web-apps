@@ -25,6 +25,7 @@ export const useGetPool = ({
 
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
+    enabled: !!token0 && !!token1,
     queryKey: ["useGetPool", token0, token1, selectedFeeTier, selectedChain],
     queryFn: async () => {
       if (!token0 || !token1) {

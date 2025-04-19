@@ -16,7 +16,7 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
   );
 
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center z-10">
       <div className="absolute">
         <svg
           width="153"
@@ -32,6 +32,7 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
           />
         </svg>
       </div>
+      <div className="w-full h-4 bg-background-default" />
       <Button
         size="icon"
         className={cn("absolute rounded-full [&_svg]:size-6", className)}
@@ -39,8 +40,8 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
         {...props}
       >
         <motion.div
-          transition={{ duration: 0.5 }}
-          animate={{ rotate: isRotated ? 0 : 180 }}
+          animate={{ scaleY: isRotated ? -1 : 1 }}
+          transition={{ duration: 0.2 }}
         >
           <SwapVerticalIcon />
         </motion.div>

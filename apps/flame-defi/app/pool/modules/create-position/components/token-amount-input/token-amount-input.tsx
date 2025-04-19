@@ -8,7 +8,6 @@ interface TokenAmountInputProps {
   selectedToken?: EvmCurrency;
   setSelectedToken: (value?: EvmCurrency) => void;
   options: EvmCurrency[];
-  isLoading?: boolean;
 }
 
 export const TokenAmountInput = ({
@@ -17,10 +16,9 @@ export const TokenAmountInput = ({
   selectedToken,
   setSelectedToken,
   options,
-  isLoading,
 }: TokenAmountInputProps) => {
   return (
-    <Card isLoading={isLoading}>
+    <Card>
       <CardContent className="flex items-center justify-between gap-6">
         <CardFigureInput
           value={value}
