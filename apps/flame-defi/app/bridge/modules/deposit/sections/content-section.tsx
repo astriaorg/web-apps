@@ -20,11 +20,17 @@ import { useBridgeConnections } from "bridge/hooks";
 import {
   useDepositOptions,
   useDepositTransaction,
+  DepositError,
+  WalletConnectionError,
+  KeplrWalletError,
 } from "bridge/modules/deposit/hooks";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
+import { NotificationType, useNotifications } from "features/notifications";
 
 export const ContentSection = () => {
+  const { addNotification } = useNotifications();
+
   // Local state for form
   const [amount, setAmount] = useState<string>("");
   const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
@@ -73,27 +79,80 @@ export const ContentSection = () => {
     setRecipientAddressOverride(undefined);
   }, []);
 
-  const handleDepositClick = useCallback(() => {
+  const handleDepositClick = useCallback(async () => {
     setIsAnimating(true);
-    void executeDeposit({
-      amount,
-      sourceConnection,
-      destinationConnection,
-      recipientAddressOverride,
-      onSuccess: () => {
-        // keep animation for a bit after success
-        setTimeout(() => setIsAnimating(false), 1000);
-      },
-      onError: () => {
-        setIsAnimating(false);
-      },
-    });
+
+    try {
+      await executeDeposit({
+        amount,
+        sourceConnection,
+        destinationConnection,
+        recipientAddressOverride,
+      });
+
+      // Success notification
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Deposit successful!",
+          onAcknowledge: () => {},
+        },
+      });
+
+      // keep animation for a bit after success
+      setTimeout(() => setIsAnimating(false), 1000);
+    } catch (error) {
+      console.error("Deposit error:", error);
+
+      // Handle errors based on their type
+      if (error instanceof WalletConnectionError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.WARNING,
+            message: error.message,
+            onAcknowledge: () => {},
+          },
+        });
+      } else if (error instanceof KeplrWalletError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: error.message,
+            onAcknowledge: () => {},
+          },
+        });
+      } else if (error instanceof DepositError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            component: (
+              <>
+                <p className="mb-1">Deposit failed.</p>
+                <p className="message-body-inner">{error.message}</p>
+              </>
+            ),
+            onAcknowledge: () => {},
+          },
+        });
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: "An unknown error occurred",
+            onAcknowledge: () => {},
+          },
+        });
+      }
+
+      setIsAnimating(false);
+    }
   }, [
     amount,
     executeDeposit,
     sourceConnection,
     destinationConnection,
     recipientAddressOverride,
+    addNotification,
   ]);
 
   // additional options

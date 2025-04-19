@@ -5,28 +5,44 @@ import { useConfig } from "wagmi";
 
 import { HexString } from "@repo/flame-types";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
 
 import { createDepositStrategy } from "bridge/modules/deposit/strategies/deposit-strategies";
 import { ChainConnection } from "bridge/types";
 
-export interface DepositTransactionState {
-  isLoading: boolean;
+export class DepositError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DepositError";
+  }
 }
 
-export interface DepositTransactionHook extends DepositTransactionState {
+export class WalletConnectionError extends DepositError {
+  constructor(message = "Please connect your wallets first.") {
+    super(message);
+    this.name = "WalletConnectionError";
+  }
+}
+
+export class KeplrWalletError extends DepositError {
+  constructor(
+    message = "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
+  ) {
+    super(message);
+    this.name = "KeplrWalletError";
+  }
+}
+
+export interface DepositTransactionHook {
+  isLoading: boolean;
   executeDeposit: (params: {
     amount: string;
     sourceConnection: ChainConnection;
     destinationConnection: ChainConnection;
     recipientAddressOverride?: string;
-    onSuccess?: () => void;
-    onError?: () => void;
   }) => Promise<void>;
 }
 
 export function useDepositTransaction(): DepositTransactionHook {
-  const { addNotification } = useNotifications();
   const wagmiConfig = useConfig();
   const cosmosWallet = useCosmosWallet();
 
@@ -38,15 +54,11 @@ export function useDepositTransaction(): DepositTransactionHook {
       sourceConnection,
       destinationConnection,
       recipientAddressOverride,
-      onSuccess,
-      onError,
     }: {
       amount: string;
       sourceConnection: ChainConnection;
       destinationConnection: ChainConnection;
       recipientAddressOverride?: string;
-      onSuccess?: () => void;
-      onError?: () => void;
     }): Promise<void> => {
       // Use either manual recipient address or the destination chain address
       const recipientAddress = (recipientAddressOverride ||
@@ -54,14 +66,7 @@ export function useDepositTransaction(): DepositTransactionHook {
 
       // Basic validation
       if (!sourceConnection.address || !recipientAddress) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.WARNING,
-            message: "Please connect your wallets first.",
-            onAcknowledge: () => {},
-          },
-        });
-        return;
+        throw new WalletConnectionError();
       }
 
       setIsLoading(true);
@@ -75,58 +80,22 @@ export function useDepositTransaction(): DepositTransactionHook {
         });
 
         await depositStrategy.execute(recipientAddress);
-
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.SUCCESS,
-            message: "Deposit successful!",
-            onAcknowledge: () => {},
-          },
-        });
-
-        if (onSuccess) {
-          onSuccess();
-        }
-
         return;
       } catch (e) {
-        if (onError) {
-          onError();
-        }
         console.error("Deposit failed", e);
         const message = e instanceof Error ? e.message : "Unknown error.";
 
-        // display appropriate error message
+        // Convert specific errors to our custom error types
         if (/failed to get account from keplr wallet/i.test(message)) {
-          addNotification({
-            toastOpts: {
-              toastType: NotificationType.DANGER,
-              message:
-                "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
-              onAcknowledge: () => {},
-            },
-          });
+          throw new KeplrWalletError();
         } else {
-          addNotification({
-            toastOpts: {
-              toastType: NotificationType.DANGER,
-              component: (
-                <>
-                  <p className="mb-1">Deposit failed.</p>
-                  <p className="message-body-inner">{message}</p>
-                </>
-              ),
-              onAcknowledge: () => {},
-            },
-          });
+          throw new DepositError(message);
         }
-
-        return;
       } finally {
         setIsLoading(false);
       }
     },
-    [addNotification, cosmosWallet, wagmiConfig],
+    [cosmosWallet, wagmiConfig],
   );
 
   return {
