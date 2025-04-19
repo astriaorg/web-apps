@@ -33,7 +33,7 @@ export const TokenAmountInput = ({
             })
           }
         />
-        <div className="flex flex-col gap-1 items-end pt-6">
+        <div className="flex flex-col gap-1 items-end pt-5">
           <TokenSelect
             options={options}
             value={selectedToken}
@@ -63,7 +63,7 @@ export const TokenAmountInput = ({
               </Badge>
             </div>
           ) : (
-            <div className="h-6" />
+            <div className="h-5" />
           )}
         </div>
       </CardContent>

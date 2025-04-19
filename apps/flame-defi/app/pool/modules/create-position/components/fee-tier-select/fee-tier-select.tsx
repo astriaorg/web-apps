@@ -30,11 +30,11 @@ export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
 
   return (
     <div className="flex flex-col gap-1">
-      {TIERS.map((it, index) => (
+      {TIERS.map((it) => (
         <div
-          key={`fee-tier-select_${index}`}
+          key={`fee-tier-select_${it}`}
           className={cn(
-            "w-full flex bg-surface-1 items-center justify-between border border-solid border-transparent rounded-xl p-4 cursor-pointer transition",
+            "w-full flex bg-surface-2 items-center justify-between border border-solid border-transparent rounded-xl p-4 cursor-pointer transition",
             it === value && "border-orange",
           )}
           onClick={() => onChange(it)}
@@ -47,14 +47,14 @@ export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
                 it === value ? "opacity-100" : "opacity-0",
               )}
             />
-            <span className="text-white font-medium flex items-center w-24 mx-4">
+            <span className="font-medium flex items-center w-20 mx-4">
               {formatNumber(it / 1_000_000, {
                 style: "percent",
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 2,
               })}
             </span>
-            <span className="text-typography-subdued text-sm">
+            <span className="text-typography-subdued text-xs font-medium">
               {DATA[it].label}
             </span>
           </div>
