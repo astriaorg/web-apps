@@ -8,6 +8,9 @@ export type BridgeHeaderSectionProps = {
   activeTab: "deposit" | "withdraw";
 };
 
+/**
+ * The header section for the bridge pages.
+ */
 export const BridgeHeaderSection = ({
   activeTab,
 }: BridgeHeaderSectionProps) => {
