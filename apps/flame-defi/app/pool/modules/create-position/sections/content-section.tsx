@@ -8,6 +8,7 @@ import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
+import { UninitializedPoolWarning } from "pool/modules/create-position/components/uninitialized-pool-warning";
 import { useMemo, useState } from "react";
 
 enum INPUT {
@@ -42,9 +43,12 @@ export const ContentSection = () => {
   });
 
   const derivedValues = useMemo(() => {
-    // TODO: Handle manual mode: if there is no pool, the user should be able to edit both inputs with no derivation.
     if (!pool || isPending) {
-      return { derivedAmount0: "", derivedAmount1: "" };
+      // When there's no pool, the user can enter any value in both inputs to initialize the position.
+      return {
+        derivedAmount0: amount0.value,
+        derivedAmount1: amount1.value,
+      };
     }
 
     if (currentInput === INPUT.INPUT_0 && amount0.value) {
@@ -92,7 +96,6 @@ export const ContentSection = () => {
     );
   }, [selectedChain.currencies, token0]);
 
-  // TODO: Clean up repeated code.
   return (
     <div className="flex flex-col gap-4">
       <div
@@ -111,6 +114,7 @@ export const ContentSection = () => {
             onInput1({ value: "" });
           }}
           options={optionsToken0}
+          isLoading={currentInput !== INPUT.INPUT_0 && isPending}
         />
         <SwapButton onClick={() => setIsInverted((value) => !value)} />
         <TokenAmountInput
@@ -126,12 +130,21 @@ export const ContentSection = () => {
             onInput1({ value: "" });
           }}
           options={optionsToken1}
+          isLoading={currentInput !== INPUT.INPUT_1 && isPending}
         />
       </div>
       <FeeTierSelect
         value={selectedFeeTier}
-        onChange={(value) => setSelectedFeeTier(value)}
+        onChange={(value) => {
+          setSelectedFeeTier(value);
+          // If the pool exists, the derived value will replace the empty string.
+          // Otherwise, don't persist values from previous edits.
+          currentInput === INPUT.INPUT_0
+            ? onInput1({ value: "" })
+            : onInput0({ value: "" });
+        }}
       />
+      {!pool && !isPending && <UninitializedPoolWarning />}
     </div>
   );
 };
