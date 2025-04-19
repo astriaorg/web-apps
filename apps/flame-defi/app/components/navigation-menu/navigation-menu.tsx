@@ -13,6 +13,8 @@ export const NavigationMenu = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
+  const isBridgePage = pathname.startsWith(LINKS.BRIDGE);
+
   return (
     <nav
       className="flex items-center justify-between px-4 py-2 w-full h-14 bg-background-default"
@@ -30,7 +32,7 @@ export const NavigationMenu = () => {
           <AstriaLogo />
         </a>
         <div className="items-center space-x-8 hidden md:flex">
-          <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
+          <NavigationMenuLink href="/" isActive={isBridgePage}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
@@ -67,7 +69,7 @@ export const NavigationMenu = () => {
       </div>
       <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
-        <ConnectWalletsButton />
+        {!isBridgePage && <ConnectWalletsButton />}
       </div>
       <div className="md:hidden">
         <MobileNavigationMenu />

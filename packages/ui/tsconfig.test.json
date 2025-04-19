@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "types": [
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-accordion",
+      "@radix-ui/react-select",
+      "@testing-library/jest-dom",
+      "jest"
+    ]
+  },
+  "include": [
+    "src",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "**/*.test.tsx",
+    "**/*.test.ts"
+  ]
+}

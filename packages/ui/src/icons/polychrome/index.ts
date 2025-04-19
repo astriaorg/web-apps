@@ -1,4 +1,5 @@
 export * from "./astria-icon";
+export * from "./base-icon";
 export * from "./celestia-icon";
 export * from "./cosmos-icon";
 export * from "./drop-tia-icon";

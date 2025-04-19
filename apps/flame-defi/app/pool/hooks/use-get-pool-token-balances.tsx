@@ -1,6 +1,6 @@
 import { useTokenBalances } from "features/evm-wallet";
 import { useAccount } from "wagmi";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useEffect, useCallback } from "react";
 
 export const useGetPoolTokenBalances = (
@@ -8,8 +8,8 @@ export const useGetPoolTokenBalances = (
   poolToken1Symbol: string,
 ) => {
   const userAccount = useAccount();
-  const { selectedChain } = useEvmChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
 
   const token0 =
     currencies.find(
@@ -24,7 +24,7 @@ export const useGetPoolTokenBalances = (
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
-    selectedChain,
+    chain,
   );
 
   useEffect(() => {

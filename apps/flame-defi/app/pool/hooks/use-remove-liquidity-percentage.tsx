@@ -1,12 +1,12 @@
 import { PoolToken } from "pool/types";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { usePoolPositionContext } from ".";
-import { useEvmChainData } from "config/hooks/use-config";
+import { useAstriaChainData } from "config";
 
 export const useRemoveLiquidityPercentage = () => {
   const { poolToken0, poolToken1, isCollectAsWrappedNative } =
     usePoolPositionContext();
-  const { wrappedNativeToken, nativeToken } = useEvmChainData();
+  const { wrappedNativeToken, nativeToken } = useAstriaChainData();
   const poolTokens = useMemo(
     () => (poolToken0 && poolToken1 ? [poolToken0, poolToken1] : []),
     [poolToken0, poolToken1],

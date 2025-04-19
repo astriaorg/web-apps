@@ -3,8 +3,9 @@ import { getChainConfigs } from "../chain-configs";
 import { getEnvVariable, getOptionalEnvVariable } from "../env";
 import type { AppConfig } from "../index";
 import {
+  CoinbaseChains,
   CosmosChains,
-  EvmChains,
+  AstriaChains,
   FlameNetwork,
   HexString,
 } from "@repo/flame-types";
@@ -33,7 +34,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
   const tokenApprovalAmount =
-    "115792089237316195423570985008687907853269984665640564039457";
+    "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
   const defaultSlippageTolerance = 0.1;
 
@@ -59,10 +60,16 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const { evmChains: evm, cosmosChains: cosmos } =
-    getChainConfigs(selectedFlameNetwork);
-  const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
+  const {
+    astriaChains: astria,
+    cosmosChains: cosmos,
+    coinbaseChains: coinbase,
+  } = getChainConfigs(selectedFlameNetwork);
+  const [astriaChains, setAstriaChains] = React.useState<AstriaChains>(astria);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
+  // TODO - rename evmChains now that we've got astriaChains
+  const [coinbaseChains, setCoinbaseChains] =
+    React.useState<CoinbaseChains>(coinbase);
 
   const networksList = useMemo(() => {
     return getEnvVariable(
@@ -73,13 +80,16 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   // update evm and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
-    const { evmChains, cosmosChains } = getChainConfigs(network);
-    setEvmChains(evmChains);
+    console.log("selectFlameNetwork called with:", network);
+    const { astriaChains, cosmosChains, coinbaseChains } =
+      getChainConfigs(network);
+    setAstriaChains(astriaChains);
     setCosmosChains(cosmosChains);
+    setCoinbaseChains(coinbaseChains);
     setSelectedFlameNetwork(network);
   };
 
-  // Parse feature flags - explicitly check for "true"
+  // parse feature flags - explicitly check for "true"
   const earnEnabled =
     getEnvVariable("NEXT_PUBLIC_FEATURE_EARN_ENABLED", "false") === "true";
   const poolEnabled =
@@ -89,7 +99,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     <ConfigContext.Provider
       value={{
         cosmosChains,
-        evmChains,
+        astriaChains,
+        coinbaseChains,
         selectedFlameNetwork,
         selectFlameNetwork,
         brandURL,

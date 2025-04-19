@@ -21,8 +21,8 @@ import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
-import { useConfig, useEvmChainData } from "config";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaChainData, useConfig } from "config";
+import { useAstriaWallet } from "features/evm-wallet";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -40,15 +40,15 @@ export const MobileNavigationMenu = () => {
     selectedFlameNetwork,
     selectFlameNetwork,
   } = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const {
-    connectEvmWallet,
-    disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
+    connectWallet,
+    disconnectWallet,
+    nativeTokenBalance,
+    isLoadingNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
-  } = useEvmWallet();
+  } = useAstriaWallet();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
@@ -71,12 +71,12 @@ export const MobileNavigationMenu = () => {
 
   const handleOnConnectWalletOpen = useCallback(() => {
     if (!isConnected) {
-      connectEvmWallet();
+      connectWallet();
     } else {
       setIsConnectWalletOpen(true);
     }
     setIsOpen(false);
-  }, [isConnected, connectEvmWallet]);
+  }, [isConnected, connectWallet]);
 
   useEffect(() => {
     setIsOpen(false);
@@ -127,7 +127,7 @@ export const MobileNavigationMenu = () => {
               <div className="flex flex-col items-center py-8 space-y-8">
                 <MobileNavigationMenuLink
                   href={LINKS.BRIDGE}
-                  isActive={pathname === LINKS.BRIDGE}
+                  isActive={pathname.startsWith(LINKS.BRIDGE)}
                 >
                   Bridge
                 </MobileNavigationMenuLink>
@@ -233,21 +233,21 @@ export const MobileNavigationMenu = () => {
             <ConnectWalletContent
               isConnected={!!account.address}
               isLoading={
-                (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+                (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
                 quoteLoading
               }
               account={account}
-              balance={evmNativeTokenBalance ?? undefined}
+              balance={nativeTokenBalance ?? undefined}
               fiat={usdcToNativeQuote}
               explorer={{
-                url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
+                url: `${chain.blockExplorerUrl}/address/${account.address}`,
               }}
               label={shortenAddress(account.address as string)}
               icon={<AstriaIcon />}
-              onConnectWallet={connectEvmWallet}
+              onConnectWallet={connectWallet}
               onDisconnectWallet={() => {
                 setIsConnectWalletOpen(false);
-                disconnectEvmWallet();
+                disconnectWallet();
               }}
               isCollapsible={false}
             />

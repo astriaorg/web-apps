@@ -2,7 +2,7 @@ import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { HexString } from "@repo/flame-types";
 import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
-import { useConfig as useAppConfig, useEvmChainData } from "config";
+import { useConfig as useAppConfig, useAstriaChainData } from "config";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import { usePoolPositionContext } from ".";
 import {
@@ -19,7 +19,7 @@ export const useRemoveLiquidityTxn = (
   const { positionNftId, poolPosition } = usePoolPositionContext();
   const { address } = useAccount();
   const wagmiConfig = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
   const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export const useRemoveLiquidityTxn = (
       const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
           wagmiConfig,
-          selectedChain.contracts.nonfungiblePositionManager.address,
+          chain.contracts.nonfungiblePositionManager.address,
         );
 
       const params =
@@ -94,7 +94,7 @@ export const useRemoveLiquidityTxn = (
           tokenInputs[1],
           address,
           slippageTolerance,
-          selectedChain,
+          chain,
           isCollectAsWrappedNative,
         );
 

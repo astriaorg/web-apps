@@ -10,7 +10,7 @@ import React, {
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { Button } from "@repo/ui/components";
 import {
@@ -20,16 +20,15 @@ import {
   TRADE_TYPE_OPPOSITES,
   TXN_STATUS,
 } from "@repo/flame-types";
-import { useGetQuote } from "../hooks";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useTokenBalances } from "features/evm-wallet";
+import { useGetQuote, useTokenBalances } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
 export default function SwapPage(): React.ReactElement {
-  const { selectedChain } = useEvmChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputOne, setInputOne] = useState<TokenInputState>({
@@ -57,7 +56,7 @@ export default function SwapPage(): React.ReactElement {
 
   const { balances, fetchBalances } = useTokenBalances(
     userAccount.address,
-    selectedChain,
+    chain,
   );
 
   const swapInputs: SwapPairProps[] = [
