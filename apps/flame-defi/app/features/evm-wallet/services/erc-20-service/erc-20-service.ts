@@ -49,14 +49,10 @@ export class Erc20Service extends GenericContractService {
     decimals: number,
   ): Promise<HexString> {
     const amountAsBigInt = parseUnits(tokenApprovalAmount, decimals);
-    // NOTE: Reset this to 0 whenever we want to reset the approval
-    // const amountAsBigInt = BigInt('0');
-    const txHash = await this.writeContractMethod(chainId, "approve", [
+    return await this.writeContractMethod(chainId, "approve", [
       contractAddress,
       amountAsBigInt,
     ]);
-
-    return txHash;
   }
 
   /**
@@ -69,7 +65,7 @@ export class Erc20Service extends GenericContractService {
    */
   async getTokenAllowance(
     chainId: number,
-    userAddress: string,
+    userAddress: HexString,
     contractAddress: Address,
   ): Promise<string | null> {
     const currentAllowance = await this.readContractMethod(

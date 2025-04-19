@@ -34,7 +34,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
   const tokenApprovalAmount =
-    "115792089237316195423570985008687907853269984665640564039457";
+    "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
   const defaultSlippageTolerance = 0.1;
 

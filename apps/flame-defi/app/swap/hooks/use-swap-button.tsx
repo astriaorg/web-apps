@@ -58,6 +58,8 @@ export function useSwapButton({
   const result = useWaitForTransactionReceipt({ hash: txnHash });
 
   const { handleTokenApproval, getTokenNeedingApproval } = useTokenApproval({
+    chain,
+    addressToApprove: chain.contracts.swapRouter.address,
     setTxnStatus,
     setTxnHash,
     setErrorText,

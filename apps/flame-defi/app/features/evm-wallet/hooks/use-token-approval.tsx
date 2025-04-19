@@ -1,18 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import { parseUnits } from "viem";
 import { useAccount, useConfig as useWagmiConfig } from "wagmi";
 
 import {
+  EvmChainInfo,
   HexString,
   TokenAllowance,
   TokenInputState,
   tokenStateToBig,
   TXN_STATUS,
 } from "@repo/flame-types";
-import { useAstriaChainData, useConfig } from "config";
+import { useConfig } from "config";
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 type TokenApprovalProps = {
+  chain: EvmChainInfo;
+  addressToApprove: HexString;
+  // FIXME - could we remove these callbacks and instead return the txnHash from
+  //  handleTokenApproval and try/catch errors at the calling site?
   setTxnStatus: (status: TXN_STATUS) => void;
   setTxnHash: (hash?: HexString) => void;
   setErrorText: (error: string) => void;
@@ -27,20 +31,24 @@ export type TokenApprovalReturn = {
     tokenInputState: TokenInputState,
   ) => TokenInputState | null;
 
-  /** Approves a token for spending by a contract */
-  approveToken: (tokenInputState: TokenInputState) => Promise<HexString | null>;
-
   /** Handles the token approval flow including transaction status updates */
   handleTokenApproval: (tokenInputToApprove: TokenInputState) => Promise<void>;
 };
 
+/**
+ * For approving ERC20s.
+ * Provides functionality to check if a token needs approval
+ * and functionality to approve a token.
+ * Keeps a cache of token allowances for the given chain and address to approve.
+ */
 export const useTokenApproval = ({
+  chain,
+  addressToApprove,
   setTxnStatus,
   setTxnHash,
   setErrorText,
 }: TokenApprovalProps): TokenApprovalReturn => {
-  const { chain } = useAstriaChainData();
-  const { currencies, contracts } = chain;
+  const { currencies } = chain;
   const { tokenApprovalAmount } = useConfig();
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
@@ -59,20 +67,18 @@ export const useTokenApproval = ({
       );
 
       const txHash = await erc20Service.approveToken(
-        chain.chainId,
-        contracts.swapRouter.address,
-        tokenApprovalAmount || tokenInputState.value,
-        token.coinDecimals,
+        chain.chainId, // Use wallet's chain ID if available
+        addressToApprove,
+        tokenApprovalAmount,
+        // NOTE - tokenApprovalAmount has already taken decimals into account
+        0,
       );
 
       const newTokenAllowances = tokenAllowances.map((data) => {
         if (data.symbol === token.coinDenom) {
           return {
             symbol: token.coinDenom,
-            value: parseUnits(
-              tokenApprovalAmount || tokenInputState.value,
-              token.coinDecimals,
-            ).toString(),
+            value: tokenApprovalAmount,
           };
         }
         return data;
@@ -84,10 +90,10 @@ export const useTokenApproval = ({
     },
     [
       wagmiConfig,
-      contracts.swapRouter.address,
-      chain,
-      tokenAllowances,
+      chain.chainId,
+      addressToApprove,
       tokenApprovalAmount,
+      tokenAllowances,
     ],
   );
 
@@ -104,9 +110,9 @@ export const useTokenApproval = ({
         );
         try {
           const allowance = await erc20Service.getTokenAllowance(
-            chain.chainId,
+            chain.chainId, // Use wallet's chain ID if available
             userAccount.address,
-            contracts.swapRouter.address,
+            addressToApprove,
           );
 
           newTokenAllowances.push({
@@ -119,8 +125,16 @@ export const useTokenApproval = ({
       }
     }
 
+    console.log({ newTokenAllowances });
     setTokenAllowances(newTokenAllowances);
-  }, [userAccount.address, contracts, currencies, chain, wagmiConfig]);
+  }, [
+    userAccount.address,
+    userAccount.chainId,
+    currencies,
+    wagmiConfig,
+    chain.chainId,
+    addressToApprove,
+  ]);
 
   const getTokenNeedingApproval = useCallback(
     (tokenInputState: TokenInputState): TokenInputState | null => {
@@ -148,6 +162,7 @@ export const useTokenApproval = ({
     [tokenAllowances],
   );
 
+  // get token allowances when address is set and we don't have any tokenAllowances yet
   useEffect(() => {
     if (userAccount.address && tokenAllowances.length === 0) {
       void getTokenAllowances();
@@ -157,14 +172,14 @@ export const useTokenApproval = ({
   const handleTokenApproval = async (
     tokenInputToApprove: TokenInputState,
   ): Promise<void> => {
-    if (!tokenInputToApprove?.token || !tokenInputToApprove?.value) {
+    if (!tokenInputToApprove?.token) {
       return;
     }
     try {
       setTxnStatus(TXN_STATUS.PENDING);
       const txHash = await approveToken({
         token: tokenInputToApprove.token,
-        value: tokenApprovalAmount || tokenInputToApprove.value,
+        value: tokenApprovalAmount,
       });
       if (txHash) {
         setTxnHash(txHash);
@@ -186,7 +201,6 @@ export const useTokenApproval = ({
   };
 
   return {
-    approveToken,
     getTokenNeedingApproval,
     handleTokenApproval,
   };
