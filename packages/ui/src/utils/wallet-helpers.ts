@@ -22,3 +22,7 @@ export function shortenAddress(
 
   return `${start}...${end}`;
 }
+
+export const isZeroAddress = (address: string) => {
+  return address === "0x0000000000000000000000000000000000000000";
+};

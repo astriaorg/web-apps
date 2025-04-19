@@ -9,6 +9,7 @@ export const cardVariants = cva("rounded-xl", {
   variants: {
     variant: {
       default: "bg-surface-1",
+      secondary: "bg-surface-2",
       accent: "bg-brand",
     },
   },

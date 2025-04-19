@@ -283,13 +283,13 @@ const FlameChainInfo: EvmChainInfo = {
     },
     // TODO - add these addresses
     poolFactory: {
-      address: "0x",
+      address: "0xbdb7C721ae69f36A303162E1e1FBC5ec445824E7",
     },
     poolContract: {
-      address: "0x",
+      address: "0xAAF22d4931147EDdf1269B16B17DB6F51aF9854D",
     },
     nonfungiblePositionManager: {
-      address: "0x",
+      address: "0x186C4bFBef4748d78Bc3C7B7628298528BbFEe47",
     },
   },
   currencies: [
