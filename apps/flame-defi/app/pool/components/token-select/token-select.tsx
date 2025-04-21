@@ -7,10 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Input,
   TokenIcon,
 } from "@repo/ui/components";
-import { CheckIcon, ChevronDownSmallIcon } from "@repo/ui/icons";
-import { useState } from "react";
+import { CheckIcon, ChevronDownSmallIcon, SearchIcon } from "@repo/ui/icons";
+import { useCallback, useState } from "react";
 
 interface TokenSelectProps {
   value?: EvmCurrency;
@@ -18,13 +19,33 @@ interface TokenSelectProps {
   options: EvmCurrency[];
 }
 
-// TODO: Add filter.
 export const TokenSelect = ({
   value,
   options,
   onValueChange,
 }: TokenSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const [search, setSearch] = useState("");
+  const [filteredOptions, setFilteredOptions] = useState(options);
+
+  const handleSearch = useCallback<React.FormEventHandler<HTMLInputElement>>(
+    (event) => {
+      const value = event.currentTarget.value;
+
+      setSearch(value);
+
+      const filteredOptions = options.filter(
+        (it) =>
+          it.title.toLowerCase().includes(value.toLowerCase()) ||
+          it.coinDenom.toLowerCase().includes(value.toLowerCase()) ||
+          it.erc20ContractAddress?.toLowerCase().includes(value.toLowerCase()),
+      );
+
+      setFilteredOptions(filteredOptions);
+    },
+    [options],
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -39,13 +60,26 @@ export const TokenSelect = ({
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="bottom-0 translate-y-0 rounded-b-none border-b-transparent md:-translate-y-1/2 md:rounded-b-xl md:border-b-stroke-default">
+      <DialogContent className="top-auto bottom-0 translate-y-0 rounded-b-none border-b-transparent md:top-[50%] md:-translate-y-1/2 md:rounded-b-xl md:border-b-stroke-default flex flex-col h-min">
         <DialogHeader>
           <DialogTitle className="text-left">Select a Token</DialogTitle>
           <DialogDescription className="sr-only"></DialogDescription>
         </DialogHeader>
+        <Input
+          value={search}
+          onInput={handleSearch}
+          placeholder="Search name or paste address..."
+          startAdornment={
+            <SearchIcon
+              aria-label="Search"
+              size={20}
+              className="text-icon-subdued"
+            />
+          }
+          className="bg-transparent"
+        />
         <div className="flex flex-col gap-1">
-          {options.map((option) => (
+          {filteredOptions.map((option) => (
             <Button
               key={option.coinDenom}
               variant="secondary"

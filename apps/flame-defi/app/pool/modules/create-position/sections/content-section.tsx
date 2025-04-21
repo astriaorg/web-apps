@@ -93,16 +93,18 @@ export const ContentSection = () => {
   ]);
 
   const optionsToken0 = useMemo(() => {
-    return selectedChain.currencies.filter(
-      (currency) =>
-        currency.erc20ContractAddress !== token1?.erc20ContractAddress,
+    return selectedChain.currencies.filter((currency) =>
+      token1
+        ? currency.erc20ContractAddress !== token1.erc20ContractAddress
+        : true,
     );
   }, [selectedChain.currencies, token1]);
 
   const optionsToken1 = useMemo(() => {
-    return selectedChain.currencies.filter(
-      (currency) =>
-        currency.erc20ContractAddress !== token0?.erc20ContractAddress,
+    return selectedChain.currencies.filter((currency) =>
+      token0
+        ? currency.erc20ContractAddress !== token0.erc20ContractAddress
+        : true,
     );
   }, [selectedChain.currencies, token0]);
 
