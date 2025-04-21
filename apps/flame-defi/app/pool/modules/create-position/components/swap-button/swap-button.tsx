@@ -4,6 +4,25 @@ import { cn } from "@repo/ui/utils";
 import { motion } from "motion/react";
 import { useCallback, useState } from "react";
 
+const CornerMask = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("absolute text-background-default", className)}
+      {...props}
+    >
+      <path
+        d="M0 0V32C1.64734 27.3392 6.0923 24 11.3172 24H31.9999L32 8.00002H11.3177C6.09285 8.00002 1.64734 4.66078 0 0Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+};
+
 export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
   const [isRotated, setIsRotated] = useState(false);
 
@@ -32,7 +51,9 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
           />
         </svg>
       </div>
+      <CornerMask className="left-0" />
       <div className="w-full h-4 bg-background-default" />
+      <CornerMask className="right-0 scale-x-[-1]" />
       <Button
         size="icon"
         className={cn("absolute rounded-full [&_svg]:size-6", className)}
