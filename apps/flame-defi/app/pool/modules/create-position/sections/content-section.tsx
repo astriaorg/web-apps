@@ -4,7 +4,7 @@ import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useEvmChainData } from "config";
 import { motion, type Transition } from "motion/react";
-import { useGetPool } from "pool/hooks/use-get-pool";
+import { useGetPools } from "pool/hooks/use-get-pools";
 import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
@@ -46,11 +46,14 @@ export const ContentSection = () => {
   // Handles the click of the swap button. Instead of swapping state, handle via CSS.
   const [isInverted, setIsInverted] = useState(false);
 
-  const { data: pool, isPending } = useGetPool({
+  const { data: pools, isPending } = useGetPools({
     token0,
     token1,
-    selectedFeeTier,
   });
+
+  const pool = useMemo(() => {
+    return pools?.[selectedFeeTier];
+  }, [pools, selectedFeeTier]);
 
   const derivedValues = useMemo(() => {
     if (!pool || isPending) {
@@ -170,11 +173,7 @@ export const ContentSection = () => {
           }
         }}
       />
-      {/* TODO: Figure out why validation is always false. */}
-      {(currentInput === INPUT.INPUT_0 ? !!amount0.value : !!amount1.value) &&
-        token0 &&
-        token1 &&
-        !pool && <UninitializedPoolWarning />}
+      {!isPending && !pool && <UninitializedPoolWarning />}
     </div>
   );
 };

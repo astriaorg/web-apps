@@ -1,6 +1,6 @@
-import type { Config } from "@wagmi/core";
-import { type Address, Abi } from "viem";
 import { HexString } from "@repo/flame-types";
+import { readContracts, type Config } from "@wagmi/core";
+import { Abi, type Address } from "viem";
 import { GenericContractService } from "../generic-contract-service";
 import POOL_FACTORY_ABI from "./pool-factory-abi.json";
 
@@ -13,6 +13,42 @@ export class PoolFactoryService extends GenericContractService {
    */
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, POOL_FACTORY_ABI as Abi);
+  }
+
+  /**
+   * Get the pool address for a given token pair and fee
+   *
+   * @param token0 - The address of the first token in the pair.
+   * @param token1 - The address of the second token in the pair.
+   * @param fees - An array of fee tiers for the pool (e.g., [500, 3000]).
+   * @returns The address of the pool if it exists, or the zero address if not.
+   */
+  async getPools(token0: Address, token1: Address, fees: number[]) {
+    // TODO: Replace with multicall when multicall contract is deployed on Flame.
+    // const result = await this.multicall({
+    //   contracts: fees.map((it) => {
+    //     return {
+    //       functionName: "getPool",
+    //       address: this.contractAddress,
+    //       abi: this.abi,
+    //       args: [token0, token1, it],
+    //     };
+    //   }),
+    // });
+    // return result as Address[];
+
+    const result = await readContracts(this.wagmiConfig, {
+      contracts: fees.map((it) => {
+        return {
+          functionName: "getPool",
+          address: this.contractAddress,
+          abi: this.abi,
+          args: [token0, token1, it],
+        };
+      }),
+    });
+
+    return result.map((it) => it.result) as Address[];
   }
 
   /**

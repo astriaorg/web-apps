@@ -1,9 +1,7 @@
 import { CheckCircleIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { FEE_TIER, type FeeTier } from "pool/constants";
+import { FEE_TIER, FEE_TIERS, type FeeTier } from "pool/constants";
 import { useIntl } from "react-intl";
-
-const TIERS = [FEE_TIER.LOWEST, FEE_TIER.LOW, FEE_TIER.MEDIUM, FEE_TIER.HIGH];
 
 const DATA: { [key in FeeTier]: { label: string } } = {
   [FEE_TIER.LOWEST]: {
@@ -30,7 +28,7 @@ export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
 
   return (
     <div className="flex flex-col gap-1">
-      {TIERS.map((it) => (
+      {FEE_TIERS.map((it) => (
         <div
           key={`fee-tier-select_${it}`}
           className={cn(

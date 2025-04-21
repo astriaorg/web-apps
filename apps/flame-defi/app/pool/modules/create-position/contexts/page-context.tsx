@@ -43,6 +43,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     token1?.coinDenom,
   );
 
+  // TODO: Figure out why validation is always false.
   const {
     amount: amount0,
     onInput: onInput0,
