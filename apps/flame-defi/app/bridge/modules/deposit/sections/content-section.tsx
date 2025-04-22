@@ -17,13 +17,14 @@ import {
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useBridgeConnections } from "bridge/hooks";
+import { useConfig } from "config";
 import {
-  useDepositOptions,
   useDepositTransaction,
   DepositError,
   WalletConnectionError,
   KeplrWalletError,
 } from "bridge/modules/deposit/hooks";
+import { useBridgeOptions } from "bridge/hooks";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -57,13 +58,21 @@ export const ContentSection = () => {
   const { isLoading, executeDeposit } = useDepositTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+
   const {
     sourceChainOptions,
     destinationChainOptions,
     getSourceCurrencyOptions,
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
-  } = useDepositOptions();
+  } = useBridgeOptions({
+    sourceChains: [
+      ...Object.values(coinbaseChains),
+      ...Object.values(cosmosChains),
+    ],
+    destinationChains: [...Object.values(astriaChains)],
+  });
 
   // Recipient address editing handlers
   const handleEditRecipientClick = useCallback(() => {

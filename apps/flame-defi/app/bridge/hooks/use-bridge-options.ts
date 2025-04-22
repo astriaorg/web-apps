@@ -8,9 +8,8 @@ import {
   IbcCurrency,
 } from "@repo/flame-types";
 import { DropdownOption } from "components/dropdown";
-import { useConfig } from "config";
 
-export interface DepositOptions {
+export interface BridgeOptions {
   // Chain options
   sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
@@ -31,34 +30,31 @@ export interface DepositOptions {
   ) => DropdownOption<EvmCurrency | IbcCurrency> | null;
 }
 
-export function useDepositOptions(): DepositOptions {
-  const { astriaChains, coinbaseChains, cosmosChains } = useConfig();
+export interface UseBridgeOptionsProps {
+  sourceChains: (CosmosChainInfo | EvmChainInfo)[];
+  destinationChains: (CosmosChainInfo | EvmChainInfo)[];
+}
 
+export function useBridgeOptions({
+  sourceChains,
+  destinationChains,
+}: UseBridgeOptionsProps): BridgeOptions {
   // Chain options
   const sourceChainOptions = useMemo(() => {
-    const cosmosChainsOptions = Object.values(cosmosChains).map((c) => ({
+    return sourceChains.map((c) => ({
       label: c.chainName,
       value: c,
       LeftIcon: c.IconComponent,
     }));
-
-    // Coinbase/Base chains
-    const evmChains = Object.values(coinbaseChains).map((c) => ({
-      label: c.chainName,
-      value: c,
-      LeftIcon: c.IconComponent,
-    }));
-
-    return [...cosmosChainsOptions, ...evmChains];
-  }, [coinbaseChains, cosmosChains]);
+  }, [sourceChains]);
 
   const destinationChainOptions = useMemo(() => {
-    return Object.values(astriaChains).map((c) => ({
+    return destinationChains.map((c) => ({
       label: c.chainName,
       value: c,
       LeftIcon: c.IconComponent,
     }));
-  }, [astriaChains]);
+  }, [destinationChains]);
 
   // Currency options generators
   const getSourceCurrencyOptions = useCallback(

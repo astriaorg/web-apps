@@ -8,13 +8,14 @@ import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useBridgeConnections } from "bridge/hooks";
+import { useConfig } from "config";
 import {
-  useWithdrawOptions,
   useWithdrawTransaction,
   WithdrawError,
   WalletConnectionError,
   AstriaWalletError,
 } from "bridge/modules/withdraw/hooks";
+import { useBridgeOptions } from "bridge/hooks";
 import { Dropdown } from "components/dropdown";
 import { NotificationType, useNotifications } from "features/notifications";
 import { formatUnits } from "viem";
@@ -48,13 +49,21 @@ export const ContentSection = () => {
   const { isLoading, executeWithdraw } = useWithdrawTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
+  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+
   const {
     sourceChainOptions,
     destinationChainOptions,
     getSourceCurrencyOptions,
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
-  } = useWithdrawOptions();
+  } = useBridgeOptions({
+    sourceChains: [...Object.values(astriaChains)],
+    destinationChains: [
+      ...Object.values(coinbaseChains),
+      ...Object.values(cosmosChains),
+    ],
+  });
 
   // Recipient address editing handlers
   const handleEditRecipientClick = useCallback(() => {
