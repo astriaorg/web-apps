@@ -1,10 +1,10 @@
+import { BridgeHeaderSection } from "bridge/components/bridge-header-section";
 import { ContentSection } from "./sections/content-section";
-import { HeaderSection } from "./sections/header-section";
 
 export const DepositPage = () => {
   return (
     <>
-      <HeaderSection />
+      <BridgeHeaderSection activeTab="deposit" />
       <ContentSection />
     </>
   );

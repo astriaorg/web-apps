@@ -44,12 +44,7 @@ export const ContentSection = () => {
     sourceConnection,
     destinationConnection,
   } = useBridgeConnections();
-
-  console.log("withdraw", {
-    sourceConnection,
-    destinationConnection,
-  });
-
+  
   const { isLoading, executeWithdraw } = useWithdrawTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
