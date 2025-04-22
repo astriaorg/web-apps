@@ -281,7 +281,6 @@ const FlameChainInfo: EvmChainInfo = {
     swapRouter: {
       address: "0x0DA34E6C6361f5B8f5Bdb6276fEE16dD241108c8",
     },
-    // TODO - add these addresses
     poolFactory: {
       address: "0xbdb7C721ae69f36A303162E1e1FBC5ec445824E7",
     },

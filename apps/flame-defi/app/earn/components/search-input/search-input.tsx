@@ -29,7 +29,7 @@ export const SearchInput = ({
               }
             }}
           >
-            <SearchIcon aria-label="Search" size={24} />
+            <SearchIcon aria-label="Search" size={20} />
           </div>
         }
         className={cn(

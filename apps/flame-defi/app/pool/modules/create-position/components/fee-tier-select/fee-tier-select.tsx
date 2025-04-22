@@ -3,7 +3,7 @@ import { cn } from "@repo/ui/utils";
 import { FEE_TIER, FEE_TIERS, type FeeTier } from "pool/constants";
 import { useIntl } from "react-intl";
 
-const DATA: { [key in FeeTier]: { label: string } } = {
+const FEE_TIER_DATA: { [key in FeeTier]: { label: string } } = {
   [FEE_TIER.LOWEST]: {
     label: "Best for very stable pairs.",
   },
@@ -28,32 +28,32 @@ export const FeeTierSelect = ({ value, onChange }: FeeTierSelectProps) => {
 
   return (
     <div className="flex flex-col gap-1">
-      {FEE_TIERS.map((it) => (
+      {FEE_TIERS.map((feeTier) => (
         <div
-          key={`fee-tier-select_${it}`}
+          key={`fee-tier-select_${feeTier}`}
           className={cn(
             "w-full flex bg-surface-2 items-center justify-between border border-solid border-transparent rounded-xl p-4 cursor-pointer transition",
-            it === value && "border-orange",
+            feeTier === value && "border-orange",
           )}
-          onClick={() => onChange(it)}
+          onClick={() => onChange(feeTier)}
         >
           <div className="flex items-center">
             <CheckCircleIcon
               size={18}
               className={cn(
                 "text-orange",
-                it === value ? "opacity-100" : "opacity-0",
+                feeTier === value ? "opacity-100" : "opacity-0",
               )}
             />
             <span className="font-medium flex items-center w-20 mx-4">
-              {formatNumber(it / 1_000_000, {
+              {formatNumber(feeTier / 1_000_000, {
                 style: "percent",
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 2,
               })}
             </span>
             <span className="text-typography-subdued text-xs font-medium">
-              {DATA[it].label}
+              {FEE_TIER_DATA[feeTier].label}
             </span>
           </div>
         </div>
