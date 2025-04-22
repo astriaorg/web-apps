@@ -29,11 +29,8 @@ export const ConnectEvmWalletButton = ({
   } = useEvmWallet();
   const userAccount = useAccount();
 
-  const { balance: tokenBalance, isLoading: isLoadingTokenBalance } = useTokenBalance(
-    userAccount.address,
-    chain,
-    nativeToken
-  );
+  const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =
+    useTokenBalance(userAccount.address, chain, nativeToken);
 
   // ui
   const label = useMemo(() => {
@@ -47,10 +44,7 @@ export const ConnectEvmWalletButton = ({
   return (
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}
-      isLoading={
-        (isLoadingTokenBalance && !tokenBalance) ||
-        quoteLoading
-      }
+      isLoading={(isLoadingTokenBalance && !tokenBalance) || quoteLoading}
       account={userAccount}
       balance={tokenBalance ?? undefined}
       fiat={usdcToNativeQuote}

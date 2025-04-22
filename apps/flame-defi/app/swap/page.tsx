@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
