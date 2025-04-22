@@ -74,7 +74,7 @@ export const useTokenBalance = (
       }
     } catch (e) {
       const errorObj =
-        e instanceof Error ? e : new Error("Failed to fetch balance");
+        e instanceof Error ? e : new Error("Failed to fetch balance.");
       setError(errorObj);
       return null;
     } finally {

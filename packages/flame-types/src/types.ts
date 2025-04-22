@@ -140,7 +140,7 @@ export function cosmosChainInfosToCosmosKitChains(
   cosmosChains: CosmosChainInfo[],
 ): [CosmosKitChain, ...CosmosKitChain[]] {
   if (cosmosChains.length === 0) {
-    throw new Error("At least one chain must be provided");
+    throw new Error("At least one chain must be provided.");
   }
   return cosmosChains.map((cosmosChain) =>
     cosmosChainInfoToCosmosKitChain(cosmosChain),
@@ -445,24 +445,6 @@ export interface AstriaChain extends EvmChainInfo {
   };
 }
 
-export function isPoolEvmChain(chain: EvmChainInfo): chain is AstriaChain {
-  return (
-    !!chain.contracts?.wrappedNativeToken &&
-    !!chain.contracts?.swapRouter &&
-    !!chain.contracts?.nonfungiblePositionManager &&
-    !!chain.contracts?.poolFactory &&
-    !!chain.contracts?.poolContract
-  );
-}
-
-export function assertPoolEvmChain(
-  chain: EvmChainInfo,
-): asserts chain is AstriaChain {
-  if (!isPoolEvmChain(chain)) {
-    throw new Error("Chain is missing required contracts for pool operations");
-  }
-}
-
 // CoinbaseChains type maps labels to CoinbaseChain objects
 export type CoinbaseChains = {
   [label: string]: EvmChainInfo;
@@ -661,7 +643,7 @@ const BASIS_POINTS_DIVISOR = JSBI.BigInt(10000);
  */
 function convertSlippageToBasisPoints(slippageTolerancePercent: number): JSBI {
   if (parseFloat(slippageTolerancePercent.toString()) > 99.99) {
-    throw new Error("Slippage tolerance must be less than 99.99 or less");
+    throw new Error("Slippage tolerance must be less than 99.99 or less.");
   }
   const parts = slippageTolerancePercent.toString().split(".");
   if (parts[1]?.length !== undefined && parts[1].length > 2) {
