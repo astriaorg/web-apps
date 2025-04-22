@@ -10,7 +10,7 @@ import {
 import { DropdownOption } from "components/dropdown";
 import { useConfig } from "config";
 
-export interface DepositOptions {
+export interface WithdrawOptions {
   // Chain options
   sourceChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
   destinationChainOptions: DropdownOption<CosmosChainInfo | EvmChainInfo>[];
@@ -31,11 +31,19 @@ export interface DepositOptions {
   ) => DropdownOption<EvmCurrency | IbcCurrency> | null;
 }
 
-export function useDepositOptions(): DepositOptions {
+export function useWithdrawOptions(): WithdrawOptions {
   const { astriaChains, coinbaseChains, cosmosChains } = useConfig();
 
   // Chain options
   const sourceChainOptions = useMemo(() => {
+    return Object.values(astriaChains).map((c) => ({
+      label: c.chainName,
+      value: c,
+      LeftIcon: c.IconComponent,
+    }));
+  }, [astriaChains]);
+
+  const destinationChainOptions = useMemo(() => {
     const cosmosChainsOptions = Object.values(cosmosChains).map((c) => ({
       label: c.chainName,
       value: c,
@@ -51,14 +59,6 @@ export function useDepositOptions(): DepositOptions {
 
     return [...cosmosChainsOptions, ...evmChains];
   }, [coinbaseChains, cosmosChains]);
-
-  const destinationChainOptions = useMemo(() => {
-    return Object.values(astriaChains).map((c) => ({
-      label: c.chainName,
-      value: c,
-      LeftIcon: c.IconComponent,
-    }));
-  }, [astriaChains]);
 
   // Currency options generators
   const getSourceCurrencyOptions = useCallback(

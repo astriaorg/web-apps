@@ -1,75 +1,237 @@
 "use client";
 
-import React, { useMemo, useEffect, useCallback } from "react";
+import Big from "big.js";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
-import { ArrowUpDownIcon, WalletIcon } from "@repo/ui/icons";
-import { shortenAddress } from "@repo/ui/utils";
-import { useWithdrawPageContext } from "bridge/modules/withdraw/hooks/use-withdraw-page-context";
+import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
+import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { useBridgeConnections } from "bridge/hooks";
+import {
+  useWithdrawOptions,
+  useWithdrawTransaction,
+  WithdrawError,
+  WalletConnectionError,
+  AstriaWalletError,
+} from "bridge/modules/withdraw/hooks";
 import { Dropdown } from "components/dropdown";
+import { NotificationType, useNotifications } from "features/notifications";
+import { formatUnits } from "viem";
 
 export const ContentSection = () => {
+  const { addNotification } = useNotifications();
+
+  // Local state for form
+  const [amount, setAmount] = useState<string>("");
+  const [isAmountValid, setIsAmountValid] = useState<boolean>(false);
+  const [hasTouchedForm, setHasTouchedForm] = useState<boolean>(false);
+
+  // Local state for recipient address management
+  const [recipientAddressOverride, setRecipientAddressOverride] = useState<
+    string | undefined
+  >(undefined);
+  const [isRecipientAddressEditable, setIsRecipientAddressEditable] =
+    useState<boolean>(false);
+  const [isRecipientAddressValid, setIsRecipientAddressValid] =
+    useState<boolean>(false);
+
   const {
-    amount,
-    setAmount,
-    isAmountValid,
-    setIsAmountValid,
-    hasTouchedForm,
-    setHasTouchedForm,
-    isLoading,
-    isAnimating,
-    recipientAddressOverride,
-    isRecipientAddressEditable,
-    handleEditRecipientClick,
-    handleEditRecipientSave,
-    handleEditRecipientClear,
-    isRecipientAddressValid,
-    setIsRecipientAddressValid,
-    setRecipientAddressOverride,
-    // handleConnectCosmosWallet,
-    isWithdrawDisabled,
-    additionalCosmosOptions,
-    cosmosWallet,
-    handleWithdraw,
-  } = useWithdrawPageContext();
+    connectSource,
+    connectDestination,
+    setSourceCurrency,
+    setDestinationCurrency,
+    sourceConnection,
+    destinationConnection,
+  } = useBridgeConnections();
 
-  // Simplified selected cosmos currency option
-  const selectedCosmosCurrencyOption = useMemo(() => {
-    if (cosmosWallet.defaultIbcCurrencyOption) {
-      return cosmosWallet.defaultIbcCurrencyOption;
+  console.log("withdraw", {
+    sourceConnection,
+    destinationConnection,
+  });
+
+  const { isLoading, executeWithdraw } = useWithdrawTransaction();
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
+
+  const {
+    sourceChainOptions,
+    destinationChainOptions,
+    getSourceCurrencyOptions,
+    getDestinationCurrencyOptions,
+    findMatchingDestinationCurrency,
+  } = useWithdrawOptions();
+
+  // Recipient address editing handlers
+  const handleEditRecipientClick = useCallback(() => {
+    setIsRecipientAddressEditable(true);
+  }, []);
+
+  const handleEditRecipientSave = useCallback(() => {
+    setIsRecipientAddressEditable(false);
+  }, []);
+
+  const handleEditRecipientClear = useCallback(() => {
+    setIsRecipientAddressEditable(false);
+    setRecipientAddressOverride(undefined);
+  }, []);
+
+  const handleWithdrawClick = useCallback(async () => {
+    setIsAnimating(true);
+
+    try {
+      await executeWithdraw({
+        amount,
+        sourceConnection,
+        destinationConnection,
+        recipientAddressOverride,
+      });
+
+      // Success notification
+      addNotification({
+        toastOpts: {
+          toastType: NotificationType.SUCCESS,
+          message: "Withdrawal successful!",
+          onAcknowledge: () => {},
+        },
+      });
+
+      // keep animation for a bit after success
+      setTimeout(() => setIsAnimating(false), 1000);
+    } catch (error) {
+      console.error("Withdrawal error:", error);
+
+      // Handle errors based on their type
+      if (error instanceof WalletConnectionError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.WARNING,
+            message: error.message,
+            onAcknowledge: () => {},
+          },
+        });
+      } else if (error instanceof AstriaWalletError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: error.message,
+            onAcknowledge: () => {},
+          },
+        });
+      } else if (error instanceof WithdrawError) {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            component: (
+              <>
+                <p className="mb-1">Withdrawal failed.</p>
+                <p className="message-body-inner">{error.message}</p>
+              </>
+            ),
+            onAcknowledge: () => {},
+          },
+        });
+      } else {
+        addNotification({
+          toastOpts: {
+            toastType: NotificationType.DANGER,
+            message: "An unknown error occurred",
+            onAcknowledge: () => {},
+          },
+        });
+      }
+
+      setIsAnimating(false);
     }
-    return null;
-  }, [cosmosWallet.defaultIbcCurrencyOption]);
+  }, [
+    amount,
+    executeWithdraw,
+    sourceConnection,
+    destinationConnection,
+    recipientAddressOverride,
+    addNotification,
+  ]);
 
+  // additional options for destination chains
+  const additionalDestinationOptions = useMemo(() => {
+    return [
+      {
+        label: "Enter address manually",
+        action: handleEditRecipientClick,
+        className: "has-text-primary",
+        RightIcon: EditIcon,
+      },
+    ];
+  }, [handleEditRecipientClick]);
+
+  const sourceCurrencyOptions = useMemo(
+    () => getSourceCurrencyOptions(sourceConnection.chain),
+    [getSourceCurrencyOptions, sourceConnection.chain],
+  );
+  const defaultSourceCurrencyOption = sourceCurrencyOptions[0];
+  const destinationCurrencyOptions = useMemo(
+    () => getDestinationCurrencyOptions(destinationConnection.chain),
+    [getDestinationCurrencyOptions, destinationConnection.chain],
+  );
+  const defaultDestinationCurrencyOption = destinationCurrencyOptions[0];
+
+  // find matching destination currency
+  const destinationCurrencyOption = useMemo(
+    () =>
+      findMatchingDestinationCurrency(
+        sourceConnection.chain,
+        sourceConnection.currency,
+        destinationConnection.chain,
+      ) || defaultDestinationCurrencyOption,
+    [
+      findMatchingDestinationCurrency,
+      sourceConnection.chain,
+      sourceConnection.currency,
+      destinationConnection.chain,
+      defaultDestinationCurrencyOption,
+    ],
+  );
+
+  // Form handling
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(event.target.value);
   };
 
-  // Simplified form validation
   const checkIsFormValid = useCallback(
-    (recipientAddressInput: string | null, amountInput: string) => {
-      if (recipientAddressInput === null) {
+    (addressInput: string | null, amountInput: string) => {
+      if (addressInput === null) {
         setIsRecipientAddressValid(false);
         return;
       }
-      const amount = Number.parseFloat(amountInput);
-      const amountValid = amount > 0;
+
+      const addressValid = addressInput.length > 0;
+      setIsRecipientAddressValid(addressValid);
+
+      const amount = new Big(amountInput || "0");
+      const amountValid = amount.gt(0);
       setIsAmountValid(amountValid);
-      const isRecipientAddressValid = recipientAddressInput.length > 0;
-      setIsRecipientAddressValid(isRecipientAddressValid);
     },
     [setIsAmountValid, setIsRecipientAddressValid],
   );
 
-  // Form validation effect
+  // Check if form is valid whenever values change
   useEffect(() => {
-    if (amount || recipientAddressOverride) {
+    // Mark form as touched when any values change or wallet connects
+    if (sourceConnection.address || amount || recipientAddressOverride) {
       setHasTouchedForm(true);
     }
-    const recipientAddress = recipientAddressOverride || "mock-address";
+
+    // Use the recipient address from either override or destination chain
+    const recipientAddress =
+      recipientAddressOverride || destinationConnection.address;
     checkIsFormValid(recipientAddress, amount);
-  }, [amount, checkIsFormValid, recipientAddressOverride, setHasTouchedForm]);
+  }, [
+    sourceConnection.address,
+    destinationConnection.address,
+    amount,
+    recipientAddressOverride,
+    checkIsFormValid,
+    setHasTouchedForm,
+  ]);
 
   const updateRecipientAddressOverride = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -77,8 +239,55 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  // Mock formatted values for display
-  const formattedCosmosBalanceValue = "5.678";
+  // Format balance values - simplified for now
+  // TODO - get balances
+  const formattedBalanceValue = formatDecimalValues("0");
+
+  const isWithdrawDisabled = useMemo<boolean>((): boolean => {
+    if (recipientAddressOverride) {
+      return !(isAmountValid && isRecipientAddressValid);
+    }
+
+    return !(
+      isAmountValid &&
+      isRecipientAddressValid &&
+      sourceConnection.address &&
+      sourceConnection.currency?.coinDenom ===
+        destinationConnection.currency?.coinDenom
+    );
+  }, [
+    destinationConnection.currency?.coinDenom,
+    isAmountValid,
+    isRecipientAddressValid,
+    recipientAddressOverride,
+    sourceConnection.address,
+    sourceConnection.currency?.coinDenom,
+  ]);
+
+  const destinationChainNativeToken = useMemo(() => {
+    return destinationConnection.chain?.currencies.find(
+      (currency) => "isNative" in currency && currency.isNative,
+    );
+  }, [destinationConnection]);
+
+  const ibcWithdrawFeeDisplay = useMemo(() => {
+    if (
+      !destinationChainNativeToken ||
+      !destinationConnection.currency ||
+      !(
+        "ibcWithdrawalFeeWei" in destinationConnection.currency &&
+        destinationConnection.currency?.ibcWithdrawalFeeWei
+      )
+    ) {
+      return "";
+    }
+
+    const fee = formatUnits(
+      BigInt(destinationConnection.currency.ibcWithdrawalFeeWei),
+      destinationChainNativeToken.coinDecimals,
+    );
+    return `${fee} ${destinationChainNativeToken.coinDenom}`;
+  }, [destinationChainNativeToken, destinationConnection.currency]);
 
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
@@ -94,14 +303,41 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Connect Wallet"
-                      options={[]}
-                      onSelect={() => {}}
+                      placeholder="Select Astria chain..."
+                      options={sourceChainOptions}
+                      onSelect={connectSource}
                       LeftIcon={WalletIcon}
                     />
                   </div>
+
+                  {sourceConnection.chain && (
+                    <div className="w-full sm:w-auto">
+                      <Dropdown
+                        placeholder="Select a token"
+                        options={sourceCurrencyOptions}
+                        defaultOption={defaultSourceCurrencyOption}
+                        onSelect={setSourceCurrency}
+                        LeftIcon={WalletIcon}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Source wallet info */}
+              {sourceConnection.address && (
+                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+                  <p className="text-grey-light font-semibold">
+                    Address: {shortenAddress(sourceConnection.address)}
+                  </p>
+                  {sourceConnection.currency && (
+                    <p className="mt-2 text-grey-lighter font-semibold">
+                      Balance: {formattedBalanceValue}{" "}
+                      {sourceConnection.currency.coinDenom}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -126,59 +362,56 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Connect Keplr Wallet or enter address"
-                      options={cosmosWallet.cosmosChainsOptions}
-                      onSelect={cosmosWallet.selectCosmosChain}
+                      placeholder="Connect wallet or enter address"
+                      options={destinationChainOptions}
+                      onSelect={connectDestination}
+                      additionalOptions={additionalDestinationOptions}
                       LeftIcon={WalletIcon}
-                      additionalOptions={additionalCosmosOptions}
-                      valueOverride={cosmosWallet.selectedCosmosChainOption}
                     />
                   </div>
-                  {cosmosWallet.selectedCosmosChain &&
-                    cosmosWallet.ibcCurrencyOptions && (
-                      <div className="w-full sm:w-auto">
-                        <Dropdown
-                          placeholder="No matching token"
-                          options={cosmosWallet.ibcCurrencyOptions}
-                          defaultOption={cosmosWallet.defaultIbcCurrencyOption}
-                          onSelect={cosmosWallet.selectIbcCurrency}
-                          valueOverride={selectedCosmosCurrencyOption}
-                          disabled={true}
-                        />
-                      </div>
-                    )}
+                  {destinationConnection.chain && (
+                    <div className="w-full sm:w-auto">
+                      <Dropdown
+                        placeholder="No matching token"
+                        options={destinationCurrencyOptions}
+                        defaultOption={defaultDestinationCurrencyOption}
+                        onSelect={setDestinationCurrency}
+                        valueOverride={destinationCurrencyOption}
+                        disabled={true}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {cosmosWallet.cosmosAccountAddress &&
+              {/* Destination address display - when using wallet address */}
+              {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
                   <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                    {cosmosWallet.cosmosAccountAddress && (
-                      <p
-                        className="text-grey-light font-semibold cursor-pointer"
-                        onClick={handleEditRecipientClick}
-                      >
-                        <span className="mr-2">
-                          Address:{" "}
-                          {shortenAddress(cosmosWallet.cosmosAccountAddress)}
-                        </span>
-                        <i className="fas fa-pen-to-square" />
-                      </p>
-                    )}
-                    {cosmosWallet.cosmosAccountAddress && (
+                    <p
+                      className="text-grey-light font-semibold cursor-pointer"
+                      onClick={handleEditRecipientClick}
+                    >
+                      <span className="mr-2">
+                        Address: {shortenAddress(destinationConnection.address)}
+                      </span>
+                      <i className="fas fa-pen-to-square" />
+                    </p>
+                    {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {formattedCosmosBalanceValue}{" "}
-                        {cosmosWallet.selectedIbcCurrency?.coinDenom || "TIA"}
+                        Balance: {formattedBalanceValue}{" "}
+                        {destinationConnection.currency.coinDenom}
                       </p>
                     )}
-                    {/* TODO - ibcWithdrawFeeDisplay */}
+                    {/* Withdrawal fee display */}
                     <div className="mt-2 text-grey-light text-sm">
-                      Withdrawal fee: 0.001 FLAME
+                      Withdrawal fee: {ibcWithdrawFeeDisplay}
                     </div>
                   </div>
                 )}
 
+              {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
                 <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <p
@@ -186,7 +419,7 @@ export const ContentSection = () => {
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
-                      Address: {recipientAddressOverride}
+                      Address: {shortenAddress(recipientAddressOverride)}
                     </span>
                     <i className="fas fa-pen-to-square" />
                   </p>
@@ -201,6 +434,7 @@ export const ContentSection = () => {
                 </div>
               )}
 
+              {/* Address input form when editing */}
               {isRecipientAddressEditable && (
                 <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
                   <div className="text-grey-light font-semibold">
@@ -263,14 +497,14 @@ export const ContentSection = () => {
           </div>
 
           <div className="mt-4">
-            {!cosmosWallet.cosmosAccountAddress ? (
+            {!sourceConnection.address ? (
               <BridgeConnectionsModal>
                 <Button variant="gradient">Connect Wallet</Button>
               </BridgeConnectionsModal>
             ) : (
               <Button
                 variant="gradient"
-                onClick={handleWithdraw}
+                onClick={handleWithdrawClick}
                 disabled={isWithdrawDisabled}
               >
                 {isLoading ? "Processing..." : "Withdraw"}

@@ -1,5 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useConfig as useAppConfig, useAstriaChainData } from "config";
+import { useAstriaChainData } from "config";
 import { useBalancePolling } from "features/get-balance-polling";
 import React, {
   useCallback,
@@ -19,7 +19,6 @@ import {
 } from "wagmi";
 
 import {
-  AstriaChain,
   Balance,
   EvmChainInfo,
   EvmCurrency,
@@ -37,8 +36,6 @@ export interface EvmWalletContextProps {
   connectToSpecificChain: (chainId: number) => void;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
-  astriaChains: AstriaChain[];
-  coinbaseChains: EvmChainInfo[];
   // FIXME - can probably refactor all this junk out of here,
   //  but it is still used to show the balance in the bridge-connections-modal,
   //  but even that needs to be refactored to show Base balances possibly
@@ -47,9 +44,7 @@ export interface EvmWalletContextProps {
   isLoadingSelectedEvmCurrencyBalance: boolean;
   resetState: () => void;
   selectedEvmChain: EvmChainInfo | null;
-  selectedEvmChainNativeToken?: EvmCurrency;
   selectEvmChain: (chain: EvmChainInfo | null) => void;
-  ibcWithdrawFeeDisplay: string;
   usdcToNativeQuote: Balance;
   quoteLoading: boolean;
 }
@@ -65,8 +60,6 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { astriaChains, coinbaseChains } = useAppConfig();
-
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
   const wagmiConfig = useConfig();
@@ -227,26 +220,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     isLoading: isLoadingSelectedEvmCurrencyBalance,
   } = useBalancePolling(getBalanceCallback, pollingConfig);
 
-  const selectedEvmChainNativeToken = useMemo(() => {
-    return selectedEvmChain?.currencies.find((currency) => currency.isNative);
-  }, [selectedEvmChain]);
-
-  // TODO - move to withdraw content-section
-  const ibcWithdrawFeeDisplay = useMemo(() => {
-    if (
-      !selectedEvmChainNativeToken ||
-      !selectedEvmCurrency?.ibcWithdrawalFeeWei
-    ) {
-      return "";
-    }
-
-    const fee = formatUnits(
-      BigInt(selectedEvmCurrency.ibcWithdrawalFeeWei),
-      18,
-    );
-    return `${fee} ${selectedEvmChainNativeToken.coinDenom}`;
-  }, [selectedEvmChainNativeToken, selectedEvmCurrency]);
-
   const selectEvmChain = useCallback((chain: EvmChainInfo | null) => {
     console.log("EVM chain selected:", chain?.chainName, chain?.chainType);
     setSelectedEvmChain(chain);
@@ -287,18 +260,14 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     connectToSpecificChain,
     disconnectEvmWallet,
     evmAccountAddress,
-    astriaChains: Object.values(astriaChains),
-    coinbaseChains: Object.values(coinbaseChains),
     evmNativeTokenBalance,
     isLoadingEvmNativeTokenBalance,
     isLoadingSelectedEvmCurrencyBalance,
     resetState,
     selectedEvmChain,
-    selectedEvmChainNativeToken,
     selectedEvmCurrency,
     selectedEvmCurrencyBalance,
     selectEvmChain,
-    ibcWithdrawFeeDisplay,
     usdcToNativeQuote,
     quoteLoading,
   };

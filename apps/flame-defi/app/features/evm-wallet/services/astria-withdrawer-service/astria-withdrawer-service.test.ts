@@ -178,14 +178,16 @@ describe("AstriaWithdrawerService", () => {
         "writeContractMethod",
       );
 
-      const result = await service.withdrawToIbcChain(
-        420,
-        mockDestinationAddress,
-        mockAmount,
-        mockAmountDenom,
-        mockFee,
-        mockMemo,
-      );
+      const withdrawParams = {
+        chainId: 420,
+        destinationChainAddress: mockDestinationAddress,
+        amount: mockAmount,
+        amountDenom: mockAmountDenom,
+        fee: mockFee,
+        memo: mockMemo,
+      };
+
+      const result = await service.withdrawToIbcChain(withdrawParams);
 
       const totalAmount =
         parseUnits(mockAmount, mockAmountDenom) + BigInt(mockFee);
@@ -210,16 +212,18 @@ describe("AstriaWithdrawerService", () => {
         .spyOn(service as any, "writeContractMethod")
         .mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        service.withdrawToIbcChain(
-          420,
-          mockDestinationAddress,
-          mockAmount,
-          mockAmountDenom,
-          mockFee,
-          mockMemo,
-        ),
-      ).rejects.toThrow(errorMessage);
+      const withdrawParams = {
+        chainId: 420,
+        destinationChainAddress: mockDestinationAddress,
+        amount: mockAmount,
+        amountDenom: mockAmountDenom,
+        fee: mockFee,
+        memo: mockMemo,
+      };
+
+      await expect(service.withdrawToIbcChain(withdrawParams)).rejects.toThrow(
+        errorMessage,
+      );
     });
   });
 });
@@ -245,14 +249,16 @@ describe("AstriaErc20WithdrawerService", () => {
         "writeContractMethod",
       );
 
-      const result = await service.withdrawToIbcChain(
-        420,
-        mockDestinationAddress,
-        mockAmount,
-        mockAmountDenom,
-        mockFee,
-        mockMemo,
-      );
+      const withdrawParams = {
+        chainId: 420,
+        destinationChainAddress: mockDestinationAddress,
+        amount: mockAmount,
+        amountDenom: mockAmountDenom,
+        fee: mockFee,
+        memo: mockMemo,
+      };
+
+      const result = await service.withdrawToIbcChain(withdrawParams);
 
       const amountBaseUnits = parseUnits(mockAmount, mockAmountDenom);
       const feeWei = BigInt(mockFee);
@@ -277,16 +283,18 @@ describe("AstriaErc20WithdrawerService", () => {
         .spyOn(service as any, "writeContractMethod")
         .mockRejectedValue(new Error(errorMessage));
 
-      await expect(
-        service.withdrawToIbcChain(
-          420,
-          mockDestinationAddress,
-          mockAmount,
-          mockAmountDenom,
-          mockFee,
-          mockMemo,
-        ),
-      ).rejects.toThrow(errorMessage);
+      const withdrawParams = {
+        chainId: 420,
+        destinationChainAddress: mockDestinationAddress,
+        amount: mockAmount,
+        amountDenom: mockAmountDenom,
+        fee: mockFee,
+        memo: mockMemo,
+      };
+
+      await expect(service.withdrawToIbcChain(withdrawParams)).rejects.toThrow(
+        errorMessage,
+      );
     });
   });
 
