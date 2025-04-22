@@ -10,9 +10,12 @@ import {
 } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
-import type { AppConfig } from "config";
-import { getChainConfigs } from "config/chain-configs";
-import { getEnvVariable, getOptionalEnvVariable } from "config/env";
+import {
+  type AppConfig,
+  getChainConfigs,
+  getEnvVariable,
+  getOptionalEnvVariable,
+} from "config";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,

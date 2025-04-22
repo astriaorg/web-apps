@@ -51,6 +51,7 @@ export interface AppConfig {
 
 export {
   getAllChainConfigs,
+  getChainConfigs,
   getFlameChainId,
   getFlameNetworkByChainId,
 } from "./chain-configs";
