@@ -80,6 +80,9 @@ export const useTokenBalance = (
     } finally {
       setIsLoading(false);
     }
+    // NOTE - because the nativeBalance updates periodically, we sort of
+    //  get polling for free, but we need to actually implement this correctly
+    //  at the calling site. should export fetchBalances again probably
   }, [wagmiConfig, evmChain, userAddress, token, nativeBalance]);
 
   // Fetch balance when parameters change
@@ -93,5 +96,6 @@ export const useTokenBalance = (
     balance,
     isLoading,
     error,
+    fetchBalance,
   };
 };
