@@ -27,7 +27,7 @@ export const ContentSection = () => {
   } = usePoolPositionContext();
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
-  const { token0, token1, token0Balance, token1Balance, refreshBalances } =
+  const { token0Balance, token1Balance } =
     useGetPoolTokenBalances(
       poolToken0?.token.coinDenom ?? "",
       poolToken1?.token.coinDenom ?? "",
@@ -84,21 +84,19 @@ export const ContentSection = () => {
     setInput0("");
     setInput1("");
     refreshPoolPosition();
-    refreshBalances();
   }, [
     setModalOpen,
     setInput0,
     setInput1,
     setTxnStatus,
     refreshPoolPosition,
-    refreshBalances,
   ]);
 
   const handleModalActionButton = useCallback(() => {
     if (txnStatus !== TXN_STATUS.IDLE) {
       handleCloseModal();
     } else {
-      addLiquidity();
+      void addLiquidity();
     }
   }, [handleCloseModal, addLiquidity, txnStatus]);
 
@@ -121,8 +119,8 @@ export const ContentSection = () => {
         <AddLiquidityInputsBlock
           input0={input0}
           input1={input1}
-          token0={token0}
-          token1={token1}
+          token0={poolToken0?.token}
+          token1={poolToken1?.token}
           token0Balance={token0Balance}
           token1Balance={token1Balance}
           handleInputChange={handleInputChange}

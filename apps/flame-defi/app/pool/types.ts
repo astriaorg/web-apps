@@ -19,8 +19,8 @@ export interface AddLiquidityInputsBlockProps {
     id: POOL_INPUT_ID,
     coinDecimals?: number,
   ) => void;
-  token0: EvmCurrency | null;
-  token1: EvmCurrency | null;
+  token0?: EvmCurrency;
+  token1?: EvmCurrency;
   token0Balance: {
     value: string;
     symbol: string;
@@ -41,11 +41,6 @@ export interface NewPositionInputsProps {
 export interface TokenPair {
   token0: EvmCurrency | null;
   token1: EvmCurrency | null;
-}
-
-export interface TokenBalance {
-  value: string;
-  symbol: string;
 }
 
 export interface FeeData {

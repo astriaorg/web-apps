@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
-import { EvmCurrency } from "@repo/flame-types";
+import { EvmCurrency, EvmChainInfo, HexString } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -14,7 +14,7 @@ import {
   PlusIcon,
   WalletIcon,
 } from "@repo/ui/icons";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
+import { shortenAddress } from "@repo/ui/utils";
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useBridgeConnections } from "bridge/hooks";
 import { useConfig } from "config";
@@ -26,7 +26,7 @@ import {
 } from "bridge/modules/deposit/hooks";
 import { useBridgeOptions } from "bridge/hooks";
 import { Dropdown } from "components/dropdown";
-import { AddErc20ToWalletButton } from "features/evm-wallet";
+import { AddErc20ToWalletButton, useTokenBalance } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 
 export const ContentSection = () => {
@@ -295,9 +295,30 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  // Format balance values - simplified for now
-  // TODO - get balances
-  const formattedBalanceValue = formatDecimalValues("0");
+  // Get source token balance if it's an EVM chain
+  // TODO - handle ibc currency balances
+  const { 
+    balance: sourceBalance, 
+    isLoading: isLoadingSourceBalance 
+  } = useTokenBalance(
+    sourceConnection.chain?.chainType === "evm" ? sourceConnection.address as HexString : undefined,
+    sourceConnection.chain?.chainType === "evm" ? sourceConnection.chain as EvmChainInfo : undefined,
+    sourceConnection.currency && sourceConnection.chain?.chainType === "evm" 
+      ? sourceConnection.currency as EvmCurrency
+      : undefined
+  );
+  
+  // Get destination token balance if it's an EVM chain
+  // TODO - even though for deposits the destination will always be evm, if we make balance fetching generic
+  //  for cosmos and evm chains then we can make the deposit and withdraw content sections reusable
+  const {
+    balance: destinationBalance, 
+    isLoading: isLoadingDestinationBalance 
+  } = useTokenBalance(
+    destinationConnection.address as HexString,
+    destinationConnection.chain as EvmChainInfo,
+    destinationConnection.currency as EvmCurrency,
+  );
 
   const isDepositDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
@@ -369,8 +390,12 @@ export const ContentSection = () => {
                   </p>
                   {sourceConnection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {formattedBalanceValue}{" "}
-                      {sourceConnection.currency.coinDenom}
+                      Balance: {isLoadingSourceBalance 
+                        ? "Loading..." 
+                        : sourceBalance
+                          ? `${sourceBalance.value} ${sourceBalance.symbol}`
+                          : `0 ${sourceConnection.currency.coinDenom}`
+                      }
                     </p>
                   )}
                 </div>
@@ -438,8 +463,12 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {formattedBalanceValue}{" "}
-                        {destinationConnection.currency.coinDenom}
+                        Balance: {isLoadingDestinationBalance 
+                          ? "Loading..." 
+                          : destinationBalance
+                            ? `${destinationBalance.value} ${destinationBalance.symbol}`
+                            : `0 ${destinationConnection.currency.coinDenom}`
+                        }
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&
@@ -475,9 +504,11 @@ export const ContentSection = () => {
                       Recipient address must be a valid EVM address
                     </div>
                   )}
-                  <p className="mt-2 text-grey-lighter font-semibold text-sm">
-                    Connect via wallet to show balance
-                  </p>
+                  {destinationConnection.currency && (
+                    <p className="mt-2 text-grey-lighter font-semibold text-sm">
+                      Connect via wallet to show balance
+                    </p>
+                  )}
                 </div>
               )}
 

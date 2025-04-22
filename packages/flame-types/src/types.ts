@@ -1,9 +1,4 @@
-import type {
-  Asset,
-  AssetList,
-  Chain as CosmosKitChain,
-  DenomUnit,
-} from "@chain-registry/types";
+import type { Asset, AssetList, Chain as CosmosKitChain, DenomUnit } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract, parseUnits } from "viem";
 import React from "react";
@@ -504,8 +499,7 @@ export type AstriaChains = {
 
 // TODO - consolidate with `TokenAmount` type
 export interface TokenInputState {
-  // token might be null before user has selected a token
-  token: EvmCurrency | null;
+  token?: EvmCurrency;
   value: string;
   isQuoteValue?: boolean;
 }

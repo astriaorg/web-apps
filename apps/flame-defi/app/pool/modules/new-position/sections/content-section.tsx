@@ -30,7 +30,7 @@ export const ContentSection = () => {
     isQuoteValue: false,
   });
   const [input1, setInput1] = useState<TokenInputState>({
-    token: null,
+    token: undefined,
     value: "",
     isQuoteValue: true,
   });

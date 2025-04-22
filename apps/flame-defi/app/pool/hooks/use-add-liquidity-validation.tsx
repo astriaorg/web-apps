@@ -1,11 +1,12 @@
-import { TokenBalance } from "pool/types";
 import { useState, useEffect } from "react";
+
+import { Balance } from "@repo/flame-types";
 
 export const useAddLiquidityValidation = (
   input0: string,
   input1: string,
-  token0Balance: TokenBalance | null,
-  token1Balance: TokenBalance | null,
+  token0Balance: Balance | null,
+  token1Balance: Balance | null,
 ) => {
   const [isValid, setIsValid] = useState(true);
   const [buttonText, setButtonText] = useState<string>("Add Liquidity");

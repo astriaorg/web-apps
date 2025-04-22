@@ -1,7 +1,8 @@
-import { useTokenBalances } from "features/evm-wallet";
 import { useAccount } from "wagmi";
+
+import { Balance } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
-import { useEffect, useCallback } from "react";
+import { useTokenBalance } from "features/evm-wallet";
 
 export const useGetPoolTokenBalances = (
   poolToken0Symbol: string,
@@ -15,37 +16,35 @@ export const useGetPoolTokenBalances = (
     currencies.find(
       (currency) =>
         currency.coinDenom.toLowerCase() === poolToken0Symbol.toLowerCase(),
-    ) || null;
+    );
   const token1 =
     currencies.find(
       (currency) =>
         currency.coinDenom.toLowerCase() === poolToken1Symbol.toLowerCase(),
-    ) || null;
+    );
 
-  const { balances, fetchBalances } = useTokenBalances(
+  // Get token0 balance
+  const { 
+    balance: token0Balance, 
+    isLoading: isLoadingToken0Balance
+  } = useTokenBalance(
     userAccount.address,
     chain,
+    token0
   );
 
-  useEffect(() => {
-    fetchBalances([token0, token1]);
-  }, [token0, token1, fetchBalances]);
+  // Get token1 balance
+  const {
+    balance: token1Balance,
+    isLoading: isLoadingToken1Balance
+  } = useTokenBalance(
+    userAccount.address,
+    chain,
+    token1
+  );
 
-  const refreshBalances = useCallback(() => {
-    if (token0 && token1) {
-      return fetchBalances([token0, token1]);
-    }
-  }, [token0, token1, fetchBalances]);
-
-  const token0Balance =
-    balances.find(
-      (balance) => balance && balance.symbol === token0?.coinDenom,
-    ) || null;
-
-  const token1Balance =
-    balances.find(
-      (balance) => balance && balance.symbol === token1?.coinDenom,
-    ) || null;
+  // Collection of balances to maintain API compatibility
+  const balances = [token0Balance, token1Balance].filter(Boolean) as Balance[];
 
   return {
     balances,
@@ -53,6 +52,6 @@ export const useGetPoolTokenBalances = (
     token1,
     token0Balance,
     token1Balance,
-    refreshBalances,
+    isLoading: isLoadingToken0Balance || isLoadingToken1Balance
   };
 };

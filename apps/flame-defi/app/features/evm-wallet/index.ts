@@ -6,7 +6,7 @@ import { useAstriaWallet } from "./hooks/use-astria-wallet";
 import { useEvmWallet } from "./hooks/use-evm-wallet";
 import { useGetQuote } from "./hooks/use-get-quote";
 import { useTokenApproval } from "./hooks/use-token-approval";
-import { useTokenBalances } from "./hooks/use-token-balances";
+import { useTokenBalance } from "./hooks/use-token-balance";
 import { createAstriaBridgeSourceService } from "./services/astria-bridge-source-service/astria-bridge-source-service";
 import { createWithdrawerService } from "./services/astria-withdrawer-service/astria-withdrawer-service";
 import {
@@ -34,7 +34,7 @@ export {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
   createPoolService,
-  createSwapRouterService,
+  createSwapRouterService, 
   createErc20Service,
   createTradeFromQuote,
   createWethService,
@@ -43,5 +43,5 @@ export {
   useEvmWallet,
   useGetQuote,
   useTokenApproval,
-  useTokenBalances,
+  useTokenBalance,
 };

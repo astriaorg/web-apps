@@ -81,6 +81,10 @@ export class Erc20Service extends GenericContractService {
     const allowance = currentAllowance as bigint;
     return allowance.toString();
   }
+
+  async getBalance(chainId: number, address: string): Promise<bigint> {
+    return this.readContractMethod(chainId, "balanceOf", [address]);
+  }
 }
 
 export function createErc20Service(

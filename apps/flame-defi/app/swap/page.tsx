@@ -22,7 +22,7 @@ import {
 } from "@repo/flame-types";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useGetQuote, useTokenBalances } from "features/evm-wallet";
+import { useGetQuote, useTokenBalance } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
@@ -37,7 +37,7 @@ export default function SwapPage(): React.ReactElement {
     isQuoteValue: false,
   });
   const [inputTwo, setInputTwo] = useState<TokenInputState>({
-    token: null,
+    token: undefined,
     value: "",
     isQuoteValue: true,
   });
@@ -54,9 +54,20 @@ export default function SwapPage(): React.ReactElement {
   const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
 
-  const { balances, fetchBalances } = useTokenBalances(
+  const {
+    balance: inputOneBalance, 
+  } = useTokenBalance(
     userAccount.address,
     chain,
+    inputOne.token
+  );
+
+  const {
+    balance: inputTwoBalance, 
+  } = useTokenBalance(
+    userAccount.address,
+    chain,
+    inputTwo.token
   );
 
   const swapInputs: SwapPairProps[] = [
@@ -64,14 +75,14 @@ export default function SwapPage(): React.ReactElement {
       id: SWAP_INPUT_ID.INPUT_ONE,
       inputToken: inputOne,
       oppositeToken: inputTwo,
-      balance: balances[0]?.value || "0",
+      balance: inputOneBalance?.value || "0",
       label: flipTokens ? "Buy" : "Sell",
     },
     {
       id: SWAP_INPUT_ID.INPUT_TWO,
       inputToken: inputTwo,
       oppositeToken: inputOne,
-      balance: balances[1]?.value || "0",
+      balance: inputTwoBalance?.value || "0",
       label: flipTokens ? "Sell" : "Buy",
     },
   ];
@@ -82,17 +93,9 @@ export default function SwapPage(): React.ReactElement {
   ];
   const topToken = swapPairs[0].inputToken;
   const bottomToken = swapPairs[1].inputToken;
-
-  useEffect(() => {
-    if (userAccount.address && (inputOne.token || inputTwo.token)) {
-      fetchBalances([inputOne.token, inputTwo.token]);
-    }
-  }, [userAccount.address, inputOne.token, inputTwo.token, fetchBalances]);
+  const topTokenBalance = swapPairs[0].balance;
 
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
-  const topTokenBalance =
-    balances.find((balance) => balance.symbol === topToken.token?.coinDenom)
-      ?.value || "0";
 
   const {
     titleText,
