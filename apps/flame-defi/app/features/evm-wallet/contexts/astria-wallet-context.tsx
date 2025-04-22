@@ -38,11 +38,10 @@ export const AstriaWalletContextProvider: React.FC<{
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
 
-  const connectWallet = useCallback(() => {
-    if (openConnectModal) {
-      openConnectModal();
-    }
-  }, [openConnectModal]);
+  const connectWallet = useCallback(
+    () => openConnectModal?.(),
+    [openConnectModal],
+  );
 
   const {
     status: nativeBalanceStatus,

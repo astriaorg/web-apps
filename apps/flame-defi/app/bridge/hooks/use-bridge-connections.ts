@@ -169,7 +169,7 @@ export function useBridgeConnections(): BridgeConnections {
         if (chain.chainType === ChainType.COSMOS) {
           cosmosWallet.connectCosmosWallet();
         } else {
-          evmWallet.connectEvmWallet(chain);
+          evmWallet.connectEvmWallet();
         }
       }
 

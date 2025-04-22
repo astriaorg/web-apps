@@ -2,10 +2,8 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 
-import { EvmChainInfo } from "@repo/flame-types";
-
 export interface EvmWalletContextProps {
-  connectEvmWallet: (chain?: EvmChainInfo) => void;
+  connectEvmWallet: () => void;
   connectToSpecificChain: (chainId: number) => void;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
@@ -44,11 +42,10 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     setEvmAccountAddress(null);
   }, []);
 
-  const connectEvmWallet = useCallback(() => {
-    if (openConnectModal) {
-      openConnectModal();
-    }
-  }, [openConnectModal]);
+  const connectEvmWallet = useCallback(
+    () => openConnectModal?.(),
+    [openConnectModal],
+  );
 
   const connectToSpecificChain = (chainId: number) => {
     if (!evmAccountAddress && openConnectModal) {
