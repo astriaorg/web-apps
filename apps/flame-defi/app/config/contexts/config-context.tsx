@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
-import { getChainConfigs } from "../chain-configs";
-import { getEnvVariable, getOptionalEnvVariable } from "../env";
-import type { AppConfig } from "../index";
+import { maxUint256 } from "viem";
+
 import {
   CoinbaseChains,
   CosmosChains,
@@ -10,6 +9,10 @@ import {
   HexString,
 } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
+
+import type { AppConfig } from "config";
+import { getChainConfigs } from "config/chain-configs";
+import { getEnvVariable, getOptionalEnvVariable } from "config/env";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,
@@ -33,8 +36,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
-  const tokenApprovalAmount =
-    "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+  const tokenApprovalAmount = maxUint256.toString();
 
   const defaultSlippageTolerance = 0.1;
 
