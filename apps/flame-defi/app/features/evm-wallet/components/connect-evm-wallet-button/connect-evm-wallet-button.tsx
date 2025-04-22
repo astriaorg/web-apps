@@ -1,10 +1,12 @@
+import { useMemo } from "react";
+import { useAccount } from "wagmi";
+
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
-import { useMemo } from "react";
-import { useAccount } from "wagmi";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
+import { useTokenBalance } from "../../hooks/use-token-balance";
 
 interface ConnectEvmWalletButtonProps {
   onDisconnectWallet?: () => void;
@@ -18,16 +20,20 @@ export const ConnectEvmWalletButton = ({
 }: ConnectEvmWalletButtonProps) => {
   // FIXME - this won't work to show Base connection.
   //  too tired to wrap my head around this rn. come back to this
-  const { chain } = useAstriaChainData();
+  const { chain, nativeToken } = useAstriaChainData();
   const {
     connectEvmWallet,
     disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
   } = useEvmWallet();
   const userAccount = useAccount();
+
+  const { balance: tokenBalance, isLoading: isLoadingTokenBalance } = useTokenBalance(
+    userAccount.address,
+    chain,
+    nativeToken
+  );
 
   // ui
   const label = useMemo(() => {
@@ -42,11 +48,11 @@ export const ConnectEvmWalletButton = ({
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}
       isLoading={
-        (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
+        (isLoadingTokenBalance && !tokenBalance) ||
         quoteLoading
       }
       account={userAccount}
-      balance={evmNativeTokenBalance ?? undefined}
+      balance={tokenBalance ?? undefined}
       fiat={usdcToNativeQuote}
       explorer={{
         url: `${chain.blockExplorerUrl}/address/${userAccount.address}`,
