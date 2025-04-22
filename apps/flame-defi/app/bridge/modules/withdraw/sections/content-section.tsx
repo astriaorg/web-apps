@@ -2,23 +2,20 @@
 
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { formatUnits } from "viem";
 
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
-import { useBridgeConnections } from "bridge/hooks";
 import { useConfig } from "config";
-import {
-  useWithdrawTransaction,
-  WithdrawError,
-  WalletConnectionError,
-  AstriaWalletError,
-} from "bridge/modules/withdraw/hooks";
-import { useBridgeOptions } from "bridge/hooks";
 import { Dropdown } from "components/dropdown";
 import { NotificationType, useNotifications } from "features/notifications";
-import { formatUnits } from "viem";
+
+import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
+import { AstriaWalletError, WalletConnectionError, WithdrawError } from "bridge/types";
+import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
+import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();

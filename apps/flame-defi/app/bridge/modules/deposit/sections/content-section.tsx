@@ -15,19 +15,16 @@ import {
   WalletIcon,
 } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
-import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
-import { useBridgeConnections } from "bridge/hooks";
 import { useConfig } from "config";
-import {
-  useDepositTransaction,
-  DepositError,
-  WalletConnectionError,
-  KeplrWalletError,
-} from "bridge/modules/deposit/hooks";
-import { useBridgeOptions } from "bridge/hooks";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton, useTokenBalance } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
+
+import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
+import { DepositError, WalletConnectionError, KeplrWalletError } from "bridge/types";
+import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
+import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();

@@ -1,36 +1,19 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useConfig } from "wagmi";
 
 import { HexString } from "@repo/flame-types";
 import { useCosmosWallet } from "features/cosmos-wallet";
 
-import { createDepositStrategy } from "bridge/modules/deposit/strategies/deposit-strategies";
-import { ChainConnection } from "bridge/types";
-
-export class DepositError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "DepositError";
-  }
-}
-
-export class WalletConnectionError extends DepositError {
-  constructor(message = "Please connect your wallets first.") {
-    super(message);
-    this.name = "WalletConnectionError";
-  }
-}
-
-export class KeplrWalletError extends DepositError {
-  constructor(
-    message = "Failed to get account from Keplr wallet. Does this address have funds for the selected chain?",
-  ) {
-    super(message);
-    this.name = "KeplrWalletError";
-  }
-}
+import { createBridgeStrategy } from "bridge/strategies";
+import {
+  ChainConnection,
+  DepositError,
+  KeplrWalletError,
+  WalletConnectionError,
+  WithdrawError,
+} from "bridge/types";
 
 export interface DepositTransactionHook {
   isLoading: boolean;
@@ -69,15 +52,22 @@ export function useDepositTransaction(): DepositTransactionHook {
         throw new WalletConnectionError();
       }
 
+      if (!destinationConnection.chain) {
+        throw new WithdrawError("Destination chain not selected");
+      }
+
       setIsLoading(true);
 
       try {
-        const depositStrategy = createDepositStrategy({
-          amount,
-          sourceConnection,
-          cosmosWallet,
-          wagmiConfig,
-        });
+        const depositStrategy = createBridgeStrategy(
+          {
+            amount,
+            sourceConnection,
+            cosmosWallet,
+            wagmiConfig,
+          },
+          destinationConnection.chain.chainType,
+        );
 
         await depositStrategy.execute(recipientAddress);
         return;

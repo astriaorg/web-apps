@@ -1,36 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useConfig } from "wagmi";
 
 import { HexString } from "@repo/flame-types";
 import { useCosmosWallet } from "features/cosmos-wallet";
 
-import { createWithdrawStrategy } from "bridge/modules/withdraw/strategies/withdraw-strategies";
-import { ChainConnection } from "bridge/types";
-
-export class WithdrawError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "WithdrawError";
-  }
-}
-
-export class WalletConnectionError extends WithdrawError {
-  constructor(message = "Please connect your wallets first.") {
-    super(message);
-    this.name = "WalletConnectionError";
-  }
-}
-
-export class AstriaWalletError extends WithdrawError {
-  constructor(
-    message = "Failed to connect to Astria wallet. Please try again.",
-  ) {
-    super(message);
-    this.name = "AstriaWalletError";
-  }
-}
+import { createBridgeStrategy } from "bridge/strategies";
+import {
+  AstriaWalletError,
+  ChainConnection,
+  WalletConnectionError,
+  WithdrawError,
+} from "bridge/types";
 
 export interface WithdrawTransactionHook {
   isLoading: boolean;
@@ -69,14 +51,14 @@ export function useWithdrawTransaction(): WithdrawTransactionHook {
         throw new WalletConnectionError();
       }
 
+      if (!destinationConnection.chain) {
+        throw new WithdrawError("Destination chain not selected");
+      }
+
       setIsLoading(true);
 
       try {
-        if (!destinationConnection.chain) {
-          throw new WithdrawError("Destination chain not selected");
-        }
-
-        const withdrawStrategy = createWithdrawStrategy(
+        const withdrawStrategy = createBridgeStrategy(
           {
             amount,
             sourceConnection,
