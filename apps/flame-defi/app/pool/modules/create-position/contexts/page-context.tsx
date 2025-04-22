@@ -2,7 +2,7 @@
 
 import type { EvmCurrency } from "@repo/flame-types";
 import { useAssetAmountInput, type Amount } from "@repo/ui/components";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { FEE_TIER, type FeeTier } from "pool/constants";
 import { useGetPoolTokenBalances } from "pool/hooks";
 import { createContext, PropsWithChildren, useState } from "react";
@@ -27,14 +27,14 @@ export const PageContext = createContext<PageContextProps | undefined>(
 );
 
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
 
   const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>(
     FEE_TIER.MEDIUM,
   );
 
   const [token0, setToken0] = useState<EvmCurrency | undefined>(
-    selectedChain.currencies[0],
+    chain.currencies[0],
   );
   const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
