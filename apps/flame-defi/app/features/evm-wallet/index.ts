@@ -11,18 +11,15 @@ import {
 import { createPoolFactoryService } from "./services/pool-factory-service";
 import { createPoolService } from "./services/pool-service";
 import {
-  SwapRouterService,
   createSwapRouterService,
   createTradeFromQuote,
+  SwapRouterService,
 } from "./services/swap-router-service";
 import { createWethService } from "./services/weth-service";
 
 export {
   AddErc20ToWalletButton,
   ConnectEvmWalletButton,
-  EvmWalletProvider,
-  NonfungiblePositionManagerService,
-  SwapRouterService,
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
   createPoolService,
@@ -30,6 +27,9 @@ export {
   createTradeFromQuote,
   createWethService,
   createWithdrawerService,
+  EvmWalletProvider,
+  NonfungiblePositionManagerService,
+  SwapRouterService,
   useEvmWallet,
   useTokenBalances,
 };

@@ -1,5 +1,5 @@
 import { PoolContextProvider } from "pool/context/pool-context";
-import { ContentSection } from "./sections/content-section";
+// import { ContentSection } from "./sections/content-section";
 import { HeaderSection } from "./sections/header-section";
 
 export const NewPosition = () => {
@@ -7,7 +7,7 @@ export const NewPosition = () => {
     <PoolContextProvider>
       <div className="flex flex-col">
         <HeaderSection />
-        <ContentSection />
+        {/* <ContentSection /> */}
       </div>
     </PoolContextProvider>
   );

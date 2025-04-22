@@ -4,8 +4,16 @@ import {
   getPublicClient,
   getWalletClient,
   type GetWalletClientReturnType,
+  multicall,
+  type MulticallParameters,
 } from "@wagmi/core";
-import type { Abi, Address, Hash, PublicClient } from "viem";
+import type {
+  Abi,
+  Address,
+  ContractFunctionParameters,
+  Hash,
+  PublicClient,
+} from "viem";
 
 export class GenericContractService {
   constructor(
@@ -109,5 +117,19 @@ export class GenericContractService {
       console.error(`Error in ${methodName}:`, e);
       throw e;
     }
+  }
+
+  protected async multicall(
+    parameters: MulticallParameters<readonly ContractFunctionParameters[]>,
+  ): Promise<unknown[]> {
+    const result = await multicall(this.wagmiConfig, parameters);
+
+    for (const call of result) {
+      if (call.error) {
+        throw new Error("Multicall error:", call.error);
+      }
+    }
+
+    return result.map((it) => it.result);
   }
 }

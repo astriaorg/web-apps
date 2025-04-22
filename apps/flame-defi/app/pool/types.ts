@@ -5,7 +5,7 @@ import {
   TokenInputState,
 } from "@repo/flame-types";
 import { Address } from "viem";
-import { FeeTier } from "./constants/pool-constants";
+import type { FeeTier } from "./constants";
 
 export enum POOL_INPUT_ID {
   INPUT_ZERO = "input_zero",
@@ -101,7 +101,6 @@ export interface PoolPosition extends GetAllPoolPositionsResponse {
 }
 
 export type PoolContextProps = {
-  feeData: FeeData[];
   poolPositions: PoolPosition[];
   poolPositionsLoading: boolean;
   modalOpen: boolean;

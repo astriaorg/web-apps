@@ -9,6 +9,13 @@ export const FEE_TIER = {
   HIGH: 10000, // 1.00%
 } as const;
 
+export const FEE_TIERS = [
+  FEE_TIER.LOWEST,
+  FEE_TIER.LOW,
+  FEE_TIER.MEDIUM,
+  FEE_TIER.HIGH,
+];
+
 /**
  * Type representing valid fee tier values
  */
