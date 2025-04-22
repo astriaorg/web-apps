@@ -2,13 +2,14 @@
 
 import { Button, Skeleton } from "@repo/ui/components";
 import { InboxIcon, PlusIcon } from "@repo/ui/icons";
+import { useAstriaWallet } from "features/evm-wallet";
+import { useRouter } from "next/navigation";
+import { usePoolContext } from "pool/hooks";
 import type React from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/navigation";
-import { PositionsTable } from "./components";
 import { ROUTES } from "../../constants/routes";
-import { useAstriaWallet } from "features/evm-wallet";
-import { usePoolContext } from "pool/hooks";
+import { PositionsTable } from "./components";
+
 export const Pool = (): React.ReactElement => {
   const { connectWallet } = useAstriaWallet();
   const { poolPositions, poolPositionsLoading } = usePoolContext();
@@ -21,7 +22,7 @@ export const Pool = (): React.ReactElement => {
         <h2 className="text-lg md:text-2xl font-medium">Pools</h2>
         {userAccount.address && (
           <Button
-            onClick={() => router.push(ROUTES.NEW_POSITION)}
+            onClick={() => router.push(ROUTES.CREATE_POSITION)}
             className="mt-0 flex items-center"
           >
             <PlusIcon />

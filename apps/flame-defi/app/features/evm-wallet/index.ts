@@ -16,9 +16,9 @@ import {
 import { createPoolFactoryService } from "./services/pool-factory-service";
 import { createPoolService } from "./services/pool-service";
 import {
-  SwapRouterService,
   createSwapRouterService,
   createTradeFromQuote,
+  SwapRouterService,
 } from "./services/swap-router-service";
 import { createErc20Service } from "./services/erc-20-service/erc-20-service";
 import { createWethService } from "./services/weth-service";
@@ -27,9 +27,6 @@ export {
   AddErc20ToWalletButton,
   AstriaWalletContextProvider,
   ConnectEvmWalletButton,
-  EvmWalletProvider,
-  NonfungiblePositionManagerService,
-  SwapRouterService,
   createAstriaBridgeSourceService,
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
@@ -39,6 +36,9 @@ export {
   createTradeFromQuote,
   createWethService,
   createWithdrawerService,
+  EvmWalletProvider,
+  NonfungiblePositionManagerService,
+  SwapRouterService,
   useAstriaWallet,
   useEvmWallet,
   useGetQuote,
