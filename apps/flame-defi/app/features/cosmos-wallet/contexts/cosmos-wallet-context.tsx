@@ -10,7 +10,6 @@ import {
   CosmosChainInfo,
   cosmosChainNameFromId,
   IbcCurrency,
-  ibcCurrencyBelongsToChain,
   TRADE_TYPE,
 } from "@repo/flame-types";
 import { removeNonNumeric } from "@repo/ui/utils";
@@ -96,7 +95,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     if (!selectedCosmosChain || !selectedIbcCurrency || !cosmosAccountAddress) {
       return null;
     }
-    if (!ibcCurrencyBelongsToChain(selectedIbcCurrency, selectedCosmosChain)) {
+    if (!selectedIbcCurrency.belongsToChain(selectedCosmosChain)) {
       return null;
     }
     const balance = await getBalanceFromChain(

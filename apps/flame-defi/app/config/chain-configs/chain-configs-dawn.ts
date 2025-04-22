@@ -7,6 +7,7 @@ import {
   EvmChainInfo,
   AstriaChains,
   EvmCurrency,
+  IbcCurrency,
 } from "@repo/flame-types";
 import {
   AstriaIcon,
@@ -61,20 +62,17 @@ const CelestiaChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
       coinDenom: "TIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "utia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-160",
       sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
+      title: "TIA",
       IconComponent: CelestiaIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -144,20 +142,17 @@ const NobleChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
       coinDenom: "USDC",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "uusdc",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-232",
       sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd",
+      title: "USDC",
       IconComponent: NobleIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -228,21 +223,18 @@ const NeutronChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
       coinDenom: "dTIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
+      title: "dTIA",
       IconComponent: DropTiaIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [

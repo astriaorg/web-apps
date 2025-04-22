@@ -7,6 +7,7 @@ import {
   EvmChainInfo,
   AstriaChains,
   EvmCurrency,
+  IbcCurrency,
 } from "@repo/flame-types";
 import {
   AstriaIcon,
@@ -25,36 +26,22 @@ import {
 
 const CelestiaChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,
-  // Chain-id of the celestia chain.
   chainId: "celestia",
-  // The name of the chain to be displayed to the user.
   chainName: "Celestia",
-  // RPC endpoint of the chain
   rpc: "https://celestia-rpc.polkachu.com:443",
-  // REST endpoint of the chain.
   rest: "https://celestia-api.polkachu.com",
-  // Staking coin information
   stakeCurrency: {
-    // Coin denomination to be displayed to the user.
     coinDenom: "TIA",
-    // Actual denom (i.e. uatom, uscrt) used by the blockchain.
     coinMinimalDenom: "utia",
-    // # of decimal points to convert minimal denomination to user-facing denomination.
     coinDecimals: 6,
-    // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-    // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
     coinGeckoId: "celestia",
   },
-  // (Optional) If you have a wallet webpage used to stake the coin then provide the url to the website in `walletUrlForStaking`.
-  // The 'stake' button in Keplr extension will link to the webpage.
-  // walletUrlForStaking: "",
   // The BIP44 path.
   bip44: {
     // You can only set the coin type of BIP44.
     // 'Purpose' is fixed to 44.
     coinType: 118,
   },
-  // The address prefix of the chain.
   bech32Config: {
     bech32PrefixAccAddr: "celestia",
     bech32PrefixAccPub: "celestiapub",
@@ -63,39 +50,26 @@ const CelestiaChainInfo: CosmosChainInfo = {
     bech32PrefixValAddr: "celestiavaloper",
     bech32PrefixValPub: "celestiavaloperpub",
   },
-  // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
-      coinDenom: "TIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-      coinMinimalDenom: "utia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
+    new IbcCurrency({
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
+      coinDenom: "TIA",
       coinGeckoId: "celestia",
+      coinMinimalDenom: "utia",
       ibcChannel: "channel-48",
-      sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
       IconComponent: CelestiaIcon,
-    },
+      isBridgeable: true,
+      isNative: true,
+      sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
+      title: "TIA",
+    }),
   ],
-  // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
     {
-      // Coin denomination to be displayed to the user.
       coinDenom: "TIA",
-      // Actual denom (i.e. nria, uscrt) used by the blockchain.
       coinMinimalDenom: "utia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
       coinGeckoId: "celestia",
-      // (Optional) This is used to set the fee of the transaction.
-      // If this field is not provided and suggesting chain is not natively integrated, Keplr extension will set the Keplr default gas price (low: 0.01, average: 0.025, high: 0.04).
-      // Currently, Keplr doesn't support dynamic calculation of the gas prices based on on-chain data.
-      // Make sure that the gas prices are higher than the minimum gas prices accepted by chain validators and RPC/REST endpoint.
       gasPriceStep: {
         low: 0.01,
         average: 0.02,
@@ -147,21 +121,18 @@ const NeutronChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
       coinDenom: "dTIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom:
         "factory/neutron1ut4c6pv4u6vyu97yw48y8g7mle0cat54848v6m97k977022lzxtsaqsgmq/udtia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-6236",
       sequencerBridgeAccount: "astria15juwcclg07xs38757q257evltequawcejzzs4l",
+      title: "dTIA",
       IconComponent: DropTiaIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -213,15 +184,18 @@ const NobleChainInfo: CosmosChainInfo = {
     bech32PrefixValPub: "noblevaloperpub",
   },
   currencies: [
-    {
+    new IbcCurrency({
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-104",
       sequencerBridgeAccount:
         "astriacompat1eg8hhey0n4untdvqqdvlyl0e7zx8wfcaz3l6wu",
+      title: "USDC",
       IconComponent: UsdcIcon,
-    },
+    }),
   ],
   feeCurrencies: [
     {
@@ -262,15 +236,18 @@ const OsmosisChainInfo: CosmosChainInfo = {
     bech32PrefixValPub: "osmosisvaloperpub",
   },
   currencies: [
-    {
+    new IbcCurrency({
       coinDenom: "milkTIA",
       coinMinimalDenom:
         "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
       coinDecimals: 6,
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-85486",
       sequencerBridgeAccount: "astria1kgxhyhvynhcwwrylkzzx6q3a8rn3tuvasxvuy8",
+      title: "milkTIA",
       IconComponent: MilkTiaIcon,
-    },
+    }),
   ],
   feeCurrencies: [
     {
@@ -311,14 +288,17 @@ const StrideChainInfo: CosmosChainInfo = {
     bech32PrefixValPub: "stridevaloperpub",
   },
   currencies: [
-    {
+    new IbcCurrency({
       coinDenom: "stTIA",
       coinMinimalDenom: "stutia",
       coinDecimals: 6,
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-285",
       sequencerBridgeAccount: "astria1dllx9d9karss9ca8le25a4vqhf67a67d5d4l6r",
+      title: "stTIA",
       IconComponent: StrideTiaIcon,
-    },
+    }),
   ],
   feeCurrencies: [
     {

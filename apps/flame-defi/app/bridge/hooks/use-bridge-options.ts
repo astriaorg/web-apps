@@ -64,13 +64,7 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => {
-          // only include bridgeable tokens
-          if ("isBridgeable" in c) {
-            return c.isBridgeable;
-          }
-          return true;
-        })
+        .filter((c) => c.isBridgeable)
         .map((c) => ({
           label: c.coinDenom,
           value: c,
@@ -87,13 +81,7 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => {
-          // only include bridgeable tokens
-          if ("isBridgeable" in c) {
-            return c.isBridgeable;
-          }
-          return true;
-        })
+        .filter((c) => c.isBridgeable)
         .map((currency) => ({
           label: currency.coinDenom,
           value: currency,

@@ -71,7 +71,7 @@ export interface CosmosChainInfo extends GenericChain {
    * This indicates the type of coin that can be used for stake.
    * You can get actual currency information from Currencies.
    */
-  readonly stakeCurrency?: CosmosCurrency;
+  readonly stakeCurrency?: BaseCurrency;
   readonly walletUrl?: string;
   readonly walletUrlForStaking?: string;
   readonly bip44: BIP44;
@@ -105,10 +105,19 @@ function cosmosChainInfoToCosmosKitChain(
     // TODO - add more fields from CosmosChain?
     ...chain,
     chain_name: cosmosChainNameFromId(chain.chainId),
+    // fees: {
+    // TODO - fee_tokens
+    //   fee_tokens: chain.feeCurrencies,
+    // },
+    // staking: {
+    // TODO - staking_tokens
+    //   staking_tokens: [chain.stakeCurrency]
+    // },
     pretty_name: chain.chainName,
     chain_id: chain.chainId,
     chain_type: "cosmos",
     bech32_prefix: chain.bech32Config?.bech32PrefixAccAddr,
+    bech32_config: chain.bech32Config,
     apis: {
       rpc: [
         {
@@ -144,6 +153,7 @@ export type CosmosChains = {
 };
 
 // Adds gas price step to a type
+// FIXME - this doesn't implement everything needed for FeeToken
 export type WithGasPriceStep<T> = T & {
   readonly gasPriceStep?: {
     readonly low: number;
@@ -152,32 +162,130 @@ export type WithGasPriceStep<T> = T & {
   };
 };
 
-// Represents information about a currency.
-export interface CosmosCurrency {
+/**
+ * Minimal description of a currency.
+ */
+export interface BaseCurrency {
+  /** Symbol of the token */
   readonly coinDenom: string;
+  /** Minimal denomination of the token */
   readonly coinMinimalDenom: string;
+  /** Number of decimal places the token uses */
   readonly coinDecimals: number;
-  /**
-   * This is used to fetch asset's fiat value from coingecko.
-   * You can get id from https://api.coingecko.com/api/v3/coins/list.
-   */
+
+  /** Used to fetch asset's fiat value from coingecko */
   readonly coinGeckoId?: string;
+  /** URL for the coin's image */
   readonly coinImageUrl?: string;
 }
 
+/**
+ * Describes a generic currency for use in the Astria app
+ */
+export interface GenericCurrency extends BaseCurrency {
+  /** Display name of the token */
+  readonly title: string;
+  /** True if this is the native token (e.g., TIA) */
+  readonly isNative: boolean;
+  /** True if this token should be shown in bridge page dropdowns */
+  readonly isBridgeable: boolean;
+  /** Component to render the token's icon */
+  readonly IconComponent?: React.FC<IconProps>;
+}
+
 // Represents information about a currency used for fees.
-export type CosmosFeeCurrency = WithGasPriceStep<CosmosCurrency>;
+export type CosmosFeeCurrency = WithGasPriceStep<BaseCurrency>;
 
 /**
  * Represents information about a currency that uses IBC.
  */
-export interface IbcCurrency extends CosmosCurrency {
-  // The ibc channel used to send this currency
-  ibcChannel?: string;
-  // The sequencer bridge account used to bridge this currency to the evm
-  sequencerBridgeAccount?: string;
-  // The icon to use for this currency in the ui
-  IconComponent?: React.FC;
+export class IbcCurrency implements GenericCurrency {
+  public readonly title: string;
+  public readonly isNative: boolean;
+  public readonly isBridgeable: boolean;
+  public readonly IconComponent?: React.FC<IconProps>;
+  public readonly coinGeckoId?: string;
+  public readonly coinImageUrl?: string;
+  public readonly coinDenom: string;
+  public readonly coinMinimalDenom: string;
+  public readonly coinDecimals: number;
+
+  /** The IBC channel used to send this currency */
+  public readonly ibcChannel?: string;
+
+  /** The sequencer bridge account used to bridge this currency to the EVM */
+  public readonly sequencerBridgeAccount?: string;
+
+  constructor(params: {
+    title: string;
+    isNative: boolean;
+    isBridgeable: boolean;
+    IconComponent?: React.FC<IconProps>;
+    coinDenom: string;
+    coinMinimalDenom: string;
+    coinDecimals: number;
+    coinGeckoId?: string;
+    coinImageUrl?: string;
+    ibcChannel?: string;
+    sequencerBridgeAccount?: string;
+  }) {
+    this.title = params.title;
+    this.coinDenom = params.coinDenom;
+    this.coinMinimalDenom = params.coinMinimalDenom;
+    this.coinDecimals = params.coinDecimals;
+    this.isNative = params.isNative;
+    this.isBridgeable = params.isBridgeable;
+    this.coinGeckoId = params.coinGeckoId;
+    this.coinImageUrl = params.coinImageUrl;
+    this.ibcChannel = params.ibcChannel;
+    this.sequencerBridgeAccount = params.sequencerBridgeAccount;
+    this.IconComponent = params.IconComponent;
+  }
+
+  /**
+   * Converts this IbcCurrency to an Asset object for use with CosmosKit.
+   *
+   * @returns An Asset object compatible with CosmosKit
+   */
+  public toCosmosKitAsset(): Asset {
+    // Create denomination units - one for the base denom and one for the display denom
+    const denomUnits: DenomUnit[] = [
+      {
+        denom: this.coinMinimalDenom,
+        exponent: 0,
+      },
+      {
+        denom: this.coinDenom,
+        exponent: this.coinDecimals,
+      },
+    ];
+
+    // sdk.coin for native assets, ics20 for IBC tokens
+    const typeAsset = this.isNative ? "sdk.coin" : "ics20";
+    const asset: Asset = {
+      denom_units: denomUnits,
+      type_asset: typeAsset,
+      base: this.coinMinimalDenom,
+      name: this.coinDenom,
+      display: this.title,
+      symbol: this.coinDenom,
+    };
+
+    // Add IBC info if channel exists
+    if (this.ibcChannel) {
+      asset.ibc = {
+        source_channel: this.ibcChannel,
+        dst_channel: "", // TODO
+        source_denom: this.coinMinimalDenom,
+      };
+    }
+
+    return asset;
+  }
+
+  public belongsToChain(chain: CosmosChainInfo): boolean {
+    return chain.currencies?.includes(this);
+  }
 }
 
 /**
@@ -203,64 +311,10 @@ export function ibcCurrenciesToCosmosKitAssetList(
 ): AssetList {
   return {
     chain_name: chainName,
-    assets: currencies.map((currency, index) => {
-      const isNativeAsset = index === 0;
-      return ibcCurrencyToCosmosKitAsset(currency, isNativeAsset);
+    assets: currencies.map((currency) => {
+      return currency.toCosmosKitAsset();
     }),
   };
-}
-
-/**
- * Converts an IbcCurrency object to an Asset object for use with CosmosKit.
- */
-function ibcCurrencyToCosmosKitAsset(
-  currency: IbcCurrency,
-  isNativeAsset = false,
-): Asset {
-  // create denomination units - one for the base denom and one for the display denom
-  const denomUnits: DenomUnit[] = [
-    {
-      denom: currency.coinMinimalDenom,
-      exponent: 0,
-    },
-    {
-      denom: currency.coinDenom,
-      exponent: currency.coinDecimals,
-    },
-  ];
-
-  // sdk.coin for native assets, ics20 for IBC tokens
-  const typeAsset = isNativeAsset ? "sdk.coin" : "ics20";
-  const asset: Asset = {
-    denom_units: denomUnits,
-    type_asset: typeAsset,
-    base: currency.coinMinimalDenom,
-    name: currency.coinDenom,
-    display: currency.coinDenom,
-    symbol: currency.coinDenom,
-  };
-
-  // add IBC info if channel exists
-  // TODO - where is this used by cosmoskit?
-  if (currency.ibcChannel) {
-    asset.ibc = {
-      source_channel: currency.ibcChannel,
-      dst_channel: "", // TODO
-      source_denom: currency.coinMinimalDenom,
-    };
-  }
-
-  return asset;
-}
-
-/**
- * Returns true if the given currency belongs to the given chain.
- */
-export function ibcCurrencyBelongsToChain(
-  currency: IbcCurrency,
-  chain: CosmosChainInfo,
-): boolean {
-  return chain.currencies?.includes(currency);
 }
 
 /**
@@ -272,17 +326,13 @@ export type HexString = `0x${string}`;
 /**
  * Represents a currency on an EVM chain, which can be either a native token or an ERC-20 token.
  */
-export class EvmCurrency {
-  /** Display name of the token */
+export class EvmCurrency implements GenericCurrency {
   public readonly title: string;
-
-  /** Token denomination (e.g., "TIA", "USDC") */
+  public readonly isNative: boolean;
+  public readonly isBridgeable: boolean;
+  public readonly IconComponent?: React.FC<IconProps>;
   public readonly coinDenom: string;
-
-  /** Minimal denomination of the token */
   public readonly coinMinimalDenom: string;
-
-  /** Number of decimal places the token uses */
   public readonly coinDecimals: number;
 
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
@@ -297,23 +347,14 @@ export class EvmCurrency {
   /** Contract address for intent bridge **/
   public readonly astriaIntentBridgeAddress?: HexString;
 
-  /** True if this is the native token (e.g., wTIA) */
-  public readonly isNative: boolean;
-
-  /** True if this is a wrapped native token (e.g., TIA) */
+  /** True if this is a wrapped native token (e.g., wTIA) */
   public readonly isWrappedNative: boolean;
 
-  /** True if this token should be shown in bridge page dropdowns */
-  public readonly isBridgeable: boolean;
-
-  /** Component to render the token's icon */
-  public readonly IconComponent?: React.FC<IconProps>;
-
-  /**
-   * Create a new EvmCurrency instance
-   */
   constructor(params: {
     title: string;
+    isNative: boolean;
+    isBridgeable: boolean;
+    IconComponent?: React.FC<IconProps>;
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
@@ -322,9 +363,6 @@ export class EvmCurrency {
     nativeTokenWithdrawerContractAddress?: HexString;
     astriaIntentBridgeAddress?: HexString;
     isWrappedNative: boolean;
-    isNative: boolean;
-    isBridgeable: boolean;
-    IconComponent?: React.FC<IconProps>;
   }) {
     this.title = params.title;
     this.coinDenom = params.coinDenom;
@@ -484,16 +522,6 @@ export function evmChainsToRainbowKitChains(
     Chain,
     ...Chain[],
   ];
-}
-
-/**
- * Returns true if the given currency belongs to the given chain.
- */
-export function evmCurrencyBelongsToChain(
-  currency: EvmCurrency,
-  chain: EvmChainInfo,
-): boolean {
-  return chain.currencies?.includes(currency);
 }
 
 // Map of environment labels to their chain configurations
