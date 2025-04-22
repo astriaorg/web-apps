@@ -39,8 +39,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    token0?.coinDenom,
-    token1?.coinDenom,
+    token0,
+    token1,
   );
 
   // TODO: Figure out why validation is always false.

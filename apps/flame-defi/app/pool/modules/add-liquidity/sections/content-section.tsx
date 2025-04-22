@@ -28,8 +28,8 @@ export const ContentSection = () => {
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    poolToken0?.token.coinDenom ?? "",
-    poolToken1?.token.coinDenom ?? "",
+    poolToken0?.token,
+    poolToken1?.token,
   );
   const {
     addLiquidity,
