@@ -59,7 +59,7 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   // use first chain as default chain
   const defaultChainId = Object.values(cosmosChains)[0]?.chainId;
   if (!defaultChainId) {
-    throw new Error("No cosmos chains provided!");
+    throw new Error("No cosmos chains provided.");
   }
   const chainName = cosmosChainNameFromId(
     selectedCosmosChain?.chainId || defaultChainId,

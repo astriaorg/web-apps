@@ -55,7 +55,7 @@ export const getEnvVariable = (
     if (defaultValue !== undefined) {
       return defaultValue;
     }
-    throw new Error(`${key} not set`);
+    throw new Error(`${key} not set.`);
   }
   return value;
 };

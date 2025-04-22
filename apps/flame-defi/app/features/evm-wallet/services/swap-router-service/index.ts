@@ -74,7 +74,7 @@ export class SwapRouterService extends GenericContractService {
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
-      throw new Error("Fee not found in pool");
+      throw new Error("Fee not found in pool.");
     }
 
     return {
@@ -141,7 +141,7 @@ export class SwapRouterService extends GenericContractService {
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
-      throw new Error("Fee not found in pool");
+      throw new Error("Fee not found in pool.");
     }
 
     return {
@@ -491,7 +491,7 @@ export function createTradeFromQuote(
   const outputToken = routePools[routePools.length - 1]?.token1;
 
   if (!inputToken || !outputToken) {
-    throw new Error("Invalid route: missing input or output token");
+    throw new Error("Invalid route: missing input or output token.");
   }
 
   const route = new Route(routePools, inputToken, outputToken);

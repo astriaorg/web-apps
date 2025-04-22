@@ -232,7 +232,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -249,7 +249,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     let value = 0n;
@@ -294,7 +294,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -311,7 +311,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     return {
@@ -422,7 +422,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     isCollectAsWrappedNative: boolean = false,
   ): CollectFeesParams {
     if (!tokenInput0.token || !tokenInput1.token) {
-      throw new Error("Token input is null");
+      throw new Error("Token input is null.");
     }
 
     const token0Address = tokenInput0.token?.isNative
@@ -433,7 +433,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -448,7 +448,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1] || !tokens[0].token || !tokens[1].token) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     const isToken0Native = tokens[0].token.isNative;
@@ -674,7 +674,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     isCollectAsWrappedNative: boolean = false,
   ): DecreaseLiquidityAndCollectParams {
     if (!tokenInput0.token || !tokenInput1.token) {
-      throw new Error("Token input is null");
+      throw new Error("Token input is null.");
     }
 
     const decreaseParams = this.getDecreaseLiquidityParams(

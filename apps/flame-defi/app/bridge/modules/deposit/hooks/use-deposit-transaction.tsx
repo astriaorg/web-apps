@@ -53,7 +53,7 @@ export function useDepositTransaction(): DepositTransactionHook {
       }
 
       if (!destinationConnection.chain) {
-        throw new WithdrawError("Destination chain not selected");
+        throw new WithdrawError("Destination chain not selected.");
       }
 
       setIsLoading(true);

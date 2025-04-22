@@ -9,7 +9,7 @@ export const useAstriaWallet = (): AstriaWalletContextProps => {
   const context = useContext(AstriaWalletContext);
   if (!context) {
     throw new Error(
-      "useAstriaWallet must be used within AstriaWalletContextProvider",
+      "useAstriaWallet must be used within AstriaWalletContextProvider.",
     );
   }
   return context;

@@ -60,7 +60,7 @@ export class EvmIntentBridgeStrategy implements BridgeStrategy {
     } = context;
     if (!address || !chain || !currency) {
       throw new Error(
-        "Source chain, currency, and address are required to create a deposit strategy",
+        "Source chain, currency, and address are required to create a deposit strategy.",
       );
     }
 
@@ -129,12 +129,12 @@ export class CosmosIbcDepositStrategy implements BridgeStrategy {
     } = context;
     if (!address || !chain || !currency) {
       throw new Error(
-        "Source chain, currency, and address are required to create a deposit strategy",
+        "Source chain, currency, and address are required to create a deposit strategy.",
       );
     }
     if (!context.cosmosWallet) {
       throw new Error(
-        "Cosmos wallet is required for Cosmos IBC deposit strategy",
+        "Cosmos wallet is required for Cosmos IBC deposit strategy.",
       );
     }
 
@@ -183,7 +183,7 @@ export class AstriaIbcWithdrawStrategy implements BridgeStrategy {
     } = context;
     if (!address || !chain || !currency) {
       throw new Error(
-        "Source chain, currency, and address are required to create a withdraw strategy",
+        "Source chain, currency, and address are required to create a withdraw strategy.",
       );
     }
 
@@ -250,7 +250,7 @@ export function createBridgeStrategy(
         return new EvmIntentBridgeStrategy(context);
       default:
         throw new Error(
-          `Error creating deposit strategy. No source chain selected or unsupported source chain type: ${sourceChainType}`,
+          `Error creating deposit strategy. No source chain selected or unsupported source chain type: ${sourceChainType}.`,
         );
     }
   }
@@ -264,12 +264,12 @@ export function createBridgeStrategy(
         return new EvmIntentBridgeStrategy(context);
       default:
         throw new Error(
-          `Error creating withdraw strategy. Unsupported destination chain type: ${destinationChainType}`,
+          `Error creating withdraw strategy. Unsupported destination chain type: ${destinationChainType}.`,
         );
     }
   }
 
   throw new Error(
-    `Unsupported bridge direction: from ${sourceChainType} to ${destinationChainType}`,
+    `Unsupported bridge direction: from ${sourceChainType} to ${destinationChainType}.`,
   );
 }

@@ -30,7 +30,7 @@ export class GenericContractService {
   ): Promise<GetWalletClientReturnType> {
     const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
     if (!walletClient) {
-      throw new Error("No wallet client available");
+      throw new Error("No wallet client available.");
     }
     return walletClient;
   }
@@ -41,7 +41,7 @@ export class GenericContractService {
   protected async getPublicClient(chainId: number): Promise<PublicClient> {
     const publicClient = getPublicClient(this.wagmiConfig, { chainId });
     if (!publicClient) {
-      throw new Error("No public client available");
+      throw new Error("No public client available.");
     }
     return publicClient;
   }
@@ -126,7 +126,7 @@ export class GenericContractService {
 
     for (const call of result) {
       if (call.error) {
-        throw new Error("Multicall error:", call.error);
+        throw new Error(`Multicall error: ${call.error}`);
       }
     }
 
