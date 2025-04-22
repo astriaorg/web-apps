@@ -54,20 +54,16 @@ export default function SwapPage(): React.ReactElement {
   const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
 
-  const {
-    balance: inputOneBalance, 
-  } = useTokenBalance(
+  const { balance: inputOneBalance } = useTokenBalance(
     userAccount.address,
     chain,
-    inputOne.token
+    inputOne.token,
   );
 
-  const {
-    balance: inputTwoBalance, 
-  } = useTokenBalance(
+  const { balance: inputTwoBalance } = useTokenBalance(
     userAccount.address,
     chain,
-    inputTwo.token
+    inputTwo.token,
   );
 
   const swapInputs: SwapPairProps[] = [

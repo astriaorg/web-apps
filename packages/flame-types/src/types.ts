@@ -1,4 +1,9 @@
-import type { Asset, AssetList, Chain as CosmosKitChain, DenomUnit } from "@chain-registry/types";
+import type {
+  Asset,
+  AssetList,
+  Chain as CosmosKitChain,
+  DenomUnit,
+} from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
 import { ChainContract, parseUnits } from "viem";
 import React from "react";

@@ -297,23 +297,25 @@ export const ContentSection = () => {
 
   // Get source token balance if it's an EVM chain
   // TODO - handle ibc currency balances
-  const { 
-    balance: sourceBalance, 
-    isLoading: isLoadingSourceBalance 
-  } = useTokenBalance(
-    sourceConnection.chain?.chainType === "evm" ? sourceConnection.address as HexString : undefined,
-    sourceConnection.chain?.chainType === "evm" ? sourceConnection.chain as EvmChainInfo : undefined,
-    sourceConnection.currency && sourceConnection.chain?.chainType === "evm" 
-      ? sourceConnection.currency as EvmCurrency
-      : undefined
-  );
-  
+  const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
+    useTokenBalance(
+      sourceConnection.chain?.chainType === "evm"
+        ? (sourceConnection.address as HexString)
+        : undefined,
+      sourceConnection.chain?.chainType === "evm"
+        ? (sourceConnection.chain as EvmChainInfo)
+        : undefined,
+      sourceConnection.currency && sourceConnection.chain?.chainType === "evm"
+        ? (sourceConnection.currency as EvmCurrency)
+        : undefined,
+    );
+
   // Get destination token balance if it's an EVM chain
   // TODO - even though for deposits the destination will always be evm, if we make balance fetching generic
   //  for cosmos and evm chains then we can make the deposit and withdraw content sections reusable
   const {
-    balance: destinationBalance, 
-    isLoading: isLoadingDestinationBalance 
+    balance: destinationBalance,
+    isLoading: isLoadingDestinationBalance,
   } = useTokenBalance(
     destinationConnection.address as HexString,
     destinationConnection.chain as EvmChainInfo,
@@ -390,12 +392,12 @@ export const ContentSection = () => {
                   </p>
                   {sourceConnection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {isLoadingSourceBalance 
-                        ? "Loading..." 
+                      Balance:{" "}
+                      {isLoadingSourceBalance
+                        ? "Loading..."
                         : sourceBalance
                           ? `${sourceBalance.value} ${sourceBalance.symbol}`
-                          : `0 ${sourceConnection.currency.coinDenom}`
-                      }
+                          : `0 ${sourceConnection.currency.coinDenom}`}
                     </p>
                   )}
                 </div>
@@ -463,12 +465,12 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {isLoadingDestinationBalance 
-                          ? "Loading..." 
+                        Balance:{" "}
+                        {isLoadingDestinationBalance
+                          ? "Loading..."
                           : destinationBalance
                             ? `${destinationBalance.value} ${destinationBalance.symbol}`
-                            : `0 ${destinationConnection.currency.coinDenom}`
-                        }
+                            : `0 ${destinationConnection.currency.coinDenom}`}
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&

@@ -12,36 +12,22 @@ export const useGetPoolTokenBalances = (
   const { chain } = useAstriaChainData();
   const { currencies } = chain;
 
-  const token0 =
-    currencies.find(
-      (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken0Symbol.toLowerCase(),
-    );
-  const token1 =
-    currencies.find(
-      (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken1Symbol.toLowerCase(),
-    );
+  const token0 = currencies.find(
+    (currency) =>
+      currency.coinDenom.toLowerCase() === poolToken0Symbol.toLowerCase(),
+  );
+  const token1 = currencies.find(
+    (currency) =>
+      currency.coinDenom.toLowerCase() === poolToken1Symbol.toLowerCase(),
+  );
 
   // Get token0 balance
-  const { 
-    balance: token0Balance, 
-    isLoading: isLoadingToken0Balance
-  } = useTokenBalance(
-    userAccount.address,
-    chain,
-    token0
-  );
+  const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
+    useTokenBalance(userAccount.address, chain, token0);
 
   // Get token1 balance
-  const {
-    balance: token1Balance,
-    isLoading: isLoadingToken1Balance
-  } = useTokenBalance(
-    userAccount.address,
-    chain,
-    token1
-  );
+  const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
+    useTokenBalance(userAccount.address, chain, token1);
 
   // Collection of balances to maintain API compatibility
   const balances = [token0Balance, token1Balance].filter(Boolean) as Balance[];
@@ -52,6 +38,6 @@ export const useGetPoolTokenBalances = (
     token1,
     token0Balance,
     token1Balance,
-    isLoading: isLoadingToken0Balance || isLoadingToken1Balance
+    isLoading: isLoadingToken0Balance || isLoadingToken1Balance,
   };
 };

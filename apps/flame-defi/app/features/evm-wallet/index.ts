@@ -34,7 +34,7 @@ export {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
   createPoolService,
-  createSwapRouterService, 
+  createSwapRouterService,
   createErc20Service,
   createTradeFromQuote,
   createWethService,
