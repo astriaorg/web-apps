@@ -1,7 +1,7 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import { isZeroAddress } from "@repo/ui/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import {
   createPoolFactoryService,
   createPoolService,
@@ -27,12 +27,12 @@ export const useGetPools = ({
   token1?: EvmCurrency;
 }): UseQueryResult<GetPoolsResult> => {
   const config = useConfig();
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
 
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!token0 && !!token1,
-    queryKey: ["useGetPool", token0, token1, selectedChain],
+    queryKey: ["useGetPool", token0, token1, chain],
     queryFn: async () => {
       console.log("useGetPool");
       if (!token0 || !token1) {
@@ -41,15 +41,15 @@ export const useGetPools = ({
 
       const poolFactoryService = createPoolFactoryService(
         config,
-        selectedChain.contracts.poolFactory.address,
+        chain.contracts.poolFactory.address,
       );
 
       // Handle native tokens. If one of the tokens is native, we need to get the wrapped token address.
       const token0Address = token0.isNative
-        ? selectedChain.contracts.wrappedNativeToken.address
+        ? chain.contracts.wrappedNativeToken.address
         : (token0.erc20ContractAddress as Address);
       const token1Address = token1.isNative
-        ? selectedChain.contracts.wrappedNativeToken.address
+        ? chain.contracts.wrappedNativeToken.address
         : (token1.erc20ContractAddress as Address);
 
       const pools = await poolFactoryService.getPools(
@@ -67,7 +67,7 @@ export const useGetPools = ({
             const poolService = createPoolService(config, it);
             return {
               address: it,
-              slot0: await poolService.getSlot0(selectedChain.chainId),
+              slot0: await poolService.getSlot0(chain.chainId),
             };
           }),
       );

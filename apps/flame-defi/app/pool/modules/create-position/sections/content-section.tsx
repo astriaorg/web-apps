@@ -2,7 +2,7 @@
 
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
-import { useEvmChainData } from "config";
+import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { usePageContext } from "pool/hooks/use-page-context";
@@ -25,7 +25,7 @@ const TRANSITION: Transition = {
 };
 
 export const ContentSection = () => {
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const {
     amount0,
     amount1,
@@ -96,20 +96,20 @@ export const ContentSection = () => {
   ]);
 
   const optionsToken0 = useMemo(() => {
-    return selectedChain.currencies.filter((currency) =>
+    return chain.currencies.filter((currency) =>
       token1
         ? currency.erc20ContractAddress !== token1.erc20ContractAddress
         : true,
     );
-  }, [selectedChain.currencies, token1]);
+  }, [chain.currencies, token1]);
 
   const optionsToken1 = useMemo(() => {
-    return selectedChain.currencies.filter((currency) =>
+    return chain.currencies.filter((currency) =>
       token0
         ? currency.erc20ContractAddress !== token0.erc20ContractAddress
         : true,
     );
-  }, [selectedChain.currencies, token0]);
+  }, [chain.currencies, token0]);
 
   return (
     <div className="flex flex-col gap-4">
