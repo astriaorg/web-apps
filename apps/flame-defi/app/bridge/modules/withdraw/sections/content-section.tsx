@@ -20,6 +20,7 @@ import {
 } from "bridge/types";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
+import { EvmCurrency } from "@repo/flame-types";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
@@ -271,7 +272,7 @@ export const ContentSection = () => {
 
   const destinationChainNativeToken = useMemo(() => {
     return destinationConnection.chain?.currencies.find(
-      (currency) => "isNative" in currency && currency.isNative,
+      (currency) => currency.isNative,
     );
   }, [destinationConnection]);
 
@@ -280,7 +281,7 @@ export const ContentSection = () => {
       !destinationChainNativeToken ||
       !destinationConnection.currency ||
       !(
-        "ibcWithdrawalFeeWei" in destinationConnection.currency &&
+        destinationConnection.currency instanceof EvmCurrency &&
         destinationConnection.currency?.ibcWithdrawalFeeWei
       )
     ) {

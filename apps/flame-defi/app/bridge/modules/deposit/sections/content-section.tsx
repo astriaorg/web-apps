@@ -306,8 +306,8 @@ export const ContentSection = () => {
       sourceConnection.chain?.chainType === "evm"
         ? (sourceConnection.chain as EvmChainInfo)
         : undefined,
-      sourceConnection.currency && sourceConnection.chain?.chainType === "evm"
-        ? (sourceConnection.currency as EvmCurrency)
+      sourceConnection.currency instanceof EvmCurrency
+        ? sourceConnection.currency
         : undefined,
     );
 
@@ -475,14 +475,11 @@ export const ContentSection = () => {
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&
-                      "erc20ContractAddress" in
-                        destinationCurrencyOption.value &&
+                      destinationCurrencyOption.value instanceof EvmCurrency &&
                       destinationConnection.address && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
-                            evmCurrency={
-                              destinationCurrencyOption.value as EvmCurrency
-                            }
+                            evmCurrency={destinationCurrencyOption.value}
                           />
                         </div>
                       )}
