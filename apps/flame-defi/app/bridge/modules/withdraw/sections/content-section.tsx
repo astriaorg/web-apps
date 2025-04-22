@@ -13,7 +13,11 @@ import { NotificationType, useNotifications } from "features/notifications";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
-import { AstriaWalletError, WalletConnectionError, WithdrawError } from "bridge/types";
+import {
+  AstriaWalletError,
+  WalletConnectionError,
+  WithdrawError,
+} from "bridge/types";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 

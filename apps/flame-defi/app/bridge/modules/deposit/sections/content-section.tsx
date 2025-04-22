@@ -22,7 +22,11 @@ import { NotificationType, useNotifications } from "features/notifications";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
-import { DepositError, WalletConnectionError, KeplrWalletError } from "bridge/types";
+import {
+  DepositError,
+  WalletConnectionError,
+  KeplrWalletError,
+} from "bridge/types";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
