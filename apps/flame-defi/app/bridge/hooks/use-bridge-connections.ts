@@ -90,10 +90,7 @@ export function useBridgeConnections(): BridgeConnections {
         chain.chainType === ChainType.EVM ||
         chain.chainType === ChainType.ASTRIA
       ) {
-        if (
-          evmWallet.evmAccountAddress &&
-          evmWallet.selectedEvmChain?.chainId === chain.chainId
-        ) {
+        if (evmWallet.evmAccountAddress) {
           address = evmWallet.evmAccountAddress;
           isConnected = true;
         } else {
@@ -208,7 +205,6 @@ export function useBridgeConnections(): BridgeConnections {
   }, [
     cosmosWallet.cosmosAccountAddress,
     evmWallet.evmAccountAddress,
-    evmWallet.selectedEvmChain?.chainId,
     sourceConnection.chain,
   ]);
 
@@ -238,7 +234,6 @@ export function useBridgeConnections(): BridgeConnections {
   }, [
     cosmosWallet.cosmosAccountAddress,
     evmWallet.evmAccountAddress,
-    evmWallet.selectedEvmChain?.chainId,
     destinationConnection.chain,
   ]);
 
