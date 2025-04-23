@@ -30,7 +30,9 @@ export const calculatePoolExchangeRate = ({
     .div(new Big(2).pow(96))
     .pow(2);
   // Calculate the denominator: 10**Decimal1 / 10**Decimal0
-  const denominator = new Big(10 ** Math.abs(decimal1 - decimal0));
+  const denominator = new Big(Math.pow(10, decimal1)).div(
+    Math.pow(10, decimal0),
+  );
 
   const buyOneOfToken0 = new Big(numerator).div(denominator).toFixed();
   const buyOneOfToken1 = new Big(1).div(buyOneOfToken0).toFixed();
