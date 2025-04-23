@@ -5,7 +5,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
-import { ChainContract, parseUnits, type Address, type Hash } from "viem";
+import { ChainContract, parseUnits, type Address } from "viem";
 import React from "react";
 import JSBI from "jsbi";
 import Big from "big.js";
@@ -733,7 +733,7 @@ export class TokenAmount {
    */
   static fromArgs(
     chainId: number,
-    tokenAddress: string,
+    tokenAddress: Address,
     decimals: number,
     symbol: string,
     humanReadableAmount: string,

@@ -2,11 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { type Address, formatUnits } from "viem";
 import { useBalance, useConfig } from "wagmi";
 
-import {
-  Balance,
-  EvmChainInfo,
-  EvmCurrency,
-} from "@repo/flame-types";
+import { Balance, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 

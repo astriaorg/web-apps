@@ -1,8 +1,4 @@
-import {
-  EvmCurrency,
-  TXN_STATUS,
-  TokenInputState,
-} from "@repo/flame-types";
+import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
 import type { Address, Hash } from "viem";
 import type { FeeTier } from "./constants";
 

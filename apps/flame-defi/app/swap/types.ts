@@ -1,8 +1,4 @@
-import {
-  EvmCurrency,
-  TokenInputState,
-  TXN_STATUS,
-} from "@repo/flame-types";
+import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { type Hash } from "viem";
 
 export enum SWAP_INPUT_ID {
