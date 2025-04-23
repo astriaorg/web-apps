@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
@@ -12,6 +13,7 @@ import { WagmiProvider } from "wagmi";
 import { base } from "wagmi/chains";
 
 import {
+  ChainId,
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
@@ -54,14 +56,14 @@ const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
 const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
 
 // Common providers for the entire app
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <ConfigContextProvider>
       <IntlProvider locale="en">
         <NotificationsContextProvider>
           <WagmiProvider config={rainbowKitConfig}>
             <QueryClientProvider client={queryClient}>
-              <RainbowKitProvider>
+              <RainbowKitProvider initialChain={ChainId.MAINNET}>
                 <ChainProvider
                   assetLists={[...assets, ...cosmosKitAssetLists]}
                   chains={[...chains, ...cosmosKitChains]}

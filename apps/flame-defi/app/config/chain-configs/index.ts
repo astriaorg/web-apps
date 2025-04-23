@@ -52,35 +52,6 @@ const NETWORK_CONFIGS: NetworkConfigs = {
 };
 
 /**
- * Gets the chain ID for a Flame network.
- */
-export function getFlameChainId(network: FlameNetwork): number {
-  const config = NETWORK_CONFIGS[network];
-  const astriaChain = Object.values(config.astriaChains)[0];
-  if (!astriaChain) {
-    throw new Error(`No EVM chain found for network ${network}`);
-  }
-  return astriaChain.chainId;
-}
-
-/**
- * Gets the Flame network for a chain ID.
- */
-export function getFlameNetworkByChainId(chainId: number): FlameNetwork {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const network = Object.entries(NETWORK_CONFIGS).find(([_, config]) => {
-    const astriaChain = Object.values(config.astriaChains)[0];
-    return astriaChain && astriaChain.chainId === chainId;
-  });
-
-  if (!network) {
-    throw new Error(`No Flame network found for chain ID ${chainId}`);
-  }
-
-  return network[0] as FlameNetwork;
-}
-
-/**
  * Gets chain configurations for the specified network.
  * Falls back to local network config if specified network is not found.
  */

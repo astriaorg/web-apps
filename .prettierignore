@@ -1,4 +1,5 @@
 # Ignore codegen files:
 apps/flame-defi/**/gql/*
 apps/flame-defi/codebase.md
+apps/flame-defi/.cache-synpress
 CLAUDE.md
