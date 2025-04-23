@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@repo/ui/components";
+import { Input, type InputProps } from "@repo/ui/components";
 import { useValidateAssetAmount, type ValidationAsset } from "@repo/ui/hooks";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { Amount } from "./asset-amount-input.types";
@@ -75,10 +75,7 @@ export const useAssetAmountInput = ({
   };
 };
 
-export const AssetAmountInput = ({
-  onInput,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => {
+export const AssetAmountInput = ({ onInput, ...props }: InputProps) => {
   const handleInput = useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       const value = event.currentTarget.value;

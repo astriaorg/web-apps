@@ -30,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative">
         {startAdornment && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-grey-light">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
             {startAdornment}
           </div>
         )}
@@ -41,8 +41,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "disabled:cursor-not-allowed disabled:opacity-50",
             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
             "focus-visible:outline-hidden",
-            startAdornment && "pl-10",
-            endAdornment && "pr-10",
+            startAdornment && "pl-11",
+            endAdornment && "pr-11",
             inputVariants({ variant }),
             className,
           )}
@@ -50,7 +50,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {endAdornment && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-grey-light">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
             {endAdornment}
           </div>
         )}
