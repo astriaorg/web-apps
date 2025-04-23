@@ -1,5 +1,5 @@
 export const LINKS = {
-  BRIDGE: "/",
+  BRIDGE: "/bridge",
   SWAP: "/swap",
   POOL: "/pool",
   EARN: "/earn",

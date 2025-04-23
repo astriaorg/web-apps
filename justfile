@@ -18,6 +18,10 @@ format:
   npm run format
 alias f := format
 
+check-types:
+  npm run check-types
+alias ct := check-types
+
 # lint everything
 lint:
   npm run lint

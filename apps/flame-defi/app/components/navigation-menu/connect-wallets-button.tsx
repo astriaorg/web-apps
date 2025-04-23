@@ -7,30 +7,30 @@ import {
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
-import { useEvmChainData } from "config";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaChainData } from "config";
+import { useAstriaWallet } from "features/evm-wallet";
 import { useAccount } from "wagmi";
 
 /**
  * Button with dropdown to connect to multiple wallets.
  */
 export const ConnectWalletsButton = () => {
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const account = useAccount();
   const {
-    connectEvmWallet,
-    disconnectEvmWallet,
-    evmNativeTokenBalance,
-    isLoadingEvmNativeTokenBalance,
+    connectWallet,
+    disconnectWallet,
+    nativeTokenBalance,
+    isLoadingNativeTokenBalance,
     usdcToNativeQuote,
     quoteLoading,
-  } = useEvmWallet();
+  } = useAstriaWallet();
 
   const isConnected = !!account.address;
 
   if (!isConnected) {
     return (
-      <Button size="sm" onClick={connectEvmWallet}>
+      <Button size="sm" onClick={connectWallet}>
         Connect Wallet
       </Button>
     );
@@ -54,19 +54,18 @@ export const ConnectWalletsButton = () => {
         <ConnectWalletContent
           isConnected={!!account.address}
           isLoading={
-            (isLoadingEvmNativeTokenBalance && !evmNativeTokenBalance) ||
-            quoteLoading
+            (isLoadingNativeTokenBalance && !nativeTokenBalance) || quoteLoading
           }
           account={account}
-          balance={evmNativeTokenBalance ?? undefined}
+          balance={nativeTokenBalance ?? undefined}
           fiat={usdcToNativeQuote}
           explorer={{
-            url: `${selectedChain.blockExplorerUrl}/address/${account.address}`,
+            url: `${chain.blockExplorerUrl}/address/${account.address}`,
           }}
           label={shortenAddress(account.address as string)}
           icon={<AstriaIcon />}
-          onConnectWallet={connectEvmWallet}
-          onDisconnectWallet={disconnectEvmWallet}
+          onConnectWallet={connectWallet}
+          onDisconnectWallet={disconnectWallet}
           isCollapsible={false}
         />
       </PopoverContent>

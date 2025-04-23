@@ -2,7 +2,7 @@
 
 import { Button, Skeleton } from "@repo/ui/components";
 import { InboxIcon, PlusIcon } from "@repo/ui/icons";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { useRouter } from "next/navigation";
 import { usePoolContext } from "pool/hooks";
 import type React from "react";
@@ -11,7 +11,7 @@ import { ROUTES } from "../../constants/routes";
 import { PositionsTable } from "./components";
 
 export const Pool = (): React.ReactElement => {
-  const { connectEvmWallet } = useEvmWallet();
+  const { connectWallet } = useAstriaWallet();
   const { poolPositions, poolPositionsLoading } = usePoolContext();
   const router = useRouter();
   const userAccount = useAccount();
@@ -44,7 +44,7 @@ export const Pool = (): React.ReactElement => {
                 Your active V3 liquidity positions will appear here.
               </p>
               {!userAccount.address && (
-                <Button className="mt-0" onClick={() => connectEvmWallet()}>
+                <Button className="mt-0" onClick={() => connectWallet()}>
                   Connect Wallet
                 </Button>
               )}

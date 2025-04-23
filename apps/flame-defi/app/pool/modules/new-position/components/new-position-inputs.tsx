@@ -13,8 +13,8 @@ export const NewPositionInputs = ({
 }: NewPositionInputsProps) => {
   const { formatNumber } = useIntl();
   const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    input0.token?.coinDenom || "",
-    input1.token?.coinDenom || "",
+    input0.token,
+    input1.token,
   );
   const inputsArray = [
     { input: input0, setInput: setInput0, tokenBalance: token0Balance },

@@ -1,10 +1,41 @@
 import type { Config } from "@wagmi/core";
-import { type Abi, type Address, parseUnits } from "viem";
+import { type Abi, type Address, parseUnits, type Hash } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
-import { HexString } from "@repo/flame-types";
 
-// AstriaWithdrawerService.ts
+/**
+ * Interface representing the parameters required for initiating a withdrawal
+ * transaction on the Astria platform to an IBC chain.
+ */
+export interface WithdrawToIbcChainParams {
+  /** The unique identifier of the chain from which the withdrawal is being initiated. */
+  chainId: number;
+
+  /**
+   * The destination chain's address where the withdrawn funds will be sent.
+   * The chain can be derived from the address, so we do not have to explicitly
+   * pass in the destination chain.
+   */
+  destinationChainAddress: string;
+
+  /** The amount to be withdrawn. */
+  amount: string;
+
+  /** The denomination of the amount. */
+  amountDenom: number;
+
+  /** The fee to be included for the transaction. */
+  fee: string;
+
+  /** Optional memo or note to attach to the transaction. */
+  memo: string;
+}
+
+/**
+ * AstriaWithdrawerService extends the GenericContractService and provides
+ * functionality to initiate withdrawals for a native currency from a given
+ * contract address to a destination chain address on an IBC-compatible chain.
+ */
 export class AstriaWithdrawerService extends GenericContractService {
   private static readonly ABI = [
     {
@@ -23,14 +54,14 @@ export class AstriaWithdrawerService extends GenericContractService {
     super(wagmiConfig, contractAddress, AstriaWithdrawerService.ABI);
   }
 
-  async withdrawToIbcChain(
-    chainId: number,
-    destinationChainAddress: string,
-    amount: string,
-    amountDenom: number,
-    fee: string,
-    memo: string,
-  ): Promise<HexString> {
+  async withdrawToIbcChain({
+    chainId,
+    destinationChainAddress,
+    amount,
+    amountDenom,
+    fee,
+    memo,
+  }: WithdrawToIbcChainParams): Promise<Hash> {
     const amountWei = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     const totalAmount = amountWei + feeWei;
@@ -43,7 +74,11 @@ export class AstriaWithdrawerService extends GenericContractService {
   }
 }
 
-// AstriaErc20WithdrawerService.ts
+/**
+ * AstriaErc20WithdrawerService extends the GenericContractService and provides
+ * functionality to initiate ERC-20 token withdrawals from a given contract
+ * address to a destination chain address on an IBC-compatible chain.
+ */
 export class AstriaErc20WithdrawerService extends GenericContractService {
   private static readonly ABI = [
     {
@@ -70,14 +105,14 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
     super(wagmiConfig, contractAddress, AstriaErc20WithdrawerService.ABI);
   }
 
-  async withdrawToIbcChain(
-    chainId: number,
-    destinationChainAddress: string,
-    amount: string,
-    amountDenom: number,
-    fee: string,
-    memo: string,
-  ): Promise<HexString> {
+  async withdrawToIbcChain({
+    chainId,
+    destinationChainAddress,
+    amount,
+    amountDenom,
+    fee,
+    memo,
+  }: WithdrawToIbcChainParams): Promise<Hash> {
     const amountBaseUnits = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     return this.writeContractMethod(

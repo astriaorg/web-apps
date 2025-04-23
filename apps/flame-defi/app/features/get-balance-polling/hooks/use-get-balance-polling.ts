@@ -29,7 +29,7 @@ export default function useBalancePolling<T>(
       setError(null);
     } catch (e) {
       const error =
-        e instanceof Error ? e : new Error("Failed to fetch balance");
+        e instanceof Error ? e : new Error("Failed to fetch balance.");
       setError(error);
       config.onError?.(error);
     } finally {

@@ -8,7 +8,7 @@ import {
 export const useEvmWallet = (): EvmWalletContextProps => {
   const context = useContext(EvmWalletContext);
   if (!context) {
-    throw new Error("useEvmWallet must be used within EvmWalletProvider");
+    throw new Error("useEvmWallet must be used within EvmWalletProvider.");
   }
   return context;
 };

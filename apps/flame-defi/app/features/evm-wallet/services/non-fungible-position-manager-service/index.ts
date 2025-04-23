@@ -1,15 +1,15 @@
 import { Config } from "@wagmi/core";
-import { type Address, Abi, encodeFunctionData } from "viem";
+import { type Address, Abi, encodeFunctionData, type Hash } from "viem";
+
 import {
-  EvmChainInfo,
-  HexString,
+  AstriaChain,
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
-import { GenericContractService } from "../generic-contract-service";
-import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
+import { GenericContractService } from "../generic-contract-service";
 import { needToReverseTokenOrder } from "../services.utils";
+import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
 type PositionResponseTuple = [
   bigint, // nonce
@@ -136,6 +136,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * @param amount1Min - The minimum amount of token1 to deposit
    * @param recipient - The address that will receive the NFT
    * @param deadline - The timestamp by which the transaction must be executed
+   * @param value
    * @returns Object containing transaction hash if successful
    */
   async mint(
@@ -152,7 +153,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient: Address,
     deadline: number,
     value: bigint,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     return await this.writeContractMethod(
       chainId,
       "mint",
@@ -199,7 +200,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       deadline,
       value,
     }: IncreaseLiquidityParams,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     return await this.writeContractMethod(
       chainId,
       "increaseLiquidity",
@@ -221,7 +222,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     tokenInput0: TokenInputState,
     tokenInput1: TokenInputState,
     slippageTolerance: number,
-    chain: EvmChainInfo,
+    chain: AstriaChain,
   ): IncreaseLiquidityParams {
     const token0Address = tokenInput0.token?.isNative
       ? chain.contracts.wrappedNativeToken.address
@@ -231,7 +232,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -248,7 +249,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     let value = 0n;
@@ -283,7 +284,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     tokenInput0: TokenInputState,
     tokenInput1: TokenInputState,
     slippageTolerance: number,
-    chain: EvmChainInfo,
+    chain: AstriaChain,
   ): DecreaseLiquidityParams {
     const token0Address = tokenInput0.token?.isNative
       ? chain.contracts.wrappedNativeToken.address
@@ -293,7 +294,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -310,7 +311,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     return {
@@ -333,7 +334,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * @param params - Parameters for the collect fees operation
    * @returns Transaction hash if successful
    */
-  async collectFees(params: CollectFeesParams): Promise<HexString> {
+  async collectFees(params: CollectFeesParams): Promise<Hash> {
     const {
       calls,
       chainId,
@@ -413,7 +414,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * to handle automatic unwrapping of wrapped native token to native token and proper token collection.
    */
   public static getCollectFeesParams(
-    chain: EvmChainInfo,
+    chain: AstriaChain,
     tokenId: string,
     tokenInput0: TokenInputState,
     tokenInput1: TokenInputState,
@@ -421,7 +422,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     isCollectAsWrappedNative: boolean = false,
   ): CollectFeesParams {
     if (!tokenInput0.token || !tokenInput1.token) {
-      throw new Error("Token input is null");
+      throw new Error("Token input is null.");
     }
 
     const token0Address = tokenInput0.token?.isNative
@@ -432,7 +433,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       : tokenInput1.token?.erc20ContractAddress;
 
     if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing");
+      throw new Error("Token addresses are missing.");
     }
 
     const shouldReverseOrder = needToReverseTokenOrder(
@@ -447,7 +448,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     if (!tokens[0] || !tokens[1] || !tokens[0].token || !tokens[1].token) {
-      throw new Error("Must have both tokens set");
+      throw new Error("Must have both tokens set.");
     }
 
     const isToken0Native = tokens[0].token.isNative;
@@ -538,7 +539,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     amount0Min: bigint,
     amount1Min: bigint,
     deadline: number,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "decreaseLiquidity",
@@ -563,7 +564,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient: Address,
     amount0Max: bigint,
     amount1Max: bigint,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "collect",
@@ -586,7 +587,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   private encodeUnwrapWETHCall(
     amountMinimum: bigint,
     recipient: Address,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "unwrapWETH9",
@@ -603,7 +604,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     token: Address,
     amountMinimum: bigint,
     recipient: Address,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "sweepToken",
@@ -620,7 +621,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    */
   async decreaseLiquidityAndCollect(
     params: DecreaseLiquidityAndCollectParams,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const {
       chainId,
       tokenId,
@@ -669,11 +670,11 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     tokenInput1: TokenInputState,
     recipient: Address,
     slippageTolerance: number,
-    chain: EvmChainInfo,
+    chain: AstriaChain,
     isCollectAsWrappedNative: boolean = false,
   ): DecreaseLiquidityAndCollectParams {
     if (!tokenInput0.token || !tokenInput1.token) {
-      throw new Error("Token input is null");
+      throw new Error("Token input is null.");
     }
 
     const decreaseParams = this.getDecreaseLiquidityParams(

@@ -1,6 +1,6 @@
 import { Skeleton, TokenSelector } from "@repo/ui/components";
 import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
-import AddErc20ToWalletButton from "features/evm-wallet/components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 import { useUsdQuote } from "../hooks";

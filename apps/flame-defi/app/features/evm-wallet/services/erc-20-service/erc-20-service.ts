@@ -1,11 +1,36 @@
 import type { Config } from "@wagmi/core";
-import { type Address, erc20Abi, parseUnits } from "viem";
-import { HexString } from "@repo/flame-types";
+import { type Address, erc20Abi, parseUnits, type Hash } from "viem";
+
 import { GenericContractService } from "../generic-contract-service";
+
+interface TransferParams {
+  recipient: Address;
+  amount: bigint;
+  chainId: number;
+}
 
 export class Erc20Service extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, erc20Abi);
+  }
+
+  /**
+   * Transfer tokens from the user's address to another address.
+   *
+   * @param chainId - The chain ID of the EVM chain
+   * @param recipientAddress - The address of the recipient
+   * @param amount - The amount of tokens to transfer as a string
+   * @returns Transaction hash if successful
+   */
+  async transfer({
+    recipient,
+    amount,
+    chainId,
+  }: TransferParams): Promise<Hash> {
+    return await this.writeContractMethod(chainId, "transfer", [
+      recipient,
+      amount,
+    ]);
   }
 
   /**
@@ -22,16 +47,12 @@ export class Erc20Service extends GenericContractService {
     contractAddress: Address,
     tokenApprovalAmount: string,
     decimals: number,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const amountAsBigInt = parseUnits(tokenApprovalAmount, decimals);
-    // NOTE: Reset this to 0 whenever we want to reset the approval
-    // const amountAsBigInt = BigInt('0');
-    const txHash = await this.writeContractMethod(chainId, "approve", [
+    return await this.writeContractMethod(chainId, "approve", [
       contractAddress,
       amountAsBigInt,
     ]);
-
-    return txHash;
   }
 
   /**
@@ -44,7 +65,7 @@ export class Erc20Service extends GenericContractService {
    */
   async getTokenAllowance(
     chainId: number,
-    userAddress: string,
+    userAddress: Address,
     contractAddress: Address,
   ): Promise<string | null> {
     const currentAllowance = await this.readContractMethod(
@@ -59,6 +80,10 @@ export class Erc20Service extends GenericContractService {
 
     const allowance = currentAllowance as bigint;
     return allowance.toString();
+  }
+
+  async getBalance(chainId: number, address: string): Promise<bigint> {
+    return this.readContractMethod(chainId, "balanceOf", [address]);
   }
 }
 
