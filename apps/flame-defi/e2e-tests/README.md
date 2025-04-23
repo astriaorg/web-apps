@@ -2,8 +2,9 @@
 
 ## Setup
 
-* generate an account and save your seed phrase and private key in
+- generate an account and save your seed phrase and private key in
   `./wallet-setup/.env.e2e-tests`. must also set your Metamask password.
+
   ```dotenv
   SEED_PHRASE=''
   PASSWORD=
@@ -11,11 +12,12 @@
   CI=
   ```
 
-* setup wallet for Synpress and run tests
+- setup wallet for Synpress and run tests
+
   ```shell
   # setup wallets for Synpress
   just setup-wallets
-  
+
   # run e2e-tests
   just run-e2e-tests
   ```
