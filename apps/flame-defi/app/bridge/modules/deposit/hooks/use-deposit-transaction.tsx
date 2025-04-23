@@ -4,16 +4,11 @@ import { useCallback, useState } from "react";
 import { Address } from "viem";
 import { useConfig } from "wagmi";
 
-import { useCosmosWallet } from "features/cosmos-wallet";
+import { KeplrWalletError, useCosmosWallet } from "features/cosmos-wallet";
 
+import { DepositError, WalletConnectionError } from "bridge/errors";
 import { createBridgeStrategy } from "bridge/strategies";
-import {
-  ChainConnection,
-  DepositError,
-  KeplrWalletError,
-  WalletConnectionError,
-  WithdrawError,
-} from "bridge/types";
+import { ChainConnection } from "bridge/types";
 
 export interface DepositTransactionHook {
   isLoading: boolean;
@@ -53,7 +48,7 @@ export function useDepositTransaction(): DepositTransactionHook {
       }
 
       if (!destinationConnection.chain) {
-        throw new WithdrawError("Destination chain not selected.");
+        throw new DepositError("Destination chain not selected.");
       }
 
       setIsLoading(true);
@@ -74,8 +69,8 @@ export function useDepositTransaction(): DepositTransactionHook {
       } catch (e) {
         console.error("Deposit failed", e);
         const message = e instanceof Error ? e.message : "Unknown error.";
-
-        // Convert specific errors to our custom error types
+        // Convert specific errors to our custom error types.
+        // This comes from keplr wallet
         if (/failed to get account from keplr wallet/i.test(message)) {
           throw new KeplrWalletError();
         } else {

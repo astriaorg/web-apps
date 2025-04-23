@@ -8,7 +8,7 @@ interface AddErc20ToWalletButtonProps {
 }
 
 // TODO - move to hook useAddErc20ToWallet
-export default function AddErc20ToWalletButton({
+export function AddErc20ToWalletButton({
   evmCurrency,
   buttonClassNameOverride,
 }: AddErc20ToWalletButtonProps) {

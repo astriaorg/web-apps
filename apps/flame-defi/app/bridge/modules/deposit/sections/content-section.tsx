@@ -23,11 +23,6 @@ import { NotificationType, useNotifications } from "features/notifications";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
-import {
-  DepositError,
-  WalletConnectionError,
-  KeplrWalletError,
-} from "bridge/types";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
@@ -113,26 +108,7 @@ export const ContentSection = () => {
       // keep animation for a bit after success
       setTimeout(() => setIsAnimating(false), 1000);
     } catch (error) {
-      console.error("Deposit error:", error);
-
-      // Handle errors based on their type
-      if (error instanceof WalletConnectionError) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.WARNING,
-            message: error.message,
-            onAcknowledge: () => {},
-          },
-        });
-      } else if (error instanceof KeplrWalletError) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: error.message,
-            onAcknowledge: () => {},
-          },
-        });
-      } else if (error instanceof DepositError) {
+      if (error instanceof Error) {
         addNotification({
           toastOpts: {
             toastType: NotificationType.DANGER,
@@ -149,7 +125,7 @@ export const ContentSection = () => {
         addNotification({
           toastOpts: {
             toastType: NotificationType.DANGER,
-            message: "An unknown error occurred",
+            message: "Failed deposit. An unknown error occurred.",
             onAcknowledge: () => {},
           },
         });

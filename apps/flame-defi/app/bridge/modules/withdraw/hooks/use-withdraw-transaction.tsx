@@ -6,13 +6,9 @@ import { useConfig } from "wagmi";
 
 import { useCosmosWallet } from "features/cosmos-wallet";
 
+import { WalletConnectionError, WithdrawError } from "bridge/errors";
 import { createBridgeStrategy } from "bridge/strategies";
-import {
-  AstriaWalletError,
-  ChainConnection,
-  WalletConnectionError,
-  WithdrawError,
-} from "bridge/types";
+import { ChainConnection } from "bridge/types";
 
 export interface WithdrawTransactionHook {
   isLoading: boolean;
@@ -69,17 +65,11 @@ export function useWithdrawTransaction(): WithdrawTransactionHook {
         );
 
         await withdrawStrategy.execute(recipientAddress);
-        return;
       } catch (e) {
         console.error("Withdraw failed", e);
-        const message = e instanceof Error ? e.message : "Unknown error.";
-
-        // Convert specific errors to our custom error types
-        if (/failed to connect to astria wallet/i.test(message)) {
-          throw new AstriaWalletError();
-        } else {
-          throw new WithdrawError(message);
-        }
+        throw new WithdrawError(
+          e instanceof Error ? e.message : "Unknown error.",
+        );
       } finally {
         setIsLoading(false);
       }

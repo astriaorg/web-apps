@@ -4,23 +4,18 @@ import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
 
+import { EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
-import { formatDecimalValues, shortenAddress } from "@repo/ui/utils";
-import { useConfig } from "config";
+import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
+import { useConfig } from "config";
 import { NotificationType, useNotifications } from "features/notifications";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
-import {
-  AstriaWalletError,
-  WalletConnectionError,
-  WithdrawError,
-} from "bridge/types";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
-import { EvmCurrency } from "@repo/flame-types";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
@@ -104,26 +99,7 @@ export const ContentSection = () => {
       // keep animation for a bit after success
       setTimeout(() => setIsAnimating(false), 1000);
     } catch (error) {
-      console.error("Withdrawal error:", error);
-
-      // Handle errors based on their type
-      if (error instanceof WalletConnectionError) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.WARNING,
-            message: error.message,
-            onAcknowledge: () => {},
-          },
-        });
-      } else if (error instanceof AstriaWalletError) {
-        addNotification({
-          toastOpts: {
-            toastType: NotificationType.DANGER,
-            message: error.message,
-            onAcknowledge: () => {},
-          },
-        });
-      } else if (error instanceof WithdrawError) {
+      if (error instanceof Error) {
         addNotification({
           toastOpts: {
             toastType: NotificationType.DANGER,
@@ -140,12 +116,11 @@ export const ContentSection = () => {
         addNotification({
           toastOpts: {
             toastType: NotificationType.DANGER,
-            message: "An unknown error occurred",
+            message: "Failed withdrawal. An unknown error occurred.",
             onAcknowledge: () => {},
           },
         });
       }
-
       setIsAnimating(false);
     }
   }, [
@@ -247,7 +222,7 @@ export const ContentSection = () => {
 
   // Format balance values - simplified for now
   // TODO - get balances
-  const formattedBalanceValue = formatDecimalValues("0");
+  const formattedBalanceValue = "0";
 
   const isWithdrawDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
