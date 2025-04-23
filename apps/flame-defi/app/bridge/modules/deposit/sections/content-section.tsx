@@ -2,7 +2,7 @@
 
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { type Address } from "viem";
+import { type Address, isAddress } from "viem";
 
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
@@ -232,7 +232,7 @@ export const ContentSection = () => {
       }
 
       // Check that address is correct EVM address format
-      if (!addressInput.startsWith("0x")) {
+      if (!isAddress(addressInput)) {
         setIsRecipientAddressValid(false);
         return;
       }
