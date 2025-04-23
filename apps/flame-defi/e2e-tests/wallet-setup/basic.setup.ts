@@ -1,6 +1,7 @@
 // Import necessary Synpress modules
 import { defineWalletSetup } from "@synthetixio/synpress";
 import { MetaMask } from "@synthetixio/synpress/playwright";
+import { BrowserContext, Page } from "@playwright/test";
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const SEED_PHRASE = process.env.SEED_PHRASE;
@@ -15,8 +16,14 @@ if (!SEED_PHRASE || !PASSWORD || !PRIVATE_KEY) {
 
 // Define the basic wallet setup
 export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
-  // Create a new MetaMask instance
-  const metamask = new MetaMask(context, walletPage, PASSWORD);
+  // NOTE - had to add `as Foo` to below args because I was getting a ts error w/o them,
+  //  even though BrowserContext from @playwright/test and playwright-core seem to be
+  //  the same type???
+  const metamask = new MetaMask(
+    context as BrowserContext,
+    walletPage as Page,
+    PASSWORD,
+  );
 
   // Import the wallet using the seed phrase
   await metamask.importWallet(SEED_PHRASE);

@@ -3,7 +3,7 @@ _default:
 
 set dotenv-filename := "./wallet-setup/.env.e2e-tests"
 
-# setup wallets for synpress
+# setup wallets for synpress. must run this when caches do not exist.
 setup-wallets:
   # NOTE - the path is relative to playwright.config.ts
   npx synpress -d ./e2e-tests/wallet-setup

@@ -12,6 +12,7 @@ import { WagmiProvider } from "wagmi";
 import { base } from "wagmi/chains";
 
 import {
+  ChainId,
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
@@ -42,16 +43,23 @@ const { astriaChains, cosmosChains, coinbaseChains } = getAllChainConfigs();
 
 // for the wagmi and rainbowkit config
 const allEvmChains = [...astriaChains, ...coinbaseChains];
+const allEvmChainsAsRainbowKitChains =
+  evmChainsToRainbowKitChains(allEvmChains);
 // wagmi and rainbowkit config, for evm chains
 const rainbowKitConfig = getDefaultConfig({
   appName: "Flame Bridge",
   projectId: WALLET_CONNECT_PROJECT_ID,
-  chains: evmChainsToRainbowKitChains(allEvmChains),
+  chains: allEvmChainsAsRainbowKitChains,
 });
 
 // TODO - refactor to same level as the cosmos wallet context provider
 const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
 const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
+
+// set this as default rainbow kit chain to connect to
+const astriaMainnet = allEvmChainsAsRainbowKitChains.find(
+  (c) => c.id === ChainId.MAINNET,
+);
 
 // Common providers for the entire app
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -61,7 +69,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <NotificationsContextProvider>
           <WagmiProvider config={rainbowKitConfig}>
             <QueryClientProvider client={queryClient}>
-              <RainbowKitProvider>
+              <RainbowKitProvider initialChain={astriaMainnet}>
                 <ChainProvider
                   assetLists={[...assets, ...cosmosKitAssetLists]}
                   chains={[...chains, ...cosmosKitChains]}

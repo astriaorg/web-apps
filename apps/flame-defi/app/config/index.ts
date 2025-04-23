@@ -50,12 +50,7 @@ export interface AppConfig {
   };
 }
 
-export {
-  getAllChainConfigs,
-  getChainConfigs,
-  getFlameChainId,
-  getFlameNetworkByChainId,
-} from "./chain-configs";
+export { getAllChainConfigs, getChainConfigs } from "./chain-configs";
 export { ConfigContextProvider } from "./contexts/config-context";
 export { getEnvVariable, getOptionalEnvVariable } from "./env";
 export { useConfig, useAstriaChainData } from "./hooks/use-config";
