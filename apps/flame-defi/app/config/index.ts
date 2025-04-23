@@ -1,9 +1,10 @@
+import { type Address } from "viem";
+
 import type {
   CoinbaseChains,
   CosmosChains,
   AstriaChains,
   FlameNetwork,
-  HexString,
 } from "@repo/flame-types";
 
 /**
@@ -41,7 +42,7 @@ export interface AppConfig {
   // The default slippage tolerance.
   defaultSlippageTolerance: number;
   // The fee recipient address for swaps.
-  feeRecipient?: HexString;
+  feeRecipient?: Address;
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;

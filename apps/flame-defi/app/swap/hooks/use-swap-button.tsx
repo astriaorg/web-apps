@@ -16,13 +16,12 @@ import {
 import {
   evmChainToRainbowKitChain,
   GetQuoteResult,
-  HexString,
   TokenInputState,
 } from "@repo/flame-types";
 import { useConfig } from "config";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
-import { Chain } from "viem";
+import { Chain, type Hash, type Address } from "viem";
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 
 interface SwapButtonProps {
@@ -53,7 +52,7 @@ export function useSwapButton({
   const { connectWallet } = useAstriaWallet();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS | undefined>(undefined);
   const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
-  const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const result = useWaitForTransactionReceipt({ hash: txnHash });
 
@@ -169,7 +168,7 @@ export function useSwapButton({
 
       const swapRouterService = createSwapRouterService(
         wagmiConfig,
-        swapRouterAddress as HexString,
+        swapRouterAddress as Address,
         evmChainToRainbowKitChain(chain) as Chain,
       );
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { type Address } from "viem";
 import { useConfig } from "wagmi";
 
-import { HexString } from "@repo/flame-types";
 import { useCosmosWallet } from "features/cosmos-wallet";
 
 import { createBridgeStrategy } from "bridge/strategies";
@@ -44,7 +44,7 @@ export function useWithdrawTransaction(): WithdrawTransactionHook {
     }): Promise<void> => {
       // Use either manual recipient address or the destination chain address
       const recipientAddress = (recipientAddressOverride ||
-        destinationConnection.address) as HexString;
+        destinationConnection.address) as Address;
 
       // Basic validation
       if (!sourceConnection.address || !recipientAddress) {

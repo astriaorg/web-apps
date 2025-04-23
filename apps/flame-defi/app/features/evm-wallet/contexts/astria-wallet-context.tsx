@@ -1,17 +1,17 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
-import { formatUnits } from "viem";
+import { type Address, formatUnits } from "viem";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 
-import { AstriaChain, Balance, HexString, TRADE_TYPE } from "@repo/flame-types";
+import { AstriaChain, Balance, TRADE_TYPE } from "@repo/flame-types";
 import { useAstriaChainData, useConfig } from "config";
 import { useGetQuote } from "../hooks/use-get-quote";
 
 export interface AstriaWalletContextProps {
   connectWallet: () => void;
   disconnectWallet: () => void;
-  accountAddress: HexString | null;
+  accountAddress: Address | null;
   chains: AstriaChain[];
   nativeTokenBalance: Balance | null;
   isLoadingNativeTokenBalance: boolean;

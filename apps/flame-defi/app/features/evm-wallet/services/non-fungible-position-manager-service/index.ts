@@ -1,15 +1,15 @@
 import { Config } from "@wagmi/core";
-import { type Address, Abi, encodeFunctionData } from "viem";
+import { type Address, Abi, encodeFunctionData, type Hash } from "viem";
+
 import {
   AstriaChain,
-  HexString,
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
-import { GenericContractService } from "../generic-contract-service";
-import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
+import { GenericContractService } from "../generic-contract-service";
 import { needToReverseTokenOrder } from "../services.utils";
+import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
 type PositionResponseTuple = [
   bigint, // nonce
@@ -153,7 +153,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient: Address,
     deadline: number,
     value: bigint,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     return await this.writeContractMethod(
       chainId,
       "mint",
@@ -200,7 +200,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       deadline,
       value,
     }: IncreaseLiquidityParams,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     return await this.writeContractMethod(
       chainId,
       "increaseLiquidity",
@@ -334,7 +334,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * @param params - Parameters for the collect fees operation
    * @returns Transaction hash if successful
    */
-  async collectFees(params: CollectFeesParams): Promise<HexString> {
+  async collectFees(params: CollectFeesParams): Promise<Hash> {
     const {
       calls,
       chainId,
@@ -539,7 +539,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     amount0Min: bigint,
     amount1Min: bigint,
     deadline: number,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "decreaseLiquidity",
@@ -564,7 +564,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient: Address,
     amount0Max: bigint,
     amount1Max: bigint,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "collect",
@@ -587,7 +587,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   private encodeUnwrapWETHCall(
     amountMinimum: bigint,
     recipient: Address,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "unwrapWETH9",
@@ -604,7 +604,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     token: Address,
     amountMinimum: bigint,
     recipient: Address,
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "sweepToken",
@@ -621,7 +621,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    */
   async decreaseLiquidityAndCollect(
     params: DecreaseLiquidityAndCollectParams,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const {
       chainId,
       tokenId,

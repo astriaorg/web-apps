@@ -1,8 +1,7 @@
 import type { Config } from "@wagmi/core";
-import { type Abi, type Address, parseUnits } from "viem";
+import { type Abi, type Address, parseUnits, type Hash } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
-import { HexString } from "@repo/flame-types";
 
 /**
  * Interface representing the parameters required for initiating a withdrawal
@@ -62,7 +61,7 @@ export class AstriaWithdrawerService extends GenericContractService {
     amountDenom,
     fee,
     memo,
-  }: WithdrawToIbcChainParams): Promise<HexString> {
+  }: WithdrawToIbcChainParams): Promise<Hash> {
     const amountWei = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     const totalAmount = amountWei + feeWei;
@@ -113,7 +112,7 @@ export class AstriaErc20WithdrawerService extends GenericContractService {
     amountDenom,
     fee,
     memo,
-  }: WithdrawToIbcChainParams): Promise<HexString> {
+  }: WithdrawToIbcChainParams): Promise<Hash> {
     const amountBaseUnits = parseUnits(amount, amountDenom);
     const feeWei = BigInt(fee);
     return this.writeContractMethod(

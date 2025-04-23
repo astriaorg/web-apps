@@ -1,6 +1,6 @@
 import type { Config } from "@wagmi/core";
-import { type Address, erc20Abi, parseUnits } from "viem";
-import { HexString } from "@repo/flame-types";
+import { type Address, erc20Abi, parseUnits, type Hash } from "viem";
+
 import { GenericContractService } from "../generic-contract-service";
 
 interface TransferParams {
@@ -26,7 +26,7 @@ export class Erc20Service extends GenericContractService {
     recipient,
     amount,
     chainId,
-  }: TransferParams): Promise<HexString> {
+  }: TransferParams): Promise<Hash> {
     return await this.writeContractMethod(chainId, "transfer", [
       recipient,
       amount,
@@ -47,7 +47,7 @@ export class Erc20Service extends GenericContractService {
     contractAddress: Address,
     tokenApprovalAmount: string,
     decimals: number,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const amountAsBigInt = parseUnits(tokenApprovalAmount, decimals);
     return await this.writeContractMethod(chainId, "approve", [
       contractAddress,
@@ -65,7 +65,7 @@ export class Erc20Service extends GenericContractService {
    */
   async getTokenAllowance(
     chainId: number,
-    userAddress: HexString,
+    userAddress: Address,
     contractAddress: Address,
   ): Promise<string | null> {
     const currentAllowance = await this.readContractMethod(

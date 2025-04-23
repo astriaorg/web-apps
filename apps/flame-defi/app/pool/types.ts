@@ -1,10 +1,9 @@
 import {
   EvmCurrency,
-  HexString,
   TXN_STATUS,
   TokenInputState,
 } from "@repo/flame-types";
-import { Address } from "viem";
+import type { Address, Hash } from "viem";
 import type { FeeTier } from "./constants";
 
 export enum POOL_INPUT_ID {
@@ -130,7 +129,7 @@ export type PoolPositionContextProps = {
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
   poolTokens: PoolToken[];
-  txnHash?: HexString;
+  txnHash?: Hash;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
@@ -167,5 +166,5 @@ export type TxnLoaderProps = {
 
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
-  txnHash: HexString;
+  txnHash: Hash;
 };

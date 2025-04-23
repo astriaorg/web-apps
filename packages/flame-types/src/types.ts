@@ -5,7 +5,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
-import { ChainContract, parseUnits } from "viem";
+import { ChainContract, parseUnits, type Address, type Hash } from "viem";
 import React from "react";
 import JSBI from "jsbi";
 import Big from "big.js";
@@ -318,12 +318,6 @@ export function ibcCurrenciesToCosmosKitAssetList(
 }
 
 /**
- * Simple type representing a hex string
- * Note: This is just a string type constraint, not a complex object
- */
-export type HexString = `0x${string}`;
-
-/**
  * Represents a currency on an EVM chain, which can be either a native token or an ERC-20 token.
  */
 export class EvmCurrency implements GenericCurrency {
@@ -339,13 +333,13 @@ export class EvmCurrency implements GenericCurrency {
   public readonly ibcWithdrawalFeeWei?: string;
 
   /** ERC-20 contract address if this is a token, undefined for native currencies */
-  public readonly erc20ContractAddress?: HexString;
+  public readonly erc20ContractAddress?: Address;
 
   /** Contract address for native token withdrawer, undefined for ERC-20 tokens */
-  public readonly nativeTokenWithdrawerContractAddress?: HexString;
+  public readonly nativeTokenWithdrawerContractAddress?: Address;
 
   /** Contract address for intent bridge **/
-  public readonly astriaIntentBridgeAddress?: HexString;
+  public readonly astriaIntentBridgeAddress?: Address;
 
   /** True if this is a wrapped native token (e.g., wTIA) */
   public readonly isWrappedNative: boolean;
@@ -359,9 +353,9 @@ export class EvmCurrency implements GenericCurrency {
     coinMinimalDenom: string;
     coinDecimals: number;
     ibcWithdrawalFeeWei?: string;
-    erc20ContractAddress?: HexString;
-    nativeTokenWithdrawerContractAddress?: HexString;
-    astriaIntentBridgeAddress?: HexString;
+    erc20ContractAddress?: Address;
+    nativeTokenWithdrawerContractAddress?: Address;
+    astriaIntentBridgeAddress?: Address;
     isWrappedNative: boolean;
   }) {
     this.title = params.title;

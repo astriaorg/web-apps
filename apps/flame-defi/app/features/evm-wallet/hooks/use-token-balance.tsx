@@ -1,16 +1,17 @@
+import { useCallback, useEffect, useState } from "react";
+import { type Address, formatUnits } from "viem";
+import { useBalance, useConfig } from "wagmi";
+
 import {
   Balance,
   EvmChainInfo,
   EvmCurrency,
-  HexString,
 } from "@repo/flame-types";
+
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
-import { useCallback, useEffect, useState } from "react";
-import { formatUnits } from "viem";
-import { useBalance, useConfig } from "wagmi";
 
 export const useTokenBalance = (
-  userAddress?: HexString,
+  userAddress?: Address,
   evmChain?: EvmChainInfo,
   token?: EvmCurrency,
 ) => {
@@ -20,7 +21,7 @@ export const useTokenBalance = (
   const [error, setError] = useState<Error | null>(null);
 
   const { data: nativeBalance } = useBalance({
-    address: userAddress as HexString,
+    address: userAddress as Address,
   });
 
   const fetchBalance = useCallback(async () => {

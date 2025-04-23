@@ -1,7 +1,6 @@
 import type { Config } from "@wagmi/core";
-import { Abi, type Address } from "viem";
+import { Abi, type Address, type Hash } from "viem";
 
-import { HexString } from "@repo/flame-types";
 import { GenericContractService } from "../generic-contract-service";
 import ASTRIA_BRIDGE_SOURCE_ABI from "./astria-bridge-source-abi.json";
 
@@ -41,7 +40,7 @@ export class AstriaBridgeSourceService extends GenericContractService {
     // FIXME - could totally refactor the GenericService so we don't
     //  have to always pass in chain id at method call time
     chainId,
-  }: BridgeTokensParams): Promise<HexString> {
+  }: BridgeTokensParams): Promise<Hash> {
     return await this.writeContractMethod(chainId, "bridgeTokens", [
       recipientAddress,
       amount,
@@ -62,7 +61,7 @@ export class AstriaBridgeSourceService extends GenericContractService {
     amount,
     assetToReceive,
     chainId,
-  }: BridgeAndSwapTokensParams): Promise<HexString> {
+  }: BridgeAndSwapTokensParams): Promise<Hash> {
     return await this.writeContractMethod(chainId, "bridgeAndSwap", [
       recipientAddress,
       amount,

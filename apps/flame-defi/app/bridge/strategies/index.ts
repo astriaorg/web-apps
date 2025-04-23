@@ -1,14 +1,13 @@
 import { Decimal } from "@cosmjs/math";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Config } from "@wagmi/core";
-import { parseUnits } from "viem";
+import { type Address, parseUnits } from "viem";
 
 import {
   ChainType,
   CosmosChainInfo,
   EvmChainInfo,
   EvmCurrency,
-  HexString,
   IbcCurrency,
 } from "@repo/flame-types";
 import { sendIbcTransfer } from "features/cosmos-wallet";
@@ -21,7 +20,7 @@ import {
 import { ChainConnection } from "../types";
 
 export interface BridgeStrategy {
-  execute(recipientAddress: HexString): Promise<void>;
+  execute(recipientAddress: Address): Promise<void>;
 }
 
 /**
@@ -70,7 +69,7 @@ export class EvmIntentBridgeStrategy implements BridgeStrategy {
     this.sourceCurrency = context.sourceConnection.currency as EvmCurrency;
   }
 
-  async execute(recipientAddress: HexString): Promise<void> {
+  async execute(recipientAddress: Address): Promise<void> {
     if (!this.sourceCurrency.erc20ContractAddress) {
       throw new Error(
         "ERC20 contract address is missing for the selected token. Intent bridge only supports ERC20 tokens.",
@@ -145,7 +144,7 @@ export class CosmosIbcDepositStrategy implements BridgeStrategy {
     this.sourceCurrency = currency as IbcCurrency;
   }
 
-  async execute(recipientAddress: HexString): Promise<void> {
+  async execute(recipientAddress: Address): Promise<void> {
     if (!this.sourceChain || !this.sourceCurrency) {
       throw new Error(
         "Please select a Cosmos chain and token to bridge first.",
@@ -193,7 +192,7 @@ export class AstriaIbcWithdrawStrategy implements BridgeStrategy {
     this.sourceCurrency = currency as EvmCurrency;
   }
 
-  async execute(recipientAddress: HexString): Promise<void> {
+  async execute(recipientAddress: Address): Promise<void> {
     if (!this.sourceChain || !this.sourceCurrency) {
       throw new Error(
         "Please select an Astria chain and token to withdraw first.",

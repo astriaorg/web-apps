@@ -2,10 +2,11 @@
 
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { type Address } from "viem";
 
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
-import { EvmCurrency, EvmChainInfo, HexString } from "@repo/flame-types";
+import { EvmCurrency, EvmChainInfo } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -301,7 +302,7 @@ export const ContentSection = () => {
   const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
     useTokenBalance(
       sourceConnection.chain?.chainType === "evm"
-        ? (sourceConnection.address as HexString)
+        ? (sourceConnection.address as Address)
         : undefined,
       sourceConnection.chain?.chainType === "evm"
         ? (sourceConnection.chain as EvmChainInfo)
@@ -318,7 +319,7 @@ export const ContentSection = () => {
     balance: destinationBalance,
     isLoading: isLoadingDestinationBalance,
   } = useTokenBalance(
-    destinationConnection.address as HexString,
+    destinationConnection.address as Address,
     destinationConnection.chain as EvmChainInfo,
     destinationConnection.currency as EvmCurrency,
   );

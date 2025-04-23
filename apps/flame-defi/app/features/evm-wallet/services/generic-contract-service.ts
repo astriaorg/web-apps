@@ -1,4 +1,3 @@
-import { HexString } from "@repo/flame-types";
 import {
   type Config,
   getPublicClient,
@@ -61,7 +60,7 @@ export class GenericContractService {
     try {
       const walletClient = await this.getWalletClient(chainId);
       const publicClient = await this.getPublicClient(chainId);
-      const signerAddress = walletClient.account?.address as HexString;
+      const signerAddress = walletClient.account?.address as Address;
       const estimatedGas = await publicClient.estimateContractGas({
         address: this.contractAddress,
         abi: this.abi,

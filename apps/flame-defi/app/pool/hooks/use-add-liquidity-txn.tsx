@@ -1,4 +1,5 @@
-import { HexString, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { type Hash } from "viem";
 import { useEffect, useState } from "react";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import { useAstriaChainData, useConfig as useAppConfig } from "config";
@@ -16,7 +17,7 @@ export const useAddLiquidityTxn = (
   const { address } = useAccount();
   const wagmiConfig = useConfig();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   const { chain } = useAstriaChainData();

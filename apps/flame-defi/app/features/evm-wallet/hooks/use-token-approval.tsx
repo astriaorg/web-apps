@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { type Address, type Hash } from "viem";
 import { useAccount, useConfig as useWagmiConfig } from "wagmi";
 
 import {
   EvmChainInfo,
-  HexString,
   TokenAllowance,
   TokenInputState,
   tokenStateToBig,
@@ -14,11 +14,11 @@ import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 type TokenApprovalProps = {
   chain: EvmChainInfo;
-  addressToApprove: HexString;
+  addressToApprove: Address;
   // FIXME - could we remove these callbacks and instead return the txnHash from
   //  handleTokenApproval and try/catch errors at the calling site?
   setTxnStatus: (status: TXN_STATUS) => void;
-  setTxnHash: (hash?: HexString) => void;
+  setTxnHash: (hash?: Hash) => void;
   setErrorText: (error: string) => void;
 };
 
@@ -56,14 +56,14 @@ export const useTokenApproval = ({
   const userAccount = useAccount();
 
   const approveToken = useCallback(
-    async (tokenInputState: TokenInputState): Promise<HexString | null> => {
+    async (tokenInputState: TokenInputState): Promise<Hash | null> => {
       const { token } = tokenInputState;
       if (!token || !token.erc20ContractAddress) {
         return null;
       }
       const erc20Service = createErc20Service(
         wagmiConfig,
-        token.erc20ContractAddress as HexString,
+        token.erc20ContractAddress as Address,
       );
 
       const txHash = await erc20Service.approveToken(
@@ -106,7 +106,7 @@ export const useTokenApproval = ({
       if (currency.erc20ContractAddress) {
         const erc20Service = createErc20Service(
           wagmiConfig,
-          currency.erc20ContractAddress as HexString,
+          currency.erc20ContractAddress as Address,
         );
         try {
           const allowance = await erc20Service.getTokenAllowance(

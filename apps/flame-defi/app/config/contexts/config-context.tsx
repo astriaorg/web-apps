@@ -1,12 +1,11 @@
 import React, { useMemo } from "react";
-import { maxUint256 } from "viem";
+import { type Address, maxUint256 } from "viem";
 
 import {
   CoinbaseChains,
   CosmosChains,
   AstriaChains,
   FlameNetwork,
-  HexString,
 } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
@@ -58,7 +57,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   const feeRecipient = getOptionalEnvVariable(
     "NEXT_PUBLIC_FEE_RECIPIENT",
-  ) as HexString;
+  ) as Address;
 
   // default to Mainnet
   // TODO - remember in localStorage?

@@ -1,5 +1,5 @@
 import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { HexString } from "@repo/flame-types";
+import { type Hash } from "viem";
 import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
 import { useConfig as useAppConfig, useAstriaChainData } from "config";
@@ -21,7 +21,7 @@ export const useRemoveLiquidityTxn = (
   const wagmiConfig = useConfig();
   const { chain } = useAstriaChainData();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;

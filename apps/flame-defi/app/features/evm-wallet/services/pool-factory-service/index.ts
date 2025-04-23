@@ -1,6 +1,6 @@
-import { HexString } from "@repo/flame-types";
 import { readContracts, type Config } from "@wagmi/core";
-import { Abi, type Address } from "viem";
+import { Abi, type Address, type Hash } from "viem";
+
 import { GenericContractService } from "../generic-contract-service";
 import POOL_FACTORY_ABI from "./pool-factory-abi.json";
 
@@ -87,7 +87,7 @@ export class PoolFactoryService extends GenericContractService {
     token0: Address,
     token1: Address,
     fee: number,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const txHash = await this.writeContractMethod(chainId, "createPool", [
       token0,
       token1,
