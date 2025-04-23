@@ -42,6 +42,6 @@ test("should connect wallet using navigation menu wallet connector button", asyn
 
   await metamask.approveSwitchNetwork();
 
-  // Verify that we're now connected (button text should change to "Connected")
-  await expect(page.locator('nav button:has-text("Connected")')).toBeVisible();
+  // Verify that we're now connected (button text should change to connected address)
+  await expect(page.locator('nav button:has-text("0x")')).toBeVisible();
 });
