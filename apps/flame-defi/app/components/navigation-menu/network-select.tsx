@@ -29,7 +29,6 @@ export const NetworkSelect = (): React.ReactElement => {
 
   //NOTES: THING TO TRACK:
   // evmChainOptions
-  // selectedEvmChain
   // selectedEvmNetwork
 
   return (

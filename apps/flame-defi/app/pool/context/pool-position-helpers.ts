@@ -1,9 +1,6 @@
-import { EvmCurrency, HexString } from "@repo/flame-types";
-import {
-  FEE_TIER,
-  TICK_BOUNDARIES,
-  TICK_SPACING_BY_FEE,
-} from "../constants/pool-constants";
+import { EvmCurrency } from "@repo/flame-types";
+import { type Address } from "viem";
+import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE } from "../constants";
 
 export const sqrtPriceX96ToPrice = (
   sqrtPriceX96: bigint,
@@ -48,7 +45,7 @@ export const tickToPrice = (
 export const getTokenDataFromCurrencies = (
   currencies: EvmCurrency[],
   tokenAddress: string,
-  wrappedNative: HexString,
+  wrappedNative: Address,
 ): EvmCurrency | null => {
   // NOTE: This check is required because the tokenAddress returned from the contract is WTIA but TIA is the native token and the only one we want to show.
   if (tokenAddress === wrappedNative) {

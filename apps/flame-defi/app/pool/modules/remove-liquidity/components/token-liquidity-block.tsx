@@ -16,8 +16,7 @@ export const TokenLiquidityBlock = ({
   return (
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex flex-col space-y-3 flex-1 bg-surface-1 rounded-lg p-4 justify-center">
-        {/* TODO: loading state */}
-        <Skeleton isLoading={!symbolsReady} className="">
+        <Skeleton isLoading={!symbolsReady} className="h-16 w-full">
           {symbolsReady && (
             <div className="flex flex-col space-x-2">
               <MultiTokenIcon
@@ -33,7 +32,7 @@ export const TokenLiquidityBlock = ({
             </div>
           )}
         </Skeleton>
-        <Skeleton isLoading={!feeTier} className="">
+        <Skeleton isLoading={!feeTier || !symbolsReady} className="h-8 w-full">
           <div className="flex space-x-2">
             <Badge
               variant="default"
@@ -49,13 +48,11 @@ export const TokenLiquidityBlock = ({
         </Skeleton>
       </div>
       <div className="flex flex-col flex-1 bg-surface-1 rounded-lg p-4">
-        {poolToken0 && poolToken1 && (
-          <PoolFeesAndLiquidityCard
-            poolTokens={[poolToken0, poolToken1]}
-            className="p-0"
-            liquidityToRemove={liquidityToRemove}
-          />
-        )}
+        <PoolFeesAndLiquidityCard
+          poolTokens={poolToken0 && poolToken1 ? [poolToken0, poolToken1] : []}
+          className="p-0"
+          liquidityToRemove={liquidityToRemove}
+        />
       </div>
     </div>
   );

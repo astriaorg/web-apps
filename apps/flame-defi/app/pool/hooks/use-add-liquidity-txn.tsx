@@ -1,12 +1,14 @@
-import { HexString, TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { useEvmChainData } from "config";
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { type Hash } from "viem";
 import { useEffect, useState } from "react";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
-import { useConfig as useAppConfig } from "config";
+import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import { getSlippageTolerance } from "@repo/ui/utils";
-import { createNonfungiblePositionManagerService } from "features/evm-wallet";
+import {
+  createNonfungiblePositionManagerService,
+  NonfungiblePositionManagerService,
+} from "features/evm-wallet";
 import { usePoolPositionContext } from "./use-pool-position-context";
-import { NonfungiblePositionManagerService } from "../../features/evm-wallet/services/non-fungible-position-manager-service";
 
 export const useAddLiquidityTxn = (
   input0Amount: string,
@@ -15,10 +17,10 @@ export const useAddLiquidityTxn = (
   const { address } = useAccount();
   const wagmiConfig = useConfig();
   const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<HexString | undefined>(undefined);
+  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
   const [errorText, setErrorText] = useState<string | null>(null);
 
-  const { selectedChain } = useEvmChainData();
+  const { chain } = useAstriaChainData();
   const { poolToken0, poolToken1, positionNftId } = usePoolPositionContext();
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
@@ -66,7 +68,7 @@ export const useAddLiquidityTxn = (
         tokenInput0,
         tokenInput1,
         slippageTolerance,
-        selectedChain,
+        chain,
       );
 
     try {
@@ -74,7 +76,7 @@ export const useAddLiquidityTxn = (
       const NonfungiblePositionManagerService =
         createNonfungiblePositionManagerService(
           wagmiConfig,
-          selectedChain.contracts.nonfungiblePositionManager.address,
+          chain.contracts.nonfungiblePositionManager.address,
         );
 
       const tx = await NonfungiblePositionManagerService.increaseLiquidity(

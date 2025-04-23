@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { useGetQuote } from "../../hooks";
+import { useGetQuote } from "features/evm-wallet";
 import { EvmCurrency, GetQuoteResult, TRADE_TYPE } from "@repo/flame-types";
 import { formatDecimalValues } from "@repo/ui/utils";
 
 export const useOneToOneQuote = (
-  inputOne: EvmCurrency | null,
-  inputTwo: EvmCurrency | null,
+  inputOne?: EvmCurrency,
+  inputTwo?: EvmCurrency,
 ) => {
   const [flipDirection, setFlipDirection] = useState(true);
   const [quoteOne, setQuoteOne] = useState<GetQuoteResult | null>(null);

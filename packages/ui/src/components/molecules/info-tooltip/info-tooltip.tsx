@@ -11,7 +11,7 @@ import {
 
 interface InfoTooltipProps {
   content: string;
-  side?: "left" | "right" | "top" | "bottom" | undefined;
+  side?: "left" | "right" | "top" | "bottom";
   className?: string;
 }
 

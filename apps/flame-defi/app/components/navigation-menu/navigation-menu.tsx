@@ -1,6 +1,6 @@
 "use client";
 
-import { FlameIcon } from "@repo/ui/icons";
+import { AstriaLogo } from "@repo/ui/logos";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
@@ -13,6 +13,8 @@ export const NavigationMenu = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
 
+  const isBridgePage = pathname.startsWith(LINKS.BRIDGE);
+
   return (
     <nav
       className="flex items-center justify-between px-4 py-2 w-full h-14 bg-background-default"
@@ -23,14 +25,14 @@ export const NavigationMenu = () => {
         <a
           target="_blank"
           href={brandURL}
-          className="flex items-center w-8 h-8 overflow-hidden mr-12"
+          className="flex items-center h-5 mr-12"
           rel="noreferrer"
-          aria-label="Flame Logo"
+          aria-label="Astria Logo"
         >
-          <FlameIcon size={32} className="text-typography-default scale-175" />
+          <AstriaLogo />
         </a>
         <div className="items-center space-x-8 hidden md:flex">
-          <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
+          <NavigationMenuLink href="/" isActive={isBridgePage}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
@@ -67,7 +69,7 @@ export const NavigationMenu = () => {
       </div>
       <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
-        <ConnectWalletsButton />
+        {!isBridgePage && <ConnectWalletsButton />}
       </div>
       <div className="md:hidden">
         <MobileNavigationMenu />

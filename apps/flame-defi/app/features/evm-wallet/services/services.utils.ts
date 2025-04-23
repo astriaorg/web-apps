@@ -1,4 +1,4 @@
-import { HexString } from "@repo/flame-types";
+import { type Address } from "viem";
 
 /**
  * Determines if token addresses need to be reversed based on Uniswap V3 requirement
@@ -9,8 +9,8 @@ import { HexString } from "@repo/flame-types";
  * @returns Boolean indicating if token order needs to be reversed
  */
 export const needToReverseTokenOrder = (
-  token0Address: HexString,
-  token1Address: HexString,
+  token0Address: Address,
+  token1Address: Address,
 ): boolean => {
   return token0Address.toLowerCase() > token1Address.toLowerCase();
 };

@@ -1,5 +1,5 @@
 import { Button, type ButtonProps } from "@repo/ui/components";
-import { useEvmWallet } from "features/evm-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
 
@@ -8,7 +8,7 @@ export const WalletActionButton = ({
   onClick,
   ...props
 }: ButtonProps) => {
-  const { connectEvmWallet } = useEvmWallet();
+  const { connectWallet } = useAstriaWallet();
   const { isConnected } = useAccount();
 
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
@@ -16,10 +16,10 @@ export const WalletActionButton = ({
       if (isConnected) {
         onClick?.(event);
       } else {
-        connectEvmWallet();
+        connectWallet();
       }
     },
-    [isConnected, onClick, connectEvmWallet],
+    [isConnected, onClick, connectWallet],
   );
 
   return (

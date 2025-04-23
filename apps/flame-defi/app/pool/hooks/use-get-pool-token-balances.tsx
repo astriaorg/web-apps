@@ -1,58 +1,28 @@
-import { useTokenBalances } from "features/evm-wallet";
 import { useAccount } from "wagmi";
-import { useEvmChainData } from "config";
-import { useEffect, useCallback } from "react";
 
+import { EvmCurrency } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
+import { useTokenBalance } from "features/evm-wallet";
+
+// Use query for caching.
 export const useGetPoolTokenBalances = (
-  poolToken0Symbol: string,
-  poolToken1Symbol: string,
+  token0?: EvmCurrency,
+  token1?: EvmCurrency,
 ) => {
   const userAccount = useAccount();
-  const { selectedChain } = useEvmChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
 
-  const token0 =
-    currencies.find(
-      (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken0Symbol.toLowerCase(),
-    ) || null;
-  const token1 =
-    currencies.find(
-      (currency) =>
-        currency.coinDenom.toLowerCase() === poolToken1Symbol.toLowerCase(),
-    ) || null;
+  // TODO: Balances aren't cleared on disconnect wallet.
 
-  const { balances, fetchBalances } = useTokenBalances(
-    userAccount.address,
-    selectedChain,
-  );
+  const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
+    useTokenBalance(userAccount.address, chain, token0);
 
-  useEffect(() => {
-    fetchBalances([token0, token1]);
-  }, [token0, token1, fetchBalances]);
-
-  const refreshBalances = useCallback(() => {
-    if (token0 && token1) {
-      return fetchBalances([token0, token1]);
-    }
-  }, [token0, token1, fetchBalances]);
-
-  const token0Balance =
-    balances.find(
-      (balance) => balance && balance.symbol === token0?.coinDenom,
-    ) || null;
-
-  const token1Balance =
-    balances.find(
-      (balance) => balance && balance.symbol === token1?.coinDenom,
-    ) || null;
+  const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
+    useTokenBalance(userAccount.address, chain, token1);
 
   return {
-    balances,
-    token0,
-    token1,
     token0Balance,
     token1Balance,
-    refreshBalances,
+    isLoading: isLoadingToken0Balance || isLoadingToken1Balance,
   };
 };

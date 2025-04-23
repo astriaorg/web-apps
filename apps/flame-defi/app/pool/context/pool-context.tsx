@@ -1,24 +1,23 @@
 "use client";
 
-import { useConfig, useAccount } from "wagmi";
-import { useEvmChainData } from "config/hooks/use-config";
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
+import type { FeeTier } from "pool/constants";
 import { PoolContextProps, PoolPosition } from "pool/types";
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useEffect,
   useState,
-  useCallback,
 } from "react";
-import { TXN_STATUS } from "@repo/flame-types";
-import { FEE_TIER, FeeTier } from "pool/constants/pool-constants";
+import { useAccount, useConfig } from "wagmi";
 import {
-  getTokenDataFromCurrencies,
   getMinMaxTick,
+  getTokenDataFromCurrencies,
   tickToPrice,
 } from "./pool-position-helpers";
 
@@ -26,46 +25,14 @@ export const PoolContext = createContext<PoolContextProps | undefined>(
   undefined,
 );
 
-const feeData = [
-  {
-    id: 0,
-    feeTier: FEE_TIER.LOWEST,
-    text: "Best for very stable pairs",
-    tvl: "100M",
-    selectPercent: "0.01%",
-  },
-  {
-    id: 1,
-    feeTier: FEE_TIER.LOW,
-    text: "Best for stable pairs.",
-    tvl: "100M",
-    selectPercent: "0.05%",
-  },
-  {
-    id: 2,
-    feeTier: FEE_TIER.MEDIUM,
-    text: "Best for most pairs.",
-    tvl: "100M",
-    selectPercent: "0.3%",
-  },
-  {
-    id: 3,
-    feeTier: FEE_TIER.HIGH,
-    text: "Best for exotic pairs.",
-    tvl: "100M",
-    selectPercent: "1%",
-  },
-];
-
 export const PoolContextProvider = ({ children }: PropsWithChildren) => {
   const wagmiConfig = useConfig();
-  const { selectedChain } = useEvmChainData();
-  const { currencies } = selectedChain;
+  const { chain } = useAstriaChainData();
+  const { currencies } = chain;
   const { address } = useAccount();
   const [poolPositions, setPoolPositions] = useState<PoolPosition[]>([]);
   const [poolPositionsLoading, setPoolPositionsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
 
   // Simplified state - only keep what's needed
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -93,7 +60,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
       }
       const factoryService = createPoolFactoryService(
         wagmiConfig,
-        selectedChain.contracts.poolFactory.address,
+        chain.contracts.poolFactory.address,
       );
 
       setPoolPositionsLoading(true);
@@ -102,12 +69,12 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
         const NonfungiblePositionManagerService =
           createNonfungiblePositionManagerService(
             wagmiConfig,
-            selectedChain.contracts.nonfungiblePositionManager.address,
+            chain.contracts.nonfungiblePositionManager.address,
           );
 
         const positions =
           await NonfungiblePositionManagerService.getAllPositions(
-            selectedChain.chainId,
+            chain.chainId,
             address,
           );
 
@@ -118,17 +85,17 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
           const tokenOne = getTokenDataFromCurrencies(
             currencies,
             position.tokenAddress0,
-            selectedChain.contracts.wrappedNativeToken.address,
+            chain.contracts.wrappedNativeToken.address,
           );
 
           const tokenTwo = getTokenDataFromCurrencies(
             currencies,
             position.tokenAddress1,
-            selectedChain.contracts.wrappedNativeToken.address,
+            chain.contracts.wrappedNativeToken.address,
           );
 
           const poolAddress = await factoryService.getPool(
-            selectedChain.chainId,
+            chain.chainId,
             position.tokenAddress0,
             position.tokenAddress1,
             position.fee,
@@ -139,7 +106,7 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
             symbolTwo: tokenTwo?.coinDenom ?? "",
             feePercent,
             inRange: !isClosed,
-            positionStatus: isClosed ? "Closed" : "In range",
+            positionStatus: isClosed ? "Closed" : "In Range",
             poolAddress,
             ...position,
           };
@@ -155,18 +122,15 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
     };
 
     getPoolPositions();
-  }, [address, currencies, wagmiConfig, selectedChain]);
+  }, [address, currencies, wagmiConfig, chain]);
 
   return (
     <PoolContext.Provider
       value={{
-        feeData,
         poolPositions,
         poolPositionsLoading,
         modalOpen,
         setModalOpen,
-        txnStatus,
-        setTxnStatus,
         maxPrice,
         updateMaxPrice,
       }}

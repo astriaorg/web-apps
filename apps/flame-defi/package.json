@@ -2,6 +2,7 @@
   "name": "flame-defi",
   "version": "0.1.0",
   "dependencies": {
+    "@coinbase/onchainkit": "^0.38.2",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/math": "^0.32.4",
     "@cosmjs/stargate": "^0.32.3",

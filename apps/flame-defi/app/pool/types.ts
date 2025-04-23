@@ -1,11 +1,6 @@
-import {
-  EvmCurrency,
-  HexString,
-  TXN_STATUS,
-  TokenInputState,
-} from "@repo/flame-types";
-import { Address } from "viem";
-import { FeeTier } from "./constants/pool-constants";
+import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
+import type { Address, Hash } from "viem";
+import type { FeeTier } from "./constants";
 
 export enum POOL_INPUT_ID {
   INPUT_ZERO = "input_zero",
@@ -19,8 +14,8 @@ export interface AddLiquidityInputsBlockProps {
     id: POOL_INPUT_ID,
     coinDecimals?: number,
   ) => void;
-  token0: EvmCurrency | null;
-  token1: EvmCurrency | null;
+  token0?: EvmCurrency;
+  token1?: EvmCurrency;
   token0Balance: {
     value: string;
     symbol: string;
@@ -41,11 +36,6 @@ export interface NewPositionInputsProps {
 export interface TokenPair {
   token0: EvmCurrency | null;
   token1: EvmCurrency | null;
-}
-
-export interface TokenBalance {
-  value: string;
-  symbol: string;
 }
 
 export interface FeeData {
@@ -101,13 +91,10 @@ export interface PoolPosition extends GetAllPoolPositionsResponse {
 }
 
 export type PoolContextProps = {
-  feeData: FeeData[];
   poolPositions: PoolPosition[];
   poolPositionsLoading: boolean;
   modalOpen: boolean;
   setModalOpen: (modalOpen: boolean) => void;
-  txnStatus: TXN_STATUS;
-  setTxnStatus: (txnStatus: TXN_STATUS) => void;
   maxPrice: string;
   updateMaxPrice: (
     feeTier: number,
@@ -121,8 +108,8 @@ export type PoolPositionContextProps = {
   rawFeeTier: number; // The unformatted fee tier value to be used in calculations
   selectedSymbol: string; // The symbol of the token that is currently in the ToggleSwitch. Controls which set of token liquidity and price data is displayed
   handleReverseTokenData: (symbol: string) => void;
-  collectAsNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
-  handleCollectAsNative: (collectAsNative: boolean) => void;
+  isCollectAsWrappedNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
+  handleCollectAsWrappedNative: (isCollectAsWrappedNative: boolean) => void;
   poolToken0: PoolToken | null;
   poolToken1: PoolToken | null;
   poolPosition: PoolPositionResponse | null;
@@ -138,7 +125,7 @@ export type PoolPositionContextProps = {
 export type PoolTxnStepsProps = {
   txnStatus: TXN_STATUS;
   poolTokens: PoolToken[];
-  txnHash?: HexString;
+  txnHash?: Hash;
   txnMsg: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
@@ -175,5 +162,5 @@ export type TxnLoaderProps = {
 
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
-  txnHash: HexString;
+  txnHash: Hash;
 };
