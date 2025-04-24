@@ -1,16 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Decimal } from "@cosmjs/math";
 
-import { Balance, IbcCurrency } from "@repo/flame-types";
+import { Balance, IbcCurrency, PollingConfig, UseBalanceResult } from "@repo/flame-types";
 import { useConfig } from "config";
 
 import { getBalanceFromChain } from "../services/cosmos";
 import { useCosmosWallet } from "./use-cosmos-wallet";
-
-interface PollingConfig {
-  enabled: boolean;
-  intervalMS: number;
-}
 
 /**
  * Custom hook to fetch and manage the balance for an IBC currency.
@@ -25,89 +20,59 @@ interface PollingConfig {
 export const useIbcCurrencyBalance = (
   currency?: IbcCurrency,
   pollingConfig?: PollingConfig,
-) => {
+): UseBalanceResult => {
   const { selectedCosmosChain, cosmosAccountAddress } = useCosmosWallet();
   const { cosmosChains } = useConfig();
 
   // use first cosmos chain if none selected yet
-  const chain = useMemo(() => {
-    if (!selectedCosmosChain) {
-      return Object.values(cosmosChains)[0];
-    }
-    return selectedCosmosChain;
-  }, [cosmosChains, selectedCosmosChain]);
+  const chain = selectedCosmosChain || Object.values(cosmosChains)[0];
 
-  const [balance, setBalance] = useState<Balance | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const intervalMS = pollingConfig?.intervalMS ?? 10000; // 10 seconds by default
+  const enabled = pollingConfig?.enabled ?? true;
 
-  // Default polling config
-  const defaultPollingConfig = {
-    enabled: !!currency && !!cosmosAccountAddress && !!chain,
-    intervalMS: 10000, // 10 seconds by default
-  };
+  const { data, isLoading, error } = useQuery({
+    queryKey: [
+      "ibcBalance",
+      chain?.chainId,
+      cosmosAccountAddress,
+      currency?.coinMinimalDenom,
+    ],
+    queryFn: async (): Promise<Balance | null> => {
+      if (!chain || !cosmosAccountAddress || !currency) {
+        return null;
+      }
 
-  // Merge provided config with defaults
-  const config = {
-    ...defaultPollingConfig,
-    ...pollingConfig,
-  };
+      try {
+        const balanceAmount = await getBalanceFromChain(
+          chain,
+          currency,
+          cosmosAccountAddress,
+        );
 
-  const fetchBalance = useCallback(async () => {
-    if (!chain || !cosmosAccountAddress || !currency) {
-      return;
-    }
+        const amount = Decimal.fromAtomics(
+          balanceAmount,
+          currency.coinDecimals,
+        );
 
-    setIsLoading(true);
-
-    try {
-      const balanceAmount = await getBalanceFromChain(
-        chain,
-        currency,
-        cosmosAccountAddress,
-      );
-
-      const amount = Decimal.fromAtomics(balanceAmount, currency.coinDecimals);
-
-      const result = {
-        value: amount.toString(),
-        symbol: currency.coinDenom,
-      };
-
-      setBalance(result);
-      setError(null);
-      return result;
-    } catch (e) {
-      const errorObj =
-        e instanceof Error ? e : new Error("Failed to fetch IBC balance.");
-      setError(errorObj);
-      console.error("Failed to fetch IBC balance", errorObj);
-      return;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [chain, cosmosAccountAddress, currency]);
-
-  // Fetch balance when parameters change
-  useEffect(() => {
-    if (chain && cosmosAccountAddress && currency) {
-      void fetchBalance();
-    }
-  }, [chain, cosmosAccountAddress, currency, fetchBalance]);
-
-  // Setup polling if enabled
-  useEffect(() => {
-    if (!config.enabled) {
-      return;
-    }
-
-    const intervalId = setInterval(fetchBalance, config.intervalMS);
-
-    return () => clearInterval(intervalId);
-  }, [fetchBalance, config.enabled, config.intervalMS]);
+        return {
+          value: amount.toString(),
+          symbol: currency.coinDenom,
+        };
+      } catch (e) {
+        const errorObj =
+          e instanceof Error ? e : new Error("Failed to fetch IBC balance.");
+        console.error("Failed to fetch IBC balance", errorObj);
+        throw errorObj;
+      }
+    },
+    enabled: !!currency && !!cosmosAccountAddress && !!chain && enabled,
+    refetchInterval: intervalMS,
+    staleTime: Math.min(intervalMS / 2, 5000),
+    retry: 2,
+  });
 
   return {
-    balance,
+    balance: data,
     isLoading,
     error,
   };

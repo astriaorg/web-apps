@@ -1,13 +1,8 @@
 import { useMemo } from "react";
 
-import { GenericCurrency, IbcCurrency, EvmCurrency } from "@repo/flame-types";
+import { GenericCurrency, IbcCurrency, EvmCurrency, PollingConfig, UseBalanceResult } from "@repo/flame-types";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
 import { useTokenBalance } from "features/evm-wallet";
-
-interface PollingConfig {
-  enabled: boolean;
-  intervalMS?: number;
-}
 
 /**
  * A hook that works with any currency type that implements GenericCurrency
@@ -22,7 +17,7 @@ interface PollingConfig {
 export function useCurrencyBalance(
   currency?: GenericCurrency,
   pollingConfig?: PollingConfig,
-) {
+): UseBalanceResult {
   // Default polling config
   const defaultPollingConfig = useMemo(
     () => ({

@@ -790,3 +790,25 @@ export type Balance = {
   value: string;
   symbol: string;
 };
+
+/**
+ * Shared polling configuration used by balance hooks
+ */
+export interface PollingConfig {
+  /** Whether polling should be enabled */
+  enabled?: boolean;
+  /** Interval in milliseconds between polling requests */
+  intervalMS?: number;
+}
+
+/**
+ * Standard response format for balance hooks
+ */
+export interface UseBalanceResult {
+  /** The current balance, or null if not loaded */
+  balance: Balance | null;
+  /** Whether the balance is currently loading */
+  isLoading: boolean;
+  /** Any error that occurred during loading */
+  error: Error | null;
+}
