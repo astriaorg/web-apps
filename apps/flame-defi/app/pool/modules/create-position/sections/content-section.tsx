@@ -180,9 +180,7 @@ export const ContentSection = () => {
       </div>
 
       {/* Right side. */}
-      <div>
-        <PriceRange />
-      </div>
+      <div>{!!pool && <PriceRange pool={pool} />}</div>
     </div>
   );
 };

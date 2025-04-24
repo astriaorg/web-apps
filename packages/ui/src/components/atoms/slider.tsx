@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "../../utils";
 
 const styles =
-  "block h-4 w-4 rounded-full border border-orange/50 bg-orange shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
+  "block h-4 w-4 rounded-full border border-orange/50 bg-orange outline-none shadow transition-colors disabled:pointer-events-none disabled:opacity-50";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,

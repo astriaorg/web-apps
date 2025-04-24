@@ -49,12 +49,16 @@ export const calculatePriceToTick = ({
   decimal1,
 }: {
   price: number;
-  decimal0: number;
-  decimal1: number;
+  decimal0?: number;
+  decimal1?: number;
 }) => {
-  return Math.floor(
-    Math.log(price * Math.pow(10, decimal0 - decimal1)) / Math.log(1.0001),
-  );
+  if (decimal0 && decimal1) {
+    return Math.floor(
+      Math.log(price * Math.pow(10, decimal0 - decimal1)) / Math.log(1.0001),
+    );
+  }
+
+  return Math.log(price) / Math.log(1.0001);
 };
 
 export const calculateTickToPrice = ({
@@ -63,12 +67,18 @@ export const calculateTickToPrice = ({
   decimal1,
 }: {
   tick: number;
-  decimal0: number;
-  decimal1: number;
+  decimal0?: number;
+  decimal1?: number;
 }) => {
   // (1.0001 ** tick) / (10 ** (Decimal1 - Decimal0))
   // Note: Docs say Decimal1 - Decimal0 but it should be decimal0 - decimal1.
-  return Math.pow(1.0001, tick) / Math.pow(10, decimal0 - decimal1);
+  const price = Math.pow(1.0001, tick);
+
+  if (decimal0 && decimal1) {
+    return price / Math.pow(10, decimal0 - decimal1);
+  }
+
+  return price;
 };
 
 const calculatePriceToSqrtPriceX96 = ({
