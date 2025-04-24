@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 
-import { GenericCurrency, IbcCurrency, EvmCurrency, PollingConfig, UseBalanceResult } from "@repo/flame-types";
+import {
+  GenericCurrency,
+  IbcCurrency,
+  EvmCurrency,
+  PollingConfig,
+  UseBalanceResult,
+} from "@repo/flame-types";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
 import { useTokenBalance } from "features/evm-wallet";
 

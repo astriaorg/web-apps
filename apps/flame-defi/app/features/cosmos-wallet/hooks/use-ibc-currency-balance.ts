@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Decimal } from "@cosmjs/math";
 
-import { Balance, IbcCurrency, PollingConfig, UseBalanceResult } from "@repo/flame-types";
+import {
+  Balance,
+  IbcCurrency,
+  PollingConfig,
+  UseBalanceResult,
+} from "@repo/flame-types";
 import { useConfig } from "config";
 
 import { getBalanceFromChain } from "../services/cosmos";
@@ -72,7 +77,7 @@ export const useIbcCurrencyBalance = (
   });
 
   return {
-    balance: data,
+    balance: data ?? null,
     isLoading,
     error,
   };

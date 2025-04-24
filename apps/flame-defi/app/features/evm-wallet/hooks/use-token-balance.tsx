@@ -2,7 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
-import { Balance, EvmCurrency, PollingConfig, UseBalanceResult } from "@repo/flame-types";
+import {
+  Balance,
+  EvmCurrency,
+  PollingConfig,
+  UseBalanceResult,
+} from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
@@ -91,7 +96,7 @@ export const useTokenBalance = (
   });
 
   return {
-    balance: data,
+    balance: data ?? null,
     isLoading,
     error,
   };
