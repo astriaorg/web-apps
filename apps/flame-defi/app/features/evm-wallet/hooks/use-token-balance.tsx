@@ -15,7 +15,7 @@ interface PollingConfig {
  * Custom hook to fetch and manage the token balance for a given token and user address.
  *
  * This hook internally handles fetching the token balance based on the provided token type (native or ERC20).
- * It provides the current balance value, loading state, error state, and a function to manually fetch the balance.
+ * It provides the current balance value, loading state, and error state.
  * Also supports automatic polling with configurable interval.
  *
  * @param token The token to fetch balance for

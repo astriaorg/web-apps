@@ -16,7 +16,7 @@ interface PollingConfig {
  * Custom hook to fetch and manage the balance for an IBC currency.
  *
  * This hook internally handles fetching the IBC token balance for a specific address.
- * It provides the current balance value, loading state, error state, and a function to manually fetch the balance.
+ * It provides the current balance value, loading state, and error state.
  * Also supports automatic polling with configurable interval.
  *
  * @param currency The IBC currency to fetch balance for
