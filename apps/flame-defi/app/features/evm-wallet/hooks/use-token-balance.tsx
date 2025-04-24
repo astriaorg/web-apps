@@ -1,28 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
-import { type Address, formatUnits } from "viem";
-import { useBalance, useConfig } from "wagmi";
+import { formatUnits } from "viem";
+import { useAccount, useBalance, useConfig } from "wagmi";
 
-import { Balance, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
+import { Balance, EvmCurrency } from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
-export const useTokenBalance = (
-  userAddress?: Address,
-  evmChain?: EvmChainInfo,
-  token?: EvmCurrency,
-) => {
+export const useTokenBalance = (token?: EvmCurrency) => {
   const wagmiConfig = useConfig();
+  const { address: userAddress, chainId } = useAccount();
+  const { data: nativeBalance } = useBalance({
+    address: userAddress,
+  });
+
   const [balance, setBalance] = useState<Balance | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const { data: nativeBalance } = useBalance({
-    address: userAddress as Address,
-  });
-
   const fetchBalance = useCallback(async () => {
-    if (!wagmiConfig || !evmChain || !userAddress || !token) {
-      return null;
+    if (!wagmiConfig || !chainId || !userAddress || !token) {
+      return;
     }
 
     setIsLoading(true);
@@ -36,7 +33,7 @@ export const useTokenBalance = (
         );
 
         const balanceRes = await erc20Service.getBalance(
-          evmChain.chainId,
+          chainId,
           userAddress as string,
         );
 
@@ -53,7 +50,7 @@ export const useTokenBalance = (
         // For native tokens
         if (!nativeBalance?.value) {
           setBalance(null);
-          return null;
+          return;
         }
 
         const balanceStr = formatUnits(
@@ -73,21 +70,21 @@ export const useTokenBalance = (
       const errorObj =
         e instanceof Error ? e : new Error("Failed to fetch balance.");
       setError(errorObj);
-      return null;
+      return;
     } finally {
       setIsLoading(false);
     }
-    // NOTE - because the nativeBalance updates periodically, we sort of
+    // FIXME - because the nativeBalance updates periodically, we sort of
     //  get polling for free, but we need to actually implement this correctly
     //  at the calling site. should export fetchBalances again probably
-  }, [wagmiConfig, evmChain, userAddress, token, nativeBalance]);
+  }, [wagmiConfig, chainId, userAddress, token, nativeBalance]);
 
   // Fetch balance when parameters change
   useEffect(() => {
-    if (userAddress && evmChain && token) {
+    if (userAddress && chainId && token) {
       void fetchBalance();
     }
-  }, [userAddress, evmChain, token, fetchBalance]);
+  }, [userAddress, chainId, token, fetchBalance]);
 
   return {
     balance,

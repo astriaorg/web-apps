@@ -1,18 +1,20 @@
 "use client";
 
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { TokenLiquidityBlock, AddLiquidityInputsBlock } from "../components";
-import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
+import { useCallback, useState } from "react";
+
 import { TXN_STATUS } from "@repo/flame-types";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { useTokenBalance } from "features/evm-wallet";
+
+import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
 import {
   useAddLiquidityTxn,
-  useGetPoolTokenBalances,
   usePoolContext,
   usePoolPositionContext,
   useAddLiquidityValidation,
 } from "pool/hooks";
-import { useCallback, useState } from "react";
 import { POOL_INPUT_ID } from "pool/types";
+import { TokenLiquidityBlock, AddLiquidityInputsBlock } from "../components";
 
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
@@ -27,10 +29,8 @@ export const ContentSection = () => {
   } = usePoolPositionContext();
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
-  const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    poolToken0?.token,
-    poolToken1?.token,
-  );
+  const { balance: token0Balance } = useTokenBalance(poolToken0?.token);
+  const { balance: token1Balance } = useTokenBalance(poolToken1?.token);
   const {
     addLiquidity,
     txnStatus,
