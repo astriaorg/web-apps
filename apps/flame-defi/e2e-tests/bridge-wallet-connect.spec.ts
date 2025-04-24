@@ -56,5 +56,18 @@ test("should connect EVM wallet from bridge connections modal", async ({
   await page.waitForSelector('div[role="dialog"]');
   
   // Verify that we're now connected by checking for the wallet display in the modal
-  await expect(page.locator('div[role="dialog"] button:has-text("0x")').first()).toBeVisible();
+  const walletButton = page.locator('div[role="dialog"] button:has-text("0x")').first();
+  await expect(walletButton).toBeVisible();
+  
+  // Click the wallet button that shows the address (0x...)
+  await walletButton.click();
+  
+  // Wait for balance to load (this may take some time)
+  await page.waitForTimeout(10000);
+  
+  // Verify that the balance shows TIA tokens
+  await expect(page.locator('text=TIA')).toBeVisible();
+  
+  // Verify that the balance shows a dollar value
+  await expect(page.locator('text=$')).toBeVisible();
 });
