@@ -34,7 +34,6 @@ export const useGetPools = ({
     enabled: !!token0 && !!token1,
     queryKey: ["useGetPool", token0, token1, chain],
     queryFn: async () => {
-      console.log("useGetPool");
       if (!token0 || !token1) {
         return null;
       }
