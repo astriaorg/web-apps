@@ -38,14 +38,14 @@ export default function useBalancePolling<T>(
   }, [config, fetchBalance]);
 
   useEffect(() => {
-    getBalance().then(() => {});
+    void getBalance();
 
     // setup polling if enabled
     if (config.enabled && config.intervalMS) {
       const intervalId = setInterval(getBalance, config.intervalMS);
       return () => clearInterval(intervalId);
     }
-    return undefined;
+    return;
   }, [getBalance, config.enabled, config.intervalMS]);
 
   return {

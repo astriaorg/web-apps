@@ -6,6 +6,12 @@ import { Balance, EvmCurrency } from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
+/**
+ * Custom hook to fetch and manage the token balance for a given token and user address.
+ *
+ * This hook internally handles fetching the token balance based on the provided token type (native or ERC20).
+ * It provides the current balance value, loading state, error state, and a function to manually fetch the balance.
+ */
 export const useTokenBalance = (token?: EvmCurrency) => {
   const wagmiConfig = useConfig();
   const { address: userAddress, chainId } = useAccount();
