@@ -103,6 +103,7 @@ const config: Config = {
     "^config": "<rootDir>/app/config/$1",
     "^features/(.*)$": "<rootDir>/app/features/$1",
     "^hooks": "<rootDir>/app/hooks/$1",
+    "^pool/(.*)$": "<rootDir>/app/pool/$1",
     "^testing/(.*)$": "<rootDir>/app/testing/$1",
   },
 

@@ -16,6 +16,7 @@ type GetPoolsResult = {
     address: string;
     rateToken0ToToken1: string;
     rateToken1ToToken0: string;
+    sqrtPriceX96: bigint;
   } | null;
 };
 
@@ -84,12 +85,13 @@ export const useGetPools = ({
         }
 
         result[feeTier] = {
-          address: pools[feeTier] as string,
+          address: pools[i] as string,
           ...calculatePoolExchangeRate({
             decimal0: token0.coinDecimals,
             decimal1: token1.coinDecimals,
             sqrtPriceX96: slot0Result.slot0.sqrtPriceX96,
           }),
+          sqrtPriceX96: slot0Result.slot0.sqrtPriceX96,
         };
       }
 

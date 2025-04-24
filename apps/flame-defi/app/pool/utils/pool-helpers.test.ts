@@ -1,8 +1,5 @@
 import Big from "big.js";
-import {
-  calculatePoolExchangeRate,
-  calculateTickToPrice,
-} from "./pool-helpers";
+import { calculatePoolExchangeRate } from "./pool-helpers";
 
 const TOKEN_0 = {
   coinDenom: "USDC",
@@ -30,17 +27,15 @@ describe("calculatePoolExchangeRate", () => {
       new Big(result.rateToken1ToToken0).toFixed(TOKEN_0.coinDecimals),
     ).toEqual("1540.820552"); // 1 WETH = _ USDC
   });
-});
 
-describe("calculateTickToPrice", () => {
-  it("should return correct price", () => {
-    const result = calculateTickToPrice({
-      decimal0: TOKEN_0.coinDecimals,
-      decimal1: TOKEN_1.coinDecimals,
-      tick: 267967,
+  it("should handle decimal0 > decimal1", () => {
+    const result = calculatePoolExchangeRate({
+      decimal0: 18,
+      decimal1: 6,
+      sqrtPriceX96: 47889311123928123387139217653477427n,
     });
 
-    expect(result.priceToken0ToToken1).toEqual(0.43358784516599413);
-    expect(result.priceToken1ToToken0).toEqual(2.306337714834145);
+    expect(result.rateToken0ToToken1).toEqual("0.36535748767549793233");
+    expect(result.rateToken1ToToken0).toEqual("2.73704531515767610072");
   });
 });
