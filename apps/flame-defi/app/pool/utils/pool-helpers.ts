@@ -43,9 +43,20 @@ export const calculatePoolExchangeRate = ({
   };
 };
 
-/**
- * Calculates the price of token0 in terms of token1 and vice versa using the tick value.
- */
+export const calculatePriceToTick = ({
+  price,
+  decimal0,
+  decimal1,
+}: {
+  price: number;
+  decimal0: number;
+  decimal1: number;
+}) => {
+  return Math.floor(
+    Math.log(price * Math.pow(10, decimal0 - decimal1)) / Math.log(1.0001),
+  );
+};
+
 export const calculateTickToPrice = ({
   tick,
   decimal0,
@@ -54,18 +65,101 @@ export const calculateTickToPrice = ({
   tick: number;
   decimal0: number;
   decimal1: number;
-}): {
-  priceToken0ToToken1: number;
-  priceToken1ToToken0: number;
-} => {
-  // Calculate price0: (1.0001 ** tick) / (10 ** (Decimal1 - Decimal0))
-  const price0 = Math.pow(1.0001, tick) / Math.pow(10, decimal1 - decimal0);
+}) => {
+  // (1.0001 ** tick) / (10 ** (Decimal1 - Decimal0))
+  // Note: Docs say Decimal1 - Decimal0 but it should be decimal0 - decimal1.
+  return Math.pow(1.0001, tick) / Math.pow(10, decimal0 - decimal1);
+};
 
-  // Calculate price1: 1 / price0
-  const price1 = 1 / price0;
+const calculatePriceToSqrtPriceX96 = ({
+  price,
+  decimal0,
+  decimal1,
+}: {
+  price: number;
+  decimal0: number;
+  decimal1: number;
+}) => {
+  const sqrtPrice = Math.sqrt(price * Math.pow(10, decimal0 - decimal1));
+  const sqrtPriceX96 = sqrtPrice * Math.pow(2, 96);
+
+  return sqrtPriceX96;
+};
+
+const calculateNearestValidTick = ({
+  tick,
+  tickSpacing,
+}: {
+  tick: number;
+  tickSpacing: number;
+}) => {
+  // Round the tick to the nearest valid tick based on the tick spacing.
+  return Math.round(tick / tickSpacing) * tickSpacing;
+};
+
+export const calculatePriceRange = ({
+  feeTier,
+  decimal0,
+  decimal1,
+  minPrice,
+  maxPrice,
+}: {
+  feeTier: FeeTier;
+  decimal0: number;
+  decimal1: number;
+  minPrice: number;
+  maxPrice: number;
+}) => {
+  const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+
+  const minTick = calculatePriceToTick({
+    price: minPrice,
+    decimal0,
+    decimal1,
+  });
+  const maxTick = calculatePriceToTick({
+    price: maxPrice,
+    decimal0,
+    decimal1,
+  });
+
+  const validMinTick = calculateNearestValidTick({
+    tick: minTick,
+    tickSpacing,
+  });
+  const validMaxTick = calculateNearestValidTick({
+    tick: maxTick,
+    tickSpacing,
+  });
+
+  const actualMinPrice = calculateTickToPrice({
+    tick: validMinTick,
+    decimal0,
+    decimal1,
+  });
+  const actualMaxPrice = calculateTickToPrice({
+    tick: validMaxTick,
+    decimal0,
+    decimal1,
+  });
+
+  const minSqrtPriceX96 = calculatePriceToSqrtPriceX96({
+    price: actualMinPrice,
+    decimal0,
+    decimal1,
+  });
+  const maxSqrtPriceX96 = calculatePriceToSqrtPriceX96({
+    price: actualMaxPrice,
+    decimal0,
+    decimal1,
+  });
 
   return {
-    priceToken0ToToken1: price0,
-    priceToken1ToToken0: price1,
+    minTick: validMinTick,
+    maxTick: validMaxTick,
+    minPrice: actualMinPrice,
+    maxPrice: actualMaxPrice,
+    minSqrtPriceX96,
+    maxSqrtPriceX96,
   };
 };
