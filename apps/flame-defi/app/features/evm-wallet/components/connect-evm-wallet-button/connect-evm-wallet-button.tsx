@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
 import { useIntl } from "react-intl";
+import { useAccount } from "wagmi";
 
+import { Balance, TRADE_TYPE } from "@repo/flame-types";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
-import { TRADE_TYPE } from "@repo/flame-types";
+
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
 import { useTokenBalance } from "../../hooks/use-token-balance";
 import { useGetQuote } from "../../hooks/use-get-quote";
@@ -21,16 +22,22 @@ interface ConnectEvmWalletButtonProps {
 export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
 }: ConnectEvmWalletButtonProps) => {
-  // FIXME - this won't work to show Base connection.
-  //  too tired to wrap my head around this rn. come back to this
-  const { chain, nativeToken } = useAstriaChainData();
-  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
   const userAccount = useAccount();
   const { formatNumber } = useIntl();
-  const [fiatValue, setFiatValue] = useState({ value: "0", symbol: "usdc" });
+  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
+
+  const [fiatValue, setFiatValue] = useState<Balance>({
+    value: "0",
+    symbol: "usdc",
+  });
+
+  // FIXME - how to get the nativeToken from information from wagmi?
+  //  like if they're connected to Base.
+  //  wait, how do i connect them to Base?
+  const { chain, nativeToken } = useAstriaChainData();
 
   const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =
-    useTokenBalance(userAccount.address, chain, nativeToken);
+    useTokenBalance(nativeToken);
 
   // Use the quote hook
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();

@@ -6,13 +6,25 @@ import { Balance, EvmCurrency } from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
+interface PollingConfig {
+  enabled: boolean;
+  intervalMS: number;
+}
+
 /**
  * Custom hook to fetch and manage the token balance for a given token and user address.
  *
  * This hook internally handles fetching the token balance based on the provided token type (native or ERC20).
  * It provides the current balance value, loading state, error state, and a function to manually fetch the balance.
+ * Also supports automatic polling with configurable interval.
+ *
+ * @param token The token to fetch balance for
+ * @param pollingConfig Optional configuration for polling (enabled, intervalMS)
  */
-export const useTokenBalance = (token?: EvmCurrency) => {
+export const useTokenBalance = (
+  token?: EvmCurrency,
+  pollingConfig?: PollingConfig,
+) => {
   const wagmiConfig = useConfig();
   const { address: userAddress, chainId } = useAccount();
   const { data: nativeBalance } = useBalance({
@@ -22,6 +34,18 @@ export const useTokenBalance = (token?: EvmCurrency) => {
   const [balance, setBalance] = useState<Balance | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Default polling config
+  const defaultPollingConfig = {
+    enabled: !!token && !!userAddress && !!chainId,
+    intervalMS: 10000, // 10 seconds by default
+  };
+
+  // Merge provided config with defaults
+  const config = {
+    ...defaultPollingConfig,
+    ...pollingConfig,
+  };
 
   const fetchBalance = useCallback(async () => {
     if (!wagmiConfig || !chainId || !userAddress || !token) {
@@ -51,6 +75,7 @@ export const useTokenBalance = (token?: EvmCurrency) => {
         };
 
         setBalance(result);
+        setError(null);
         return result;
       } else {
         // For native tokens
@@ -70,19 +95,18 @@ export const useTokenBalance = (token?: EvmCurrency) => {
         };
 
         setBalance(result);
+        setError(null);
         return result;
       }
     } catch (e) {
       const errorObj =
         e instanceof Error ? e : new Error("Failed to fetch balance.");
       setError(errorObj);
+      console.error("Failed to fetch token balance", errorObj);
       return;
     } finally {
       setIsLoading(false);
     }
-    // FIXME - because the nativeBalance updates periodically, we sort of
-    //  get polling for free, but we need to actually implement this correctly
-    //  at the calling site. should export fetchBalances again probably
   }, [wagmiConfig, chainId, userAddress, token, nativeBalance]);
 
   // Fetch balance when parameters change
@@ -91,6 +115,17 @@ export const useTokenBalance = (token?: EvmCurrency) => {
       void fetchBalance();
     }
   }, [userAddress, chainId, token, fetchBalance]);
+
+  // Setup polling if enabled
+  useEffect(() => {
+    if (!config.enabled) {
+      return;
+    }
+
+    const intervalId = setInterval(fetchBalance, config.intervalMS);
+
+    return () => clearInterval(intervalId);
+  }, [fetchBalance, config.enabled, config.intervalMS]);
 
   return {
     balance,

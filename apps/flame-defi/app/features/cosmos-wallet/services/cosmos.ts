@@ -1,4 +1,3 @@
-import { Decimal } from "@cosmjs/math";
 import type { SigningStargateClient } from "@cosmjs/stargate";
 import { osmosis } from "osmojs";
 
@@ -82,15 +81,10 @@ export const getBalanceFromChain = async (
     });
 
     if (!balance?.balance) {
-      return `0 ${currency.coinDenom}`;
+      return "0";
     }
 
-    // convert to display amount using decimal places
-    const amount = Decimal.fromAtomics(
-      balance.balance.amount,
-      currency.coinDecimals,
-    );
-    return `${amount.toString()} ${currency.coinDenom}`;
+    return balance.balance.amount;
   } catch (error) {
     console.error("Failed to fetch balance:", error);
     throw error;
