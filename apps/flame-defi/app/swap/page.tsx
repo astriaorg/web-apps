@@ -16,7 +16,7 @@ import {
 } from "@repo/flame-types";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useGetQuote, useTokenBalance } from "features/evm-wallet";
+import { useGetQuote, useEvmCurrencyBalance } from "features/evm-wallet";
 import debounce from "lodash.debounce";
 import { SwapPairProps, SWAP_INPUT_ID } from "./types";
 
@@ -48,9 +48,9 @@ export default function SwapPage(): React.ReactElement {
   const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
     useGetQuote();
 
-  const { balance: inputOneBalance } = useTokenBalance(inputOne.token);
+  const { balance: inputOneBalance } = useEvmCurrencyBalance(inputOne.token);
 
-  const { balance: inputTwoBalance } = useTokenBalance(inputTwo.token);
+  const { balance: inputTwoBalance } = useEvmCurrencyBalance(inputTwo.token);
 
   const swapInputs: SwapPairProps[] = [
     {

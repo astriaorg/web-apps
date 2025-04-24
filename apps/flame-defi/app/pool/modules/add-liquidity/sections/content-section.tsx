@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 
 import { TXN_STATUS } from "@repo/flame-types";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { useTokenBalance } from "features/evm-wallet";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 
 import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
 import {
@@ -29,8 +29,8 @@ export const ContentSection = () => {
   } = usePoolPositionContext();
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
-  const { balance: token0Balance } = useTokenBalance(poolToken0?.token);
-  const { balance: token1Balance } = useTokenBalance(poolToken1?.token);
+  const { balance: token0Balance } = useEvmCurrencyBalance(poolToken0?.token);
+  const { balance: token1Balance } = useEvmCurrencyBalance(poolToken1?.token);
   const {
     addLiquidity,
     txnStatus,

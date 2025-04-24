@@ -8,8 +8,8 @@ import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
 
+import { useEvmCurrencyBalance } from "../../hooks/use-evm-currency-balance";
 import { useEvmWallet } from "../../hooks/use-evm-wallet";
-import { useTokenBalance } from "../../hooks/use-token-balance";
 import { useGetQuote } from "../../hooks/use-get-quote";
 
 interface ConnectEvmWalletButtonProps {
@@ -37,7 +37,7 @@ export const ConnectEvmWalletButton = ({
   const { chain, nativeToken } = useAstriaChainData();
 
   const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =
-    useTokenBalance(nativeToken);
+    useEvmCurrencyBalance(nativeToken);
 
   // Use the quote hook
   const { quote, loading: quoteLoading, getQuote } = useGetQuote();

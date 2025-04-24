@@ -21,7 +21,7 @@ import { createErc20Service } from "../services/erc-20-service/erc-20-service";
  * @param token The token to fetch balance for
  * @param pollingConfig Optional configuration for polling (enabled, intervalMS)
  */
-export const useTokenBalance = (
+export const useEvmCurrencyBalance = (
   token?: EvmCurrency,
   pollingConfig?: PollingConfig,
 ): UseBalanceResult => {

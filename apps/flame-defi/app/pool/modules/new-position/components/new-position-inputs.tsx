@@ -2,7 +2,7 @@ import { useIntl } from "react-intl";
 
 import { Card, CardFigureInput, TokenSelector } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
-import { useTokenBalance } from "features/evm-wallet";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 
 import { NewPositionInputsProps } from "pool/types";
 
@@ -14,8 +14,8 @@ export const NewPositionInputs = ({
   currencies,
 }: NewPositionInputsProps) => {
   const { formatNumber } = useIntl();
-  const { balance: token0Balance } = useTokenBalance(input0.token);
-  const { balance: token1Balance } = useTokenBalance(input1.token);
+  const { balance: token0Balance } = useEvmCurrencyBalance(input0.token);
+  const { balance: token1Balance } = useEvmCurrencyBalance(input1.token);
   const inputsArray = [
     { input: input0, setInput: setInput0, tokenBalance: token0Balance },
     { input: input1, setInput: setInput1, tokenBalance: token1Balance },

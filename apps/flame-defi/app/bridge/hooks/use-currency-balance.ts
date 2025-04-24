@@ -7,8 +7,8 @@ import {
   PollingConfig,
   UseBalanceResult,
 } from "@repo/flame-types";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
-import { useTokenBalance } from "features/evm-wallet";
 
 /**
  * A hook that works with any currency type that implements GenericCurrency
@@ -46,7 +46,7 @@ export function useCurrencyBalance(
     balance: evmBalance,
     isLoading: isLoadingEvmBalance,
     error: evmError,
-  } = useTokenBalance(
+  } = useEvmCurrencyBalance(
     currency instanceof EvmCurrency ? currency : undefined,
     config,
   );
