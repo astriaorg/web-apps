@@ -29,6 +29,7 @@ test("should connect EVM wallet from bridge connections modal", async ({
 
   // Find and click the "Connect Wallet" button in the bridge form
   await page.locator('button:has-text("Connect Wallet")').click();
+
   // Wait for the modal to appear
   await page.waitForSelector('div[role="dialog"]');
 
