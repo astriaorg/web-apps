@@ -131,6 +131,5 @@ export const useTokenBalance = (
     balance,
     isLoading,
     error,
-    fetchBalance,
   };
 };

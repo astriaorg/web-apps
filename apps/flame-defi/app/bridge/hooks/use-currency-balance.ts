@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { GenericCurrency, IbcCurrency, EvmCurrency } from "@repo/flame-types";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
@@ -41,23 +41,19 @@ export function useCurrencyBalance(
     [defaultPollingConfig, pollingConfig],
   );
 
-  // For EVM currencies, use the existing hook
   const {
     balance: evmBalance,
     isLoading: isLoadingEvmBalance,
     error: evmError,
-    fetchBalance: fetchEvmBalance,
   } = useTokenBalance(
     currency instanceof EvmCurrency ? currency : undefined,
     config,
   );
 
-  // For IBC currencies, use the new hook
   const {
     balance: ibcBalance,
     isLoading: isLoadingIbcBalance,
     error: ibcError,
-    fetchBalance: fetchIbcBalance,
   } = useIbcCurrencyBalance(
     currency instanceof IbcCurrency ? currency : undefined,
     config,
@@ -69,20 +65,9 @@ export function useCurrencyBalance(
     currency instanceof EvmCurrency ? isLoadingEvmBalance : isLoadingIbcBalance;
   const error = currency instanceof EvmCurrency ? evmError : ibcError;
 
-  // Provide a combined fetchBalance function
-  const fetchBalance = useCallback(async () => {
-    if (currency instanceof EvmCurrency) {
-      return fetchEvmBalance();
-    } else if (currency instanceof IbcCurrency) {
-      return fetchIbcBalance();
-    }
-    return null;
-  }, [currency, fetchEvmBalance, fetchIbcBalance]);
-
   return {
     balance,
     isLoading,
     error,
-    fetchBalance,
   };
 }

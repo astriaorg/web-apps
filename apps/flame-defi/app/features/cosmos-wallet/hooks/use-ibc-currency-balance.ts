@@ -110,6 +110,5 @@ export const useIbcCurrencyBalance = (
     balance,
     isLoading,
     error,
-    fetchBalance,
   };
 };
