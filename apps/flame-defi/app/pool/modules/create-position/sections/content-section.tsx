@@ -5,12 +5,12 @@ import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
-import { usePageContext } from "pool/hooks/use-page-context";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { PriceRange } from "pool/modules/create-position/components/price-range";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { UninitializedPoolWarning } from "pool/modules/create-position/components/uninitialized-pool-warning";
+import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { useMemo, useState } from "react";
 
 enum INPUT {
