@@ -7,27 +7,27 @@ import {
 // Test our implementation against the values in the Uniswap V3 documentation example.
 describe("calculatePoolExchangeRate", () => {
   // price = token1/token0 = WETH/USDC
-  const token0 = {
+  const TOKEN_0 = {
     coinDenom: "USDC",
     coinDecimals: 6,
   };
-  const token1 = {
+  const TOKEN_1 = {
     coinDenom: "WETH",
     coinDecimals: 18,
   };
 
   it("should return correct exchange rate", () => {
     const result = calculatePoolExchangeRate({
-      decimal0: token0.coinDecimals,
-      decimal1: token1.coinDecimals,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
       sqrtPriceX96: 2018382873588440326581633304624437n,
     });
 
     expect(
-      new Big(result.rateToken0ToToken1).toFixed(token1.coinDecimals),
+      new Big(result.rateToken0ToToken1).toFixed(TOKEN_1.coinDecimals),
     ).toEqual("0.000649004842701370"); // 1 USDC = _ WETH
     expect(
-      new Big(result.rateToken1ToToken0).toFixed(token0.coinDecimals),
+      new Big(result.rateToken1ToToken0).toFixed(TOKEN_0.coinDecimals),
     ).toEqual("1540.820552"); // 1 WETH = _ USDC
   });
 
@@ -45,42 +45,47 @@ describe("calculatePoolExchangeRate", () => {
 
 describe("calculatePriceToTick and calculateTickToPrice", () => {
   // USDC/WETH
-  const token0 = {
+  const TOKEN_0 = {
     coinDenom: "WETH",
     coinDecimals: 18,
   };
-  const token1 = {
+  const TOKEN_1 = {
     coinDenom: "USDC",
     coinDecimals: 6,
   };
 
+  // Values from Uniswap V3 example.
+  const TICK_LOWER = 202910;
+  const TICK_UPPER = 202920;
+  const PRICE_LOWER = 648378713.2500573;
+  const PRICE_UPPER = 649027383.8115474;
+  const INVERSE_DECIMAL_ADJUSTED_PRICE_LOWER = "1542.30";
+  const INVERSE_DECIMAL_ADJUSTED_PRICE_UPPER = "1540.76";
+
   it("calculateTickToPrice", () => {
-    const tickLower = 202910;
-    const tickUpper = 202920;
+    const priceLower = calculateTickToPrice({ tick: TICK_LOWER });
+    const priceUpper = calculateTickToPrice({ tick: TICK_UPPER });
 
-    const priceLower = calculateTickToPrice({ tick: tickLower });
-    const priceUpper = calculateTickToPrice({ tick: tickUpper });
-
-    expect(priceLower).toEqual(648378713.2500573);
-    expect(priceUpper).toEqual(649027383.8115474);
+    expect(priceLower).toEqual(PRICE_LOWER);
+    expect(priceUpper).toEqual(PRICE_UPPER);
 
     const decimalAdjustedPriceLower = calculateTickToPrice({
-      tick: tickLower,
-      decimal0: token0.coinDecimals,
-      decimal1: token1.coinDecimals,
+      tick: TICK_LOWER,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
     });
     const decimalAdjustedPriceUpper = calculateTickToPrice({
-      tick: tickUpper,
-      decimal0: token0.coinDecimals,
-      decimal1: token1.coinDecimals,
+      tick: TICK_UPPER,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
     });
 
     // Example has values truncated to 2 decimal places.
     expect(new Big(1 / decimalAdjustedPriceLower).toFixed(2, 0)).toEqual(
-      "1542.30",
+      INVERSE_DECIMAL_ADJUSTED_PRICE_LOWER,
     );
     expect(new Big(1 / decimalAdjustedPriceUpper).toFixed(2, 0)).toEqual(
-      "1540.76",
+      INVERSE_DECIMAL_ADJUSTED_PRICE_UPPER,
     );
   });
 });
