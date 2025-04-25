@@ -5,7 +5,7 @@ import * as React from "react";
 import { cn } from "../../utils";
 
 const styles =
-  "block h-4 w-4 rounded-full border border-orange/50 bg-orange outline-none shadow transition-colors disabled:pointer-events-none disabled:opacity-50";
+  "block h-4 w-4 rounded-full border border-orange/50 bg-orange outline-none shadow transition-colors";
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -14,9 +14,10 @@ const Slider = React.forwardRef<
   <SliderPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex w-full touch-none select-none items-center",
+      "relative flex w-full touch-none select-none items-center data-disabled:pointer-events-none data-disabled:opacity-50",
       className,
     )}
+    data-disabled={props.disabled ? true : undefined}
     {...props}
   >
     <SliderPrimitive.Track className="relative h-[4px] w-full grow overflow-hidden rounded-full bg-orange/40">
