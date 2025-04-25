@@ -1,6 +1,7 @@
 import Big from "big.js";
 import {
   calculatePoolExchangeRate,
+  calculatePriceToTick,
   calculateTickToPrice,
 } from "./pool-helpers";
 
@@ -87,5 +88,38 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
     expect(new Big(1 / decimalAdjustedPriceUpper).toFixed(2, 0)).toEqual(
       INVERSE_DECIMAL_ADJUSTED_PRICE_UPPER,
     );
+  });
+
+  it("calculatePriceToTick", () => {
+    const priceLower = 1 / Number(INVERSE_DECIMAL_ADJUSTED_PRICE_LOWER);
+    const priceUpper = 1 / Number(INVERSE_DECIMAL_ADJUSTED_PRICE_UPPER);
+
+    const tickLower = calculatePriceToTick({
+      price: priceLower,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
+    });
+    const tickUpper = calculatePriceToTick({
+      price: priceUpper,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
+    });
+
+    expect(tickLower).toEqual(TICK_LOWER);
+    expect(tickUpper).toEqual(TICK_UPPER);
+
+    const decimalAdjustedTickLower = calculatePriceToTick({
+      price: priceLower,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
+    });
+    const decimalAdjustedTickUpper = calculatePriceToTick({
+      price: priceUpper,
+      decimal0: TOKEN_0.coinDecimals,
+      decimal1: TOKEN_1.coinDecimals,
+    });
+
+    expect(decimalAdjustedTickLower).toEqual(TICK_LOWER);
+    expect(decimalAdjustedTickUpper).toEqual(TICK_UPPER);
   });
 });
