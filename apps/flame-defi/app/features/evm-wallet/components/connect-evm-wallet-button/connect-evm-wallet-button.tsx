@@ -33,21 +33,24 @@ export const ConnectEvmWalletButton = ({
   const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =
     useEvmCurrencyBalance(nativeToken);
 
-  const quoteInput = useMemo(() => ({
-    token: nativeToken,
-    value: tokenBalance?.value || "0",
-  }), [nativeToken, tokenBalance?.value]);
-  
+  const quoteInput = useMemo(
+    () => ({
+      token: nativeToken,
+      value: tokenBalance?.value || "0",
+    }),
+    [nativeToken, tokenBalance?.value],
+  );
+
   const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
-  
+
   const fiatValue = useMemo<Balance | undefined>(() => {
     if (!quote) {
       return;
     }
-    
+
     return {
       value: quote.quoteDecimals,
-      symbol: "usdc"
+      symbol: "usdc",
     };
   }, [quote]);
 

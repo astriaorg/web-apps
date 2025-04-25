@@ -57,13 +57,16 @@ export const AstriaWalletContextProvider: React.FC<{
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
 
-  const quoteInput = useMemo(() => ({
-    token: nativeToken,
-    value: nativeTokenBalance?.value || "0",
-  }), [nativeToken, nativeTokenBalance?.value]);
-  
+  const quoteInput = useMemo(
+    () => ({
+      token: nativeToken,
+      value: nativeTokenBalance?.value || "0",
+    }),
+    [nativeToken, nativeTokenBalance?.value],
+  );
+
   const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
-  
+
   const usdcToNativeQuote = useMemo<Balance>(() => {
     if (!quote) {
       return {
@@ -71,7 +74,7 @@ export const AstriaWalletContextProvider: React.FC<{
         symbol: "usdc",
       };
     }
-    
+
     return {
       value: quote.quoteDecimals,
       symbol: "usdc",
