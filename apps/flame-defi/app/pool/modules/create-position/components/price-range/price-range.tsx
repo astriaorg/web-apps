@@ -155,15 +155,32 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
     [selectedFeeTier, token0, token1],
   );
 
-  const displayPrice = useMemo(() => {
-    // Don't show exponential notation for large numbers.
-    return {
-      minPrice: Number(minPrice) === 0 ? "0" : new Big(minPrice).toFixed(),
-      maxPrice:
-        Number(maxPrice) === Infinity ? "∞" : new Big(maxPrice).toFixed(),
-      rate: `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`,
-    };
-  }, [minPrice, maxPrice, rate, token0, token1, formatNumber]);
+  const displayMinPrice = useMemo(() => {
+    if (!minPrice) {
+      return minPrice;
+    }
+
+    return Number(minPrice) === 0 ? "0" : new Big(minPrice).toFixed();
+  }, [minPrice]);
+
+  const displayMaxPrice = useMemo(() => {
+    if (!maxPrice) {
+      return maxPrice;
+    }
+
+    return Number(maxPrice) === Infinity ? "∞" : new Big(maxPrice).toFixed();
+  }, [maxPrice]);
+
+  const exchangeRate = useMemo(() => {
+    return `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`;
+  }, [token0, token1, rate, formatNumber]);
+
+  const isValid = useMemo(() => {
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    return !!minPrice && !!maxPrice && !isNaN(min) && !isNaN(max) && min < max;
+  }, [minPrice, maxPrice]);
 
   return (
     <Card variant="secondary" className="w-full">
@@ -187,7 +204,7 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
             label="Min"
-            value={displayPrice.minPrice}
+            value={displayMinPrice}
             onInput={(event) => setMinPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getCalculatedPriceRange({
@@ -198,10 +215,11 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMinPrice(result.minPrice.toString());
               }
             }}
+            aria-invalid={!isValid}
           />
           <MinMaxInput
             label="Max"
-            value={displayPrice.maxPrice}
+            value={displayMaxPrice}
             onInput={(event) => setMaxPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getCalculatedPriceRange({
@@ -212,11 +230,12 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMaxPrice(result.maxPrice.toString());
               }
             }}
+            aria-invalid={!isValid}
           />
         </div>
         <div className="flex items-center gap-2 text-sm mt-2">
           <span className="text-typography-subdued">Market Price:</span>
-          <span>{displayPrice.rate}</span>
+          <span>{exchangeRate}</span>
         </div>
       </CardContent>
     </Card>

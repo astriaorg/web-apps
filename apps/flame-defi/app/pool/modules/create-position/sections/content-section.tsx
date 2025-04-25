@@ -177,11 +177,11 @@ export const ContentSection = () => {
             }
           }}
         />
-        {!isPending && !pool && <UninitializedPoolWarning />}
       </div>
 
       {/* Right side. */}
       <div>
+        {!isPending && !pool && <UninitializedPoolWarning />}
         {!!pool && (
           <PriceRange
             {...(isInverted

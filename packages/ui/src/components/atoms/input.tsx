@@ -41,6 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "disabled:cursor-not-allowed disabled:opacity-50",
             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
             "focus-visible:outline-hidden",
+            "aria-invalid:border-danger aria-invalid:bg-danger/10",
             startAdornment && "pl-11",
             endAdornment && "pr-11",
             inputVariants({ variant }),
