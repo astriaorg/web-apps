@@ -11,9 +11,9 @@ import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
 import { useConfig } from "config";
 import { NotificationType, useNotifications } from "features/notifications";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
-import { useCurrencyBalance } from "bridge/hooks/use-currency-balance";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";

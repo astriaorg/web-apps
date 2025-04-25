@@ -20,9 +20,9 @@ import { useConfig } from "config";
 import { Dropdown } from "components/dropdown";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
-import { useCurrencyBalance } from "bridge/hooks/use-currency-balance";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
