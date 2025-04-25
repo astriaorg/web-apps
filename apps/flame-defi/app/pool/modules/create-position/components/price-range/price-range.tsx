@@ -19,9 +19,9 @@ const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = Infinity;
 
 interface PriceRangeProps {
-  rate: string;
-  token0: EvmCurrency;
-  token1: EvmCurrency;
+  rate?: string;
+  token0?: EvmCurrency;
+  token1?: EvmCurrency;
 }
 
 export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
@@ -172,8 +172,16 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
   }, [maxPrice]);
 
   const exchangeRate = useMemo(() => {
+    if (!rate || !token0 || !token1) {
+      return null;
+    }
+
     return `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`;
   }, [token0, token1, rate, formatNumber]);
+
+  const isDisabled = useMemo(() => {
+    return !rate;
+  }, [rate]);
 
   const isValid = useMemo(() => {
     const min = Number(minPrice);
@@ -200,6 +208,7 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
           min={SLIDER_MIN}
           max={SLIDER_MAX}
           step={1}
+          disabled={isDisabled}
         />
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
@@ -215,6 +224,7 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMinPrice(result.minPrice.toString());
               }
             }}
+            disabled={isDisabled}
             aria-invalid={!isValid}
           />
           <MinMaxInput
@@ -230,13 +240,16 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMaxPrice(result.maxPrice.toString());
               }
             }}
+            disabled={isDisabled}
             aria-invalid={!isValid}
           />
         </div>
-        <div className="flex items-center gap-2 text-sm mt-2">
-          <span className="text-typography-subdued">Market Price:</span>
-          <span>{exchangeRate}</span>
-        </div>
+        {exchangeRate && (
+          <div className="flex items-center gap-2 text-sm mt-2">
+            <span className="text-typography-subdued">Market Price:</span>
+            <span>{exchangeRate}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

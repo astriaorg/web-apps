@@ -1,6 +1,5 @@
 "use client";
 
-import type { EvmCurrency } from "@repo/flame-types";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
@@ -180,23 +179,21 @@ export const ContentSection = () => {
       </div>
 
       {/* Right side. */}
-      <div>
+      <div className="flex flex-col gap-4">
+        <PriceRange
+          {...(isInverted
+            ? {
+                rate: pool?.rateToken0ToToken1,
+                token0: token1,
+                token1: token0,
+              }
+            : {
+                rate: pool?.rateToken1ToToken0,
+                token0: token0,
+                token1: token1,
+              })}
+        />
         {!isPending && !pool && <UninitializedPoolWarning />}
-        {!!pool && (
-          <PriceRange
-            {...(isInverted
-              ? {
-                  rate: pool.rateToken0ToToken1,
-                  token0: token1 as EvmCurrency,
-                  token1: token0 as EvmCurrency,
-                }
-              : {
-                  rate: pool.rateToken1ToToken0,
-                  token0: token0 as EvmCurrency,
-                  token1: token1 as EvmCurrency,
-                })}
-          />
-        )}
       </div>
     </div>
   );
