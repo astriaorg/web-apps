@@ -32,8 +32,6 @@ export const useEvmCurrencyBalance = (
     chainId,
   });
 
-  console.log("chainId!!!!!!!!!!", chainId, userAddress, nativeBalance?.value);
-
   const intervalMS = pollingConfig?.intervalMS ?? 10000; // 10 seconds by default
   const enabled = pollingConfig?.enabled ?? true;
 
