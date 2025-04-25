@@ -1,14 +1,14 @@
+import type { EvmCurrency } from "@repo/flame-types";
 import { Card, CardContent, Slider } from "@repo/ui/components";
 import Big from "big.js";
 import { TICK_BOUNDARIES } from "pool/constants";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import type { PoolWithSlot0Data } from "pool/types";
 import {
   calculatePriceRange,
   calculatePriceToTick,
   calculateTickToPrice,
 } from "pool/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { MinMaxInput } from "./min-max-input";
 
@@ -18,8 +18,14 @@ const SLIDER_MAX = 100;
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = Infinity;
 
-export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
-  const { token0, token1, selectedFeeTier } = usePageContext();
+interface PriceRangeProps {
+  rate: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+}
+
+export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
+  const { selectedFeeTier } = usePageContext();
   const { formatNumber } = useIntl();
 
   const [minPrice, setMinPrice] = useState<string>(
@@ -30,14 +36,19 @@ export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
   );
 
   const handleReset = useCallback(() => {
-    setMinPrice("0");
-    setMaxPrice(Infinity.toString());
+    setMinPrice(MIN_PRICE_DEFAULT.toString());
+    setMaxPrice(MAX_PRICE_DEFAULT.toString());
   }, []);
+
+  useEffect(() => {
+    // When the rate changes, i.e. user swaps inputs, reset the slider.
+    handleReset();
+  }, [rate, handleReset]);
 
   const sliderToPrice = useCallback(
     (value: number): number => {
       const currentTick = calculatePriceToTick({
-        price: +pool.rateToken1ToToken0,
+        price: Number(rate),
       });
 
       if (value === SLIDER_MIN) {
@@ -68,13 +79,13 @@ export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
         tick: newTick,
       });
     },
-    [pool.rateToken1ToToken0],
+    [rate],
   );
 
   const priceToSlider = useCallback(
     (price: number): number => {
       const currentTick = calculatePriceToTick({
-        price: +pool.rateToken1ToToken0,
+        price: Number(rate),
       });
 
       if (price <= 0) {
@@ -99,7 +110,7 @@ export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
 
       return Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, sliderValue));
     },
-    [pool.rateToken1ToToken0],
+    [rate],
   );
 
   const sliderValue = useMemo(() => {
@@ -150,8 +161,9 @@ export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
       minPrice: Number(minPrice) === 0 ? "0" : new Big(minPrice).toFixed(),
       maxPrice:
         Number(maxPrice) === Infinity ? "∞" : new Big(maxPrice).toFixed(),
+      rate: `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`,
     };
-  }, [minPrice, maxPrice]);
+  }, [minPrice, maxPrice, rate, token0, token1, formatNumber]);
 
   return (
     <Card variant="secondary" className="w-full">
@@ -204,9 +216,7 @@ export const PriceRange = ({ pool }: { pool: PoolWithSlot0Data }) => {
         </div>
         <div className="flex items-center gap-2 text-sm mt-2">
           <span className="text-typography-subdued">Market Price:</span>
-          <span>
-            {`1 ${token0?.coinDenom} = ${formatNumber(Number(pool.rateToken1ToToken0), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1?.coinDenom}`}
-          </span>
+          <span>{displayPrice.rate}</span>
         </div>
       </CardContent>
     </Card>
