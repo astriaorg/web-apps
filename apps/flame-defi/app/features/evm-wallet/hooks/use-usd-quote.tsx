@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import debounce from "lodash.debounce";
 
-import { useAstriaChainData } from "config";
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
-import { useGetQuote } from "features/evm-wallet";
+import { useAstriaChainData } from "config";
+import { useGetQuote } from "./use-get-quote";
 
 export const useUsdQuote = (inputToken: TokenInputState) => {
   const { chain } = useAstriaChainData();

@@ -1,12 +1,12 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useIntl } from "react-intl";
+import React, { useCallback, useMemo } from "react";
 import { type Address, formatUnits } from "viem";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 
-import { AstriaChain, Balance, TRADE_TYPE } from "@repo/flame-types";
+import { AstriaChain, Balance } from "@repo/flame-types";
 import { useAstriaChainData, useConfig } from "config";
-import { useGetQuote } from "../hooks/use-get-quote";
+
+import { useUsdQuote } from "features/evm-wallet/hooks/use-usd-quote";
 
 export interface AstriaWalletContextProps {
   connectWallet: () => void;
@@ -30,10 +30,6 @@ export const AstriaWalletContextProvider: React.FC<{
 }> = ({ children }) => {
   const { astriaChains } = useConfig();
   const { chain, nativeToken } = useAstriaChainData();
-  const { currencies } = chain;
-  const { quote, loading: quoteLoading, getQuote } = useGetQuote();
-  const { formatNumber } = useIntl();
-
   const userAccount = useAccount();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
@@ -61,42 +57,26 @@ export const AstriaWalletContextProvider: React.FC<{
     return { value: formattedBalance, symbol: nativeBalance.symbol };
   }, [nativeBalance, nativeBalanceStatus]);
 
-  // get usdc quote of native token for display
-  useEffect(() => {
-    if (!nativeTokenBalance) {
-      return;
-    }
-    const usdcToken = currencies.find(
-      (currency) => currency.coinDenom.toLowerCase() === "usdc",
-    );
-    if (!usdcToken) {
-      console.warn("No USDC token found in currencies");
-      return;
-    }
-    if (!nativeToken) {
-      console.warn("No native token found in currencies");
-      return;
-    }
-
-    void getQuote(
-      TRADE_TYPE.EXACT_IN,
-      { token: nativeToken, value: nativeTokenBalance.value },
-      { token: usdcToken, value: "" },
-    );
-  }, [currencies, getQuote, nativeToken, nativeTokenBalance]);
-
-  const usdcToNativeQuote = quote
-    ? {
-        value: formatNumber(parseFloat(quote.quoteDecimals), {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-        symbol: "usdc",
-      }
-    : {
+  const quoteInput = useMemo(() => ({
+    token: nativeToken,
+    value: nativeTokenBalance?.value || "0",
+  }), [nativeToken, nativeTokenBalance?.value]);
+  
+  const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
+  
+  const usdcToNativeQuote = useMemo<Balance>(() => {
+    if (!quote) {
+      return {
         value: "0",
         symbol: "usdc",
       };
+    }
+    
+    return {
+      value: quote.quoteDecimals,
+      symbol: "usdc",
+    };
+  }, [quote]);
 
   return (
     <AstriaWalletContext.Provider

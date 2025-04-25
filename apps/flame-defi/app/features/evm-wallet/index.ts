@@ -8,6 +8,7 @@ export * from "./hooks/use-evm-currency-balance";
 export * from "./hooks/use-evm-wallet";
 export * from "./hooks/use-get-quote";
 export * from "./hooks/use-token-approval";
+export * from "./hooks/use-usd-quote";
 export * from "./services/astria-bridge-source-service/astria-bridge-source-service";
 export * from "./services/astria-withdrawer-service/astria-withdrawer-service";
 export * from "./services/non-fungible-position-manager-service";
