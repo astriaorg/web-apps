@@ -63,9 +63,7 @@ export const useIbcCurrencyBalance = (
         cosmosAccountAddress,
       );
 
-      const amount = Decimal.fromAtomics(
-        currency.coinDecimals,
-      );
+      const amount = Decimal.fromAtomics(balanceAmount, currency.coinDecimals);
 
       return {
         value: amount.toString(),
