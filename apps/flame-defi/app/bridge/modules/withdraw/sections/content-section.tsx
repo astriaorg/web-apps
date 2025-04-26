@@ -11,6 +11,7 @@ import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
 import { useConfig } from "config";
 import { NotificationType, useNotifications } from "features/notifications";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
@@ -220,9 +221,15 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  // Format balance values - simplified for now
-  // TODO - get balances
-  const formattedBalanceValue = "0";
+  // Get source token balance
+  const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
+    useCurrencyBalance(sourceConnection.currency ?? undefined);
+
+  // Get destination token balance
+  const {
+    balance: destinationBalance,
+    isLoading: isLoadingDestinationBalance,
+  } = useCurrencyBalance(destinationConnection.currency ?? undefined);
 
   const isWithdrawDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
@@ -313,8 +320,13 @@ export const ContentSection = () => {
                   </p>
                   {sourceConnection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {formattedBalanceValue}{" "}
-                      {sourceConnection.currency.coinDenom}
+                      Balance: {isLoadingSourceBalance && "Loading..."}
+                      {!isLoadingSourceBalance &&
+                        sourceBalance &&
+                        `${sourceBalance.value} ${sourceBalance.symbol}`}
+                      {!isLoadingSourceBalance &&
+                        !sourceBalance &&
+                        `0 ${sourceConnection.currency.coinDenom}`}
                     </p>
                   )}
                 </div>
@@ -381,8 +393,13 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {formattedBalanceValue}{" "}
-                        {destinationConnection.currency.coinDenom}
+                        Balance: {isLoadingDestinationBalance && "Loading..."}
+                        {!isLoadingDestinationBalance &&
+                          destinationBalance &&
+                          `${destinationBalance.value} ${destinationBalance.symbol}`}
+                        {!isLoadingDestinationBalance &&
+                          !destinationBalance &&
+                          `0 ${destinationConnection.currency.coinDenom}`}
                       </p>
                     )}
                     {/* Withdrawal fee display */}

@@ -2,11 +2,11 @@
 
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { type Address, isAddress } from "viem";
+import { isAddress } from "viem";
 
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 
-import { EvmCurrency, EvmChainInfo } from "@repo/flame-types";
+import { EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -18,8 +18,9 @@ import {
 import { shortenAddress } from "@repo/ui/utils";
 import { useConfig } from "config";
 import { Dropdown } from "components/dropdown";
-import { AddErc20ToWalletButton, useTokenBalance } from "features/evm-wallet";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
@@ -273,32 +274,13 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
-  // Get source token balance if it's an EVM chain
-  // TODO - handle ibc currency balances
   const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
-    useTokenBalance(
-      sourceConnection.chain?.chainType === "evm"
-        ? (sourceConnection.address as Address)
-        : undefined,
-      sourceConnection.chain?.chainType === "evm"
-        ? (sourceConnection.chain as EvmChainInfo)
-        : undefined,
-      sourceConnection.currency instanceof EvmCurrency
-        ? sourceConnection.currency
-        : undefined,
-    );
+    useCurrencyBalance(sourceConnection.currency ?? undefined);
 
-  // Get destination token balance if it's an EVM chain
-  // TODO - even though for deposits the destination will always be evm, if we make balance fetching generic
-  //  for cosmos and evm chains then we can make the deposit and withdraw content sections reusable
   const {
     balance: destinationBalance,
     isLoading: isLoadingDestinationBalance,
-  } = useTokenBalance(
-    destinationConnection.address as Address,
-    destinationConnection.chain as EvmChainInfo,
-    destinationConnection.currency as EvmCurrency,
-  );
+  } = useCurrencyBalance(destinationConnection.currency ?? undefined);
 
   const isDepositDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
@@ -370,12 +352,13 @@ export const ContentSection = () => {
                   </p>
                   {sourceConnection.currency && (
                     <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance:{" "}
-                      {isLoadingSourceBalance
-                        ? "Loading..."
-                        : sourceBalance
-                          ? `${sourceBalance.value} ${sourceBalance.symbol}`
-                          : `0 ${sourceConnection.currency.coinDenom}`}
+                      Balance: {isLoadingSourceBalance && "Loading..."}
+                      {!isLoadingSourceBalance &&
+                        sourceBalance &&
+                        `${sourceBalance.value} ${sourceBalance.symbol}`}
+                      {!isLoadingSourceBalance &&
+                        !sourceBalance &&
+                        `0 ${sourceConnection.currency.coinDenom}`}
                     </p>
                   )}
                 </div>
@@ -443,12 +426,13 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency && (
                       <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance:{" "}
-                        {isLoadingDestinationBalance
-                          ? "Loading..."
-                          : destinationBalance
-                            ? `${destinationBalance.value} ${destinationBalance.symbol}`
-                            : `0 ${destinationConnection.currency.coinDenom}`}
+                        Balance: {isLoadingDestinationBalance && "Loading..."}
+                        {!isLoadingDestinationBalance &&
+                          destinationBalance &&
+                          `${destinationBalance.value} ${destinationBalance.symbol}`}
+                        {!isLoadingDestinationBalance &&
+                          !destinationBalance &&
+                          `0 ${destinationConnection.currency.coinDenom}`}
                       </p>
                     )}
                     {destinationCurrencyOption?.value &&

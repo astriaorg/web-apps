@@ -1,8 +1,12 @@
+import { useCallback, useMemo, useState } from "react";
+
 import { CosmosIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
-import { useCallback, useMemo, useState } from "react";
-import { useCosmosWallet } from "../../hooks/use-cosmos-wallet";
+import { useConfig } from "config";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
+
+import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
 
 interface ConnectCosmosWalletButtonProps {
   onDisconnectWallet?: () => void;
@@ -17,12 +21,27 @@ export const ConnectCosmosWalletButton = ({
   const {
     connectCosmosWallet,
     cosmosAccountAddress,
-    cosmosBalance,
     disconnectCosmosWallet,
-    isLoadingCosmosBalance,
-    usdcToNativeQuote,
-    quoteLoading,
+    selectedCosmosChain,
   } = useCosmosWallet();
+  const { cosmosChains } = useConfig();
+
+  // use first cosmos chain if none selected yet
+  const chain = selectedCosmosChain ?? Object.values(cosmosChains)[0];
+
+  // get balance of native currency
+  const { balance: cosmosBalance, isLoading: isLoadingCosmosBalance } =
+    useCurrencyBalance(chain?.currencies.find((c) => c.isNative));
+
+  // TODO - usd value
+  const { quoteLoading, usdcToNativeQuote } = {
+    quoteLoading: false,
+    usdcToNativeQuote: {
+      value: "4.20",
+      symbol: "USDC",
+    },
+  };
+
   // information dropdown
   const [isDropdownActive, setIsDropdownActive] = useState(false);
   // const [showTransactions, setShowTransactions] = useState(false);

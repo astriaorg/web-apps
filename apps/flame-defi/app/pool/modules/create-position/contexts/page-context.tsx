@@ -1,11 +1,13 @@
 "use client";
 
+import { createContext, PropsWithChildren, useState } from "react";
+
 import type { EvmCurrency } from "@repo/flame-types";
 import { useAssetAmountInput, type Amount } from "@repo/ui/components";
 import { useAstriaChainData } from "config";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
+
 import { FEE_TIER, type FeeTier } from "pool/constants";
-import { useGetPoolTokenBalances } from "pool/hooks";
-import { createContext, PropsWithChildren, useState } from "react";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
@@ -38,10 +40,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   );
   const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
-  const { token0Balance, token1Balance } = useGetPoolTokenBalances(
-    token0,
-    token1,
-  );
+  const { balance: token0Balance } = useEvmCurrencyBalance(token0);
+  const { balance: token1Balance } = useEvmCurrencyBalance(token1);
 
   // TODO: Figure out why validation is always false.
   const {

@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useAccount } from "wagmi";
-import { useIntl } from "react-intl";
 
+import { Balance } from "@repo/flame-types";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useAstriaChainData } from "config";
-import { TRADE_TYPE } from "@repo/flame-types";
-import { useEvmWallet } from "../../hooks/use-evm-wallet";
-import { useTokenBalance } from "../../hooks/use-token-balance";
-import { useGetQuote } from "../../hooks/use-get-quote";
+
+import { useEvmCurrencyBalance } from "features/evm-wallet/hooks/use-evm-currency-balance";
+import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
+import { useUsdQuote } from "features/evm-wallet/hooks/use-usd-quote";
 
 interface ConnectEvmWalletButtonProps {
   onDisconnectWallet?: () => void;
@@ -21,55 +21,38 @@ interface ConnectEvmWalletButtonProps {
 export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
 }: ConnectEvmWalletButtonProps) => {
-  // FIXME - this won't work to show Base connection.
-  //  too tired to wrap my head around this rn. come back to this
-  const { chain, nativeToken } = useAstriaChainData();
-  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
   const userAccount = useAccount();
-  const { formatNumber } = useIntl();
-  const [fiatValue, setFiatValue] = useState({ value: "0", symbol: "usdc" });
+  const { connectEvmWallet, disconnectEvmWallet } = useEvmWallet();
+
+  // FIXME - how to get the nativeToken from information from wagmi?
+  //  like if they're connected to Base.
+  // TODO - need to connect them to Base
+  //  - should switch the chain when the user selects Base in the dropdown
+  const { chain, nativeToken } = useAstriaChainData();
 
   const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =
-    useTokenBalance(userAccount.address, chain, nativeToken);
+    useEvmCurrencyBalance(nativeToken);
 
-  // Use the quote hook
-  const { quote, loading: quoteLoading, getQuote } = useGetQuote();
+  const quoteInput = useMemo(
+    () => ({
+      token: nativeToken,
+      value: tokenBalance?.value || "0",
+    }),
+    [nativeToken, tokenBalance?.value],
+  );
 
-  // Get USDC token
-  // TODO - how will we get USDC quote for base chain?
-  const usdcToken = useMemo(() => {
-    return chain.currencies.find(
-      (currency) => currency.coinDenom.toLowerCase() === "usdc",
-    );
-  }, [chain.currencies]);
+  const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
 
-  // Fetch quote when token balance changes
-  useEffect(() => {
-    if (!tokenBalance || !nativeToken || !usdcToken) {
-      return;
-    }
-
-    void getQuote(
-      TRADE_TYPE.EXACT_IN,
-      { token: nativeToken, value: tokenBalance.value },
-      { token: usdcToken, value: "" },
-    );
-  }, [tokenBalance, nativeToken, usdcToken, getQuote]);
-
-  // Update fiat value when quote changes
-  useEffect(() => {
+  const fiatValue = useMemo<Balance | undefined>(() => {
     if (!quote) {
       return;
     }
 
-    setFiatValue({
-      value: formatNumber(parseFloat(quote.quoteDecimals), {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
+    return {
+      value: quote.quoteDecimals,
       symbol: "usdc",
-    });
-  }, [quote, formatNumber]);
+    };
+  }, [quote]);
 
   // ui
   const label = useMemo(() => {

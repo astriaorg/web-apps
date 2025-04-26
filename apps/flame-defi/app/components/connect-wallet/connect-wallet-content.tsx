@@ -69,7 +69,7 @@ export const ConnectWalletContent = ({
         </div>
         <AccordionContent className="pl-8 md:pl-10">
           <div className="flex flex-col gap-2">
-            <Skeleton isLoading={isLoading}>
+            <Skeleton isLoading={!balance && isLoading}>
               <span className="text-4xl font-dot">
                 <FormattedNumber
                   value={Number(balance?.value ?? 0)}
@@ -80,7 +80,7 @@ export const ConnectWalletContent = ({
                 {balance?.symbol}
               </span>
             </Skeleton>
-            <Skeleton isLoading={isLoading}>
+            <Skeleton isLoading={!fiat && isLoading}>
               <span className="text-xs font-normal">
                 <FormattedNumber
                   value={Number(fiat?.value ?? 0)}

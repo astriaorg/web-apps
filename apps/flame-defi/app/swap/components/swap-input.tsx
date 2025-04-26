@@ -1,10 +1,11 @@
-import { Skeleton, TokenSelector } from "@repo/ui/components";
-import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
-import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
-import { useUsdQuote } from "../hooks";
-import { SwapInputProps } from "../types";
+
+import { Skeleton, TokenSelector } from "@repo/ui/components";
+import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
+import { AddErc20ToWalletButton, useUsdQuote } from "features/evm-wallet";
+
+import { SwapInputProps } from "swap/types";
 
 export function SwapInput({
   availableTokens,

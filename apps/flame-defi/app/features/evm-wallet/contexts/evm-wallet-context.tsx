@@ -48,9 +48,11 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   );
 
   const connectToSpecificChain = (chainId: number) => {
-    if (!evmAccountAddress && openConnectModal) {
-      openConnectModal();
-    } else if (!evmAccountAddress) {
+    console.log({ evmAccountAddress, chainId });
+    if (!evmAccountAddress) {
+      // FIXME - how do i switch chains after they connect?
+      openConnectModal?.();
+    } else {
       switchChain({ chainId });
     }
   };
