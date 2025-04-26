@@ -2,14 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { formatUnits } from "viem";
 import { useAccount, useBalance, useConfig } from "wagmi";
 
-import {
-  Balance,
-  EvmCurrency,
-  PollingConfig,
-  UseBalanceResult,
-} from "@repo/flame-types";
+import { Balance, EvmCurrency } from "@repo/flame-types";
+import { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
 
-import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+import { createErc20Service } from "features/evm-wallet/services/erc-20-service/erc-20-service";
 
 /**
  * Custom hook to fetch and manage the token balance for a given token and user address.

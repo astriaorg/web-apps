@@ -1,14 +1,35 @@
 import { useMemo } from "react";
 
 import {
+  Balance,
   GenericCurrency,
   IbcCurrency,
   EvmCurrency,
-  PollingConfig,
-  UseBalanceResult,
 } from "@repo/flame-types";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
+
+/**
+ * Shared polling configuration used by balance hooks
+ */
+export interface PollingConfig {
+  /** Whether polling should be enabled */
+  enabled?: boolean;
+  /** Interval in milliseconds between polling requests */
+  intervalMS?: number;
+}
+
+/**
+ * Standard response format for balance hooks
+ */
+export interface UseBalanceResult {
+  /** The current balance, or null if not loaded */
+  balance: Balance | null;
+  /** Whether the balance is currently loading */
+  isLoading: boolean;
+  /** Any error that occurred during loading */
+  error: Error | null;
+}
 
 /**
  * A hook that works with any currency type that implements GenericCurrency
