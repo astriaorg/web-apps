@@ -37,7 +37,12 @@ export const useIbcCurrencyBalance = (
       return false;
     }
     const enabledFromConfig = pollingConfig?.enabled ?? true; // true if pollingConfig undefined
-    return enabledFromConfig && Boolean(chain) && Boolean(currency) && Boolean(cosmosAccountAddress);
+    return (
+      enabledFromConfig &&
+      Boolean(chain) &&
+      Boolean(currency) &&
+      Boolean(cosmosAccountAddress)
+    );
   })();
 
   const { data, isLoading, error } = useQuery({
@@ -59,7 +64,6 @@ export const useIbcCurrencyBalance = (
       );
 
       const amount = Decimal.fromAtomics(
-        balanceAmount,
         currency.coinDecimals,
       );
 

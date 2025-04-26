@@ -1,7 +1,9 @@
 export class ChainCurrencyMismatchError extends Error {
   constructor(chainId: string, currencyChainId: string) {
-    super(`Currency chain ID (${currencyChainId}) does not match the provided chain ID (${chainId})`);
-    this.name = 'ChainCurrencyMismatchError';
+    super(
+      `Currency chain ID (${currencyChainId}) does not match the provided chain ID (${chainId})`,
+    );
+    this.name = "ChainCurrencyMismatchError";
   }
 }
 

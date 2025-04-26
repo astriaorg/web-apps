@@ -36,7 +36,12 @@ export const useEvmCurrencyBalance = (
       return false;
     }
     const enabledFromConfig = pollingConfig?.enabled ?? true; // true if pollingConfig undefined
-    return enabledFromConfig && Boolean(chainId) && Boolean(currency) && Boolean(userAddress);
+    return (
+      enabledFromConfig &&
+      Boolean(chainId) &&
+      Boolean(currency) &&
+      Boolean(userAddress)
+    );
   })();
 
   const { data, isLoading, error } = useQuery({
