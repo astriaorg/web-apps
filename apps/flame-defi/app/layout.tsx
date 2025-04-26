@@ -241,6 +241,7 @@ const ledDotMatrix = localFont({
   src: "../public/fonts/LED_Dot-Matrix.woff2",
   format: "woff2",
   display: "swap",
+  preload: false,
   variable: "--font-dot-matrix",
 });
 

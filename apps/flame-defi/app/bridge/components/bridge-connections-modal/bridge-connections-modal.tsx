@@ -61,7 +61,7 @@ export function BridgeConnectionsModal({
                 <ConnectEvmWalletButton />
               </div>
             ) : (
-              // FIXME - bad stop gap solution b/c can't click on 3rd party modal opened
+              //  bad stop gap solution b/c can't click on 3rd party modal opened
               //  from shadcn Dialog. attempting to close this modal before opening evm modal,
               //  but i think the timing is off. it's still buggy.
               // NOTE - this has actually been performing fine? still room for improvement
