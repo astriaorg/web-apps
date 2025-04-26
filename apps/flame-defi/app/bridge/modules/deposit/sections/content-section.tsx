@@ -393,7 +393,7 @@ export const ContentSection = () => {
                     )}
                   {sourceConnection.currency &&
                     sourceConnection.currency instanceof EvmCurrency &&
-                    sourceConnection.address && (
+                    sourceConnection.isConnected && (
                       <div className="mt-3">
                         <AddErc20ToWalletButton
                           evmCurrency={sourceConnection.currency}
@@ -478,7 +478,7 @@ export const ContentSection = () => {
                       )}
                     {destinationCurrencyOption?.value &&
                       destinationCurrencyOption.value instanceof EvmCurrency &&
-                      destinationConnection.address && (
+                      destinationConnection.isConnected && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
                             evmCurrency={destinationCurrencyOption.value}
