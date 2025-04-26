@@ -7,13 +7,13 @@ import {
   createPoolService,
 } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier } from "pool/constants";
-import type { PoolWithSlot0Data } from "pool/types";
+import type { PoolWithSlot0 } from "pool/types";
 import { calculatePoolExchangeRate } from "pool/utils";
 import type { Address } from "viem";
 import { useConfig } from "wagmi";
 
 type GetPoolsResult = {
-  [key in FeeTier]: PoolWithSlot0Data | null;
+  [key in FeeTier]: PoolWithSlot0 | null;
 };
 
 export const useGetPools = ({
