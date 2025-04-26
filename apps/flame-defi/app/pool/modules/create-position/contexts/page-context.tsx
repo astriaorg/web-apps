@@ -3,7 +3,7 @@
 import { createContext, PropsWithChildren, useState } from "react";
 
 import type { EvmCurrency } from "@repo/flame-types";
-import { useAssetAmountInput, type Amount } from "@repo/ui/components";
+import { useTokenAmountInput, type Amount } from "@repo/ui/components";
 import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
 
@@ -38,7 +38,9 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [token0, setToken0] = useState<EvmCurrency | undefined>(
     chain.currencies[0],
   );
-  const [token1, setToken1] = useState<EvmCurrency | undefined>();
+  const [token1, setToken1] = useState<EvmCurrency | undefined>(
+    chain.currencies[3],
+  );
 
   const { balance: token0Balance } = useEvmCurrencyBalance(token0);
   const { balance: token1Balance } = useEvmCurrencyBalance(token1);
@@ -48,10 +50,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     amount: amount0,
     onInput: onInput0,
     // isValid: isValid0,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: token0Balance?.symbol,
     minimum: "0",
-    asset: token0
+    token: token0
       ? {
           symbol: token0?.coinDenom,
           decimals: token0?.coinDecimals,
@@ -63,10 +65,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     amount: amount1,
     onInput: onInput1,
     // isValid: isValid1,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: token1Balance?.symbol,
     minimum: "0",
-    asset: token1
+    token: token1
       ? {
           symbol: token1.coinDenom,
           decimals: token1.coinDecimals,

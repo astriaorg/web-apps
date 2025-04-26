@@ -1,22 +1,22 @@
 "use client";
 
-import { Input } from "@repo/ui/components";
-import { useValidateAssetAmount, type ValidationAsset } from "@repo/ui/hooks";
+import { Input, type InputProps } from "@repo/ui/components";
+import { useValidateTokenAmount, type ValidationToken } from "@repo/ui/hooks";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import type { Amount } from "./asset-amount-input.types";
+import type { Amount } from "./token-amount-input.types";
 
 type Params = {
-  asset?: ValidationAsset;
+  token?: ValidationToken;
   minimum?: string;
   balance?: string;
 };
 
-export const useAssetAmountInput = ({
+export const useTokenAmountInput = ({
   balance = "0",
   minimum,
-  asset,
+  token,
 }: Params) => {
-  const validate = useValidateAssetAmount();
+  const validate = useValidateTokenAmount();
 
   const [amount, setAmount] = useState<Amount>({
     value: "",
@@ -34,7 +34,7 @@ export const useAssetAmountInput = ({
 
   const onInput = useCallback(
     ({ value }: { value: string }) => {
-      if (!asset) {
+      if (!token) {
         return;
       }
 
@@ -42,14 +42,14 @@ export const useAssetAmountInput = ({
         value,
         validation: validate({
           value,
-          asset,
-          decimals: asset.decimals,
+          token,
+          decimals: token.decimals,
           minimum,
           maximum: balance,
         }),
       });
     },
-    [asset, balance, minimum, setAmount, validate],
+    [token, balance, minimum, setAmount, validate],
   );
 
   const onReset = useCallback(() => {
@@ -75,10 +75,7 @@ export const useAssetAmountInput = ({
   };
 };
 
-export const AssetAmountInput = ({
-  onInput,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => {
+export const TokenAmountInput = ({ onInput, ...props }: InputProps) => {
   const handleInput = useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       const value = event.currentTarget.value;

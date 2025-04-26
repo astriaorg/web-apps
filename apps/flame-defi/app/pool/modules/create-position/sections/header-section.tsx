@@ -1,6 +1,7 @@
 "use client";
 
 import { Header, HeaderTitle } from "components/header";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "pool/constants/routes";
 
@@ -9,7 +10,10 @@ export const HeaderSection = () => {
 
   return (
     <Header onClickBack={() => router.push(ROUTES.POOL)}>
-      <HeaderTitle>New Position</HeaderTitle>
+      <div className="flex items-center justify-between w-full">
+        <HeaderTitle>New Position</HeaderTitle>
+        <SettingsPopover />
+      </div>
     </Header>
   );
 };

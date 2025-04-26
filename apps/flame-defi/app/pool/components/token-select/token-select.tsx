@@ -11,7 +11,7 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownSmallIcon, SearchIcon } from "@repo/ui/icons";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface TokenSelectProps {
   value?: EvmCurrency;
@@ -28,6 +28,10 @@ export const TokenSelect = ({
 
   const [search, setSearch] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
+
+  useEffect(() => {
+    setFilteredOptions(options);
+  }, [options]);
 
   const handleSearch = useCallback<React.FormEventHandler<HTMLInputElement>>(
     (event) => {
