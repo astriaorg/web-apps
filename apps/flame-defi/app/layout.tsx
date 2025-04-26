@@ -21,84 +21,102 @@ const nbAkademieMono = localFont({
       path: "../public/fonts/nb_akademie_mono_900-webfont.woff2",
       weight: "900",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_800-webfont.woff2",
       weight: "800",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_700-webfont.woff2",
       weight: "700",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_600-webfont.woff2",
       weight: "600",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_500-webfont.woff2",
       weight: "500",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_400-webfont.woff2",
       weight: "400",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_300-webfont.woff2",
       weight: "300",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_200-webfont.woff2",
       weight: "200",
       style: "normal",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_200_italic-webfont.woff2",
       weight: "200",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_900_italic-webfont.woff2",
       weight: "900",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_800_italic-webfont.woff2",
       weight: "800",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_700_italic-webfont.woff2",
       weight: "700",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_600_italic-webfont.woff2",
       weight: "600",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_500_italic-webfont.woff2",
       weight: "500",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_400_italic-webfont.woff2",
       weight: "400",
       style: "italic",
+      format: "woff2",
     },
     {
       path: "../public/fonts/nb_akademie_mono_300_italic-webfont.woff2",
       weight: "300",
       style: "italic",
+      format: "woff2",
     },
   ],
   display: "swap",
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-nb-akademie-mono",
 });
 
@@ -214,12 +232,14 @@ const switzer = localFont({
     },
   ],
   display: "swap",
-  preload: true,
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-switzer",
 });
 
 const ledDotMatrix = localFont({
   src: "../public/fonts/LED_Dot-Matrix.woff2",
+  format: "woff2",
   display: "swap",
   variable: "--font-dot-matrix",
 });

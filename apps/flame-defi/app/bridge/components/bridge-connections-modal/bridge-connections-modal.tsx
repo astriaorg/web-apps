@@ -47,13 +47,11 @@ export function BridgeConnectionsModal({
             <div>
               <DialogTitle>{title}</DialogTitle>
               <DialogDescription className="sr-only">
-                Connect your Ethereum and Cosmos wallets to use bridge functionality
+                Connect your Ethereum and Cosmos wallets to use bridge
+                functionality
               </DialogDescription>
             </div>
-            <button 
-              onClick={handleCloseModal}
-              aria-label="Close dialog"
-            >
+            <button onClick={handleCloseModal} aria-label="Close dialog">
               <CloseIcon className="text-grey-light hover:text-white transition" />
             </button>
           </div>

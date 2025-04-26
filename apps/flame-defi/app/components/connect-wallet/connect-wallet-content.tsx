@@ -30,9 +30,9 @@ export const ConnectWalletContent = ({
   isCollapsible = true,
   ...props
 }: ConnectWalletContentProps) => {
-  // Filter out the isConnected prop to prevent it from being passed to the DOM
-  const { isConnected, ...accordionProps } = props;
-  
+  // Filter out props that shouldn't be passed to the Accordion component
+  const { isConnected, onConnectWallet, ...accordionProps } = props;
+
   return (
     <Accordion
       type="single"
@@ -62,7 +62,7 @@ export const ConnectWalletContent = ({
               </CopyToClipboard>
             )}
             {explorer && (
-              <a 
+              <a
                 href={explorer.url}
                 target="_blank"
                 rel="noreferrer"
@@ -71,8 +71,8 @@ export const ConnectWalletContent = ({
                 <ShareRightIcon aria-hidden="true" />
               </a>
             )}
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => onDisconnectWallet()}
               aria-label="Disconnect wallet"
             >

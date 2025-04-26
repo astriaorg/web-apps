@@ -2,7 +2,9 @@ import type { SigningStargateClient } from "@cosmjs/stargate";
 import { osmosis } from "osmojs";
 
 import type { CosmosChainInfo, IbcCurrency } from "@repo/flame-types";
-import { nowPlusMinutesInNano } from "../utils/utils";
+
+import { ChainCurrencyMismatchError } from "features/cosmos-wallet/errors";
+import { nowPlusMinutesInNano } from "features/cosmos-wallet/utils/utils";
 
 /**
  * Send an IBC transfer from the selected chain to the recipient address.
@@ -65,28 +67,27 @@ export const sendIbcTransfer = async (
  * Gets the balance for a given address and currency on an IBC chain using Cosmos SDK client.
  */
 export const getBalanceFromChain = async (
-  chainInfo: CosmosChainInfo,
+  chain: CosmosChainInfo,
   currency: IbcCurrency,
   address: string,
 ): Promise<string> => {
+  if (chain.chainId !== currency.chainId) {
+    throw new ChainCurrencyMismatchError(chain.chainId, currency.chainId);
+  }
+
   const client = await osmosis.ClientFactory.createRPCQueryClient({
-    rpcEndpoint: chainInfo.rpc,
+    rpcEndpoint: chain.rpc,
   });
 
-  try {
-    // query balance using bank module
-    const balance = await client.cosmos.bank.v1beta1.balance({
-      address,
-      denom: currency.coinMinimalDenom,
-    });
+  // query balance using bank module
+  const balanceRes = await client.cosmos.bank.v1beta1.balance({
+    address,
+    denom: currency.coinMinimalDenom,
+  });
 
-    if (!balance?.balance) {
-      return "0";
-    }
-
-    return balance.balance.amount;
-  } catch (error) {
-    console.error("Failed to fetch balance:", error);
-    throw error;
+  if (!balanceRes?.balance) {
+    return "0";
   }
+
+  return balanceRes.balance.amount;
 };

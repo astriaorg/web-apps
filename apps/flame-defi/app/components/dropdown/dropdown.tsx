@@ -76,6 +76,7 @@ export const Dropdown = <T,>({
   // set the default option when defaultOption or onSelect change
   useEffect(() => {
     if (defaultOption) {
+      console.log("setting from default option", defaultOption);
       setSelectedOption(defaultOption);
       onSelect(defaultOption.value);
     }

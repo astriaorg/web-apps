@@ -52,6 +52,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
   },
   currencies: [
     new IbcCurrency({
+      chainId: "celestia",
       coinDecimals: 6,
       coinDenom: "TIA",
       coinGeckoId: "celestia",
@@ -122,6 +123,7 @@ const NeutronChainInfo: CosmosChainInfo = {
   // List of all coin/tokens used in this chain.
   currencies: [
     new IbcCurrency({
+      chainId: "neutron-1",
       coinDenom: "dTIA",
       coinMinimalDenom:
         "factory/neutron1ut4c6pv4u6vyu97yw48y8g7mle0cat54848v6m97k977022lzxtsaqsgmq/udtia",
@@ -185,6 +187,7 @@ const NobleChainInfo: CosmosChainInfo = {
   },
   currencies: [
     new IbcCurrency({
+      chainId: "noble-1",
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
@@ -237,6 +240,7 @@ const OsmosisChainInfo: CosmosChainInfo = {
   },
   currencies: [
     new IbcCurrency({
+      chainId: "osmosis-1",
       coinDenom: "milkTIA",
       coinMinimalDenom:
         "factory/osmo1f5vfcph2dvfeqcqkhetwv75fda69z7e5c2dldm3kvgj23crkv6wqcn47a0/umilkTIA",
@@ -289,6 +293,7 @@ const StrideChainInfo: CosmosChainInfo = {
   },
   currencies: [
     new IbcCurrency({
+      chainId: "stride-1",
       coinDenom: "stTIA",
       coinMinimalDenom: "stutia",
       coinDecimals: 6,
@@ -353,6 +358,7 @@ const AstriaChainInfo: AstriaChain = {
   },
   currencies: [
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "TIA",
       title: "TIA",
       coinMinimalDenom: "utia",
@@ -366,6 +372,7 @@ const AstriaChainInfo: AstriaChain = {
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "dTIA",
       title: "Drop Staked TIA",
       coinMinimalDenom:
@@ -379,6 +386,7 @@ const AstriaChainInfo: AstriaChain = {
       IconComponent: DropTiaIcon,
     }),
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "WTIA",
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
@@ -391,6 +399,7 @@ const AstriaChainInfo: AstriaChain = {
       IconComponent: WrappedTiaIcon,
     }),
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
@@ -403,6 +412,7 @@ const AstriaChainInfo: AstriaChain = {
       IconComponent: UsdcIcon,
     }),
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "milkTIA",
       title: "Milk TIA",
       coinMinimalDenom:
@@ -416,6 +426,7 @@ const AstriaChainInfo: AstriaChain = {
       IconComponent: MilkTiaIcon,
     }),
     new EvmCurrency({
+      chainId: 253368190,
       coinDenom: "stTIA",
       title: "Stride TIA",
       coinMinimalDenom: "stutia",
@@ -446,6 +457,7 @@ const BaseChainInfo: EvmChainInfo = {
     // NOTE - this is really only here to satisfy the config needed
     //  for wagmi and rainbowkit providers. it's not used atm.
     new EvmCurrency({
+      chainId: 8453,
       title: "Ether",
       coinDenom: "ETH",
       // is gwei correct?
@@ -456,6 +468,7 @@ const BaseChainInfo: EvmChainInfo = {
       isBridgeable: false,
     }),
     new EvmCurrency({
+      chainId: 8453,
       title: "USDC",
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",

@@ -25,11 +25,20 @@ export const useIbcCurrencyBalance = (
   const { selectedCosmosChain, cosmosAccountAddress } = useCosmosWallet();
   const { cosmosChains } = useConfig();
 
-  // use first cosmos chain if none selected yet
+  // user may not have selected a chain from the ui,
+  // but we want to get balance for the default chain
   const chain = selectedCosmosChain || Object.values(cosmosChains)[0];
 
   const intervalMS = pollingConfig?.intervalMS ?? 10000; // 10 seconds by default
-  const enabled = pollingConfig?.enabled ?? true;
+
+  const enabled = (() => {
+    // chain id must match currency id
+    if (chain?.chainId !== currency?.chainId) {
+      return false;
+    }
+    const enabledFromConfig = pollingConfig?.enabled ?? true; // true if pollingConfig undefined
+    return enabledFromConfig && Boolean(chain) && Boolean(currency) && Boolean(cosmosAccountAddress);
+  })();
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
@@ -43,30 +52,23 @@ export const useIbcCurrencyBalance = (
         return null;
       }
 
-      try {
-        const balanceAmount = await getBalanceFromChain(
-          chain,
-          currency,
-          cosmosAccountAddress,
-        );
+      const balanceAmount = await getBalanceFromChain(
+        chain,
+        currency,
+        cosmosAccountAddress,
+      );
 
-        const amount = Decimal.fromAtomics(
-          balanceAmount,
-          currency.coinDecimals,
-        );
+      const amount = Decimal.fromAtomics(
+        balanceAmount,
+        currency.coinDecimals,
+      );
 
-        return {
-          value: amount.toString(),
-          symbol: currency.coinDenom,
-        };
-      } catch (e) {
-        const errorObj =
-          e instanceof Error ? e : new Error("Failed to fetch IBC balance.");
-        console.error("Failed to fetch IBC balance", errorObj);
-        throw errorObj;
-      }
+      return {
+        value: amount.toString(),
+        symbol: currency.coinDenom,
+      };
     },
-    enabled: !!currency && !!cosmosAccountAddress && !!chain && enabled,
+    enabled: enabled,
     refetchInterval: intervalMS,
     staleTime: Math.min(intervalMS / 2, 5000),
     retry: 2,

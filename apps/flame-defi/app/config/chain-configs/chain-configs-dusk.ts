@@ -61,6 +61,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
   // List of all coin/tokens used in this chain.
   currencies: [
     new IbcCurrency({
+      chainId: "mocha-4",
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
@@ -72,6 +73,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       IconComponent: CelestiaIcon,
     }),
     new IbcCurrency({
+      chainId: "mocha-4",
       coinDenom: "fakeTIA",
       coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
@@ -152,6 +154,7 @@ const NobleChainInfo: CosmosChainInfo = {
   // List of all coin/tokens used in this chain.
   currencies: [
     new IbcCurrency({
+      chainId: "grand-1",
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
@@ -219,6 +222,7 @@ const FlameChainInfo: AstriaChain = {
   },
   currencies: [
     new EvmCurrency({
+      chainId: 912559,
       coinDenom: "RIA",
       title: "RIA",
       coinMinimalDenom: "uria",
@@ -230,6 +234,7 @@ const FlameChainInfo: AstriaChain = {
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
+      chainId: 912559,
       coinDenom: "WTIA",
       title: "Wrapped Celestia",
       coinMinimalDenom: "wtia",
@@ -242,6 +247,7 @@ const FlameChainInfo: AstriaChain = {
       IconComponent: WrappedTiaIcon,
     }),
     new EvmCurrency({
+      chainId: 912559,
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
@@ -257,6 +263,7 @@ const FlameChainInfo: AstriaChain = {
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
+      chainId: 912559,
       coinDenom: "fakeTIA",
       title: "fakeTIA",
       coinMinimalDenom: "ufaketia",
@@ -290,6 +297,7 @@ const BaseChainInfo: EvmChainInfo = {
     // NOTE - this is really only here to satisfy the config needed
     //  for wagmi and rainbowkit providers. it's not used atm.
     new EvmCurrency({
+      chainId: 84532,
       title: "Ether",
       coinDenom: "ETH",
       // is gwei correct?
@@ -300,6 +308,7 @@ const BaseChainInfo: EvmChainInfo = {
       isBridgeable: false,
     }),
     new EvmCurrency({
+      chainId: 84532,
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",

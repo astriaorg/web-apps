@@ -63,6 +63,29 @@ export const ContentSection = () => {
     ],
   });
 
+  // without these in combination with Dropdown's valueOverride,
+  // we would not be able to clear the selection
+  const sourceChainOption = useMemo(() => {
+    if (!sourceConnection.chain) {
+      return null;
+    }
+    return {
+      label: sourceConnection.chain.chainName,
+      value: sourceConnection.chain,
+      LeftIcon: sourceConnection.chain.IconComponent,
+    };
+  }, [sourceConnection]);
+  const destinationChainOption = useMemo(() => {
+    if (!destinationConnection.chain) {
+      return null;
+    }
+    return {
+      label: destinationConnection.chain.chainName,
+      value: destinationConnection.chain,
+      LeftIcon: destinationConnection.chain.IconComponent,
+    };
+  }, [destinationConnection]);
+
   // Recipient address editing handlers
   const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(true);
@@ -172,6 +195,21 @@ export const ContentSection = () => {
       defaultDestinationCurrencyOption,
     ],
   );
+  const sourceCurrencyOption = useMemo(
+    () =>
+      findMatchingDestinationCurrency(
+        destinationConnection.chain,
+        destinationConnection.currency,
+        sourceConnection.chain,
+      ) || defaultSourceCurrencyOption,
+    [
+      findMatchingDestinationCurrency,
+      destinationConnection.chain,
+      destinationConnection.currency,
+      sourceConnection.chain,
+      defaultSourceCurrencyOption,
+    ],
+  );
 
   // Form handling
   const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,13 +261,17 @@ export const ContentSection = () => {
 
   // Get source token balance
   const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
-    useCurrencyBalance(sourceConnection.currency ?? undefined);
+    useCurrencyBalance(sourceConnection.currency ?? undefined, {
+      enabled: sourceConnection.isConnected,
+    });
 
   // Get destination token balance
   const {
     balance: destinationBalance,
     isLoading: isLoadingDestinationBalance,
-  } = useCurrencyBalance(destinationConnection.currency ?? undefined);
+  } = useCurrencyBalance(destinationConnection.currency ?? undefined, {
+    enabled: destinationConnection.isConnected,
+  });
 
   const isWithdrawDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
@@ -294,6 +336,7 @@ export const ContentSection = () => {
                       placeholder="Select Astria chain..."
                       options={sourceChainOptions}
                       onSelect={connectSource}
+                      valueOverride={sourceChainOption}
                       LeftIcon={WalletIcon}
                     />
                   </div>
@@ -305,6 +348,7 @@ export const ContentSection = () => {
                         options={sourceCurrencyOptions}
                         defaultOption={defaultSourceCurrencyOption}
                         onSelect={setSourceCurrency}
+                        valueOverride={sourceCurrencyOption}
                         LeftIcon={WalletIcon}
                       />
                     </div>
@@ -318,17 +362,18 @@ export const ContentSection = () => {
                   <p className="text-grey-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
-                  {sourceConnection.currency && (
-                    <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {isLoadingSourceBalance && "Loading..."}
-                      {!isLoadingSourceBalance &&
-                        sourceBalance &&
-                        `${sourceBalance.value} ${sourceBalance.symbol}`}
-                      {!isLoadingSourceBalance &&
-                        !sourceBalance &&
-                        `0 ${sourceConnection.currency.coinDenom}`}
-                    </p>
-                  )}
+                  {sourceConnection.currency &&
+                    sourceConnection.isConnected && (
+                      <p className="mt-2 text-grey-lighter font-semibold">
+                        Balance: {isLoadingSourceBalance && "Loading..."}
+                        {!isLoadingSourceBalance &&
+                          sourceBalance &&
+                          `${sourceBalance.value} ${sourceBalance.symbol}`}
+                        {!isLoadingSourceBalance &&
+                          !sourceBalance &&
+                          `0 ${sourceConnection.currency.coinDenom}`}
+                      </p>
+                    )}
                 </div>
               )}
             </div>
@@ -358,6 +403,7 @@ export const ContentSection = () => {
                       placeholder="Connect wallet or enter address"
                       options={destinationChainOptions}
                       onSelect={connectDestination}
+                      valueOverride={destinationChainOption}
                       additionalOptions={additionalDestinationOptions}
                       LeftIcon={WalletIcon}
                     />
@@ -391,21 +437,24 @@ export const ContentSection = () => {
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
-                    {destinationConnection.currency && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {isLoadingDestinationBalance && "Loading..."}
-                        {!isLoadingDestinationBalance &&
-                          destinationBalance &&
-                          `${destinationBalance.value} ${destinationBalance.symbol}`}
-                        {!isLoadingDestinationBalance &&
-                          !destinationBalance &&
-                          `0 ${destinationConnection.currency.coinDenom}`}
-                      </p>
-                    )}
+                    {destinationConnection.currency &&
+                      destinationConnection.isConnected && (
+                        <p className="mt-2 text-grey-lighter font-semibold">
+                          Balance: {isLoadingDestinationBalance && "Loading..."}
+                          {!isLoadingDestinationBalance &&
+                            destinationBalance &&
+                            `${destinationBalance.value} ${destinationBalance.symbol}`}
+                          {!isLoadingDestinationBalance &&
+                            !destinationBalance &&
+                            `0 ${destinationConnection.currency.coinDenom}`}
+                        </p>
+                      )}
                     {/* Withdrawal fee display */}
-                    <div className="mt-2 text-grey-light text-sm">
-                      Withdrawal fee: {ibcWithdrawFeeDisplay}
-                    </div>
+                    {ibcWithdrawFeeDisplay && (
+                      <div className="mt-2 text-grey-light text-sm">
+                        Withdrawal fee: {ibcWithdrawFeeDisplay}
+                      </div>
+                    )}
                   </div>
                 )}
 
