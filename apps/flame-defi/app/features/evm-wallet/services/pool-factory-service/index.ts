@@ -2,14 +2,20 @@ import { type Config } from "@wagmi/core";
 import { Abi, type Address, type Hash } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
+import {
+  mapSlot0ResponseToSlot0,
+  POOL_ABI,
+  type Slot0,
+  type Slot0Response,
+} from "../pool-service";
 import POOL_FACTORY_ABI from "./pool-factory-abi.json";
 
 export class PoolFactoryService extends GenericContractService {
   /**
-   * Creates a new PoolFactoryService instance
+   * Creates a new `PoolFactoryService` instance.
    *
-   * @param wagmiConfig - The wagmi configuration object
-   * @param contractAddress - The address of the Uniswap V3 factory contract
+   * @param wagmiConfig - The `wagmi` configuration object.
+   * @param contractAddress - The address of the Uniswap V3 factory contract.
    */
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, POOL_FACTORY_ABI as Abi);
@@ -39,13 +45,44 @@ export class PoolFactoryService extends GenericContractService {
   }
 
   /**
-   * Get the pool address for a given token pair and fee
+   * Get the slot0 data for a given array of pool addresses.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param token0 - The address of the first token in the pair
-   * @param token1 - The address of the second token in the pair
-   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
-   * @returns The address of the pool if it exists, or the zero address if not
+   * @param addresses - The addresses of the pools to get slot0 data for.
+   * @returns An array of objects containing the pool address and its corresponding slot0 data.
+   */
+  async getPoolsSlot0(addresses: Address[]): Promise<
+    {
+      address: Address;
+      slot0: Slot0;
+    }[]
+  > {
+    const result = await this.multicall({
+      contracts: addresses.map((it) => {
+        return {
+          functionName: "slot0",
+          address: it,
+          abi: POOL_ABI as Abi,
+          args: [],
+        };
+      }),
+    });
+
+    return result.map((it, index) => {
+      return {
+        address: addresses[index] as Address,
+        slot0: mapSlot0ResponseToSlot0(it as Slot0Response),
+      };
+    });
+  }
+
+  /**
+   * Get the pool address for a given token pair and fee.
+   *
+   * @param chainId - The chain ID of the EVM chain.
+   * @param token0 - The address of the first token in the pair.
+   * @param token1 - The address of the second token in the pair.
+   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%).
+   * @returns The address of the pool if it exists, or the zero address if not.
    */
   async getPool(
     chainId: number,
@@ -61,13 +98,13 @@ export class PoolFactoryService extends GenericContractService {
   }
 
   /**
-   * Create a new Uniswap V3 pool for a token pair with specified fee
+   * Create a new Uniswap V3 pool for a token pair with specified fee.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param token0 - The address of the first token in the pair
-   * @param token1 - The address of the second token in the pair
-   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
-   * @returns Transaction hash if successful
+   * @param chainId - The chain ID of the EVM chain.
+   * @param token0 - The address of the first token in the pair.
+   * @param token1 - The address of the second token in the pair.
+   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%).
+   * @returns Transaction hash if successful.
    */
   async createPool(
     chainId: number,
@@ -86,11 +123,11 @@ export class PoolFactoryService extends GenericContractService {
 }
 
 /**
- * Factory function to create a new PoolFactoryService instance
+ * Factory function to create a new `PoolFactoryService` instance.
  *
- * @param wagmiConfig - The wagmi configuration object
- * @param contractAddress - The address of the Uniswap V3 factory contract
- * @returns A new PoolFactoryService instance
+ * @param wagmiConfig - The `wagmi` configuration object.
+ * @param contractAddress - The address of the Uniswap V3 factory contract.
+ * @returns A new `PoolFactoryService` instance.
  */
 export function createPoolFactoryService(
   wagmiConfig: Config,

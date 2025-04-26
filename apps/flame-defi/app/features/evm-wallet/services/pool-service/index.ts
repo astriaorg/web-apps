@@ -3,6 +3,8 @@ import { type Address, Abi } from "viem";
 import { GenericContractService } from "../generic-contract-service";
 import POOL_ABI from "./pool-abi.json";
 
+export { POOL_ABI };
+
 export type Slot0 = {
   sqrtPriceX96: bigint;
   tick: number;
@@ -13,7 +15,7 @@ export type Slot0 = {
   unlocked: boolean;
 };
 
-type Slot0ResponseTuple = [
+export type Slot0Response = [
   bigint, // sqrtPriceX96
   number, // tick
   number, // observationIndex
@@ -22,6 +24,16 @@ type Slot0ResponseTuple = [
   number, // feeProtocol
   boolean, // unlocked
 ];
+
+export const mapSlot0ResponseToSlot0 = (response: Slot0Response): Slot0 => ({
+  sqrtPriceX96: response[0],
+  tick: response[1],
+  observationIndex: response[2],
+  observationCardinality: response[3],
+  observationCardinalityNext: response[4],
+  feeProtocol: response[5],
+  unlocked: response[6],
+});
 
 export class PoolService extends GenericContractService {
   /**
@@ -41,21 +53,13 @@ export class PoolService extends GenericContractService {
    * @returns Slot0 object containing the current price, tick, and other pool state variables.
    */
   async getSlot0(chainId: number): Promise<Slot0> {
-    const slot0 = await this.readContractMethod<Slot0ResponseTuple>(
+    const slot0 = await this.readContractMethod<Slot0Response>(
       chainId,
       "slot0",
       [],
     );
 
-    return {
-      sqrtPriceX96: slot0[0],
-      tick: slot0[1],
-      observationIndex: slot0[2],
-      observationCardinality: slot0[3],
-      observationCardinalityNext: slot0[4],
-      feeProtocol: slot0[5],
-      unlocked: slot0[6],
-    };
+    return mapSlot0ResponseToSlot0(slot0);
   }
 
   /**

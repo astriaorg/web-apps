@@ -2,10 +2,7 @@ import type { EvmCurrency } from "@repo/flame-types";
 import { isZeroAddress } from "@repo/ui/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useAstriaChainData } from "config";
-import {
-  createPoolFactoryService,
-  createPoolService,
-} from "features/evm-wallet";
+import { createPoolFactoryService } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier } from "pool/constants";
 import type { PoolWithSlot0 } from "pool/types";
 import { calculatePoolExchangeRate } from "pool/utils";
@@ -54,19 +51,8 @@ export const useGetPools = ({
         FEE_TIERS,
       );
 
-      // TODO: Use multicall.
-      // Batch the `getSlot0` calls for all pools
-      const slot0Results = await Promise.all(
-        pools
-          .filter((it) => !isZeroAddress(it))
-          .map(async (it) => {
-            const poolService = createPoolService(config, it);
-            return {
-              address: it,
-              slot0: await poolService.getSlot0(chain.chainId),
-            };
-          }),
-      );
+      const validPools = pools.filter((it) => !isZeroAddress(it));
+      const slot0Results = await poolFactoryService.getPoolsSlot0(validPools);
 
       const result = {} as GetPoolsResult;
 
