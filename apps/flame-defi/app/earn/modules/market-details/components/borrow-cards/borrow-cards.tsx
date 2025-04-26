@@ -3,7 +3,7 @@ import {
   CardContent,
   CardLabel,
   Skeleton,
-  useAssetAmountInput,
+  useTokenAmountInput,
 } from "@repo/ui/components";
 import Big from "big.js";
 import { Image } from "components/image";
@@ -50,10 +50,10 @@ export const BorrowCards = () => {
     onInput: onInputSupply,
     onReset: onResetSupply,
     isValid: isValidSupply,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: BALANCE,
     minimum: "0",
-    asset: data?.marketByUniqueKey.collateralAsset ?? undefined,
+    token: data?.marketByUniqueKey.collateralAsset ?? undefined,
   });
 
   const {
@@ -61,10 +61,10 @@ export const BorrowCards = () => {
     onInput: onInputBorrow,
     onReset: onResetBorrow,
     isValid: isValidBorrow,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: BALANCE,
     minimum: "0",
-    asset: data?.marketByUniqueKey.loanAsset ?? undefined,
+    token: data?.marketByUniqueKey.loanAsset ?? undefined,
   });
 
   const items = useMemo<
