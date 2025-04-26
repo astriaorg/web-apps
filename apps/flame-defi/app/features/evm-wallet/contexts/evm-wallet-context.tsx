@@ -1,4 +1,4 @@
-import { useChainModal, useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 
@@ -22,7 +22,6 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
   const { openConnectModal } = useConnectModal();
-  const { openChainModal } = useChainModal();
   const { disconnect } = useDisconnect();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
