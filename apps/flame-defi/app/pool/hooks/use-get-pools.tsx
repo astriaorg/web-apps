@@ -29,7 +29,7 @@ export const useGetPools = ({
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!token0 && !!token1,
-    queryKey: ["useGetPool", token0, token1, chain],
+    queryKey: ["useGetPools", token0, token1, chain],
     queryFn: async () => {
       if (!token0 || !token1) {
         return null;
