@@ -42,3 +42,10 @@ alias r := run
 build:
   npm run build
 alias b := build
+
+# run all commands to ensure successful build in ci
+prepush:
+  just format
+  just check-types
+  just lint
+  just test
