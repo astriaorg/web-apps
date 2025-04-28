@@ -3,10 +3,10 @@
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { isAddress } from "viem";
+import { useSwitchChain } from "wagmi";
 
 // import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
-
-import { EvmCurrency } from "@repo/flame-types";
+import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import {
   ArrowUpDownIcon,
@@ -29,6 +29,7 @@ import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
+  const { switchChain } = useSwitchChain();
 
   // Local state for form
   const [amount, setAmount] = useState<string>("");
@@ -111,6 +112,13 @@ export const ContentSection = () => {
 
   const handleDepositClick = useCallback(async () => {
     setIsAnimating(true);
+
+    if (
+      (sourceConnection.chain?.chainType === ChainType.EVM ||
+        sourceConnection.chain?.chainType === ChainType.ASTRIA)
+    ) {
+      switchChain({ chainId: sourceConnection.chain.chainId });
+    }
 
     try {
       await executeDeposit({
