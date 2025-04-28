@@ -2,12 +2,11 @@
 
 import { useCallback, useState } from "react";
 import { Address } from "viem";
-import { useConfig } from "wagmi";
 
-import { KeplrWalletError, useCosmosWallet } from "features/cosmos-wallet";
+import { KeplrWalletError } from "features/cosmos-wallet";
 
 import { DepositError, WalletConnectionError } from "bridge/errors";
-import { createBridgeStrategy } from "bridge/strategies";
+import { useBridgeStrategy } from "bridge/hooks/use-bridge-strategy";
 import { ChainConnection } from "bridge/types";
 
 export interface DepositTransactionHook {
@@ -21,8 +20,7 @@ export interface DepositTransactionHook {
 }
 
 export function useDepositTransaction(): DepositTransactionHook {
-  const wagmiConfig = useConfig();
-  const cosmosWallet = useCosmosWallet();
+  const { executeStrategy } = useBridgeStrategy();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -54,17 +52,12 @@ export function useDepositTransaction(): DepositTransactionHook {
       setIsLoading(true);
 
       try {
-        const depositStrategy = createBridgeStrategy(
-          {
-            amount,
-            sourceConnection,
-            cosmosWallet,
-            wagmiConfig,
-          },
-          destinationConnection.chain.chainType,
-        );
-
-        await depositStrategy.execute(recipientAddress);
+        await executeStrategy({
+          amount,
+          sourceConnection,
+          recipientAddress,
+          destinationChainType: destinationConnection.chain.chainType,
+        });
         return;
       } catch (e) {
         console.error("Deposit failed", e);
@@ -80,7 +73,7 @@ export function useDepositTransaction(): DepositTransactionHook {
         setIsLoading(false);
       }
     },
-    [cosmosWallet, wagmiConfig],
+    [executeStrategy],
   );
 
   return {
