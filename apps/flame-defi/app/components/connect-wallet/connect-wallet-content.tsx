@@ -30,8 +30,12 @@ export const ConnectWalletContent = ({
   isCollapsible = true,
   ...props
 }: ConnectWalletContentProps) => {
-  // Filter out props that shouldn't be passed to the Accordion component
-  const { isConnected, onConnectWallet, ...accordionProps } = props;
+  // Filter out props that shouldn't be passed to the Accordion component to fix DOM errors.
+  const {
+    isConnected: _isConnected,
+    onConnectWallet: _onConnectWallet,
+    ...accordionProps
+  } = props;
 
   return (
     <Accordion
