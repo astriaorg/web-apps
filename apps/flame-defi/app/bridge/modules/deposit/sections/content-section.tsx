@@ -114,8 +114,8 @@ export const ContentSection = () => {
     setIsAnimating(true);
 
     if (
-      (sourceConnection.chain?.chainType === ChainType.EVM ||
-        sourceConnection.chain?.chainType === ChainType.ASTRIA)
+      sourceConnection.chain?.chainType === ChainType.EVM ||
+      sourceConnection.chain?.chainType === ChainType.ASTRIA
     ) {
       switchChain({ chainId: sourceConnection.chain.chainId });
     }
