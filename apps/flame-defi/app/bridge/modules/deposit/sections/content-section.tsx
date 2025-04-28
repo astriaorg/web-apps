@@ -166,9 +166,10 @@ export const ContentSection = () => {
       setIsAnimating(false);
     }
   }, [
-    amount,
-    executeDeposit,
     sourceConnection,
+    switchChain,
+    executeDeposit,
+    amount,
     destinationConnection,
     recipientAddressOverride,
     addNotification,
