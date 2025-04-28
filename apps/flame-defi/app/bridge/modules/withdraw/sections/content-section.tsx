@@ -3,8 +3,9 @@
 import Big from "big.js";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
+import { useSwitchChain } from "wagmi";
 
-import { EvmCurrency } from "@repo/flame-types";
+import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
 import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
@@ -20,6 +21,7 @@ import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
+  const { switchChain } = useSwitchChain();
 
   // Local state for form
   const [amount, setAmount] = useState<string>("");
@@ -103,6 +105,13 @@ export const ContentSection = () => {
   const handleWithdrawClick = useCallback(async () => {
     setIsAnimating(true);
 
+    if (
+      sourceConnection.chain?.chainType === ChainType.EVM ||
+      sourceConnection.chain?.chainType === ChainType.ASTRIA
+    ) {
+      switchChain({ chainId: sourceConnection.chain.chainId });
+    }
+
     try {
       await executeWithdraw({
         amount,
@@ -148,9 +157,10 @@ export const ContentSection = () => {
       setIsAnimating(false);
     }
   }, [
-    amount,
-    executeWithdraw,
     sourceConnection,
+    switchChain,
+    executeWithdraw,
+    amount,
     destinationConnection,
     recipientAddressOverride,
     addNotification,
