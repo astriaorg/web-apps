@@ -24,7 +24,7 @@ interface PriceRangeProps {
   token1?: EvmCurrency;
 }
 
-export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
+export const PriceRangeInput = ({ rate, token0, token1 }: PriceRangeProps) => {
   const { selectedFeeTier } = usePageContext();
   const { formatNumber } = useIntl();
 

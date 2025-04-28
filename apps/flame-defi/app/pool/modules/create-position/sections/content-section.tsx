@@ -7,7 +7,7 @@ import { motion, type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
-import { PriceRange } from "pool/modules/create-position/components/price-range";
+import { PriceRangeInput } from "pool/modules/create-position/components/price-range-input";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
@@ -201,7 +201,7 @@ export const ContentSection = () => {
 
         {/* Right side. */}
         <div className="flex flex-col gap-4">
-          <PriceRange {...poolState} />
+          <PriceRangeInput {...poolState} />
         </div>
       </div>
     </div>
