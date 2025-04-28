@@ -160,7 +160,9 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       return minPrice;
     }
 
-    return Number(minPrice) === 0 ? "0" : new Big(minPrice).toFixed();
+    return Number(minPrice) === MIN_PRICE_DEFAULT
+      ? "0"
+      : new Big(minPrice).toFixed();
   }, [minPrice]);
 
   const displayMaxPrice = useMemo(() => {
@@ -168,7 +170,9 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       return maxPrice;
     }
 
-    return Number(maxPrice) === Infinity ? "∞" : new Big(maxPrice).toFixed();
+    return Number(maxPrice) === MAX_PRICE_DEFAULT
+      ? "∞"
+      : new Big(maxPrice).toFixed();
   }, [maxPrice]);
 
   const exchangeRate = useMemo(() => {
@@ -178,10 +182,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
 
     return `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`;
   }, [token0, token1, rate, formatNumber]);
-
-  const isDisabled = useMemo(() => {
-    return !rate;
-  }, [rate]);
 
   const isValid = useMemo(() => {
     const min = Number(minPrice);
@@ -208,7 +208,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
           min={SLIDER_MIN}
           max={SLIDER_MAX}
           step={1}
-          disabled={isDisabled}
         />
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
@@ -224,7 +223,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMinPrice(result.minPrice.toString());
               }
             }}
-            disabled={isDisabled}
             aria-invalid={!isValid}
           />
           <MinMaxInput
@@ -240,7 +238,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMaxPrice(result.maxPrice.toString());
               }
             }}
-            disabled={isDisabled}
             aria-invalid={!isValid}
           />
         </div>
