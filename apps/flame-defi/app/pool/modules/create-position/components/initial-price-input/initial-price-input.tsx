@@ -1,24 +1,21 @@
-import type { EvmCurrency } from "@repo/flame-types";
 import {
   Card,
   CardContent,
   CardDescription,
   TokenAmountInput,
 } from "@repo/ui/components";
+import type { CreatePositionInputProps } from "pool/modules/create-position/types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-interface InitialPriceInputProps {
-  rate?: string;
-  token0?: EvmCurrency;
-  token1?: EvmCurrency;
-}
+const UNINITIALIZED_POOL_WARNING =
+  "This pool must be initialized before you can add liquidity. To initialize, enter a starting price for the pool. Then, enter your deposit amount and liquidity price range. Gas fees will be higher than usual due to the initialization transaction.";
 
 export const InitialPriceInput = ({
   rate,
   token0,
   token1,
-}: InitialPriceInputProps) => {
+}: CreatePositionInputProps) => {
   const { formatNumber } = useIntl();
 
   const exchangeRate = useMemo(() => {
@@ -33,12 +30,7 @@ export const InitialPriceInput = ({
     <div className="flex flex-col gap-6">
       <Card variant="accent" className="bg-warning/20">
         <CardContent className="p-4">
-          <CardDescription>
-            This pool must be initialized before you can add liquidity. To
-            initialize, enter a starting price for the pool. Then, enter your
-            liquidity price range and deposit amount. Gas fees will be higher
-            than usual due to the initialization transaction.
-          </CardDescription>
+          <CardDescription>{UNINITIALIZED_POOL_WARNING}</CardDescription>
         </CardContent>
       </Card>
 

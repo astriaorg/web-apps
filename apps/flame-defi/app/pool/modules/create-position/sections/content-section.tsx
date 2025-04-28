@@ -13,7 +13,7 @@ import { TokenAmountInput } from "pool/modules/create-position/components/token-
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { useMemo, useState } from "react";
 
-enum INPUT {
+enum InputId {
   INPUT_0 = "INPUT_0",
   INPUT_1 = "INPUT_1",
 }
@@ -43,7 +43,7 @@ export const ContentSection = () => {
   } = usePageContext();
 
   // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
-  const [currentInput, setCurrentInput] = useState<INPUT>(INPUT.INPUT_0);
+  const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   // Handles the click of the swap button. Instead of swapping state, handle via CSS.
   const [isInverted, setIsInverted] = useState(false);
 
@@ -65,7 +65,7 @@ export const ContentSection = () => {
       };
     }
 
-    if (currentInput === INPUT.INPUT_0 && amount0.value) {
+    if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
         .mul(pool.rateToken1ToToken0)
         .toFixed(token1?.coinDecimals || 0);
@@ -75,7 +75,7 @@ export const ContentSection = () => {
       };
     }
 
-    if (currentInput === INPUT.INPUT_1 && amount1.value) {
+    if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
         .mul(pool.rateToken0ToToken1)
         .toFixed(token0?.coinDecimals || 0);
@@ -147,7 +147,7 @@ export const ContentSection = () => {
                 value={derivedValues.derivedAmount0}
                 onInput={({ value }) => {
                   onInput0({ value });
-                  setCurrentInput(INPUT.INPUT_0);
+                  setCurrentInput(InputId.INPUT_0);
                 }}
                 selectedToken={token0}
                 setSelectedToken={(value) => {
@@ -171,7 +171,7 @@ export const ContentSection = () => {
                 value={derivedValues.derivedAmount1}
                 onInput={({ value }) => {
                   onInput1({ value });
-                  setCurrentInput(INPUT.INPUT_1);
+                  setCurrentInput(InputId.INPUT_1);
                 }}
                 selectedToken={token1}
                 setSelectedToken={(value) => {
@@ -190,7 +190,7 @@ export const ContentSection = () => {
               setSelectedFeeTier(value);
               // If the pool exists, the derived value will replace the empty string.
               // Otherwise, don't persist values from previous edits.
-              if (currentInput === INPUT.INPUT_0) {
+              if (currentInput === InputId.INPUT_0) {
                 onInput1({ value: "" });
               } else {
                 onInput0({ value: "" });

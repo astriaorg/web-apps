@@ -1,8 +1,8 @@
-import type { EvmCurrency } from "@repo/flame-types";
 import { Card, CardContent, Slider } from "@repo/ui/components";
 import Big from "big.js";
 import { TICK_BOUNDARIES } from "pool/constants";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
+import type { CreatePositionInputProps } from "pool/modules/create-position/types";
 import {
   calculatePriceRange,
   calculatePriceToTick,
@@ -18,13 +18,11 @@ const SLIDER_MAX = 100;
 const MIN_PRICE_DEFAULT = 0;
 const MAX_PRICE_DEFAULT = Infinity;
 
-interface PriceRangeProps {
-  rate?: string;
-  token0?: EvmCurrency;
-  token1?: EvmCurrency;
-}
-
-export const PriceRangeInput = ({ rate, token0, token1 }: PriceRangeProps) => {
+export const PriceRangeInput = ({
+  rate,
+  token0,
+  token1,
+}: CreatePositionInputProps) => {
   const { selectedFeeTier } = usePageContext();
   const { formatNumber } = useIntl();
 
