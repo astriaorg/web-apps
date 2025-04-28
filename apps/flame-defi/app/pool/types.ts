@@ -1,5 +1,5 @@
 import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
-import type { Slot0Data } from "features/evm-wallet";
+import type { Slot0 } from "features/evm-wallet";
 import type { Address, Hash } from "viem";
 import type { FeeTier } from "./constants";
 
@@ -166,7 +166,7 @@ export type TxnSuccessProps = {
   txnHash: Hash;
 };
 
-export type PoolWithSlot0Data = Slot0Data & {
+export type PoolWithSlot0 = Slot0 & {
   address: string;
   rateToken0ToToken1: string;
   rateToken1ToToken0: string;

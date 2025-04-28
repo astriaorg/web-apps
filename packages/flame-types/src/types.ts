@@ -5,10 +5,10 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
-import { ChainContract, parseUnits, type Address } from "viem";
-import React from "react";
-import JSBI from "jsbi";
 import Big from "big.js";
+import JSBI from "jsbi";
+import React from "react";
+import { ChainContract, parseUnits, type Address } from "viem";
 
 /**
  * ChainType describes the type of chain.
@@ -436,6 +436,7 @@ export interface AstriaChain extends EvmChainInfo {
     nonfungiblePositionManager: ChainContract;
     poolFactory: ChainContract;
     poolContract: ChainContract;
+    multicall3: ChainContract;
   };
 }
 
