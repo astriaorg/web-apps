@@ -4,7 +4,7 @@ import { useTokenAmountInput } from "@repo/ui/components";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
-import { type Transition } from "motion/react";
+import { motion, type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
@@ -185,41 +185,53 @@ export const ContentSection = () => {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
             {depositType === DepositType.BOTH && (
-              <TokenAmountInput
-                value={derivedValues.derivedAmount0}
-                onInput={({ value }) => {
-                  onInput0({ value });
-                  setCurrentInput(InputId.INPUT_0);
-                }}
-                selectedToken={token0}
-                setSelectedToken={(value) => {
-                  setToken0(value);
-                  onInput0({ value: "" });
-                  onInput1({ value: "" });
-                }}
-                options={optionsToken0}
-                balance={token0Balance}
-              />
+              <motion.div
+                layout
+                transition={TRANSITION}
+                key={isInverted ? "token1" : "token0"}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount0}
+                  onInput={({ value }) => {
+                    onInput0({ value });
+                    setCurrentInput(InputId.INPUT_0);
+                  }}
+                  selectedToken={token0}
+                  setSelectedToken={(value) => {
+                    setToken0(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken0}
+                  balance={token0Balance}
+                />
+              </motion.div>
             )}
             {depositType === DepositType.BOTH && (
               <SwapButton onClick={() => handleSwap()} />
             )}
             {depositType === DepositType.BOTH && (
-              <TokenAmountInput
-                value={derivedValues.derivedAmount1}
-                onInput={({ value }) => {
-                  onInput1({ value });
-                  setCurrentInput(InputId.INPUT_1);
-                }}
-                selectedToken={token1}
-                setSelectedToken={(value) => {
-                  setToken1(value);
-                  onInput0({ value: "" });
-                  onInput1({ value: "" });
-                }}
-                options={optionsToken1}
-                balance={token1Balance}
-              />
+              <motion.div
+                layout
+                transition={TRANSITION}
+                key={isInverted ? "token0" : "token1"}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount1}
+                  onInput={({ value }) => {
+                    onInput1({ value });
+                    setCurrentInput(InputId.INPUT_1);
+                  }}
+                  selectedToken={token1}
+                  setSelectedToken={(value) => {
+                    setToken1(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken1}
+                  balance={token1Balance}
+                />
+              </motion.div>
             )}
           </div>
           <FeeTierSelect
