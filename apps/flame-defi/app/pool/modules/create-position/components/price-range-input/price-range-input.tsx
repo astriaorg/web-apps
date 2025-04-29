@@ -2,41 +2,46 @@ import { Card, CardContent, Slider } from "@repo/ui/components";
 import Big from "big.js";
 import { TICK_BOUNDARIES } from "pool/constants";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import type { CreatePositionInputProps } from "pool/modules/create-position/types";
+import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+  type CreatePositionInputProps,
+} from "pool/modules/create-position/types";
 import {
   calculatePriceRange,
   calculatePriceToTick,
   calculateTickToPrice,
 } from "pool/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { MinMaxInput } from "./min-max-input";
 
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
 
-const MIN_PRICE_DEFAULT = 0;
-const MAX_PRICE_DEFAULT = Infinity;
+interface PriceRangeInputProps extends CreatePositionInputProps {
+  minPrice: string;
+  maxPrice: string;
+  setMinPrice: (value: string) => void;
+  setMaxPrice: (value: string) => void;
+}
 
 export const PriceRangeInput = ({
   rate,
   token0,
   token1,
-}: CreatePositionInputProps) => {
+  minPrice,
+  maxPrice,
+  setMinPrice,
+  setMaxPrice,
+}: PriceRangeInputProps) => {
   const { selectedFeeTier } = usePageContext();
   const { formatNumber } = useIntl();
-
-  const [minPrice, setMinPrice] = useState<string>(
-    MIN_PRICE_DEFAULT.toString(),
-  );
-  const [maxPrice, setMaxPrice] = useState<string>(
-    MAX_PRICE_DEFAULT.toString(),
-  );
 
   const handleReset = useCallback(() => {
     setMinPrice(MIN_PRICE_DEFAULT.toString());
     setMaxPrice(MAX_PRICE_DEFAULT.toString());
-  }, []);
+  }, [setMinPrice, setMaxPrice]);
 
   useEffect(() => {
     // When the rate changes, i.e. user swaps inputs, reset the slider.
@@ -130,7 +135,7 @@ export const PriceRangeInput = ({
       setMinPrice(minPrice.toString());
       setMaxPrice(maxPrice.toString());
     },
-    [sliderToPrice],
+    [sliderToPrice, setMinPrice, setMaxPrice],
   );
 
   const getCalculatedPriceRange = useCallback(
