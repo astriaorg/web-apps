@@ -208,7 +208,7 @@ export const ContentSection = () => {
               <motion.div
                 layout
                 transition={TRANSITION}
-                key={isInverted ? "token1" : "token0"}
+                key={isInverted ? InputId.INPUT_1 : InputId.INPUT_0}
               >
                 <TokenAmountInput
                   value={derivedValues.derivedAmount0}
@@ -236,7 +236,7 @@ export const ContentSection = () => {
               <motion.div
                 layout
                 transition={TRANSITION}
-                key={isInverted ? "token0" : "token1"}
+                key={isInverted ? InputId.INPUT_0 : InputId.INPUT_1}
               >
                 <TokenAmountInput
                   value={derivedValues.derivedAmount1}
