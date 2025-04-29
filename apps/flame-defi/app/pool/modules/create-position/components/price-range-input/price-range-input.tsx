@@ -1,4 +1,5 @@
 import { Card, CardContent, Slider } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import Big from "big.js";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import {
@@ -207,7 +208,7 @@ export const PriceRangeInput = ({
   return (
     <Card variant="secondary" className="w-full">
       <CardContent>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <span>Price Range</span>
           <span
             className="text-xs text-typography-subdued hover:cursor-pointer"
@@ -222,6 +223,8 @@ export const PriceRangeInput = ({
           min={SLIDER_MIN}
           max={SLIDER_MAX}
           step={1}
+          disabled={!rate}
+          className={cn("mt-2", !rate && "hidden mt-0")}
         />
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
