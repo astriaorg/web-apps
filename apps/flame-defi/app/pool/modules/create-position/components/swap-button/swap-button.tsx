@@ -55,8 +55,10 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
       <div className="w-full h-4 bg-background-default" />
       <CornerMask className="right-0 scale-x-[-1]" />
       <Button
-        size="icon"
-        className={cn("absolute rounded-full [&_svg]:size-6", className)}
+        className={cn(
+          "absolute rounded-full w-10 h-10 [&_svg]:size-6",
+          className,
+        )}
         onClick={handleClick}
         {...props}
       >

@@ -66,7 +66,7 @@ export const useEvmCurrencyBalance = (
             chainId,
           });
 
-          if (!nativeBalance?.value) {
+          if (!nativeBalance.value) {
             return null;
           }
 

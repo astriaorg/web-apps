@@ -1,6 +1,6 @@
 "use client";
 
-import { useTokenAmountInput } from "@repo/ui/components";
+import { Button, useTokenAmountInput } from "@repo/ui/components";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
@@ -281,6 +281,8 @@ export const ContentSection = () => {
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
           />
+
+          <Button>Connect Wallet</Button>
         </div>
       </div>
     </div>
