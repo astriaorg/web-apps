@@ -42,7 +42,7 @@ export const PriceRangeInput = ({
   }, [setMinPrice, setMaxPrice]);
 
   useEffect(() => {
-    // When the rate changes, i.e. user swaps inputs, reset the slider.
+    // When the rate changes, i.e. user swaps inputs or changes fee tier, reset the slider.
     handleReset();
   }, [rate, handleReset]);
 

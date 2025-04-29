@@ -16,7 +16,7 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
@@ -57,7 +57,6 @@ export const ContentSection = () => {
   const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   const [isInverted, setIsInverted] = useState(false);
 
-  // TODO: Use validation hook.
   const [minPrice, setMinPrice] = useState<string>(
     MIN_PRICE_DEFAULT.toString(),
   );
@@ -76,6 +75,10 @@ export const ContentSection = () => {
     return pools?.[selectedFeeTier];
   }, [pools, selectedFeeTier]);
 
+  const rate = useMemo(() => {
+    return isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0;
+  }, [isInverted, pool]);
+
   const derivedValues = useMemo(() => {
     if (!pool || isPending) {
       // When there's no pool, the user can enter any value in both inputs to initialize the position.
@@ -85,11 +88,9 @@ export const ContentSection = () => {
       };
     }
 
-    const rate = isInverted ? pool.rateToken0ToToken1 : pool.rateToken1ToToken0;
-
     if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
-        .mul(rate)
+        .mul(rate as string)
         .toFixed(token1?.coinDecimals || 0);
       return {
         derivedAmount0: amount0.value,
@@ -99,7 +100,7 @@ export const ContentSection = () => {
 
     if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
-        .mul(new Big(1).div(rate))
+        .mul(new Big(1).div(rate as string))
         .toFixed(token0?.coinDecimals || 0);
       return {
         derivedAmount0: formatNumberWithoutTrailingZeros(derivedAmount0),
@@ -110,13 +111,13 @@ export const ContentSection = () => {
     return { derivedAmount0: "", derivedAmount1: "" };
   }, [
     pool,
+    rate,
     isPending,
     currentInput,
     amount0.value,
     amount1.value,
     token0,
     token1,
-    isInverted,
   ]);
 
   const optionsToken0 = useMemo(() => {
@@ -135,20 +136,6 @@ export const ContentSection = () => {
     );
   }, [chain.currencies, token0]);
 
-  const { amount: initialPrice, onInput: setInitialPrice } =
-    useTokenAmountInput({
-      token: token0
-        ? {
-            symbol: token0?.coinDenom,
-            decimals: token0?.coinDecimals,
-          }
-        : undefined,
-    });
-
-  const isPoolInitialized = useMemo(() => {
-    return !isPending && pool;
-  }, [isPending, pool]);
-
   const handleSwap = useCallback(() => {
     setIsInverted((value) => !value);
 
@@ -165,13 +152,48 @@ export const ContentSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentInput, amount0.value, amount1.value, token0, token1]);
 
+  const { amount: initialPrice, onInput: setInitialPrice } =
+    useTokenAmountInput({
+      token: token0
+        ? {
+            symbol: token0?.coinDenom,
+            decimals: token0?.coinDecimals,
+          }
+        : undefined,
+    });
+
+  const isPoolInitialized = useMemo(() => {
+    return !isPending && pool;
+  }, [isPending, pool]);
+
+  // Handle single asset deposit when initial price exceeds the min or max price.
+  useEffect(() => {
+    if (minPrice === "" || maxPrice === "") {
+      return;
+    }
+
+    if (isPoolInitialized || !initialPrice.validation.isValid) {
+      setDepositType(DepositType.BOTH);
+      return;
+    }
+
+    if (new Big(initialPrice.value).lt(minPrice)) {
+      setDepositType(DepositType.TOKEN_1_ONLY);
+    } else if (
+      maxPrice !== MAX_PRICE_DEFAULT.toString() &&
+      new Big(initialPrice.value).gt(maxPrice)
+    ) {
+      setDepositType(DepositType.TOKEN_0_ONLY);
+    } else {
+      setDepositType(DepositType.BOTH);
+    }
+  }, [initialPrice, isPoolInitialized, minPrice, maxPrice]);
+
   return (
     <div className="flex flex-col gap-6">
       {!isPoolInitialized && (
         <InitialPriceInput
-          rate={
-            isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0
-          }
+          rate={rate}
           value={initialPrice.value}
           onInput={(event) =>
             setInitialPrice({ value: event.currentTarget.value })
@@ -183,7 +205,8 @@ export const ContentSection = () => {
         {/* Left side. */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
-            {depositType === DepositType.BOTH && (
+            {(depositType === DepositType.BOTH ||
+              depositType === DepositType.TOKEN_0_ONLY) && (
               <motion.div
                 layout
                 transition={TRANSITION}
@@ -209,7 +232,8 @@ export const ContentSection = () => {
             {depositType === DepositType.BOTH && (
               <SwapButton onClick={() => handleSwap()} />
             )}
-            {depositType === DepositType.BOTH && (
+            {(depositType === DepositType.BOTH ||
+              depositType === DepositType.TOKEN_1_ONLY) && (
               <motion.div
                 layout
                 transition={TRANSITION}
@@ -251,9 +275,7 @@ export const ContentSection = () => {
         {/* Right side. */}
         <div className="flex flex-col gap-4">
           <PriceRangeInput
-            rate={
-              isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0
-            }
+            rate={rate}
             minPrice={minPrice}
             maxPrice={maxPrice}
             setMinPrice={setMinPrice}
