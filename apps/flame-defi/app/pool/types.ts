@@ -53,6 +53,12 @@ export const TICK_BOUNDARIES = {
   MIN: -887272,
 } as const;
 
+export enum DepositType {
+  TOKEN_0_ONLY = "TOKEN_0_ONLY",
+  TOKEN_1_ONLY = "TOKEN_1_ONLY",
+  BOTH = "BOTH",
+}
+
 // TODO: Remove these once we clean up existing pages.
 
 export enum POOL_INPUT_ID {

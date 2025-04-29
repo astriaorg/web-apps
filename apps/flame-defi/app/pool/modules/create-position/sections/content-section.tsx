@@ -16,17 +16,13 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
+import { DepositType } from "pool/types";
+import { calculateDepositType } from "pool/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
   INPUT_1 = "INPUT_1",
-}
-
-enum DepositType {
-  TOKEN_0_ONLY = "TOKEN_0_ONLY",
-  TOKEN_1_ONLY = "TOKEN_1_ONLY",
-  BOTH = "BOTH",
 }
 
 const TRANSITION: Transition = {
@@ -166,25 +162,26 @@ export const ContentSection = () => {
 
   // Handle single asset deposit when initial price exceeds the min or max price.
   useEffect(() => {
-    if (minPrice === "" || maxPrice === "") {
-      return;
-    }
-
-    if (!!pool || !initialPrice.validation.isValid) {
-      setDepositType(DepositType.BOTH);
-      return;
-    }
-
-    if (new Big(initialPrice.value).lt(minPrice)) {
-      setDepositType(DepositType.TOKEN_1_ONLY);
-    } else if (
-      maxPrice !== MAX_PRICE_DEFAULT.toString() &&
-      new Big(initialPrice.value).gt(maxPrice)
+    if (
+      minPrice === "" ||
+      maxPrice === "" ||
+      !initialPrice.validation.isValid
     ) {
-      setDepositType(DepositType.TOKEN_0_ONLY);
-    } else {
-      setDepositType(DepositType.BOTH);
+      return;
     }
+
+    if (pool) {
+      setDepositType(DepositType.BOTH);
+      return;
+    }
+
+    const depositType = calculateDepositType({
+      currentPrice: Number(initialPrice.value),
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+    });
+
+    setDepositType(depositType);
   }, [initialPrice, minPrice, maxPrice, pool]);
 
   return (
