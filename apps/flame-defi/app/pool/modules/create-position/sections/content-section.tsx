@@ -49,6 +49,8 @@ export const ContentSection = () => {
     setToken1,
     token0Balance,
     token1Balance,
+    isLoadingToken0Balance,
+    isLoadingToken1Balance,
     selectedFeeTier,
     setSelectedFeeTier,
   } = usePageContext();
@@ -162,17 +164,13 @@ export const ContentSection = () => {
         : undefined,
     });
 
-  const isPoolInitialized = useMemo(() => {
-    return !isPending && pool;
-  }, [isPending, pool]);
-
   // Handle single asset deposit when initial price exceeds the min or max price.
   useEffect(() => {
     if (minPrice === "" || maxPrice === "") {
       return;
     }
 
-    if (isPoolInitialized || !initialPrice.validation.isValid) {
+    if (!!pool || !initialPrice.validation.isValid) {
       setDepositType(DepositType.BOTH);
       return;
     }
@@ -187,11 +185,11 @@ export const ContentSection = () => {
     } else {
       setDepositType(DepositType.BOTH);
     }
-  }, [initialPrice, isPoolInitialized, minPrice, maxPrice]);
+  }, [initialPrice, minPrice, maxPrice, pool]);
 
   return (
     <div className="flex flex-col gap-6">
-      {!isPoolInitialized && (
+      {!isPending && !pool && (
         <InitialPriceInput
           rate={rate}
           value={initialPrice.value}
@@ -226,6 +224,7 @@ export const ContentSection = () => {
                   }}
                   options={optionsToken0}
                   balance={token0Balance}
+                  isLoading={isLoadingToken0Balance}
                 />
               </motion.div>
             )}
@@ -253,6 +252,7 @@ export const ContentSection = () => {
                   }}
                   options={optionsToken1}
                   balance={token1Balance}
+                  isLoading={isLoadingToken1Balance}
                 />
               </motion.div>
             )}

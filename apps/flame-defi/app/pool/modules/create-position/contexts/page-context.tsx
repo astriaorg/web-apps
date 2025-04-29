@@ -20,6 +20,8 @@ export interface PageContextProps extends PropsWithChildren {
   token1Balance: { symbol: string; value: string } | null;
   setToken0: (value?: EvmCurrency) => void;
   setToken1: (value?: EvmCurrency) => void;
+  isLoadingToken0Balance: boolean;
+  isLoadingToken1Balance: boolean;
   selectedFeeTier: FeeTier;
   setSelectedFeeTier: (value: FeeTier) => void;
 }
@@ -42,8 +44,10 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     chain.currencies[3],
   );
 
-  const { balance: token0Balance } = useEvmCurrencyBalance(token0);
-  const { balance: token1Balance } = useEvmCurrencyBalance(token1);
+  const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
+    useEvmCurrencyBalance(token0);
+  const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
+    useEvmCurrencyBalance(token1);
 
   // TODO: Figure out why validation is always false.
   const {
@@ -89,6 +93,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         setToken1,
         token0Balance,
         token1Balance,
+        isLoadingToken0Balance,
+        isLoadingToken1Balance,
         selectedFeeTier,
         setSelectedFeeTier,
       }}
