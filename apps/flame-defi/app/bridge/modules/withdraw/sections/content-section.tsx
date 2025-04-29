@@ -7,7 +7,7 @@ import { formatUnits } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
+import { AnimatedArrowSpacer } from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
@@ -15,7 +15,9 @@ import { useConfig } from "config";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";
 
+import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
+import { SubmitButton } from "bridge/components/submit-button";
 import { ROUTES } from "bridge/constants/routes";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
@@ -223,11 +225,6 @@ export const ContentSection = () => {
     ],
   );
 
-  // Form handling
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
   const checkIsFormValid = useCallback(
     (addressInput: string | null, amountInput: string) => {
       // check that we have an address and it is correct format
@@ -306,13 +303,12 @@ export const ContentSection = () => {
     sourceConnection.currency?.coinDenom,
   ]);
 
-  const destinationChainNativeToken = useMemo(() => {
-    return destinationConnection.chain?.currencies.find(
-      (currency) => currency.isNative,
-    );
-  }, [destinationConnection]);
-
   const ibcWithdrawFeeDisplay = useMemo(() => {
+    const destinationChainNativeToken =
+      destinationConnection.chain?.currencies.find(
+        (currency) => currency.isNative,
+      );
+
     if (
       !destinationChainNativeToken ||
       !destinationConnection.currency ||
@@ -329,13 +325,12 @@ export const ContentSection = () => {
       destinationChainNativeToken.coinDecimals,
     );
     return `${fee} ${destinationChainNativeToken.coinDenom}`;
-  }, [destinationChainNativeToken, destinationConnection.currency]);
+  }, [destinationConnection.chain?.currencies, destinationConnection.currency]);
 
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
         <div className="flex justify-end mb-4">
-          {/* Wallet Connection Button */}
           <ManageWalletsButton />
         </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
@@ -536,43 +531,19 @@ export const ContentSection = () => {
             <div className="w-full border-t border-grey-dark my-4" />
           </div>
 
-          <div className="mb-4">
-            <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">Amount</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  Amount
-                </div>
-                <div className="grow">
-                  <input
-                    className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white text-[20px]"
-                    type="text"
-                    placeholder="0.00"
-                    onChange={updateAmount}
-                    value={amount}
-                  />
-                </div>
-              </div>
-              {!isAmountValid && hasTouchedForm && (
-                <div className="text-status-danger mt-2">
-                  Amount must be a number greater than 0
-                </div>
-              )}
-            </div>
-          </div>
+          <AmountInput
+            amount={amount}
+            setAmount={setAmount}
+            isAmountValid={isAmountValid}
+            hasTouchedForm={hasTouchedForm}
+          />
 
-          <div className="flex flex-col gap-3 mt-8">
-            <div className="w-full">
-              <Button
-                variant="gradient"
-                onClick={handleWithdrawClick}
-                disabled={isWithdrawDisabled || !sourceConnection.address}
-                className="w-full"
-              >
-                {isLoading ? "Processing..." : "Withdraw"}
-              </Button>
-            </div>
-          </div>
+          <SubmitButton
+            onClick={handleWithdrawClick}
+            isLoading={isLoading}
+            isDisabled={isWithdrawDisabled || !sourceConnection.address}
+            buttonText="Withdraw"
+          />
         </div>
       </div>
     </div>

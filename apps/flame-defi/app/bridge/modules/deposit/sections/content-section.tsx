@@ -6,9 +6,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { isAddress } from "viem";
 import { useSwitchChain } from "wagmi";
 
-// import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
+import { AnimatedArrowSpacer } from "@repo/ui/components";
 import {
   ArrowDownIcon,
   BaseIcon,
@@ -23,7 +22,9 @@ import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";
 
+import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
+import { SubmitButton } from "bridge/components/submit-button";
 import { ROUTES } from "bridge/constants/routes";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
@@ -254,11 +255,6 @@ export const ContentSection = () => {
     ],
   );
 
-  // Form handling
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
   const checkIsFormValid = useCallback(
     (addressInput: string | null, amountInput: string) => {
       // check that we have an address and it is correct format
@@ -344,7 +340,6 @@ export const ContentSection = () => {
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
         <div className="flex justify-end mb-4">
-          {/* Wallet Connection Button */}
           <ManageWalletsButton />
         </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
@@ -355,11 +350,6 @@ export const ContentSection = () => {
                 <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
                   From
                 </div>
-                {/*{Boolean(coinbaseOnrampBuyUrl) && (*/}
-                {/*  <div>*/}
-                {/*    <FundButton fundingUrl={coinbaseOnrampBuyUrl} />*/}
-                {/*  </div>*/}
-                {/*)}*/}
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -566,47 +556,23 @@ export const ContentSection = () => {
             <div className="border-t border-grey-dark my-4 w-full" />
           </div>
 
-          <div className="mb-4">
-            <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">Amount</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  Amount
-                </div>
-                <div className="grow">
-                  <input
-                    className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white text-[20px]"
-                    type="text"
-                    placeholder="0.00"
-                    onChange={updateAmount}
-                    value={amount}
-                  />
-                </div>
-              </div>
-            </div>
-            {!isAmountValid && hasTouchedForm && (
-              <div className="text-status-danger mt-2">
-                Amount must be a number greater than 0
-              </div>
-            )}
-          </div>
+          <AmountInput
+            amount={amount}
+            setAmount={setAmount}
+            isAmountValid={isAmountValid}
+            hasTouchedForm={hasTouchedForm}
+          />
 
-          <div className="flex flex-col gap-3 mt-8">
-            <div className="w-full">
-              <Button
-                variant="gradient"
-                onClick={handleDepositClick}
-                disabled={
-                  isDepositDisabled ||
-                  !sourceConnection.address ||
-                  !destinationConnection.address
-                }
-                className="w-full"
-              >
-                {isLoading ? "Processing..." : "Deposit"}
-              </Button>
-            </div>
-          </div>
+          <SubmitButton
+            onClick={handleDepositClick}
+            isLoading={isLoading}
+            isDisabled={
+              isDepositDisabled ||
+              !sourceConnection.address ||
+              !destinationConnection.address
+            }
+            buttonText="Deposit"
+          />
         </div>
       </div>
     </div>
