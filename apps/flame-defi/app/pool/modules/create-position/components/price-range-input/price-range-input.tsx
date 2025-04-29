@@ -1,12 +1,12 @@
 import { Card, CardContent, Slider } from "@repo/ui/components";
 import Big from "big.js";
-import { TICK_BOUNDARIES } from "pool/constants";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
   type CreatePositionInputProps,
 } from "pool/modules/create-position/types";
+import { TICK_BOUNDARIES } from "pool/types";
 import {
   calculatePriceRange,
   calculatePriceToTick,

@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { FEE_TIER_TICK_SPACING, type FeeTier } from "pool/constants";
+import { FEE_TIER_TICK_SPACING, type FeeTier } from "pool/types";
 
 /**
  * Implements the calculation to get the exchange rate of the pool.
