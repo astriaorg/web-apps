@@ -151,7 +151,6 @@ export const ContentSection = () => {
 
   const handleSwap = useCallback(() => {
     setIsInverted((value) => !value);
-    console.log(amount0.value, amount1.value);
 
     setToken0(token1);
     setToken1(token0);
