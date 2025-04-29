@@ -12,9 +12,9 @@ import { useAstriaWallet } from "features/evm-wallet";
 import { useAccount } from "wagmi";
 
 /**
- * Button with dropdown to connect to multiple wallets.
+ * Button with dropdown to connect to Astria wallet.
  */
-export const ConnectWalletsButton = () => {
+export const ConnectAstriaWalletButton = () => {
   const { chain } = useAstriaChainData();
   const account = useAccount();
   const {
