@@ -14,18 +14,14 @@ import { BridgeConnectionsModal } from "bridge/components/bridge-connections-mod
  * with a dynamic label depending on connection statuses.
  */
 export const ManageWalletsButton: React.FC = () => {
-  const {cosmosAccountAddress} = useCosmosWallet();
-  const { isConnected: isEvmWalletConnected } = useAccount()
+  const { cosmosAccountAddress } = useCosmosWallet();
+  const { isConnected: isEvmWalletConnected } = useAccount();
 
   const hasConnections = cosmosAccountAddress || isEvmWalletConnected;
   const buttonText = hasConnections ? "Wallets" : "Connect Wallet";
   return (
     <BridgeConnectionsModal>
-      <Button 
-        variant="secondary" 
-        size="sm"
-        className="flex items-center gap-2"
-      >
+      <Button variant="secondary" size="sm" className="flex items-center gap-2">
         <WalletIcon size={16} />
         <span>{buttonText}</span>
       </Button>

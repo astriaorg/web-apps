@@ -230,13 +230,13 @@ export const ContentSection = () => {
 
   const checkIsFormValid = useCallback(
     (addressInput: string | null, amountInput: string) => {
-      if (addressInput === null) {
+      // check that we have an address and it is correct format
+      if (addressInput === null || addressInput.length < 0) {
         setIsRecipientAddressValid(false);
-        return;
+      } else {
+        const addressValid = addressInput.length > 0;
+        setIsRecipientAddressValid(addressValid);
       }
-
-      const addressValid = addressInput.length > 0;
-      setIsRecipientAddressValid(addressValid);
 
       const amount = new Big(amountInput || "0");
       const amountValid = amount.gt(0);
@@ -340,7 +340,6 @@ export const ContentSection = () => {
         </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div>
-            
             <div className="flex flex-col">
               <div className="mb-2 sm:hidden">From</div>
               <div className="flex flex-col sm:flex-row sm:items-center">
@@ -373,7 +372,6 @@ export const ContentSection = () => {
                 </div>
               </div>
 
-
               {/* Source wallet info */}
               {sourceConnection.address && (
                 <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
@@ -403,7 +401,7 @@ export const ContentSection = () => {
             <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
               <Link href={ROUTES.DEPOSIT}>
                 <div>
-                  <ArrowDownIcon size={32}/>
+                  <ArrowDownIcon size={32} />
                 </div>
               </Link>
               <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />

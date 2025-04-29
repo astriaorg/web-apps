@@ -261,8 +261,12 @@ export const ContentSection = () => {
 
   const checkIsFormValid = useCallback(
     (addressInput: string | null, amountInput: string) => {
-      // check that we have an address and it is correct EVM address format
-      if (addressInput === null || !isAddress(addressInput) || addressInput.length < 0) {
+      // check that we have an address and it is correct format
+      if (
+        addressInput === null ||
+        !isAddress(addressInput) ||
+        addressInput.length < 0
+      ) {
         setIsRecipientAddressValid(false);
       } else {
         const addressValid = addressInput.length > 0;
@@ -272,7 +276,6 @@ export const ContentSection = () => {
       const amount = new Big(amountInput || "0");
       const amountValid = amount.gt(0);
       setIsAmountValid(amountValid);
-
     },
     [setIsAmountValid, setIsRecipientAddressValid],
   );
@@ -346,7 +349,6 @@ export const ContentSection = () => {
         </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div>
-
             <div className="flex flex-col">
               <div className="mb-2 sm:hidden">From</div>
               <div className="flex flex-col sm:flex-row sm:items-center">
@@ -383,7 +385,6 @@ export const ContentSection = () => {
                   )}
                 </div>
               </div>
-
 
               {/* Source wallet info - unified display regardless of chain type */}
               {sourceConnection.address && (
@@ -558,7 +559,6 @@ export const ContentSection = () => {
                   </div>
                 </div>
               )}
-              
             </div>
           </div>
 
@@ -596,7 +596,11 @@ export const ContentSection = () => {
               <Button
                 variant="gradient"
                 onClick={handleDepositClick}
-                disabled={isDepositDisabled || !sourceConnection.address || !destinationConnection.address}
+                disabled={
+                  isDepositDisabled ||
+                  !sourceConnection.address ||
+                  !destinationConnection.address
+                }
                 className="w-full"
               >
                 {isLoading ? "Processing..." : "Deposit"}
