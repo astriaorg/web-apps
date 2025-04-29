@@ -16,7 +16,7 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
@@ -58,6 +58,7 @@ export const ContentSection = () => {
   // Handles the click of the swap button. Instead of swapping state, handle via CSS.
   const [isInverted, setIsInverted] = useState(false);
 
+  // TODO: Use validation hook.
   const [minPrice, setMinPrice] = useState<string>(
     MIN_PRICE_DEFAULT.toString(),
   );
@@ -160,21 +161,6 @@ export const ContentSection = () => {
     return !isPending && pool;
   }, [isPending, pool]);
 
-  useEffect(() => {
-    if (isPoolInitialized || !initialPrice.validation.isValid) {
-      setDepositType(DepositType.BOTH);
-      return;
-    }
-
-    if (new Big(initialPrice.value).lt(minPrice)) {
-      setDepositType(DepositType.TOKEN_1_ONLY);
-    } else if (new Big(initialPrice.value).gt(maxPrice)) {
-      setDepositType(DepositType.TOKEN_0_ONLY);
-    } else {
-      setDepositType(DepositType.BOTH);
-    }
-  }, [initialPrice, isPoolInitialized, minPrice, maxPrice]);
-
   return (
     <div className="flex flex-col gap-6">
       {!isPoolInitialized && (
@@ -191,32 +177,32 @@ export const ContentSection = () => {
         {/* Left side. */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
-            {depositType === DepositType.BOTH ||
+            {(depositType === DepositType.BOTH ||
               (depositType === DepositType.TOKEN_0_ONLY &&
                 token0?.erc20ContractAddress ===
-                  poolState.token0?.erc20ContractAddress && (
-                  <motion.div
-                    layout
-                    style={{ order: isInverted ? 2 : 0 }}
-                    transition={TRANSITION}
-                  >
-                    <TokenAmountInput
-                      value={derivedValues.derivedAmount0}
-                      onInput={({ value }) => {
-                        onInput0({ value });
-                        setCurrentInput(InputId.INPUT_0);
-                      }}
-                      selectedToken={token0}
-                      setSelectedToken={(value) => {
-                        setToken0(value);
-                        onInput0({ value: "" });
-                        onInput1({ value: "" });
-                      }}
-                      options={optionsToken0}
-                      balance={token0Balance}
-                    />
-                  </motion.div>
-                ))}
+                  poolState.token0?.erc20ContractAddress)) && (
+              <motion.div
+                layout
+                style={{ order: isInverted ? 2 : 0 }}
+                transition={TRANSITION}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount0}
+                  onInput={({ value }) => {
+                    onInput0({ value });
+                    setCurrentInput(InputId.INPUT_0);
+                  }}
+                  selectedToken={token0}
+                  setSelectedToken={(value) => {
+                    setToken0(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken0}
+                  balance={token0Balance}
+                />
+              </motion.div>
+            )}
             {depositType === DepositType.BOTH && (
               <motion.div
                 style={{
@@ -226,32 +212,32 @@ export const ContentSection = () => {
                 <SwapButton onClick={() => setIsInverted((value) => !value)} />
               </motion.div>
             )}
-            {depositType === DepositType.BOTH ||
+            {(depositType === DepositType.BOTH ||
               (depositType === DepositType.TOKEN_1_ONLY &&
                 token1?.erc20ContractAddress ===
-                  poolState.token1?.erc20ContractAddress && (
-                  <motion.div
-                    layout
-                    style={{ order: isInverted ? 0 : 2 }}
-                    transition={TRANSITION}
-                  >
-                    <TokenAmountInput
-                      value={derivedValues.derivedAmount1}
-                      onInput={({ value }) => {
-                        onInput1({ value });
-                        setCurrentInput(InputId.INPUT_1);
-                      }}
-                      selectedToken={token1}
-                      setSelectedToken={(value) => {
-                        setToken1(value);
-                        onInput0({ value: "" });
-                        onInput1({ value: "" });
-                      }}
-                      options={optionsToken1}
-                      balance={token1Balance}
-                    />
-                  </motion.div>
-                ))}
+                  poolState.token1?.erc20ContractAddress)) && (
+              <motion.div
+                layout
+                style={{ order: isInverted ? 0 : 2 }}
+                transition={TRANSITION}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount1}
+                  onInput={({ value }) => {
+                    onInput1({ value });
+                    setCurrentInput(InputId.INPUT_1);
+                  }}
+                  selectedToken={token1}
+                  setSelectedToken={(value) => {
+                    setToken1(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken1}
+                  balance={token1Balance}
+                />
+              </motion.div>
+            )}
           </div>
           <FeeTierSelect
             value={selectedFeeTier}
