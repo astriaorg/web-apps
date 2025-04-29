@@ -18,6 +18,7 @@ import { MinMaxInput } from "./min-max-input";
 
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
+const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
 
 interface PriceRangeInputProps extends CreatePositionInputProps {
   minPrice: string;
@@ -61,14 +62,20 @@ export const PriceRangeInput = ({
       }
 
       // Calculate the range of ticks based on the current tick.
-      // We want to go from MIN_TICK to MAX_TICK, but centered around the current tick.
+      // We want to exponentially center the range from MIN_TICK to MAX_TICK around the current tick, providing more granular control closer to the current price.
       const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const maxOffset = tickRange / 2;
 
-      // Normalize the slider value to a range of [-0.5, 0.5].
-      const normalizedValue = (value - 50) / 100;
+      // Normalize slider value to [-1, 1]
+      const normalizedValue = (value - SLIDER_MAX / 2) / (SLIDER_MAX / 2);
 
-      // Calculate the tick offset from the current tick.
-      const tickOffset = normalizedValue * tickRange;
+      // Apply exponential scaling.
+      const scaledValue =
+        Math.sign(normalizedValue) *
+        Math.pow(Math.abs(normalizedValue), SLIDER_EXPONENT);
+
+      // Scale to the tick offset range.
+      const tickOffset = scaledValue * maxOffset;
 
       // Calculate the new tick, ensuring it stays within the bounds.
       const newTick = Math.max(
@@ -89,25 +96,31 @@ export const PriceRangeInput = ({
         price: Number(rate),
       });
 
-      if (price <= 0) {
+      if (price <= MIN_PRICE_DEFAULT) {
         return SLIDER_MIN;
       }
 
-      if (price >= Infinity) {
+      if (price >= MAX_PRICE_DEFAULT) {
         return SLIDER_MAX;
       }
 
       const tick = calculatePriceToTick({ price });
       const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const maxOffset = tickRange / 2;
 
-      // Calculate the tick offset from the current tick.
       const tickOffset = tick - currentTick;
 
-      // Normalize the tick offset to a range of [-0.5, 0.5].
-      const normalizedOffset = tickOffset / tickRange;
+      // Normalize the tick offset to the [-1, 1] range.
+      const normalizedOffset = tickOffset / maxOffset;
 
-      // Map the normalized offset to the slider range [0, 100].
-      const sliderValue = 50 + normalizedOffset * 100;
+      // Invert the exponential scaling.
+      const invertedScaledOffset =
+        Math.sign(normalizedOffset) *
+        Math.pow(Math.abs(normalizedOffset), 1 / SLIDER_EXPONENT);
+
+      // Map the normalized offset to the slider range [0, SLIDER_MAX].
+      const sliderValue =
+        SLIDER_MAX / 2 + invertedScaledOffset * (SLIDER_MAX / 2);
 
       return Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, sliderValue));
     },
