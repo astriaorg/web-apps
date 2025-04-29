@@ -1,20 +1,22 @@
 "use client";
 
 import Big from "big.js";
+import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
-import { ArrowUpDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
+import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
 import { useConfig } from "config";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";
 
-import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
+import { ROUTES } from "bridge/constants/routes";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
@@ -332,8 +334,13 @@ export const ContentSection = () => {
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
+        <div className="flex justify-end mb-4">
+          {/* Wallet Connection Button */}
+          <ManageWalletsButton />
+        </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
-          <div className="mb-4">
+          <div>
+            
             <div className="flex flex-col">
               <div className="mb-2 sm:hidden">From</div>
               <div className="flex flex-col sm:flex-row sm:items-center">
@@ -343,7 +350,7 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Select Astria chain..."
+                      placeholder="Select chain..."
                       options={sourceChainOptions}
                       onSelect={connectSource}
                       valueOverride={sourceChainOption}
@@ -365,6 +372,7 @@ export const ContentSection = () => {
                   )}
                 </div>
               </div>
+
 
               {/* Source wallet info */}
               {sourceConnection.address && (
@@ -393,9 +401,11 @@ export const ContentSection = () => {
             <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
             <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
-              <div>
-                <ArrowUpDownIcon size={32} />
-              </div>
+              <Link href={ROUTES.DEPOSIT}>
+                <div>
+                  <ArrowDownIcon size={32}/>
+                </div>
+              </Link>
               <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
             </div>
           )}
@@ -553,20 +563,17 @@ export const ContentSection = () => {
             </div>
           </div>
 
-          <div className="mt-4">
-            {!sourceConnection.address ? (
-              <BridgeConnectionsModal>
-                <Button variant="gradient">Connect Wallet</Button>
-              </BridgeConnectionsModal>
-            ) : (
+          <div className="flex flex-col gap-3 mt-8">
+            <div className="w-full">
               <Button
                 variant="gradient"
                 onClick={handleWithdrawClick}
-                disabled={isWithdrawDisabled}
+                disabled={isWithdrawDisabled || !sourceConnection.address}
+                className="w-full"
               >
                 {isLoading ? "Processing..." : "Withdraw"}
               </Button>
-            )}
+            </div>
           </div>
         </div>
       </div>

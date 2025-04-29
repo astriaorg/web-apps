@@ -123,7 +123,7 @@ export function useBridgeConnections(): BridgeConnections {
           }));
         }
         // if they select astria as source and destination is an evm chain,
-        // keep the address but disconnect the wallet
+        // keep the address but set isConnected false
         if (
           chain?.chainType === ChainType.ASTRIA &&
           destinationConnection.chain?.chainType === ChainType.EVM
