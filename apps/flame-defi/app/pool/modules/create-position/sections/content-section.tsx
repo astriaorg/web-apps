@@ -4,7 +4,7 @@ import { useTokenAmountInput } from "@repo/ui/components";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
-import { motion, type Transition } from "motion/react";
+import { type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
@@ -16,7 +16,7 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
@@ -55,7 +55,6 @@ export const ContentSection = () => {
 
   // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
   const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
-  // Handles the click of the swap button. Instead of swapping state, handle via CSS.
   const [isInverted, setIsInverted] = useState(false);
 
   // TODO: Use validation hook.
@@ -86,9 +85,11 @@ export const ContentSection = () => {
       };
     }
 
+    const rate = isInverted ? pool.rateToken0ToToken1 : pool.rateToken1ToToken0;
+
     if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
-        .mul(pool.rateToken1ToToken0)
+        .mul(rate)
         .toFixed(token1?.coinDecimals || 0);
       return {
         derivedAmount0: amount0.value,
@@ -98,7 +99,7 @@ export const ContentSection = () => {
 
     if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
-        .mul(pool.rateToken0ToToken1)
+        .mul(new Big(1).div(rate))
         .toFixed(token0?.coinDecimals || 0);
       return {
         derivedAmount0: formatNumberWithoutTrailingZeros(derivedAmount0),
@@ -115,6 +116,7 @@ export const ContentSection = () => {
     amount1.value,
     token0,
     token1,
+    isInverted,
   ]);
 
   const optionsToken0 = useMemo(() => {
@@ -133,26 +135,12 @@ export const ContentSection = () => {
     );
   }, [chain.currencies, token0]);
 
-  const poolState = useMemo(() => {
-    return isInverted
-      ? {
-          rate: pool?.rateToken0ToToken1,
-          token0: token1,
-          token1: token0,
-        }
-      : {
-          rate: pool?.rateToken1ToToken0,
-          token0: token0,
-          token1: token1,
-        };
-  }, [isInverted, pool, token0, token1]);
-
   const { amount: initialPrice, onInput: setInitialPrice } =
     useTokenAmountInput({
-      token: poolState.token0
+      token: token0
         ? {
-            symbol: poolState.token0?.coinDenom,
-            decimals: poolState.token0?.coinDecimals,
+            symbol: token0?.coinDenom,
+            decimals: token0?.coinDecimals,
           }
         : undefined,
     });
@@ -161,11 +149,30 @@ export const ContentSection = () => {
     return !isPending && pool;
   }, [isPending, pool]);
 
+  const handleSwap = useCallback(() => {
+    setIsInverted((value) => !value);
+    console.log(amount0.value, amount1.value);
+
+    setToken0(token1);
+    setToken1(token0);
+    onInput0({ value: amount1.value });
+    onInput1({ value: amount0.value });
+
+    if (currentInput === InputId.INPUT_0) {
+      setCurrentInput(InputId.INPUT_1);
+    } else {
+      setCurrentInput(InputId.INPUT_0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentInput, amount0.value, amount1.value, token0, token1]);
+
   return (
     <div className="flex flex-col gap-6">
       {!isPoolInitialized && (
         <InitialPriceInput
-          {...poolState}
+          rate={
+            isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0
+          }
           value={initialPrice.value}
           onInput={(event) =>
             setInitialPrice({ value: event.currentTarget.value })
@@ -177,66 +184,42 @@ export const ContentSection = () => {
         {/* Left side. */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
-            {(depositType === DepositType.BOTH ||
-              (depositType === DepositType.TOKEN_0_ONLY &&
-                token0?.erc20ContractAddress ===
-                  poolState.token0?.erc20ContractAddress)) && (
-              <motion.div
-                layout
-                style={{ order: isInverted ? 2 : 0 }}
-                transition={TRANSITION}
-              >
-                <TokenAmountInput
-                  value={derivedValues.derivedAmount0}
-                  onInput={({ value }) => {
-                    onInput0({ value });
-                    setCurrentInput(InputId.INPUT_0);
-                  }}
-                  selectedToken={token0}
-                  setSelectedToken={(value) => {
-                    setToken0(value);
-                    onInput0({ value: "" });
-                    onInput1({ value: "" });
-                  }}
-                  options={optionsToken0}
-                  balance={token0Balance}
-                />
-              </motion.div>
+            {depositType === DepositType.BOTH && (
+              <TokenAmountInput
+                value={derivedValues.derivedAmount0}
+                onInput={({ value }) => {
+                  onInput0({ value });
+                  setCurrentInput(InputId.INPUT_0);
+                }}
+                selectedToken={token0}
+                setSelectedToken={(value) => {
+                  setToken0(value);
+                  onInput0({ value: "" });
+                  onInput1({ value: "" });
+                }}
+                options={optionsToken0}
+                balance={token0Balance}
+              />
             )}
             {depositType === DepositType.BOTH && (
-              <motion.div
-                style={{
-                  order: 1,
-                }}
-              >
-                <SwapButton onClick={() => setIsInverted((value) => !value)} />
-              </motion.div>
+              <SwapButton onClick={() => handleSwap()} />
             )}
-            {(depositType === DepositType.BOTH ||
-              (depositType === DepositType.TOKEN_1_ONLY &&
-                token1?.erc20ContractAddress ===
-                  poolState.token1?.erc20ContractAddress)) && (
-              <motion.div
-                layout
-                style={{ order: isInverted ? 0 : 2 }}
-                transition={TRANSITION}
-              >
-                <TokenAmountInput
-                  value={derivedValues.derivedAmount1}
-                  onInput={({ value }) => {
-                    onInput1({ value });
-                    setCurrentInput(InputId.INPUT_1);
-                  }}
-                  selectedToken={token1}
-                  setSelectedToken={(value) => {
-                    setToken1(value);
-                    onInput0({ value: "" });
-                    onInput1({ value: "" });
-                  }}
-                  options={optionsToken1}
-                  balance={token1Balance}
-                />
-              </motion.div>
+            {depositType === DepositType.BOTH && (
+              <TokenAmountInput
+                value={derivedValues.derivedAmount1}
+                onInput={({ value }) => {
+                  onInput1({ value });
+                  setCurrentInput(InputId.INPUT_1);
+                }}
+                selectedToken={token1}
+                setSelectedToken={(value) => {
+                  setToken1(value);
+                  onInput0({ value: "" });
+                  onInput1({ value: "" });
+                }}
+                options={optionsToken1}
+                balance={token1Balance}
+              />
             )}
           </div>
           <FeeTierSelect
@@ -257,7 +240,9 @@ export const ContentSection = () => {
         {/* Right side. */}
         <div className="flex flex-col gap-4">
           <PriceRangeInput
-            {...poolState}
+            rate={
+              isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0
+            }
             minPrice={minPrice}
             maxPrice={maxPrice}
             setMinPrice={setMinPrice}

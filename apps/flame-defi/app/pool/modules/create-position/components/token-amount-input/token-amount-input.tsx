@@ -1,6 +1,7 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import { Badge, Card, CardContent, CardFigureInput } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { motion } from "motion/react";
 import { TokenSelect } from "pool/components/token-select";
 
 interface TokenAmountInputProps {
@@ -23,50 +24,60 @@ export const TokenAmountInput = ({
   const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
   return (
-    <Card variant="secondary">
-      <CardContent className="flex items-center justify-between gap-6">
-        <CardFigureInput
-          value={value}
-          onInput={(event) =>
-            onInput({
-              value: event.currentTarget.value,
-            })
-          }
-        />
-        <div className="flex flex-col gap-1 items-end pt-5">
-          <TokenSelect
-            options={options}
-            value={selectedToken}
-            onValueChange={setSelectedToken}
+    <motion.div
+      layout
+      transition={{
+        duration: 0.1,
+        type: "spring",
+        damping: 30,
+        stiffness: 500,
+      }}
+    >
+      <Card variant="secondary">
+        <CardContent className="flex items-center justify-between gap-6">
+          <CardFigureInput
+            value={value}
+            onInput={(event) =>
+              onInput({
+                value: event.currentTarget.value,
+              })
+            }
           />
+          <div className="flex flex-col gap-1 items-end pt-5">
+            <TokenSelect
+              options={options}
+              value={selectedToken}
+              onValueChange={setSelectedToken}
+            />
 
-          {balance ? (
-            <div className="flex items-center gap-1">
-              <span className="text-xs">
-                {formatAbbreviatedNumber(balance.value, {
-                  minimumFractionDigits: 4,
-                  maximumFractionDigits: 4,
-                })}
-                &nbsp;
-                {balance.symbol}
-              </span>
-              <Badge
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => {
-                  onInput({
-                    value: balance.value,
-                  });
-                }}
-              >
-                Max
-              </Badge>
-            </div>
-          ) : (
-            <div className="h-5" />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            {balance ? (
+              <div className="flex items-center gap-1">
+                <span className="text-xs">
+                  {formatAbbreviatedNumber(balance.value, {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4,
+                  })}
+                  &nbsp;
+                  {balance.symbol}
+                </span>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    onInput({
+                      value: balance.value,
+                    });
+                  }}
+                >
+                  Max
+                </Badge>
+              </div>
+            ) : (
+              <div className="h-5" />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };

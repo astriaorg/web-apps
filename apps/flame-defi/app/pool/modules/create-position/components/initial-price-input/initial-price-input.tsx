@@ -5,6 +5,7 @@ import {
   TokenAmountInput,
   type InputProps,
 } from "@repo/ui/components";
+import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import type { CreatePositionInputProps } from "pool/modules/create-position/types";
 import { useMemo } from "react";
 
@@ -14,11 +15,11 @@ const UNINITIALIZED_POOL_WARNING =
 interface InitialPriceInputProps extends CreatePositionInputProps, InputProps {}
 
 export const InitialPriceInput = ({
-  token0,
-  token1,
   value,
   onInput,
 }: InitialPriceInputProps) => {
+  const { token0, token1 } = usePageContext();
+
   const exchangeRate = useMemo(() => {
     if (!token0 || !token1) {
       return null;

@@ -28,14 +28,12 @@ interface PriceRangeInputProps extends CreatePositionInputProps {
 
 export const PriceRangeInput = ({
   rate,
-  token0,
-  token1,
   minPrice,
   maxPrice,
   setMinPrice,
   setMaxPrice,
 }: PriceRangeInputProps) => {
-  const { selectedFeeTier } = usePageContext();
+  const { selectedFeeTier, token0, token1 } = usePageContext();
   const { formatNumber } = useIntl();
 
   const handleReset = useCallback(() => {
