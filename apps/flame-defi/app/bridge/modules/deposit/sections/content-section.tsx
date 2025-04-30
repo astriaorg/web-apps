@@ -87,7 +87,7 @@ export const ContentSection = () => {
       value: sourceConnection.chain,
       LeftIcon: sourceConnection.chain.IconComponent,
     };
-  }, [sourceConnection]);
+  }, [sourceConnection.chain]);
   const destinationChainOption = useMemo(() => {
     if (!destinationConnection.chain) {
       return null;
@@ -97,7 +97,7 @@ export const ContentSection = () => {
       value: destinationConnection.chain,
       LeftIcon: destinationConnection.chain.IconComponent,
     };
-  }, [destinationConnection]);
+  }, [destinationConnection.chain]);
 
   // Recipient address editing handlers
   const handleEditRecipientClick = useCallback(() => {

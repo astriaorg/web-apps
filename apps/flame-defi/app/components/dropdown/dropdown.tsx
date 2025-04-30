@@ -82,11 +82,17 @@ export const Dropdown = <T,>({
 
   useEffect(() => {
     if (valueOverride) {
+      console.log("set from valueOverride");
       setSelectedOption(valueOverride);
+      // FIXME - this causes a lot of unnecessary re-renders,
+      //  and also causes hard to fix bugs due to timings of setting state.
+      //  e.g. if the value passed to valueOverride is derived from value A,
+      //   and A gets cleared in some parent state,
       onSelect(valueOverride.value);
     }
     if (valueOverride === null) {
       setSelectedOption(null);
+      console.log("empty from valueOverride");
     }
   }, [valueOverride, onSelect]);
 
