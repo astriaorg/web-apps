@@ -67,13 +67,11 @@ export function useBridgeConnections(): BridgeConnections {
     (chain: CosmosChainInfo | EvmChainInfo) => {
       // Skip if already connecting to avoid infinite loops
       if (isSourceConnecting) {
-        console.log("Already connecting source, skipping");
         return;
       }
 
       // don't do anything if they select the same chain
       if (sourceConnection.chain === chain) {
-        console.log("selecting same source chain");
         return;
       }
 
@@ -114,7 +112,6 @@ export function useBridgeConnections(): BridgeConnections {
 
         // set destination address manually when source is evm type
         if (chain?.chainType === ChainType.EVM) {
-          console.log("setting destination address, setting isConnected false");
           setDestinationConnection((prev) => ({
             ...prev,
             address: evmWallet.evmAccountAddress,
@@ -127,7 +124,6 @@ export function useBridgeConnections(): BridgeConnections {
           chain?.chainType === ChainType.ASTRIA &&
           destinationConnection.chain?.chainType === ChainType.EVM
         ) {
-          console.log("set destination connection false");
           setDestinationConnection((prev) => ({
             ...prev,
             address: evmWallet.evmAccountAddress,
@@ -152,13 +148,11 @@ export function useBridgeConnections(): BridgeConnections {
     (chain: CosmosChainInfo | EvmChainInfo) => {
       // Skip if already connecting to avoid infinite loops
       if (isDestinationConnecting) {
-        console.log("Already connecting destination, skipping");
         return;
       }
 
       // don't do anything if they select the same chain
       if (destinationConnection.chain === chain) {
-        console.log("selecting same destination chain");
         return;
       }
 
@@ -239,7 +233,6 @@ export function useBridgeConnections(): BridgeConnections {
         sourceConnection.chain?.chainType === ChainType.ASTRIA) &&
       evmWallet.evmAccountAddress
     ) {
-      console.log("setting source from useEffect");
       setSourceConnection((prev) => ({
         ...prev,
         address: evmWallet.evmAccountAddress,
@@ -270,10 +263,6 @@ export function useBridgeConnections(): BridgeConnections {
       evmWallet.evmAccountAddress
     ) {
       if (destinationConnection.chain?.chainId === connectedEvmChainId) {
-        console.log(
-          "setting destination from useEffect",
-          destinationConnection.chain,
-        );
         setDestinationConnection((prev) => ({
           ...prev,
           address: evmWallet.evmAccountAddress,
@@ -326,7 +315,6 @@ export function useBridgeConnections(): BridgeConnections {
     // switch to selected chain in wallet after evm wallet connected
     onConnect(data) {
       // TODO - refactor some of the useEffect spaghetti to here?
-      console.log("onConnect", evmWallet.evmAccountAddress, data);
       if (
         sourceConnection.chain?.chainType === ChainType.EVM ||
         sourceConnection.chain?.chainType === ChainType.ASTRIA
