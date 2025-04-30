@@ -12,6 +12,7 @@ import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { Dropdown } from "components/dropdown";
 import { useConfig } from "config";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";
 
@@ -384,6 +385,15 @@ export const ContentSection = () => {
                           !sourceBalance &&
                           `0 ${sourceConnection.currency.coinDenom}`}
                       </p>
+                    )}
+                  {sourceConnection.currency instanceof EvmCurrency &&
+                    !isLoadingSourceBalance &&
+                    (!sourceBalance || sourceBalance.value === "0") && (
+                      <div className="mt-3">
+                        <AddErc20ToWalletButton
+                          evmCurrency={sourceConnection.currency}
+                        />
+                      </div>
                     )}
                 </div>
               )}
