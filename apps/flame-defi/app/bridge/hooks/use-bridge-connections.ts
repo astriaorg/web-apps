@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useChainId } from "wagmi";
+import { useAccountEffect, useChainId, useSwitchChain } from "wagmi";
 
 import {
   ChainType,
@@ -41,6 +41,7 @@ export function useBridgeConnections(): BridgeConnections {
   const evmWallet = useEvmWallet();
   const cosmosWallet = useCosmosWallet();
   const connectedEvmChainId = useChainId();
+  const { switchChain } = useSwitchChain();
 
   // Connection state
   const [sourceConnection, setSourceConnection] = useState<ChainConnection>({
@@ -72,7 +73,7 @@ export function useBridgeConnections(): BridgeConnections {
 
       // don't do anything if they select the same chain
       if (sourceConnection.chain === chain) {
-        console.log("selecting same chain");
+        console.log("selecting same source chain");
         return;
       }
 
@@ -113,9 +114,7 @@ export function useBridgeConnections(): BridgeConnections {
 
         // set destination address manually when source is evm type
         if (chain?.chainType === ChainType.EVM) {
-          console.log(
-            "setting destination address, clearing destination chain",
-          );
+          console.log("setting destination address, setting isConnected false");
           setDestinationConnection((prev) => ({
             ...prev,
             address: evmWallet.evmAccountAddress,
@@ -159,6 +158,7 @@ export function useBridgeConnections(): BridgeConnections {
 
       // don't do anything if they select the same chain
       if (destinationConnection.chain === chain) {
+        console.log("selecting same destination chain");
         return;
       }
 
@@ -287,6 +287,97 @@ export function useBridgeConnections(): BridgeConnections {
     destinationConnection.chain,
     connectedEvmChainId,
   ]);
+
+  // clear cosmos connections when cosmos address updates and is empty
+  useEffect(() => {
+    if (!cosmosWallet.cosmosAccountAddress) {
+      if (
+        sourceConnection.isConnected &&
+        sourceConnection.chain?.chainType === ChainType.COSMOS
+      ) {
+        setSourceConnection({
+          chain: null,
+          currency: null,
+          address: null,
+          isConnected: false,
+        });
+      }
+      if (
+        destinationConnection.isConnected &&
+        destinationConnection.chain?.chainType === ChainType.COSMOS
+      ) {
+        setDestinationConnection({
+          chain: null,
+          currency: null,
+          address: null,
+          isConnected: false,
+        });
+      }
+    }
+  }, [
+    cosmosWallet.cosmosAccountAddress,
+    destinationConnection.chain?.chainType,
+    destinationConnection.isConnected,
+    sourceConnection.chain?.chainType,
+    sourceConnection.isConnected,
+  ]);
+
+  useAccountEffect({
+    // switch to selected chain in wallet after evm wallet connected
+    onConnect(data) {
+      // TODO - refactor some of the useEffect spaghetti to here?
+      console.log("onConnect", evmWallet.evmAccountAddress, data);
+      if (
+        sourceConnection.chain?.chainType === ChainType.EVM ||
+        sourceConnection.chain?.chainType === ChainType.ASTRIA
+      ) {
+        // if the connected chain does not match our selected chain, switch to it
+        if (
+          sourceConnection.chain &&
+          data.chainId !== sourceConnection.chain.chainId
+        ) {
+          switchChain({ chainId: sourceConnection.chain.chainId });
+        }
+      }
+      if (
+        destinationConnection.chain?.chainType === ChainType.EVM ||
+        destinationConnection.chain?.chainType === ChainType.ASTRIA
+      ) {
+        // if the connected chain does not match our selected chain, switch to it
+        if (
+          destinationConnection.chain &&
+          data.chainId !== destinationConnection.chain.chainId
+        ) {
+          switchChain({ chainId: destinationConnection.chain.chainId });
+        }
+      }
+    },
+    // clear the relevant connection when evm wallet disconnected
+    onDisconnect() {
+      if (
+        sourceConnection.chain?.chainType === ChainType.EVM ||
+        sourceConnection.chain?.chainType === ChainType.ASTRIA
+      ) {
+        setSourceConnection({
+          chain: null,
+          currency: null,
+          address: null,
+          isConnected: false,
+        });
+      }
+      if (
+        destinationConnection.chain?.chainType === ChainType.EVM ||
+        destinationConnection.chain?.chainType === ChainType.ASTRIA
+      ) {
+        setDestinationConnection({
+          chain: null,
+          currency: null,
+          address: null,
+          isConnected: false,
+        });
+      }
+    },
+  });
 
   // Currency selection
   const setSourceCurrency = useCallback(
