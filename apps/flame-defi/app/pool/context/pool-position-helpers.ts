@@ -1,6 +1,6 @@
 import { EvmCurrency } from "@repo/flame-types";
 import { type Address } from "viem";
-import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE } from "../types";
+import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE_TIER } from "../types";
 
 export const sqrtPriceX96ToPrice = (
   sqrtPriceX96: bigint,
@@ -65,7 +65,7 @@ export const getMinMaxTick = (
   // Check if the fee matches any of our defined fee tiers
   const feeTiers = Object.values(FEE_TIER) as number[];
   const tickSpacing = feeTiers.includes(fee)
-    ? TICK_SPACING_BY_FEE[fee as keyof typeof TICK_SPACING_BY_FEE]
+    ? TICK_SPACING_BY_FEE_TIER[fee as keyof typeof TICK_SPACING_BY_FEE_TIER]
     : 1;
 
   // Min and max ticks are derived from tick spacing

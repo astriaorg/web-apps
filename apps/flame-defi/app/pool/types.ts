@@ -36,7 +36,7 @@ export type FeeTier = (typeof FEE_TIER)[keyof typeof FEE_TIER];
  * Mapping of fee tiers to their corresponding tick spacing values.
  * Tick spacing determines the interval between initialized ticks.
  */
-export const TICK_SPACING_BY_FEE: Record<FeeTier, number> = {
+export const TICK_SPACING_BY_FEE_TIER: Record<FeeTier, number> = {
   [FEE_TIER.LOWEST]: 1,
   [FEE_TIER.LOW]: 10,
   [FEE_TIER.MEDIUM]: 60,

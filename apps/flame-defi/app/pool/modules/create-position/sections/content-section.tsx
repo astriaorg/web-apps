@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, useTokenAmountInput } from "@repo/ui/components";
+import { Button } from "@repo/ui/components";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
@@ -12,10 +12,6 @@ import { PriceRangeInput } from "pool/modules/create-position/components/price-r
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import {
-  MAX_PRICE_DEFAULT,
-  MIN_PRICE_DEFAULT,
-} from "pool/modules/create-position/types";
 import { DepositType } from "pool/types";
 import { calculateDepositType } from "pool/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -47,20 +43,16 @@ export const ContentSection = () => {
     token1Balance,
     isLoadingToken0Balance,
     isLoadingToken1Balance,
-    selectedFeeTier,
-    setSelectedFeeTier,
+    feeTier,
+    setFeeTier,
+    minPrice,
+    maxPrice,
+    amountInitialPrice,
   } = usePageContext();
 
   // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
   const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   const [isInverted, setIsInverted] = useState(false);
-
-  const [minPrice, setMinPrice] = useState<string>(
-    MIN_PRICE_DEFAULT.toString(),
-  );
-  const [maxPrice, setMaxPrice] = useState<string>(
-    MAX_PRICE_DEFAULT.toString(),
-  );
 
   const [depositType, setDepositType] = useState(DepositType.BOTH);
 
@@ -70,8 +62,8 @@ export const ContentSection = () => {
   });
 
   const pool = useMemo(() => {
-    return pools?.[selectedFeeTier];
-  }, [pools, selectedFeeTier]);
+    return pools?.[feeTier];
+  }, [pools, feeTier]);
 
   const rate = useMemo(() => {
     return isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0;
@@ -150,22 +142,12 @@ export const ContentSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentInput, amount0.value, amount1.value, token0, token1]);
 
-  const { amount: initialPrice, onInput: setInitialPrice } =
-    useTokenAmountInput({
-      token: token0
-        ? {
-            symbol: token0?.coinDenom,
-            decimals: token0?.coinDecimals,
-          }
-        : undefined,
-    });
-
   // Handle single asset deposit when initial price exceeds the min or max price.
   useEffect(() => {
     if (
       minPrice === "" ||
       maxPrice === "" ||
-      !initialPrice.validation.isValid
+      !amountInitialPrice.validation.isValid
     ) {
       return;
     }
@@ -176,25 +158,17 @@ export const ContentSection = () => {
     }
 
     const depositType = calculateDepositType({
-      currentPrice: Number(initialPrice.value),
+      currentPrice: Number(amountInitialPrice.value),
       minPrice: Number(minPrice),
       maxPrice: Number(maxPrice),
     });
 
     setDepositType(depositType);
-  }, [initialPrice, minPrice, maxPrice, pool]);
+  }, [amountInitialPrice, minPrice, maxPrice, pool]);
 
   return (
     <div className="flex flex-col gap-6">
-      {!isPending && !pool && (
-        <InitialPriceInput
-          rate={rate}
-          value={initialPrice.value}
-          onInput={(event) =>
-            setInitialPrice({ value: event.currentTarget.value })
-          }
-        />
-      )}
+      {!isPending && !pool && <InitialPriceInput />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left side. */}
@@ -255,9 +229,9 @@ export const ContentSection = () => {
             )}
           </div>
           <FeeTierSelect
-            value={selectedFeeTier}
+            value={feeTier}
             onChange={(value) => {
-              setSelectedFeeTier(value);
+              setFeeTier(value);
               // If the pool exists, the derived value will replace the empty string.
               // Otherwise, don't persist values from previous edits.
               if (currentInput === InputId.INPUT_0) {
@@ -271,13 +245,7 @@ export const ContentSection = () => {
 
         {/* Right side. */}
         <div className="flex flex-col gap-4">
-          <PriceRangeInput
-            rate={rate}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            setMinPrice={setMinPrice}
-            setMaxPrice={setMaxPrice}
-          />
+          <PriceRangeInput rate={rate} />
 
           <Button>Connect Wallet</Button>
         </div>

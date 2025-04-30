@@ -5,7 +5,6 @@ import { usePageContext } from "pool/modules/create-position/hooks/use-page-cont
 import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
-  type CreatePositionInputProps,
 } from "pool/modules/create-position/types";
 import { TICK_BOUNDARIES } from "pool/types";
 import {
@@ -21,21 +20,20 @@ const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
 const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
 
-interface PriceRangeInputProps extends CreatePositionInputProps {
-  minPrice: string;
-  maxPrice: string;
-  setMinPrice: (value: string) => void;
-  setMaxPrice: (value: string) => void;
+interface PriceRangeInputProps {
+  rate?: string;
 }
 
-export const PriceRangeInput = ({
-  rate,
-  minPrice,
-  maxPrice,
-  setMinPrice,
-  setMaxPrice,
-}: PriceRangeInputProps) => {
-  const { selectedFeeTier, token0, token1 } = usePageContext();
+export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
+  const {
+    feeTier,
+    token0,
+    token1,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+  } = usePageContext();
   const { formatNumber } = useIntl();
 
   const handleReset = useCallback(() => {
@@ -160,14 +158,14 @@ export const PriceRangeInput = ({
       }
 
       return calculatePriceRange({
-        feeTier: selectedFeeTier,
+        feeTier,
         decimal0: token0.coinDecimals,
         decimal1: token1.coinDecimals,
         minPrice: min,
         maxPrice: max,
       });
     },
-    [selectedFeeTier, token0, token1],
+    [feeTier, token0, token1],
   );
 
   const displayMinPrice = useMemo(() => {
