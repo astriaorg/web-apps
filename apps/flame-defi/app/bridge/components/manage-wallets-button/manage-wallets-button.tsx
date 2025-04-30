@@ -18,7 +18,7 @@ export const ManageWalletsButton: React.FC = () => {
   const { isConnected: isEvmWalletConnected } = useAccount();
 
   const hasConnections = cosmosAccountAddress || isEvmWalletConnected;
-  const buttonText = hasConnections ? "Wallets" : "Connect Wallet";
+  const buttonText = hasConnections ? "Wallets" : "Connect Wallets";
   return (
     <BridgeConnectionsModal>
       <Button variant="secondary" size="sm" className="flex items-center gap-2">
