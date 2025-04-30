@@ -34,6 +34,8 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   useEffect(() => {
     if (userAccount?.address) {
       setEvmAccountAddress(userAccount.address);
+    } else {
+      setEvmAccountAddress(null);
     }
   }, [userAccount.address]);
 
