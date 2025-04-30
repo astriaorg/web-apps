@@ -51,7 +51,8 @@ const rainbowKitConfig = getDefaultConfig({
   chains: evmChainsToRainbowKitChains(allEvmChains),
 });
 
-// TODO - refactor to same level as the cosmos wallet context provider
+// TODO - refactor ChainProvider to same level as the cosmos wallet context provider
+//  because they are only used for Bridge
 const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
 const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
 

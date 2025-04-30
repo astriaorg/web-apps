@@ -82,13 +82,12 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   const connectCosmosWallet = useCallback(() => {
     // only open modal if not already connected
     if (!isWalletConnected) {
-      console.log("opening cosmos wallet modal");
       openCosmosWalletModal();
     }
   }, [openCosmosWalletModal, isWalletConnected]);
 
   const disconnectCosmosWallet = useCallback(() => {
-    disconnect().then(() => {});
+    void disconnect();
     resetState();
   }, [disconnect, resetState]);
 
