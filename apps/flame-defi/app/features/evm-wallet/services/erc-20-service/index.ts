@@ -9,7 +9,7 @@ interface TransferParams {
   chainId: number;
 }
 
-export class Erc20Service extends GenericContractService {
+export class Index extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, erc20Abi);
   }
@@ -90,6 +90,6 @@ export class Erc20Service extends GenericContractService {
 export function createErc20Service(
   wagmiConfig: Config,
   contractAddress: Address,
-): Erc20Service {
-  return new Erc20Service(wagmiConfig, contractAddress);
+): Index {
+  return new Index(wagmiConfig, contractAddress);
 }

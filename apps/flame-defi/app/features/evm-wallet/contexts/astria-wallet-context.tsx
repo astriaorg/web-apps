@@ -6,7 +6,7 @@ import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { AstriaChain, Balance } from "@repo/flame-types";
 import { useAstriaChainData, useConfig } from "config";
 
-import { useUsdQuote } from "features/evm-wallet/hooks/use-usd-quote";
+import { useUsdQuote } from "../hooks/use-usd-quote";
 
 export interface AstriaWalletContextProps {
   connectWallet: () => void;

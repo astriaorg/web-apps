@@ -10,7 +10,8 @@ import {
   TXN_STATUS,
 } from "@repo/flame-types";
 import { useConfig } from "config";
-import { createErc20Service } from "../services/erc-20-service/erc-20-service";
+
+import { createErc20Service } from "../services/erc-20-service";
 
 type TokenApprovalProps = {
   chain: EvmChainInfo;
