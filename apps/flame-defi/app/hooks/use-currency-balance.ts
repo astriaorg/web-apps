@@ -2,12 +2,12 @@ import { useMemo } from "react";
 
 import {
   Balance,
+  EvmCurrency,
   GenericCurrency,
   IbcCurrency,
-  EvmCurrency,
 } from "@repo/flame-types";
-import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { useIbcCurrencyBalance } from "features/cosmos-wallet";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 
 /**
  * Shared polling configuration used by balance hooks

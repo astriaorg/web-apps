@@ -1,7 +1,8 @@
-import { Skeleton, TokenIcon } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 import { PoolToken } from "pool/types";
 import { useIntl } from "react-intl";
+
+import { Skeleton, TokenIcon } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 
 export const PoolFeesAndLiquidityCard = ({
   poolTokens,

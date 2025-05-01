@@ -1,10 +1,10 @@
 import {
-  CoinbaseChains,
-  CosmosChains,
   AstriaChains,
-  FlameNetwork,
-  EvmChainInfo,
+  CoinbaseChains,
   CosmosChainInfo,
+  CosmosChains,
+  EvmChainInfo,
+  FlameNetwork,
 } from "@repo/flame-types";
 
 import * as dawn from "./chain-configs-dawn";

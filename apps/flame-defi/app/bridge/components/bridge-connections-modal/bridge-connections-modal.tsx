@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -10,11 +11,11 @@ import {
   DialogTrigger,
 } from "@repo/ui/components";
 import { CloseIcon } from "@repo/ui/icons";
-import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
 import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
+import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
 
 interface BridgeConnectionsModalProps {
   children?: React.ReactNode;

@@ -1,5 +1,7 @@
-import { EvmCurrency } from "@repo/flame-types";
 import { type Address } from "viem";
+
+import { EvmCurrency } from "@repo/flame-types";
+
 import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE_TIER } from "../types";
 
 export const sqrtPriceX96ToPrice = (

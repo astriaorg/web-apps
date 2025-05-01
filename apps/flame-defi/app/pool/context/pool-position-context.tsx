@@ -1,7 +1,7 @@
 "use client";
 
-import { PoolPositionResponse, PoolToken } from "pool/types";
 import { useParams } from "next/navigation";
+import { PoolPositionResponse, PoolToken } from "pool/types";
 import { PoolPositionContextProps } from "pool/types";
 import {
   createContext,
@@ -11,21 +11,23 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
+import { formatUnits } from "viem";
+import { useAccount, useConfig } from "wagmi";
+
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
-import { useAccount, useConfig } from "wagmi";
 import { useAstriaChainData } from "config/hooks/use-config";
+
 import {
-  getTokensLiquidityAmounts,
   getMinMaxTick,
   getTokenDataFromCurrencies,
+  getTokensLiquidityAmounts,
   sqrtPriceX96ToPrice,
   tickToPrice,
 } from "./pool-position-helpers";
-import { formatUnits } from "viem";
 
 export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined

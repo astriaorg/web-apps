@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@repo/ui/components";
-import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
@@ -15,6 +13,9 @@ import { usePageContext } from "pool/modules/create-position/hooks/use-page-cont
 import { DepositType } from "pool/types";
 import { calculateDepositType } from "pool/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Button } from "@repo/ui/components";
+import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 
 enum InputId {
   INPUT_0 = "INPUT_0",

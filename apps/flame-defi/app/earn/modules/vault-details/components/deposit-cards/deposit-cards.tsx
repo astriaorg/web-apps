@@ -1,12 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardLabel,
-  Skeleton,
-  useTokenAmountInput,
-} from "@repo/ui/components";
 import Big from "big.js";
-import { Image } from "components/image";
 import { DepositCard } from "earn/components/deposit-card";
 import { WalletActionButton } from "earn/components/wallet-action-button";
 import { useFetchVaultPosition } from "earn/modules/vault-details/hooks/use-fetch-vault-position";
@@ -15,6 +7,15 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
 import { useAccount } from "wagmi";
+
+import {
+  Card,
+  CardContent,
+  CardLabel,
+  Skeleton,
+  useTokenAmountInput,
+} from "@repo/ui/components";
+import { Image } from "components/image";
 
 // TODO: Get balance from contract.
 const BALANCE = "0";

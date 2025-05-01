@@ -1,4 +1,6 @@
 import type { AccordionSingleProps } from "@radix-ui/react-accordion";
+import { FormattedNumber } from "react-intl";
+
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +11,7 @@ import {
 } from "@repo/ui/components";
 import { CopyIcon, PowerIcon, ShareRightIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { FormattedNumber } from "react-intl";
+
 import type { ConnectWalletProps } from "./connect-wallet.types";
 
 interface ConnectWalletContentProps

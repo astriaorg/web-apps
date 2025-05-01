@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
-import { useGetQuote } from "features/evm-wallet";
+import { useEffect, useMemo, useState } from "react";
+
 import { EvmCurrency, GetQuoteResult, TRADE_TYPE } from "@repo/flame-types";
 import { formatDecimalValues } from "@repo/ui/utils";
+import { useGetQuote } from "features/evm-wallet";
 
 export const useOneToOneQuote = (
   inputOne?: EvmCurrency,

@@ -1,20 +1,20 @@
 "use client";
 
-import { useCallback, useState } from "react";
-
-import { TXN_STATUS } from "@repo/flame-types";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { useEvmCurrencyBalance } from "features/evm-wallet";
-
 import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
 import {
   useAddLiquidityTxn,
+  useAddLiquidityValidation,
   usePoolContext,
   usePoolPositionContext,
-  useAddLiquidityValidation,
 } from "pool/hooks";
 import { POOL_INPUT_ID } from "pool/types";
-import { TokenLiquidityBlock, AddLiquidityInputsBlock } from "../components";
+import { useCallback, useState } from "react";
+
+import { TXN_STATUS } from "@repo/flame-types";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+
+import { AddLiquidityInputsBlock, TokenLiquidityBlock } from "../components";
 
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();

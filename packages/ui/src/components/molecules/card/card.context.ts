@@ -2,6 +2,7 @@
 
 import { type VariantProps } from "class-variance-authority";
 import { createContext, useContext } from "react";
+
 import { cardVariants } from "./card";
 
 interface CardContextType extends VariantProps<typeof cardVariants> {

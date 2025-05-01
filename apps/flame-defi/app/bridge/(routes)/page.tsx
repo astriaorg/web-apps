@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
 import { ROUTES } from "bridge/constants/routes";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function BridgePage() {
   const router = useRouter();

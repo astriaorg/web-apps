@@ -1,6 +1,7 @@
-import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
-import type { Slot0 } from "features/evm-wallet";
 import type { Address, Hash } from "viem";
+
+import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import type { Slot0 } from "features/evm-wallet";
 
 /**
  * Fee tiers available in Uniswap V3.

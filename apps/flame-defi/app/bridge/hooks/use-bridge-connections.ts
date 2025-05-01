@@ -1,5 +1,6 @@
 "use client";
 
+import { ChainConnection } from "bridge/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccountEffect, useChainId, useSwitchChain } from "wagmi";
 
@@ -10,10 +11,8 @@ import {
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
-import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
-
-import { ChainConnection } from "bridge/types";
+import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 
 export interface BridgeConnections {
   // Chain connections

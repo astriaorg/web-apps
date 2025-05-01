@@ -1,18 +1,19 @@
+import Big from "big.js";
+import type { Asset, Maybe } from "earn/generated/gql/graphql";
+import React from "react";
+import { useAccount } from "wagmi";
+
 import {
+  type Amount,
   Badge,
   Card,
   CardContent,
   CardFigureInput,
   CardLabel,
   Skeleton,
-  type Amount,
 } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
-import Big from "big.js";
 import { Image } from "components/image";
-import type { Asset, Maybe } from "earn/generated/gql/graphql";
-import React from "react";
-import { useAccount } from "wagmi";
 
 interface DepositCardProps {
   asset?: Maybe<Pick<Asset, "logoURI" | "name" | "symbol" | "priceUsd">>;

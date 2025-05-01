@@ -1,10 +1,11 @@
-import { Badge, Skeleton } from "@repo/ui/components";
 import { BackButton } from "earn/components/back-button";
 import { MarketAssets } from "earn/components/market";
 import { ROUTES } from "earn/constants/routes";
 import { Asset, Maybe } from "earn/generated/gql/graphql";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useRouter } from "next/navigation";
+
+import { Badge, Skeleton } from "@repo/ui/components";
 
 export const HeaderSection = () => {
   const router = useRouter();

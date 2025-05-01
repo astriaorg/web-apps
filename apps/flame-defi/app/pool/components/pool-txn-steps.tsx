@@ -1,5 +1,18 @@
 "use client";
 
+import { useAstriaChainData } from "config";
+import { usePathname } from "next/navigation";
+import { usePoolPositionContext } from "pool/hooks";
+import {
+  getTxnType,
+  POOL_TXN_TYPE,
+  PoolTxnStepsProps,
+  TxnComponentProps,
+  TxnLoaderProps,
+  TxnSuccessProps,
+} from "pool/types";
+import { useIntl } from "react-intl";
+
 import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
 import {
   BlockLoader,
@@ -9,18 +22,7 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
-import { useAstriaChainData } from "config";
-import { usePathname } from "next/navigation";
-import { usePoolPositionContext } from "pool/hooks";
-import {
-  PoolTxnStepsProps,
-  TxnComponentProps,
-  TxnLoaderProps,
-  TxnSuccessProps,
-  POOL_TXN_TYPE,
-  getTxnType,
-} from "pool/types";
-import { useIntl } from "react-intl";
+
 import { PriceRangeCard } from "./price-range-card";
 
 export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {

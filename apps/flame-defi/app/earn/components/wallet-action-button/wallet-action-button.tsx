@@ -1,7 +1,8 @@
-import { Button, type ButtonProps } from "@repo/ui/components";
-import { useAstriaWallet } from "features/evm-wallet";
 import { useCallback } from "react";
 import { useAccount } from "wagmi";
+
+import { Button, type ButtonProps } from "@repo/ui/components";
+import { useAstriaWallet } from "features/evm-wallet";
 
 export const WalletActionButton = ({
   children,

@@ -1,5 +1,7 @@
-import { Skeleton, ToggleSwitch } from "@repo/ui/components";
 import { usePoolPositionContext } from "pool/hooks";
+
+import { Skeleton, ToggleSwitch } from "@repo/ui/components";
+
 import { PositionRangeBadge } from "./position-range-badge";
 import { PriceRangeCard } from "./price-range-card";
 

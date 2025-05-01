@@ -1,3 +1,5 @@
+import { FormatNumberOptions } from "react-intl";
+
 import {
   AnimatedCounter,
   Card,
@@ -5,7 +7,6 @@ import {
   CardLabel,
   Skeleton,
 } from "@repo/ui/components";
-import { FormatNumberOptions } from "react-intl";
 
 export interface SummaryCardsProps
   extends React.HTMLAttributes<HTMLDivElement> {

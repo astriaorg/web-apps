@@ -1,3 +1,17 @@
+import { Maybe } from "earn/generated/gql/graphql";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { useIntl } from "react-intl";
+import {
+  CartesianGrid,
+  Label,
+  Line,
+  LineChart as BaseLineChart,
+  ReferenceLine,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import {
   Button,
   Card,
@@ -22,19 +36,6 @@ import {
 } from "@repo/ui/components";
 import { ChevronDownSmallIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { Maybe } from "earn/generated/gql/graphql";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
-import {
-  LineChart as BaseLineChart,
-  CartesianGrid,
-  Label,
-  Line,
-  ReferenceLine,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 // The height of the chart minus axis.
 const CHART_HEIGHT = 169;

@@ -1,28 +1,28 @@
+import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { useAstriaChainData } from "config";
+import { useConfig } from "config";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { type Address, Chain, type Hash } from "viem";
 import {
   useAccount,
   useConfig as useWagmiConfig,
   useWaitForTransactionReceipt,
 } from "wagmi";
 
-import { useAstriaChainData } from "config";
-import {
-  useAstriaWallet,
-  createTradeFromQuote,
-  createWethService,
-  createSwapRouterService,
-  useTokenApproval,
-} from "features/evm-wallet";
 import {
   evmChainToRainbowKitChain,
   GetQuoteResult,
   TokenInputState,
 } from "@repo/flame-types";
-import { useConfig } from "config";
-import { getSlippageTolerance } from "@repo/ui/utils";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
-import { Chain, type Hash, type Address } from "viem";
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
+import { getSlippageTolerance } from "@repo/ui/utils";
+import {
+  createSwapRouterService,
+  createTradeFromQuote,
+  createWethService,
+  useAstriaWallet,
+  useTokenApproval,
+} from "features/evm-wallet";
 
 interface SwapButtonProps {
   topToken: TokenInputState;

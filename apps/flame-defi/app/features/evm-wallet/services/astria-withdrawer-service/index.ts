@@ -1,5 +1,5 @@
 import type { Config } from "@wagmi/core";
-import { type Abi, type Address, parseUnits, type Hash } from "viem";
+import { type Abi, type Address, type Hash, parseUnits } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
 

@@ -4,7 +4,10 @@ import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import { Balance, EvmCurrency } from "@repo/flame-types";
-import type { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
+import type {
+  PollingConfig,
+  UseBalanceResult,
+} from "hooks/use-currency-balance";
 
 import { createErc20Service } from "../services/erc-20-service";
 

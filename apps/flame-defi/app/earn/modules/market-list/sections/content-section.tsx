@@ -1,10 +1,11 @@
-import { Pagination, Skeleton, StatusCard } from "@repo/ui/components";
 import { getPlaceholderData, MarketListTable } from "earn/components/market";
 import { SearchInput } from "earn/components/search-input";
 import { Market, OrderDirection } from "earn/generated/gql/graphql";
 import { PAGE_SIZE } from "earn/modules/market-list/hooks/use-fetch-markets";
 import { usePageContext } from "earn/modules/market-list/hooks/use-page-context";
 import { useMemo } from "react";
+
+import { Pagination, Skeleton, StatusCard } from "@repo/ui/components";
 
 export const ContentSection = () => {
   const {

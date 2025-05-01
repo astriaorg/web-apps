@@ -1,8 +1,10 @@
 "use client";
 
-import { cn } from "@repo/ui/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { forwardRef } from "react";
+
+import { cn } from "@repo/ui/utils";
+
 import { CardContext } from "./card.context";
 
 export const cardVariants = cva("rounded-xl", {

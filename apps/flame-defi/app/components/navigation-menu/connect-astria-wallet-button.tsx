@@ -1,3 +1,6 @@
+import { useAstriaChainData } from "config";
+import { useAccount } from "wagmi";
+
 import {
   Button,
   Popover,
@@ -6,10 +9,8 @@ import {
 } from "@repo/ui/components";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
-import { ConnectWalletContent } from "components/connect-wallet";
-import { useAstriaChainData } from "config";
 import { useAstriaWallet } from "features/evm-wallet";
-import { useAccount } from "wagmi";
+import { ConnectWalletContent } from "components/connect-wallet";
 
 /**
  * Button with dropdown to connect to Astria wallet.

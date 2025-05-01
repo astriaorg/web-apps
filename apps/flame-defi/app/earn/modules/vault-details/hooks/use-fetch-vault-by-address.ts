@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useConfig } from "config/hooks/use-config";
 import { graphql } from "earn/generated/gql";
 import request from "graphql-request";
+
+import { useConfig } from "config/hooks/use-config";
 
 const query = graphql(`
   query VaultByAddress($address: String!, $chainId: Int) {

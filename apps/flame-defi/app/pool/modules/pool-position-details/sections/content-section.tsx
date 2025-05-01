@@ -1,17 +1,19 @@
 "use client";
 
-import { PositionInfoCard } from "../components";
-import {
-  usePoolPositionContext,
-  usePoolContext,
-  useCollectFeesTxn,
-} from "pool/hooks";
 import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { Switch } from "@repo/ui/components";
-import { useIntl } from "react-intl";
+import {
+  useCollectFeesTxn,
+  usePoolContext,
+  usePoolPositionContext,
+} from "pool/hooks";
 import { useCallback } from "react";
+import { useIntl } from "react-intl";
+
 import { TXN_STATUS } from "@repo/flame-types";
+import { Switch } from "@repo/ui/components";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+
+import { PositionInfoCard } from "../components";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const { formatNumber } = useIntl();

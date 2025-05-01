@@ -1,8 +1,9 @@
 "use client";
 
-import { cn } from "@repo/ui/utils";
 import { ROUTES } from "bridge/constants/routes";
 import Link from "next/link";
+
+import { cn } from "@repo/ui/utils";
 
 export type BridgeHeaderSectionProps = {
   activeTab: "deposit" | "withdraw";

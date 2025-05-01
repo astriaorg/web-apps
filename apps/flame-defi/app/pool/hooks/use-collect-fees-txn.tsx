@@ -1,14 +1,16 @@
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { type Hash } from "viem";
+import { useAstriaChainData } from "config";
 import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
+import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
-import { usePoolPositionContext } from ".";
+
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
-import { useAstriaChainData } from "config";
+
+import { usePoolPositionContext } from ".";
 
 export const useCollectFeesTxn = (
   poolTokens: PoolToken[],

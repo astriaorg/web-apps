@@ -1,4 +1,5 @@
 import type { IconProps } from "@repo/flame-types";
+
 import { DEFAULT_ICON_SIZE } from "../constants";
 
 export const DotIcon: React.FC<IconProps> = ({

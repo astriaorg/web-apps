@@ -1,4 +1,9 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { useAstriaChainData, useConfig } from "config";
+import { usePathname } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+
 import type { FlameNetwork } from "@repo/flame-types";
 import {
   Button,
@@ -19,13 +24,10 @@ import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
+import { useAstriaWallet } from "features/evm-wallet";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
-import { useAstriaChainData, useConfig } from "config";
-import { useAstriaWallet } from "features/evm-wallet";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";
 import { NavigationMenuButton } from "./navigation-menu-button";
 import { NetworkIcon } from "./network-icon";

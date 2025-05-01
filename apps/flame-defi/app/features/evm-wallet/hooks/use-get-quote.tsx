@@ -1,6 +1,7 @@
+import { useAstriaChainData, useConfig } from "config";
 import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
-import { useConfig, useAstriaChainData } from "config";
+
 import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
 
 export const useGetQuote = () => {

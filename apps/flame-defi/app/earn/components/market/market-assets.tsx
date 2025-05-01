@@ -1,6 +1,7 @@
+import { Asset, Maybe } from "earn/generated/gql/graphql";
+
 import { cn } from "@repo/ui/utils";
 import { Image } from "components/image";
-import { Asset, Maybe } from "earn/generated/gql/graphql";
 
 interface MarketAssetsProps extends React.HTMLAttributes<HTMLDivElement> {
   assetA?: Maybe<Asset>;

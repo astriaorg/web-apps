@@ -1,5 +1,6 @@
 "use client";
 
+import { useConfig } from "config";
 import type React from "react";
 import { useCallback } from "react";
 
@@ -13,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components";
-import { useConfig } from "config";
+
 import { NetworkIcon } from "./network-icon";
 
 export const NetworkSelect = (): React.ReactElement => {

@@ -1,11 +1,13 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
+import { PositionRangeBadge } from "pool/components";
+import { usePoolPositionContext } from "pool/hooks";
+
 import { Badge, Button, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { ArrowLeftIcon } from "@repo/ui/icons";
-import { usePathname, useRouter } from "next/navigation";
-import { usePoolPositionContext } from "pool/hooks";
+
 import { ROUTES } from "../../../constants/routes";
-import { PositionRangeBadge } from "pool/components";
 
 export const HeaderSection = () => {
   const router = useRouter();

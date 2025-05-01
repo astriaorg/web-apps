@@ -1,12 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
 import { Decimal } from "@cosmjs/math";
+import { useQuery } from "@tanstack/react-query";
+import { useConfig } from "config";
 
 import { Balance, IbcCurrency } from "@repo/flame-types";
-import { useConfig } from "config";
-import { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
-
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
 import { getBalanceFromChain } from "features/cosmos-wallet/services/cosmos";
+import { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
 
 /**
  * Custom hook to fetch and manage the balance for an IBC currency.

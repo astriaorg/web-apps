@@ -1,16 +1,18 @@
-import {
-  GetQuoteResult,
-  TRADE_TYPE,
-  Token,
-  TokenAmount,
-  TokenInputState,
-} from "@repo/flame-types";
-import { getSlippageTolerance } from "@repo/ui/utils";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
+
+import {
+  GetQuoteResult,
+  Token,
+  TokenAmount,
+  TokenInputState,
+  TRADE_TYPE,
+} from "@repo/flame-types";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import { useGetQuote } from "features/evm-wallet";
+
 import { TransactionInfo } from "../types";
 
 // NOTE: When the tradeType is exactOut we must refetch the quote with exactIn because the

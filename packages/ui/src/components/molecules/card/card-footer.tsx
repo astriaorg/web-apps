@@ -1,5 +1,6 @@
-import { cn } from "@repo/ui/utils";
 import { forwardRef } from "react";
+
+import { cn } from "@repo/ui/utils";
 
 export const CardFooter = forwardRef<
   HTMLDivElement,

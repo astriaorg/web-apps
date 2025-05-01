@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { type Address } from "viem";
-
 import { WalletConnectionError, WithdrawError } from "bridge/errors";
 import { useBridgeStrategy } from "bridge/hooks/use-bridge-strategy";
 import { ChainConnection } from "bridge/types";
+import { useCallback, useState } from "react";
+import { type Address } from "viem";
 
 export interface WithdrawTransactionHook {
   isLoading: boolean;

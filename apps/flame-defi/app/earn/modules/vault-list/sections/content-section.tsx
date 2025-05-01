@@ -1,10 +1,11 @@
-import { Pagination, Skeleton, StatusCard } from "@repo/ui/components";
 import { SearchInput } from "earn/components/search-input";
 import { getPlaceholderData, VaultListTable } from "earn/components/vault";
 import { OrderDirection, Vault } from "earn/generated/gql/graphql";
 import { PAGE_SIZE } from "earn/modules/vault-list/hooks/use-fetch-vaults";
 import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
+
+import { Pagination, Skeleton, StatusCard } from "@repo/ui/components";
 
 export const ContentSection = () => {
   const {

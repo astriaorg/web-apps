@@ -1,9 +1,10 @@
 "use client";
 
-import { Header, HeaderTitle } from "components/header";
-import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "pool/constants/routes";
+
+import { Header, HeaderTitle } from "components/header";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
 
 export const HeaderSection = () => {
   const router = useRouter();

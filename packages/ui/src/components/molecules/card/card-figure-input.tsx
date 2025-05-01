@@ -1,6 +1,8 @@
+import React from "react";
+
 import { Skeleton, TokenAmountInput } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import React from "react";
+
 import { useCardContext } from "./card.context";
 
 export const CardFigureInput = ({

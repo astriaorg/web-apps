@@ -1,10 +1,10 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAstriaChainData, useConfig } from "config";
 import React, { useCallback, useMemo } from "react";
 import { type Address, formatUnits } from "viem";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 
 import { AstriaChain, Balance } from "@repo/flame-types";
-import { useAstriaChainData, useConfig } from "config";
 
 import { useUsdQuote } from "../hooks/use-usd-quote";
 

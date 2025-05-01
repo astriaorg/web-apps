@@ -1,9 +1,11 @@
-import { ChartInterval, getTimestampsFromInterval } from "@repo/ui/components";
 import Big from "big.js";
 import type {
   BigIntDataPoint,
   TimeseriesOptions,
 } from "earn/generated/gql/graphql";
+
+import { ChartInterval, getTimestampsFromInterval } from "@repo/ui/components";
+
 import { CHART_CACHE_TIME_MILLISECONDS } from "./charts.types";
 
 /**

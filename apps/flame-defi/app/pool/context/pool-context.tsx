@@ -1,10 +1,5 @@
 "use client";
 
-import { useAstriaChainData } from "config/hooks/use-config";
-import {
-  createNonfungiblePositionManagerService,
-  createPoolFactoryService,
-} from "features/evm-wallet";
 import type { FeeTier } from "pool/types";
 import { PoolContextProps, PoolPosition } from "pool/types";
 import {
@@ -15,6 +10,13 @@ import {
   useState,
 } from "react";
 import { useAccount, useConfig } from "wagmi";
+
+import {
+  createNonfungiblePositionManagerService,
+  createPoolFactoryService,
+} from "features/evm-wallet";
+import { useAstriaChainData } from "config/hooks/use-config";
+
 import {
   getMinMaxTick,
   getTokenDataFromCurrencies,

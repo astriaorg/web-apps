@@ -1,15 +1,16 @@
-import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
+import { type ComponentType } from "react";
+
 import {
+  CelestiaIcon,
+  DotIcon,
+  DropTiaIcon,
   MilkTiaIcon,
   StrideIcon,
-  CelestiaIcon,
   StrideTiaIcon,
   UsdcIcon,
   WrappedTiaIcon,
-  DotIcon,
-  DropTiaIcon,
 } from "../../../icons";
-import { type ComponentType } from "react";
+import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
 
 // FIXME - this is redundant and can be derived from the chain configs
 export enum TokenSymbol {

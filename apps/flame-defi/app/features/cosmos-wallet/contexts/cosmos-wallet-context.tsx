@@ -1,8 +1,7 @@
-import { useChain } from "@cosmos-kit/react";
-import React, { useCallback, useEffect, useState } from "react";
-
 import type { SigningStargateClient } from "@cosmjs/stargate";
+import { useChain } from "@cosmos-kit/react";
 import { useConfig } from "config";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { CosmosChainInfo, cosmosChainNameFromId } from "@repo/flame-types";
 

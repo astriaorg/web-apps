@@ -1,16 +1,17 @@
 "use client";
 
 import { TokenInputState } from "@repo/flame-types";
+import { GetQuoteResult } from "@repo/flame-types";
 import { InfoTooltip, Skeleton } from "@repo/ui/components";
-import { GasIcon } from "@repo/ui/icons";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/components";
+import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
-import { GetQuoteResult } from "@repo/flame-types";
+
 import { OneToOneQuoteProps, TransactionInfo } from "../types";
 import { RoutePath } from "./route-path";
 

@@ -24,8 +24,9 @@ check-types:
 alias ct := check-types
 
 # lint everything
-lint:
-  npm run lint
+# Usage: just lint [--fix] (add --fix to auto-fix issues)
+lint fix="":
+  {{ if fix == "--fix" { "npm run lint:fix" } else { "npm run lint" } }}
   just lint-md
 alias l := lint
 

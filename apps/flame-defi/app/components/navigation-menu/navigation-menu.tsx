@@ -1,9 +1,11 @@
 "use client";
 
-import { AstriaLogo } from "@repo/ui/logos";
-import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
+
+import { AstriaLogo } from "@repo/ui/logos";
+import { LINKS } from "components/footer/links";
+
 import { ConnectAstriaWalletButton } from "./connect-astria-wallet-button";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";

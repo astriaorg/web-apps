@@ -8,8 +8,8 @@ import { useNotifications } from "./hooks/use-notifications";
 
 export {
   Notification,
+  NotificationsContext,
   NotificationsContextProvider,
   NotificationType,
-  NotificationsContext,
   useNotifications,
 };

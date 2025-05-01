@@ -1,6 +1,7 @@
+import { PriceRangeCardProps } from "pool/types";
+
 import { InfoTooltip } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import { PriceRangeCardProps } from "pool/types";
 
 export function PositionInfoCard({
   leftLabel,

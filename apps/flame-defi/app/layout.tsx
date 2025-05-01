@@ -1,15 +1,16 @@
 import "@interchain-ui/react/styles";
 import "@rainbow-me/rainbowkit/styles.css";
+import "./globals.css";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+
 import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
-import localFont from "next/font/local";
-import { Inter } from "next/font/google";
+
 import { SideTag } from "./components/side-tag/side-tag";
 import { Observability } from "./features/observability";
 import { Providers } from "./providers";
-
-import "./globals.css";
 
 export const metadata = {
   title: "Flame App",
