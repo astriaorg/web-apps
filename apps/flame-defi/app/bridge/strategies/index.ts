@@ -13,7 +13,6 @@ import {
 import { sendIbcTransfer } from "features/cosmos-wallet";
 import {
   createAstriaBridgeSourceService,
-  createErc20Service,
   createWithdrawerService,
 } from "features/evm-wallet";
 
@@ -85,21 +84,6 @@ export class EvmIntentBridgeStrategy implements BridgeStrategy {
       this.sourceCurrency.coinDecimals,
     );
 
-    // approve the bridge contract to spend tokens
-    // TODO - replace this logic by using useTokenApproval in
-    //  content-section
-    const erc20Service = createErc20Service(
-      this.wagmiConfig,
-      this.sourceCurrency.erc20ContractAddress,
-    );
-    await erc20Service.approveToken(
-      this.sourceChain.chainId,
-      this.sourceCurrency.astriaIntentBridgeAddress,
-      this.amount,
-      this.sourceCurrency.coinDecimals,
-    );
-
-    // handle bridging via AstriaBridgeSourceService
     const bridgeService = createAstriaBridgeSourceService(
       this.wagmiConfig,
       this.sourceCurrency.astriaIntentBridgeAddress,

@@ -58,6 +58,8 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
     // make sure the address is set when the address changes
     if (cosmosAddressFromWallet) {
       setCosmosAccountAddress(cosmosAddressFromWallet);
+    } else {
+      setCosmosAccountAddress(null);
     }
   }, [cosmosAddressFromWallet]);
 
@@ -69,9 +71,6 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   // deselect chain and currency when network is changed
   useEffect(() => {
     resetState();
-    if (selectedFlameNetwork) {
-      resetState();
-    }
   }, [resetState, selectedFlameNetwork]);
 
   const selectCosmosChain = useCallback((chain: CosmosChainInfo | null) => {
@@ -82,13 +81,12 @@ export const CosmosWalletProvider: React.FC<CosmosWalletProviderProps> = ({
   const connectCosmosWallet = useCallback(() => {
     // only open modal if not already connected
     if (!isWalletConnected) {
-      console.log("opening cosmos wallet modal");
       openCosmosWalletModal();
     }
   }, [openCosmosWalletModal, isWalletConnected]);
 
-  const disconnectCosmosWallet = useCallback(() => {
-    disconnect().then(() => {});
+  const disconnectCosmosWallet = useCallback(async () => {
+    await disconnect();
     resetState();
   }, [disconnect, resetState]);
 

@@ -5,7 +5,7 @@ import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
-import type { FeeTier } from "pool/constants";
+import type { FeeTier } from "pool/types";
 import { PoolContextProps, PoolPosition } from "pool/types";
 import {
   createContext,

@@ -26,8 +26,6 @@ export const ConnectEvmWalletButton = ({
 
   // FIXME - how to get the nativeToken from information from wagmi?
   //  like if they're connected to Base.
-  // TODO - need to connect them to Base
-  //  - should switch the chain when the user selects Base in the dropdown
   const { chain, nativeToken } = useAstriaChainData();
 
   const { balance: tokenBalance, isLoading: isLoadingTokenBalance } =

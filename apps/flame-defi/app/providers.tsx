@@ -23,7 +23,11 @@ import {
   getAllChainConfigs,
   getEnvVariable,
 } from "config";
-import { AstriaWalletContextProvider } from "features/evm-wallet";
+import {
+  AstriaWalletContextProvider,
+  EvmWalletProvider,
+} from "features/evm-wallet";
+import { CosmosWalletProvider } from "features/cosmos-wallet";
 import { NotificationsContextProvider } from "features/notifications";
 
 const WALLET_CONNECT_PROJECT_ID = getEnvVariable(
@@ -51,7 +55,8 @@ const rainbowKitConfig = getDefaultConfig({
   chains: evmChainsToRainbowKitChains(allEvmChains),
 });
 
-// TODO - refactor to same level as the cosmos wallet context provider
+// TODO - refactor ChainProvider to same level as the cosmos wallet context provider
+//  because they are only used for Bridge
 const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
 const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
 
@@ -82,9 +87,12 @@ export function Providers({ children }: { children: ReactNode }) {
                     projectId={CDP_PROJECT_ID}
                     chain={base}
                   >
-                    {/* AstriaWalletContextProvider is used by multiple pages, so it stays at the app level */}
                     <AstriaWalletContextProvider>
-                      {children}
+                      {/* Bridge specific providers moved here from bridge/layout.tsx to
+                          prevent re-initialization during page navigation */}
+                      <EvmWalletProvider>
+                        <CosmosWalletProvider>{children}</CosmosWalletProvider>
+                      </EvmWalletProvider>
                     </AstriaWalletContextProvider>
                   </OnchainKitProvider>
                 </ChainProvider>

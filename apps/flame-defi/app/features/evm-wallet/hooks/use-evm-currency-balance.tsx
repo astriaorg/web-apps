@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { getBalance } from "@wagmi/core";
 import { formatUnits } from "viem";
-import { useAccount, useBalance, useConfig } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import { Balance, EvmCurrency } from "@repo/flame-types";
 import { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
 
-import { createErc20Service } from "features/evm-wallet/services/erc-20-service/erc-20-service";
+import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 /**
  * Custom hook to fetch and manage the token balance for a given token and user address.
@@ -14,79 +15,86 @@ import { createErc20Service } from "features/evm-wallet/services/erc-20-service/
  * It provides the current balance value, loading state, and error state.
  * Also supports automatic polling with configurable interval.
  *
- * @param token The token to fetch balance for
+ * @param currency The currency to fetch balance for
  * @param pollingConfig Optional configuration for polling (enabled, intervalMS)
  */
 export const useEvmCurrencyBalance = (
-  token?: EvmCurrency,
+  currency?: EvmCurrency,
   pollingConfig?: PollingConfig,
 ): UseBalanceResult => {
   const wagmiConfig = useConfig();
   const { address: userAddress, chainId } = useAccount();
-  const { data: nativeBalance } = useBalance({
-    address: userAddress,
-    chainId,
-  });
 
   const intervalMS = pollingConfig?.intervalMS ?? 10000; // 10 seconds by default
-  const enabled = pollingConfig?.enabled ?? true;
+
+  const enabled = (() => {
+    // chain id must match currency id
+    if (chainId !== currency?.chainId) {
+      return false;
+    }
+    const enabledFromConfig = pollingConfig?.enabled ?? true; // true if pollingConfig undefined
+    return (
+      enabledFromConfig &&
+      Boolean(chainId) &&
+      Boolean(currency) &&
+      Boolean(userAddress)
+    );
+  })();
 
   const { data, isLoading, error } = useQuery({
     queryKey: [
       "tokenBalance",
       userAddress,
       chainId,
-      token?.coinDenom,
-      token?.erc20ContractAddress,
+      currency?.coinDenom,
+      currency?.erc20ContractAddress,
     ],
     queryFn: async (): Promise<Balance | null> => {
-      if (!wagmiConfig || !chainId || !userAddress || !token) {
+      if (!wagmiConfig || !chainId || !userAddress || !currency) {
         return null;
       }
 
-      try {
-        if (token.erc20ContractAddress) {
-          // For ERC20 tokens
-          const erc20Service = createErc20Service(
-            wagmiConfig,
-            token.erc20ContractAddress,
-          );
+      if (currency.erc20ContractAddress) {
+        // For ERC20 tokens
+        const erc20Service = createErc20Service(
+          wagmiConfig,
+          currency.erc20ContractAddress,
+        );
 
-          const balanceRes = await erc20Service.getBalance(
-            chainId,
-            userAddress as string,
-          );
+        const balanceRes = await erc20Service.getBalance(
+          chainId,
+          userAddress as string,
+        );
 
-          const balanceStr = formatUnits(balanceRes, token.coinDecimals);
+        const balanceStr = formatUnits(balanceRes, currency.coinDecimals);
 
-          return {
-            value: balanceStr,
-            symbol: token.coinDenom,
-          };
-        } else {
-          // For native tokens
-          if (!nativeBalance?.value) {
-            return null;
-          }
+        return {
+          value: balanceStr,
+          symbol: currency.coinDenom,
+        };
+      } else {
+        // Fetch native token balance inside the query so loading state is synchronized.
+        const nativeBalance = await getBalance(wagmiConfig, {
+          address: userAddress,
+          chainId,
+        });
 
-          const balanceStr = formatUnits(
-            nativeBalance.value,
-            nativeBalance.decimals,
-          );
-
-          return {
-            value: balanceStr,
-            symbol: token.coinDenom,
-          };
+        if (!nativeBalance.value) {
+          return null;
         }
-      } catch (e) {
-        const errorObj =
-          e instanceof Error ? e : new Error("Failed to fetch balance.");
-        console.error("Failed to fetch token balance", errorObj);
-        throw errorObj;
+
+        const balanceStr = formatUnits(
+          nativeBalance.value,
+          nativeBalance.decimals,
+        );
+
+        return {
+          value: balanceStr,
+          symbol: currency.coinDenom,
+        };
       }
     },
-    enabled: !!token && !!userAddress && !!chainId && enabled,
+    enabled: enabled,
     refetchInterval: intervalMS,
     staleTime: Math.min(intervalMS / 2, 5000),
     retry: 2,

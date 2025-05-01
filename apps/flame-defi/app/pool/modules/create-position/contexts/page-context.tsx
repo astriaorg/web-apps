@@ -6,8 +6,11 @@ import type { EvmCurrency } from "@repo/flame-types";
 import { useTokenAmountInput, type Amount } from "@repo/ui/components";
 import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
-
-import { FEE_TIER, type FeeTier } from "pool/constants";
+import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+} from "pool/modules/create-position/types";
+import { FEE_TIER, type FeeTier } from "pool/types";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
@@ -20,8 +23,16 @@ export interface PageContextProps extends PropsWithChildren {
   token1Balance: { symbol: string; value: string } | null;
   setToken0: (value?: EvmCurrency) => void;
   setToken1: (value?: EvmCurrency) => void;
-  selectedFeeTier: FeeTier;
-  setSelectedFeeTier: (value: FeeTier) => void;
+  isLoadingToken0Balance: boolean;
+  isLoadingToken1Balance: boolean;
+  feeTier: FeeTier;
+  setFeeTier: (value: FeeTier) => void;
+  minPrice: string;
+  setMinPrice: (value: string) => void;
+  maxPrice: string;
+  setMaxPrice: (value: string) => void;
+  amountInitialPrice: Amount;
+  setAmountInitialPrice: ({ value }: { value: string }) => void;
 }
 
 export const PageContext = createContext<PageContextProps | undefined>(
@@ -31,19 +42,24 @@ export const PageContext = createContext<PageContextProps | undefined>(
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const { chain } = useAstriaChainData();
 
-  const [selectedFeeTier, setSelectedFeeTier] = useState<FeeTier>(
-    FEE_TIER.MEDIUM,
+  const [feeTier, setFeeTier] = useState<FeeTier>(FEE_TIER.MEDIUM);
+
+  const [minPrice, setMinPrice] = useState<string>(
+    MIN_PRICE_DEFAULT.toString(),
+  );
+  const [maxPrice, setMaxPrice] = useState<string>(
+    MAX_PRICE_DEFAULT.toString(),
   );
 
   const [token0, setToken0] = useState<EvmCurrency | undefined>(
     chain.currencies[0],
   );
-  const [token1, setToken1] = useState<EvmCurrency | undefined>(
-    chain.currencies[3],
-  );
+  const [token1, setToken1] = useState<EvmCurrency | undefined>();
 
-  const { balance: token0Balance } = useEvmCurrencyBalance(token0);
-  const { balance: token1Balance } = useEvmCurrencyBalance(token1);
+  const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
+    useEvmCurrencyBalance(token0);
+  const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
+    useEvmCurrencyBalance(token1);
 
   // TODO: Figure out why validation is always false.
   const {
@@ -76,6 +92,16 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       : undefined,
   });
 
+  const { amount: amountInitialPrice, onInput: setAmountInitialPrice } =
+    useTokenAmountInput({
+      token: token0
+        ? {
+            symbol: token0?.coinDenom,
+            decimals: token0?.coinDecimals,
+          }
+        : undefined,
+    });
+
   return (
     <PageContext.Provider
       value={{
@@ -89,8 +115,16 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         setToken1,
         token0Balance,
         token1Balance,
-        selectedFeeTier,
-        setSelectedFeeTier,
+        isLoadingToken0Balance,
+        isLoadingToken1Balance,
+        feeTier,
+        setFeeTier,
+        minPrice,
+        setMinPrice,
+        maxPrice,
+        setMaxPrice,
+        amountInitialPrice,
+        setAmountInitialPrice,
       }}
     >
       {children}

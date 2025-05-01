@@ -1,5 +1,3 @@
-"use client";
-
 import { CloseIcon } from "@repo/ui/icons";
 import {
   Button,

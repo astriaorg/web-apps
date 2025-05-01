@@ -3,7 +3,7 @@ import * as React from "react";
 
 import { ArrowLeftIcon, ArrowRightIcon } from "../../icons";
 import { cn } from "../../utils";
-import { ButtonProps, buttonVariants } from "./button";
+import { buttonVariants } from "./button";
 
 interface PaginationProps {
   totalPages: number;
@@ -47,14 +47,12 @@ PaginationItem.displayName = "PaginationItem";
 type PaginationLinkProps = {
   isActive?: boolean;
   isDisabled?: boolean;
-} & Pick<ButtonProps, "size"> &
-  React.ComponentProps<"a">;
+} & React.ComponentProps<"a">;
 
 const PaginationLink = ({
   className,
   isActive,
   isDisabled,
-  size = "icon",
   ...props
 }: PaginationLinkProps) => (
   <a
@@ -62,7 +60,6 @@ const PaginationLink = ({
     className={cn(
       buttonVariants({
         variant: isActive ? "outline" : "secondary",
-        size,
       }),
       isDisabled && ["pointer-events-none opacity-50 shadow-none"],
       className,
@@ -78,7 +75,6 @@ const PaginationPrevious = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label="Go to previous page"
-    size="default"
     className={cn("h-10 w-12 text-icon-subdued", className)}
     {...props}
   >
@@ -94,7 +90,6 @@ const PaginationNext = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label="Go to next page"
-    size="default"
     className={cn("h-10 w-12 text-icon-subdued", className)}
     {...props}
   >
