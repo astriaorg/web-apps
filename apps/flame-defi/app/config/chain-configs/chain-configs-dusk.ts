@@ -1,11 +1,11 @@
 import {
   AstriaChain,
+  AstriaChains,
   ChainType,
   CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
-  AstriaChains,
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
@@ -218,6 +218,9 @@ const FlameChainInfo: AstriaChain = {
     },
     nonfungiblePositionManager: {
       address: "0x371cC275651E799890E8409102D7Cc1910647ceD",
+    },
+    multicall3: {
+      address: "0x",
     },
   },
   currencies: [

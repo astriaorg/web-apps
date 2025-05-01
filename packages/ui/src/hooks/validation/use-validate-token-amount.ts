@@ -1,9 +1,9 @@
 import Big from "big.js";
-import { type Validation, type ValidationAsset } from "./types";
+import { type Validation, type ValidationToken } from "./types";
 
 type Params = {
   value: string;
-  asset: ValidationAsset;
+  token: ValidationToken;
   decimals?: number;
   minimum?: string;
   maximum?: string;
@@ -62,7 +62,7 @@ export const validate = ({
   };
 };
 
-export const useValidateAssetAmount = () => {
+export const useValidateTokenAmount = () => {
   return (params: Params): Validation => {
     const state = validate(params);
 
@@ -81,7 +81,7 @@ export const useValidateAssetAmount = () => {
       errors.push(`The minimum amount is ${params.minimum}.`);
     }
     if (!state.maximum) {
-      errors.push(`Insufficient ${params.asset.symbol} balance.`);
+      errors.push(`Insufficient ${params.token.symbol} balance.`);
     }
 
     return { isValid: state.isValid, errors };

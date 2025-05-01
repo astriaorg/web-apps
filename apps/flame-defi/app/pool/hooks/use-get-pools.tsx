@@ -2,21 +2,15 @@ import type { EvmCurrency } from "@repo/flame-types";
 import { isZeroAddress } from "@repo/ui/utils";
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useAstriaChainData } from "config";
-import {
-  createPoolFactoryService,
-  createPoolService,
-} from "features/evm-wallet";
+import { createPoolFactoryService } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier } from "pool/constants";
+import type { PoolWithSlot0 } from "pool/types";
 import { calculatePoolExchangeRate } from "pool/utils";
 import type { Address } from "viem";
 import { useConfig } from "wagmi";
 
 type GetPoolsResult = {
-  [key in FeeTier]: {
-    address: string;
-    rateToken0ToToken1: string;
-    rateToken1ToToken0: string;
-  } | null;
+  [key in FeeTier]: PoolWithSlot0 | null;
 };
 
 export const useGetPools = ({
@@ -32,9 +26,8 @@ export const useGetPools = ({
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!token0 && !!token1,
-    queryKey: ["useGetPool", token0, token1, chain],
+    queryKey: ["useGetPools", token0, token1, chain],
     queryFn: async () => {
-      console.log("useGetPool");
       if (!token0 || !token1) {
         return null;
       }
@@ -58,19 +51,8 @@ export const useGetPools = ({
         FEE_TIERS,
       );
 
-      // TODO: Use multicall.
-      // Batch the `getSlot0` calls for all pools
-      const slot0Results = await Promise.all(
-        pools
-          .filter((it) => !isZeroAddress(it))
-          .map(async (it) => {
-            const poolService = createPoolService(config, it);
-            return {
-              address: it,
-              slot0: await poolService.getSlot0(chain.chainId),
-            };
-          }),
-      );
+      const validPools = pools.filter((it) => !isZeroAddress(it));
+      const slot0Results = await poolFactoryService.getPoolsSlot0(validPools);
 
       const result = {} as GetPoolsResult;
 
@@ -85,12 +67,13 @@ export const useGetPools = ({
         }
 
         result[feeTier] = {
-          address: pools[feeTier] as string,
+          address: pools[i] as string,
           ...calculatePoolExchangeRate({
             decimal0: token0.coinDecimals,
             decimal1: token1.coinDecimals,
             sqrtPriceX96: slot0Result.slot0.sqrtPriceX96,
           }),
+          ...slot0Result.slot0,
         };
       }
 

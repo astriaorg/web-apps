@@ -3,4 +3,4 @@ export type Validation = {
   errors?: string[];
 };
 
-export type ValidationAsset = { symbol: string; decimals: number };
+export type ValidationToken = { symbol: string; decimals: number };

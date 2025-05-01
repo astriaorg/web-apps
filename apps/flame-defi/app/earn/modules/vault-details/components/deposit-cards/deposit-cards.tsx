@@ -3,7 +3,7 @@ import {
   CardContent,
   CardLabel,
   Skeleton,
-  useAssetAmountInput,
+  useTokenAmountInput,
 } from "@repo/ui/components";
 import Big from "big.js";
 import { Image } from "components/image";
@@ -37,10 +37,10 @@ export const DepositCards = () => {
     },
   });
 
-  const { amount, onInput, onReset, isValid } = useAssetAmountInput({
+  const { amount, onInput, onReset, isValid } = useTokenAmountInput({
     balance: "0",
     minimum: "0",
-    asset: data?.vaultByAddress.asset,
+    token: data?.vaultByAddress.asset,
   });
 
   const items = useMemo<

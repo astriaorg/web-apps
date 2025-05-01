@@ -1,6 +1,6 @@
 /**
- * Fee tiers available in Uniswap V3
- * Values are in hundredths of a basis point (1 = 0.0001%)
+ * Fee tiers available in Uniswap V3.
+ * Values are in hundredths of a basis point (1 = 0.0001%).
  */
 export const FEE_TIER = {
   LOWEST: 100, // 0.01%
@@ -15,6 +15,16 @@ export const FEE_TIERS = [
   FEE_TIER.MEDIUM,
   FEE_TIER.HIGH,
 ];
+
+/**
+ * Returns the same values as "tickSpacing" in the contract, hard-code since these values are fixed.
+ */
+export const FEE_TIER_TICK_SPACING: { [key in FeeTier]: number } = {
+  [FEE_TIER.LOWEST]: 1,
+  [FEE_TIER.LOW]: 10,
+  [FEE_TIER.MEDIUM]: 60,
+  [FEE_TIER.HIGH]: 200,
+};
 
 /**
  * Type representing valid fee tier values
