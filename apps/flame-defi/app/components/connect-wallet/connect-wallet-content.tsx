@@ -32,8 +32,10 @@ export const ConnectWalletContent = ({
 }: ConnectWalletContentProps) => {
   // Filter out props that shouldn't be passed to the Accordion component to fix DOM errors.
   const {
-    isConnected: _isConnected,
-    onConnectWallet: _onConnectWallet,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    isConnected,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onConnectWallet,
     ...accordionProps
   } = props;
 
