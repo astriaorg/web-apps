@@ -1,5 +1,6 @@
 # recipes for the flame defi app
 mod flame-defi 'apps/flame-defi'
+mod e2e-tests 'apps/flame-defi/e2e-tests'
 
 _default:
   @just --list
