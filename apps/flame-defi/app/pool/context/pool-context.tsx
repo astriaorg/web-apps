@@ -9,11 +9,11 @@ import {
 } from "react";
 import { useAccount, useConfig } from "wagmi";
 
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
-import { useAstriaChainData } from "config/hooks/use-config";
 import type { FeeTier } from "pool/types";
 import { PoolContextProps, PoolPosition } from "pool/types";
 

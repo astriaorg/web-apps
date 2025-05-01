@@ -9,8 +9,8 @@ import {
 } from "@repo/ui/components";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
-import { useAstriaWallet } from "features/evm-wallet";
 import { ConnectWalletContent } from "components/connect-wallet";
+import { useAstriaWallet } from "features/evm-wallet";
 
 /**
  * Button with dropdown to connect to Astria wallet.

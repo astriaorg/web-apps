@@ -5,10 +5,10 @@ import { useAccount } from "wagmi";
 import { Balance } from "@repo/flame-types";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
+import { ConnectMultipleWallets } from "components/connect-wallet";
 import { useEvmCurrencyBalance } from "features/evm-wallet/hooks/use-evm-currency-balance";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useUsdQuote } from "features/evm-wallet/hooks/use-usd-quote";
-import { ConnectMultipleWallets } from "components/connect-wallet";
 
 interface ConnectEvmWalletButtonProps {
   onDisconnectWallet?: () => void;

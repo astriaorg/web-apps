@@ -3,8 +3,8 @@
 import { useCallback, useState } from "react";
 
 import { TXN_STATUS } from "@repo/flame-types";
-import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
 import {
   useAddLiquidityTxn,

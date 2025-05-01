@@ -12,12 +12,12 @@ import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
-import { useAstriaChainData } from "config/hooks/use-config";
 import { PoolPositionResponse, PoolToken } from "pool/types";
 import { PoolPositionContextProps } from "pool/types";
 

@@ -14,9 +14,9 @@ import {
 } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
 import { ArrowDownIcon } from "@repo/ui/icons";
-import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
 import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";

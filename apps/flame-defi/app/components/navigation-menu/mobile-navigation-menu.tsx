@@ -24,9 +24,9 @@ import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
-import { useAstriaWallet } from "features/evm-wallet";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
+import { useAstriaWallet } from "features/evm-wallet";
 
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";
 import { NavigationMenuButton } from "./navigation-menu-button";
