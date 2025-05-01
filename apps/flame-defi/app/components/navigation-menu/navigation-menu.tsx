@@ -4,7 +4,7 @@ import { AstriaLogo } from "@repo/ui/logos";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 import { usePathname } from "next/navigation";
-import { ConnectWalletsButton } from "./connect-wallets-button";
+import { ConnectAstriaWalletButton } from "./connect-astria-wallet-button";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
 import { NetworkSelect } from "./network-select";
@@ -69,7 +69,7 @@ export const NavigationMenu = () => {
       </div>
       <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
-        {!isBridgePage && <ConnectWalletsButton />}
+        {!isBridgePage && <ConnectAstriaWalletButton />}
       </div>
       <div className="md:hidden">
         <MobileNavigationMenu />

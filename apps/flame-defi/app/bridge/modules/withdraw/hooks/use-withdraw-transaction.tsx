@@ -2,12 +2,9 @@
 
 import { useCallback, useState } from "react";
 import { type Address } from "viem";
-import { useConfig } from "wagmi";
-
-import { useCosmosWallet } from "features/cosmos-wallet";
 
 import { WalletConnectionError, WithdrawError } from "bridge/errors";
-import { createBridgeStrategy } from "bridge/strategies";
+import { useBridgeStrategy } from "bridge/hooks/use-bridge-strategy";
 import { ChainConnection } from "bridge/types";
 
 export interface WithdrawTransactionHook {
@@ -21,9 +18,7 @@ export interface WithdrawTransactionHook {
 }
 
 export function useWithdrawTransaction(): WithdrawTransactionHook {
-  const wagmiConfig = useConfig();
-  const cosmosWallet = useCosmosWallet();
-
+  const { executeStrategy } = useBridgeStrategy();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const executeWithdraw = useCallback(
@@ -54,17 +49,12 @@ export function useWithdrawTransaction(): WithdrawTransactionHook {
       setIsLoading(true);
 
       try {
-        const withdrawStrategy = createBridgeStrategy(
-          {
-            amount,
-            sourceConnection,
-            cosmosWallet,
-            wagmiConfig,
-          },
-          destinationConnection.chain.chainType,
-        );
-
-        await withdrawStrategy.execute(recipientAddress);
+        await executeStrategy({
+          amount,
+          sourceConnection,
+          recipientAddress,
+          destinationChainType: destinationConnection.chain.chainType,
+        });
       } catch (e) {
         console.error("Withdraw failed", e);
         throw new WithdrawError(
@@ -74,7 +64,7 @@ export function useWithdrawTransaction(): WithdrawTransactionHook {
         setIsLoading(false);
       }
     },
-    [cosmosWallet, wagmiConfig],
+    [executeStrategy],
   );
 
   return {

@@ -4,6 +4,7 @@ import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import { SideTag } from "./components/side-tag/side-tag";
 import { Observability } from "./features/observability";
 import { Providers } from "./providers";
@@ -99,6 +100,8 @@ const nbAkademieMono = localFont({
     },
   ],
   display: "swap",
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-nb-akademie-mono",
 });
 
@@ -196,13 +199,24 @@ const switzer = localFont({
     },
   ],
   display: "swap",
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-switzer",
 });
 
 const ledDotMatrix = localFont({
   src: "../public/fonts/LED_Dot-Matrix.woff2",
   display: "swap",
+  preload: false,
   variable: "--font-dot-matrix",
+});
+
+// Add Inter font using Next.js font system
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  preload: false,
 });
 
 export default function RootLayout({
@@ -215,7 +229,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="dark"
-      className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable}`}
+      className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable} ${inter.variable}`}
     >
       <body>
         <Providers>

@@ -15,8 +15,6 @@ export interface AstriaWalletContextProps {
   chains: AstriaChain[];
   nativeTokenBalance: Balance | null;
   isLoadingNativeTokenBalance: boolean;
-  // FIXME - do we still need this here?
-  //  should/can it replace the network selection implementation?
   chain: AstriaChain | null;
   usdcToNativeQuote: Balance;
   quoteLoading: boolean;
@@ -87,7 +85,6 @@ export const AstriaWalletContextProvider: React.FC<{
         connectWallet,
         disconnectWallet: disconnect,
         accountAddress: userAccount.address ?? null,
-        // FIXME - should this be all Astria chains, i.e. devnet and testnet?
         chains: Object.values(astriaChains),
         nativeTokenBalance,
         isLoadingNativeTokenBalance,

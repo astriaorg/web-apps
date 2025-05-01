@@ -37,7 +37,7 @@ export const ConnectCosmosWalletButton = ({
   const { quoteLoading, usdcToNativeQuote } = {
     quoteLoading: false,
     usdcToNativeQuote: {
-      value: "4.20",
+      value: "---",
       symbol: "USDC",
     },
   };
@@ -71,7 +71,7 @@ export const ConnectCosmosWalletButton = ({
 
   return (
     <ConnectMultipleWallets
-      isConnected={!!cosmosAccountAddress}
+      isConnected={Boolean(cosmosAccountAddress)}
       isLoading={isLoadingCosmosBalance || !cosmosBalance || quoteLoading}
       account={
         cosmosAccountAddress ? { address: cosmosAccountAddress } : undefined

@@ -1,5 +1,6 @@
 # recipes for the flame defi app
 mod flame-defi 'apps/flame-defi'
+mod e2e-tests 'apps/flame-defi/e2e-tests'
 
 _default:
   @just --list
@@ -42,3 +43,10 @@ alias r := run
 build:
   npm run build
 alias b := build
+
+# run all commands to ensure successful build in ci
+prepush:
+  just format
+  just check-types
+  just lint
+  just test

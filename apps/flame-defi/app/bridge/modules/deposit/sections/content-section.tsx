@@ -1,15 +1,15 @@
 "use client";
 
 import Big from "big.js";
+import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { isAddress } from "viem";
+import { useSwitchChain } from "wagmi";
 
-// import { FundButton, getOnrampBuyUrl } from "@coinbase/onchainkit/fund";
-
-import { EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Button } from "@repo/ui/components";
+import { ChainType, EvmCurrency } from "@repo/flame-types";
+import { AnimatedArrowSpacer } from "@repo/ui/components";
 import {
-  ArrowUpDownIcon,
+  ArrowDownIcon,
   BaseIcon,
   EditIcon,
   PlusIcon,
@@ -22,13 +22,17 @@ import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";
 
-import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
+import { AmountInput } from "bridge/components/amount-input";
+import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
+import { SubmitButton } from "bridge/components/submit-button";
+import { ROUTES } from "bridge/constants/routes";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();
+  const { switchChain } = useSwitchChain();
 
   // Local state for form
   const [amount, setAmount] = useState<string>("");
@@ -72,6 +76,29 @@ export const ContentSection = () => {
     destinationChains: [...Object.values(astriaChains)],
   });
 
+  // without these in combination with Dropdown's valueOverride,
+  // we would not be able to clear the selection
+  const sourceChainOption = useMemo(() => {
+    if (!sourceConnection.chain) {
+      return null;
+    }
+    return {
+      label: sourceConnection.chain.chainName,
+      value: sourceConnection.chain,
+      LeftIcon: sourceConnection.chain.IconComponent,
+    };
+  }, [sourceConnection.chain]);
+  const destinationChainOption = useMemo(() => {
+    if (!destinationConnection.chain) {
+      return null;
+    }
+    return {
+      label: destinationConnection.chain.chainName,
+      value: destinationConnection.chain,
+      LeftIcon: destinationConnection.chain.IconComponent,
+    };
+  }, [destinationConnection.chain]);
+
   // Recipient address editing handlers
   const handleEditRecipientClick = useCallback(() => {
     setIsRecipientAddressEditable(true);
@@ -88,6 +115,13 @@ export const ContentSection = () => {
 
   const handleDepositClick = useCallback(async () => {
     setIsAnimating(true);
+
+    if (
+      sourceConnection.chain?.chainType === ChainType.EVM ||
+      sourceConnection.chain?.chainType === ChainType.ASTRIA
+    ) {
+      switchChain({ chainId: sourceConnection.chain.chainId });
+    }
 
     try {
       await executeDeposit({
@@ -135,9 +169,10 @@ export const ContentSection = () => {
       setIsAnimating(false);
     }
   }, [
-    amount,
-    executeDeposit,
     sourceConnection,
+    switchChain,
+    executeDeposit,
+    amount,
     destinationConnection,
     recipientAddressOverride,
     addNotification,
@@ -220,30 +255,23 @@ export const ContentSection = () => {
     ],
   );
 
-  // Form handling
-  const updateAmount = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(event.target.value);
-  };
-
   const checkIsFormValid = useCallback(
     (addressInput: string | null, amountInput: string) => {
-      if (addressInput === null) {
+      // check that we have an address and it is correct format
+      if (
+        addressInput === null ||
+        !isAddress(addressInput) ||
+        addressInput.length < 0
+      ) {
         setIsRecipientAddressValid(false);
-        return;
-      }
-
-      // Check that address is correct EVM address format
-      if (!isAddress(addressInput)) {
-        setIsRecipientAddressValid(false);
-        return;
+      } else {
+        const addressValid = addressInput.length > 0;
+        setIsRecipientAddressValid(addressValid);
       }
 
       const amount = new Big(amountInput || "0");
       const amountValid = amount.gt(0);
       setIsAmountValid(amountValid);
-
-      const addressValid = addressInput.length > 0;
-      setIsRecipientAddressValid(addressValid);
     },
     [setIsAmountValid, setIsRecipientAddressValid],
   );
@@ -274,13 +302,18 @@ export const ContentSection = () => {
     setRecipientAddressOverride(event.target.value);
   };
 
+  // we only enable fetching if the wallet is connected.
+  // this prevents trying to get astria balance when connected to base as source for example
   const { balance: sourceBalance, isLoading: isLoadingSourceBalance } =
-    useCurrencyBalance(sourceConnection.currency ?? undefined);
-
+    useCurrencyBalance(sourceConnection.currency ?? undefined, {
+      enabled: sourceConnection.isConnected,
+    });
   const {
     balance: destinationBalance,
     isLoading: isLoadingDestinationBalance,
-  } = useCurrencyBalance(destinationConnection.currency ?? undefined);
+  } = useCurrencyBalance(destinationConnection.currency ?? undefined, {
+    enabled: destinationConnection.isConnected,
+  });
 
   const isDepositDisabled = useMemo<boolean>((): boolean => {
     if (recipientAddressOverride) {
@@ -306,6 +339,9 @@ export const ContentSection = () => {
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
+        <div className="flex justify-end mb-4">
+          <ManageWalletsButton />
+        </div>
         <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
           <div>
             <div className="flex flex-col">
@@ -314,17 +350,13 @@ export const ContentSection = () => {
                 <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
                   From
                 </div>
-                {/*{Boolean(coinbaseOnrampBuyUrl) && (*/}
-                {/*  <div>*/}
-                {/*    <FundButton fundingUrl={coinbaseOnrampBuyUrl} />*/}
-                {/*  </div>*/}
-                {/*)}*/}
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
                       placeholder="Select chain..."
                       options={sourceChainOptions}
                       additionalOptions={additionalSourceOptions}
+                      valueOverride={sourceChainOption}
                       onSelect={connectSource}
                       LeftIcon={WalletIcon}
                     />
@@ -350,17 +382,29 @@ export const ContentSection = () => {
                   <p className="text-grey-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
-                  {sourceConnection.currency && (
-                    <p className="mt-2 text-grey-lighter font-semibold">
-                      Balance: {isLoadingSourceBalance && "Loading..."}
-                      {!isLoadingSourceBalance &&
-                        sourceBalance &&
-                        `${sourceBalance.value} ${sourceBalance.symbol}`}
-                      {!isLoadingSourceBalance &&
-                        !sourceBalance &&
-                        `0 ${sourceConnection.currency.coinDenom}`}
-                    </p>
-                  )}
+                  {sourceConnection.currency &&
+                    sourceConnection.isConnected && (
+                      <p className="mt-2 text-grey-lighter font-semibold">
+                        Balance: {isLoadingSourceBalance && "Loading..."}
+                        {!isLoadingSourceBalance &&
+                          sourceBalance &&
+                          `${sourceBalance.value} ${sourceBalance.symbol}`}
+                        {!isLoadingSourceBalance &&
+                          !sourceBalance &&
+                          `0 ${sourceConnection.currency.coinDenom}`}
+                      </p>
+                    )}
+                  {sourceConnection.currency &&
+                    sourceConnection.currency instanceof EvmCurrency &&
+                    sourceConnection.isConnected &&
+                    !isLoadingSourceBalance &&
+                    (!sourceBalance || sourceBalance.value === "0") && (
+                      <div className="mt-3">
+                        <AddErc20ToWalletButton
+                          evmCurrency={sourceConnection.currency}
+                        />
+                      </div>
+                    )}
                 </div>
               )}
             </div>
@@ -369,10 +413,12 @@ export const ContentSection = () => {
           {isAnimating ? (
             <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
-            <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4 h-[40px]">
-              <div>
-                <ArrowUpDownIcon size={32} />
-              </div>
+            <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
+              <Link href={ROUTES.WITHDRAW}>
+                <div>
+                  <ArrowDownIcon size={32} />
+                </div>
+              </Link>
               <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
             </div>
           )}
@@ -387,9 +433,10 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Connect Astria wallet or enter address"
+                      placeholder="Connect wallet or enter address"
                       options={destinationChainOptions}
                       onSelect={connectDestination}
+                      valueOverride={destinationChainOption}
                       additionalOptions={additionalDestinationOptions}
                       LeftIcon={WalletIcon}
                     />
@@ -424,20 +471,24 @@ export const ContentSection = () => {
                       </span>
                       <i className="fas fa-pen-to-square" />
                     </p>
-                    {destinationConnection.currency && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
-                        Balance: {isLoadingDestinationBalance && "Loading..."}
-                        {!isLoadingDestinationBalance &&
-                          destinationBalance &&
-                          `${destinationBalance.value} ${destinationBalance.symbol}`}
-                        {!isLoadingDestinationBalance &&
-                          !destinationBalance &&
-                          `0 ${destinationConnection.currency.coinDenom}`}
-                      </p>
-                    )}
+                    {destinationConnection.currency &&
+                      destinationConnection.isConnected && (
+                        <p className="mt-2 text-grey-lighter font-semibold">
+                          Balance: {isLoadingDestinationBalance && "Loading..."}
+                          {!isLoadingDestinationBalance &&
+                            destinationBalance &&
+                            `${destinationBalance.value} ${destinationBalance.symbol}`}
+                          {!isLoadingDestinationBalance &&
+                            !destinationBalance &&
+                            `0 ${destinationConnection.currency.coinDenom}`}
+                        </p>
+                      )}
                     {destinationCurrencyOption?.value &&
                       destinationCurrencyOption.value instanceof EvmCurrency &&
-                      destinationConnection.address && (
+                      destinationConnection.isConnected &&
+                      !isLoadingDestinationBalance &&
+                      (!destinationBalance ||
+                        destinationBalance.value === "0") && (
                         <div className="mt-3">
                           <AddErc20ToWalletButton
                             evmCurrency={destinationCurrencyOption.value}
@@ -510,46 +561,23 @@ export const ContentSection = () => {
             <div className="border-t border-grey-dark my-4 w-full" />
           </div>
 
-          <div className="mb-4">
-            <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">Amount</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  Amount
-                </div>
-                <div className="grow">
-                  <input
-                    className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white text-[20px]"
-                    type="text"
-                    placeholder="0.00"
-                    onChange={updateAmount}
-                    value={amount}
-                  />
-                </div>
-              </div>
-            </div>
-            {!isAmountValid && hasTouchedForm && (
-              <div className="text-status-danger mt-2">
-                Amount must be a number greater than 0
-              </div>
-            )}
-          </div>
+          <AmountInput
+            amount={amount}
+            setAmount={setAmount}
+            isAmountValid={isAmountValid}
+            hasTouchedForm={hasTouchedForm}
+          />
 
-          <div className="mt-4">
-            {!sourceConnection.address || !destinationConnection.address ? (
-              <BridgeConnectionsModal>
-                <Button variant="gradient">Connect Wallet</Button>
-              </BridgeConnectionsModal>
-            ) : (
-              <Button
-                variant="gradient"
-                onClick={handleDepositClick}
-                disabled={isDepositDisabled}
-              >
-                {isLoading ? "Processing..." : "Deposit"}
-              </Button>
-            )}
-          </div>
+          <SubmitButton
+            onClick={handleDepositClick}
+            isLoading={isLoading}
+            isDisabled={
+              isDepositDisabled ||
+              !sourceConnection.address ||
+              !destinationConnection.address
+            }
+            buttonText="Deposit"
+          />
         </div>
       </div>
     </div>

@@ -185,6 +185,8 @@ export interface BaseCurrency {
 export interface GenericCurrency extends BaseCurrency {
   /** Display name of the token */
   readonly title: string;
+  /** Chain id of the chain the currency belongs to */
+  readonly chainId: string | number;
   /** True if this is the native token (e.g., TIA) */
   readonly isNative: boolean;
   /** True if this token should be shown in bridge page dropdowns */
@@ -201,6 +203,7 @@ export type CosmosFeeCurrency = WithGasPriceStep<BaseCurrency>;
  */
 export class IbcCurrency implements GenericCurrency {
   public readonly title: string;
+  public readonly chainId: string;
   public readonly isNative: boolean;
   public readonly isBridgeable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
@@ -218,6 +221,7 @@ export class IbcCurrency implements GenericCurrency {
 
   constructor(params: {
     title: string;
+    chainId: string;
     isNative: boolean;
     isBridgeable: boolean;
     IconComponent?: React.FC<IconProps>;
@@ -230,6 +234,7 @@ export class IbcCurrency implements GenericCurrency {
     sequencerBridgeAccount?: string;
   }) {
     this.title = params.title;
+    this.chainId = params.chainId;
     this.coinDenom = params.coinDenom;
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;
@@ -282,10 +287,6 @@ export class IbcCurrency implements GenericCurrency {
 
     return asset;
   }
-
-  public belongsToChain(chain: CosmosChainInfo): boolean {
-    return chain.currencies?.includes(this);
-  }
 }
 
 /**
@@ -322,6 +323,7 @@ export function ibcCurrenciesToCosmosKitAssetList(
  */
 export class EvmCurrency implements GenericCurrency {
   public readonly title: string;
+  public readonly chainId: number;
   public readonly isNative: boolean;
   public readonly isBridgeable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
@@ -346,6 +348,7 @@ export class EvmCurrency implements GenericCurrency {
 
   constructor(params: {
     title: string;
+    chainId: number;
     isNative: boolean;
     isBridgeable: boolean;
     IconComponent?: React.FC<IconProps>;
@@ -359,6 +362,7 @@ export class EvmCurrency implements GenericCurrency {
     isWrappedNative: boolean;
   }) {
     this.title = params.title;
+    this.chainId = params.chainId;
     this.coinDenom = params.coinDenom;
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;

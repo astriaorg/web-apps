@@ -30,12 +30,21 @@ export const ConnectWalletContent = ({
   isCollapsible = true,
   ...props
 }: ConnectWalletContentProps) => {
+  // Filter out props that shouldn't be passed to the Accordion component to fix DOM errors.
+  const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    isConnected,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onConnectWallet,
+    ...accordionProps
+  } = props;
+
   return (
     <Accordion
       type="single"
       // Force the accordion to stay opened for single wallets.
       value={!isCollapsible ? "wallet" : undefined}
-      {...props}
+      {...accordionProps}
     >
       <AccordionItem value="wallet">
         <div className="flex items-center justify-between w-full md:min-w-[300px]">
@@ -43,7 +52,7 @@ export const ConnectWalletContent = ({
             className={cn(
               "p-2 text-typography-subdued font-medium",
               // Hide the caret icon if the wallet is not collapsible, in the case of single wallets.
-              !props.collapsible && "[&>svg]:hidden",
+              !accordionProps.collapsible && "[&>svg]:hidden",
             )}
           >
             <div className="flex items-center gap-2 mr-2 [&_svg]:size-4 md:[&_svg]:size-6">
@@ -54,16 +63,26 @@ export const ConnectWalletContent = ({
           <div className="flex items-center gap-3 text-icon-subdued mr-2 [&_svg]:cursor-pointer [&_svg]:size-4 [&_svg]:hover:text-typography-default">
             {account?.address && (
               <CopyToClipboard value={account.address}>
-                <CopyIcon aria-label="Copy" />
+                <CopyIcon aria-hidden="true" />
+                <span className="sr-only">Copy wallet address</span>
               </CopyToClipboard>
             )}
             {explorer && (
-              <a href={explorer.url} target="_blank" rel="noreferrer">
-                <ShareRightIcon aria-label="Explorer" />
+              <a
+                href={explorer.url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="View in explorer"
+              >
+                <ShareRightIcon aria-hidden="true" />
               </a>
             )}
-            <button type="button" onClick={() => onDisconnectWallet()}>
-              <PowerIcon aria-label="Disconnect" />
+            <button
+              type="button"
+              onClick={() => onDisconnectWallet()}
+              aria-label="Disconnect wallet"
+            >
+              <PowerIcon aria-hidden="true" />
             </button>
           </div>
         </div>
