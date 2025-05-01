@@ -65,7 +65,6 @@ test("should connect EVM wallet from bridge connections modal", async ({
   // Click the wallet button that shows the address (0x...)
   await walletButton.click();
 
-
   // Verify that the balance shows TIA tokens,
   // which is the native currency of the default selected cosmos chain
   await expect(page.locator("text=TIA")).toBeVisible();
