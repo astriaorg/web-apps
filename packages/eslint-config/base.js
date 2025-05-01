@@ -3,6 +3,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 import onlyWarn from "eslint-plugin-only-warn";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
 import { rules as customRules } from "./rules/index.js";
 
 /**
@@ -38,6 +39,31 @@ export const config = [
     },
     rules: {
       "@repo/prefer-optional-syntax": "warn",
+    },
+  },
+  {
+    plugins: {
+      "simple-import-sort": simpleImportSort,
+    },
+    rules: {
+      "simple-import-sort/imports": [
+        "warn",
+        {
+          "groups": [
+            // Node.js builtins and third-party packages
+            ["^\\u0000", "^node:", "^@(?!repo|/)", "^[a-z]"],
+            // Empty line
+            ["^"],
+            // Internal packages (@repo/ prefixed and absolute imports from the project)
+            ["^@repo", "^@/", "^app/", "^features/", "^hooks/", "^config/", "^components/", "^utils/", "^types/", "^styles/", "^assets/", "^services/", "^constants/", "^contexts/"],
+            // Empty line
+            ["^"],
+            // Relative imports
+            ["^\\."]
+          ]
+        }
+      ],
+      "simple-import-sort/exports": "warn"
     },
   },
 ];
