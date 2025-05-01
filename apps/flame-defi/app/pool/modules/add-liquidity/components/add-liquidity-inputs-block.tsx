@@ -1,4 +1,3 @@
-import { AddLiquidityInputsBlockProps, POOL_INPUT_ID } from "pool/types";
 import { useIntl } from "react-intl";
 
 import {
@@ -8,6 +7,7 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
+import { AddLiquidityInputsBlockProps, POOL_INPUT_ID } from "pool/types";
 
 export const AddLiquidityInputsBlock = ({
   input0,

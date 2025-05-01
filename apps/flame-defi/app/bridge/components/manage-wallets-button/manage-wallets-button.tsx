@@ -1,12 +1,12 @@
 "use client";
 
-import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 import React from "react";
 import { useAccount } from "wagmi";
 
 import { Button } from "@repo/ui/components";
 import { WalletIcon } from "@repo/ui/icons";
 import { useCosmosWallet } from "features/cosmos-wallet";
+import { BridgeConnectionsModal } from "bridge/components/bridge-connections-modal";
 
 /**
  * A button for opening the BridgeConnectionsModal

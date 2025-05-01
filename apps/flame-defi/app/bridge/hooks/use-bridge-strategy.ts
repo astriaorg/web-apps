@@ -1,7 +1,5 @@
 "use client";
 
-import { createBridgeStrategy } from "bridge/strategies";
-import { ChainConnection } from "bridge/types";
 import { useConfig } from "config";
 import { useCallback } from "react";
 import { Address } from "viem";
@@ -10,6 +8,8 @@ import { useConfig as useWagmiConfig } from "wagmi";
 import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { createErc20Service } from "features/evm-wallet";
+import { createBridgeStrategy } from "bridge/strategies";
+import { ChainConnection } from "bridge/types";
 
 export interface UseBridgeStrategyResult {
   executeStrategy: (params: {

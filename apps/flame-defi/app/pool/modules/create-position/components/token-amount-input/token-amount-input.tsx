@@ -1,5 +1,3 @@
-import { TokenSelect } from "pool/components/token-select";
-
 import type { EvmCurrency } from "@repo/flame-types";
 import {
   Badge,
@@ -9,6 +7,7 @@ import {
   Skeleton,
 } from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { TokenSelect } from "pool/components/token-select";
 
 interface TokenAmountInputProps {
   value: string;

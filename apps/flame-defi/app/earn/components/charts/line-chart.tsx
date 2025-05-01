@@ -1,4 +1,3 @@
-import { Maybe } from "earn/generated/gql/graphql";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -36,6 +35,7 @@ import {
 } from "@repo/ui/components";
 import { ChevronDownSmallIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
+import { Maybe } from "earn/generated/gql/graphql";
 
 // The height of the chart minus axis.
 const CHART_HEIGHT = 169;

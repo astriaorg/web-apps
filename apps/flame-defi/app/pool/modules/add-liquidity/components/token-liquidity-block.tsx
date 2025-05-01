@@ -1,8 +1,7 @@
-import { TokenInfoCard } from "pool/components";
-import { PoolToken } from "pool/types";
-
 import { Badge, MultiTokenIcon, Skeleton } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
+import { TokenInfoCard } from "pool/components";
+import { PoolToken } from "pool/types";
 
 export const TokenLiquidityBlock = ({
   poolToken0,

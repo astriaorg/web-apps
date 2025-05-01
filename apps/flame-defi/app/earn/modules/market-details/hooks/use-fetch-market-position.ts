@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { graphql } from "earn/generated/gql";
 import request from "graphql-request";
 
 import { useConfig } from "config/hooks/use-config";
+import { graphql } from "earn/generated/gql";
 
 const query = graphql(`
   query MarketPosition($address: String!, $key: String!, $chainId: Int) {

@@ -1,4 +1,9 @@
 import Big from "big.js";
+import { useCallback, useEffect, useMemo } from "react";
+import { useIntl } from "react-intl";
+
+import { Card, CardContent, Slider } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import {
   MAX_PRICE_DEFAULT,
@@ -10,11 +15,6 @@ import {
   calculatePriceToTick,
   calculateTickToPrice,
 } from "pool/utils";
-import { useCallback, useEffect, useMemo } from "react";
-import { useIntl } from "react-intl";
-
-import { Card, CardContent, Slider } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 
 import { MinMaxInput } from "./min-max-input";
 

@@ -1,7 +1,5 @@
 "use client";
 
-import type { FeeTier } from "pool/types";
-import { PoolContextProps, PoolPosition } from "pool/types";
 import {
   createContext,
   PropsWithChildren,
@@ -16,6 +14,8 @@ import {
   createPoolFactoryService,
 } from "features/evm-wallet";
 import { useAstriaChainData } from "config/hooks/use-config";
+import type { FeeTier } from "pool/types";
+import { PoolContextProps, PoolPosition } from "pool/types";
 
 import {
   getMinMaxTick,

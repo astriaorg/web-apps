@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import request from "graphql-request";
+
+import { useConfig } from "config/hooks/use-config";
 import { graphql } from "earn/generated/gql";
 import {
   OrderDirection,
   VaultFilters,
   VaultOrderBy,
 } from "earn/generated/gql/graphql";
-import request from "graphql-request";
-
-import { useConfig } from "config/hooks/use-config";
 
 export const PAGE_SIZE = 25;
 

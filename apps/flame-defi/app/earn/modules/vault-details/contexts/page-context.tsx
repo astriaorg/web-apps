@@ -1,3 +1,7 @@
+import { useParams } from "next/navigation";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
+import { ChartInterval } from "@repo/ui/components";
 import {
   CHART_TYPE,
   Charts as ChartsType,
@@ -6,10 +10,6 @@ import {
 import { useFetchVaultByAddress } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address";
 import { useFetchVaultByAddressHistoricalState } from "earn/modules/vault-details/hooks/use-fetch-vault-by-address-historical-state";
 import { TOTAL_ASSETS_OPTION } from "earn/modules/vault-details/types";
-import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
-
-import { ChartInterval } from "@repo/ui/components";
 
 type Status = "error" | "empty" | "success";
 

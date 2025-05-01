@@ -1,9 +1,9 @@
-import { NewPositionInputsProps } from "pool/types";
 import { useIntl } from "react-intl";
 
 import { Card, CardFigureInput, TokenSelector } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
+import { NewPositionInputsProps } from "pool/types";
 
 export const NewPositionInputs = ({
   input0,

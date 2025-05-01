@@ -1,8 +1,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { PoolPositionResponse, PoolToken } from "pool/types";
-import { PoolPositionContextProps } from "pool/types";
 import {
   createContext,
   PropsWithChildren,
@@ -20,6 +18,8 @@ import {
   createPoolService,
 } from "features/evm-wallet";
 import { useAstriaChainData } from "config/hooks/use-config";
+import { PoolPositionResponse, PoolToken } from "pool/types";
+import { PoolPositionContextProps } from "pool/types";
 
 import {
   getMinMaxTick,

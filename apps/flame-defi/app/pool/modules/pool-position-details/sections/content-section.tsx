@@ -1,17 +1,17 @@
 "use client";
 
-import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
-import {
-  useCollectFeesTxn,
-  usePoolContext,
-  usePoolPositionContext,
-} from "pool/hooks";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
 import { TXN_STATUS } from "@repo/flame-types";
 import { Switch } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
+import {
+  useCollectFeesTxn,
+  usePoolContext,
+  usePoolPositionContext,
+} from "pool/hooks";
 
 import { PositionInfoCard } from "../components";
 export const ContentSection = () => {

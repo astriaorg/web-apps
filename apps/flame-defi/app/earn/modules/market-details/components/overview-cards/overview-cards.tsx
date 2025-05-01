@@ -1,10 +1,10 @@
 import Big from "big.js";
-import { Asset } from "earn/generated/gql/graphql";
-import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { useMemo } from "react";
 import { FormattedDate, useIntl } from "react-intl";
 
 import { Card, CardContent, CardLabel } from "@repo/ui/components";
+import { Asset } from "earn/generated/gql/graphql";
+import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 
 import { AssetRow } from "./asset-row";
 

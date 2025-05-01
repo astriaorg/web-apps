@@ -1,9 +1,4 @@
 import Big from "big.js";
-import { DepositCard } from "earn/components/deposit-card";
-import { WalletActionButton } from "earn/components/wallet-action-button";
-import { ROUTES } from "earn/constants/routes";
-import { useFetchMarketPosition } from "earn/modules/market-details/hooks/use-fetch-market-position";
-import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 import { redirect, useParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { FormattedNumber } from "react-intl";
@@ -17,6 +12,11 @@ import {
   useTokenAmountInput,
 } from "@repo/ui/components";
 import { Image } from "components/image";
+import { DepositCard } from "earn/components/deposit-card";
+import { WalletActionButton } from "earn/components/wallet-action-button";
+import { ROUTES } from "earn/constants/routes";
+import { useFetchMarketPosition } from "earn/modules/market-details/hooks/use-fetch-market-position";
+import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
 
 // TODO: Get balance from contract.
 const BALANCE = "0";

@@ -1,8 +1,8 @@
-import { BigIntDataPoint, FloatDataPoint } from "earn/generated/gql/graphql";
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { BigIntDataPoint, FloatDataPoint } from "earn/generated/gql/graphql";
 
 export const useFormatChartValue = () => {
   const { formatNumber } = useIntl();

@@ -1,4 +1,3 @@
-import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 import { useMemo } from "react";
 
 import {
@@ -8,6 +7,7 @@ import {
   CardLabel,
   Skeleton,
 } from "@repo/ui/components";
+import { usePageContext } from "earn/modules/vault-list/hooks/use-page-context";
 
 // TODO: Use fetched values, handle error state.
 const VALUE_DEPOSIT = 1000000;

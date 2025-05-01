@@ -1,10 +1,10 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { PoolPosition } from "pool/types";
 import { useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
 import { MultiTokenIcon } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
+import { PoolPosition } from "pool/types";
 
 import { usePoolContext } from "./use-pool-context";
 

@@ -1,5 +1,10 @@
 "use client";
 
+import { useCallback } from "react";
+
+import { TXN_STATUS } from "@repo/flame-types";
+import { Switch } from "@repo/ui/components";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { PoolTxnSteps } from "pool/components";
 import {
   usePoolContext,
@@ -7,11 +12,6 @@ import {
   useRemoveLiquidityPercentage,
   useRemoveLiquidityTxn,
 } from "pool/hooks";
-import { useCallback } from "react";
-
-import { TXN_STATUS } from "@repo/flame-types";
-import { Switch } from "@repo/ui/components";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 
 import { TokenLiquidityBlock } from "../components";
 import { RemoveAmountSlider } from "../components";

@@ -1,8 +1,8 @@
-import { PoolToken } from "pool/types";
 import { useIntl } from "react-intl";
 
 import { Badge, Skeleton, TokenIcon } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
+import { PoolToken } from "pool/types";
 
 export function TokenInfoCard({
   poolToken0,

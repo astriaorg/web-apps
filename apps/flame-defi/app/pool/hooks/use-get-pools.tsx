@@ -1,13 +1,13 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useAstriaChainData } from "config";
-import { FEE_TIERS, type FeeTier, type PoolWithSlot0 } from "pool/types";
-import { calculatePoolExchangeRate } from "pool/utils";
 import type { Address } from "viem";
 import { useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import { isZeroAddress } from "@repo/ui/utils";
 import { createPoolFactoryService } from "features/evm-wallet";
+import { FEE_TIERS, type FeeTier, type PoolWithSlot0 } from "pool/types";
+import { calculatePoolExchangeRate } from "pool/utils";
 
 type GetPoolsResult = {
   [key in FeeTier]: PoolWithSlot0 | null;

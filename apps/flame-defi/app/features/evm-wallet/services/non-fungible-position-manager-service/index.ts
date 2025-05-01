@@ -1,5 +1,4 @@
 import { Config } from "@wagmi/core";
-import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 import { Abi, type Address, encodeFunctionData, type Hash } from "viem";
 
 import {
@@ -7,6 +6,7 @@ import {
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
+import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 
 import { GenericContractService } from "../generic-contract-service";
 import { needToReverseTokenOrder } from "../services.utils";

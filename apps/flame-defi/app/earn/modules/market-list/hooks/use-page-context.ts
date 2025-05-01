@@ -1,5 +1,6 @@
-import { PageContext } from "earn/modules/market-list/contexts/page-context";
 import { useContext } from "react";
+
+import { PageContext } from "earn/modules/market-list/contexts/page-context";
 
 export const usePageContext = () => {
   const context = useContext(PageContext);

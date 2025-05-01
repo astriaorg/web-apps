@@ -1,5 +1,4 @@
 import { useAstriaChainData, useConfig as useAppConfig } from "config";
-import { PoolToken } from "pool/types";
 import { useEffect, useState } from "react";
 import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
@@ -10,6 +9,7 @@ import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
+import { PoolToken } from "pool/types";
 
 import { usePoolPositionContext } from ".";
 

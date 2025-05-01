@@ -1,8 +1,7 @@
-import { Asset } from "earn/generated/gql/graphql";
-
 import { Button, CopyToClipboard } from "@repo/ui/components";
 import { CopyIcon } from "@repo/ui/icons";
 import { Image } from "components/image";
+import { Asset } from "earn/generated/gql/graphql";
 
 export const AssetRow = ({ asset }: { asset?: Asset }) => {
   return (
