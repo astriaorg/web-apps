@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-brand text-typography-black hover:bg-surface-inverted hover:text-typography-inverted active:bg-surface-inverted-subdued active:text-typography-inverted",
+          "bg-orange text-white hover:bg-surface-inverted hover:text-typography-inverted active:bg-surface-inverted-subdued active:text-typography-inverted",
         destructive: "",
         outline: "",
         secondary:
@@ -21,10 +21,10 @@ const buttonVariants = cva(
         link: "",
       },
       size: {
-        default: "h-10 rounded-xl px-4 py-3 text-base/4 font-semibold",
+        default: "h-12 rounded-xl px-4 py-3 text-base/4 font-semibold",
         sm: "h-8 rounded-lg px-2 py-1.5 text-sm font-medium",
         lg: "",
-        icon: "h-10 w-10 rounded-lg",
+        icon: "h-8 w-8 rounded-lg",
       },
     },
     defaultVariants: {

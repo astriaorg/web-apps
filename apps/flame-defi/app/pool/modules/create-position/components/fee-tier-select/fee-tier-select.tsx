@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { FEE_TIER, FEE_TIERS, type FeeTier } from "pool/constants";
+import { FEE_TIER, FEE_TIERS, type FeeTier } from "pool/types";
 import { useIntl } from "react-intl";
 
 const FEE_TIER_DATA: { [key in FeeTier]: { label: string } } = {

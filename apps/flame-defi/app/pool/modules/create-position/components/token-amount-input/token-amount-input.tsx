@@ -1,5 +1,11 @@
 import type { EvmCurrency } from "@repo/flame-types";
-import { Badge, Card, CardContent, CardFigureInput } from "@repo/ui/components";
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardFigureInput,
+  Skeleton,
+} from "@repo/ui/components";
 import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { TokenSelect } from "pool/components/token-select";
 
@@ -10,6 +16,7 @@ interface TokenAmountInputProps {
   setSelectedToken: (value?: EvmCurrency) => void;
   options: EvmCurrency[];
   balance: { value: string; symbol: string } | null;
+  isLoading: boolean;
 }
 
 export const TokenAmountInput = ({
@@ -19,6 +26,7 @@ export const TokenAmountInput = ({
   setSelectedToken,
   options,
   balance,
+  isLoading,
 }: TokenAmountInputProps) => {
   const { formatAbbreviatedNumber } = useFormatAbbreviatedNumber();
 
@@ -40,31 +48,33 @@ export const TokenAmountInput = ({
             onValueChange={setSelectedToken}
           />
 
-          {balance ? (
-            <div className="flex items-center gap-1">
-              <span className="text-xs">
-                {formatAbbreviatedNumber(balance.value, {
-                  minimumFractionDigits: 4,
-                  maximumFractionDigits: 4,
-                })}
-                &nbsp;
-                {balance.symbol}
-              </span>
-              <Badge
-                variant="secondary"
-                className="cursor-pointer"
-                onClick={() => {
-                  onInput({
-                    value: balance.value,
-                  });
-                }}
-              >
-                Max
-              </Badge>
-            </div>
-          ) : (
-            <div className="h-5" />
-          )}
+          <Skeleton isLoading={isLoading} className="w-20 h-5">
+            {balance ? (
+              <div className="flex items-center gap-1">
+                <span className="text-xs">
+                  {formatAbbreviatedNumber(balance.value, {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4,
+                  })}
+                  &nbsp;
+                  {balance.symbol}
+                </span>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer"
+                  onClick={() => {
+                    onInput({
+                      value: balance.value,
+                    });
+                  }}
+                >
+                  Max
+                </Badge>
+              </div>
+            ) : (
+              <div className="h-5" />
+            )}
+          </Skeleton>
         </div>
       </CardContent>
     </Card>

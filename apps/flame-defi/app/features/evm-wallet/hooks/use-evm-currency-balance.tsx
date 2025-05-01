@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { getBalance } from "@wagmi/core";
 import { formatUnits } from "viem";
-import { useAccount, useBalance, useConfig } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import { Balance, EvmCurrency } from "@repo/flame-types";
 import { PollingConfig, UseBalanceResult } from "hooks/use-currency-balance";
 
-import { createErc20Service } from "features/evm-wallet/services/erc-20-service/erc-20-service";
+import { createErc20Service } from "../services/erc-20-service/erc-20-service";
 
 /**
  * Custom hook to fetch and manage the token balance for a given token and user address.
@@ -23,10 +24,6 @@ export const useEvmCurrencyBalance = (
 ): UseBalanceResult => {
   const wagmiConfig = useConfig();
   const { address: userAddress, chainId } = useAccount();
-  const { data: nativeBalance } = useBalance({
-    address: userAddress,
-    chainId,
-  });
 
   const intervalMS = pollingConfig?.intervalMS ?? 10000; // 10 seconds by default
 
@@ -76,8 +73,13 @@ export const useEvmCurrencyBalance = (
           symbol: currency.coinDenom,
         };
       } else {
-        // For native tokens
-        if (!nativeBalance?.value) {
+        // Fetch native token balance inside the query so loading state is synchronized.
+        const nativeBalance = await getBalance(wagmiConfig, {
+          address: userAddress,
+          chainId,
+        });
+
+        if (!nativeBalance.value) {
           return null;
         }
 

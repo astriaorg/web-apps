@@ -1,19 +1,22 @@
 "use client";
 
+import { Button } from "@repo/ui/components";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
-import { PriceRange } from "pool/modules/create-position/components/price-range";
+import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
+import { PriceRangeInput } from "pool/modules/create-position/components/price-range-input";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
-import { UninitializedPoolWarning } from "pool/modules/create-position/components/uninitialized-pool-warning";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { useMemo, useState } from "react";
+import { DepositType } from "pool/types";
+import { calculateDepositType } from "pool/utils";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-enum INPUT {
+enum InputId {
   INPUT_0 = "INPUT_0",
   INPUT_1 = "INPUT_1",
 }
@@ -38,14 +41,20 @@ export const ContentSection = () => {
     setToken1,
     token0Balance,
     token1Balance,
-    selectedFeeTier,
-    setSelectedFeeTier,
+    isLoadingToken0Balance,
+    isLoadingToken1Balance,
+    feeTier,
+    setFeeTier,
+    minPrice,
+    maxPrice,
+    amountInitialPrice,
   } = usePageContext();
 
   // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
-  const [currentInput, setCurrentInput] = useState<INPUT>(INPUT.INPUT_0);
-  // Handles the click of the swap button. Instead of swapping state, handle via CSS.
+  const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   const [isInverted, setIsInverted] = useState(false);
+
+  const [depositType, setDepositType] = useState(DepositType.BOTH);
 
   const { data: pools, isPending } = useGetPools({
     token0,
@@ -53,8 +62,12 @@ export const ContentSection = () => {
   });
 
   const pool = useMemo(() => {
-    return pools?.[selectedFeeTier];
-  }, [pools, selectedFeeTier]);
+    return pools?.[feeTier];
+  }, [pools, feeTier]);
+
+  const rate = useMemo(() => {
+    return isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0;
+  }, [isInverted, pool]);
 
   const derivedValues = useMemo(() => {
     if (!pool || isPending) {
@@ -65,9 +78,9 @@ export const ContentSection = () => {
       };
     }
 
-    if (currentInput === INPUT.INPUT_0 && amount0.value) {
+    if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
-        .mul(pool.rateToken1ToToken0)
+        .mul(rate as string)
         .toFixed(token1?.coinDecimals || 0);
       return {
         derivedAmount0: amount0.value,
@@ -75,9 +88,9 @@ export const ContentSection = () => {
       };
     }
 
-    if (currentInput === INPUT.INPUT_1 && amount1.value) {
+    if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
-        .mul(pool.rateToken0ToToken1)
+        .mul(new Big(1).div(rate as string))
         .toFixed(token0?.coinDecimals || 0);
       return {
         derivedAmount0: formatNumberWithoutTrailingZeros(derivedAmount0),
@@ -88,6 +101,7 @@ export const ContentSection = () => {
     return { derivedAmount0: "", derivedAmount1: "" };
   }, [
     pool,
+    rate,
     isPending,
     currentInput,
     amount0.value,
@@ -112,88 +126,129 @@ export const ContentSection = () => {
     );
   }, [chain.currencies, token0]);
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Left side. */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col">
-          <motion.div
-            layout
-            style={{ order: isInverted ? 2 : 0 }}
-            transition={TRANSITION}
-          >
-            <TokenAmountInput
-              value={derivedValues.derivedAmount0}
-              onInput={({ value }) => {
-                onInput0({ value });
-                setCurrentInput(INPUT.INPUT_0);
-              }}
-              selectedToken={token0}
-              setSelectedToken={(value) => {
-                setToken0(value);
-                onInput0({ value: "" });
-                onInput1({ value: "" });
-              }}
-              options={optionsToken0}
-              balance={token0Balance}
-            />
-          </motion.div>
-          <motion.div style={{ order: 1 }}>
-            <SwapButton onClick={() => setIsInverted((value) => !value)} />
-          </motion.div>
-          <motion.div
-            layout
-            style={{ order: isInverted ? 0 : 2 }}
-            transition={TRANSITION}
-          >
-            <TokenAmountInput
-              value={derivedValues.derivedAmount1}
-              onInput={({ value }) => {
-                onInput1({ value });
-                setCurrentInput(INPUT.INPUT_1);
-              }}
-              selectedToken={token1}
-              setSelectedToken={(value) => {
-                setToken1(value);
-                onInput0({ value: "" });
-                onInput1({ value: "" });
-              }}
-              options={optionsToken1}
-              balance={token1Balance}
-            />
-          </motion.div>
-        </div>
-        <FeeTierSelect
-          value={selectedFeeTier}
-          onChange={(value) => {
-            setSelectedFeeTier(value);
-            // If the pool exists, the derived value will replace the empty string.
-            // Otherwise, don't persist values from previous edits.
-            if (currentInput === INPUT.INPUT_0) {
-              onInput1({ value: "" });
-            } else {
-              onInput0({ value: "" });
-            }
-          }}
-        />
-      </div>
+  const handleSwap = useCallback(() => {
+    setIsInverted((value) => !value);
 
-      {/* Right side. */}
-      <div className="flex flex-col gap-4">
-        <PriceRange
-          {...(isInverted
-            ? {
-                rate: pool?.rateToken0ToToken1,
-                token0: token1,
-                token1: token0,
+    setToken0(token1);
+    setToken1(token0);
+    onInput0({ value: amount1.value });
+    onInput1({ value: amount0.value });
+
+    if (currentInput === InputId.INPUT_0) {
+      setCurrentInput(InputId.INPUT_1);
+    } else {
+      setCurrentInput(InputId.INPUT_0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentInput, amount0.value, amount1.value, token0, token1]);
+
+  // Handle single asset deposit when initial price exceeds the min or max price.
+  useEffect(() => {
+    if (
+      minPrice === "" ||
+      maxPrice === "" ||
+      !amountInitialPrice.validation.isValid
+    ) {
+      return;
+    }
+
+    if (pool) {
+      setDepositType(DepositType.BOTH);
+      return;
+    }
+
+    const depositType = calculateDepositType({
+      currentPrice: Number(amountInitialPrice.value),
+      minPrice: Number(minPrice),
+      maxPrice: Number(maxPrice),
+    });
+
+    setDepositType(depositType);
+  }, [amountInitialPrice, minPrice, maxPrice, pool]);
+
+  return (
+    <div className="flex flex-col gap-6">
+      {!isPending && !pool && <InitialPriceInput />}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left side. */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            {(depositType === DepositType.BOTH ||
+              depositType === DepositType.TOKEN_0_ONLY) && (
+              <motion.div
+                layout
+                transition={TRANSITION}
+                key={isInverted ? InputId.INPUT_1 : InputId.INPUT_0}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount0}
+                  onInput={({ value }) => {
+                    onInput0({ value });
+                    setCurrentInput(InputId.INPUT_0);
+                  }}
+                  selectedToken={token0}
+                  setSelectedToken={(value) => {
+                    setToken0(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken0}
+                  balance={token0Balance}
+                  isLoading={isLoadingToken0Balance}
+                />
+              </motion.div>
+            )}
+            {depositType === DepositType.BOTH && (
+              <SwapButton onClick={() => handleSwap()} />
+            )}
+            {(depositType === DepositType.BOTH ||
+              depositType === DepositType.TOKEN_1_ONLY) && (
+              <motion.div
+                layout
+                transition={TRANSITION}
+                key={isInverted ? InputId.INPUT_0 : InputId.INPUT_1}
+              >
+                <TokenAmountInput
+                  value={derivedValues.derivedAmount1}
+                  onInput={({ value }) => {
+                    onInput1({ value });
+                    setCurrentInput(InputId.INPUT_1);
+                  }}
+                  selectedToken={token1}
+                  setSelectedToken={(value) => {
+                    setToken1(value);
+                    onInput0({ value: "" });
+                    onInput1({ value: "" });
+                  }}
+                  options={optionsToken1}
+                  balance={token1Balance}
+                  isLoading={isLoadingToken1Balance}
+                />
+              </motion.div>
+            )}
+          </div>
+          <FeeTierSelect
+            value={feeTier}
+            onChange={(value) => {
+              setFeeTier(value);
+              // If the pool exists, the derived value will replace the empty string.
+              // Otherwise, don't persist values from previous edits.
+              if (currentInput === InputId.INPUT_0) {
+                onInput1({ value: "" });
+              } else {
+                onInput0({ value: "" });
               }
-            : {
-                rate: pool?.rateToken1ToToken0,
-                token0: token0,
-                token1: token1,
-              })}
-        />
-        {!isPending && !pool && <UninitializedPoolWarning />}
+            }}
+          />
+        </div>
+
+        {/* Right side. */}
+        <div className="flex flex-col gap-4">
+          <PriceRangeInput rate={rate} />
+
+          <Button>Connect Wallet</Button>
+        </div>
       </div>
     </div>
   );

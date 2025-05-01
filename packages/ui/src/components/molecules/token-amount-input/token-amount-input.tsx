@@ -11,11 +11,7 @@ type Params = {
   balance?: string;
 };
 
-export const useTokenAmountInput = ({
-  balance = "0",
-  minimum,
-  token,
-}: Params) => {
+export const useTokenAmountInput = ({ balance, minimum, token }: Params) => {
   const validate = useValidateTokenAmount();
 
   const [amount, setAmount] = useState<Amount>({
