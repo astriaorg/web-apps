@@ -49,11 +49,12 @@ export const validate = ({
     const decimalIndex = value.indexOf(".");
     const decimal =
       decimalIndex !== -1 ? value.substring(decimalIndex + 1) : undefined;
-    res.decimals = decimals
-      ? decimal
-        ? decimal.length <= decimals
-        : true
-      : true;
+    res.decimals =
+      decimals !== undefined
+        ? decimal
+          ? decimal.length <= decimals
+          : true
+        : true;
     // eslint-disable-next-line no-empty
   } catch {}
 

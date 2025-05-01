@@ -61,13 +61,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
     useEvmCurrencyBalance(token1);
 
-  // TODO: Figure out why validation is always false.
-  const {
-    amount: amount0,
-    onInput: onInput0,
-    // isValid: isValid0,
-  } = useTokenAmountInput({
-    balance: token0Balance?.symbol,
+  const { amount: amount0, onInput: onInput0 } = useTokenAmountInput({
+    balance: token0Balance?.value,
     minimum: "0",
     token: token0
       ? {
@@ -77,12 +72,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
       : undefined,
   });
 
-  const {
-    amount: amount1,
-    onInput: onInput1,
-    // isValid: isValid1,
-  } = useTokenAmountInput({
-    balance: token1Balance?.symbol,
+  const { amount: amount1, onInput: onInput1 } = useTokenAmountInput({
+    balance: token1Balance?.value,
     minimum: "0",
     token: token1
       ? {
