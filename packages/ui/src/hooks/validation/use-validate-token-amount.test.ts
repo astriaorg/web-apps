@@ -90,4 +90,17 @@ describe("validate", () => {
     expect(result.isValid).toBe(false);
     expect(result.number).toBe(false);
   });
+
+  it("should validate zero with no other params", () => {
+    const result = validate({
+      value: "0",
+      token: { symbol: "ETH", decimals: 18 },
+    });
+    expect(result.isValid).toBe(true);
+    expect(result.number).toBe(true);
+    expect(result.decimals).toBe(true);
+    expect(result.minimum).toBe(true);
+    expect(result.maximum).toBe(true);
+    expect(result.zero).toBe(true);
+  });
 });

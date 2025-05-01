@@ -23,7 +23,7 @@ export const validate = ({
   decimals,
   minimum,
   maximum,
-  canBeZero,
+  canBeZero = true,
 }: Params): ValidateState => {
   const res = {
     number: false,
@@ -41,9 +41,9 @@ export const validate = ({
     const amount = Big(value);
 
     res.number = true;
-    res.minimum = minimum ? amount.gte(minimum) : true;
-    res.maximum = maximum ? amount.lte(maximum) : true;
-    res.zero = !canBeZero ? amount.gt(0) : true;
+    res.minimum = minimum !== undefined ? amount.gte(minimum) : true;
+    res.maximum = maximum !== undefined ? amount.lte(maximum) : true;
+    res.zero = canBeZero || amount.gt(0);
 
     const decimalIndex = value.indexOf(".");
     const decimal =

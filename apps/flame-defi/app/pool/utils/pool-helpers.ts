@@ -1,5 +1,10 @@
 import Big from "big.js";
-import { FEE_TIER_TICK_SPACING, type FeeTier } from "pool/constants";
+import {
+  DepositType,
+  FEE_TIER_TICK_SPACING,
+  TICK_BOUNDARIES,
+  type FeeTier,
+} from "pool/types";
 
 /**
  * Implements the calculation to get the exchange rate of the pool.
@@ -172,4 +177,43 @@ export const calculatePriceRange = ({
     minSqrtPriceX96,
     maxSqrtPriceX96,
   };
+};
+
+export const calculateDepositType = ({
+  currentPrice,
+  minPrice,
+  maxPrice,
+  decimal0,
+  decimal1,
+}: {
+  currentPrice: number;
+  minPrice: number;
+  maxPrice: number;
+  decimal0?: number;
+  decimal1?: number;
+}) => {
+  let minTick = calculatePriceToTick({ price: minPrice, decimal0, decimal1 });
+  let maxTick = calculatePriceToTick({ price: maxPrice, decimal0, decimal1 });
+
+  if (minTick < TICK_BOUNDARIES.MIN) {
+    minTick = TICK_BOUNDARIES.MIN;
+  }
+  if (maxTick > TICK_BOUNDARIES.MAX) {
+    maxTick = TICK_BOUNDARIES.MAX;
+  }
+
+  const currentTick = calculatePriceToTick({
+    price: currentPrice,
+    decimal0,
+    decimal1,
+  });
+
+  if (currentTick < minTick) {
+    return DepositType.TOKEN_1_ONLY;
+  }
+  if (currentTick > maxTick) {
+    return DepositType.TOKEN_0_ONLY;
+  }
+
+  return DepositType.BOTH;
 };

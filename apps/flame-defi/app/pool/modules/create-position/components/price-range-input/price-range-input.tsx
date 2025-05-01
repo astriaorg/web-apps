@@ -1,47 +1,48 @@
-import type { EvmCurrency } from "@repo/flame-types";
 import { Card, CardContent, Slider } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
 import Big from "big.js";
-import { TICK_BOUNDARIES } from "pool/constants";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
+import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+} from "pool/modules/create-position/types";
+import { TICK_BOUNDARIES } from "pool/types";
 import {
   calculatePriceRange,
   calculatePriceToTick,
   calculateTickToPrice,
 } from "pool/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { MinMaxInput } from "./min-max-input";
 
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
+const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
 
-const MIN_PRICE_DEFAULT = 0;
-const MAX_PRICE_DEFAULT = Infinity;
-
-interface PriceRangeProps {
+interface PriceRangeInputProps {
   rate?: string;
-  token0?: EvmCurrency;
-  token1?: EvmCurrency;
 }
 
-export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
-  const { selectedFeeTier } = usePageContext();
+export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
+  const {
+    feeTier,
+    token0,
+    token1,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+  } = usePageContext();
   const { formatNumber } = useIntl();
-
-  const [minPrice, setMinPrice] = useState<string>(
-    MIN_PRICE_DEFAULT.toString(),
-  );
-  const [maxPrice, setMaxPrice] = useState<string>(
-    MAX_PRICE_DEFAULT.toString(),
-  );
 
   const handleReset = useCallback(() => {
     setMinPrice(MIN_PRICE_DEFAULT.toString());
     setMaxPrice(MAX_PRICE_DEFAULT.toString());
-  }, []);
+  }, [setMinPrice, setMaxPrice]);
 
   useEffect(() => {
-    // When the rate changes, i.e. user swaps inputs, reset the slider.
+    // When the rate changes, i.e. user swaps inputs or changes fee tier, reset the slider.
     handleReset();
   }, [rate, handleReset]);
 
@@ -60,14 +61,20 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       }
 
       // Calculate the range of ticks based on the current tick.
-      // We want to go from MIN_TICK to MAX_TICK, but centered around the current tick.
+      // We want to exponentially center the range from MIN_TICK to MAX_TICK around the current tick, providing more granular control closer to the current price.
       const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const maxOffset = tickRange / 2;
 
-      // Normalize the slider value to a range of [-0.5, 0.5].
-      const normalizedValue = (value - 50) / 100;
+      // Normalize slider value to [-1, 1]
+      const normalizedValue = (value - SLIDER_MAX / 2) / (SLIDER_MAX / 2);
 
-      // Calculate the tick offset from the current tick.
-      const tickOffset = normalizedValue * tickRange;
+      // Apply exponential scaling.
+      const scaledValue =
+        Math.sign(normalizedValue) *
+        Math.pow(Math.abs(normalizedValue), SLIDER_EXPONENT);
+
+      // Scale to the tick offset range.
+      const tickOffset = scaledValue * maxOffset;
 
       // Calculate the new tick, ensuring it stays within the bounds.
       const newTick = Math.max(
@@ -88,25 +95,31 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
         price: Number(rate),
       });
 
-      if (price <= 0) {
+      if (price <= MIN_PRICE_DEFAULT) {
         return SLIDER_MIN;
       }
 
-      if (price >= Infinity) {
+      if (price >= MAX_PRICE_DEFAULT) {
         return SLIDER_MAX;
       }
 
       const tick = calculatePriceToTick({ price });
       const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const maxOffset = tickRange / 2;
 
-      // Calculate the tick offset from the current tick.
       const tickOffset = tick - currentTick;
 
-      // Normalize the tick offset to a range of [-0.5, 0.5].
-      const normalizedOffset = tickOffset / tickRange;
+      // Normalize the tick offset to the [-1, 1] range.
+      const normalizedOffset = tickOffset / maxOffset;
 
-      // Map the normalized offset to the slider range [0, 100].
-      const sliderValue = 50 + normalizedOffset * 100;
+      // Invert the exponential scaling.
+      const invertedScaledOffset =
+        Math.sign(normalizedOffset) *
+        Math.pow(Math.abs(normalizedOffset), 1 / SLIDER_EXPONENT);
+
+      // Map the normalized offset to the slider range [0, SLIDER_MAX].
+      const sliderValue =
+        SLIDER_MAX / 2 + invertedScaledOffset * (SLIDER_MAX / 2);
 
       return Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, sliderValue));
     },
@@ -132,7 +145,7 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       setMinPrice(minPrice.toString());
       setMaxPrice(maxPrice.toString());
     },
-    [sliderToPrice],
+    [sliderToPrice, setMinPrice, setMaxPrice],
   );
 
   const getCalculatedPriceRange = useCallback(
@@ -145,14 +158,14 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       }
 
       return calculatePriceRange({
-        feeTier: selectedFeeTier,
+        feeTier,
         decimal0: token0.coinDecimals,
         decimal1: token1.coinDecimals,
         minPrice: min,
         maxPrice: max,
       });
     },
-    [selectedFeeTier, token0, token1],
+    [feeTier, token0, token1],
   );
 
   const displayMinPrice = useMemo(() => {
@@ -160,7 +173,9 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       return minPrice;
     }
 
-    return Number(minPrice) === 0 ? "0" : new Big(minPrice).toFixed();
+    return Number(minPrice) === MIN_PRICE_DEFAULT
+      ? "0"
+      : new Big(minPrice).toFixed();
   }, [minPrice]);
 
   const displayMaxPrice = useMemo(() => {
@@ -168,7 +183,9 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
       return maxPrice;
     }
 
-    return Number(maxPrice) === Infinity ? "∞" : new Big(maxPrice).toFixed();
+    return Number(maxPrice) === MAX_PRICE_DEFAULT
+      ? "∞"
+      : new Big(maxPrice).toFixed();
   }, [maxPrice]);
 
   const exchangeRate = useMemo(() => {
@@ -178,10 +195,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
 
     return `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`;
   }, [token0, token1, rate, formatNumber]);
-
-  const isDisabled = useMemo(() => {
-    return !rate;
-  }, [rate]);
 
   const isValid = useMemo(() => {
     const min = Number(minPrice);
@@ -193,7 +206,7 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
   return (
     <Card variant="secondary" className="w-full">
       <CardContent>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <span>Price Range</span>
           <span
             className="text-xs text-typography-subdued hover:cursor-pointer"
@@ -208,7 +221,8 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
           min={SLIDER_MIN}
           max={SLIDER_MAX}
           step={1}
-          disabled={isDisabled}
+          disabled={!rate}
+          className={cn("mt-2", !rate && "hidden mt-0")}
         />
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
@@ -224,7 +238,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMinPrice(result.minPrice.toString());
               }
             }}
-            disabled={isDisabled}
             aria-invalid={!isValid}
           />
           <MinMaxInput
@@ -240,7 +253,6 @@ export const PriceRange = ({ rate, token0, token1 }: PriceRangeProps) => {
                 setMaxPrice(result.maxPrice.toString());
               }
             }}
-            disabled={isDisabled}
             aria-invalid={!isValid}
           />
         </div>
