@@ -46,8 +46,11 @@ build:
 alias b := build
 
 # run all commands to ensure successful build in ci
-prepush:
+# Usage: just prepush [--all] (add --all to include e2e tests)
+prepush all="":
   just format
+  just lint --fix
   just check-types
   just lint
   just test
+  {{ if all == "--all" { "just e2e-tests run-e2e-tests" } else { "" } }}
