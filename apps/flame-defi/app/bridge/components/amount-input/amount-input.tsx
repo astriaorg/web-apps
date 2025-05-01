@@ -8,6 +8,9 @@ type AmountInputProps = {
   className?: string;
 };
 
+/**
+ * Shared amount input component for deposit and withdraw pages.
+ */
 export const AmountInput = ({
   amount,
   setAmount,

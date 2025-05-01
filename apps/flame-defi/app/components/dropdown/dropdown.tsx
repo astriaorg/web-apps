@@ -74,7 +74,7 @@ export const Dropdown = <T,>({
   // set the default option when defaultOption or onSelect change
   useEffect(() => {
     if (defaultOption) {
-      console.log("setting from default option", defaultOption);
+      // console.log("setting from default option", defaultOption);
       setSelectedOption(defaultOption);
       onSelect(defaultOption.value);
     }
@@ -82,17 +82,20 @@ export const Dropdown = <T,>({
 
   useEffect(() => {
     if (valueOverride) {
-      console.log("set from valueOverride");
+      // console.log("set from valueOverride");
       setSelectedOption(valueOverride);
       // FIXME - this causes a lot of unnecessary re-renders,
       //  and also causes hard to fix bugs due to timings of setting state.
-      //  e.g. if the value passed to valueOverride is derived from value A,
-      //   and A gets cleared in some parent state,
+      //  e.g. if the value passed to valueOverride is derived from value A and B,
+      //   and A gets cleared in some parent state and B changes, it will updated valueOverride
+      //   and trigger onSelect which might set something incorrectly even though it should be empty.
+      //   it requires you to write a lot of guards to ensure proper functionality, plus it's probably
+      //   non performant
       onSelect(valueOverride.value);
     }
     if (valueOverride === null) {
+      // console.log("empty from valueOverride");
       setSelectedOption(null);
-      console.log("empty from valueOverride");
     }
   }, [valueOverride, onSelect]);
 
