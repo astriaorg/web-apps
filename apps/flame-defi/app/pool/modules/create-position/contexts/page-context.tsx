@@ -1,16 +1,16 @@
 "use client";
 
 import { useAstriaChainData } from "config";
-import { createContext, PropsWithChildren, useState } from "react";
-
-import type { EvmCurrency } from "@repo/flame-types";
-import { type Amount, useTokenAmountInput } from "@repo/ui/components";
-import { useEvmCurrencyBalance } from "features/evm-wallet";
 import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
 import { FEE_TIER, type FeeTier } from "pool/types";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
+import type { EvmCurrency } from "@repo/flame-types";
+import { type Amount, useTokenAmountInput } from "@repo/ui/components";
+import { useEvmCurrencyBalance } from "features/evm-wallet";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
@@ -31,6 +31,7 @@ export interface PageContextProps extends PropsWithChildren {
   setMinPrice: (value: string) => void;
   maxPrice: string;
   setMaxPrice: (value: string) => void;
+  isPriceRangeValid: boolean;
   amountInitialPrice: Amount;
   setAmountInitialPrice: ({ value }: { value: string }) => void;
 }
@@ -50,6 +51,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [maxPrice, setMaxPrice] = useState<string>(
     MAX_PRICE_DEFAULT.toString(),
   );
+
+  const isPriceRangeValid = useMemo(() => {
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    return !!minPrice && !!maxPrice && !isNaN(min) && !isNaN(max) && min < max;
+  }, [minPrice, maxPrice]);
 
   const [token0, setToken0] = useState<EvmCurrency | undefined>(
     chain.currencies[0],
@@ -114,6 +122,7 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         setMinPrice,
         maxPrice,
         setMaxPrice,
+        isPriceRangeValid,
         amountInitialPrice,
         setAmountInitialPrice,
       }}

@@ -3,19 +3,19 @@
 import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { Button } from "@repo/ui/components";
-import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
 import { PriceRangeInput } from "pool/modules/create-position/components/price-range-input";
+import { SubmitButton } from "pool/modules/create-position/components/submit-button";
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
 import { calculateDepositType } from "pool/utils";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
@@ -48,6 +48,7 @@ export const ContentSection = () => {
     setFeeTier,
     minPrice,
     maxPrice,
+    isPriceRangeValid,
     amountInitialPrice,
   } = usePageContext();
 
@@ -63,7 +64,7 @@ export const ContentSection = () => {
   });
 
   const pool = useMemo(() => {
-    return pools?.[feeTier];
+    return pools?.[feeTier] ?? null;
   }, [pools, feeTier]);
 
   const rate = useMemo(() => {
@@ -145,11 +146,7 @@ export const ContentSection = () => {
 
   // Handle single asset deposit when initial price exceeds the min or max price.
   useEffect(() => {
-    if (
-      minPrice === "" ||
-      maxPrice === "" ||
-      !amountInitialPrice.validation.isValid
-    ) {
+    if (!isPriceRangeValid || !amountInitialPrice.validation.isValid) {
       return;
     }
 
@@ -165,7 +162,7 @@ export const ContentSection = () => {
     });
 
     setDepositType(depositType);
-  }, [amountInitialPrice, minPrice, maxPrice, pool]);
+  }, [amountInitialPrice, minPrice, maxPrice, isPriceRangeValid, pool]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -248,7 +245,7 @@ export const ContentSection = () => {
         <div className="flex flex-col gap-4">
           <PriceRangeInput rate={rate} />
 
-          <Button>Connect Wallet</Button>
+          <SubmitButton pool={pool} />
         </div>
       </div>
     </div>

@@ -1,6 +1,9 @@
-import { type Validation } from "@repo/ui/hooks";
+import {
+  type ValidateTokenAmountErrorType,
+  type Validation,
+} from "@repo/ui/hooks";
 
 export type Amount = {
   value: string;
-  validation: Validation;
+  validation: Validation<ValidateTokenAmountErrorType>;
 };

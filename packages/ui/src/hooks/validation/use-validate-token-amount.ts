@@ -1,6 +1,18 @@
 import Big from "big.js";
 
-import { type Validation, type ValidationToken } from "./types";
+import {
+  type Validation,
+  type ValidationError,
+  type ValidationToken,
+} from "./types";
+
+export enum ValidateTokenAmountErrorType {
+  INVALID_AMOUNT = "INVALID_AMOUNT",
+  INVALID_DECIMALS = "INVALID_DECIMALS",
+  ZERO_AMOUNT = "ZERO_AMOUNT",
+  BELOW_MINIMUM = "BELOW_MINIMUM",
+  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
+}
 
 type Params = {
   value: string;
@@ -11,7 +23,10 @@ type Params = {
   canBeZero?: boolean;
 };
 
-type ValidateState = Pick<Validation, "isValid"> & {
+type ValidateState = Pick<
+  Validation<ValidateTokenAmountErrorType>,
+  "isValid"
+> & {
   number: boolean;
   decimals: boolean;
   minimum: boolean;
@@ -65,25 +80,40 @@ export const validate = ({
 };
 
 export const useValidateTokenAmount = () => {
-  return (params: Params): Validation => {
+  return (params: Params): Validation<ValidateTokenAmountErrorType> => {
     const state = validate(params);
 
-    const errors: string[] = [];
+    const errors: ValidationError<ValidateTokenAmountErrorType>[] = [];
 
     if (!state.number) {
-      errors.push(`Invalid amount.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INVALID_AMOUNT,
+        message: `Invalid amount.`,
+      });
     }
     if (!state.decimals) {
-      errors.push(`Invalid amount. Maximum ${params.decimals} decimals.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INVALID_DECIMALS,
+        message: `Invalid amount. Maximum ${params.decimals} decimals.`,
+      });
     }
     if (!state.zero) {
-      errors.push(`Amount cannot be 0.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.ZERO_AMOUNT,
+        message: `Amount cannot be 0.`,
+      });
     }
     if (!state.minimum) {
-      errors.push(`The minimum amount is ${params.minimum}.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.BELOW_MINIMUM,
+        message: `The minimum amount is ${params.minimum}.`,
+      });
     }
     if (!state.maximum) {
-      errors.push(`Insufficient ${params.token.symbol} balance.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INSUFFICIENT_BALANCE,
+        message: `Insufficient ${params.token.symbol} balance.`,
+      });
     }
 
     return { isValid: state.isValid, errors };
