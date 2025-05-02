@@ -1,6 +1,7 @@
 "use client";
 
 import Big from "big.js";
+import { useConfig } from "config";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { isAddress } from "viem";
@@ -16,19 +17,17 @@ import {
   WalletIcon,
 } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
-import { useConfig } from "config";
-import { Dropdown } from "components/dropdown";
-import { AddErc20ToWalletButton } from "features/evm-wallet";
-import { NotificationType, useNotifications } from "features/notifications";
-import { useCurrencyBalance } from "hooks/use-currency-balance";
-
 import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
 import { SubmitButton } from "bridge/components/submit-button";
 import { ROUTES } from "bridge/constants/routes";
-import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
 import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
+import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
+import { Dropdown } from "components/dropdown";
+import { AddErc20ToWalletButton } from "features/evm-wallet";
+import { NotificationType, useNotifications } from "features/notifications";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 export const ContentSection = () => {
   const { addNotification } = useNotifications();

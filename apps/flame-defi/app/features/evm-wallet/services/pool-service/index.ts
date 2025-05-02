@@ -1,5 +1,6 @@
 import type { Config } from "@wagmi/core";
-import { type Address, Abi } from "viem";
+import { Abi, type Address } from "viem";
+
 import { GenericContractService } from "../generic-contract-service";
 import POOL_ABI from "./pool-abi.json";
 

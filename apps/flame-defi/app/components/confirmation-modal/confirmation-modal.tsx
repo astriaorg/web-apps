@@ -1,4 +1,3 @@
-import { CloseIcon } from "@repo/ui/icons";
 import {
   Button,
   Dialog,
@@ -7,6 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components";
+import { CloseIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 
 interface ConfirmationModalProps {

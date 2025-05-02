@@ -1,13 +1,15 @@
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { type Hash } from "viem";
-import { useEffect, useState } from "react";
-import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 import { useAstriaChainData, useConfig as useAppConfig } from "config";
+import { useEffect, useState } from "react";
+import { type Hash } from "viem";
+import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
+
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
+
 import { usePoolPositionContext } from "./use-pool-position-context";
 
 export const useAddLiquidityTxn = (

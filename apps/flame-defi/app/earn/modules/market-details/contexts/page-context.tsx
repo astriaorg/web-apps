@@ -1,3 +1,6 @@
+import { useParams } from "next/navigation";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
 import { ChartInterval } from "@repo/ui/components";
 import {
   CHART_TYPE,
@@ -7,8 +10,6 @@ import {
 import { useFetchMarketByUniqueKey } from "earn/modules/market-details/hooks/use-fetch-market-by-unique-key";
 import { useFetchMarketByUniqueKeyHistoricalState } from "earn/modules/market-details/hooks/use-fetch-market-by-unique-key-historical-state";
 import { TOTAL_ASSETS_OPTION } from "earn/modules/market-details/types";
-import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 

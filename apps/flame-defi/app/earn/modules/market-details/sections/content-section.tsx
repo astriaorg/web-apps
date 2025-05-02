@@ -1,7 +1,9 @@
-import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
-import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { SortingState } from "@tanstack/react-table";
 import Big from "big.js";
+import { useCallback, useMemo, useState } from "react";
+
+import { CHART_INTERVALS, Skeleton, StatusCard } from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 import { CHART_TYPE, LineChart } from "earn/components/charts";
 import { SummaryCards, SummaryCardsProps } from "earn/components/summary-cards";
 import { getPlaceholderData, VaultListTable } from "earn/components/vault";
@@ -19,7 +21,6 @@ import {
   TOTAL_ASSETS_OPTIONS,
   TotalAssetsOption,
 } from "earn/modules/market-details/types";
-import { useCallback, useMemo, useState } from "react";
 
 export const ContentSection = () => {
   const {

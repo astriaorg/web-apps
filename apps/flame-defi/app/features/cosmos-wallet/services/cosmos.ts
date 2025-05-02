@@ -2,7 +2,6 @@ import type { SigningStargateClient } from "@cosmjs/stargate";
 import { osmosis } from "osmojs";
 
 import type { CosmosChainInfo, IbcCurrency } from "@repo/flame-types";
-
 import { ChainCurrencyMismatchError } from "features/cosmos-wallet/errors";
 import { nowPlusMinutesInNano } from "features/cosmos-wallet/utils/utils";
 

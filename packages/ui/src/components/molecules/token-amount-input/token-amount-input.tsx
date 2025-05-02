@@ -1,8 +1,10 @@
 "use client";
 
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 import { Input, type InputProps } from "@repo/ui/components";
 import { useValidateTokenAmount, type ValidationToken } from "@repo/ui/hooks";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+
 import type { Amount } from "./token-amount-input.types";
 
 type Params = {

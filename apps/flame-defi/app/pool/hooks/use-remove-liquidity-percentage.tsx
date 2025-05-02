@@ -1,7 +1,9 @@
-import { PoolToken } from "pool/types";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { usePoolPositionContext } from ".";
 import { useAstriaChainData } from "config";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { PoolToken } from "pool/types";
+
+import { usePoolPositionContext } from ".";
 
 export const useRemoveLiquidityPercentage = () => {
   const { poolToken0, poolToken1, isCollectAsWrappedNative } =

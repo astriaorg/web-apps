@@ -1,12 +1,10 @@
 "use client";
 
+import { useAstriaChainData } from "config";
+import debounce from "lodash.debounce";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { SettingsPopover } from "components/settings-popover/settings-popover";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { useAstriaChainData } from "config";
-import { ArrowDownIcon } from "@repo/ui/icons";
-import { Button } from "@repo/ui/components";
+
 import {
   EvmCurrency,
   TokenInputState,
@@ -14,11 +12,15 @@ import {
   TRADE_TYPE_OPPOSITES,
   TXN_STATUS,
 } from "@repo/flame-types";
-import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
+import { Button } from "@repo/ui/components";
+import { ArrowDownIcon } from "@repo/ui/icons";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
+
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useGetQuote, useEvmCurrencyBalance } from "features/evm-wallet";
-import debounce from "lodash.debounce";
-import { SwapPairProps, SWAP_INPUT_ID } from "./types";
+import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
+import { SWAP_INPUT_ID, SwapPairProps } from "./types";
 
 export default function SwapPage(): React.ReactElement {
   const { chain } = useAstriaChainData();

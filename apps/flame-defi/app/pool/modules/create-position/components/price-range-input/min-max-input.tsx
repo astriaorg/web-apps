@@ -1,4 +1,4 @@
-import { TokenAmountInput, type InputProps } from "@repo/ui/components";
+import { type InputProps, TokenAmountInput } from "@repo/ui/components";
 
 interface MinMaxInputProps extends InputProps {
   label: React.ReactNode;

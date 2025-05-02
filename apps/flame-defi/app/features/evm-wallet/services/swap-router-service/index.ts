@@ -1,5 +1,5 @@
 import { type Config } from "@wagmi/core";
-import { Chain, encodeFunctionData, type Address, Abi, type Hash } from "viem";
+import { Abi, type Address, Chain, encodeFunctionData, type Hash } from "viem";
 
 import {
   GetQuoteResult,
@@ -7,6 +7,8 @@ import {
   TokenAmount,
   TRADE_TYPE,
 } from "@repo/flame-types";
+
+import { GenericContractService } from "../generic-contract-service";
 import SWAP_ROUTER_ABI from "./swaprouter02.json";
 import {
   ExactInputParams,
@@ -18,7 +20,6 @@ import {
   SwapOptions,
   Trade,
 } from "./types";
-import { GenericContractService } from "../generic-contract-service";
 
 // Default fee in basis points (25 bips = 0.25%)
 // TODO - move to AppConfig

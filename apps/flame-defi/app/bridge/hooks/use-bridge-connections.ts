@@ -10,10 +10,9 @@ import {
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
-import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
-import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
-
 import { ChainConnection } from "bridge/types";
+import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
+import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 
 export interface BridgeConnections {
   // Chain connections

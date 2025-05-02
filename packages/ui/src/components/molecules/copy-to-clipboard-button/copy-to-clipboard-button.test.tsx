@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { act } from "react";
+
 import { CopyToClipboardButton } from "./copy-to-clipboard-button";
 
 describe("<CopyToClipboardButton />", () => {

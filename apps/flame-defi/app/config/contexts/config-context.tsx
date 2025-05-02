@@ -1,20 +1,19 @@
-import React, { useMemo } from "react";
-import { type Address, maxUint256 } from "viem";
-
-import {
-  CoinbaseChains,
-  CosmosChains,
-  AstriaChains,
-  FlameNetwork,
-} from "@repo/flame-types";
-import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
-
 import {
   type AppConfig,
   getChainConfigs,
   getEnvVariable,
   getOptionalEnvVariable,
 } from "config";
+import React, { useMemo } from "react";
+import { type Address, maxUint256 } from "viem";
+
+import {
+  AstriaChains,
+  CoinbaseChains,
+  CosmosChains,
+  FlameNetwork,
+} from "@repo/flame-types";
+import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,

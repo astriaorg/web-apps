@@ -1,6 +1,7 @@
+import type { PropsWithChildren } from "react";
+
 import { Button } from "@repo/ui/components";
 import { ArrowLeftIcon } from "@repo/ui/icons";
-import type { PropsWithChildren } from "react";
 
 interface HeaderProps extends PropsWithChildren {
   children: React.ReactNode;

@@ -1,5 +1,7 @@
-import { Button, Input, Slider } from "@repo/ui/components";
 import { useEffect, useState } from "react";
+
+import { Button, Input, Slider } from "@repo/ui/components";
+
 import { AreaChartWithRange } from "./area-chart-with-range";
 
 export const NewPositionPriceRange = ({

@@ -1,15 +1,17 @@
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import { type Hash } from "viem";
-import { PoolToken } from "pool/types";
+import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import { useEffect, useState } from "react";
-import { useConfig as useAppConfig, useAstriaChainData } from "config";
+import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
-import { usePoolPositionContext } from ".";
+
+import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
-import { getSlippageTolerance } from "@repo/ui/utils";
+import { PoolToken } from "pool/types";
+
+import { usePoolPositionContext } from ".";
 
 export const useRemoveLiquidityTxn = (
   liquidityToRemove: PoolToken[],

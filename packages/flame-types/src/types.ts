@@ -8,7 +8,7 @@ import type { Chain } from "@rainbow-me/rainbowkit";
 import Big from "big.js";
 import JSBI from "jsbi";
 import React from "react";
-import { ChainContract, parseUnits, type Address } from "viem";
+import { type Address, ChainContract, parseUnits } from "viem";
 
 /**
  * ChainType describes the type of chain.

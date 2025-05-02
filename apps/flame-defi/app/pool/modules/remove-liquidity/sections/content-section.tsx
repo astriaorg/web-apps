@@ -1,18 +1,20 @@
 "use client";
 
-import { TokenLiquidityBlock } from "../components";
+import { useCallback } from "react";
+
+import { TXN_STATUS } from "@repo/flame-types";
 import { Switch } from "@repo/ui/components";
-import { RemoveAmountSlider } from "../components";
+import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { PoolTxnSteps } from "pool/components";
 import {
   usePoolContext,
   usePoolPositionContext,
   useRemoveLiquidityPercentage,
   useRemoveLiquidityTxn,
 } from "pool/hooks";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { PoolTxnSteps } from "pool/components";
-import { TXN_STATUS } from "@repo/flame-types";
-import { useCallback } from "react";
+
+import { TokenLiquidityBlock } from "../components";
+import { RemoveAmountSlider } from "../components";
 
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();

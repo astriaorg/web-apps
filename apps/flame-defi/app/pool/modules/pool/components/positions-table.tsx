@@ -1,6 +1,13 @@
 import {
-  Table as BaseTable,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+
+import {
   Skeleton,
+  Table as BaseTable,
   TableBody,
   TableCell,
   TableHead,
@@ -8,14 +15,8 @@ import {
   TableRow,
 } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { usePositionsTable } from "pool/hooks";
-import { useRouter } from "next/navigation";
 import { ROUTES } from "pool/constants/routes";
+import { usePositionsTable } from "pool/hooks";
 import { usePoolContext } from "pool/hooks";
 
 export const PositionsTable = () => {

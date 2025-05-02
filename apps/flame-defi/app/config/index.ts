@@ -1,9 +1,9 @@
 import { type Address } from "viem";
 
 import type {
+  AstriaChains,
   CoinbaseChains,
   CosmosChains,
-  AstriaChains,
   FlameNetwork,
 } from "@repo/flame-types";
 
@@ -53,4 +53,4 @@ export interface AppConfig {
 export { getAllChainConfigs, getChainConfigs } from "./chain-configs";
 export { ConfigContextProvider } from "./contexts/config-context";
 export { getEnvVariable, getOptionalEnvVariable } from "./env";
-export { useConfig, useAstriaChainData } from "./hooks/use-config";
+export { useAstriaChainData, useConfig } from "./hooks/use-config";

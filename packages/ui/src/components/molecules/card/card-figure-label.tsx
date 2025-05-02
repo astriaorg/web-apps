@@ -1,6 +1,8 @@
+import React, { forwardRef } from "react";
+
 import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import React, { forwardRef } from "react";
+
 import { useCardContext } from "./card.context";
 
 export const CardFigureLabel = forwardRef<

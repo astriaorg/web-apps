@@ -1,8 +1,8 @@
 import type { Config } from "@wagmi/core";
 import { type Abi, type Address, type Hash, parseUnits } from "viem";
 
-import WETH_ABI from "./weth.json";
 import { GenericContractService } from "../generic-contract-service";
+import WETH_ABI from "./weth.json";
 
 export class WethService extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {

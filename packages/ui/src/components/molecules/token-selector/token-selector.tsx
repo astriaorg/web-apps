@@ -1,8 +1,10 @@
 "use client";
 
-import { EvmCurrency } from "@repo/flame-types";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
+
+import { EvmCurrency } from "@repo/flame-types";
+
 import {
   CheckMarkIcon,
   ChevronDownIcon,

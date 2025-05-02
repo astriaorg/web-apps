@@ -1,5 +1,5 @@
 import { Config } from "@wagmi/core";
-import { type Address, Abi, encodeFunctionData, type Hash } from "viem";
+import { Abi, type Address, encodeFunctionData, type Hash } from "viem";
 
 import {
   AstriaChain,
@@ -7,6 +7,7 @@ import {
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
+
 import { GenericContractService } from "../generic-contract-service";
 import { needToReverseTokenOrder } from "../services.utils";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";

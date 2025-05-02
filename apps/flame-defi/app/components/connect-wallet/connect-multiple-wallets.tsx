@@ -1,6 +1,7 @@
 import { cn } from "@repo/ui/utils";
-import { ConnectWalletContent } from "./connect-wallet-content";
+
 import type { ConnectWalletProps } from "./connect-wallet.types";
+import { ConnectWalletContent } from "./connect-wallet-content";
 
 export const ConnectMultipleWallets = (props: ConnectWalletProps) => {
   return props.isConnected ? (

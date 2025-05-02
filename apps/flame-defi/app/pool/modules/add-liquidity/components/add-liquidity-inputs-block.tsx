@@ -1,12 +1,13 @@
+import { useIntl } from "react-intl";
+
 import {
   Card,
   CardFigureInput,
-  TokenIcon,
   Skeleton,
+  TokenIcon,
 } from "@repo/ui/components";
 import { isDustAmount } from "@repo/ui/utils";
 import { AddLiquidityInputsBlockProps, POOL_INPUT_ID } from "pool/types";
-import { useIntl } from "react-intl";
 
 export const AddLiquidityInputsBlock = ({
   input0,

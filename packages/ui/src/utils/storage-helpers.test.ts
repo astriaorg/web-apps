@@ -1,7 +1,7 @@
 import {
   getFromLocalStorage,
-  setInLocalStorage,
   getSlippageTolerance,
+  setInLocalStorage,
 } from "./storage-helpers";
 
 describe("storage-helpers", () => {

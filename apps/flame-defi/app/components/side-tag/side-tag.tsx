@@ -1,7 +1,8 @@
 "use client";
 
-import { ShareRightIcon } from "@repo/ui/icons";
 import { useConfig } from "config";
+
+import { ShareRightIcon } from "@repo/ui/icons";
 
 interface SideTagProps {
   label: string;

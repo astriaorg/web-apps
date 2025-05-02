@@ -1,3 +1,4 @@
+import { useAstriaChainData } from "config";
 import { useMemo } from "react";
 import { useAccount } from "wagmi";
 
@@ -5,8 +6,6 @@ import { Balance } from "@repo/flame-types";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
-import { useAstriaChainData } from "config";
-
 import { useEvmCurrencyBalance } from "features/evm-wallet/hooks/use-evm-currency-balance";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 import { useUsdQuote } from "features/evm-wallet/hooks/use-usd-quote";

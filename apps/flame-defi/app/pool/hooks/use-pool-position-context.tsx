@@ -1,5 +1,6 @@
-import { PoolPositionContext } from "pool/context/pool-position-context";
 import { useContext } from "react";
+
+import { PoolPositionContext } from "pool/context/pool-position-context";
 
 export const usePoolPositionContext = () => {
   const context = useContext(PoolPositionContext);

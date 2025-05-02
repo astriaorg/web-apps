@@ -79,6 +79,7 @@
     "codegen": "graphql-codegen",
     "dev": "next dev --turbopack",
     "lint": "next lint --max-warnings 0",
+    "lint:fix": "next lint --fix",
     "start": "next start",
     "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
   },

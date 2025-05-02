@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { ArrowLeftIcon } from "@repo/ui/icons";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
-import { useRouter } from "next/navigation";
 
 export const HeaderSection = () => {
   const router = useRouter();

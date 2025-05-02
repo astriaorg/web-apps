@@ -1,5 +1,6 @@
-import { getChainConfigs } from "./chain-configs";
 import { FlameNetwork } from "@repo/flame-types";
+
+import { getChainConfigs } from "./chain-configs";
 
 describe("Chain Configs", () => {
   describe("getChainConfigs", () => {

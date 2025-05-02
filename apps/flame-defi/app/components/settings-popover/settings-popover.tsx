@@ -1,7 +1,10 @@
 "use client";
 
+import { useConfig } from "config";
+import { useState } from "react";
+import { useIntl } from "react-intl";
+
 import { InfoTooltip } from "@repo/ui/components";
-import { GearIcon } from "@repo/ui/icons";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,10 +19,8 @@ import {
   PopoverTrigger,
   Switch,
 } from "@repo/ui/components";
+import { GearIcon } from "@repo/ui/icons";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
-import { useConfig } from "config";
-import { useState } from "react";
-import { useIntl } from "react-intl";
 
 export const SettingsPopover = () => {
   const { formatNumber } = useIntl();

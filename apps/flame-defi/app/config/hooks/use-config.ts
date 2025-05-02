@@ -3,6 +3,7 @@
 import { useContext } from "react";
 
 import { AstriaChain } from "@repo/flame-types";
+
 import { ConfigContext } from "../contexts/config-context";
 
 /**

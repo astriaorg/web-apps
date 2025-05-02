@@ -1,5 +1,7 @@
 "use client";
 
+import { useAstriaChainData } from "config";
+
 import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
 import {
   BlockLoader,
@@ -9,7 +11,7 @@ import {
 } from "@repo/ui/components";
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
-import { useAstriaChainData } from "config";
+
 import { SwapTxnStepsProps, TxnDetailsProps, TxnStepsProps } from "../types";
 
 export function TxnDetails({

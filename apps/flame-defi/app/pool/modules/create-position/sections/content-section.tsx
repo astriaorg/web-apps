@@ -1,10 +1,12 @@
 "use client";
 
-import { Button } from "@repo/ui/components";
-import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { Button } from "@repo/ui/components";
+import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
@@ -14,7 +16,6 @@ import { TokenAmountInput } from "pool/modules/create-position/components/token-
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
 import { calculateDepositType } from "pool/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
 enum InputId {
   INPUT_0 = "INPUT_0",

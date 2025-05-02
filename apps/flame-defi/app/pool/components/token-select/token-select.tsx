@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useState } from "react";
+
 import type { EvmCurrency } from "@repo/flame-types";
 import {
   Button,
@@ -11,7 +13,6 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownSmallIcon, SearchIcon } from "@repo/ui/icons";
-import { useCallback, useEffect, useState } from "react";
 
 interface TokenSelectProps {
   value?: EvmCurrency;

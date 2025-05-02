@@ -1,7 +1,8 @@
 "use client";
 
-import { Badge, Slider } from "@repo/ui/components";
 import { useState } from "react";
+
+import { Badge, Slider } from "@repo/ui/components";
 
 export const RemoveAmountSlider = ({
   handlePercentToRemove,

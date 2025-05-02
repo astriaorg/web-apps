@@ -1,7 +1,9 @@
-import { Skeleton } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 import { cva } from "class-variance-authority";
 import { forwardRef } from "react";
+
+import { Skeleton } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
+
 import { useCardContext } from "./card.context";
 
 const cardDescriptionVariants = cva("", {

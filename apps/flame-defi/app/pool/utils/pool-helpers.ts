@@ -1,9 +1,10 @@
 import Big from "big.js";
+
 import {
   DepositType,
   FEE_TIER_TICK_SPACING,
-  TICK_BOUNDARIES,
   type FeeTier,
+  TICK_BOUNDARIES,
 } from "pool/types";
 
 /**

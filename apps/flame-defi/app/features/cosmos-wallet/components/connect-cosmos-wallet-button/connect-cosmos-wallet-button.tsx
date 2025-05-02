@@ -1,12 +1,11 @@
+import { useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 
 import { CosmosIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
-import { useConfig } from "config";
-import { useCurrencyBalance } from "hooks/use-currency-balance";
-
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
+import { useCurrencyBalance } from "hooks/use-currency-balance";
 
 interface ConnectCosmosWalletButtonProps {
   onDisconnectWallet?: () => void;

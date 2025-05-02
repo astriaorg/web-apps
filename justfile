@@ -24,8 +24,9 @@ check-types:
 alias ct := check-types
 
 # lint everything
-lint:
-  npm run lint
+# Usage: just lint [--fix] (add --fix to auto-fix issues)
+lint fix="":
+  {{ if fix == "--fix" { "npm run lint:fix" } else { "npm run lint" } }}
   just lint-md
 alias l := lint
 
@@ -45,8 +46,11 @@ build:
 alias b := build
 
 # run all commands to ensure successful build in ci
-prepush:
+# Usage: just prepush [--all] (add --all to include e2e tests)
+prepush all="":
   just format
+  just lint --fix
   just check-types
   just lint
   just test
+  {{ if all == "--all" { "just e2e-tests run-e2e-tests" } else { "" } }}

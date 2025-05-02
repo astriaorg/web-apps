@@ -1,5 +1,6 @@
-import { PoolContext } from "pool/context/pool-context";
 import { useContext } from "react";
+
+import { PoolContext } from "pool/context/pool-context";
 
 export const usePoolContext = () => {
   const context = useContext(PoolContext);

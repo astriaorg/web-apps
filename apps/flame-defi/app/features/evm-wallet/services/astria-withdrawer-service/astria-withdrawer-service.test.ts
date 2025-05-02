@@ -7,7 +7,7 @@ import {
   AstriaErc20WithdrawerService,
   AstriaWithdrawerService,
   createWithdrawerService,
-} from "./astria-withdrawer-service";
+} from "./index";
 
 // Mock wagmi core
 jest.mock("@wagmi/core", () => ({

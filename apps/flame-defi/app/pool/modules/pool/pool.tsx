@@ -1,12 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useAccount } from "wagmi";
+
 import { Button, Skeleton } from "@repo/ui/components";
 import { InboxIcon, PlusIcon } from "@repo/ui/icons";
 import { useAstriaWallet } from "features/evm-wallet";
-import { useRouter } from "next/navigation";
 import { usePoolContext } from "pool/hooks";
-import type React from "react";
-import { useAccount } from "wagmi";
+
 import { ROUTES } from "../../constants/routes";
 import { PositionsTable } from "./components";
 

@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import request from "graphql-request";
+
 import { useConfig } from "config/hooks/use-config";
 import {
   CHART_CACHE_TIME_MILLISECONDS,
@@ -7,7 +9,6 @@ import {
 } from "earn/components/charts";
 import { graphql } from "earn/generated/gql";
 import { TimeseriesOptions } from "earn/generated/gql/graphql";
-import request from "graphql-request";
 
 const query = graphql(`
   query VaultByAddressHistoricalState(

@@ -3,11 +3,10 @@
 import { useCallback, useState } from "react";
 import { Address } from "viem";
 
-import { KeplrWalletError } from "features/cosmos-wallet";
-
 import { DepositError, WalletConnectionError } from "bridge/errors";
 import { useBridgeStrategy } from "bridge/hooks/use-bridge-strategy";
 import { ChainConnection } from "bridge/types";
+import { KeplrWalletError } from "features/cosmos-wallet";
 
 export interface DepositTransactionHook {
   isLoading: boolean;
