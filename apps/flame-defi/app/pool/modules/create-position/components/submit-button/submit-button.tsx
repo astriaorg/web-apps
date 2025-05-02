@@ -1,12 +1,13 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useCallback, useMemo, useState } from "react";
+import { Hash } from "viem";
+import { useAccount } from "wagmi";
+
 import { TransactionStatus } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import type { PoolWithSlot0 } from "pool/types";
-import { useCallback, useMemo, useState } from "react";
-import { Hash } from "viem";
-import { useAccount } from "wagmi";
 
 interface SubmitUninitializedPoolProps {
   pool: null;

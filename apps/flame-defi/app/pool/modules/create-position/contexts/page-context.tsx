@@ -1,16 +1,16 @@
 "use client";
 
 import { useAstriaChainData } from "config";
-import {
-  MAX_PRICE_DEFAULT,
-  MIN_PRICE_DEFAULT,
-} from "pool/modules/create-position/types";
-import { FEE_TIER, type FeeTier } from "pool/types";
 import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import { type Amount, useTokenAmountInput } from "@repo/ui/components";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
+import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+} from "pool/modules/create-position/types";
+import { FEE_TIER, type FeeTier } from "pool/types";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
