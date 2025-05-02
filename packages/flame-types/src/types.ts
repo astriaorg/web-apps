@@ -801,8 +801,15 @@ export type Balance = {
 };
 
 export enum TransactionStatus {
-  IDLE = "idle",
-  PENDING = "pending",
-  SUCCESS = "success",
-  FAILED = "failed",
+  IDLE = "Idle",
+  PENDING = "Pending",
+  SUCCESS = "Success",
+  FAILED = "Failed",
+}
+
+export enum ApproveStatus {
+  PENDING = "Pending",
+  REQUIRED = "Required",
+  SUCCESS = "Success",
+  FAILED = "Failed",
 }

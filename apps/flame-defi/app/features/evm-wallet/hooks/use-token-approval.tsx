@@ -116,7 +116,7 @@ export const useTokenApproval = ({
 
           newTokenAllowances.push({
             symbol: currency.coinDenom,
-            value: allowance ?? "0",
+            value: allowance.toString(),
           });
         } catch (error) {
           console.error("Failed to get token allowance:", error);

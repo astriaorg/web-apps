@@ -245,7 +245,7 @@ export const ContentSection = () => {
         <div className="flex flex-col gap-4">
           <PriceRangeInput rate={rate} />
 
-          <SubmitButton pool={pool} />
+          <SubmitButton pool={pool} depositType={depositType} />
         </div>
       </div>
     </div>

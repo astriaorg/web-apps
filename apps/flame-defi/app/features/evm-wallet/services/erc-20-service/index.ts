@@ -64,21 +64,14 @@ export class ERC20Service extends GenericContractService {
     chainId: number,
     owner: Address,
     spender: Address,
-  ): Promise<string | null> {
-    // TODO: Fix type conversions.
-    const currentAllowance = await this.readContractMethod(
+  ): Promise<bigint> {
+    const allowance = await this.readContractMethod<bigint>(
       chainId,
       "allowance",
       [owner, spender],
     );
 
-    if (currentAllowance === null) {
-      return null;
-    }
-
-    const allowance = currentAllowance as bigint;
-
-    return allowance.toString();
+    return allowance;
   }
 
   async balanceOf(chainId: number, address: string): Promise<bigint> {
