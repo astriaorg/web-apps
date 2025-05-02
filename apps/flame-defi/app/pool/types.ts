@@ -54,6 +54,12 @@ export const TICK_BOUNDARIES = {
   MIN: -887272,
 } as const;
 
+export type PoolWithSlot0 = Slot0 & {
+  address: string;
+  rateToken0ToToken1: string;
+  rateToken1ToToken0: string;
+};
+
 export enum DepositType {
   TOKEN_0_ONLY = "TOKEN_0_ONLY",
   TOKEN_1_ONLY = "TOKEN_1_ONLY",
@@ -223,10 +229,4 @@ export type TxnLoaderProps = {
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
   txnHash: Hash;
-};
-
-export type PoolWithSlot0 = Slot0 & {
-  address: string;
-  rateToken0ToToken1: string;
-  rateToken1ToToken0: string;
 };
