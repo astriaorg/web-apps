@@ -42,7 +42,7 @@ export class Index extends GenericContractService {
    * @param decimals - The number of decimals of the token
    * @returns Object containing transaction hash if successful
    */
-  async approveToken(
+  async approve(
     chainId: number,
     contractAddress: Address,
     tokenApprovalAmount: string,
@@ -63,7 +63,7 @@ export class Index extends GenericContractService {
    * @param contractAddress - The address of the contract to check allowance for
    * @returns The current allowance of the token as a Big.js instance
    */
-  async getTokenAllowance(
+  async allowance(
     chainId: number,
     userAddress: Address,
     contractAddress: Address,
@@ -82,7 +82,7 @@ export class Index extends GenericContractService {
     return allowance.toString();
   }
 
-  async getBalance(chainId: number, address: string): Promise<bigint> {
+  async balanceOf(chainId: number, address: string): Promise<bigint> {
     return this.readContractMethod(chainId, "balanceOf", [address]);
   }
 }

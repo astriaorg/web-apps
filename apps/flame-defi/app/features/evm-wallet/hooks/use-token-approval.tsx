@@ -67,7 +67,7 @@ export const useTokenApproval = ({
         token.erc20ContractAddress as Address,
       );
 
-      const txHash = await erc20Service.approveToken(
+      const txHash = await erc20Service.approve(
         chain.chainId, // Use wallet's chain ID if available
         addressToApprove,
         tokenApprovalAmount,
@@ -110,7 +110,7 @@ export const useTokenApproval = ({
           currency.erc20ContractAddress as Address,
         );
         try {
-          const allowance = await erc20Service.getTokenAllowance(
+          const allowance = await erc20Service.allowance(
             chain.chainId, // Use wallet's chain ID if available
             userAccount.address,
             addressToApprove,

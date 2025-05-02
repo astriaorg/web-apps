@@ -59,7 +59,7 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
           wagmiConfig,
           currency.erc20ContractAddress,
         );
-        await erc20Service.approveToken(
+        await erc20Service.approve(
           (chain as EvmChainInfo).chainId,
           currency.astriaIntentBridgeAddress,
           tokenApprovalAmount,
