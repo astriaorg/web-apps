@@ -9,7 +9,7 @@ import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 import { createBridgeStrategy } from "bridge/strategies";
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { createErc20Service } from "features/evm-wallet";
+import { createERC20Service } from "features/evm-wallet";
 
 export interface UseBridgeStrategyResult {
   executeStrategy: (params: {
@@ -55,7 +55,7 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
         currency.erc20ContractAddress &&
         currency.astriaIntentBridgeAddress
       ) {
-        const erc20Service = createErc20Service(
+        const erc20Service = createERC20Service(
           wagmiConfig,
           currency.erc20ContractAddress,
         );
@@ -63,9 +63,6 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
           (chain as EvmChainInfo).chainId,
           currency.astriaIntentBridgeAddress,
           tokenApprovalAmount,
-          // tokenApprovalAmount already has decimals taken into account,
-          //  so pass in 0 here
-          0,
         );
       }
 

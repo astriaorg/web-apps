@@ -9,7 +9,7 @@ import type {
   UseBalanceResult,
 } from "hooks/use-currency-balance";
 
-import { createErc20Service } from "../services/erc-20-service";
+import { createERC20Service } from "../services/erc-20-service";
 
 /**
  * Custom hook to fetch and manage the token balance for a given token and user address.
@@ -59,7 +59,7 @@ export const useEvmCurrencyBalance = (
 
       if (currency.erc20ContractAddress) {
         // For ERC20 tokens
-        const erc20Service = createErc20Service(
+        const erc20Service = createERC20Service(
           wagmiConfig,
           currency.erc20ContractAddress,
         );

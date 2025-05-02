@@ -1,5 +1,5 @@
 import type { Config } from "@wagmi/core";
-import { type Address, erc20Abi, type Hash, parseUnits } from "viem";
+import { type Address, erc20Abi, type Hash } from "viem";
 
 import { GenericContractService } from "../generic-contract-service";
 
@@ -9,7 +9,7 @@ interface TransferParams {
   chainId: number;
 }
 
-export class Index extends GenericContractService {
+export class ERC20Service extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
     super(wagmiConfig, contractAddress, erc20Abi);
   }
@@ -17,10 +17,10 @@ export class Index extends GenericContractService {
   /**
    * Transfer tokens from the user's address to another address.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param recipientAddress - The address of the recipient
-   * @param amount - The amount of tokens to transfer as a string
-   * @returns Transaction hash if successful
+   * @param chainId - The chain ID of the EVM chain.
+   * @param recipientAddress - The address of the recipient.
+   * @param amount - The amount of tokens to transfer as a string.
+   * @returns Transaction hash if successful.
    */
   async transfer({
     recipient,
@@ -36,42 +36,40 @@ export class Index extends GenericContractService {
   /**
    * Approve a contract to spend tokens on behalf of the user.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param contractAddress - The address of the contract that is granted approval to be a recipient of transfers from this ERC20
-   * @param tokenApprovalAmount - The amount of tokens to approve as a string
-   * @param decimals - The number of decimals of the token
-   * @returns Object containing transaction hash if successful
+   * @param chainId - The chain ID of the EVM chain.
+   * @param spender - The address of the contract that is granted approval to be a recipient of transfers from this ERC20.
+   * @param amount - The amount of tokens to approve as a string.
+   * @returns Object containing transaction hash if successful.
    */
   async approve(
     chainId: number,
-    contractAddress: Address,
-    tokenApprovalAmount: string,
-    decimals: number,
+    spender: Address,
+    amount: string,
   ): Promise<Hash> {
-    const amountAsBigInt = parseUnits(tokenApprovalAmount, decimals);
     return await this.writeContractMethod(chainId, "approve", [
-      contractAddress,
-      amountAsBigInt,
+      spender,
+      amount,
     ]);
   }
 
   /**
    * Get the current allowance of a token for a specific contract.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param userAddress - The address of the user
-   * @param contractAddress - The address of the contract to check allowance for
-   * @returns The current allowance of the token as a Big.js instance
+   * @param chainId - The chain ID of the EVM chain.
+   * @param owner - The address of the user.
+   * @param spender - The address of the contract to check allowance for.
+   * @returns The current allowance of the token, or null if no allowance.
    */
   async allowance(
     chainId: number,
-    userAddress: Address,
-    contractAddress: Address,
+    owner: Address,
+    spender: Address,
   ): Promise<string | null> {
+    // TODO: Fix type conversions.
     const currentAllowance = await this.readContractMethod(
       chainId,
       "allowance",
-      [userAddress, contractAddress],
+      [owner, spender],
     );
 
     if (currentAllowance === null) {
@@ -79,6 +77,7 @@ export class Index extends GenericContractService {
     }
 
     const allowance = currentAllowance as bigint;
+
     return allowance.toString();
   }
 
@@ -87,9 +86,9 @@ export class Index extends GenericContractService {
   }
 }
 
-export function createErc20Service(
-  wagmiConfig: Config,
-  contractAddress: Address,
-): Index {
-  return new Index(wagmiConfig, contractAddress);
+export function createERC20Service(
+  config: Config,
+  address: Address,
+): ERC20Service {
+  return new ERC20Service(config, address);
 }

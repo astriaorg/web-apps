@@ -711,15 +711,15 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 }
 
 /**
- * Factory function to create a new NonfungiblePositionManagerService instance
+ * Factory function to create a new `NonfungiblePositionManagerService` instance.
  *
- * @param wagmiConfig - The wagmi configuration object
- * @param contractAddress - The address of the NonFungiblePositionManager contract
- * @returns A new NonfungiblePositionManagerService instance
+ * @param config - The `wagmi` configuration object
+ * @param address - The address of the `NonFungiblePositionManager` contract.
+ * @returns A new `NonfungiblePositionManagerService` instance.
  */
 export function createNonfungiblePositionManagerService(
-  wagmiConfig: Config,
-  contractAddress: Address,
+  config: Config,
+  address: Address,
 ): NonfungiblePositionManagerService {
-  return new NonfungiblePositionManagerService(wagmiConfig, contractAddress);
+  return new NonfungiblePositionManagerService(config, address);
 }

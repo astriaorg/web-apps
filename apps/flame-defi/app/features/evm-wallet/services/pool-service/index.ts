@@ -115,13 +115,13 @@ export class PoolService extends GenericContractService {
 /**
  * Factory function to create a new `PoolService` instance.
  *
- * @param wagmiConfig - The wagmi configuration object.
- * @param contractAddress - The address of the Uniswap V3 pool contract.
+ * @param config - The wagmi configuration object.
+ * @param address - The address of the Uniswap V3 pool contract.
  * @returns A new `PoolService` instance.
  */
 export function createPoolService(
-  wagmiConfig: Config,
-  contractAddress: Address,
+  config: Config,
+  address: Address,
 ): PoolService {
-  return new PoolService(wagmiConfig, contractAddress);
+  return new PoolService(config, address);
 }

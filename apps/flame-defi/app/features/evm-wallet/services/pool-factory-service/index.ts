@@ -125,13 +125,13 @@ export class PoolFactoryService extends GenericContractService {
 /**
  * Factory function to create a new `PoolFactoryService` instance.
  *
- * @param wagmiConfig - The `wagmi` configuration object.
- * @param contractAddress - The address of the Uniswap V3 factory contract.
+ * @param config - The `wagmi` configuration object.
+ * @param address - The address of the Uniswap V3 factory contract.
  * @returns A new `PoolFactoryService` instance.
  */
 export function createPoolFactoryService(
-  wagmiConfig: Config,
-  contractAddress: Address,
+  config: Config,
+  address: Address,
 ): PoolFactoryService {
-  return new PoolFactoryService(wagmiConfig, contractAddress);
+  return new PoolFactoryService(config, address);
 }
