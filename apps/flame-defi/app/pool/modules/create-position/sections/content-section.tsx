@@ -5,6 +5,9 @@ import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { EvmCurrency } from "@repo/flame-types";
+import type { Amount } from "@repo/ui/components";
+import { useValidateTokenAmount } from "@repo/ui/hooks";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
@@ -31,6 +34,7 @@ const TRANSITION: Transition = {
 
 export const ContentSection = () => {
   const { chain } = useAstriaChainData();
+  const validate = useValidateTokenAmount();
   const {
     amount0,
     amount1,
@@ -71,45 +75,82 @@ export const ContentSection = () => {
     return isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0;
   }, [isInverted, pool]);
 
-  const derivedValues = useMemo(() => {
-    if (!pool || isPending) {
+  const derivedValues = useMemo((): {
+    derivedAmount0: Amount;
+    derivedAmount1: Amount;
+  } => {
+    if (!pool || isPending || !token0 || !token1) {
       // When there's no pool, the user can enter any value in both inputs to initialize the position.
       return {
-        derivedAmount0: amount0.value,
-        derivedAmount1: amount1.value,
+        derivedAmount0: amount0,
+        derivedAmount1: amount1,
       };
     }
+
+    const getDerivedAmount = (
+      amount: string,
+      token: EvmCurrency,
+      balance?: string,
+    ) => {
+      return {
+        value: amount,
+        validation: validate({
+          value: amount,
+          token: {
+            symbol: token.coinDenom,
+            decimals: token.coinDecimals,
+          },
+          decimals: token.coinDecimals,
+          minimum: "0",
+          maximum: balance,
+        }),
+      };
+    };
 
     if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
         .mul(rate as string)
-        .toFixed(token1?.coinDecimals || 0);
+        .toFixed(token1.coinDecimals);
       return {
-        derivedAmount0: amount0.value,
-        derivedAmount1: formatNumberWithoutTrailingZeros(derivedAmount1),
+        derivedAmount0: amount0,
+        derivedAmount1: getDerivedAmount(
+          formatNumberWithoutTrailingZeros(derivedAmount1),
+          token1,
+          token1Balance?.value,
+        ),
       };
     }
 
     if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
         .mul(new Big(1).div(rate as string))
-        .toFixed(token0?.coinDecimals || 0);
+        .toFixed(token0.coinDecimals);
       return {
-        derivedAmount0: formatNumberWithoutTrailingZeros(derivedAmount0),
-        derivedAmount1: amount1.value,
+        derivedAmount0: getDerivedAmount(
+          formatNumberWithoutTrailingZeros(derivedAmount0),
+          token0,
+          token0Balance?.value,
+        ),
+        derivedAmount1: amount1,
       };
     }
 
-    return { derivedAmount0: "", derivedAmount1: "" };
+    return {
+      derivedAmount0: getDerivedAmount("", token0, token0Balance?.value),
+      derivedAmount1: getDerivedAmount("", token1, token1Balance?.value),
+    };
   }, [
     pool,
     rate,
     isPending,
     currentInput,
-    amount0.value,
-    amount1.value,
+    amount0,
+    amount1,
     token0,
     token1,
+    token0Balance,
+    token1Balance,
+    validate,
   ]);
 
   const optionsToken0 = useMemo(() => {
@@ -180,7 +221,7 @@ export const ContentSection = () => {
                 key={isInverted ? InputId.INPUT_1 : InputId.INPUT_0}
               >
                 <TokenAmountInput
-                  value={derivedValues.derivedAmount0}
+                  value={derivedValues.derivedAmount0.value}
                   onInput={({ value }) => {
                     onInput0({ value });
                     setCurrentInput(InputId.INPUT_0);
@@ -208,7 +249,7 @@ export const ContentSection = () => {
                 key={isInverted ? InputId.INPUT_0 : InputId.INPUT_1}
               >
                 <TokenAmountInput
-                  value={derivedValues.derivedAmount1}
+                  value={derivedValues.derivedAmount1.value}
                   onInput={({ value }) => {
                     onInput1({ value });
                     setCurrentInput(InputId.INPUT_1);
@@ -245,7 +286,12 @@ export const ContentSection = () => {
         <div className="flex flex-col gap-4">
           <PriceRangeInput rate={rate} />
 
-          <SubmitButton pool={pool} depositType={depositType} />
+          <SubmitButton
+            pool={pool}
+            depositType={depositType}
+            amount0={derivedValues.derivedAmount0}
+            amount1={derivedValues.derivedAmount1}
+          />
         </div>
       </div>
     </div>

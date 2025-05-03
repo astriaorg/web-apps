@@ -16,33 +16,38 @@ import { usePageContext } from "pool/modules/create-position/hooks/use-page-cont
 import { DepositType, PoolWithSlot0 } from "pool/types";
 
 interface SubmitButtonProps {
+  amount0: Amount;
+  amount1: Amount;
   pool: PoolWithSlot0 | null;
   depositType: DepositType;
 }
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
-  CONNECT_WALLET = "Connect Wallet",
-  INSUFFICIENT_BALANCE = "Insufficient Balance",
-  INVALID_INPUT = "Invalid Input",
+  CONNECT_WALLET = "CONNECT_WALLET",
+  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
+  INVALID_INPUT = "INVALID_INPUT",
 
-  APPROVE_TOKEN_0 = "Approve Token 0",
-  PENDING_APPROVE_TOKEN_0 = "Approving Token 0...",
-  APPROVE_TOKEN_1 = "Approve Token 1",
-  PENDING_APPROVE_TOKEN_1 = "Approving Token 1...",
+  APPROVE_TOKEN_0 = "APPROVE_TOKEN_0",
+  PENDING_APPROVE_TOKEN_0 = "PENDING_APPROVE_TOKEN_0",
+  APPROVE_TOKEN_1 = "APPROVE_TOKEN_1",
+  PENDING_APPROVE_TOKEN_1 = "PENDING_APPROVE_TOKEN_1",
 
-  SEND_TRANSACTION = "Submit",
-  PENDING_SEND_TRANSACTION = "Sending Transaction...",
+  SEND_TRANSACTION = "SEND_TRANSACTION",
+  PENDING_SEND_TRANSACTION = "PENDING_SEND_TRANSACTION",
 }
 
-export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
+export const SubmitButton = ({
+  amount0,
+  amount1,
+  pool,
+  depositType,
+}: SubmitButtonProps) => {
   const { isConnected, address } = useAccount();
   const publicClient = usePublicClient();
   const { openConnectModal } = useConnectModal();
   const { chain } = useAstriaChainData();
   const {
-    amount0,
-    amount1,
     token0,
     token1,
     maxPrice,
@@ -65,7 +70,7 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
   );
 
   useEffect(() => {
-    if (!token0 || !token1 || !amount0.value || !amount1.value) {
+    if (!token0 || !token1 || amount0.value === "" || amount1.value === "") {
       return;
     }
 
@@ -226,7 +231,11 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
       }
     }
 
-    const validateAmount = (amount: Amount) => {
+    if (!token0 || !token1) {
+      return ButtonState.INVALID_INPUT;
+    }
+
+    const getButtonStateFromAmountValidation = (amount: Amount) => {
       if (!amount.validation.isValid) {
         if (
           amount.value !== "" &&
@@ -239,22 +248,42 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
         }
         return ButtonState.INVALID_INPUT;
       }
+
+      if (!isCheckingApproval) {
+        if (approveStatusToken0 === ApproveStatus.PENDING) {
+          return ButtonState.PENDING_APPROVE_TOKEN_0;
+        }
+        if (approveStatusToken1 === ApproveStatus.PENDING) {
+          return ButtonState.PENDING_APPROVE_TOKEN_1;
+        }
+        if (approveStatusToken0 === ApproveStatus.REQUIRED) {
+          return ButtonState.APPROVE_TOKEN_0;
+        }
+        if (approveStatusToken1 === ApproveStatus.REQUIRED) {
+          return ButtonState.APPROVE_TOKEN_1;
+        }
+      }
+
       return ButtonState.SEND_TRANSACTION;
     };
 
+    let state: ButtonState = ButtonState.SEND_TRANSACTION;
+
     if (depositType === DepositType.TOKEN_0_ONLY) {
-      return validateAmount(amount0);
+      state = getButtonStateFromAmountValidation(amount0);
     } else if (depositType === DepositType.TOKEN_1_ONLY) {
-      return validateAmount(amount1);
+      state = getButtonStateFromAmountValidation(amount1);
     } else if (depositType === DepositType.BOTH) {
-      const state0 = validateAmount(amount0);
-      const state1 = validateAmount(amount1);
+      const state0 = getButtonStateFromAmountValidation(amount0);
+      const state1 = getButtonStateFromAmountValidation(amount1);
+
       if (
         state0 === ButtonState.INSUFFICIENT_BALANCE ||
         state1 === ButtonState.INSUFFICIENT_BALANCE
       ) {
         return ButtonState.INSUFFICIENT_BALANCE;
       }
+
       if (
         state0 === ButtonState.INVALID_INPUT ||
         state1 === ButtonState.INVALID_INPUT
@@ -263,25 +292,12 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
       }
     }
 
-    if (!isCheckingApproval) {
-      if (approveStatusToken0 === ApproveStatus.PENDING) {
-        return ButtonState.PENDING_APPROVE_TOKEN_0;
-      }
-      if (approveStatusToken1 === ApproveStatus.PENDING) {
-        return ButtonState.PENDING_APPROVE_TOKEN_1;
-      }
-      if (approveStatusToken0 === ApproveStatus.REQUIRED) {
-        return ButtonState.APPROVE_TOKEN_0;
-      }
-      if (approveStatusToken1 === ApproveStatus.REQUIRED) {
-        return ButtonState.APPROVE_TOKEN_1;
-      }
-    }
-
-    return ButtonState.SEND_TRANSACTION;
+    return state;
   }, [
     amount0,
     amount1,
+    token0,
+    token1,
     amountInitialPrice.validation.isValid,
     isPriceRangeValid,
     approveStatusToken0,
@@ -298,9 +314,9 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
 
     switch (state) {
       case ButtonState.CONNECT_WALLET:
-        return ButtonState.CONNECT_WALLET;
+        return "Connect Wallet";
       case ButtonState.INSUFFICIENT_BALANCE:
-        return ButtonState.INSUFFICIENT_BALANCE;
+        return "Insufficient Balance";
       case ButtonState.INVALID_INPUT:
         return action;
       case ButtonState.APPROVE_TOKEN_0:
@@ -312,7 +328,7 @@ export const SubmitButton = ({ pool, depositType }: SubmitButtonProps) => {
       case ButtonState.PENDING_APPROVE_TOKEN_1:
         return `Approving ${token1?.coinDenom}...`;
       case ButtonState.PENDING_SEND_TRANSACTION:
-        return ButtonState.PENDING_SEND_TRANSACTION;
+        return "Sending Transaction...";
       case ButtonState.SEND_TRANSACTION:
         return action;
     }
