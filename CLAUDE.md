@@ -27,3 +27,5 @@
   VERY IMPORTANT TO ALWAYS ADD AN EMPTY NEW LINE TO THE END OF FILES.
   THERE MUST NEVER BE A FILE YOU TOUCH THAT DOES NOT END IN A NEW LINE.
 - NEVER write a nested ternary.
+- Do not leave a comment when you remove code explaining why you removed the
+  code.

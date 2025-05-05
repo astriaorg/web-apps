@@ -344,7 +344,7 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Select chain..."
+                      placeholder="Select source..."
                       options={sourceChainOptions}
                       onSelect={connectSource}
                       valueOverride={sourceChainOption}
@@ -422,7 +422,7 @@ export const ContentSection = () => {
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
-                      placeholder="Connect wallet or enter address"
+                      placeholder="Select destination..."
                       options={destinationChainOptions}
                       onSelect={connectDestination}
                       valueOverride={destinationChainOption}

@@ -9,7 +9,7 @@ import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 import { createBridgeStrategy } from "bridge/strategies";
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { createErc20Service } from "features/evm-wallet";
+import { createErc20Service, useTokenApproval } from "features/evm-wallet";
 
 export interface UseBridgeStrategyResult {
   executeStrategy: (params: {
@@ -55,6 +55,7 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
         currency.erc20ContractAddress &&
         currency.astriaIntentBridgeAddress
       ) {
+        // TODO - need to actually check if they need an approval first
         const erc20Service = createErc20Service(
           wagmiConfig,
           currency.erc20ContractAddress,
