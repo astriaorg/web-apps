@@ -235,7 +235,11 @@ export const SubmitButton = ({
       return ButtonState.INVALID_INPUT;
     }
 
-    const getButtonStateFromAmountValidation = (amount: Amount) => {
+    const getButtonStateFromAmountValidation = (
+      amount: Amount,
+      status: ApproveStatus,
+      token: EvmCurrency,
+    ) => {
       if (!amount.validation.isValid) {
         if (
           amount.value !== "" &&
@@ -250,16 +254,16 @@ export const SubmitButton = ({
       }
 
       if (!isCheckingApproval) {
-        if (approveStatusToken0 === ApproveStatus.PENDING) {
-          return ButtonState.PENDING_APPROVE_TOKEN_0;
-        }
-        if (approveStatusToken1 === ApproveStatus.PENDING) {
+        if (status === ApproveStatus.PENDING) {
+          if (token === token0) {
+            return ButtonState.PENDING_APPROVE_TOKEN_0;
+          }
           return ButtonState.PENDING_APPROVE_TOKEN_1;
         }
-        if (approveStatusToken0 === ApproveStatus.REQUIRED) {
-          return ButtonState.APPROVE_TOKEN_0;
-        }
-        if (approveStatusToken1 === ApproveStatus.REQUIRED) {
+        if (status === ApproveStatus.REQUIRED) {
+          if (token === token0) {
+            return ButtonState.APPROVE_TOKEN_0;
+          }
           return ButtonState.APPROVE_TOKEN_1;
         }
       }
@@ -267,32 +271,39 @@ export const SubmitButton = ({
       return ButtonState.SEND_TRANSACTION;
     };
 
-    let state: ButtonState = ButtonState.SEND_TRANSACTION;
+    let state0 = ButtonState.SEND_TRANSACTION;
+    let state1 = ButtonState.SEND_TRANSACTION;
 
-    if (depositType === DepositType.TOKEN_0_ONLY) {
-      state = getButtonStateFromAmountValidation(amount0);
-    } else if (depositType === DepositType.TOKEN_1_ONLY) {
-      state = getButtonStateFromAmountValidation(amount1);
-    } else if (depositType === DepositType.BOTH) {
-      const state0 = getButtonStateFromAmountValidation(amount0);
-      const state1 = getButtonStateFromAmountValidation(amount1);
-
-      if (
-        state0 === ButtonState.INSUFFICIENT_BALANCE ||
-        state1 === ButtonState.INSUFFICIENT_BALANCE
-      ) {
-        return ButtonState.INSUFFICIENT_BALANCE;
-      }
-
-      if (
-        state0 === ButtonState.INVALID_INPUT ||
-        state1 === ButtonState.INVALID_INPUT
-      ) {
-        return ButtonState.INVALID_INPUT;
-      }
+    if (
+      depositType === DepositType.BOTH ||
+      depositType !== DepositType.TOKEN_1_ONLY
+    ) {
+      state0 = getButtonStateFromAmountValidation(
+        amount0,
+        approveStatusToken0,
+        token0,
+      );
+    }
+    if (
+      depositType === DepositType.BOTH ||
+      depositType !== DepositType.TOKEN_0_ONLY
+    ) {
+      state1 = getButtonStateFromAmountValidation(
+        amount1,
+        approveStatusToken1,
+        token1,
+      );
     }
 
-    return state;
+    // If any of the states are not SEND_TRANSACTION, return the one that is not.
+    if (state0 !== ButtonState.SEND_TRANSACTION) {
+      return state0;
+    }
+    if (state1 !== ButtonState.SEND_TRANSACTION) {
+      return state1;
+    }
+
+    return ButtonState.SEND_TRANSACTION;
   }, [
     amount0,
     amount1,
