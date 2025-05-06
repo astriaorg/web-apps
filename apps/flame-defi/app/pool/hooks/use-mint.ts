@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAstriaChainData } from "config";
 import { useCallback } from "react";
-import { type Address, parseUnits } from "viem";
+import { type Address } from "viem";
 import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
@@ -13,10 +13,10 @@ export interface MintParams {
   fee: number;
   tickLower: number;
   tickUpper: number;
-  amount0Desired: string;
-  amount1Desired: string;
-  amount0Min: string;
-  amount1Min: string;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
   recipient: Address;
   deadline: bigint;
   /**
@@ -73,12 +73,12 @@ export const useMint = () => {
         sortedAmount1Min = params.amount0Min;
       }
 
-      let value: bigint = BigInt(0);
-      if (params.token0.isNative) {
-        value = BigInt(params.amount0Desired);
+      let value: bigint = 0n;
+      if (sortedToken0.isNative) {
+        value = sortedAmount0Desired;
       }
-      if (params.token1.isNative) {
-        value = BigInt(params.amount1Desired);
+      if (sortedToken1.isNative) {
+        value = sortedAmount1Desired;
       }
 
       const result =
@@ -90,16 +90,10 @@ export const useMint = () => {
             fee: params.fee,
             tickLower: params.tickLower,
             tickUpper: params.tickUpper,
-            amount0Desired: parseUnits(
-              sortedAmount0Desired,
-              sortedToken0.coinDecimals,
-            ),
-            amount1Desired: parseUnits(
-              sortedAmount1Desired,
-              sortedToken1.coinDecimals,
-            ),
-            amount0Min: parseUnits(sortedAmount0Min, sortedToken0.coinDecimals),
-            amount1Min: parseUnits(sortedAmount1Min, sortedToken1.coinDecimals),
+            amount0Desired: sortedAmount0Desired,
+            amount1Desired: sortedAmount1Desired,
+            amount0Min: sortedAmount0Min,
+            amount1Min: sortedAmount1Min,
             recipient: params.recipient,
             deadline: params.deadline,
             sqrtPriceX96: params.sqrtPriceX96,

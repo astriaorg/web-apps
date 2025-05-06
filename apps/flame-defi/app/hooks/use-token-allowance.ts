@@ -24,7 +24,6 @@ export const useTokenAllowance = ({
   return useQuery<bigint | null>({
     queryKey: ["useTokenAllowance", token, spender],
     queryFn: async () => {
-      console.log("useTokenAllowance", token?.coinDenom);
       if (!address || !chainId || !publicClient || !token || !spender) {
         return null;
       }
@@ -41,7 +40,7 @@ export const useTokenAllowance = ({
           address,
           spender,
         );
-        console.log("allowance", token?.coinDenom, allowance);
+
         return allowance;
       } catch (error) {
         console.error("Error checking token allowance:", error);

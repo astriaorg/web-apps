@@ -1,14 +1,16 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import Big from "big.js";
-import { useAstriaChainData, useConfig } from "config";
+import { useAstriaChainData } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
-import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
+import {
+  calculateMinimumAmountsWithBasisPoints,
+  type EvmCurrency,
+  TransactionStatus,
+} from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
-import { getSlippageTolerance } from "@repo/ui/utils";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { type MintParams, useMint } from "pool/hooks/use-mint";
@@ -56,10 +58,6 @@ export const SubmitButton = ({
     feeTier,
   } = usePageContext();
 
-  const { defaultSlippageTolerance } = useConfig();
-  const slippageTolerance: number =
-    getSlippageTolerance() || defaultSlippageTolerance;
-
   const { mint } = useMint();
 
   const { approve, getIsApproved } = useApproveToken();
@@ -84,7 +82,7 @@ export const SubmitButton = ({
   const isToken0Approved = useMemo(() => {
     if (
       !token0 ||
-      !token0Allowance ||
+      typeof token0Allowance !== "bigint" ||
       isPendingToken0Allowance ||
       !amount0.validation.isValid
     ) {
@@ -105,7 +103,7 @@ export const SubmitButton = ({
   const isToken1Approved = useMemo(() => {
     if (
       !token1 ||
-      !token1Allowance ||
+      typeof token1Allowance !== "bigint" ||
       isPendingToken1Allowance ||
       !amount1.validation.isValid
     ) {
@@ -190,12 +188,37 @@ export const SubmitButton = ({
       // TODO: Implement create position logic.
       console.log("Creating position...");
 
-      const amount0Min = new Big(amount0.value || 0)
-        .mul(1 - slippageTolerance)
-        .toFixed();
-      const amount1Min = new Big(amount1.value || 0)
-        .mul(1 - slippageTolerance)
-        .toFixed();
+      const amount0Desired = parseUnits(
+        amount0.value || "0",
+        token0.coinDecimals,
+      );
+      const amount1Desired = parseUnits(
+        amount1.value || "0",
+        token1.coinDecimals,
+      );
+      // TODO: Use real slippage tolerance.
+      const amount0Min = calculateMinimumAmountsWithBasisPoints({
+        amountDesired: amount0Desired,
+        slippageTolerance: 10,
+      });
+      const amount1Min = calculateMinimumAmountsWithBasisPoints({
+        amountDesired: amount1Desired,
+        slippageTolerance: 10,
+      });
+
+      // 20 minute deadline.
+      // TODO: Add this to settings.
+      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+      const sqrtPriceX96 = pool
+        ? undefined
+        : BigInt(
+            calculatePriceToSqrtPriceX96({
+              price: Number(amountInitialPrice.value),
+              decimal0: token0.coinDecimals,
+              decimal1: token1.coinDecimals,
+            }),
+          );
 
       const params: MintParams = {
         token0,
@@ -211,23 +234,13 @@ export const SubmitButton = ({
           decimal0: token0.coinDecimals,
           decimal1: token1.coinDecimals,
         }),
-        amount0Desired: amount0.value || "0",
-        amount1Desired: amount1.value || "0",
+        amount0Desired,
+        amount1Desired,
         amount0Min,
         amount1Min,
         recipient: address,
-        // 20 minute deadline.
-        // TODO: Add this to settings.
-        deadline: BigInt(Math.floor(Date.now() / 1000) + 20 * 60),
-        sqrtPriceX96: pool
-          ? undefined
-          : BigInt(
-              calculatePriceToSqrtPriceX96({
-                price: Number(amountInitialPrice.value),
-                decimal0: token0.coinDecimals,
-                decimal1: token1.coinDecimals,
-              }),
-            ),
+        deadline: BigInt(deadline),
+        sqrtPriceX96,
       };
 
       await mint(params);
@@ -252,7 +265,6 @@ export const SubmitButton = ({
     maxPrice,
     pool,
     amountInitialPrice,
-    slippageTolerance,
     mint,
   ]);
 
