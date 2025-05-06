@@ -814,19 +814,6 @@ export enum ApproveStatus {
   FAILED = "Failed",
 }
 
-/**
- * Convert basis points to a multiplier for calculations.
- *
- * A basis point (bps) is 1/100th of a percent (0.01%)
- * 1 bps = 0.0001 in decimal.
- * 10 bps = 0.1% slippage.
- * 50 bps = 0.5% slippage.
- * 100 bps = 1% slippage.
- */
-const basisPointsToMultiplier = (basisPoints: number) => {
-  return 1 - basisPoints / 10000;
-};
-
 // Calculate minimum amounts using basis points.
 export const calculateMinimumAmountsWithBasisPoints = ({
   amountDesired,
