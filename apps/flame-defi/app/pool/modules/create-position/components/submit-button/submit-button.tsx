@@ -123,7 +123,9 @@ export const SubmitButton = ({
   ]);
 
   // TODO: Error handling.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hash, setHash] = useState<string | null>(null);
   const [status, setStatus] = useState<TransactionStatus>();
 
