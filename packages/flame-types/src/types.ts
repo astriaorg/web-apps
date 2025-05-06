@@ -247,15 +247,6 @@ export class IbcCurrency implements GenericCurrency {
     this.IconComponent = params.IconComponent;
   }
 
-  // TODO - refactor GenericCurrency and BaseCurrency into classes and put these
-  //  on GenericCurrency class
-  isEvmCurrency(): this is EvmCurrency {
-    return false;
-  }
-  isIbcCurrency(): this is IbcCurrency {
-    return true;
-  }
-
   /**
    * Converts this IbcCurrency to an Asset object for use with CosmosKit.
    *
@@ -384,15 +375,6 @@ export class EvmCurrency implements GenericCurrency {
     this.isNative = params.isNative;
     this.isBridgeable = params.isBridgeable;
     this.IconComponent = params.IconComponent;
-  }
-
-  // TODO - refactor GenericCurrency and BaseCurrency into classes and put these
-  //  on GenericCurrency class
-  isEvmCurrency(): this is EvmCurrency {
-    return true;
-  }
-  isIbcCurrency(): this is IbcCurrency {
-    return false;
   }
 
   /**

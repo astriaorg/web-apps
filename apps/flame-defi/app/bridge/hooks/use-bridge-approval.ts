@@ -3,7 +3,7 @@ import { useConfig } from "config";
 import { Address } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
-import { ChainType } from "@repo/flame-types";
+import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { ChainConnection } from "bridge/types";
 import { createErc20Service } from "features/evm-wallet";
 
@@ -21,7 +21,7 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
   const currency = chainConnection?.currency ?? null;
 
   // only non-native evm currencies need approvals
-  const isErc20 = currency && currency.isEvmCurrency() && !currency.isNative;
+  const isErc20 = currency && currency instanceof EvmCurrency && !currency.isNative;
 
   const erc20Address = isErc20 ? currency.erc20ContractAddress : null;
   const bridgeAddress = isErc20 ? currency.astriaIntentBridgeAddress : null;
@@ -48,7 +48,7 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
         address &&
         (chain?.chainType === ChainType.EVM ||
           chain?.chainType === ChainType.ASTRIA) &&
-        currency?.isEvmCurrency() &&
+        currency instanceof EvmCurrency &&
         currency.erc20ContractAddress &&
         currency.astriaIntentBridgeAddress
       ) {
@@ -80,7 +80,7 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
         !chain ||
         (chain.chainType !== ChainType.EVM &&
           chain.chainType !== ChainType.ASTRIA) ||
-        !currency?.isEvmCurrency() ||
+        !(currency instanceof EvmCurrency) ||
         !currency.erc20ContractAddress ||
         !currency.astriaIntentBridgeAddress
       ) {
