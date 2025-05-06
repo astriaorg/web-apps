@@ -247,7 +247,7 @@ export class IbcCurrency implements GenericCurrency {
     this.IconComponent = params.IconComponent;
   }
 
-  // TODO - refactor GenericCurrency and BaseCurrency into classes and but these
+  // TODO - refactor GenericCurrency and BaseCurrency into classes and put these
   //  on GenericCurrency class
   isEvmCurrency(): this is EvmCurrency {
     return false;
@@ -386,7 +386,7 @@ export class EvmCurrency implements GenericCurrency {
     this.IconComponent = params.IconComponent;
   }
 
-  // TODO - refactor GenericCurrency and BaseCurrency into classes and but these
+  // TODO - refactor GenericCurrency and BaseCurrency into classes and put these
   //  on GenericCurrency class
   isEvmCurrency(): this is EvmCurrency {
     return true;
