@@ -25,9 +25,7 @@ enum ButtonState {
   INVALID_INPUT = "INVALID_INPUT",
 
   APPROVE_TOKEN_0 = "APPROVE_TOKEN_0",
-  PENDING_APPROVE_TOKEN_0 = "PENDING_APPROVE_TOKEN_0",
   APPROVE_TOKEN_1 = "APPROVE_TOKEN_1",
-  PENDING_APPROVE_TOKEN_1 = "PENDING_APPROVE_TOKEN_1",
 
   SEND_TRANSACTION = "SEND_TRANSACTION",
   PENDING_SEND_TRANSACTION = "PENDING_SEND_TRANSACTION",
@@ -245,10 +243,6 @@ export const SubmitButton = ({
         return `Approve ${token0?.coinDenom}`;
       case ButtonState.APPROVE_TOKEN_1:
         return `Approve ${token1?.coinDenom}`;
-      case ButtonState.PENDING_APPROVE_TOKEN_0:
-        return `Approving ${token0?.coinDenom}...`;
-      case ButtonState.PENDING_APPROVE_TOKEN_1:
-        return `Approving ${token1?.coinDenom}...`;
       case ButtonState.PENDING_SEND_TRANSACTION:
         return "Sending Transaction...";
       case ButtonState.SEND_TRANSACTION:
@@ -262,8 +256,6 @@ export const SubmitButton = ({
       isCheckingToken1Approval ||
       [
         ButtonState.INSUFFICIENT_BALANCE,
-        ButtonState.PENDING_APPROVE_TOKEN_0,
-        ButtonState.PENDING_APPROVE_TOKEN_1,
         ButtonState.PENDING_SEND_TRANSACTION,
         ButtonState.INVALID_INPUT,
       ].includes(state)
