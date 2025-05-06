@@ -9,7 +9,7 @@ import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 import { createBridgeStrategy } from "bridge/strategies";
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { createErc20Service, useTokenApproval } from "features/evm-wallet";
+import { createErc20Service } from "features/evm-wallet";
 
 export interface UseBridgeStrategyResult {
   executeStrategy: (params: {
