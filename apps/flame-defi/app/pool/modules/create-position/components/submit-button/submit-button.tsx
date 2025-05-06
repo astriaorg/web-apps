@@ -1,5 +1,6 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAstriaChainData } from "config";
+import Big from "big.js";
+import { useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
@@ -7,10 +8,13 @@ import { useAccount, usePublicClient } from "wagmi";
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
+import { type MintParams, useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, PoolWithSlot0 } from "pool/types";
+import { calculatePriceToSqrtPriceX96, calculatePriceToTick } from "pool/utils";
 
 interface SubmitButtonProps {
   amount0: Amount;
@@ -49,9 +53,17 @@ export const SubmitButton = ({
     minPrice,
     isPriceRangeValid,
     amountInitialPrice,
+    feeTier,
   } = usePageContext();
 
+  const { defaultSlippageTolerance } = useConfig();
+  const slippageTolerance: number =
+    getSlippageTolerance() || defaultSlippageTolerance;
+
+  const { mint } = useMint();
+
   const { approve, getIsApproved } = useApproveToken();
+
   const {
     data: token0Allowance,
     isPending: isPendingToken0Allowance,
@@ -112,6 +124,7 @@ export const SubmitButton = ({
     getIsApproved,
   ]);
 
+  // TODO: Error handling.
   const [error, setError] = useState<string | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [status, setStatus] = useState<TransactionStatus>();
@@ -167,7 +180,7 @@ export const SubmitButton = ({
   );
 
   const handleCreatePosition = useCallback(async () => {
-    if (!address) {
+    if (!address || !token0 || !token1 || !amount0 || !amount1) {
       return;
     }
 
@@ -176,18 +189,72 @@ export const SubmitButton = ({
     try {
       // TODO: Implement create position logic.
       console.log("Creating position...");
-      // Simulate a successful transaction for now.
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const amount0Min = new Big(amount0.value || 0)
+        .mul(1 - slippageTolerance)
+        .toFixed();
+      const amount1Min = new Big(amount1.value || 0)
+        .mul(1 - slippageTolerance)
+        .toFixed();
+
+      const params: MintParams = {
+        token0,
+        token1,
+        fee: feeTier,
+        tickLower: calculatePriceToTick({
+          price: Number(minPrice),
+          decimal0: token0.coinDecimals,
+          decimal1: token1.coinDecimals,
+        }),
+        tickUpper: calculatePriceToTick({
+          price: Number(maxPrice),
+          decimal0: token0.coinDecimals,
+          decimal1: token1.coinDecimals,
+        }),
+        amount0Desired: amount0.value || "0",
+        amount1Desired: amount1.value || "0",
+        amount0Min,
+        amount1Min,
+        recipient: address,
+        // 20 minute deadline.
+        // TODO: Add this to settings.
+        deadline: BigInt(Math.floor(Date.now() / 1000) + 20 * 60),
+        sqrtPriceX96: pool
+          ? undefined
+          : BigInt(
+              calculatePriceToSqrtPriceX96({
+                price: Number(amountInitialPrice.value),
+                decimal0: token0.coinDecimals,
+                decimal1: token1.coinDecimals,
+              }),
+            ),
+      };
+
+      await mint(params);
+
       setError(null);
       setStatus(TransactionStatus.SUCCESS);
       setHash("0x0" as Hash);
     } catch (error) {
       console.error("Error creating position:", error);
-      setError("Failed to create position");
+      setError("Failed to create position.");
       setStatus(TransactionStatus.FAILED);
       setHash(null);
     }
-  }, [address]);
+  }, [
+    address,
+    feeTier,
+    token0,
+    token1,
+    amount0,
+    amount1,
+    minPrice,
+    maxPrice,
+    pool,
+    amountInitialPrice,
+    slippageTolerance,
+    mint,
+  ]);
 
   const state = useMemo<ButtonState>(() => {
     if (!isConnected) {

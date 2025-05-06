@@ -12,20 +12,26 @@ import { GenericContractService } from "../generic-contract-service";
 import { needToReverseTokenOrder } from "../services.utils";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
-type PositionResponseTuple = [
-  bigint, // nonce
-  string, // operator
-  Address, // tokenAddress0
-  Address, // tokenAddress1
-  bigint, // fee
-  bigint, // tickLower
-  bigint, // tickUpper
-  bigint, // liquidity
-  bigint, // feeGrowthInside0LastX128
-  bigint, // feeGrowthInside1LastX128
-  bigint, // tokensOwed0
-  bigint, // tokensOwed1
-];
+export interface CreateAndInitializePoolIfNecessaryParams {
+  token0: Address;
+  token1: Address;
+  fee: number;
+  sqrtPriceX96: bigint;
+}
+
+export interface MintParams {
+  token0: Address;
+  token1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  recipient: Address;
+  deadline: bigint;
+}
 
 export interface IncreaseLiquidityParams {
   chainId: number;
@@ -73,108 +79,113 @@ export interface CollectFeesParams {
 }
 
 export class NonfungiblePositionManagerService extends GenericContractService {
-  /**
-   * Creates a new NonfungiblePositionManagerService instance
-   *
-   * @param wagmiConfig - The wagmi configuration object
-   * @param contractAddress - The address of the NonFungiblePositionManager contract
-   */
-  constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(
-      wagmiConfig,
-      contractAddress,
-      NON_FUNGIBLE_POSITION_MANAGER_ABI as Abi,
-    );
+  constructor(config: Config, address: Address) {
+    super(config, address, NON_FUNGIBLE_POSITION_MANAGER_ABI as Abi);
   }
 
-  /**
-   * Get the pool positions of a user.
-   *
-   * @param chainId - The chain ID of the EVM chain
-   * @param tokenId - The ID of the token
-   * @returns Object containing position data including liquidity, ticks, and fees
-   */
   async positions(
     chainId: number,
     tokenId: string,
   ): Promise<PoolPositionResponse> {
-    const positionsArray = await this.readContractMethod<PositionResponseTuple>(
-      chainId,
-      "positions",
-      [tokenId],
-    );
+    const response = await this.readContractMethod<
+      [
+        bigint, // nonce
+        string, // operator
+        Address, // tokenAddress0
+        Address, // tokenAddress1
+        bigint, // fee
+        bigint, // tickLower
+        bigint, // tickUpper
+        bigint, // liquidity
+        bigint, // feeGrowthInside0LastX128
+        bigint, // feeGrowthInside1LastX128
+        bigint, // tokensOwed0
+        bigint, // tokensOwed1
+      ]
+    >(chainId, "positions", [tokenId]);
 
     const position: PoolPositionResponse = {
-      nonce: positionsArray[0],
-      operator: positionsArray[1],
-      tokenAddress0: positionsArray[2],
-      tokenAddress1: positionsArray[3],
-      fee: Number(positionsArray[4]),
-      tickLower: Number(positionsArray[5]),
-      tickUpper: Number(positionsArray[6]),
-      liquidity: positionsArray[7],
-      feeGrowthInside0LastX128: positionsArray[8],
-      feeGrowthInside1LastX128: positionsArray[9],
-      tokensOwed0: positionsArray[10],
-      tokensOwed1: positionsArray[11],
+      nonce: response[0],
+      operator: response[1],
+      tokenAddress0: response[2],
+      tokenAddress1: response[3],
+      fee: Number(response[4]),
+      tickLower: Number(response[5]),
+      tickUpper: Number(response[6]),
+      liquidity: response[7],
+      feeGrowthInside0LastX128: response[8],
+      feeGrowthInside1LastX128: response[9],
+      tokensOwed0: response[10],
+      tokensOwed1: response[11],
     };
 
     return position;
   }
 
-  /**
-   * Creates a new position in a Uniswap V3 pool
-   *
-   * @param chainId - The chain ID of the EVM chain
-   * @param token0 - The address of the first token in the pair
-   * @param token1 - The address of the second token in the pair
-   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%)
-   * @param tickLower - The lower tick boundary of the position
-   * @param tickUpper - The upper tick boundary of the position
-   * @param amount0Desired - The desired amount of token0 to deposit
-   * @param amount1Desired - The desired amount of token1 to deposit
-   * @param amount0Min - The minimum amount of token0 to deposit
-   * @param amount1Min - The minimum amount of token1 to deposit
-   * @param recipient - The address that will receive the NFT
-   * @param deadline - The timestamp by which the transaction must be executed
-   * @param value
-   * @returns Object containing transaction hash if successful
-   */
-  async mint(
+  async createAndInitializePoolIfNecessary(
     chainId: number,
-    token0: Address,
-    token1: Address,
-    fee: number,
-    tickLower: number,
-    tickUpper: number,
-    amount0Desired: bigint,
-    amount1Desired: bigint,
-    amount0Min: bigint,
-    amount1Min: bigint,
-    recipient: Address,
-    deadline: number,
-    value: bigint,
+    params: CreateAndInitializePoolIfNecessaryParams,
+    value?: bigint,
   ): Promise<Hash> {
     return await this.writeContractMethod(
       chainId,
-      "mint",
-      [
-        {
-          token0,
-          token1,
-          fee,
-          tickLower,
-          tickUpper,
-          amount0Desired,
-          amount1Desired,
-          amount0Min,
-          amount1Min,
-          recipient,
-          deadline,
-        },
-      ],
+      "createAndInitializePoolIfNecessary",
+      [params],
       value,
     );
+  }
+
+  private encodeCreateAndInitializePoolIfNecessary = (
+    token0: Address,
+    token1: Address,
+    fee: number,
+    sqrtPriceX96: bigint,
+  ): string => {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "createAndInitializePoolIfNecessary",
+      args: [token0, token1, fee, sqrtPriceX96],
+    });
+  };
+
+  async mint(chainId: number, params: MintParams, value?: bigint) {
+    return await this.writeContractMethod(chainId, "mint", [params], value);
+  }
+
+  private encodeMint(params: MintParams) {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "mint",
+      args: [params],
+    });
+  }
+
+  /**
+   * Creates a new pool if necessary and mints a new position in a single transaction.
+   */
+  async createAndInitializePoolIfNecessaryAndMint(
+    chainId: number,
+    params: MintParams & { sqrtPriceX96?: bigint },
+    value?: bigint,
+  ): Promise<unknown> {
+    const calls: string[] = [];
+
+    const { sqrtPriceX96, ...otherParams } = params;
+
+    if (sqrtPriceX96) {
+      const createPoolCall = this.encodeCreateAndInitializePoolIfNecessary(
+        params.token0,
+        params.token1,
+        params.fee,
+        sqrtPriceX96,
+      );
+      calls.push(createPoolCall);
+    }
+
+    const mintCall = this.encodeMint(otherParams);
+    calls.push(mintCall);
+
+    return await this.writeContractMethod(chainId, "multicall", [calls], value);
   }
 
   /**
@@ -710,13 +721,6 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 }
 
-/**
- * Factory function to create a new `NonfungiblePositionManagerService` instance.
- *
- * @param config - The `wagmi` configuration object
- * @param address - The address of the `NonFungiblePositionManager` contract.
- * @returns A new `NonfungiblePositionManagerService` instance.
- */
 export function createNonfungiblePositionManagerService(
   config: Config,
   address: Address,

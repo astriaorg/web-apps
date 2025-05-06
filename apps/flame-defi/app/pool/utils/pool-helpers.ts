@@ -58,13 +58,24 @@ export const calculatePriceToTick = ({
   decimal0?: number;
   decimal1?: number;
 }) => {
+  let tick: number = 0;
+
   if (decimal0 && decimal1) {
-    return Math.floor(
+    tick = Math.floor(
       Math.log(price * Math.pow(10, decimal0 - decimal1)) / Math.log(1.0001),
     );
+  } else {
+    tick = Math.floor(Math.log(price) / Math.log(1.0001));
   }
 
-  return Math.log(price) / Math.log(1.0001);
+  if (tick < TICK_BOUNDARIES.MIN) {
+    return TICK_BOUNDARIES.MIN;
+  }
+  if (tick > TICK_BOUNDARIES.MAX) {
+    return TICK_BOUNDARIES.MAX;
+  }
+
+  return tick;
 };
 
 export const calculateTickToPrice = ({
@@ -87,7 +98,7 @@ export const calculateTickToPrice = ({
   return price;
 };
 
-const calculatePriceToSqrtPriceX96 = ({
+export const calculatePriceToSqrtPriceX96 = ({
   price,
   decimal0,
   decimal1,
