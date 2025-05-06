@@ -185,7 +185,15 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     const mintCall = this.encodeMint(otherParams);
     calls.push(mintCall);
 
-    return await this.writeContractMethod(chainId, "multicall", [calls], value);
+    const gasLimit = await this.estimateMulticallGasLimit(chainId, calls);
+
+    return await this.writeContractMethod(
+      chainId,
+      "multicall",
+      [calls],
+      value,
+      gasLimit,
+    );
   }
 
   /**
