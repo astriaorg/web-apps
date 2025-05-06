@@ -1,4 +1,9 @@
+import { useMemo } from "react";
+
 import { Button } from "@repo/ui/components";
+
+import { useApproval } from "../../hooks/use-bridge-approval";
+import { ChainConnection } from "../../types";
 
 type SubmitButtonProps = {
   onClick: () => void;
@@ -7,6 +12,8 @@ type SubmitButtonProps = {
   buttonText: string;
   loadingText?: string;
   className?: string;
+  // used to check if source token needs approval
+  sourceConnection: ChainConnection;
 };
 
 export const SubmitButton = ({
@@ -16,17 +23,68 @@ export const SubmitButton = ({
   buttonText,
   loadingText = "Processing...",
   className = "w-full",
+  sourceConnection,
 }: SubmitButtonProps) => {
+  const { needsApproval, isCheckingApproval, isApproving, approveToken } =
+    useApproval({
+      chainConnection: sourceConnection,
+    });
+
+  const buttonTextDerived = useMemo(() => {
+    if (isLoading || isCheckingApproval) {
+      return loadingText;
+    }
+    if (isApproving) {
+      return "Approving...";
+    }
+    if (needsApproval) {
+      return "Approve Token for Spend";
+    }
+    return buttonText;
+  }, [
+    buttonText,
+    isLoading,
+    loadingText,
+    needsApproval,
+    isCheckingApproval,
+    isApproving,
+  ]);
+
+  const isProcessing = isLoading || isCheckingApproval || isApproving;
+
+  const handleClick = async () => {
+    if (needsApproval) {
+      try {
+        await approveToken();
+      } catch (error) {
+        console.error("Failed to approve token:", error);
+      }
+    } else {
+      onClick();
+    }
+  };
+
+  const isDisabledDerived = useMemo(() => {
+    if (isProcessing) {
+      return true;
+    }
+    if (needsApproval) {
+      // we need to enable the button so they can click to approve
+      return false;
+    }
+    return isDisabled;
+  }, [isDisabled, isProcessing, needsApproval]);
+
   return (
     <div className="flex flex-col gap-3 mt-8">
       <div className="w-full">
         <Button
           variant="gradient"
-          onClick={onClick}
-          disabled={isDisabled || isLoading}
+          onClick={handleClick}
+          disabled={isDisabledDerived}
           className={className}
         >
-          {isLoading ? loadingText : buttonText}
+          {buttonTextDerived}
         </Button>
       </div>
     </div>

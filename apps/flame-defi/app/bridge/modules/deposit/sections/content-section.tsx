@@ -576,6 +576,7 @@ export const ContentSection = () => {
               !destinationConnection.address
             }
             buttonText="Deposit"
+            sourceConnection={sourceConnection}
           />
         </div>
       </div>

@@ -552,6 +552,7 @@ export const ContentSection = () => {
             isLoading={isLoading}
             isDisabled={isWithdrawDisabled || !sourceConnection.address}
             buttonText="Withdraw"
+            sourceConnection={sourceConnection}
           />
         </div>
       </div>
