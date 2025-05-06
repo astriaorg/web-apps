@@ -8,6 +8,7 @@ import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { useApproveToken } from "hooks/use-approve-token";
+import { useTokenAllowance } from "hooks/use-token-allowance";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, PoolWithSlot0 } from "pool/types";
 
@@ -50,28 +51,81 @@ export const SubmitButton = ({
     amountInitialPrice,
   } = usePageContext();
 
-  const { approve, useIsTokenApproved } = useApproveToken();
-  const { data: isToken0Approved, isPending: isCheckingToken0Approval } =
-    useIsTokenApproved({
-      token: token0,
-      spender: chain.contracts.nonfungiblePositionManager.address,
+  const { approve, getIsApproved } = useApproveToken();
+  const {
+    data: token0Allowance,
+    isPending: isPendingToken0Allowance,
+    refetch: refetchToken0Allowance,
+  } = useTokenAllowance({
+    token: token0,
+    spender: chain.contracts.nonfungiblePositionManager.address,
+  });
+  const {
+    data: token1Allowance,
+    isPending: isPendingToken1Allowance,
+    refetch: refetchToken1Allowance,
+  } = useTokenAllowance({
+    token: token1,
+    spender: chain.contracts.nonfungiblePositionManager.address,
+  });
+
+  const isToken0Approved = useMemo(() => {
+    if (
+      !token0 ||
+      !token0Allowance ||
+      isPendingToken0Allowance ||
+      !amount0.validation.isValid
+    ) {
+      return false;
+    }
+    return getIsApproved({
+      allowance: token0Allowance,
       amount: amount0.value,
+      token: token0,
     });
-  const { data: isToken1Approved, isPending: isCheckingToken1Approval } =
-    useIsTokenApproved({
-      token: token1,
-      spender: chain.contracts.nonfungiblePositionManager.address,
+  }, [
+    token0,
+    token0Allowance,
+    amount0,
+    isPendingToken0Allowance,
+    getIsApproved,
+  ]);
+  const isToken1Approved = useMemo(() => {
+    if (
+      !token1 ||
+      !token1Allowance ||
+      isPendingToken1Allowance ||
+      !amount1.validation.isValid
+    ) {
+      return false;
+    }
+    return getIsApproved({
+      allowance: token1Allowance,
       amount: amount1.value,
+      token: token1,
     });
+  }, [
+    token1,
+    token1Allowance,
+    amount1,
+    isPendingToken1Allowance,
+    getIsApproved,
+  ]);
 
   const [error, setError] = useState<string | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [status, setStatus] = useState<TransactionStatus>();
 
   const handleApproveToken = useCallback(
-    async ({ token, amount }: { token: EvmCurrency; amount: Amount }) => {
-      setHash(null);
-
+    async ({
+      token,
+      amount,
+      refetch,
+    }: {
+      token: EvmCurrency;
+      amount: Amount;
+      refetch: () => Promise<unknown>;
+    }) => {
       if (!address || !publicClient) {
         return;
       }
@@ -86,8 +140,22 @@ export const SubmitButton = ({
         });
 
         if (hash) {
-          setHash(hash);
-          setStatus(TransactionStatus.SUCCESS);
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            await refetch();
+
+            setStatus(TransactionStatus.SUCCESS);
+
+            return;
+          } else {
+            throw new Error("Transaction failed.");
+          }
         }
       } catch (error) {
         console.error("Error approving token:", error);
@@ -197,22 +265,36 @@ export const SubmitButton = ({
   ]);
 
   const handleSubmit = useCallback(async () => {
-    if (!token0 || !token1 || !amount0.value || !amount1.value) {
-      return;
-    }
-
     if (state === ButtonState.CONNECT_WALLET) {
       openConnectModal?.();
       return;
     }
 
     if (state === ButtonState.APPROVE_TOKEN_0) {
-      handleApproveToken({ token: token0, amount: amount0 });
+      if (!token0 || !amount0.validation.isValid) {
+        return;
+      }
+
+      handleApproveToken({
+        token: token0,
+        amount: amount0,
+        refetch: refetchToken0Allowance,
+      });
+
       return;
     }
 
     if (state === ButtonState.APPROVE_TOKEN_1) {
-      handleApproveToken({ token: token1, amount: amount1 });
+      if (!token1 || !amount1.validation.isValid) {
+        return;
+      }
+
+      handleApproveToken({
+        token: token1,
+        amount: amount1,
+        refetch: refetchToken1Allowance,
+      });
+
       return;
     }
 
@@ -227,6 +309,8 @@ export const SubmitButton = ({
     handleCreatePosition,
     openConnectModal,
     handleApproveToken,
+    refetchToken0Allowance,
+    refetchToken1Allowance,
   ]);
 
   const content = useMemo<string>(() => {
@@ -252,15 +336,15 @@ export const SubmitButton = ({
 
   const isDisabled = useMemo(() => {
     return (
-      isCheckingToken0Approval ||
-      isCheckingToken1Approval ||
+      isPendingToken0Allowance ||
+      isPendingToken1Allowance ||
       [
         ButtonState.INSUFFICIENT_BALANCE,
         ButtonState.PENDING_SEND_TRANSACTION,
         ButtonState.INVALID_INPUT,
       ].includes(state)
     );
-  }, [isCheckingToken0Approval, isCheckingToken1Approval, state]);
+  }, [isPendingToken0Allowance, isPendingToken1Allowance, state]);
 
   return (
     <Button onClick={handleSubmit} disabled={isDisabled}>
