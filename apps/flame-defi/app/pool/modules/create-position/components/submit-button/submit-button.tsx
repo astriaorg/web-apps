@@ -1,7 +1,7 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAstriaChainData } from "config";
 import { useCallback, useMemo, useState } from "react";
-import { Hash, parseUnits } from "viem";
+import { type Hash, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
@@ -158,9 +158,6 @@ export const SubmitButton = ({
         return ButtonState.INVALID_INPUT;
       }
 
-      if (isCheckingToken0Approval) {
-        return ButtonState.PENDING_APPROVE_TOKEN_0;
-      }
       if (!isToken0Approved) {
         return ButtonState.APPROVE_TOKEN_0;
       }
@@ -180,9 +177,6 @@ export const SubmitButton = ({
         return ButtonState.INVALID_INPUT;
       }
 
-      if (isCheckingToken1Approval) {
-        return ButtonState.PENDING_APPROVE_TOKEN_1;
-      }
       if (!isToken1Approved) {
         return ButtonState.APPROVE_TOKEN_1;
       }
@@ -202,8 +196,6 @@ export const SubmitButton = ({
     amount1,
     isToken0Approved,
     isToken1Approved,
-    isCheckingToken0Approval,
-    isCheckingToken1Approval,
   ]);
 
   const handleSubmit = useCallback(async () => {
@@ -211,26 +203,19 @@ export const SubmitButton = ({
       return;
     }
 
-    if (!isConnected) {
+    if (state === ButtonState.CONNECT_WALLET) {
       openConnectModal?.();
       return;
     }
 
-    switch (state) {
-      case ButtonState.CONNECT_WALLET:
-        openConnectModal?.();
-        break;
-      case ButtonState.APPROVE_TOKEN_0:
-        handleApproveToken({ token: token0, amount: amount0 });
-        break;
-      case ButtonState.APPROVE_TOKEN_1:
-        handleApproveToken({ token: token1, amount: amount1 });
-        break;
-      case ButtonState.SEND_TRANSACTION:
-        handleCreatePosition();
-        break;
-      default:
-        break;
+    if (state === ButtonState.APPROVE_TOKEN_0) {
+      handleApproveToken({ token: token0, amount: amount0 });
+      return;
+    }
+
+    if (state === ButtonState.APPROVE_TOKEN_1) {
+      handleApproveToken({ token: token1, amount: amount1 });
+      return;
     }
 
     // If no approvals are needed or approvals are complete, create the position.
@@ -241,7 +226,6 @@ export const SubmitButton = ({
     token1,
     amount0,
     amount1,
-    isConnected,
     handleCreatePosition,
     openConnectModal,
     handleApproveToken,
