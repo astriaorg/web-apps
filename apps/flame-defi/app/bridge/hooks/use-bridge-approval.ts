@@ -21,7 +21,8 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
   const currency = chainConnection?.currency ?? null;
 
   // only non-native evm currencies need approvals
-  const isErc20 = currency && currency instanceof EvmCurrency && !currency.isNative;
+  const isErc20 =
+    currency && currency instanceof EvmCurrency && !currency.isNative;
 
   const erc20Address = isErc20 ? currency.erc20ContractAddress : null;
   const bridgeAddress = isErc20 ? currency.astriaIntentBridgeAddress : null;
