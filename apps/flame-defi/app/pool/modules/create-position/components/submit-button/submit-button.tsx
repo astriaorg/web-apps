@@ -1,17 +1,13 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAstriaChainData } from "config";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Hash, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
-import {
-  ApproveStatus,
-  type EvmCurrency,
-  TransactionStatus,
-} from "@repo/flame-types";
+import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
-import { useApproveToken } from "hooks/use-token-approve";
+import { useApproveToken } from "hooks/use-approve-token";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, PoolWithSlot0 } from "pool/types";
 
@@ -56,56 +52,23 @@ export const SubmitButton = ({
     amountInitialPrice,
   } = usePageContext();
 
-  const { getIsApproved, approve } = useApproveToken();
+  const { approve, useIsTokenApproved } = useApproveToken();
+  const { data: isToken0Approved, isPending: isCheckingToken0Approval } =
+    useIsTokenApproved({
+      token: token0,
+      spender: chain.contracts.nonfungiblePositionManager.address,
+      amount: amount0.value,
+    });
+  const { data: isToken1Approved, isPending: isCheckingToken1Approval } =
+    useIsTokenApproved({
+      token: token1,
+      spender: chain.contracts.nonfungiblePositionManager.address,
+      amount: amount1.value,
+    });
 
   const [error, setError] = useState<string | null>(null);
   const [hash, setHash] = useState<string | null>(null);
   const [status, setStatus] = useState<TransactionStatus>();
-  const [isCheckingApproval, setIsCheckingApproval] = useState(false);
-  const [approveStatusToken0, setApproveStatusToken0] = useState<ApproveStatus>(
-    ApproveStatus.REQUIRED,
-  );
-  const [approveStatusToken1, setApproveStatusToken1] = useState<ApproveStatus>(
-    ApproveStatus.REQUIRED,
-  );
-
-  useEffect(() => {
-    if (!token0 || !token1 || amount0.value === "" || amount1.value === "") {
-      return;
-    }
-
-    // TODO: Check is mounted.
-    (async () => {
-      setIsCheckingApproval(true);
-
-      const isToken0Approved = await getIsApproved({
-        token: token0,
-        amount: amount0.value,
-        spender: chain.contracts.nonfungiblePositionManager.address,
-      });
-      const isToken1Approved = await getIsApproved({
-        token: token1,
-        amount: amount1.value,
-        spender: chain.contracts.nonfungiblePositionManager.address,
-      });
-
-      setApproveStatusToken0(
-        isToken0Approved ? ApproveStatus.SUCCESS : ApproveStatus.REQUIRED,
-      );
-      setApproveStatusToken1(
-        isToken1Approved ? ApproveStatus.SUCCESS : ApproveStatus.REQUIRED,
-      );
-
-      setIsCheckingApproval(false);
-    })();
-  }, [
-    getIsApproved,
-    token0,
-    token1,
-    amount0.value,
-    amount1.value,
-    chain.contracts,
-  ]);
 
   const handleApproveToken = useCallback(
     async ({ token, amount }: { token: EvmCurrency; amount: Amount }) => {
@@ -160,58 +123,6 @@ export const SubmitButton = ({
     }
   }, [address]);
 
-  const handleOnSubmit = useCallback(async () => {
-    if (!token0 || !token1 || !amount0.value || !amount1.value) {
-      return;
-    }
-
-    if (!isConnected) {
-      openConnectModal?.();
-      return;
-    }
-
-    if (
-      depositType === DepositType.BOTH ||
-      depositType === DepositType.TOKEN_0_ONLY
-    ) {
-      if (approveStatusToken0 === ApproveStatus.REQUIRED) {
-        handleApproveToken({
-          token: token0,
-          amount: amount0, // TODO: Should we just send max approval?
-        });
-        return;
-      }
-    }
-
-    if (
-      depositType === DepositType.BOTH ||
-      depositType === DepositType.TOKEN_1_ONLY
-    ) {
-      if (approveStatusToken1 === ApproveStatus.REQUIRED) {
-        handleApproveToken({
-          token: token1,
-          amount: amount1,
-        });
-        return;
-      }
-    }
-
-    // If no approvals are needed or approvals are complete, create the position.
-    handleCreatePosition();
-  }, [
-    token0,
-    token1,
-    amount0,
-    amount1,
-    isConnected,
-    depositType,
-    handleCreatePosition,
-    openConnectModal,
-    approveStatusToken0,
-    approveStatusToken1,
-    handleApproveToken,
-  ]);
-
   const state = useMemo<ButtonState>(() => {
     if (!isConnected) {
       return ButtonState.CONNECT_WALLET;
@@ -225,25 +136,19 @@ export const SubmitButton = ({
       return ButtonState.INVALID_INPUT;
     }
 
-    if (!pool) {
-      if (!amountInitialPrice.validation.isValid) {
-        return ButtonState.INVALID_INPUT;
-      }
+    if (!pool && !amountInitialPrice.validation.isValid) {
+      return ButtonState.INVALID_INPUT;
     }
 
     if (!token0 || !token1) {
       return ButtonState.INVALID_INPUT;
     }
 
-    const getButtonStateFromAmountValidation = (
-      amount: Amount,
-      status: ApproveStatus,
-      token: EvmCurrency,
-    ) => {
-      if (!amount.validation.isValid) {
+    if (depositType !== DepositType.TOKEN_1_ONLY) {
+      if (!amount0.validation.isValid) {
         if (
-          amount.value !== "" &&
-          amount.validation.errors?.some(
+          amount0.value !== "" &&
+          amount0.validation.errors?.some(
             (error) =>
               error.type === ValidateTokenAmountErrorType.INSUFFICIENT_BALANCE,
           )
@@ -253,71 +158,93 @@ export const SubmitButton = ({
         return ButtonState.INVALID_INPUT;
       }
 
-      if (!isCheckingApproval) {
-        if (status === ApproveStatus.PENDING) {
-          if (token === token0) {
-            return ButtonState.PENDING_APPROVE_TOKEN_0;
-          }
-          return ButtonState.PENDING_APPROVE_TOKEN_1;
+      if (isCheckingToken0Approval) {
+        return ButtonState.PENDING_APPROVE_TOKEN_0;
+      }
+      if (!isToken0Approved) {
+        return ButtonState.APPROVE_TOKEN_0;
+      }
+    }
+
+    if (depositType !== DepositType.TOKEN_0_ONLY) {
+      if (!amount1.validation.isValid) {
+        if (
+          amount1.value !== "" &&
+          amount1.validation.errors?.some(
+            (error) =>
+              error.type === ValidateTokenAmountErrorType.INSUFFICIENT_BALANCE,
+          )
+        ) {
+          return ButtonState.INSUFFICIENT_BALANCE;
         }
-        if (status === ApproveStatus.REQUIRED) {
-          if (token === token0) {
-            return ButtonState.APPROVE_TOKEN_0;
-          }
-          return ButtonState.APPROVE_TOKEN_1;
-        }
+        return ButtonState.INVALID_INPUT;
       }
 
-      return ButtonState.SEND_TRANSACTION;
-    };
-
-    let state0 = ButtonState.SEND_TRANSACTION;
-    let state1 = ButtonState.SEND_TRANSACTION;
-
-    if (
-      depositType === DepositType.BOTH ||
-      depositType !== DepositType.TOKEN_1_ONLY
-    ) {
-      state0 = getButtonStateFromAmountValidation(
-        amount0,
-        approveStatusToken0,
-        token0,
-      );
-    }
-    if (
-      depositType === DepositType.BOTH ||
-      depositType !== DepositType.TOKEN_0_ONLY
-    ) {
-      state1 = getButtonStateFromAmountValidation(
-        amount1,
-        approveStatusToken1,
-        token1,
-      );
-    }
-
-    // If any of the states are not SEND_TRANSACTION, return the one that is not.
-    if (state0 !== ButtonState.SEND_TRANSACTION) {
-      return state0;
-    }
-    if (state1 !== ButtonState.SEND_TRANSACTION) {
-      return state1;
+      if (isCheckingToken1Approval) {
+        return ButtonState.PENDING_APPROVE_TOKEN_1;
+      }
+      if (!isToken1Approved) {
+        return ButtonState.APPROVE_TOKEN_1;
+      }
     }
 
     return ButtonState.SEND_TRANSACTION;
   }, [
-    amount0,
-    amount1,
-    token0,
-    token1,
-    amountInitialPrice.validation.isValid,
-    isPriceRangeValid,
-    approveStatusToken0,
-    approveStatusToken1,
-    isCheckingApproval,
-    pool,
-    depositType,
     isConnected,
     status,
+    isPriceRangeValid,
+    pool,
+    amountInitialPrice.validation.isValid,
+    token0,
+    token1,
+    depositType,
+    amount0,
+    amount1,
+    isToken0Approved,
+    isToken1Approved,
+    isCheckingToken0Approval,
+    isCheckingToken1Approval,
+  ]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!token0 || !token1 || !amount0.value || !amount1.value) {
+      return;
+    }
+
+    if (!isConnected) {
+      openConnectModal?.();
+      return;
+    }
+
+    switch (state) {
+      case ButtonState.CONNECT_WALLET:
+        openConnectModal?.();
+        break;
+      case ButtonState.APPROVE_TOKEN_0:
+        handleApproveToken({ token: token0, amount: amount0 });
+        break;
+      case ButtonState.APPROVE_TOKEN_1:
+        handleApproveToken({ token: token1, amount: amount1 });
+        break;
+      case ButtonState.SEND_TRANSACTION:
+        handleCreatePosition();
+        break;
+      default:
+        break;
+    }
+
+    // If no approvals are needed or approvals are complete, create the position.
+    handleCreatePosition();
+  }, [
+    state,
+    token0,
+    token1,
+    amount0,
+    amount1,
+    isConnected,
+    handleCreatePosition,
+    openConnectModal,
+    handleApproveToken,
   ]);
 
   const content = useMemo<string>(() => {
@@ -347,17 +274,20 @@ export const SubmitButton = ({
 
   const isDisabled = useMemo(() => {
     return (
-      isCheckingApproval ||
-      state === ButtonState.INSUFFICIENT_BALANCE ||
-      state === ButtonState.PENDING_APPROVE_TOKEN_0 ||
-      state === ButtonState.PENDING_APPROVE_TOKEN_1 ||
-      state === ButtonState.PENDING_SEND_TRANSACTION ||
-      state === ButtonState.INVALID_INPUT
+      isCheckingToken0Approval ||
+      isCheckingToken1Approval ||
+      [
+        ButtonState.INSUFFICIENT_BALANCE,
+        ButtonState.PENDING_APPROVE_TOKEN_0,
+        ButtonState.PENDING_APPROVE_TOKEN_1,
+        ButtonState.PENDING_SEND_TRANSACTION,
+        ButtonState.INVALID_INPUT,
+      ].includes(state)
     );
-  }, [isCheckingApproval, state]);
+  }, [isCheckingToken0Approval, isCheckingToken1Approval, state]);
 
   return (
-    <Button onClick={handleOnSubmit} disabled={isDisabled}>
+    <Button onClick={handleSubmit} disabled={isDisabled}>
       {content}
     </Button>
   );
