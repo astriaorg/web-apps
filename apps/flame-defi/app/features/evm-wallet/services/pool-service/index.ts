@@ -37,14 +37,8 @@ export const mapSlot0ResponseToSlot0 = (response: Slot0Response): Slot0 => ({
 });
 
 export class PoolService extends GenericContractService {
-  /**
-   * Creates a new `PoolService` instance.
-   *
-   * @param wagmiConfig - The `wagmi` configuration object.
-   * @param contractAddress - The address of the Uniswap V3 pool contract.
-   */
-  constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, POOL_ABI as Abi);
+  constructor(config: Config, address: Address) {
+    super(config, address, POOL_ABI as Abi);
   }
 
   /**
@@ -112,13 +106,6 @@ export class PoolService extends GenericContractService {
   }
 }
 
-/**
- * Factory function to create a new `PoolService` instance.
- *
- * @param config - The wagmi configuration object.
- * @param address - The address of the Uniswap V3 pool contract.
- * @returns A new `PoolService` instance.
- */
 export function createPoolService(
   config: Config,
   address: Address,

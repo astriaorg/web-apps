@@ -10,8 +10,8 @@ interface TransferParams {
 }
 
 export class ERC20Service extends GenericContractService {
-  constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, erc20Abi);
+  constructor(config: Config, address: Address) {
+    super(config, address, erc20Abi);
   }
 
   /**

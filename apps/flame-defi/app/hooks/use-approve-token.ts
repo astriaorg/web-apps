@@ -26,7 +26,7 @@ export const useApproveToken = () => {
       amount: string;
     }) => {
       if (!address || !chainId || !publicClient) {
-        throw new Error("Wallet not connected.");
+        throw new Error("Wallet is not connected.");
       }
 
       if (token.isNative) {
