@@ -12,7 +12,7 @@ type UseApprovalProps = {
 };
 
 // NOTE - existing useTokenApproval didn't quite work and didn't have time to refactor and combine atm
-export const useApproval = ({ chainConnection }: UseApprovalProps) => {
+export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
   const wagmiConfig = useWagmiConfig();
   const { tokenApprovalAmount } = useConfig();
 

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { Button } from "@repo/ui/components";
 
-import { useApproval } from "../../hooks/use-bridge-approval";
+import { useBridgeApproval } from "../../hooks/use-bridge-approval";
 import { ChainConnection } from "../../types";
 
 type SubmitButtonProps = {
@@ -26,7 +26,7 @@ export const SubmitButton = ({
   sourceConnection,
 }: SubmitButtonProps) => {
   const { needsApproval, isCheckingApproval, isApproving, approveToken } =
-    useApproval({
+    useBridgeApproval({
       chainConnection: sourceConnection,
     });
 
