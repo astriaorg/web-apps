@@ -1,0 +1,81 @@
+name: E2E Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "develop"
+      - "main"
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Cache Playwright Browsers
+        id: cache-browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-browsers-
+
+      - name: Cache Wallet Setup
+        id: cache-wallet
+        uses: actions/cache@v3
+        with:
+          path: apps/flame-defi/e2e-tests/wallet-setup
+          key: ${{ runner.os }}-wallet-setup-${{ hashFiles('apps/flame-defi/e2e-tests/wallet-setup/.env.e2e-tests') }}
+          restore-keys: |
+            ${{ runner.os }}-wallet-setup-
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Playwright Browsers
+        if: steps.cache-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Setup E2E Test Environment
+        env:
+          SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
+          PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          PRIVATE_KEY: ${{ secrets.E2E_PRIVATE_KEY }}
+          CI: true
+        run: |
+          cd apps/flame-defi
+          # Create .env file for e2e tests
+          mkdir -p e2e-tests/wallet-setup
+          echo "SEED_PHRASE='$SEED_PHRASE'" > e2e-tests/wallet-setup/.env.e2e-tests
+          echo "PASSWORD=$PASSWORD" >> e2e-tests/wallet-setup/.env.e2e-tests
+          echo "PRIVATE_KEY=$PRIVATE_KEY" >> e2e-tests/wallet-setup/.env.e2e-tests
+          echo "CI=true" >> e2e-tests/wallet-setup/.env.e2e-tests
+
+          # Setup wallets for Synpress (headful mode with xvfb)
+          xvfb-run npx synpress -d ./e2e-tests/wallet-setup
+
+      - name: Run E2E Tests
+        env:
+          SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
+          PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          PRIVATE_KEY: ${{ secrets.E2E_PRIVATE_KEY }}
+          CI: true
+        run: |
+          cd apps/flame-defi
+          xvfb-run npx playwright test e2e-tests
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/flame-defi/playwright-report/
+          retention-days: 30
