@@ -35,13 +35,6 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
     (chain.chainType === ChainType.EVM || chain.chainType === ChainType.ASTRIA)
   );
 
-  console.log({
-    shouldEnableQuery,
-    address,
-    chain,
-    currency,
-  });
-
   const approvalQuery = useQuery({
     queryKey: [
       "tokenApproval",
@@ -51,7 +44,6 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
       bridgeAddress,
     ],
     queryFn: async () => {
-      // EVM chain type
       if (
         address &&
         (chain?.chainType === ChainType.EVM ||
@@ -70,8 +62,6 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
           address as Address,
           currency.astriaIntentBridgeAddress,
         );
-
-        console.log({ allowance });
 
         return allowance === "0";
       }
