@@ -28,7 +28,7 @@ export class PoolFactoryService extends GenericContractService {
       contracts: fees.map((it) => {
         return {
           functionName: "getPool",
-          address: this.contractAddress,
+          address: this.address,
           abi: this.abi,
           args: [token0, token1, it],
         };

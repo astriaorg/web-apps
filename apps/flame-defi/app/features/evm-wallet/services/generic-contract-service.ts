@@ -16,8 +16,8 @@ import type {
 
 export class GenericContractService {
   constructor(
-    protected readonly wagmiConfig: Config,
-    protected readonly contractAddress: Address,
+    protected readonly config: Config,
+    protected readonly address: Address,
     protected readonly abi: Abi,
   ) {}
 
@@ -27,7 +27,7 @@ export class GenericContractService {
   protected async getWalletClient(
     chainId: number,
   ): Promise<GetWalletClientReturnType> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
+    const walletClient = await getWalletClient(this.config, { chainId });
     if (!walletClient) {
       throw new Error("No wallet client available.");
     }
@@ -38,7 +38,7 @@ export class GenericContractService {
    * Helper to get the public client
    */
   protected async getPublicClient(chainId: number): Promise<PublicClient> {
-    const publicClient = getPublicClient(this.wagmiConfig, { chainId });
+    const publicClient = getPublicClient(this.config, { chainId });
     if (!publicClient) {
       throw new Error("No public client available.");
     }
@@ -46,32 +46,45 @@ export class GenericContractService {
   }
 
   /**
-   * Estimates gas limit for a multicall operation with a 20% buffer
-   * @param chainId - The chain ID
-   * @param calls - Array of encoded function calls
-   * @returns Estimated gas limit with 20% buffer
+   * Estimates gas limit and adds a buffer.
+   * This is useful for multicall transactions where the gas limit may need to be significantly higher than the estimate.
+   *
+   * @returns The estimated gas limit, with buffer added.
    */
-  protected async estimateMulticallGasLimit(
+  protected async estimateContractGasWithBuffer(
     chainId: number,
     calls: string[],
+    value: bigint,
+    buffer?: number,
   ): Promise<bigint> {
     const DEFAULT_GAS_LIMIT = 300000n;
+    const DEFAULT_BUFFER = 0.2; // Default 20% buffer.
 
     try {
       const walletClient = await this.getWalletClient(chainId);
       const publicClient = await this.getPublicClient(chainId);
       const signerAddress = walletClient.account?.address as Address;
+
       const estimatedGas = await publicClient.estimateContractGas({
-        address: this.contractAddress,
+        address: this.address,
         abi: this.abi,
         functionName: "multicall",
         args: [calls],
         account: signerAddress,
+        value,
       });
-      // Increase the estimated gas by 20%
-      return (estimatedGas * 120n) / 100n;
+
+      // Increase the estimated gas by the buffer.
+      return (
+        estimatedGas +
+        BigInt(
+          (estimatedGas *
+            BigInt(Math.round((buffer ?? DEFAULT_BUFFER) * 100))) /
+            100n,
+        )
+      );
     } catch (err) {
-      console.warn("Gas estimation failed, using default limit", err);
+      console.warn("Gas estimation failed, using default limit.", err);
       return DEFAULT_GAS_LIMIT;
     }
   }
@@ -84,7 +97,7 @@ export class GenericContractService {
     try {
       const publicClient = await this.getPublicClient(chainId);
       return (await publicClient.readContract({
-        address: this.contractAddress,
+        address: this.address,
         abi: this.abi,
         functionName: methodName,
         args,
@@ -105,7 +118,7 @@ export class GenericContractService {
     try {
       const walletClient = await this.getWalletClient(chainId);
       return await walletClient.writeContract({
-        address: this.contractAddress,
+        address: this.address,
         abi: this.abi,
         functionName: methodName,
         args,
@@ -121,7 +134,7 @@ export class GenericContractService {
   protected async multicall(
     parameters: MulticallParameters<readonly ContractFunctionParameters[]>,
   ): Promise<unknown[]> {
-    const result = await multicall(this.wagmiConfig, parameters);
+    const result = await multicall(this.config, parameters);
 
     for (const call of result) {
       if (call.error) {

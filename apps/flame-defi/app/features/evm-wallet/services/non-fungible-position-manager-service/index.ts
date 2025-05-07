@@ -267,7 +267,11 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       calls.push(unwrapCall);
     }
 
-    const gasLimit = await this.estimateMulticallGasLimit(chain.chainId, calls);
+    const gasLimit = await this.estimateContractGasWithBuffer(
+      chain.chainId,
+      calls,
+      value,
+    );
 
     return await this.writeContractMethod(
       chain.chainId,
@@ -465,7 +469,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       // Collects wrappedNativeToken and other token values to contract so we can unwrap the values after
       const collectCall = this.encodeCollect(
         tokenId,
-        this.contractAddress, // Collect to the contract itself
+        this.address, // Collect to the contract itself
         MAX_UINT128,
         MAX_UINT128,
       );
@@ -496,9 +500,10 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       }
     }
 
-    const gasLimit = await this.estimateMulticallGasLimit(
+    const gasLimit = await this.estimateContractGasWithBuffer(
       chainId,
       collectCalls,
+      0n,
     );
 
     return await this.writeContractMethod(
