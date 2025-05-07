@@ -3,7 +3,7 @@
 ## Setup
 
 - generate an account and save your seed phrase and private key in
-  `./wallet-setup/.env.e2e-tests`. must also set your Metamask password.
+  `./wallet-setup/.env.e2e-tests`. must also set a Metamask password.
 
   ```dotenv
   SEED_PHRASE=''

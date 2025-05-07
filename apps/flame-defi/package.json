@@ -81,7 +81,8 @@
     "lint": "next lint --max-warnings 0",
     "lint:fix": "next lint --fix",
     "start": "next start",
-    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
+    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\"",
+    "test:e2e": "playwright test e2e-tests"
   },
   "type": "module"
 }

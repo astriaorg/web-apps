@@ -1,7 +1,13 @@
-// Import necessary Synpress modules
+import { BrowserContext, Page } from "@playwright/test";
 import { defineWalletSetup } from "@synthetixio/synpress";
 import { MetaMask } from "@synthetixio/synpress/playwright";
-import { BrowserContext, Page } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
+
+// NOTE - path is relative to playwright.config.ts
+dotenv.config({
+  path: path.resolve("./e2e-tests/wallet-setup/.env.e2e-tests"),
+});
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const SEED_PHRASE = process.env.SEED_PHRASE;

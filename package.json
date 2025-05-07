@@ -19,7 +19,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,md,css,json}\"",
     "lint": "turbo lint",
     "lint:fix": "turbo lint:fix",
-    "test": "turbo test"
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e"
   },
   "workspaces": [
     "apps/*",

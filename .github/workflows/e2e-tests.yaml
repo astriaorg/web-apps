@@ -21,8 +21,9 @@ jobs:
 
       - name: Cache Playwright Browsers
         id: cache-browsers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
+          # filepath to playwright browser cache on linux
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
@@ -30,9 +31,9 @@ jobs:
 
       - name: Cache Wallet Setup
         id: cache-wallet
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: apps/flame-defi/e2e-tests/wallet-setup
+          path: apps/flame-defi/.cache-synpress
           key: ${{ runner.os }}-wallet-setup-${{ hashFiles('apps/flame-defi/e2e-tests/wallet-setup/.env.e2e-tests') }}
           restore-keys: |
             ${{ runner.os }}-wallet-setup-
@@ -44,7 +45,8 @@ jobs:
         if: steps.cache-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: Setup E2E Test Environment
+      - name: Setup Wallet
+        if: steps.cache-wallet.outputs.cache-hit != 'true'
         env:
           SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
           PASSWORD: ${{ secrets.E2E_PASSWORD }}
