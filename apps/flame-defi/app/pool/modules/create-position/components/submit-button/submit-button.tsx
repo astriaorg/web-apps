@@ -207,6 +207,7 @@ export const SubmitButton = ({
 
       /**
        * TODO: Use slippage calculation in `TokenAmount` class.
+       * Too bulky to use here for now, wait until the class is refactored to implement it.
        */
       const calculateAmountWithSlippage = (amount: bigint) => {
         // Convert slippage to basis points (1 bp = 0.01%)
