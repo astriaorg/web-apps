@@ -3,13 +3,12 @@ import Big from "big.js";
 import { useAstriaChainData } from "config";
 import { useCallback } from "react";
 import { type Address, formatUnits } from "viem";
-import { useAccount, useConfig, usePublicClient } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
 import { createERC20Service } from "features/evm-wallet";
 
 export const useApproveToken = () => {
-  const publicClient = usePublicClient();
   const queryClient = useQueryClient();
   const config = useConfig();
   const { address, chainId } = useAccount();
@@ -25,12 +24,13 @@ export const useApproveToken = () => {
       spender: Address;
       amount: string;
     }) => {
-      if (!address || !chainId || !publicClient) {
+      if (!address || !chainId) {
         throw new Error("Wallet is not connected.");
       }
 
+      // Native tokens do not need approval.
       if (token.isNative) {
-        return null; // TODO: Check if native tokens need approval.
+        return null;
       }
 
       const tokenAddress = token.isNative
@@ -93,7 +93,7 @@ export const useApproveToken = () => {
       allowance: bigint | null;
       amount: string;
     }): boolean => {
-      // TODO: Check if native tokens need approval.
+      // Native tokens do not need approval.
       if (token.isNative) {
         return true;
       }

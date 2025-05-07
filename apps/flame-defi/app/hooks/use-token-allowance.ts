@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAstriaChainData } from "config";
 import { type Address } from "viem";
-import { useAccount, useConfig, usePublicClient } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
 import { createERC20Service } from "features/evm-wallet";
@@ -16,7 +16,6 @@ export const useTokenAllowance = ({
   token?: EvmCurrency;
   spender: Address;
 }) => {
-  const publicClient = usePublicClient();
   const config = useConfig();
   const { address, chainId } = useAccount();
   const { chain } = useAstriaChainData();
@@ -24,7 +23,7 @@ export const useTokenAllowance = ({
   return useQuery<bigint | null>({
     queryKey: ["useTokenAllowance", token, spender],
     queryFn: async () => {
-      if (!address || !chainId || !publicClient || !token || !spender) {
+      if (!address || !chainId || !token || !spender) {
         return null;
       }
 
@@ -48,7 +47,7 @@ export const useTokenAllowance = ({
 
       return null;
     },
-    enabled: !!address && !!chainId && !!publicClient && !!token && !!spender,
+    enabled: !!address && !!chainId && !!token && !!spender,
     staleTime: STALE_TIME_MILLISECONDS,
     gcTime: CACHE_TIME_MILLISECONDS,
   });
