@@ -57,12 +57,10 @@ jobs:
         run: |
           cd apps/flame-defi
           # Create .env file for e2e tests
-          mkdir -p e2e-tests/wallet-setup
           echo "SEED_PHRASE='$SEED_PHRASE'" > e2e-tests/wallet-setup/.env.e2e-tests
           echo "PASSWORD=$PASSWORD" >> e2e-tests/wallet-setup/.env.e2e-tests
           echo "PRIVATE_KEY=$PRIVATE_KEY" >> e2e-tests/wallet-setup/.env.e2e-tests
           echo "CI=true" >> e2e-tests/wallet-setup/.env.e2e-tests
-          cat e2e-tests/wallet-setup/.env.e2e-tests
 
           # Setup wallets for Synpress (headful mode with xvfb).
           # path is relative to playwright.config.ts
