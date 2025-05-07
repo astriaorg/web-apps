@@ -113,15 +113,27 @@ export const calculatePriceToSqrtPriceX96 = ({
   return sqrtPriceX96;
 };
 
-const calculateNearestValidTick = ({
+/**
+ * Calculates the nearest valid tick for a given tick lower or upper bound.
+ *
+ * Rounding behavior:
+ * - For positive ticks: Always round DOWN to the nearest multiple of `tickSpacing`.
+ * - For negative ticks: Always round UP (toward zero) to the nearest multiple of `tickSpacing`.
+ *
+ * This matches the implementation in the contract.
+ */
+export const calculateNearestValidTick = ({
   tick,
   tickSpacing,
 }: {
   tick: number;
   tickSpacing: number;
-}) => {
-  // Round the tick to the nearest valid tick based on the tick spacing.
-  return Math.round(tick / tickSpacing) * tickSpacing;
+}): number => {
+  // For negative ticks, round toward zero (ceil)
+  // For positive ticks, round down (floor)
+  return tick < 0
+    ? Math.ceil(tick / tickSpacing) * tickSpacing
+    : Math.floor(tick / tickSpacing) * tickSpacing;
 };
 
 export const calculatePriceRange = ({
