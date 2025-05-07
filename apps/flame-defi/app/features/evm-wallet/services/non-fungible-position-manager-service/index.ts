@@ -3,14 +3,34 @@ import { Abi, type Address, encodeFunctionData, type Hash } from "viem";
 
 import {
   AstriaChain,
+  type EvmCurrency,
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
 import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
 
 import { GenericContractService } from "../generic-contract-service";
-import { needToReverseTokenOrder } from "../services.utils";
+import {
+  needToReverseTokenOrder,
+  shouldReverseTokenOrder,
+} from "../services.utils";
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
+
+export interface CreateAndInitializePoolIfNecessaryAndMintParams {
+  chain: AstriaChain;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  recipient: Address;
+  deadline: bigint;
+  sqrtPriceX96?: bigint;
+}
 
 export interface CreateAndInitializePoolIfNecessaryParams {
   token0: Address;
@@ -163,32 +183,94 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   /**
    * Creates a new pool if necessary and mints a new position in a single transaction.
    */
-  async createAndInitializePoolIfNecessaryAndMint(
-    chainId: number,
-    params: MintParams & { sqrtPriceX96?: bigint },
-    value?: bigint,
-  ): Promise<unknown> {
+  async createAndInitializePoolIfNecessaryAndMint({
+    chain,
+    token0,
+    token1,
+    fee,
+    tickLower,
+    tickUpper,
+    amount0Desired,
+    amount1Desired,
+    amount0Min,
+    amount1Min,
+    recipient,
+    deadline,
+    sqrtPriceX96,
+  }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<unknown> {
     const calls: string[] = [];
 
-    const { sqrtPriceX96, ...otherParams } = params;
+    const token0Address = token0.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : (token0.erc20ContractAddress as Address);
+
+    const token1Address = token1.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : (token1.erc20ContractAddress as Address);
+
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+    let sortedToken0Address = token0Address;
+    let sortedToken1Address = token1Address;
+    let sortedAmount0Desired = amount0Desired;
+    let sortedAmount1Desired = amount1Desired;
+    let sortedAmount0Min = amount0Min;
+    let sortedAmount1Min = amount1Min;
+
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+      sortedToken0Address = token1Address;
+      sortedToken1Address = token0Address;
+      sortedAmount0Desired = amount1Desired;
+      sortedAmount1Desired = amount0Desired;
+      sortedAmount0Min = amount1Min;
+      sortedAmount1Min = amount0Min;
+    }
+
+    let value: bigint = 0n;
+    if (sortedToken0.isNative) {
+      value = sortedAmount0Desired;
+    }
+    if (sortedToken1.isNative) {
+      value = sortedAmount1Desired;
+    }
 
     if (sqrtPriceX96) {
       const createPoolCall = this.encodeCreateAndInitializePoolIfNecessary(
-        params.token0,
-        params.token1,
-        params.fee,
+        sortedToken0Address,
+        sortedToken1Address,
+        fee,
         sqrtPriceX96,
       );
       calls.push(createPoolCall);
     }
 
-    const mintCall = this.encodeMint(otherParams);
+    const mintCall = this.encodeMint({
+      token0: sortedToken0Address,
+      token1: sortedToken1Address,
+      fee,
+      tickLower,
+      tickUpper,
+      amount0Desired: sortedAmount0Desired,
+      amount1Desired: sortedAmount1Desired,
+      amount0Min: sortedAmount0Min,
+      amount1Min: sortedAmount1Min,
+      recipient,
+      deadline,
+    });
     calls.push(mintCall);
 
-    const gasLimit = await this.estimateMulticallGasLimit(chainId, calls);
+    if (token0.isNative || token1.isNative) {
+      // Pass 0 to unwrap all available WTIA to TIA with no minimum amount requirement.
+      const unwrapCall = this.encodeUnwrapWETH9(0n, recipient);
+      calls.push(unwrapCall);
+    }
+
+    const gasLimit = await this.estimateMulticallGasLimit(chain.chainId, calls);
 
     return await this.writeContractMethod(
-      chainId,
+      chain.chainId,
       "multicall",
       [calls],
       value,
@@ -372,7 +454,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
     if (isCollectAsWrappedNative || isCollectNonNativeTokens) {
       // Collects wrappedNativeToken and other token values to recipient directly since unwrapping to native token is not needed
-      const collectCall = this.encodeCollectCall(
+      const collectCall = this.encodeCollect(
         tokenId,
         recipient,
         MAX_UINT128,
@@ -381,7 +463,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       collectCalls.push(collectCall);
     } else {
       // Collects wrappedNativeToken and other token values to contract so we can unwrap the values after
-      const collectCall = this.encodeCollectCall(
+      const collectCall = this.encodeCollect(
         tokenId,
         this.contractAddress, // Collect to the contract itself
         MAX_UINT128,
@@ -390,12 +472,12 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       collectCalls.push(collectCall);
 
       // Unwraps wrappedNativeToken to nativeToken and sends it to the recipient
-      const unwrapCall = this.encodeUnwrapWETHCall(1n, recipient);
+      const unwrapCall = this.encodeUnwrapWETH9(1n, recipient);
       collectCalls.push(unwrapCall);
 
       // Sweeps non-native tokens to the recipient
       if (!isToken0Native) {
-        const sweepToken0Call = this.encodeSweepTokenCall(
+        const sweepToken0Call = this.encodeSweepToken(
           position.tokenAddress0,
           0n,
           recipient,
@@ -405,7 +487,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
       // Sweeps non-native tokens to the recipient
       if (!isToken1Native) {
-        const sweepToken1Call = this.encodeSweepTokenCall(
+        const sweepToken1Call = this.encodeSweepToken(
           position.tokenAddress1,
           0n,
           recipient,
@@ -496,11 +578,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Get the number of NFTs owned by an address
-   *
-   * @param chainId - The chain ID of the EVM chain
-   * @param owner - The address to check the balance of
-   * @returns The number of NFTs owned by the address as a bigint
+   * Get the number of NFTs owned by an address.
    */
   async balanceOf(chainId: number, owner: Address): Promise<bigint> {
     return await this.readContractMethod<bigint>(chainId, "balanceOf", [owner]);
@@ -550,10 +628,9 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Encodes a decreaseLiquidity function call to be used in a multicall transaction.
-   * @private
+   * Encodes a `decreaseLiquidity` function call to be used in a multicall transaction.
    */
-  private encodeDecreaseLiquidityCall(
+  private encodeDecreaseLiquidity(
     tokenId: string,
     liquidity: bigint,
     amount0Min: bigint,
@@ -577,9 +654,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
   /**
    * Encodes a collect function call to be used in a multicall transaction.
-   * @private
    */
-  private encodeCollectCall(
+  private encodeCollect(
     tokenId: string,
     recipient: Address,
     amount0Max: bigint,
@@ -600,14 +676,10 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Encodes an unwrapWETH9 function call to be used in a multicall transaction.
-   * This method is used to unwrap WETH (wrapped native token) back to the native token (e.g., TIA)
-   * @private
+   * Encodes an `unwrapWETH9` function call to be used in a multicall transaction.
+   * This method is used to unwrap WETH (wrapped native token) back to the native token (e.g., ETH).
    */
-  private encodeUnwrapWETHCall(
-    amountMinimum: bigint,
-    recipient: Address,
-  ): string {
+  private encodeUnwrapWETH9(amountMinimum: bigint, recipient: Address): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName: "unwrapWETH9",
@@ -616,11 +688,10 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Encodes a sweepToken function call to be used in a multicall transaction.
+   * Encodes a `sweepToken` function call to be used in a multicall transaction.
    * This method sweeps all of the specified token from the contract to the recipient.
-   * @private
    */
-  private encodeSweepTokenCall(
+  private encodeSweepToken(
     token: Address,
     amountMinimum: bigint,
     recipient: Address,
@@ -657,7 +728,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     } = params;
 
     const calls: string[] = [];
-    const decreaseCall = this.encodeDecreaseLiquidityCall(
+    const decreaseCall = this.encodeDecreaseLiquidity(
       tokenId,
       liquidity,
       amount0Min,

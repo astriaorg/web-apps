@@ -1,22 +1,25 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAstriaChainData } from "config";
+import { useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
-import {
-  calculateMinimumAmountsWithBasisPoints,
-  type EvmCurrency,
-  TransactionStatus,
-} from "@repo/flame-types";
+import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
+import { getSlippageTolerance } from "@repo/ui/utils";
+import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
+import { getMaxBigInt } from "features/evm-wallet/services/services.utils";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
-import { type MintParams, useMint } from "pool/hooks/use-mint";
+import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType, PoolWithSlot0 } from "pool/types";
-import { calculatePriceToSqrtPriceX96, calculatePriceToTick } from "pool/utils";
+import { DepositType, FEE_TIER_TICK_SPACING, PoolWithSlot0 } from "pool/types";
+import {
+  calculateNearestValidTick,
+  calculatePriceToSqrtPriceX96,
+  calculatePriceToTick,
+} from "pool/utils";
 
 interface SubmitButtonProps {
   amount0: Amount;
@@ -58,8 +61,10 @@ export const SubmitButton = ({
     feeTier,
   } = usePageContext();
 
-  const { mint } = useMint();
+  const { defaultSlippageTolerance } = useConfig();
+  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
+  const { mint } = useCreateAndInitializePoolIfNecessaryAndMint();
   const { approve, getIsApproved } = useApproveToken();
 
   const {
@@ -88,6 +93,7 @@ export const SubmitButton = ({
     ) {
       return false;
     }
+
     return getIsApproved({
       allowance: token0Allowance,
       amount: amount0.value,
@@ -198,14 +204,38 @@ export const SubmitButton = ({
         amount1.value || "0",
         token1.coinDecimals,
       );
-      // TODO: Use real slippage tolerance.
-      const amount0Min = calculateMinimumAmountsWithBasisPoints({
-        amountDesired: amount0Desired,
-        slippageTolerance: 10,
+
+      /**
+       * TODO: Use slippage calculation in `TokenAmount` class.
+       */
+      const calculateAmountWithSlippage = (amount: bigint) => {
+        // Convert slippage to basis points (1 bp = 0.01%)
+        // Example: 0.1% = 10 basis points
+        const basisPoints = Math.round(slippageTolerance * 100);
+
+        // Calculate: amount * (10000 - basisPoints) / 10000
+        return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
+      };
+
+      const amount0Min = calculateAmountWithSlippage(amount0Desired);
+      const amount1Min = calculateAmountWithSlippage(amount1Desired);
+
+      const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+      const tickLower = calculateNearestValidTick({
+        tick: calculatePriceToTick({
+          price: Number(minPrice),
+          decimal0: token0.coinDecimals,
+          decimal1: token1.coinDecimals,
+        }),
+        tickSpacing,
       });
-      const amount1Min = calculateMinimumAmountsWithBasisPoints({
-        amountDesired: amount1Desired,
-        slippageTolerance: 10,
+      const tickUpper = calculateNearestValidTick({
+        tick: calculatePriceToTick({
+          price: Number(maxPrice),
+          decimal0: token0.coinDecimals,
+          decimal1: token1.coinDecimals,
+        }),
+        tickSpacing,
       });
 
       // 20 minute deadline.
@@ -222,24 +252,17 @@ export const SubmitButton = ({
             }),
           );
 
-      const params: MintParams = {
+      const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
+        chain,
         token0,
         token1,
         fee: feeTier,
-        tickLower: calculatePriceToTick({
-          price: Number(minPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        tickUpper: calculatePriceToTick({
-          price: Number(maxPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        amount0Desired,
-        amount1Desired,
-        amount0Min,
-        amount1Min,
+        tickLower,
+        tickUpper,
+        amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
+        amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
+        amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
+        amount1Min: getMaxBigInt(amount1Min, BigInt(1)),
         recipient: address,
         deadline: BigInt(deadline),
         sqrtPriceX96,
@@ -258,6 +281,7 @@ export const SubmitButton = ({
     }
   }, [
     address,
+    chain,
     feeTier,
     token0,
     token1,
@@ -267,6 +291,7 @@ export const SubmitButton = ({
     maxPrice,
     pool,
     amountInitialPrice,
+    slippageTolerance,
     mint,
   ]);
 

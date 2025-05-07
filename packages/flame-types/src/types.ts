@@ -813,21 +813,3 @@ export enum ApproveStatus {
   SUCCESS = "Success",
   FAILED = "Failed",
 }
-
-// Calculate minimum amounts using basis points.
-export const calculateMinimumAmountsWithBasisPoints = ({
-  amountDesired,
-  slippageTolerance, // In basis points (e.g., 10 = 0.1%).
-}: {
-  amountDesired: bigint;
-  slippageTolerance: number;
-}): bigint => {
-  // Calculate the multiplier from basis points.
-  // 10000 - `slippageTolerance` because we're calculating minimum.
-  const multiplier = BigInt(10000 - slippageTolerance);
-
-  // Apply slippage tolerance (division by 10000 to convert from bps).
-  const amountMin = (BigInt(amountDesired) * multiplier) / BigInt(10000);
-
-  return amountMin;
-};
