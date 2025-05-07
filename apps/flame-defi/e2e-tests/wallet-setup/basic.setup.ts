@@ -16,8 +16,16 @@ const PASSWORD = process.env.PASSWORD;
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
-if (!SEED_PHRASE || !PASSWORD || !PRIVATE_KEY) {
-  throw new Error("Must set SEED_PHRASE, PASSWORD, PRIVATE_KEY");
+if (!SEED_PHRASE) {
+  throw new Error("Must set SEED_PHRASE");
+}
+
+if (!PASSWORD) {
+  throw new Error("Must set PASSWORD");
+}
+
+if (!PRIVATE_KEY) {
+  throw new Error("Must set PRIVATE_KEY");
 }
 
 // Define the basic wallet setup

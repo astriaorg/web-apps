@@ -61,7 +61,8 @@ jobs:
           echo "PRIVATE_KEY=$PRIVATE_KEY" >> e2e-tests/wallet-setup/.env.e2e-tests
           echo "CI=true" >> e2e-tests/wallet-setup/.env.e2e-tests
 
-          # Setup wallets for Synpress (headful mode with xvfb)
+          # Setup wallets for Synpress (headful mode with xvfb).
+          # path is relative to playwright.config.ts
           xvfb-run npx synpress -d ./e2e-tests/wallet-setup
 
       - name: Run E2E Tests
@@ -72,6 +73,7 @@ jobs:
           CI: true
         run: |
           cd apps/flame-defi
+          # path is relative to playwright.config.ts
           xvfb-run npx playwright test e2e-tests
 
       - name: Upload Test Results
