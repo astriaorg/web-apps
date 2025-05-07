@@ -41,6 +41,7 @@ export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
 
   // Import the wallet using the seed phrase
   await metamask.importWallet(SEED_PHRASE);
+  // FIXME - dont think i need both of these
   await metamask.importWalletFromPrivateKey(PRIVATE_KEY);
 
   // Additional setup steps can be added here, such as:
