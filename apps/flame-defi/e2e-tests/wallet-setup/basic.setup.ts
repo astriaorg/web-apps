@@ -1,4 +1,3 @@
-import { BrowserContext, Page } from "@playwright/test";
 import { defineWalletSetup } from "@synthetixio/synpress";
 import { MetaMask } from "@synthetixio/synpress/playwright";
 import dotenv from "dotenv";
@@ -30,14 +29,7 @@ if (!SEED_PHRASE) {
 
 // Define the basic wallet setup
 export default defineWalletSetup(PASSWORD, async (context, walletPage) => {
-  // NOTE - had to add `as Foo` to below args because I was getting a ts error w/o them,
-  //  even though BrowserContext from @playwright/test and playwright-core seem to be
-  //  the same type???
-  const metamask = new MetaMask(
-    context as BrowserContext,
-    walletPage as Page,
-    PASSWORD,
-  );
+  const metamask = new MetaMask(context, walletPage, PASSWORD);
 
   // Import the wallet using the seed phrase
   await metamask.importWallet(SEED_PHRASE);
