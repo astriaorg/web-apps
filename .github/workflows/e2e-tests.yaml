@@ -46,7 +46,7 @@ jobs:
       - name: Install Playwright Browsers
         if: steps.cache-browsers.outputs.cache-hit != 'true'
         run: |
-          npx playwright@1.48.0 install --with-deps
+          npx playwright install --with-deps
 
       - name: Setup Wallet
         if: steps.cache-wallet.outputs.cache-hit != 'true'
