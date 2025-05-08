@@ -42,7 +42,7 @@ jobs:
             ${{ runner.os }}-wallet-setup-
 
       - name: Install Dependencies
-        if: steps.setup-node.outputs.cache-hit != 'true'
+        #if: steps.setup-node.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Install Playwright Browsers
