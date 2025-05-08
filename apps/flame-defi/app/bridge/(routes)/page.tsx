@@ -1,17 +1,5 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-import { ROUTES } from "bridge/constants/routes";
-
+// This component won't typically render because middleware will redirect
+// But it's here as a fallback
 export default function BridgePage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to deposit page by default
-    router.push(ROUTES.DEPOSIT);
-  }, [router]);
-
   return null;
 }
