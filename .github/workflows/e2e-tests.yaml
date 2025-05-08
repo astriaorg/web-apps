@@ -102,8 +102,12 @@ jobs:
           GRAFANA_SOURCE_MAP_UPLOADER_API_KEY: ""
         run: |
           cd apps/flame-defi
+          # building is slow, but the next dev server was so 
+          # slow it caused tests to fail...
+          npm run build
+          npm run start &
           # path is relative to playwright.config.ts
-          xvfb-run npx playwright test e2e-tests --workers=4
+          xvfb-run npx playwright test e2e-tests --workers=3
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
