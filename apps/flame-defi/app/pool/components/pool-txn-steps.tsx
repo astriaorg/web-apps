@@ -1,6 +1,5 @@
 "use client";
 
-import { useAstriaChainData } from "config";
 import { usePathname } from "next/navigation";
 import { useIntl } from "react-intl";
 
@@ -13,6 +12,7 @@ import {
   TokenIcon,
 } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
+import { useAstriaChainData } from "config";
 import { usePoolPositionContext } from "pool/hooks";
 import {
   getTxnType,

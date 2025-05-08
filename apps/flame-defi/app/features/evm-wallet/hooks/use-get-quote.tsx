@@ -1,8 +1,8 @@
-import { useAstriaChainData, useConfig } from "config";
 import { useCallback, useRef, useState } from "react";
 import { parseUnits } from "viem";
 
 import { GetQuoteResult, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
+import { useAstriaChainData, useConfig } from "config";
 
 export const useGetQuote = () => {
   const { swapQuoteAPIURL } = useConfig();

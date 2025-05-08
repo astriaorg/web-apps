@@ -1,4 +1,3 @@
-import { useAstriaChainData } from "config";
 import { useAccount } from "wagmi";
 
 import {
@@ -10,6 +9,7 @@ import {
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
+import { useAstriaChainData } from "config";
 import { useAstriaWallet } from "features/evm-wallet";
 
 /**

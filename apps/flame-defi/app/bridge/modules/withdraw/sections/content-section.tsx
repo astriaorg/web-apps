@@ -1,7 +1,6 @@
 "use client";
 
 import Big from "big.js";
-import { useConfig } from "config";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatUnits } from "viem";
@@ -19,6 +18,7 @@ import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { Dropdown } from "components/dropdown";
+import { useConfig } from "config";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
 import { useCurrencyBalance } from "hooks/use-currency-balance";

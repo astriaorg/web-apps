@@ -1,4 +1,3 @@
-import { useConfig } from "config";
 import { useCallback, useEffect, useState } from "react";
 import { type Address, type Hash } from "viem";
 import { useAccount, useConfig as useWagmiConfig } from "wagmi";
@@ -10,6 +9,7 @@ import {
   tokenStateToBig,
   TXN_STATUS,
 } from "@repo/flame-types";
+import { useConfig } from "config";
 
 import { createErc20Service } from "../services/erc-20-service";
 

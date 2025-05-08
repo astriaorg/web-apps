@@ -7,11 +7,6 @@ import { ChainProvider } from "@cosmos-kit/react";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { assets, chains } from "chain-registry";
-import {
-  ConfigContextProvider,
-  getAllChainConfigs,
-  getEnvVariable,
-} from "config";
 import type { ReactNode } from "react";
 import { IntlProvider } from "react-intl";
 import { WagmiProvider } from "wagmi";
@@ -23,6 +18,11 @@ import {
   cosmosChainInfosToCosmosKitChains,
   evmChainsToRainbowKitChains,
 } from "@repo/flame-types";
+import {
+  ConfigContextProvider,
+  getAllChainConfigs,
+  getEnvVariable,
+} from "config";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
 import {
   AstriaWalletContextProvider,

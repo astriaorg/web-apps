@@ -55,7 +55,7 @@ export const config = [
             // Empty line
             ["^"],
             // Internal packages (@repo/ prefixed and absolute imports from the project)
-            ["^@repo", "^@/", "^app/", "^borrow/", "^bridge/", "^components/", "^config/", "^constants/", "^earn/", "^features/", "^hooks/", "^icons/", "^logos/", "^pool/", "^swap/", "^testing/", "^utils/"],
+            ["^@repo", "^@/", "^app/", "^borrow/", "^bridge/", "^components/", "^config$", "^constants/", "^earn/", "^features/", "^hooks/", "^icons/", "^logos/", "^pool/", "^swap/", "^testing/", "^utils/"],
             // Empty line
             ["^"],
             // Relative imports
