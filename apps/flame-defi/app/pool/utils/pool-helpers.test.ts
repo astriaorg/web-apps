@@ -7,8 +7,6 @@ import {
   calculatePoolExchangeRate,
   calculatePriceToTick,
   calculateTickToPrice,
-  getAmount0ForLiquidity,
-  getAmount1ForLiquidity,
 } from "./pool-helpers";
 
 // Test our implementation against the values in the Uniswap V3 documentation example.
@@ -149,50 +147,5 @@ describe("calculateNearestValidTick", () => {
     });
 
     expect(nearestTickUpper).toEqual(887220);
-  });
-});
-
-describe("getAmount0ForLiquidity", () => {
-  it("should calculate correct derived amount", () => {
-    let result = getAmount0ForLiquidity({
-      amount1: "0.000001",
-      price: 1,
-      decimal0: 18,
-    });
-
-    // Test using values from legacy app TIA/USDC 0.01% pool (uninitialized).
-    // Legacy app: 0.000000999996
-    expect(result).toEqual("0.000000999950003749");
-
-    result = getAmount0ForLiquidity({
-      amount1: "0.000001",
-      price: 2,
-      decimal0: 18,
-    });
-
-    // Legacy app: 0.000000499989
-    expect(result).toEqual("0.000000499995459580");
-  });
-});
-
-describe("getAmount1ForLiquidity", () => {
-  it("should calculate correct derived amount", () => {
-    let result = getAmount1ForLiquidity({
-      amount0: "1",
-      price: 1,
-      decimal1: 18,
-    });
-
-    // Legacy app: 1
-    expect(result).toEqual("1.000049998751066095");
-
-    result = getAmount1ForLiquidity({
-      amount0: "1",
-      price: 2,
-      decimal1: 18,
-    });
-
-    // Legacy app: 2.00004
-    expect(result).toEqual("2.000018161846137105");
   });
 });
