@@ -1,15 +1,12 @@
 name: E2E Tests
 
 on:
-  pull_request:
-  push:
-    branches:
-      - "develop"
-      - "main"
+  deployment_status:
 
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
     environment: github-actions
     steps:
       - uses: actions/checkout@v4
@@ -60,6 +57,7 @@ jobs:
         run: |
           cd apps/flame-defi
           # Create .env file for e2e tests
+          # NOTE - manually creating .env.e2e-tests because it serves as the cache key for the wallet setup cache
           echo "SEED_PHRASE='$SEED_PHRASE'" > e2e-tests/wallet-setup/.env.e2e-tests
           echo "PASSWORD=$PASSWORD" >> e2e-tests/wallet-setup/.env.e2e-tests
           echo "PRIVATE_KEY=$PRIVATE_KEY" >> e2e-tests/wallet-setup/.env.e2e-tests
@@ -100,7 +98,7 @@ jobs:
           GRAFANA_SOURCE_MAP_UPLOADER_STACK_ID: ""
           GRAFANA_SOURCE_MAP_UPLOADER_ENDPOINT: ""
           GRAFANA_SOURCE_MAP_UPLOADER_API_KEY: ""
-          PLAYWRIGHT_TEST_BASE_URL: ""
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
         run: |
           cd apps/flame-defi
           # path is relative to playwright.config.ts
