@@ -18,7 +18,11 @@ import { SwapButton } from "pool/modules/create-position/components/swap-button"
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
-import { calculateDepositType } from "pool/utils";
+import {
+  calculateDepositType,
+  getAmount0ForLiquidity,
+  getAmount1ForLiquidity,
+} from "pool/utils";
 
 enum InputId {
   INPUT_0 = "INPUT_0",
@@ -79,8 +83,7 @@ export const ContentSection = () => {
     derivedAmount0: Amount;
     derivedAmount1: Amount;
   } => {
-    if (!pool || isPending || !token0 || !token1) {
-      // When there's no pool, the user can enter any value in both inputs to initialize the position.
+    if (isPending || !token0 || !token1) {
       return {
         derivedAmount0: amount0,
         derivedAmount1: amount1,
@@ -106,6 +109,47 @@ export const ContentSection = () => {
         }),
       };
     };
+
+    if (!pool) {
+      if (!amountInitialPrice.validation.isValid) {
+        return {
+          derivedAmount0: amount0,
+          derivedAmount1: amount1,
+        };
+      }
+
+      // When there's no pool, derive the amount from the initial price.
+      if (currentInput === InputId.INPUT_0 && amount0.value) {
+        const derivedAmount1 = getAmount1ForLiquidity({
+          amount0: amount0.value,
+          price: Number(amountInitialPrice.value),
+          decimal1: token1.coinDecimals,
+        });
+        return {
+          derivedAmount0: amount0,
+          derivedAmount1: getDerivedAmount(
+            formatNumberWithoutTrailingZeros(derivedAmount1),
+            token1,
+            token1Balance?.value,
+          ),
+        };
+      }
+      if (currentInput === InputId.INPUT_1 && amount1.value) {
+        const derivedAmount0 = getAmount0ForLiquidity({
+          amount1: amount1.value,
+          price: Number(amountInitialPrice.value),
+          decimal0: token0.coinDecimals,
+        });
+        return {
+          derivedAmount0: getDerivedAmount(
+            formatNumberWithoutTrailingZeros(derivedAmount0),
+            token0,
+            token0Balance?.value,
+          ),
+          derivedAmount1: amount1,
+        };
+      }
+    }
 
     if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
@@ -150,6 +194,7 @@ export const ContentSection = () => {
     token1,
     token0Balance,
     token1Balance,
+    amountInitialPrice,
     validate,
   ]);
 
