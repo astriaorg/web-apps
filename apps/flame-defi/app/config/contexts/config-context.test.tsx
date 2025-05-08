@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
+import { useConfig } from "config/hooks/use-config";
 import type React from "react";
 
-import { useConfig } from "config/hooks/use-config";
 import { renderWithProviders } from "testing/helpers";
 
 const TestComponent: React.FC = () => {

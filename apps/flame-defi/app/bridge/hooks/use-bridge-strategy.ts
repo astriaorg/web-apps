@@ -1,6 +1,5 @@
 "use client";
 
-import { useConfig } from "config";
 import { useCallback } from "react";
 import { Address } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
@@ -8,6 +7,7 @@ import { useConfig as useWagmiConfig } from "wagmi";
 import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
 import { createBridgeStrategy } from "bridge/strategies";
 import { ChainConnection } from "bridge/types";
+import { useConfig } from "config";
 import { useCosmosWallet } from "features/cosmos-wallet";
 import { createErc20Service } from "features/evm-wallet";
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useAstriaChainData } from "config";
 import { createContext, PropsWithChildren, useState } from "react";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import { type Amount, useTokenAmountInput } from "@repo/ui/components";
+import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
 import {
   MAX_PRICE_DEFAULT,

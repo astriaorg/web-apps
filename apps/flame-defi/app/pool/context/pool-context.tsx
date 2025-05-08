@@ -1,5 +1,6 @@
 "use client";
 
+import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createContext,
   PropsWithChildren,
@@ -9,7 +10,6 @@ import {
 } from "react";
 import { useAccount, useConfig } from "wagmi";
 
-import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
