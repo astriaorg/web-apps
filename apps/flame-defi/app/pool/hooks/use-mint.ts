@@ -33,7 +33,7 @@ export const useCreateAndInitializePoolIfNecessaryAndMint = () => {
     onSuccess: (hash) => {
       if (hash) {
         // TODO: Make positions fetch a query.
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
           queryKey: ["usePositions"],
         });
       }
