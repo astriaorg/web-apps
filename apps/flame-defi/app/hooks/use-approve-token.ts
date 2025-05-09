@@ -51,7 +51,7 @@ export const useApproveToken = () => {
         return;
       }
 
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         // TODO: Share allowance query key.
         queryKey: ["useTokenAllowance", variables.token, variables.spender],
       });
