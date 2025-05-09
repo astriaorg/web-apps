@@ -52,25 +52,27 @@ test("should handle token approval flow on deposit page", async ({
 
   // Navigate to the bridge deposit page
   await page.goto("/bridge/deposit");
-  
+
   // Connect the source wallet (using helper function)
   await connectSourceWallet(page, metamask);
 
   // Select Base as source chain
   await page.locator('button:has-text("Select source...")').first().click();
   await page.waitForSelector("div.absolute", { timeout: 10000 });
-  
+
   // Find and click on Base option
   const baseOption = page.locator('button:has-text("Base")').first();
   await baseOption.click();
   await page.waitForTimeout(1000); // Wait for UI to stabilize
 
   // Enter a deposit amount
-  await page.locator('[placeholder="0.00"]').fill("5")
+  await page.locator('[placeholder="0.00"]').fill("5");
   await page.waitForTimeout(1000);
 
   // The button should now show "Approve Token for Spend" text
-  const approveButton = page.locator('button:has-text("Approve Token for Spend")');
+  const approveButton = page.locator(
+    'button:has-text("Approve Token for Spend")',
+  );
   await expect(approveButton).toBeVisible();
   await expect(approveButton).toBeEnabled();
 
