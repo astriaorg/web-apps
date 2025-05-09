@@ -185,7 +185,7 @@ export const SubmitButton = ({
 
       setStatus(TransactionStatus.FAILED);
     },
-    [address, publicClient, chain.contracts, approve],
+    [address, environment, publicClient, chain.contracts, approve],
   );
 
   const handleCreatePosition = useCallback(async () => {
