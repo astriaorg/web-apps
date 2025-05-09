@@ -8,8 +8,9 @@ import type {
 } from "@repo/flame-types";
 
 export enum Environment {
-  DEVELOPMENT = "development",
-  PRODUCTION = "production",
+  MAIN = "main",
+  STAGING = "staging",
+  DEVELOP = "develop",
 }
 
 /**

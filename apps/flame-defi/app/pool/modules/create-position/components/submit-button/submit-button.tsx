@@ -156,7 +156,7 @@ export const SubmitButton = ({
           token,
           spender: chain.contracts.nonfungiblePositionManager.address,
           amount:
-            environment === Environment.DEVELOPMENT
+            environment === Environment.DEVELOP
               ? parseUnits(amount.value, token.coinDecimals)
               : maxUint256,
         });
