@@ -1,29 +1,32 @@
 import type { EvmCurrency } from "@repo/flame-types";
 
+/**
+ * Filter token options for opposite list based on selected token
+ */
 export const filterPoolTokens = (
-  currencies: EvmCurrency[],
-  token?: EvmCurrency,
+  tokens: EvmCurrency[],
+  selectedToken?: EvmCurrency,
 ) => {
-  return currencies.filter((currency) => {
-    if (!token) {
-      // No token selected, show all currencies.
+  return tokens.filter((token) => {
+    if (!selectedToken) {
+      // No token selected, show all tokens.
       return true;
     }
-    if (token.isNative) {
+    if (selectedToken.isNative) {
       // If the selected token is native, exclude the wrapped native.
       return (
-        !currency.isWrappedNative &&
-        currency.erc20ContractAddress !== token.erc20ContractAddress
+        !token.isWrappedNative &&
+        token.erc20ContractAddress !== selectedToken.erc20ContractAddress
       );
     }
-    if (token.isWrappedNative) {
+    if (selectedToken.isWrappedNative) {
       // If the selected token is wrapped native, exclude the native.
       return (
-        !currency.isNative &&
-        currency.erc20ContractAddress !== token.erc20ContractAddress
+        !token.isNative &&
+        token.erc20ContractAddress !== selectedToken.erc20ContractAddress
       );
     }
     // Exclude the currently selected token.
-    return currency.erc20ContractAddress !== token.erc20ContractAddress;
+    return token.erc20ContractAddress !== selectedToken.erc20ContractAddress;
   });
 };
