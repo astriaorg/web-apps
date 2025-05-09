@@ -6,7 +6,7 @@ import { type Address, formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
-import { createERC20Service } from "features/evm-wallet";
+import { createErc20Service } from "features/evm-wallet";
 
 // TODO: Unify token approval hooks.
 export const useApproveToken = () => {
@@ -38,7 +38,7 @@ export const useApproveToken = () => {
         ? chain.contracts.wrappedNativeToken.address
         : (token.erc20ContractAddress as Address);
 
-      const erc20Service = createERC20Service(config, tokenAddress);
+      const erc20Service = createErc20Service(config, tokenAddress);
 
       const hash = await erc20Service.approve(chainId, spender, amount);
 

@@ -9,7 +9,7 @@ interface TransferParams {
   chainId: number;
 }
 
-export class ERC20Service extends GenericContractService {
+export class Erc20Service extends GenericContractService {
   constructor(config: Config, address: Address) {
     super(config, address, erc20Abi);
   }
@@ -79,9 +79,9 @@ export class ERC20Service extends GenericContractService {
   }
 }
 
-export function createERC20Service(
+export function createErc20Service(
   config: Config,
   address: Address,
-): ERC20Service {
-  return new ERC20Service(config, address);
+): Erc20Service {
+  return new Erc20Service(config, address);
 }

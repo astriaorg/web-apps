@@ -4,7 +4,7 @@ import { type Address } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
-import { createERC20Service } from "features/evm-wallet";
+import { createErc20Service } from "features/evm-wallet";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
 const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
@@ -33,7 +33,7 @@ export const useTokenAllowance = ({
           ? chain.contracts.wrappedNativeToken.address
           : (token.erc20ContractAddress as Address);
 
-        const erc20Service = createERC20Service(config, tokenAddress);
+        const erc20Service = createErc20Service(config, tokenAddress);
 
         const allowance = await erc20Service.allowance(
           chainId,

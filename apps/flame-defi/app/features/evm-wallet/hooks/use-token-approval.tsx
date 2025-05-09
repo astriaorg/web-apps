@@ -10,7 +10,7 @@ import {
   TXN_STATUS,
 } from "@repo/flame-types";
 
-import { createERC20Service } from "../services/erc-20-service";
+import { createErc20Service } from "../services/erc-20-service";
 
 type TokenApprovalProps = {
   chain: EvmChainInfo;
@@ -60,7 +60,7 @@ export const useTokenApproval = ({
       if (!token || !token.erc20ContractAddress) {
         return null;
       }
-      const erc20Service = createERC20Service(
+      const erc20Service = createErc20Service(
         wagmiConfig,
         token.erc20ContractAddress as Address,
       );
@@ -95,7 +95,7 @@ export const useTokenApproval = ({
     const newTokenAllowances: TokenAllowance[] = [];
     for (const currency of currencies) {
       if (currency.erc20ContractAddress) {
-        const erc20Service = createERC20Service(
+        const erc20Service = createErc20Service(
           wagmiConfig,
           currency.erc20ContractAddress as Address,
         );
