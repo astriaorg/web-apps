@@ -61,15 +61,14 @@ export const validate = ({
     res.maximum = maximum !== undefined ? amount.lte(maximum) : true;
     res.zero = canBeZero || amount.gt(0);
 
-    const decimalIndex = value.indexOf(".");
-    const decimal =
-      decimalIndex !== -1 ? value.substring(decimalIndex + 1) : undefined;
-    res.decimals =
-      decimals !== undefined
-        ? decimal
-          ? decimal.length <= decimals
-          : true
-        : true;
+    res.decimals = (() => {
+      const decimalIndex = value.indexOf(".");
+      if (decimalIndex === -1) {
+        return decimals === undefined;
+      }
+      const decimal = value.substring(decimalIndex + 1);
+      return decimals === undefined || decimal.length <= decimals;
+    })();
     // eslint-disable-next-line no-empty
   } catch {}
 
