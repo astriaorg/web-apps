@@ -9,6 +9,7 @@ import type { EvmCurrency } from "@repo/flame-types";
 import type { Amount } from "@repo/ui/components";
 import { useValidateTokenAmount } from "@repo/ui/hooks";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
+import { filterPoolTokens } from "pool/components/token-select";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
@@ -198,21 +199,15 @@ export const ContentSection = () => {
     validate,
   ]);
 
-  const optionsToken0 = useMemo(() => {
-    return chain.currencies.filter((currency) =>
-      token1
-        ? currency.erc20ContractAddress !== token1.erc20ContractAddress
-        : true,
-    );
-  }, [chain.currencies, token1]);
+  const optionsToken0 = useMemo(
+    () => filterPoolTokens(chain.currencies, token1),
+    [chain.currencies, token1],
+  );
 
-  const optionsToken1 = useMemo(() => {
-    return chain.currencies.filter((currency) =>
-      token0
-        ? currency.erc20ContractAddress !== token0.erc20ContractAddress
-        : true,
-    );
-  }, [chain.currencies, token0]);
+  const optionsToken1 = useMemo(
+    () => filterPoolTokens(chain.currencies, token0),
+    [chain.currencies, token0],
+  );
 
   const handleSwap = useCallback(() => {
     setIsInverted((value) => !value);
