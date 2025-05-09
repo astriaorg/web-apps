@@ -1,6 +1,18 @@
 import Big from "big.js";
 
-import { type Validation, type ValidationToken } from "./types";
+import {
+  type Validation,
+  type ValidationError,
+  type ValidationToken,
+} from "./types";
+
+export enum ValidateTokenAmountErrorType {
+  INVALID_AMOUNT = "INVALID_AMOUNT",
+  INVALID_DECIMALS = "INVALID_DECIMALS",
+  ZERO_AMOUNT = "ZERO_AMOUNT",
+  BELOW_MINIMUM = "BELOW_MINIMUM",
+  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
+}
 
 type Params = {
   value: string;
@@ -8,15 +20,23 @@ type Params = {
   decimals?: number;
   minimum?: string;
   maximum?: string;
-  canBeZero?: boolean;
+  /**
+   * Whether the amount can be zero.
+   *
+   * @default true
+   */
+  nonzero?: boolean;
 };
 
-type ValidateState = Pick<Validation, "isValid"> & {
+type ValidateState = Pick<
+  Validation<ValidateTokenAmountErrorType>,
+  "isValid"
+> & {
   number: boolean;
   decimals: boolean;
   minimum: boolean;
   maximum: boolean;
-  zero: boolean;
+  nonzero: boolean;
 };
 
 export const validate = ({
@@ -24,14 +44,14 @@ export const validate = ({
   decimals,
   minimum,
   maximum,
-  canBeZero = true,
+  nonzero = true,
 }: Params): ValidateState => {
   const res = {
     number: false,
     decimals: false,
     minimum: false,
     maximum: false,
-    zero: false,
+    nonzero: false,
   };
 
   if (!value) {
@@ -44,16 +64,16 @@ export const validate = ({
     res.number = true;
     res.minimum = minimum !== undefined ? amount.gte(minimum) : true;
     res.maximum = maximum !== undefined ? amount.lte(maximum) : true;
-    res.zero = canBeZero || amount.gt(0);
+    res.nonzero = nonzero ? amount.gt(0) : true;
 
-    const decimalIndex = value.indexOf(".");
-    const decimal =
-      decimalIndex !== -1 ? value.substring(decimalIndex + 1) : undefined;
-    res.decimals = decimals
-      ? decimal
-        ? decimal.length <= decimals
-        : true
-      : true;
+    res.decimals = (() => {
+      const decimalIndex = value.indexOf(".");
+      if (decimalIndex === -1) {
+        return true;
+      }
+      const decimal = value.substring(decimalIndex + 1);
+      return decimals === undefined || decimal.length <= decimals;
+    })();
     // eslint-disable-next-line no-empty
   } catch {}
 
@@ -64,25 +84,40 @@ export const validate = ({
 };
 
 export const useValidateTokenAmount = () => {
-  return (params: Params): Validation => {
+  return (params: Params): Validation<ValidateTokenAmountErrorType> => {
     const state = validate(params);
 
-    const errors: string[] = [];
+    const errors: ValidationError<ValidateTokenAmountErrorType>[] = [];
 
     if (!state.number) {
-      errors.push(`Invalid amount.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INVALID_AMOUNT,
+        message: `Invalid amount.`,
+      });
     }
     if (!state.decimals) {
-      errors.push(`Invalid amount. Maximum ${params.decimals} decimals.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INVALID_DECIMALS,
+        message: `Invalid amount. Maximum ${params.decimals} decimals.`,
+      });
     }
-    if (!state.zero) {
-      errors.push(`Amount cannot be 0.`);
+    if (!state.nonzero) {
+      errors.push({
+        type: ValidateTokenAmountErrorType.ZERO_AMOUNT,
+        message: `Amount cannot be 0.`,
+      });
     }
     if (!state.minimum) {
-      errors.push(`The minimum amount is ${params.minimum}.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.BELOW_MINIMUM,
+        message: `The minimum amount is ${params.minimum}.`,
+      });
     }
     if (!state.maximum) {
-      errors.push(`Insufficient ${params.token.symbol} balance.`);
+      errors.push({
+        type: ValidateTokenAmountErrorType.INSUFFICIENT_BALANCE,
+        message: `Insufficient ${params.token.symbol} balance.`,
+      });
     }
 
     return { isValid: state.isValid, errors };

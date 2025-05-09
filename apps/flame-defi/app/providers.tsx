@@ -81,6 +81,7 @@ export function Providers({ children }: { children: ReactNode }) {
                   signerOptions={{
                     preferredSignType: () => "amino",
                   }}
+                  throwErrors={false}
                 >
                   <OnchainKitProvider
                     apiKey={ONCHAINKIT_API_KEY}

@@ -37,14 +37,8 @@ export const mapSlot0ResponseToSlot0 = (response: Slot0Response): Slot0 => ({
 });
 
 export class PoolService extends GenericContractService {
-  /**
-   * Creates a new `PoolService` instance.
-   *
-   * @param wagmiConfig - The `wagmi` configuration object.
-   * @param contractAddress - The address of the Uniswap V3 pool contract.
-   */
-  constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, POOL_ABI as Abi);
+  constructor(config: Config, address: Address) {
+    super(config, address, POOL_ABI as Abi);
   }
 
   /**
@@ -53,7 +47,7 @@ export class PoolService extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain.
    * @returns Slot0 object containing the current price, tick, and other pool state variables.
    */
-  async getSlot0(chainId: number): Promise<Slot0> {
+  async slot0(chainId: number): Promise<Slot0> {
     const slot0 = await this.readContractMethod<Slot0Response>(
       chainId,
       "slot0",
@@ -69,7 +63,7 @@ export class PoolService extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain.
    * @returns The total liquidity currently active in the pool as a bigint.
    */
-  async getLiquidity(chainId: number): Promise<bigint> {
+  async liquidity(chainId: number): Promise<bigint> {
     return await this.readContractMethod<bigint>(chainId, "liquidity", []);
   }
 
@@ -79,7 +73,7 @@ export class PoolService extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain.
    * @returns The tick spacing value which depends on the pool's fee tier.
    */
-  async getTickSpacing(chainId: number): Promise<number> {
+  async tickSpacing(chainId: number): Promise<number> {
     return await this.readContractMethod<number>(chainId, "tickSpacing", []);
   }
 
@@ -89,7 +83,7 @@ export class PoolService extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain.
    * @returns The accumulated protocol fees for token0 as a bigint.
    */
-  async getFeeGrowthGlobal0X128(chainId: number): Promise<bigint> {
+  async feeGrowthGlobal0X128(chainId: number): Promise<bigint> {
     return await this.readContractMethod<bigint>(
       chainId,
       "feeGrowthGlobal0X128",
@@ -103,7 +97,7 @@ export class PoolService extends GenericContractService {
    * @param chainId - The chain ID of the EVM chain.
    * @returns The accumulated protocol fees for token1 as a bigint.
    */
-  async getFeeGrowthGlobal1X128(chainId: number): Promise<bigint> {
+  async feeGrowthGlobal1X128(chainId: number): Promise<bigint> {
     return await this.readContractMethod<bigint>(
       chainId,
       "feeGrowthGlobal1X128",
@@ -112,16 +106,9 @@ export class PoolService extends GenericContractService {
   }
 }
 
-/**
- * Factory function to create a new `PoolService` instance.
- *
- * @param wagmiConfig - The wagmi configuration object.
- * @param contractAddress - The address of the Uniswap V3 pool contract.
- * @returns A new `PoolService` instance.
- */
 export function createPoolService(
-  wagmiConfig: Config,
-  contractAddress: Address,
+  config: Config,
+  address: Address,
 ): PoolService {
-  return new PoolService(wagmiConfig, contractAddress);
+  return new PoolService(config, address);
 }

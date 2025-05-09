@@ -19,7 +19,7 @@ export const useGetPools = ({
 }: {
   token0?: EvmCurrency;
   token1?: EvmCurrency;
-}): UseQueryResult<GetPoolsResult> => {
+}): UseQueryResult<GetPoolsResult | null> => {
   const config = useConfig();
   const { chain } = useAstriaChainData();
 

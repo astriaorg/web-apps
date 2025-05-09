@@ -58,13 +58,24 @@ export const calculatePriceToTick = ({
   decimal0?: number;
   decimal1?: number;
 }) => {
+  let tick: number = 0;
+
   if (decimal0 && decimal1) {
-    return Math.floor(
+    tick = Math.floor(
       Math.log(price * Math.pow(10, decimal0 - decimal1)) / Math.log(1.0001),
     );
+  } else {
+    tick = Math.floor(Math.log(price) / Math.log(1.0001));
   }
 
-  return Math.log(price) / Math.log(1.0001);
+  if (tick < TICK_BOUNDARIES.MIN) {
+    return TICK_BOUNDARIES.MIN;
+  }
+  if (tick > TICK_BOUNDARIES.MAX) {
+    return TICK_BOUNDARIES.MAX;
+  }
+
+  return tick;
 };
 
 export const calculateTickToPrice = ({
@@ -87,7 +98,7 @@ export const calculateTickToPrice = ({
   return price;
 };
 
-const calculatePriceToSqrtPriceX96 = ({
+export const calculatePriceToSqrtPriceX96 = ({
   price,
   decimal0,
   decimal1,
@@ -102,15 +113,27 @@ const calculatePriceToSqrtPriceX96 = ({
   return sqrtPriceX96;
 };
 
-const calculateNearestValidTick = ({
+/**
+ * Calculates the nearest valid tick for a given tick lower or upper bound.
+ *
+ * Rounding behavior:
+ * - For positive ticks: Always round DOWN to the nearest multiple of `tickSpacing`.
+ * - For negative ticks: Always round UP (toward zero) to the nearest multiple of `tickSpacing`.
+ *
+ * This matches the implementation in the contract.
+ */
+export const calculateNearestValidTick = ({
   tick,
   tickSpacing,
 }: {
   tick: number;
   tickSpacing: number;
-}) => {
-  // Round the tick to the nearest valid tick based on the tick spacing.
-  return Math.round(tick / tickSpacing) * tickSpacing;
+}): number => {
+  // For negative ticks, round toward zero (ceil)
+  // For positive ticks, round down (floor)
+  return tick < 0
+    ? Math.ceil(tick / tickSpacing) * tickSpacing
+    : Math.floor(tick / tickSpacing) * tickSpacing;
 };
 
 export const calculatePriceRange = ({

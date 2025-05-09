@@ -245,7 +245,7 @@ export class SwapRouterService extends GenericContractService {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
-          address: this.contractAddress,
+          address: this.address,
           abi: this.abi,
           functionName: swapParams.functionName,
           args: swapParams.args,
@@ -381,7 +381,7 @@ export class SwapRouterService extends GenericContractService {
     // For native output or when a fee recipient is specified,
     // we need to send to the router first
     if (options.isNativeOut || options.feeRecipient) {
-      return this.contractAddress;
+      return this.address;
     }
 
     // Otherwise we can send directly to the recipient
@@ -428,7 +428,7 @@ export class SwapRouterService extends GenericContractService {
 
     try {
       return await walletClient.writeContract({
-        address: this.contractAddress,
+        address: this.address,
         abi: this.abi,
         functionName: methodName,
         args,
