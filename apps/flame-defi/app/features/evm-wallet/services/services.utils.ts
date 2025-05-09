@@ -3,6 +3,7 @@ import { type Address } from "viem";
 import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
 
 /**
+ * TODO: Refactor.
  * Determines if token addresses need to be reversed based on Uniswap V3 requirement
  * that token0 must have the lower address
  *

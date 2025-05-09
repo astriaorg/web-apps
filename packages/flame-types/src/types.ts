@@ -783,6 +783,8 @@ export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
 /**
  * @deprecated
  * Use `TransactionStatus` instead.
+ *
+ * TODO: Refactor.
  */
 export enum TXN_STATUS {
   IDLE = "idle",
