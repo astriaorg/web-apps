@@ -1,6 +1,5 @@
-import { useConfig } from "config";
 import { useCallback, useEffect, useState } from "react";
-import { type Address, type Hash } from "viem";
+import { type Address, type Hash, maxUint256 } from "viem";
 import { useAccount, useConfig as useWagmiConfig } from "wagmi";
 
 import {
@@ -50,7 +49,6 @@ export const useTokenApproval = ({
   setErrorText,
 }: TokenApprovalProps): TokenApprovalReturn => {
   const { currencies } = chain;
-  const { tokenApprovalAmount } = useConfig();
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
   const wagmiConfig = useWagmiConfig();
@@ -70,14 +68,14 @@ export const useTokenApproval = ({
       const txHash = await erc20Service.approve(
         chain.chainId, // Use wallet's chain ID if available
         addressToApprove,
-        tokenApprovalAmount,
+        maxUint256,
       );
 
       const newTokenAllowances = tokenAllowances.map((data) => {
         if (data.symbol === token.coinDenom) {
           return {
             symbol: token.coinDenom,
-            value: tokenApprovalAmount,
+            value: maxUint256.toString(),
           };
         }
         return data;
@@ -87,13 +85,7 @@ export const useTokenApproval = ({
 
       return txHash;
     },
-    [
-      wagmiConfig,
-      chain.chainId,
-      addressToApprove,
-      tokenApprovalAmount,
-      tokenAllowances,
-    ],
+    [wagmiConfig, chain.chainId, addressToApprove, tokenAllowances],
   );
 
   const getTokenAllowances = useCallback(async () => {
@@ -177,7 +169,7 @@ export const useTokenApproval = ({
       setTxnStatus(TXN_STATUS.PENDING);
       const txHash = await approveToken({
         token: tokenInputToApprove.token,
-        value: tokenApprovalAmount,
+        value: maxUint256.toString(),
       });
       if (txHash) {
         setTxnHash(txHash);

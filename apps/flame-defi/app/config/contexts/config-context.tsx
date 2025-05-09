@@ -5,7 +5,7 @@ import {
   getOptionalEnvVariable,
 } from "config";
 import React, { useMemo } from "react";
-import { type Address, maxUint256 } from "viem";
+import { type Address } from "viem";
 
 import {
   AstriaChains,
@@ -36,8 +36,6 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
-
-  const tokenApprovalAmount = maxUint256.toString();
 
   const defaultSlippageTolerance = 0.1;
 
@@ -115,7 +113,6 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         feeRecipient,
         swapQuoteAPIURL,
         networksList,
-        tokenApprovalAmount,
         defaultSlippageTolerance,
         featureFlags: {
           earnEnabled,

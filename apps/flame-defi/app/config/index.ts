@@ -37,8 +37,6 @@ export interface AppConfig {
   swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
-  // The default approval amount for tokens.
-  tokenApprovalAmount: string;
   // The default slippage tolerance.
   defaultSlippageTolerance: number;
   // The fee recipient address for swaps.

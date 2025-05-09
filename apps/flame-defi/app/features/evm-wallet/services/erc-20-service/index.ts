@@ -38,13 +38,13 @@ export class ERC20Service extends GenericContractService {
    *
    * @param chainId - The chain ID of the EVM chain.
    * @param spender - The address of the contract that is granted approval to be a recipient of transfers from this ERC20.
-   * @param amount - The amount of tokens to approve as a string.
+   * @param amount - The amount of tokens to approve.
    * @returns Object containing transaction hash if successful.
    */
   async approve(
     chainId: number,
     spender: Address,
-    amount: string,
+    amount: bigint,
   ): Promise<Hash> {
     return await this.writeContractMethod(chainId, "approve", [
       spender,
