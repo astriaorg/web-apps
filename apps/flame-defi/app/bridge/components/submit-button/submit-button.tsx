@@ -14,6 +14,7 @@ type SubmitButtonProps = {
   className?: string;
   // used to check if source token needs approval
   sourceConnection: ChainConnection;
+  amountInput?: string;
 };
 
 export const SubmitButton = ({
@@ -24,10 +25,12 @@ export const SubmitButton = ({
   loadingText = "Processing...",
   className = "w-full",
   sourceConnection,
+  amountInput,
 }: SubmitButtonProps) => {
   const { needsApproval, isCheckingApproval, isApproving, approveToken } =
     useBridgeApproval({
       chainConnection: sourceConnection,
+      amountInput,
     });
 
   const buttonTextDerived = useMemo(() => {

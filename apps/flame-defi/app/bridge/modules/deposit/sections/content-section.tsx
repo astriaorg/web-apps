@@ -577,6 +577,7 @@ export const ContentSection = () => {
             }
             buttonText="Deposit"
             sourceConnection={sourceConnection}
+            amountInput={amount}
           />
         </div>
       </div>

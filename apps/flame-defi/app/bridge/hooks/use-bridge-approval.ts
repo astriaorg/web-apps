@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useConfig } from "config";
-import { Address } from "viem";
+import Big from "big.js";
+import { useMemo } from "react";
+import { Address, formatUnits, maxUint256 } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
@@ -9,12 +10,15 @@ import { createErc20Service } from "features/evm-wallet";
 
 type UseApprovalProps = {
   chainConnection: ChainConnection;
+  amountInput?: string;
 };
 
 // NOTE - existing useTokenApproval didn't quite work and didn't have time to refactor and combine atm
-export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
+export const useBridgeApproval = ({
+  chainConnection,
+  amountInput = "0",
+}: UseApprovalProps) => {
   const wagmiConfig = useWagmiConfig();
-  const { tokenApprovalAmount } = useConfig();
 
   const address = chainConnection?.address ?? null;
   const chain = chainConnection?.chain ?? null;
@@ -27,18 +31,19 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
   const erc20Address = isErc20 ? currency.erc20ContractAddress : null;
   const bridgeAddress = isErc20 ? currency.astriaIntentBridgeAddress : null;
 
-  const shouldEnableQuery = !!(
+  const shouldEnableQuery = Boolean(
     address &&
-    chain &&
-    isErc20 &&
-    erc20Address &&
-    bridgeAddress &&
-    (chain.chainType === ChainType.EVM || chain.chainType === ChainType.ASTRIA)
+      chain &&
+      isErc20 &&
+      erc20Address &&
+      bridgeAddress &&
+      (chain.chainType === ChainType.EVM ||
+        chain.chainType === ChainType.ASTRIA),
   );
 
-  const approvalQuery = useQuery({
+  const allowanceQuery = useQuery({
     queryKey: [
-      "tokenApproval",
+      "allowanceQuery",
       address,
       chain?.chainId,
       erc20Address,
@@ -58,13 +63,13 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
           currency.erc20ContractAddress,
         );
 
-        const allowance = await erc20Service.getTokenAllowance(
+        const allowance = await erc20Service.allowance(
           chain.chainId,
           address as Address,
           currency.astriaIntentBridgeAddress,
         );
 
-        return allowance === "0";
+        return formatUnits(allowance, currency.coinDecimals);
       }
 
       return false;
@@ -93,35 +98,39 @@ export const useBridgeApproval = ({ chainConnection }: UseApprovalProps) => {
         currency.erc20ContractAddress,
       );
 
-      return await erc20Service.approveToken(
+      return await erc20Service.approve(
         chain.chainId,
         currency.astriaIntentBridgeAddress,
-        tokenApprovalAmount,
-        // tokenApprovalAmount already has decimals taken into account,
-        //  so pass in 0 here
-        0,
+        maxUint256,
       );
     },
     onSuccess: () => {
       // invalidate the approval query to refresh the approval status
-      void approvalQuery.refetch();
+      void allowanceQuery.refetch();
     },
   });
 
   // function to handle token approval
   const approveToken = async () => {
-    if (approvalQuery.data) {
+    if (allowanceQuery.data) {
       return approvalMutation.mutateAsync();
     }
     return null;
   };
 
+  const needsApproval = useMemo(() => {
+    if (!allowanceQuery.data || !amountInput) {
+      return false;
+    }
+    return new Big(amountInput).gte(allowanceQuery.data);
+  }, [allowanceQuery.data, amountInput]);
+
   return {
     // data from the query
-    needsApproval: approvalQuery.data,
-    isCheckingApproval: approvalQuery.isLoading,
-    isError: approvalQuery.isError,
-    error: approvalQuery.error,
+    needsApproval,
+    isCheckingApproval: allowanceQuery.isLoading,
+    isError: allowanceQuery.isError,
+    error: allowanceQuery.error,
 
     // data from the mutation
     isApproving: approvalMutation.isPending,

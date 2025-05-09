@@ -553,6 +553,7 @@ export const ContentSection = () => {
             isDisabled={isWithdrawDisabled || !sourceConnection.address}
             buttonText="Withdraw"
             sourceConnection={sourceConnection}
+            amountInput={amount}
           />
         </div>
       </div>
