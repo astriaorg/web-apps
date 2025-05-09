@@ -780,6 +780,12 @@ export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
   [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
 };
 
+/**
+ * @deprecated
+ * Use `TransactionStatus` instead.
+ *
+ * TODO: Refactor.
+ */
 export enum TXN_STATUS {
   IDLE = "idle",
   PENDING = "pending",
@@ -795,3 +801,17 @@ export type Balance = {
   value: string;
   symbol: string;
 };
+
+export enum TransactionStatus {
+  IDLE = "Idle",
+  PENDING = "Pending",
+  SUCCESS = "Success",
+  FAILED = "Failed",
+}
+
+export enum ApproveStatus {
+  PENDING = "Pending",
+  REQUIRED = "Required",
+  SUCCESS = "Success",
+  FAILED = "Failed",
+}

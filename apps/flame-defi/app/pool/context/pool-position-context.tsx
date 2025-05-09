@@ -114,7 +114,7 @@ export const PoolPositionContextProvider = ({
           position.fee,
         );
         const poolService = createPoolService(wagmiConfig, poolAddress);
-        const slot0 = await poolService.getSlot0(chain.chainId);
+        const slot0 = await poolService.slot0(chain.chainId);
 
         const { amount0, amount1 } = getTokensLiquidityAmounts(
           position,
@@ -205,7 +205,7 @@ export const PoolPositionContextProvider = ({
         position.fee,
       );
       const poolService = createPoolService(wagmiConfig, poolAddress);
-      const slot0 = await poolService.getSlot0(chain.chainId);
+      const slot0 = await poolService.slot0(chain.chainId);
       const pricePerToken = sqrtPriceX96ToPrice(
         slot0.sqrtPriceX96,
         invertedPrice,

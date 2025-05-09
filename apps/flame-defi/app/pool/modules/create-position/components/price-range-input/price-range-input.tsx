@@ -35,6 +35,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     setMinPrice,
     maxPrice,
     setMaxPrice,
+    isPriceRangeValid,
   } = usePageContext();
   const { formatNumber } = useIntl();
 
@@ -198,13 +199,6 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     return `1 ${token0.coinDenom} = ${formatNumber(Number(rate), { minimumFractionDigits: 4, maximumFractionDigits: 4 })} ${token1.coinDenom}`;
   }, [token0, token1, rate, formatNumber]);
 
-  const isValid = useMemo(() => {
-    const min = Number(minPrice);
-    const max = Number(maxPrice);
-
-    return !!minPrice && !!maxPrice && !isNaN(min) && !isNaN(max) && min < max;
-  }, [minPrice, maxPrice]);
-
   return (
     <Card variant="secondary" className="w-full">
       <CardContent>
@@ -240,7 +234,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
                 setMinPrice(result.minPrice.toString());
               }
             }}
-            aria-invalid={!isValid}
+            aria-invalid={!isPriceRangeValid}
           />
           <MinMaxInput
             label="Max"
@@ -255,7 +249,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
                 setMaxPrice(result.maxPrice.toString());
               }
             }}
-            aria-invalid={!isValid}
+            aria-invalid={!isPriceRangeValid}
           />
         </div>
         {exchangeRate && (

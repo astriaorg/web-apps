@@ -36,6 +36,7 @@ export type FeeTier = (typeof FEE_TIER)[keyof typeof FEE_TIER];
 /**
  * Mapping of fee tiers to their corresponding tick spacing values.
  * Tick spacing determines the interval between initialized ticks.
+ * @deprecated Use `FEE_TIER_TICK_SPACING` instead.
  */
 export const TICK_SPACING_BY_FEE_TIER: Record<FeeTier, number> = {
   [FEE_TIER.LOWEST]: 1,
@@ -43,6 +44,11 @@ export const TICK_SPACING_BY_FEE_TIER: Record<FeeTier, number> = {
   [FEE_TIER.MEDIUM]: 60,
   [FEE_TIER.HIGH]: 200,
 };
+
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
+}
 
 /**
  * Tick boundaries for Uniswap V3.
@@ -53,6 +59,12 @@ export const TICK_BOUNDARIES = {
   MAX: 887272,
   MIN: -887272,
 } as const;
+
+export type PoolWithSlot0 = Slot0 & {
+  address: string;
+  rateToken0ToToken1: string;
+  rateToken1ToToken0: string;
+};
 
 export enum DepositType {
   TOKEN_0_ONLY = "TOKEN_0_ONLY",
@@ -223,10 +235,4 @@ export type TxnLoaderProps = {
 export type TxnSuccessProps = {
   poolTokens: PoolToken[];
   txnHash: Hash;
-};
-
-export type PoolWithSlot0 = Slot0 & {
-  address: string;
-  rateToken0ToToken1: string;
-  rateToken1ToToken0: string;
 };

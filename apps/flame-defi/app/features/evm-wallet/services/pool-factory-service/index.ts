@@ -11,14 +11,8 @@ import {
 import POOL_FACTORY_ABI from "./pool-factory-abi.json";
 
 export class PoolFactoryService extends GenericContractService {
-  /**
-   * Creates a new `PoolFactoryService` instance.
-   *
-   * @param wagmiConfig - The `wagmi` configuration object.
-   * @param contractAddress - The address of the Uniswap V3 factory contract.
-   */
-  constructor(wagmiConfig: Config, contractAddress: Address) {
-    super(wagmiConfig, contractAddress, POOL_FACTORY_ABI as Abi);
+  constructor(config: Config, address: Address) {
+    super(config, address, POOL_FACTORY_ABI as Abi);
   }
 
   /**
@@ -34,7 +28,7 @@ export class PoolFactoryService extends GenericContractService {
       contracts: fees.map((it) => {
         return {
           functionName: "getPool",
-          address: this.contractAddress,
+          address: this.address,
           abi: this.abi,
           args: [token0, token1, it],
         };
@@ -122,16 +116,9 @@ export class PoolFactoryService extends GenericContractService {
   }
 }
 
-/**
- * Factory function to create a new `PoolFactoryService` instance.
- *
- * @param wagmiConfig - The `wagmi` configuration object.
- * @param contractAddress - The address of the Uniswap V3 factory contract.
- * @returns A new `PoolFactoryService` instance.
- */
 export function createPoolFactoryService(
-  wagmiConfig: Config,
-  contractAddress: Address,
+  config: Config,
+  address: Address,
 ): PoolFactoryService {
-  return new PoolFactoryService(wagmiConfig, contractAddress);
+  return new PoolFactoryService(config, address);
 }

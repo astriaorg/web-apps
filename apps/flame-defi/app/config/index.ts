@@ -7,10 +7,18 @@ import type {
   FlameNetwork,
 } from "@repo/flame-types";
 
+export enum Environment {
+  MAIN = "main",
+  STAGING = "staging",
+  DEVELOP = "develop",
+}
+
 /**
  * Represents the configuration object for the application.
  */
 export interface AppConfig {
+  // The environment in which the application is running (e.g., development, production).
+  environment: Environment;
   // The configurations for Cosmos chains.
   cosmosChains: CosmosChains;
   // The configurations for Astria chains.
@@ -37,8 +45,6 @@ export interface AppConfig {
   swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
-  // The default approval amount for tokens.
-  tokenApprovalAmount: string;
   // The default slippage tolerance.
   defaultSlippageTolerance: number;
   // The fee recipient address for swaps.

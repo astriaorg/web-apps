@@ -62,24 +62,24 @@ describe("validate", () => {
     expect(result.decimals).toBe(false);
   });
 
-  it("should return invalid for zero when canBeZero is false", () => {
+  it("should return invalid for zero when nonzero is true", () => {
     const result = validate({
       value: "0",
       token: { symbol: "ETH", decimals: 18 },
-      canBeZero: false,
+      nonzero: true,
     });
     expect(result.isValid).toBe(false);
-    expect(result.zero).toBe(false);
+    expect(result.nonzero).toBe(false);
   });
 
-  it("should validate zero when canBeZero is true", () => {
+  it("should validate zero when nonzero is false", () => {
     const result = validate({
       value: "0",
       token: { symbol: "ETH", decimals: 18 },
-      canBeZero: true,
+      nonzero: false,
     });
     expect(result.isValid).toBe(true);
-    expect(result.zero).toBe(true);
+    expect(result.nonzero).toBe(true);
   });
 
   it("should return invalid for a non-numeric value", () => {
@@ -91,9 +91,9 @@ describe("validate", () => {
     expect(result.number).toBe(false);
   });
 
-  it("should validate zero with no other params", () => {
+  it("should validate with no other params", () => {
     const result = validate({
-      value: "0",
+      value: "1",
       token: { symbol: "ETH", decimals: 18 },
     });
     expect(result.isValid).toBe(true);
@@ -101,6 +101,19 @@ describe("validate", () => {
     expect(result.decimals).toBe(true);
     expect(result.minimum).toBe(true);
     expect(result.maximum).toBe(true);
-    expect(result.zero).toBe(true);
+    expect(result.nonzero).toBe(true);
+  });
+
+  it("should not validate zero with no other params", () => {
+    const result = validate({
+      value: "0",
+      token: { symbol: "ETH", decimals: 18 },
+    });
+    expect(result.isValid).toBe(false);
+    expect(result.number).toBe(true);
+    expect(result.decimals).toBe(true);
+    expect(result.minimum).toBe(true);
+    expect(result.maximum).toBe(true);
+    expect(result.nonzero).toBe(false);
   });
 });
