@@ -69,8 +69,6 @@ export const useBridgeApproval = ({
           currency.astriaIntentBridgeAddress,
         );
 
-        console.log({allowance})
-
         return formatUnits(allowance, currency.coinDecimals);
       }
 
