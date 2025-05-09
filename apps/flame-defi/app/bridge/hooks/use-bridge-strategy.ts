@@ -1,14 +1,13 @@
 "use client";
 
 import { useCallback } from "react";
-import { Address, maxUint256 } from "viem";
+import { Address } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
-import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
+import { ChainType } from "@repo/flame-types";
 import { createBridgeStrategy } from "bridge/strategies";
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet";
-import { createErc20Service } from "features/evm-wallet";
 
 export interface UseBridgeStrategyResult {
   executeStrategy: (params: {
@@ -43,26 +42,6 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
         recipientAddress,
         destinationChainType,
       } = params;
-      const { chain, currency } = sourceConnection;
-
-      // Handle token approval for EVM chains if needed
-      if (
-        (chain?.chainType === ChainType.EVM ||
-          chain?.chainType === ChainType.ASTRIA) &&
-        currency instanceof EvmCurrency &&
-        currency.erc20ContractAddress &&
-        currency.astriaIntentBridgeAddress
-      ) {
-        const erc20Service = createErc20Service(
-          wagmiConfig,
-          currency.erc20ContractAddress,
-        );
-        await erc20Service.approve(
-          (chain as EvmChainInfo).chainId,
-          currency.astriaIntentBridgeAddress,
-          maxUint256,
-        );
-      }
 
       const strategy = createBridgeStrategy(
         {

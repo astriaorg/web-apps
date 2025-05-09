@@ -1,7 +1,7 @@
 // Import necessary Synpress modules
+import { BrowserContext, Page } from "@playwright/test";
 import { defineWalletSetup } from "@synthetixio/synpress";
 import { MetaMask } from "@synthetixio/synpress/playwright";
-import { BrowserContext, Page } from "@playwright/test";
 
 // eslint-disable-next-line turbo/no-undeclared-env-vars
 const SEED_PHRASE = process.env.SEED_PHRASE;

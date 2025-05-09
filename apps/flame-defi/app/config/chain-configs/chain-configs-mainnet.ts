@@ -458,7 +458,7 @@ const BaseChainInfo: EvmChainInfo = {
   blockExplorerUrl: "https://basescan.org/",
   contracts: {},
   currencies: [
-    // NOTE - this is really only here to satisfy the config needed
+    // NOTE - the native currency is really only here to satisfy the config needed
     //  for wagmi and rainbowkit providers. it's not used atm.
     new EvmCurrency({
       chainId: 8453,
