@@ -69,13 +69,15 @@ export const useBridgeApproval = ({
           currency.astriaIntentBridgeAddress,
         );
 
+        console.log({allowance})
+
         return formatUnits(allowance, currency.coinDecimals);
       }
 
       return false;
     },
     enabled: shouldEnableQuery,
-    refetchInterval: 10000, // 10 seconds
+    refetchInterval: false,
     placeholderData: false,
   });
 
@@ -136,7 +138,8 @@ export const useBridgeApproval = ({
     isApproving: approvalMutation.isPending,
     approvalError: approvalMutation.error,
 
-    // the approval function
+    // the approval and refetch function
     approveToken,
+    refetchNeedsApproval: allowanceQuery.refetch,
   };
 };

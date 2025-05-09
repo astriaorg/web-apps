@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { usePublicClient } from "wagmi";
 
 import { Button } from "@repo/ui/components";
 
@@ -27,11 +28,18 @@ export const SubmitButton = ({
   sourceConnection,
   amountInput,
 }: SubmitButtonProps) => {
-  const { needsApproval, isCheckingApproval, isApproving, approveToken } =
-    useBridgeApproval({
-      chainConnection: sourceConnection,
-      amountInput,
-    });
+  const publicClient = usePublicClient();
+
+  const {
+    needsApproval,
+    refetchNeedsApproval,
+    isCheckingApproval,
+    isApproving,
+    approveToken,
+  } = useBridgeApproval({
+    chainConnection: sourceConnection,
+    amountInput,
+  });
 
   const buttonTextDerived = useMemo(() => {
     if (isLoading || isCheckingApproval) {
@@ -56,9 +64,24 @@ export const SubmitButton = ({
   const isProcessing = isLoading || isCheckingApproval || isApproving;
 
   const handleClick = async () => {
-    if (needsApproval) {
+    if (needsApproval && publicClient) {
       try {
-        await approveToken();
+        const hash = await approveToken();
+        if (hash) {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
+            await refetchNeedsApproval();
+
+            return;
+          } else {
+            throw new Error("Transaction failed.");
+          }
+        }
       } catch (error) {
         console.error("Failed to approve token:", error);
       }
