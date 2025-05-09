@@ -1,11 +1,12 @@
 import {
   type AppConfig,
+  type Environment,
   getChainConfigs,
   getEnvVariable,
   getOptionalEnvVariable,
 } from "config";
 import React, { useMemo } from "react";
-import { type Address, maxUint256 } from "viem";
+import { type Address } from "viem";
 
 import {
   AstriaChains,
@@ -30,14 +31,13 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
+  const environment = getEnvVariable("NEXT_PUBLIC_ENV") as Environment;
   const brandURL = getEnvVariable("NEXT_PUBLIC_BRAND_URL");
   const bridgeURL = getEnvVariable("NEXT_PUBLIC_BRIDGE_URL");
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
   const poolURL = getEnvVariable("NEXT_PUBLIC_POOL_URL");
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
-
-  const tokenApprovalAmount = maxUint256.toString();
 
   const defaultSlippageTolerance = 0.1;
 
@@ -101,6 +101,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   return (
     <ConfigContext.Provider
       value={{
+        environment,
         cosmosChains,
         astriaChains,
         coinbaseChains,
@@ -115,7 +116,6 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         feeRecipient,
         swapQuoteAPIURL,
         networksList,
-        tokenApprovalAmount,
         defaultSlippageTolerance,
         featureFlags: {
           earnEnabled,

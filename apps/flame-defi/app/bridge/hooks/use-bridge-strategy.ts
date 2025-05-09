@@ -1,8 +1,7 @@
 "use client";
 
-import { useConfig } from "config";
 import { useCallback } from "react";
-import { Address } from "viem";
+import { Address, maxUint256 } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
 import { ChainType, EvmChainInfo, EvmCurrency } from "@repo/flame-types";
@@ -27,7 +26,6 @@ export interface UseBridgeStrategyResult {
 export function useBridgeStrategy(): UseBridgeStrategyResult {
   const wagmiConfig = useWagmiConfig();
   const cosmosWallet = useCosmosWallet();
-  const { tokenApprovalAmount } = useConfig();
 
   /**
    * Executes a bridge strategy with token approval handling if needed
@@ -59,13 +57,10 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
           wagmiConfig,
           currency.erc20ContractAddress,
         );
-        await erc20Service.approveToken(
+        await erc20Service.approve(
           (chain as EvmChainInfo).chainId,
           currency.astriaIntentBridgeAddress,
-          tokenApprovalAmount,
-          // tokenApprovalAmount already has decimals taken into account,
-          //  so pass in 0 here
-          0,
+          maxUint256,
         );
       }
 
@@ -80,7 +75,7 @@ export function useBridgeStrategy(): UseBridgeStrategyResult {
       );
       await strategy.execute(recipientAddress);
     },
-    [cosmosWallet, tokenApprovalAmount, wagmiConfig],
+    [cosmosWallet, wagmiConfig],
   );
 
   return {

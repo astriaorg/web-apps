@@ -1,6 +1,5 @@
-import { useConfig } from "config";
 import { useCallback, useEffect, useState } from "react";
-import { type Address, type Hash } from "viem";
+import { type Address, type Hash, maxUint256 } from "viem";
 import { useAccount, useConfig as useWagmiConfig } from "wagmi";
 
 import {
@@ -50,7 +49,6 @@ export const useTokenApproval = ({
   setErrorText,
 }: TokenApprovalProps): TokenApprovalReturn => {
   const { currencies } = chain;
-  const { tokenApprovalAmount } = useConfig();
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
   const wagmiConfig = useWagmiConfig();
@@ -67,19 +65,17 @@ export const useTokenApproval = ({
         token.erc20ContractAddress as Address,
       );
 
-      const txHash = await erc20Service.approveToken(
+      const txHash = await erc20Service.approve(
         chain.chainId, // Use wallet's chain ID if available
         addressToApprove,
-        tokenApprovalAmount,
-        // NOTE - tokenApprovalAmount has already taken decimals into account
-        0,
+        maxUint256,
       );
 
       const newTokenAllowances = tokenAllowances.map((data) => {
         if (data.symbol === token.coinDenom) {
           return {
             symbol: token.coinDenom,
-            value: tokenApprovalAmount,
+            value: maxUint256.toString(),
           };
         }
         return data;
@@ -89,13 +85,7 @@ export const useTokenApproval = ({
 
       return txHash;
     },
-    [
-      wagmiConfig,
-      chain.chainId,
-      addressToApprove,
-      tokenApprovalAmount,
-      tokenAllowances,
-    ],
+    [wagmiConfig, chain.chainId, addressToApprove, tokenAllowances],
   );
 
   const getTokenAllowances = useCallback(async () => {
@@ -110,7 +100,7 @@ export const useTokenApproval = ({
           currency.erc20ContractAddress as Address,
         );
         try {
-          const allowance = await erc20Service.getTokenAllowance(
+          const allowance = await erc20Service.allowance(
             chain.chainId, // Use wallet's chain ID if available
             userAccount.address,
             addressToApprove,
@@ -118,7 +108,7 @@ export const useTokenApproval = ({
 
           newTokenAllowances.push({
             symbol: currency.coinDenom,
-            value: allowance ?? "0",
+            value: allowance.toString(),
           });
         } catch (error) {
           console.error("Failed to get token allowance:", error);
@@ -179,7 +169,7 @@ export const useTokenApproval = ({
       setTxnStatus(TXN_STATUS.PENDING);
       const txHash = await approveToken({
         token: tokenInputToApprove.token,
-        value: tokenApprovalAmount,
+        value: maxUint256.toString(),
       });
       if (txHash) {
         setTxnHash(txHash);

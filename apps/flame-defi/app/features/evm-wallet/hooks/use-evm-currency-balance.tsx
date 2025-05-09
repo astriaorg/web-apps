@@ -64,7 +64,7 @@ export const useEvmCurrencyBalance = (
           currency.erc20ContractAddress,
         );
 
-        const balanceRes = await erc20Service.getBalance(
+        const balanceRes = await erc20Service.balanceOf(
           chainId,
           userAddress as string,
         );
