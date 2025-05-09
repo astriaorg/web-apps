@@ -8,6 +8,7 @@ import { useAccount, useConfig } from "wagmi";
 import { type EvmCurrency } from "@repo/flame-types";
 import { createERC20Service } from "features/evm-wallet";
 
+// TODO: Unify token approval hooks.
 export const useApproveToken = () => {
   const queryClient = useQueryClient();
   const config = useConfig();

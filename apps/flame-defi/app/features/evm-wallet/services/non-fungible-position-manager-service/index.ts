@@ -103,6 +103,9 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     super(config, address, NON_FUNGIBLE_POSITION_MANAGER_ABI as Abi);
   }
 
+  /**
+   * Get position information for a given position NFT ID.
+   */
   async positions(
     chainId: number,
     tokenId: string,
@@ -284,16 +287,6 @@ export class NonfungiblePositionManagerService extends GenericContractService {
 
   /**
    * Increases liquidity for an existing position.
-   *
-   * @param tokenId - The ID of the NFT position to increase liquidity in
-   * @param chainId - The chain ID of the EVM chain
-   * @param amount0Desired - The desired amount of token0 to add
-   * @param amount1Desired - The desired amount of token1 to add
-   * @param amount0Min - The minimum amount of token0 to add (slippage protection)
-   * @param amount1Min - The minimum amount of token1 to add (slippage protection)
-   * @param deadline - The timestamp by which the transaction must be executed
-   * @param value - Optional value to send with the transaction (needed for native token operations)
-   * @returns Object containing transaction hash if successful, and the additional liquidity amount
    */
   async increaseLiquidity(
     tokenId: string,

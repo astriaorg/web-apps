@@ -9,6 +9,7 @@ import { createERC20Service } from "features/evm-wallet";
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
 const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
 
+// TODO: Unify token approval hooks.
 export const useTokenAllowance = ({
   token,
   spender,
