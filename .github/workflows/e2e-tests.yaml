@@ -102,7 +102,7 @@ jobs:
         run: |
           cd apps/flame-defi
           # path is relative to playwright.config.ts
-          DEBUG=pw:api xvfb-run npx playwright test e2e-tests --debug
+          DEBUG=pw:api xvfb-run npx playwright test e2e-tests
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
