@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Big from "big.js";
+import { Environment, useConfig } from "config";
 import { useMemo } from "react";
-import { Address, formatUnits, maxUint256 } from "viem";
+import { Address, formatUnits, maxUint256, parseUnits } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
@@ -19,6 +20,7 @@ export const useBridgeApproval = ({
   amountInput = "0",
 }: UseApprovalProps) => {
   const wagmiConfig = useWagmiConfig();
+  const { environment } = useConfig();
 
   const address = chainConnection?.address ?? null;
   const chain = chainConnection?.chain ?? null;
@@ -98,10 +100,14 @@ export const useBridgeApproval = ({
         currency.erc20ContractAddress,
       );
 
+      const approvalAmount =
+        environment === Environment.DEVELOP
+          ? parseUnits(amountInput, currency.coinDecimals)
+          : maxUint256;
       return await erc20Service.approve(
         chain.chainId,
         currency.astriaIntentBridgeAddress,
-        maxUint256,
+        approvalAmount,
       );
     },
     onSuccess: () => {
@@ -122,7 +128,7 @@ export const useBridgeApproval = ({
     if (!allowanceQuery.data || !amountInput) {
       return false;
     }
-    return new Big(amountInput).gte(allowanceQuery.data);
+    return new Big(amountInput).gt(allowanceQuery.data);
   }, [allowanceQuery.data, amountInput]);
 
   return {
