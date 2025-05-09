@@ -23,7 +23,7 @@ export const useApproveToken = () => {
     }: {
       token: EvmCurrency;
       spender: Address;
-      amount: string;
+      amount: bigint;
     }) => {
       if (!address || !chainId) {
         throw new Error("Wallet is not connected.");
@@ -66,7 +66,7 @@ export const useApproveToken = () => {
     }: {
       token: EvmCurrency;
       spender: Address;
-      amount: string;
+      amount: bigint;
     }) => {
       try {
         const result = await mutation.mutateAsync({

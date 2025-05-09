@@ -1,5 +1,6 @@
 import {
   type AppConfig,
+  type Environment,
   getChainConfigs,
   getEnvVariable,
   getOptionalEnvVariable,
@@ -30,6 +31,7 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
+  const environment = getEnvVariable("NEXT_PUBLIC_ENV") as Environment;
   const brandURL = getEnvVariable("NEXT_PUBLIC_BRAND_URL");
   const bridgeURL = getEnvVariable("NEXT_PUBLIC_BRIDGE_URL");
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
@@ -99,6 +101,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   return (
     <ConfigContext.Provider
       value={{
+        environment,
         cosmosChains,
         astriaChains,
         coinbaseChains,

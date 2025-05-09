@@ -7,10 +7,17 @@ import type {
   FlameNetwork,
 } from "@repo/flame-types";
 
+export enum Environment {
+  DEVELOPMENT = "development",
+  PRODUCTION = "production",
+}
+
 /**
  * Represents the configuration object for the application.
  */
 export interface AppConfig {
+  // The environment in which the application is running (e.g., development, production).
+  environment: Environment;
   // The configurations for Cosmos chains.
   cosmosChains: CosmosChains;
   // The configurations for Astria chains.

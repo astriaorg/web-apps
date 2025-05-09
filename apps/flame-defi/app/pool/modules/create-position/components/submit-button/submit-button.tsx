@@ -1,7 +1,7 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAstriaChainData, useConfig } from "config";
+import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
-import { type Hash, parseUnits } from "viem";
+import { type Hash, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
@@ -61,7 +61,7 @@ export const SubmitButton = ({
     feeTier,
   } = usePageContext();
 
-  const { defaultSlippageTolerance } = useConfig();
+  const { defaultSlippageTolerance, environment } = useConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
   const { mint } = useCreateAndInitializePoolIfNecessaryAndMint();
@@ -155,7 +155,10 @@ export const SubmitButton = ({
         const hash = await approve({
           token,
           spender: chain.contracts.nonfungiblePositionManager.address,
-          amount: parseUnits(amount.value, token.coinDecimals).toString(),
+          amount:
+            environment === Environment.DEVELOPMENT
+              ? parseUnits(amount.value, token.coinDecimals)
+              : maxUint256,
         });
 
         if (hash) {

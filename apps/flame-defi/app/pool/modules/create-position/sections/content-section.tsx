@@ -94,7 +94,7 @@ export const ContentSection = () => {
       amount: string,
       token: EvmCurrency,
       balance?: string,
-    ) => {
+    ): Amount => {
       return {
         value: amount,
         validation: validate({
