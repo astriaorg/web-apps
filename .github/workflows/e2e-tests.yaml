@@ -69,11 +69,14 @@ jobs:
 
       - name: Run E2E Tests
         env:
+          # e2e testing envars
           SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
           PASSWORD: ${{ secrets.E2E_PASSWORD }}
           PRIVATE_KEY: ${{ secrets.E2E_PRIVATE_KEY }}
           CI: true
-          # app envars
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          # flame-defi app envars
           NEXT_PUBLIC_ENV: "develop"
           NEXT_PUBLIC_VERSION: "0.1.0"
           NEXT_PUBLIC_NETWORK_LIST_OPTIONS: "dawn,mainnet"
@@ -98,7 +101,6 @@ jobs:
           GRAFANA_SOURCE_MAP_UPLOADER_STACK_ID: ""
           GRAFANA_SOURCE_MAP_UPLOADER_ENDPOINT: ""
           GRAFANA_SOURCE_MAP_UPLOADER_API_KEY: ""
-          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
         run: |
           cd apps/flame-defi
           # path is relative to playwright.config.ts

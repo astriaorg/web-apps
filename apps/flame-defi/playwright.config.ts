@@ -41,6 +41,7 @@ export default defineConfig({
       if (secret) {
         return { "x-vercel-protection-bypass": secret };
       }
+      // NOTE - must type empty return to avoid lint error
       return {} as Record<string, string>;
     })(),
   },
