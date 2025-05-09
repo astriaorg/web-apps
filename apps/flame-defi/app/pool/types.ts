@@ -45,6 +45,11 @@ export const TICK_SPACING_BY_FEE_TIER: Record<FeeTier, number> = {
   [FEE_TIER.HIGH]: 200,
 };
 
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
+}
+
 /**
  * Tick boundaries for Uniswap V3.
  *

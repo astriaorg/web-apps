@@ -20,7 +20,12 @@ type Params = {
   decimals?: number;
   minimum?: string;
   maximum?: string;
-  canBeZero?: boolean;
+  /**
+   * Whether the amount can be zero.
+   *
+   * @default true
+   */
+  nonzero?: boolean;
 };
 
 type ValidateState = Pick<
@@ -31,7 +36,7 @@ type ValidateState = Pick<
   decimals: boolean;
   minimum: boolean;
   maximum: boolean;
-  zero: boolean;
+  nonzero: boolean;
 };
 
 export const validate = ({
@@ -39,14 +44,14 @@ export const validate = ({
   decimals,
   minimum,
   maximum,
-  canBeZero = true,
+  nonzero = true,
 }: Params): ValidateState => {
   const res = {
     number: false,
     decimals: false,
     minimum: false,
     maximum: false,
-    zero: false,
+    nonzero: false,
   };
 
   if (!value) {
@@ -59,12 +64,12 @@ export const validate = ({
     res.number = true;
     res.minimum = minimum !== undefined ? amount.gte(minimum) : true;
     res.maximum = maximum !== undefined ? amount.lte(maximum) : true;
-    res.zero = canBeZero || amount.gt(0);
+    res.nonzero = nonzero ? amount.gt(0) : true;
 
     res.decimals = (() => {
       const decimalIndex = value.indexOf(".");
       if (decimalIndex === -1) {
-        return decimals === undefined;
+        return true;
       }
       const decimal = value.substring(decimalIndex + 1);
       return decimals === undefined || decimal.length <= decimals;
@@ -96,7 +101,7 @@ export const useValidateTokenAmount = () => {
         message: `Invalid amount. Maximum ${params.decimals} decimals.`,
       });
     }
-    if (!state.zero) {
+    if (!state.nonzero) {
       errors.push({
         type: ValidateTokenAmountErrorType.ZERO_AMOUNT,
         message: `Amount cannot be 0.`,

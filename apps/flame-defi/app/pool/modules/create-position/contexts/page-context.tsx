@@ -10,7 +10,7 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { FEE_TIER, type FeeTier } from "pool/types";
+import { FEE_TIER, type FeeTier, InputId } from "pool/types";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
@@ -25,6 +25,8 @@ export interface PageContextProps extends PropsWithChildren {
   setToken1: (value?: EvmCurrency) => void;
   isLoadingToken0Balance: boolean;
   isLoadingToken1Balance: boolean;
+  currentInput: InputId;
+  setCurrentInput: (value: InputId) => void;
   feeTier: FeeTier;
   setFeeTier: (value: FeeTier) => void;
   minPrice: string;
@@ -42,6 +44,9 @@ export const PageContext = createContext<PageContextProps | undefined>(
 
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const { chain } = useAstriaChainData();
+
+  // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
+  const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
 
   const [feeTier, setFeeTier] = useState<FeeTier>(FEE_TIER.MEDIUM);
 
@@ -93,12 +98,16 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
 
   const { amount: amountInitialPrice, onInput: setAmountInitialPrice } =
     useTokenAmountInput({
-      token: token0
-        ? {
-            symbol: token0?.coinDenom,
-            decimals: token0?.coinDecimals,
-          }
-        : undefined,
+      minimum: "0",
+      token: (() => {
+        const token = currentInput === InputId.INPUT_0 ? token0 : token1;
+        return token
+          ? {
+              symbol: token.coinDenom,
+              decimals: token.coinDecimals,
+            }
+          : undefined;
+      })(),
     });
 
   return (
@@ -116,6 +125,8 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
         token1Balance,
         isLoadingToken0Balance,
         isLoadingToken1Balance,
+        currentInput,
+        setCurrentInput,
         feeTier,
         setFeeTier,
         minPrice,

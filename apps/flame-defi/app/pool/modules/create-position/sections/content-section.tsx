@@ -18,17 +18,12 @@ import { SubmitButton } from "pool/modules/create-position/components/submit-but
 import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType } from "pool/types";
+import { DepositType, InputId } from "pool/types";
 import {
   calculateDepositType,
   getAmount0ForLiquidity,
   getAmount1ForLiquidity,
 } from "pool/utils";
-
-enum InputId {
-  INPUT_0 = "INPUT_0",
-  INPUT_1 = "INPUT_1",
-}
 
 const TRANSITION: Transition = {
   duration: 0.1,
@@ -53,6 +48,8 @@ export const ContentSection = () => {
     token1Balance,
     isLoadingToken0Balance,
     isLoadingToken1Balance,
+    currentInput,
+    setCurrentInput,
     feeTier,
     setFeeTier,
     minPrice,
@@ -61,8 +58,6 @@ export const ContentSection = () => {
     amountInitialPrice,
   } = usePageContext();
 
-  // Store the last edited input to identify which input holds the user’s value and which to display the derived value.
-  const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   const [isInverted, setIsInverted] = useState(false);
 
   const [depositType, setDepositType] = useState(DepositType.BOTH);

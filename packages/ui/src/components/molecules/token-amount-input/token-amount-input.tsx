@@ -11,9 +11,15 @@ type Params = {
   token?: ValidationToken;
   minimum?: string;
   balance?: string;
+  nonzero?: boolean;
 };
 
-export const useTokenAmountInput = ({ balance, minimum, token }: Params) => {
+export const useTokenAmountInput = ({
+  balance,
+  minimum,
+  token,
+  nonzero,
+}: Params) => {
   const validate = useValidateTokenAmount();
 
   const [amount, setAmount] = useState<Amount>({
@@ -44,10 +50,11 @@ export const useTokenAmountInput = ({ balance, minimum, token }: Params) => {
           decimals: token.decimals,
           minimum,
           maximum: balance,
+          nonzero,
         }),
       });
     },
-    [token, balance, minimum, setAmount, validate],
+    [token, balance, minimum, nonzero, setAmount, validate],
   );
 
   const onReset = useCallback(() => {
