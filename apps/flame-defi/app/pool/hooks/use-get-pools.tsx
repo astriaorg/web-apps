@@ -46,13 +46,16 @@ export const useGetPools = ({
         : (token1.erc20ContractAddress as Address);
 
       const pools = await poolFactoryService.getPools(
-        token0Address,
-        token1Address,
-        FEE_TIERS,
+        FEE_TIERS.map((it) => ({
+          token0: token0Address,
+          token1: token1Address,
+          fee: it,
+        })),
       );
 
       const validPools = pools.filter((it) => !isZeroAddress(it));
-      const slot0Results = await poolFactoryService.getPoolsSlot0(validPools);
+      const slot0Results =
+        await poolFactoryService.getSlot0ForPools(validPools);
 
       const result = {} as GetPoolsResult;
 

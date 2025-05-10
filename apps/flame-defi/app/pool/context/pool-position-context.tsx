@@ -18,7 +18,7 @@ import {
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
-import { PoolPositionResponse, PoolToken } from "pool/types";
+import { PoolToken, Position } from "pool/types";
 import { PoolPositionContextProps } from "pool/types";
 
 import {
@@ -52,9 +52,7 @@ export const PoolPositionContextProvider = ({
   const [isReversedPoolTokens, setIsReversedPoolTokens] =
     useState<boolean>(false);
   const [poolTokens, setPoolTokens] = useState<PoolToken[] | []>([]);
-  const [poolPosition, setPoolPosition] = useState<PoolPositionResponse | null>(
-    null,
-  );
+  const [poolPosition, setPoolPosition] = useState<Position | null>(null);
   const [feeTier, setFeeTier] = useState<string>("");
   const [rawFeeTier, setRawFeeTier] = useState<number>(0);
   const [isPositionClosed, setIsPositionClosed] = useState<boolean>(false);
@@ -86,12 +84,12 @@ export const PoolPositionContextProvider = ({
 
       const token0 = getTokenDataFromCurrencies(
         currencies,
-        position.tokenAddress0,
+        position.token0,
         chain.contracts.wrappedNativeToken.address,
       );
       const token1 = getTokenDataFromCurrencies(
         currencies,
-        position.tokenAddress1,
+        position.token1,
         chain.contracts.wrappedNativeToken.address,
       );
 
@@ -109,8 +107,8 @@ export const PoolPositionContextProvider = ({
         );
         const poolAddress = await factoryService.getPool(
           chain.chainId,
-          position.tokenAddress0,
-          position.tokenAddress1,
+          position.token0,
+          position.token1,
           position.fee,
         );
         const poolService = createPoolService(wagmiConfig, poolAddress);
@@ -188,20 +186,20 @@ export const PoolPositionContextProvider = ({
 
       const token0 = getTokenDataFromCurrencies(
         currencies,
-        position.tokenAddress0,
+        position.token0,
         chain.contracts.wrappedNativeToken.address,
       );
 
       const token1 = getTokenDataFromCurrencies(
         currencies,
-        position.tokenAddress1,
+        position.token1,
         chain.contracts.wrappedNativeToken.address,
       );
 
       const poolAddress = await factoryService.getPool(
         chain.chainId,
-        position.tokenAddress0,
-        position.tokenAddress1,
+        position.token0,
+        position.token1,
         position.fee,
       );
       const poolService = createPoolService(wagmiConfig, poolAddress);

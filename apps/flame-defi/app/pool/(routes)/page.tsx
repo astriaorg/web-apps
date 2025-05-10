@@ -1,7 +1,5 @@
-"use client";
-
-import { Pool } from "../modules";
+import { Page as PositionListPage } from "pool/modules/position-list";
 
 export default function Page() {
-  return <Pool />;
+  return <PositionListPage />;
 }
