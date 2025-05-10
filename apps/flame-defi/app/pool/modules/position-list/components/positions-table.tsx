@@ -68,7 +68,9 @@ export const PositionsTable = () => {
           <TableRow
             key={row.id}
             className="group cursor-pointer"
-            onClick={() => router.push(`${ROUTES.POOL}${row.original.tokenId}`)}
+            onClick={() =>
+              router.push(`${ROUTES.POSITION_LIST}/${row.original.tokenId}`)
+            }
           >
             {row.getVisibleCells().map((cell) => (
               <TableCell
