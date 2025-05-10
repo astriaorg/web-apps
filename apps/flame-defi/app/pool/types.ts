@@ -88,6 +88,9 @@ export interface Position {
 }
 
 export interface PositionWithKey extends Position {
+  /**
+   * The position's key is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
+   */
   key: string;
 }
 

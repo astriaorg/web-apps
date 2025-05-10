@@ -614,9 +614,9 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     const positions: PositionWithKey[] = [];
 
     for (let i = 0; i < Number(nftCount); i++) {
-      const tokenId = await this.tokenOfOwnerByIndex(chainId, owner, i);
-      const position = await this.positions(chainId, tokenId.toString());
-      positions.push({ ...position, key: tokenId.toString() });
+      const key = await this.tokenOfOwnerByIndex(chainId, owner, i);
+      const position = await this.positions(chainId, key.toString());
+      positions.push({ ...position, key: key.toString() });
     }
 
     return positions;
