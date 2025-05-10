@@ -13,6 +13,7 @@ import {
   Badge,
   Card,
   MultiTokenIcon,
+  Skeleton,
   Table as BaseTable,
   TableBody,
   TableCell,
@@ -28,6 +29,8 @@ import {
   useGetPositions,
 } from "pool/hooks/use-get-positions";
 import { usePageContext } from "pool/modules/position-list/hooks/use-page-context";
+
+import { getPlaceholderData } from "./position-list-table.utils";
 
 export const PositionListTable = () => {
   const router = useRouter();
@@ -84,6 +87,10 @@ export const PositionListTable = () => {
   }, [columnHelper, formatNumber]);
 
   const filteredData: GetPositionsResult[] = useMemo(() => {
+    if (isPending) {
+      return getPlaceholderData(3);
+    }
+
     if (!data) {
       return [];
     }
@@ -93,7 +100,7 @@ export const PositionListTable = () => {
     }
 
     return data.filter((position) => position.position.liquidity !== 0n);
-  }, [data, isClosedPositionsShown]);
+  }, [data, isPending, isClosedPositionsShown]);
 
   const table = useReactTable<GetPositionsResult>({
     columns,
@@ -145,7 +152,9 @@ export const PositionListTable = () => {
                   key={cell.id}
                   data-column-id={`th-${cell.column.id}`}
                 >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  <Skeleton isLoading={isPending}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Skeleton>
                 </TableCell>
               ))}
             </TableRow>

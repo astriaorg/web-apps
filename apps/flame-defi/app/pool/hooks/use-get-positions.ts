@@ -58,6 +58,7 @@ export const useGetPositions = (): UseQueryResult<
           chain.contracts.poolFactory.address,
         );
 
+        // TODO: Use multicall.
         const address = await poolFactoryService.getPool(
           chain.chainId,
           position.token0,
