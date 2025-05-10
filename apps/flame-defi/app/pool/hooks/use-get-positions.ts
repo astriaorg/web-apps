@@ -76,8 +76,6 @@ export const useGetPositions = (): UseQueryResult<
 
       const result = await Promise.all(promises);
 
-      console.log("Result", result);
-
       return result;
     },
   });
