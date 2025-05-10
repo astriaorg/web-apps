@@ -23,18 +23,14 @@ export enum TokenSymbol {
   STRIDE = "stride",
 }
 
-type IconComponentProps = {
-  size?: number;
-  className?: string;
-};
-
-type TokenIconMap = {
+const TOKEN_SYMBOL_TO_ICON_MAP: {
   [key in TokenSymbol]: {
-    Icon: ComponentType<IconComponentProps>;
+    Icon: ComponentType<{
+      size?: number;
+      className?: string;
+    }>;
   };
-};
-
-const tokenIcons: TokenIconMap = {
+} = {
   [TokenSymbol.TIA]: {
     Icon: CelestiaIcon,
   },
@@ -67,34 +63,34 @@ export const TokenIcon = ({
   size?: number;
   className?: string;
 }) => {
-  const normalizedSymbol = symbol.toLowerCase();
+  const normalizedSymbol = symbol.toLowerCase() as TokenSymbol;
   const FallbackIcon = DotIcon;
 
-  // Check if the symbol exists in our map
-  const isKnownToken = Object.values(TokenSymbol).includes(
-    normalizedSymbol as TokenSymbol,
-  );
+  // Check if the symbol exists in our map.
+  const isKnownToken = Object.values(TokenSymbol).includes(normalizedSymbol);
 
   const IconComponent = isKnownToken
-    ? tokenIcons[normalizedSymbol as TokenSymbol].Icon
+    ? TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol].Icon
     : FallbackIcon;
 
   return <IconComponent size={size} className={className} />;
 };
 
+const MULTI_TOKEN_ICON_SHIFT = 6;
+
 export const MultiTokenIcon = ({
   symbols,
   size = DEFAULT_ICON_SIZE,
-  shift = 8,
 }: {
   symbols: string[];
   size?: number;
-  shift?: number;
 }) => {
   return (
     <div
       className="flex items-center h-full"
-      style={{ marginRight: `${-shift * (symbols.length - 1)}px` }}
+      style={{
+        marginRight: `${-MULTI_TOKEN_ICON_SHIFT * (symbols.length - 1)}px`,
+      }}
     >
       {symbols.map((symbol, index) => (
         <div
@@ -103,7 +99,7 @@ export const MultiTokenIcon = ({
           style={{
             height: size,
             width: size,
-            right: `${shift * index}px`,
+            right: `${MULTI_TOKEN_ICON_SHIFT * index}px`,
             zIndex: symbols.length,
           }}
         >

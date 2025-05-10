@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Button, Switch } from "@repo/ui/components";
@@ -12,6 +13,8 @@ export const HeaderSection = () => {
   const router = useRouter();
   const { isConnected } = useAccount();
 
+  const [showClosedPositions, setShowClosedPositions] = useState(false);
+
   return (
     <Header>
       <div className="flex items-center justify-between w-full">
@@ -22,7 +25,12 @@ export const HeaderSection = () => {
               <span className="text-sm text-typography-secondary font-medium">
                 Show Closed Positions
               </span>
-              <Switch />
+              <Switch
+                checked={showClosedPositions}
+                onCheckedChange={() =>
+                  setShowClosedPositions((value) => !value)
+                }
+              />
             </div>
             <Button onClick={() => router.push(ROUTES.CREATE_POSITION)}>
               <PlusIcon />

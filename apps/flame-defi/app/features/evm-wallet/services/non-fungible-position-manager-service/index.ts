@@ -7,7 +7,7 @@ import {
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
-import { GetAllPoolPositionsResponse, PoolPositionResponse } from "pool/types";
+import { Position, PositionWithKey } from "pool/types";
 
 import { GenericContractService } from "../generic-contract-service";
 import {
@@ -106,16 +106,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   /**
    * Get position information for a given position NFT ID.
    */
-  async positions(
-    chainId: number,
-    tokenId: string,
-  ): Promise<PoolPositionResponse> {
+  async positions(chainId: number, tokenId: string): Promise<Position> {
     const response = await this.readContractMethod<
       [
         bigint, // nonce
         string, // operator
-        Address, // tokenAddress0
-        Address, // tokenAddress1
+        Address, // token0
+        Address, // token1
         bigint, // fee
         bigint, // tickLower
         bigint, // tickUpper
@@ -127,11 +124,11 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       ]
     >(chainId, "positions", [tokenId]);
 
-    const position: PoolPositionResponse = {
+    const position: Position = {
       nonce: response[0],
       operator: response[1],
-      tokenAddress0: response[2],
-      tokenAddress1: response[3],
+      token0: response[2],
+      token1: response[3],
       fee: Number(response[4]),
       tickLower: Number(response[5]),
       tickUpper: Number(response[6]),
@@ -475,7 +472,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       // Sweeps non-native tokens to the recipient
       if (!isToken0Native) {
         const sweepToken0Call = this.encodeSweepToken(
-          position.tokenAddress0,
+          position.token0,
           0n,
           recipient,
         );
@@ -485,7 +482,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       // Sweeps non-native tokens to the recipient
       if (!isToken1Native) {
         const sweepToken1Call = this.encodeSweepToken(
-          position.tokenAddress1,
+          position.token1,
           0n,
           recipient,
         );
@@ -583,12 +580,12 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Get the token ID at a given index of the owner's token list
+   * Get the token ID at a given index of the owner's token list.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param owner - The address of the NFT owner
-   * @param index - The index in the owner's token list
-   * @returns The token ID at the specified index
+   * @param chainId - The chain ID of the EVM chain.
+   * @param owner - The address of the NFT owner.
+   * @param index - The index in the owner's token list.
+   * @returns The token ID at the specified index.
    */
   async tokenOfOwnerByIndex(
     chainId: number,
@@ -603,23 +600,23 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }
 
   /**
-   * Get all NFT positions owned by an address
+   * Get all NFT positions owned by an address.
    *
-   * @param chainId - The chain ID of the EVM chain
-   * @param owner - The address to get positions for
-   * @returns An array of position data for all NFTs owned by the address
+   * @param chainId - The chain ID of the EVM chain.
+   * @param owner - The address to get positions for.
+   * @returns An array of position data for all NFTs owned by the address.
    */
-  async getAllPositions(
+  async getPositions(
     chainId: number,
     owner: Address,
-  ): Promise<GetAllPoolPositionsResponse[]> {
+  ): Promise<PositionWithKey[]> {
     const nftCount = await this.balanceOf(chainId, owner);
-    const positions: GetAllPoolPositionsResponse[] = [];
+    const positions: PositionWithKey[] = [];
 
     for (let i = 0; i < Number(nftCount); i++) {
       const tokenId = await this.tokenOfOwnerByIndex(chainId, owner, i);
       const position = await this.positions(chainId, tokenId.toString());
-      positions.push({ ...position, tokenId: tokenId.toString() });
+      positions.push({ ...position, key: tokenId.toString() });
     }
 
     return positions;

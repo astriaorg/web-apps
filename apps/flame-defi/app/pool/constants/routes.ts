@@ -1,4 +1,5 @@
 export const ROUTES = {
+  BASE: "/pool",
   POSITION_LIST: "/pool",
   // NEW_POSITION: "/pool/new-position",
   CREATE_POSITION: "/pool/create",

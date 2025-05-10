@@ -241,7 +241,7 @@ export const ContentSection = () => {
   }, [amountInitialPrice, minPrice, maxPrice, isPriceRangeValid, pool]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6">
       {!isPending && !pool && <InitialPriceInput />}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -329,6 +329,6 @@ export const ContentSection = () => {
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 };
