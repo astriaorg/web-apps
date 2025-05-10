@@ -10,7 +10,7 @@ import type { Amount } from "@repo/ui/components";
 import { useValidateTokenAmount } from "@repo/ui/hooks";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
 import { filterPoolTokens } from "pool/components/token-select";
-import { useGetPools } from "pool/hooks/use-get-pools";
+import { useFetchPools } from "pool/hooks/use-fetch-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
 import { PriceRangeInput } from "pool/modules/create-position/components/price-range-input";
@@ -62,7 +62,7 @@ export const ContentSection = () => {
 
   const [depositType, setDepositType] = useState(DepositType.BOTH);
 
-  const { data: pools, isPending } = useGetPools({
+  const { data: pools, isPending } = useFetchPools({
     token0,
     token1,
   });
