@@ -9,24 +9,24 @@ import { createPoolFactoryService } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier, type PoolWithSlot0 } from "pool/types";
 import { calculatePoolExchangeRate } from "pool/utils";
 
-type FetchPoolsResult = {
+type GetPoolsResult = {
   [key in FeeTier]: PoolWithSlot0 | null;
 };
 
-export const useFetchPools = ({
+export const useGetPools = ({
   token0,
   token1,
 }: {
   token0?: EvmCurrency;
   token1?: EvmCurrency;
-}): UseQueryResult<FetchPoolsResult | null> => {
+}): UseQueryResult<GetPoolsResult | null> => {
   const config = useConfig();
   const { chain } = useAstriaChainData();
 
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!token0 && !!token1,
-    queryKey: ["useFetchPools", token0, token1, chain],
+    queryKey: ["useGetPools", token0, token1, chain],
     queryFn: async () => {
       if (!token0 || !token1) {
         return null;
@@ -54,7 +54,7 @@ export const useFetchPools = ({
       const validPools = pools.filter((it) => !isZeroAddress(it));
       const slot0Results = await poolFactoryService.getPoolsSlot0(validPools);
 
-      const result = {} as FetchPoolsResult;
+      const result = {} as GetPoolsResult;
 
       for (let i = 0; i < FEE_TIERS.length; i++) {
         const feeTier = FEE_TIERS[i] as FeeTier;
