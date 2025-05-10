@@ -9,13 +9,16 @@ export const getPlaceholderData = (length: number): GetPositionsResult[] =>
         position: {
           liquidity: 0n,
         } as PositionWithKey,
-        token0: {
-          coinDenom: `Token${index}`,
-        } as EvmCurrency,
-        token1: {
-          coinDenom: `Token${index + 1}`,
-        } as EvmCurrency,
-        address: `0x${index}`,
-        feeTier: FEE_TIER.LOWEST,
+        pool: {
+          token0: {
+            coinDenom: `Token${index}`,
+          } as EvmCurrency,
+          token1: {
+            coinDenom: `Token${index + 1}`,
+          } as EvmCurrency,
+          address: `0x${index}`,
+          liquidity: 0n,
+          feeTier: FEE_TIER.LOWEST,
+        },
       }) as GetPositionsResult,
   );

@@ -42,24 +42,25 @@ export const PositionListTable = () => {
 
   const columns = useMemo(() => {
     return [
-      columnHelper.accessor("token0", {
-        id: "token0",
+      columnHelper.accessor("pool.token0", {
+        id: "pool.token0",
         header: "Your Positions",
         cell: ({ row }) => {
           return (
             <div className="flex items-center gap-2">
               <MultiTokenIcon
                 symbols={[
-                  row.original.token0.coinDenom,
-                  row.original.token1.coinDenom,
+                  row.original.pool.token0.coinDenom,
+                  row.original.pool.token1.coinDenom,
                 ]}
                 size={24}
               />
               <span className="text-lg font-medium">
-                {row.original.token0.coinDenom}/{row.original.token1.coinDenom}
+                {row.original.pool.token0.coinDenom}/
+                {row.original.pool.token1.coinDenom}
               </span>
               <Badge>
-                {formatNumber(row.original.feeTier, {
+                {formatNumber(row.original.pool.feeTier / 1000000, {
                   style: "percent",
                   maximumFractionDigits: 2,
                 })}
@@ -73,6 +74,7 @@ export const PositionListTable = () => {
         header: "Status",
         cell: ({ row }) => {
           const isPositionInRange = row.original.position.liquidity !== 0n;
+
           return (
             <Badge className="gap-1">
               {isPositionInRange && (
@@ -99,7 +101,7 @@ export const PositionListTable = () => {
       return data;
     }
 
-    return data.filter((position) => position.position.liquidity !== 0n);
+    return data.filter((it) => it.position.liquidity !== 0n);
   }, [data, isPending, isClosedPositionsShown]);
 
   const table = useReactTable<GetPositionsResult>({

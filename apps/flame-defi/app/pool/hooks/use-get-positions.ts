@@ -11,11 +11,14 @@ import { type FeeTier, type PositionWithKey } from "pool/types";
 import { getTokenFromAddress } from "pool/utils";
 
 export type GetPositionsResult = {
+  pool: {
+    address: string;
+    token0: EvmCurrency;
+    token1: EvmCurrency;
+    liquidity: bigint;
+    feeTier: FeeTier;
+  };
   position: PositionWithKey;
-  token0: EvmCurrency;
-  token1: EvmCurrency;
-  address: string;
-  feeTier: FeeTier;
 };
 
 export const useGetPositions = (): UseQueryResult<
@@ -43,9 +46,23 @@ export const useGetPositions = (): UseQueryResult<
         address,
       );
 
-      const promises = positions.map(async (position) => {
-        const feeTier = (position.fee / 1000000) as FeeTier;
+      const poolFactoryService = createPoolFactoryService(
+        config,
+        chain.contracts.poolFactory.address,
+      );
 
+      const pools = await poolFactoryService.getPools(
+        positions.map((position) => ({
+          token0: position.token0,
+          token1: position.token1,
+          fee: position.fee,
+        })),
+      );
+
+      const liquidityResults =
+        await poolFactoryService.getLiquidityForPools(pools);
+
+      return positions.map((position, index) => {
         const token0 = getTokenFromAddress(position.token0, chain);
         const token1 = getTokenFromAddress(position.token1, chain);
 
@@ -53,31 +70,18 @@ export const useGetPositions = (): UseQueryResult<
           throw new Error("Tokens in position not found.");
         }
 
-        const poolFactoryService = createPoolFactoryService(
-          config,
-          chain.contracts.poolFactory.address,
-        );
-
-        // TODO: Use multicall.
-        const address = await poolFactoryService.getPool(
-          chain.chainId,
-          position.token0,
-          position.token1,
-          position.fee,
-        );
-
         return {
-          token0,
-          token1,
-          feeTier,
-          address,
           position,
+          pool: {
+            address: pools[index],
+            token0,
+            token1,
+            liquidity: (liquidityResults[index] as { liquidity: bigint })
+              .liquidity,
+            feeTier: position.fee as FeeTier,
+          },
         };
       });
-
-      const result = await Promise.all(promises);
-
-      return result;
     },
   });
 };
