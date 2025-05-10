@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { PageContext } from "pool/modules/create-position/contexts/page-context";
+import { PageContext } from "pool/modules/position-list/contexts/page-context";
 
 export const usePageContext = () => {
   const context = useContext(PageContext);

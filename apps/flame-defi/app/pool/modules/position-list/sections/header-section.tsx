@@ -1,19 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Button, Switch } from "@repo/ui/components";
 import { PlusIcon } from "@repo/ui/icons";
 import { Header, HeaderTitle } from "components/header";
 import { ROUTES } from "pool/constants/routes";
+import { usePageContext } from "pool/modules/position-list/hooks/use-page-context";
 
 export const HeaderSection = () => {
   const router = useRouter();
   const { isConnected } = useAccount();
-
-  const [showClosedPositions, setShowClosedPositions] = useState(false);
+  const { isClosedPositionsShown, setIsClosedPositionsShown } =
+    usePageContext();
 
   return (
     <Header>
@@ -26,9 +26,9 @@ export const HeaderSection = () => {
                 Show Closed Positions
               </span>
               <Switch
-                checked={showClosedPositions}
+                checked={isClosedPositionsShown}
                 onCheckedChange={() =>
-                  setShowClosedPositions((value) => !value)
+                  setIsClosedPositionsShown(!isClosedPositionsShown)
                 }
               />
             </div>

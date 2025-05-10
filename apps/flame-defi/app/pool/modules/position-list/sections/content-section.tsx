@@ -1,27 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
-
 import { StatusCard } from "@repo/ui/components";
-import { useGetPositions } from "pool/hooks/use-get-positions";
 import { PositionListTable } from "pool/modules/position-list/components/position-list-table";
-
-type Status = "error" | "empty" | "success";
+import { usePageContext } from "pool/modules/position-list/hooks/use-page-context";
 
 export const ContentSection = () => {
-  const { data, isError, isPending } = useGetPositions();
-
-  const status = useMemo<Status>(() => {
-    if (isError) {
-      return "error";
-    }
-
-    if (!isPending && !data?.length) {
-      return "empty";
-    }
-
-    return "success";
-  }, [isError, isPending, data?.length]);
+  const { status } = usePageContext();
 
   return (
     <section className="flex flex-col">
@@ -31,7 +15,9 @@ export const ContentSection = () => {
         </StatusCard>
       )}
       {status === "empty" && (
-        <StatusCard status="empty">{`No positions found.`}</StatusCard>
+        <StatusCard status="empty">
+          {`Your active V3 liquidity positions will appear here.`}
+        </StatusCard>
       )}
       {status === "success" && <PositionListTable />}
     </section>

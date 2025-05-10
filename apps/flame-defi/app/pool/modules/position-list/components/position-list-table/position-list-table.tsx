@@ -27,11 +27,13 @@ import {
   type GetPositionsResult,
   useGetPositions,
 } from "pool/hooks/use-get-positions";
+import { usePageContext } from "pool/modules/position-list/hooks/use-page-context";
 
 export const PositionListTable = () => {
   const router = useRouter();
   const { formatNumber } = useIntl();
   const { data, isPending } = useGetPositions();
+  const { isClosedPositionsShown } = usePageContext();
 
   const columnHelper = createColumnHelper<GetPositionsResult>();
 
@@ -39,7 +41,7 @@ export const PositionListTable = () => {
     return [
       columnHelper.accessor("token0", {
         id: "token0",
-        header: `Your Positions (${data?.length})`,
+        header: "Your Positions",
         cell: ({ row }) => {
           return (
             <div className="flex items-center gap-2">
@@ -79,11 +81,23 @@ export const PositionListTable = () => {
         },
       }),
     ];
-  }, [columnHelper, data?.length, formatNumber]);
+  }, [columnHelper, formatNumber]);
+
+  const filteredData: GetPositionsResult[] = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    if (isClosedPositionsShown) {
+      return data;
+    }
+
+    return data.filter((position) => position.position.liquidity !== 0n);
+  }, [data, isClosedPositionsShown]);
 
   const table = useReactTable<GetPositionsResult>({
     columns,
-    data: (data ?? []) as GetPositionsResult[],
+    data: filteredData,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     enableSorting: true,
