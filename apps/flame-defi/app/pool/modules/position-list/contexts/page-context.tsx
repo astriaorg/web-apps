@@ -19,19 +19,20 @@ export const PageContext = createContext<PageContextProps | undefined>(
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
   const [isClosedPositionsShown, setIsClosedPositionsShown] = useState(false);
 
-  const { data, isError, isPending } = useGetPositions();
+  const { data, isError, isLoading } = useGetPositions();
 
   const status = useMemo<Status>(() => {
     if (isError) {
       return "error";
     }
 
-    if (!isPending && !data?.length) {
+    // Check for loading state so we don't show the skeleton when the wallet is not connected.
+    if (!isLoading && !data?.length) {
       return "empty";
     }
 
     return "success";
-  }, [isError, isPending, data?.length]);
+  }, [isError, isLoading, data?.length]);
 
   return (
     <PageContext.Provider

@@ -10,6 +10,9 @@ import {
 import { type FeeTier, type PositionWithKey } from "pool/types";
 import { getTokenFromAddress } from "pool/utils";
 
+const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
+const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
+
 export type GetPositionsResult = {
   pool: {
     address: string;
@@ -83,5 +86,8 @@ export const useGetPositions = (): UseQueryResult<
         };
       });
     },
+    enabled: !!address,
+    staleTime: STALE_TIME_MILLISECONDS,
+    gcTime: CACHE_TIME_MILLISECONDS,
   });
 };
