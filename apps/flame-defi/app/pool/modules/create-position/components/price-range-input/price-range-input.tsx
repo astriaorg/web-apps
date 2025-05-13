@@ -138,6 +138,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     return [min, max];
   }, [priceToSlider, minPrice, maxPrice]);
 
+  // TODO: Slider is sticky near current price.
   const handleSliderValueChange = useCallback(
     (values: number[]) => {
       if (values.length !== 2) {
