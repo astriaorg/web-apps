@@ -1,4 +1,5 @@
 import Big from "big.js";
+import { useAstriaChainData } from "config";
 import { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 
@@ -11,9 +12,9 @@ import {
 } from "pool/modules/create-position/types";
 import { TICK_BOUNDARIES } from "pool/types";
 import {
-  calculatePriceRange,
   calculatePriceToTick,
   calculateTickToPrice,
+  getUserPriceToNearestTickPrice,
 } from "pool/utils";
 
 import { MinMaxInput } from "./min-max-input";
@@ -37,6 +38,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     setMaxPrice,
     isPriceRangeValid,
   } = usePageContext();
+  const { chain } = useAstriaChainData();
   const { formatNumber } = useIntl();
 
   const handleReset = useCallback(() => {
@@ -152,23 +154,26 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
   );
 
   const getCalculatedPriceRange = useCallback(
-    ({ minPrice, maxPrice }: { minPrice: string; maxPrice: string }) => {
-      const min = Number(minPrice);
-      const max = Number(maxPrice);
+    (params: { price: string }) => {
+      const price = Number(params.price);
 
-      if (!token0 || !token1 || isNaN(min) || isNaN(max)) {
+      if (!token0 || !token1 || isNaN(price)) {
         return;
       }
 
-      return calculatePriceRange({
+      if (!price) {
+        return MIN_PRICE_DEFAULT;
+      }
+
+      return getUserPriceToNearestTickPrice({
+        price,
+        token0,
+        token1,
+        chain,
         feeTier,
-        decimal0: token0.coinDecimals,
-        decimal1: token1.coinDecimals,
-        minPrice: min,
-        maxPrice: max,
       });
     },
-    [feeTier, token0, token1],
+    [feeTier, token0, token1, chain],
   );
 
   const displayMinPrice = useMemo(() => {
@@ -227,11 +232,10 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             onInput={(event) => setMinPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getCalculatedPriceRange({
-                minPrice: event.currentTarget.value,
-                maxPrice,
+                price: event.currentTarget.value,
               });
               if (result) {
-                setMinPrice(result.minPrice.toString());
+                setMinPrice(result.toString());
               }
             }}
             aria-invalid={!isPriceRangeValid}
@@ -242,11 +246,10 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             onInput={(event) => setMaxPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getCalculatedPriceRange({
-                minPrice,
-                maxPrice: event.currentTarget.value,
+                price: event.currentTarget.value,
               });
               if (result) {
-                setMaxPrice(result.maxPrice.toString());
+                setMaxPrice(result.toString());
               }
             }}
             aria-invalid={!isPriceRangeValid}

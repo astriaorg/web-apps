@@ -1,3 +1,13 @@
+import { Price, Token } from "@uniswap/sdk-core";
+import {
+  nearestUsableTick,
+  priceToClosestTick,
+  tickToPrice,
+} from "@uniswap/v3-sdk";
+import JSBI from "jsbi";
+import type { Address } from "viem";
+
+import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
 import {
   DepositType,
   FEE_TIER_TICK_SPACING,
@@ -92,71 +102,53 @@ export const calculateNearestValidTick = ({
     : Math.floor(tick / tickSpacing) * tickSpacing;
 };
 
-export const calculatePriceRange = ({
+/**
+ * Calculates the nearest tick price for a given price based on the tick spacing.
+ */
+export const getUserPriceToNearestTickPrice = ({
+  chain,
   feeTier,
-  decimal0,
-  decimal1,
-  minPrice,
-  maxPrice,
+  ...params
 }: {
+  price: number;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  chain: AstriaChain;
   feeTier: FeeTier;
-  decimal0: number;
-  decimal1: number;
-  minPrice: number;
-  maxPrice: number;
 }) => {
+  const token0 = new Token(
+    params.token0.chainId,
+    (params.token0.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : params.token0.erc20ContractAddress) as Address,
+    params.token0.coinDecimals,
+    params.token0.coinDenom,
+  );
+
+  const token1 = new Token(
+    params.token1.chainId,
+    (params.token1.isNative
+      ? chain.contracts.wrappedNativeToken.address
+      : params.token1.erc20ContractAddress) as Address,
+    params.token1.coinDecimals,
+    params.token1.coinDenom,
+  );
+
+  const price = new Price(
+    token0,
+    token1,
+    JSBI.BigInt(10 ** token0.decimals),
+    JSBI.BigInt(Math.round(params.price * 10 ** token1.decimals)),
+  );
+
+  const tick = priceToClosestTick(price);
+
   const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+  const nearestTick = nearestUsableTick(tick, tickSpacing);
 
-  const minTick = calculatePriceToTick({
-    price: minPrice,
-    decimal0,
-    decimal1,
-  });
-  const maxTick = calculatePriceToTick({
-    price: maxPrice,
-    decimal0,
-    decimal1,
-  });
+  const nearestPrice = tickToPrice(token0, token1, nearestTick);
 
-  const validMinTick = calculateNearestValidTick({
-    tick: minTick,
-    tickSpacing,
-  });
-  const validMaxTick = calculateNearestValidTick({
-    tick: maxTick,
-    tickSpacing,
-  });
-
-  const actualMinPrice = calculateTickToPrice({
-    tick: validMinTick,
-    decimal0,
-    decimal1,
-  });
-  const actualMaxPrice = calculateTickToPrice({
-    tick: validMaxTick,
-    decimal0,
-    decimal1,
-  });
-
-  const minSqrtPriceX96 = calculatePriceToSqrtPriceX96({
-    price: actualMinPrice,
-    decimal0,
-    decimal1,
-  });
-  const maxSqrtPriceX96 = calculatePriceToSqrtPriceX96({
-    price: actualMaxPrice,
-    decimal0,
-    decimal1,
-  });
-
-  return {
-    minTick: validMinTick,
-    maxTick: validMaxTick,
-    minPrice: actualMinPrice,
-    maxPrice: actualMaxPrice,
-    minSqrtPriceX96,
-    maxSqrtPriceX96,
-  };
+  return nearestPrice.toFixed(token0.decimals);
 };
 
 export const calculateDepositType = ({

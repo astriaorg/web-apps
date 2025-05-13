@@ -76,29 +76,26 @@ export const useGetPools = ({
           continue;
         }
 
-        const poolToken0 = new Token(
-          chain.chainId,
-          token0Address,
-          token0.coinDecimals,
-          token0.coinDenom,
-        );
-        const poolToken1 = new Token(
-          chain.chainId,
-          token1Address,
-          token1.coinDecimals,
-          token1.coinDenom,
-        );
-
-        const configuredPool = new Pool(
-          poolToken0,
-          poolToken1,
+        const pool = new Pool(
+          new Token(
+            chain.chainId,
+            token0Address,
+            token0.coinDecimals,
+            token0.coinDenom,
+          ),
+          new Token(
+            chain.chainId,
+            token1Address,
+            token1.coinDecimals,
+            token1.coinDenom,
+          ),
           feeTier,
           slot0Result.slot0.sqrtPriceX96.toString(),
           liquidityResult.liquidity.toString(),
           slot0Result.slot0.tick,
         );
 
-        result[feeTier] = configuredPool;
+        result[feeTier] = pool;
       }
 
       return result;

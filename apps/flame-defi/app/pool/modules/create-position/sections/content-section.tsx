@@ -75,8 +75,10 @@ export const ContentSection = () => {
     if (!pool) {
       return null;
     }
-    const price = pool.token0Price.toFixed(pool.token0.decimals);
-    return isInverted ? price : new Big(1).div(price).toFixed();
+
+    return isInverted
+      ? pool.token0Price.toFixed(pool.token0.decimals)
+      : pool.token0Price.invert().toFixed(pool.token0.decimals);
   }, [isInverted, pool]);
 
   const derivedValues = useMemo((): {
