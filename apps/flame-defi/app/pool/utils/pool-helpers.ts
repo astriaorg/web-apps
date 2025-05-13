@@ -1,53 +1,9 @@
-import Big from "big.js";
-
 import {
   DepositType,
   FEE_TIER_TICK_SPACING,
   type FeeTier,
   TICK_BOUNDARIES,
 } from "pool/types";
-
-/**
- * Implements the calculation to get the exchange rate of the pool.
- *
- * The exchange rate is calculated using the formula defined in the Uniswap V3 documentation.
- *
- * Ref: https://blog.uniswap.org/uniswap-v3-math-primer#how-do-i-calculate-the-current-exchange-rate
- */
-export const calculatePoolExchangeRate = ({
-  decimal0,
-  decimal1,
-  sqrtPriceX96,
-}: {
-  decimal0: number;
-  decimal1: number;
-  sqrtPriceX96: bigint;
-}): {
-  /**
-   * 1 Token 0 = _ Token 1
-   */
-  rateToken0ToToken1: string;
-  /**
-   * 1 Token 1 = _ Token 0
-   */
-  rateToken1ToToken0: string;
-} => {
-  // Calculate the numerator: (sqrtPriceX96 / 2**96)**2
-  const numerator = new Big(sqrtPriceX96.toString())
-    .div(new Big(2).pow(96))
-    .pow(2);
-  // Calculate the denominator: 10**Decimal1 / 10**Decimal0
-  // We still divide by the same amount to normalize the raw price to the adjusted price, so it doesn't matter which token has more decimals.
-  const denominator = new Big(10).pow(Math.abs(decimal1 - decimal0));
-
-  const buyOneOfToken0 = numerator.div(denominator).toFixed();
-  const buyOneOfToken1 = new Big(1).div(buyOneOfToken0).toFixed();
-
-  return {
-    rateToken0ToToken1: buyOneOfToken0,
-    rateToken1ToToken0: buyOneOfToken1,
-  };
-};
 
 export const calculatePriceToTick = ({
   price,

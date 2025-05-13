@@ -23,7 +23,7 @@ const SLIDER_MAX = 100;
 const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
 
 interface PriceRangeInputProps {
-  rate?: string;
+  rate: string | null;
 }
 
 export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {

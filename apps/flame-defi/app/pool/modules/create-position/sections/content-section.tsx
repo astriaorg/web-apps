@@ -72,7 +72,11 @@ export const ContentSection = () => {
   }, [pools, feeTier]);
 
   const rate = useMemo(() => {
-    return isInverted ? pool?.rateToken0ToToken1 : pool?.rateToken1ToToken0;
+    if (!pool) {
+      return null;
+    }
+    const price = pool.token0Price.toFixed(pool.token0.decimals);
+    return isInverted ? price : new Big(1).div(price).toFixed();
   }, [isInverted, pool]);
 
   const derivedValues = useMemo((): {

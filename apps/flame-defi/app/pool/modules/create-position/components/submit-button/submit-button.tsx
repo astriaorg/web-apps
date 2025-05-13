@@ -1,4 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import type { Pool } from "@uniswap/v3-sdk";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
@@ -14,7 +15,7 @@ import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType, FEE_TIER_TICK_SPACING, PoolWithSlot0 } from "pool/types";
+import { DepositType, FEE_TIER_TICK_SPACING } from "pool/types";
 import {
   calculateNearestValidTick,
   calculatePriceToSqrtPriceX96,
@@ -24,7 +25,7 @@ import {
 interface SubmitButtonProps {
   amount0: Amount;
   amount1: Amount;
-  pool: PoolWithSlot0 | null;
+  pool: Pool | null;
   depositType: DepositType;
 }
 
