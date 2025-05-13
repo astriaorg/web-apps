@@ -1,11 +1,10 @@
-import { Price, Token } from "@uniswap/sdk-core";
+import { Price } from "@uniswap/sdk-core";
 import {
   nearestUsableTick,
   priceToClosestTick,
   tickToPrice,
 } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
-import type { Address } from "viem";
 
 import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
 import {
@@ -14,6 +13,7 @@ import {
   type FeeTier,
   TICK_BOUNDARIES,
 } from "pool/types";
+import { getTokenFromInternalToken } from "pool/utils";
 
 export const calculatePriceToTick = ({
   price,
@@ -116,23 +116,8 @@ export const getUserPriceToNearestTickPrice = ({
   chain: AstriaChain;
   feeTier: FeeTier;
 }) => {
-  const token0 = new Token(
-    params.token0.chainId,
-    (params.token0.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : params.token0.erc20ContractAddress) as Address,
-    params.token0.coinDecimals,
-    params.token0.coinDenom,
-  );
-
-  const token1 = new Token(
-    params.token1.chainId,
-    (params.token1.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : params.token1.erc20ContractAddress) as Address,
-    params.token1.coinDecimals,
-    params.token1.coinDenom,
-  );
+  const token0 = getTokenFromInternalToken(params.token0, chain);
+  const token1 = getTokenFromInternalToken(params.token1, chain);
 
   const price = new Price(
     token0,
