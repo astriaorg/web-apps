@@ -63,7 +63,9 @@ test("should handle token approval flow on deposit page", async ({
   // Find and click on Base option
   const baseOption = page.locator('button:has-text("Base")').first();
   await baseOption.click();
-  await page.waitForTimeout(1000); // Wait for UI to stabilize
+  await metamask.approveNewNetwork();
+  await metamask.approveSwitchNetwork();
+  await page.waitForTimeout(60000); // Wait for UI to stabilize
 
   // Enter a deposit amount
   await page.locator('[placeholder="0.00"]').fill("5");
