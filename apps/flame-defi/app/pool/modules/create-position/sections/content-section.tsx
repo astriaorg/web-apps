@@ -80,11 +80,13 @@ export const ContentSection = () => {
   const derivedValues = useMemo((): {
     derivedAmount0: Amount;
     derivedAmount1: Amount;
+    sqrtPriceX96: bigint | null;
   } => {
     if (isPending || !token0 || !token1) {
       return {
         derivedAmount0: amount0,
         derivedAmount1: amount1,
+        sqrtPriceX96: null,
       };
     }
 
@@ -113,17 +115,20 @@ export const ContentSection = () => {
         return {
           derivedAmount0: amount0,
           derivedAmount1: amount1,
+          sqrtPriceX96: null,
         };
       }
 
       // When there's no pool, derive the amount from the initial price.
-      const { token0Price, token1Price } = calculateNewPoolPrices({
-        price: Number(amountInitialPrice.value),
-        token0,
-        token1,
-        chain,
-        feeTier,
-      });
+      const { token0Price, token1Price, sqrtPriceX96 } = calculateNewPoolPrices(
+        {
+          price: Number(amountInitialPrice.value),
+          token0,
+          token1,
+          chain,
+          feeTier,
+        },
+      );
 
       if (currentInput === InputId.INPUT_0 && amount0.value) {
         const derivedAmount1 = new Big(amount0.value)
@@ -136,6 +141,7 @@ export const ContentSection = () => {
             token1,
             token1Balance?.value,
           ),
+          sqrtPriceX96,
         };
       }
       if (currentInput === InputId.INPUT_1 && amount1.value) {
@@ -149,6 +155,7 @@ export const ContentSection = () => {
             token0Balance?.value,
           ),
           derivedAmount1: amount1,
+          sqrtPriceX96,
         };
       }
     }
@@ -164,6 +171,7 @@ export const ContentSection = () => {
           token1,
           token1Balance?.value,
         ),
+        sqrtPriceX96: null,
       };
     }
 
@@ -178,12 +186,14 @@ export const ContentSection = () => {
           token0Balance?.value,
         ),
         derivedAmount1: amount1,
+        sqrtPriceX96: null,
       };
     }
 
     return {
       derivedAmount0: getDerivedAmount("", token0, token0Balance?.value),
       derivedAmount1: getDerivedAmount("", token1, token1Balance?.value),
+      sqrtPriceX96: null,
     };
   }, [
     pool,
@@ -330,7 +340,7 @@ export const ContentSection = () => {
           <PriceRangeInput rate={rate} />
 
           <SubmitButton
-            pool={pool}
+            sqrtPriceX96={derivedValues.sqrtPriceX96}
             depositType={depositType}
             amount0={derivedValues.derivedAmount0}
             amount1={derivedValues.derivedAmount1}

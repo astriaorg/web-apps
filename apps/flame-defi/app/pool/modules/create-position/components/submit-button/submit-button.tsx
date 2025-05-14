@@ -1,5 +1,4 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import type { Pool } from "@uniswap/v3-sdk";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
@@ -16,18 +15,24 @@ import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, FEE_TIER_TICK_SPACING } from "pool/types";
-import {
-  calculateNearestValidTick,
-  calculatePriceToSqrtPriceX96,
-  calculatePriceToTick,
-} from "pool/utils";
+import { calculateNearestValidTick, calculatePriceToTick } from "pool/utils";
 
-interface SubmitButtonProps {
+interface BaseSubmitButtonProps {
   amount0: Amount;
   amount1: Amount;
-  pool: Pool | null;
   depositType: DepositType;
 }
+
+interface InitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
+  sqrtPriceX96: null;
+}
+interface UninitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
+  sqrtPriceX96: bigint;
+}
+
+type SubmitButtonProps =
+  | InitializedPoolSubmitButtonProps
+  | UninitializedPoolSubmitButtonProps;
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
@@ -45,7 +50,7 @@ enum ButtonState {
 export const SubmitButton = ({
   amount0,
   amount1,
-  pool,
+  sqrtPriceX96,
   depositType,
 }: SubmitButtonProps) => {
   const { isConnected, address } = useAccount();
@@ -247,16 +252,6 @@ export const SubmitButton = ({
       // TODO: Add this to settings.
       const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
 
-      const sqrtPriceX96 = pool
-        ? undefined
-        : BigInt(
-            calculatePriceToSqrtPriceX96({
-              price: Number(amountInitialPrice.value),
-              decimal0: token0.coinDecimals,
-              decimal1: token1.coinDecimals,
-            }),
-          );
-
       const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
         chain,
         token0,
@@ -294,9 +289,8 @@ export const SubmitButton = ({
     amount1,
     minPrice,
     maxPrice,
-    pool,
-    amountInitialPrice,
     slippageTolerance,
+    sqrtPriceX96,
     mint,
   ]);
 
@@ -313,7 +307,7 @@ export const SubmitButton = ({
       return ButtonState.INVALID_INPUT;
     }
 
-    if (!pool && !amountInitialPrice.validation.isValid) {
+    if (sqrtPriceX96 === null && !amountInitialPrice.validation.isValid) {
       return ButtonState.INVALID_INPUT;
     }
 
@@ -364,7 +358,7 @@ export const SubmitButton = ({
     isConnected,
     status,
     isPriceRangeValid,
-    pool,
+    sqrtPriceX96,
     amountInitialPrice.validation.isValid,
     token0,
     token1,

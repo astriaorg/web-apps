@@ -229,7 +229,7 @@ export const calculateNewPoolPrices = ({
   const token0Price = actualPriceObj.toFixed(token0.decimals);
 
   return {
-    sqrtPriceX96,
+    sqrtPriceX96: BigInt(sqrtPriceX96.toString()),
     tick,
     tickLower,
     tickUpper,
