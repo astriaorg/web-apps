@@ -12,8 +12,9 @@ import {
   EvmWalletProvider,
 } from "features/evm-wallet";
 import { OnchainKitProvider } from "features/evm-wallet/providers/onchainkit";
-import { WagmiRainbowKitProvider } from "features/evm-wallet/providers/wagmi";
+import { WagmiRainbowKitProvider } from "features/evm-wallet/providers/wagmi-rainbowkit";
 import { NotificationsContextProvider } from "features/notifications";
+import { ParaClientProvider } from "features/para/providers";
 
 // tanstack
 const queryClient = new QueryClient();
@@ -21,10 +22,10 @@ const queryClient = new QueryClient();
 // Common providers for the entire app
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ConfigContextProvider>
-      <IntlProvider locale="en">
-        <NotificationsContextProvider>
-          <QueryClientProvider client={queryClient}>
+    <IntlProvider locale="en">
+      <NotificationsContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <ConfigContextProvider>
             <WagmiRainbowKitProvider>
               <CosmosKitChainProvider>
                 <OnchainKitProvider>
@@ -38,9 +39,9 @@ export function Providers({ children }: { children: ReactNode }) {
                 </OnchainKitProvider>
               </CosmosKitChainProvider>
             </WagmiRainbowKitProvider>
-          </QueryClientProvider>
-        </NotificationsContextProvider>
-      </IntlProvider>
-    </ConfigContextProvider>
+          </ConfigContextProvider>
+        </QueryClientProvider>
+      </NotificationsContextProvider>
+    </IntlProvider>
   );
 }
