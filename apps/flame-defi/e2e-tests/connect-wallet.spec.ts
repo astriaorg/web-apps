@@ -1,16 +1,12 @@
-// Import necessary Synpress modules and setup
 import { testWithSynpress } from "@synthetixio/synpress";
 import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright";
 
 import basicSetup from "./wallet-setup/basic.setup";
 
-// Create a test instance with Synpress and MetaMask fixtures
 const test = testWithSynpress(metaMaskFixtures(basicSetup));
 
-// Extract expect function from test
 const { expect } = test;
 
-// Define a basic test case
 test("should connect wallet using navigation menu wallet connector button", async ({
   context,
   page,
