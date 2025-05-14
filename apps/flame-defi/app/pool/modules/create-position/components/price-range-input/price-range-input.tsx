@@ -14,7 +14,7 @@ import { TICK_BOUNDARIES } from "pool/types";
 import {
   calculatePriceToTick,
   calculateTickToPrice,
-  getUserPriceToNearestTickPrice,
+  calculateUserPriceToNearestTickPrice,
 } from "pool/utils";
 
 import { MinMaxInput } from "./min-max-input";
@@ -162,11 +162,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
         return;
       }
 
-      if (!price) {
-        return MIN_PRICE_DEFAULT;
-      }
-
-      return getUserPriceToNearestTickPrice({
+      return calculateUserPriceToNearestTickPrice({
         price,
         token0,
         token1,

@@ -8,6 +8,10 @@ import JSBI from "jsbi";
 
 import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
 import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+} from "pool/modules/create-position/types";
+import {
   DepositType,
   FEE_TIER_TICK_SPACING,
   type FeeTier,
@@ -105,7 +109,7 @@ export const calculateNearestValidTick = ({
 /**
  * Calculates the nearest tick price for a given price based on the tick spacing.
  */
-export const getUserPriceToNearestTickPrice = ({
+export const calculateUserPriceToNearestTickPrice = ({
   chain,
   feeTier,
   ...params
@@ -115,7 +119,14 @@ export const getUserPriceToNearestTickPrice = ({
   token1: EvmCurrency;
   chain: AstriaChain;
   feeTier: FeeTier;
-}) => {
+}): string => {
+  if (params.price === MIN_PRICE_DEFAULT) {
+    return MIN_PRICE_DEFAULT.toString();
+  }
+  if (params.price === MAX_PRICE_DEFAULT) {
+    return MAX_PRICE_DEFAULT.toString();
+  }
+
   const token0 = getTokenFromInternalToken(params.token0, chain);
   const token1 = getTokenFromInternalToken(params.token1, chain);
 

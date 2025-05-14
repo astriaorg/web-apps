@@ -1,11 +1,14 @@
 import Big from "big.js";
+import { type Address, type ChainContract } from "viem";
 
+import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
 import { TICK_BOUNDARIES } from "pool/types";
 
 import {
   calculateNearestValidTick,
   calculatePriceToTick,
   calculateTickToPrice,
+  calculateUserPriceToNearestTickPrice,
 } from "./pool-helpers";
 
 describe("calculatePriceToTick and calculateTickToPrice", () => {
@@ -107,5 +110,70 @@ describe("calculateNearestValidTick", () => {
     });
 
     expect(nearestTickUpper).toEqual(887220);
+  });
+});
+
+describe("calculateUserPriceToNearestTickPrice", () => {
+  const TOKEN_0 = {
+    chainId: 1,
+    coinDenom: "WTIS",
+    coinDecimals: 18,
+    erc20ContractAddress:
+      "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071" as Address,
+    isNative: false,
+    isWrappedNative: true,
+  } as EvmCurrency;
+  const TOKEN_1 = {
+    chainId: 1,
+    coinDenom: "USDC",
+    coinDecimals: 6,
+    erc20ContractAddress:
+      "0x3f65144F387f6545bF4B19a1B39C94231E1c849F" as Address,
+    isNative: false,
+    isWrappedNative: false,
+  } as EvmCurrency;
+  const CHAIN = {
+    contracts: {
+      wrappedNativeToken: {
+        address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+      } as ChainContract,
+    },
+  } as AstriaChain;
+
+  it("should convert user price to nearest tick price", () => {
+    const result = calculateUserPriceToNearestTickPrice({
+      price: 2,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
+      chain: CHAIN,
+    });
+
+    // Legacy app: 1.9984
+    expect(result).toEqual("1.998442298074652790");
+  });
+
+  it("should handle minimum price", () => {
+    const result = calculateUserPriceToNearestTickPrice({
+      price: 0,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
+      chain: CHAIN,
+    });
+
+    expect(result).toEqual("0");
+  });
+
+  it("should handle maximum price", () => {
+    const result = calculateUserPriceToNearestTickPrice({
+      price: Infinity,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
+      chain: CHAIN,
+    });
+
+    expect(result).toEqual("Infinity");
   });
 });
