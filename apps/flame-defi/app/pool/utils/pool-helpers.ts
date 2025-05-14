@@ -191,8 +191,6 @@ export const calculateDepositType = ({
  * Calculates token prices and ticks for a new pool.
  */
 export const calculateNewPoolPrices = ({
-  minPrice,
-  maxPrice,
   chain,
   feeTier,
   ...params
@@ -200,8 +198,6 @@ export const calculateNewPoolPrices = ({
   price: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
-  minPrice: number;
-  maxPrice: number;
   chain: AstriaChain;
   feeTier: FeeTier;
 }) => {
@@ -222,35 +218,11 @@ export const calculateNewPoolPrices = ({
 
   let tickLower, tickUpper;
 
-  if (minPrice !== 0 && !isNaN(minPrice) && minPrice !== Infinity) {
-    const minPriceObj = new Price(
-      token0,
-      token1,
-      JSBI.BigInt(10 ** token0.decimals),
-      JSBI.BigInt(minPrice * 10 ** token1.decimals),
-    );
-    const minTick = priceToClosestTick(minPriceObj);
-    tickLower = nearestUsableTick(minTick, tickSpacing);
-  } else {
-    // Default to minimum tick if min price is 0 or not provided.
-    tickLower = nearestUsableTick(TickMath.MIN_TICK, tickSpacing);
-    tickLower = TickMath.MIN_TICK;
-  }
+  tickLower = nearestUsableTick(TickMath.MIN_TICK, tickSpacing);
+  tickLower = TickMath.MIN_TICK;
 
-  if (maxPrice !== Infinity && !isNaN(maxPrice) && maxPrice !== 0) {
-    const maxPriceObj = new Price(
-      token0,
-      token1,
-      JSBI.BigInt(10 ** token0.decimals),
-      JSBI.BigInt(maxPrice * 10 ** token1.decimals),
-    );
-    const maxTick = priceToClosestTick(maxPriceObj);
-    tickUpper = nearestUsableTick(maxTick, tickSpacing);
-  } else {
-    // Default to maximum tick if max price is Infinity or not provided.
-    tickUpper = nearestUsableTick(TickMath.MAX_TICK, tickSpacing);
-    tickUpper = TickMath.MAX_TICK;
-  }
+  tickUpper = nearestUsableTick(TickMath.MAX_TICK, tickSpacing);
+  tickUpper = TickMath.MAX_TICK;
 
   const actualPriceObj = tickToPrice(token0, token1, tick);
   const token1Price = actualPriceObj.invert().toFixed(token1.decimals);

@@ -109,11 +109,7 @@ export const ContentSection = () => {
     };
 
     if (!pool) {
-      if (
-        !amountInitialPrice.validation.isValid ||
-        isNaN(Number(minPrice)) ||
-        isNaN(Number(maxPrice))
-      ) {
+      if (!amountInitialPrice.validation.isValid) {
         return {
           derivedAmount0: amount0,
           derivedAmount1: amount1,
@@ -126,8 +122,6 @@ export const ContentSection = () => {
         token0,
         token1,
         chain,
-        minPrice: Number(minPrice),
-        maxPrice: Number(maxPrice),
         feeTier,
       });
 
@@ -204,8 +198,6 @@ export const ContentSection = () => {
     token1Balance,
     amountInitialPrice,
     validate,
-    minPrice,
-    maxPrice,
     feeTier,
     chain,
   ]);

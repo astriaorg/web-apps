@@ -186,8 +186,6 @@ describe("calculateNewPoolPrices", () => {
         price: 0,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        minPrice: 0,
-        maxPrice: Infinity,
         feeTier: 3000,
         chain: CHAIN,
       });
@@ -202,8 +200,6 @@ describe("calculateNewPoolPrices", () => {
         price: 0.5,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        minPrice: 0,
-        maxPrice: Infinity,
         feeTier: 500,
         chain: CHAIN,
       });
@@ -219,8 +215,6 @@ describe("calculateNewPoolPrices", () => {
         price: 1,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        minPrice: 0,
-        maxPrice: Infinity,
         feeTier: 500,
         chain: CHAIN,
       });
@@ -234,8 +228,6 @@ describe("calculateNewPoolPrices", () => {
         price: 2,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        minPrice: 0,
-        maxPrice: Infinity,
         feeTier: 500,
         chain: CHAIN,
       });
