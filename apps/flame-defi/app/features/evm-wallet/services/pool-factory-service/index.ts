@@ -16,21 +16,22 @@ export class PoolFactoryService extends GenericContractService {
   }
 
   /**
-   * Get the pool addresses for a given token pair and an array of fee tiers.
-   *
-   * @param token0 - The address of the first token in the pair.
-   * @param token1 - The address of the second token in the pair.
-   * @param fees - An array of fee tiers for the pool (e.g., [500, 3000]).
-   * @returns The address of the pool if it exists, or the zero address if not.
+   * Get multiple pools using multicall.
    */
-  async getPools(token0: Address, token1: Address, fees: number[]) {
+  async getPools(
+    params: {
+      token0: Address;
+      token1: Address;
+      fee: number;
+    }[],
+  ) {
     const result = await this.multicall({
-      contracts: fees.map((it) => {
+      contracts: params.map((it) => {
         return {
           functionName: "getPool",
           address: this.address,
           abi: this.abi,
-          args: [token0, token1, it],
+          args: [it.token0, it.token1, it.fee],
         };
       }),
     });
@@ -39,12 +40,41 @@ export class PoolFactoryService extends GenericContractService {
   }
 
   /**
+   * Get the liquidity data for a given array of pool addresses.
+   */
+  async getLiquidityForPools(addresses: Address[]): Promise<
+    {
+      address: Address;
+      liquidity: bigint;
+    }[]
+  > {
+    const result = await this.multicall({
+      contracts: addresses.map((it) => {
+        return {
+          functionName: "liquidity",
+          address: it,
+          abi: POOL_ABI as Abi,
+          args: [],
+        };
+      }),
+    });
+
+    return result.map((it, index) => {
+      return {
+        address: addresses[index] as Address,
+        liquidity: it as bigint,
+      };
+    });
+  }
+
+  /**
    * Get the slot0 data for a given array of pool addresses.
+   * Pools with zero addresses will throw an error.
    *
    * @param addresses - The addresses of the pools to get slot0 data for.
    * @returns An array of objects containing the pool address and its corresponding slot0 data.
    */
-  async getPoolsSlot0(addresses: Address[]): Promise<
+  async getSlot0ForPools(addresses: Address[]): Promise<
     {
       address: Address;
       slot0: Slot0;
@@ -71,12 +101,6 @@ export class PoolFactoryService extends GenericContractService {
 
   /**
    * Get the pool address for a given token pair and fee.
-   *
-   * @param chainId - The chain ID of the EVM chain.
-   * @param token0 - The address of the first token in the pair.
-   * @param token1 - The address of the second token in the pair.
-   * @param fee - The fee tier of the pool (e.g., 500 for 0.05%, 3000 for 0.3%).
-   * @returns The address of the pool if it exists, or the zero address if not.
    */
   async getPool(
     chainId: number,

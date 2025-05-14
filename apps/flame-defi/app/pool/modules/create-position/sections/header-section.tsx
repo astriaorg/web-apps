@@ -10,7 +10,7 @@ export const HeaderSection = () => {
   const router = useRouter();
 
   return (
-    <Header onClickBack={() => router.push(ROUTES.POOL)}>
+    <Header onClickBack={() => router.push(ROUTES.POSITION_LIST)}>
       <div className="flex items-center justify-between w-full">
         <HeaderTitle>New Position</HeaderTitle>
         <SettingsPopover />

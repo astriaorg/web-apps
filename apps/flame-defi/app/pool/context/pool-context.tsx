@@ -74,11 +74,10 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
             chain.contracts.nonfungiblePositionManager.address,
           );
 
-        const positions =
-          await NonfungiblePositionManagerService.getAllPositions(
-            chain.chainId,
-            address,
-          );
+        const positions = await NonfungiblePositionManagerService.getPositions(
+          chain.chainId,
+          address,
+        );
 
         const positionsWithCurrencyData = positions.map(async (position) => {
           const isClosed = position.liquidity === 0n;
@@ -86,20 +85,20 @@ export const PoolContextProvider = ({ children }: PropsWithChildren) => {
 
           const tokenOne = getTokenDataFromCurrencies(
             currencies,
-            position.tokenAddress0,
+            position.token0,
             chain.contracts.wrappedNativeToken.address,
           );
 
           const tokenTwo = getTokenDataFromCurrencies(
             currencies,
-            position.tokenAddress1,
+            position.token1,
             chain.contracts.wrappedNativeToken.address,
           );
 
           const poolAddress = await factoryService.getPool(
             chain.chainId,
-            position.tokenAddress0,
-            position.tokenAddress1,
+            position.token0,
+            position.token1,
             position.fee,
           );
 
