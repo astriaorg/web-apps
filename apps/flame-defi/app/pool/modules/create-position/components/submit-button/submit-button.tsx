@@ -202,9 +202,6 @@ export const SubmitButton = ({
     setStatus(TransactionStatus.PENDING);
 
     try {
-      // TODO: Implement create position logic.
-      console.log("Creating position...");
-
       const amount0Desired = parseUnits(
         amount0.value || "0",
         token0.coinDecimals,
