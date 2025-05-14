@@ -19,11 +19,7 @@ import { SwapButton } from "pool/modules/create-position/components/swap-button"
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, InputId } from "pool/types";
-import {
-  calculateDepositType,
-  getAmount0ForLiquidity,
-  getAmount1ForLiquidity,
-} from "pool/utils";
+import { calculateDepositType, calculateNewPoolPrices } from "pool/utils";
 
 const TRANSITION: Transition = {
   duration: 0.1,
@@ -113,7 +109,11 @@ export const ContentSection = () => {
     };
 
     if (!pool) {
-      if (!amountInitialPrice.validation.isValid) {
+      if (
+        !amountInitialPrice.validation.isValid ||
+        isNaN(Number(minPrice)) ||
+        isNaN(Number(maxPrice))
+      ) {
         return {
           derivedAmount0: amount0,
           derivedAmount1: amount1,
@@ -121,12 +121,20 @@ export const ContentSection = () => {
       }
 
       // When there's no pool, derive the amount from the initial price.
+      const { token0Price, token1Price } = calculateNewPoolPrices({
+        price: Number(amountInitialPrice.value),
+        token0,
+        token1,
+        chain,
+        minPrice: Number(minPrice),
+        maxPrice: Number(maxPrice),
+        feeTier,
+      });
+
       if (currentInput === InputId.INPUT_0 && amount0.value) {
-        const derivedAmount1 = getAmount1ForLiquidity({
-          amount0: amount0.value,
-          price: Number(amountInitialPrice.value),
-          decimal1: token1.coinDecimals,
-        });
+        const derivedAmount1 = new Big(amount0.value)
+          .mul(token0Price)
+          .toFixed(token1.coinDecimals);
         return {
           derivedAmount0: amount0,
           derivedAmount1: getDerivedAmount(
@@ -137,11 +145,9 @@ export const ContentSection = () => {
         };
       }
       if (currentInput === InputId.INPUT_1 && amount1.value) {
-        const derivedAmount0 = getAmount0ForLiquidity({
-          amount1: amount1.value,
-          price: Number(amountInitialPrice.value),
-          decimal0: token0.coinDecimals,
-        });
+        const derivedAmount0 = new Big(amount1.value)
+          .mul(token1Price)
+          .toFixed(token0.coinDecimals);
         return {
           derivedAmount0: getDerivedAmount(
             formatNumberWithoutTrailingZeros(derivedAmount0),
@@ -198,6 +204,10 @@ export const ContentSection = () => {
     token1Balance,
     amountInitialPrice,
     validate,
+    minPrice,
+    maxPrice,
+    feeTier,
+    chain,
   ]);
 
   const optionsToken0 = useMemo(

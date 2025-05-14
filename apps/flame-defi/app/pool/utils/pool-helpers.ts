@@ -2,6 +2,7 @@ import { Price } from "@uniswap/sdk-core";
 import {
   nearestUsableTick,
   priceToClosestTick,
+  TickMath,
   tickToPrice,
 } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
@@ -184,4 +185,85 @@ export const calculateDepositType = ({
   }
 
   return DepositType.BOTH;
+};
+
+/**
+ * Calculates token prices and ticks for a new pool.
+ */
+export const calculateNewPoolPrices = ({
+  minPrice,
+  maxPrice,
+  chain,
+  feeTier,
+  ...params
+}: {
+  price: number;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  minPrice: number;
+  maxPrice: number;
+  chain: AstriaChain;
+  feeTier: FeeTier;
+}) => {
+  const token0 = getTokenFromInternalToken(params.token0, chain);
+  const token1 = getTokenFromInternalToken(params.token1, chain);
+
+  const price = new Price(
+    token0,
+    token1,
+    JSBI.BigInt(10 ** token0.decimals),
+    JSBI.BigInt(params.price * 10 ** token1.decimals),
+  );
+
+  const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+
+  const tick = priceToClosestTick(price);
+  const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick);
+
+  let tickLower, tickUpper;
+
+  if (minPrice !== 0 && !isNaN(minPrice) && minPrice !== Infinity) {
+    const minPriceObj = new Price(
+      token0,
+      token1,
+      JSBI.BigInt(10 ** token0.decimals),
+      JSBI.BigInt(minPrice * 10 ** token1.decimals),
+    );
+    const minTick = priceToClosestTick(minPriceObj);
+    tickLower = nearestUsableTick(minTick, tickSpacing);
+  } else {
+    // Default to minimum tick if min price is 0 or not provided.
+    tickLower = nearestUsableTick(TickMath.MIN_TICK, tickSpacing);
+    tickLower = TickMath.MIN_TICK;
+  }
+
+  if (maxPrice !== Infinity && !isNaN(maxPrice) && maxPrice !== 0) {
+    const maxPriceObj = new Price(
+      token0,
+      token1,
+      JSBI.BigInt(10 ** token0.decimals),
+      JSBI.BigInt(maxPrice * 10 ** token1.decimals),
+    );
+    const maxTick = priceToClosestTick(maxPriceObj);
+    tickUpper = nearestUsableTick(maxTick, tickSpacing);
+  } else {
+    // Default to maximum tick if max price is Infinity or not provided.
+    tickUpper = nearestUsableTick(TickMath.MAX_TICK, tickSpacing);
+    tickUpper = TickMath.MAX_TICK;
+  }
+
+  const actualPriceObj = tickToPrice(token0, token1, tick);
+  const token1Price = actualPriceObj.invert().toFixed(token1.decimals);
+  const token0Price = actualPriceObj.toFixed(token0.decimals);
+
+  return {
+    sqrtPriceX96,
+    tick,
+    tickLower,
+    tickUpper,
+    token0Price,
+    token1Price,
+    minPriceInTick: tickToPrice(token0, token1, tickLower),
+    maxPriceInTick: tickToPrice(token0, token1, tickUpper),
+  };
 };

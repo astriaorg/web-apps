@@ -6,10 +6,37 @@ import { TICK_BOUNDARIES } from "pool/types";
 
 import {
   calculateNearestValidTick,
+  calculateNewPoolPrices,
   calculatePriceToTick,
   calculateTickToPrice,
   calculateUserPriceToNearestTickPrice,
 } from "./pool-helpers";
+
+const TOKEN_0 = {
+  chainId: 1,
+  coinDenom: "WTIS",
+  coinDecimals: 18,
+  erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071" as Address,
+  isNative: false,
+  isWrappedNative: true,
+} as EvmCurrency;
+
+const TOKEN_1 = {
+  chainId: 1,
+  coinDenom: "USDC",
+  coinDecimals: 6,
+  erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F" as Address,
+  isNative: false,
+  isWrappedNative: false,
+} as EvmCurrency;
+
+const CHAIN = {
+  contracts: {
+    wrappedNativeToken: {
+      address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
+    } as ChainContract,
+  },
+} as AstriaChain;
 
 describe("calculatePriceToTick and calculateTickToPrice", () => {
   // USDC/WETH
@@ -114,32 +141,6 @@ describe("calculateNearestValidTick", () => {
 });
 
 describe("calculateUserPriceToNearestTickPrice", () => {
-  const TOKEN_0 = {
-    chainId: 1,
-    coinDenom: "WTIS",
-    coinDecimals: 18,
-    erc20ContractAddress:
-      "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071" as Address,
-    isNative: false,
-    isWrappedNative: true,
-  } as EvmCurrency;
-  const TOKEN_1 = {
-    chainId: 1,
-    coinDenom: "USDC",
-    coinDecimals: 6,
-    erc20ContractAddress:
-      "0x3f65144F387f6545bF4B19a1B39C94231E1c849F" as Address,
-    isNative: false,
-    isWrappedNative: false,
-  } as EvmCurrency;
-  const CHAIN = {
-    contracts: {
-      wrappedNativeToken: {
-        address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
-      } as ChainContract,
-    },
-  } as AstriaChain;
-
   it("should convert user price to nearest tick price", () => {
     const result = calculateUserPriceToNearestTickPrice({
       price: 2,
@@ -175,5 +176,74 @@ describe("calculateUserPriceToNearestTickPrice", () => {
     });
 
     expect(result).toEqual("Infinity");
+  });
+});
+
+describe("calculateNewPoolPrices", () => {
+  it("should throw an error if price is zero", () => {
+    try {
+      calculateNewPoolPrices({
+        price: 0,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+        minPrice: 0,
+        maxPrice: Infinity,
+        feeTier: 3000,
+        chain: CHAIN,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(RangeError);
+    }
+  });
+
+  it("should calculate new pool prices", () => {
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 0.5,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+        minPrice: 0,
+        maxPrice: Infinity,
+        feeTier: 500,
+        chain: CHAIN,
+      });
+
+      // Legacy app: 0.500042
+      expect(result.token0Price).toEqual("0.500042240322764881");
+      // Legacy app: 1.99983
+      expect(result.token1Price).toEqual("1.999831");
+    })();
+
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 1,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+        minPrice: 0,
+        maxPrice: Infinity,
+        feeTier: 500,
+        chain: CHAIN,
+      });
+
+      expect(result.token0Price).toEqual("1.000002643830950671");
+      expect(result.token1Price).toEqual("0.999997");
+    })();
+
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 2,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+        minPrice: 0,
+        maxPrice: Infinity,
+        feeTier: 500,
+        chain: CHAIN,
+      });
+
+      // Legacy app: 2.00004
+      expect(result.token0Price).toEqual("2.000041611588882732");
+      // Legacy app: 0.499990
+      expect(result.token1Price).toEqual("0.499990");
+    })();
   });
 });
