@@ -11,23 +11,36 @@ const test = testWithSynpress(metaMaskFixtures(basicSetup));
 // Extract expect function from test
 const { expect } = test;
 
+test.beforeEach(async ({ page }) => {
+  // Intercept requests to Base RPC endpoint and remove the Vercel bypass header
+  await page.route("https://mainnet.base.org/", async (route) => {
+    const request = route.request();
+    const headers = { ...request.headers() };
+
+    // Remove the problematic header only for Base RPC requests
+    delete headers["x-vercel-protection-bypass"];
+
+    await route.continue({ headers });
+  });
+});
+
 // A helper function to connect the source wallet (EVM wallet)
 async function connectSourceWallet(page: Page, metamask: MetaMask) {
   // Connect source wallet (EVM wallet)
-  await page.locator('button:has-text("Connect Wallet")').first().click();
-  await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
-  await page.locator('button:has-text("EVM Wallet")').click();
-  await page.locator('button:has-text("MetaMask")').click();
+  await page.locator("button:has-text(\"Connect Wallet\")").first().click();
+  await page.waitForSelector("div[role=\"dialog\"]", { timeout: 10000 });
+  await page.locator("button:has-text(\"EVM Wallet\")").click();
+  await page.locator("button:has-text(\"MetaMask\")").click();
   await metamask.connectToDapp();
   await metamask.approveNewNetwork();
   await metamask.approveSwitchNetwork();
 
   // Click the wallet button again to verify connection
   await page.waitForTimeout(1000); // Give it a moment to complete the connection
-  await page.locator('button:has-text("Wallets")').click();
-  await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
+  await page.locator("button:has-text(\"Wallets\")").click();
+  await page.waitForSelector("div[role=\"dialog\"]", { timeout: 10000 });
   const walletButton = page
-    .locator('div[role="dialog"] button:has-text("0x")')
+    .locator("div[role=\"dialog\"] button:has-text(\"0x\")")
     .first();
   await expect(walletButton).toBeVisible();
   // Close the dialog by clicking somewhere else
@@ -57,23 +70,22 @@ test("should handle token approval flow on deposit page", async ({
   await connectSourceWallet(page, metamask);
 
   // Select Base as source chain
-  await page.locator('button:has-text("Select source...")').first().click();
+  await page.locator("button:has-text(\"Select source...\")").first().click();
   await page.waitForSelector("div.absolute", { timeout: 10000 });
 
   // Find and click on Base option
-  const baseOption = page.locator('button:has-text("Base")').first();
+  const baseOption = page.locator("button:has-text(\"Base\")").first();
   await baseOption.click();
   await metamask.approveNewNetwork();
   await metamask.approveSwitchNetwork();
-  await page.waitForTimeout(60000); // Wait for UI to stabilize
 
   // Enter a deposit amount
-  await page.locator('[placeholder="0.00"]').fill("5");
+  await page.locator("[placeholder=\"0.00\"]").fill("5");
   await page.waitForTimeout(1000);
 
   // The button should now show "Approve Token for Spend" text
   const approveButton = page.locator(
-    'button:has-text("Approve Token for Spend")',
+    "button:has-text(\"Approve Token for Spend\")",
   );
   await expect(approveButton).toBeVisible();
   await expect(approveButton).toBeEnabled();
