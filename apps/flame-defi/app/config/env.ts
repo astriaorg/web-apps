@@ -24,6 +24,8 @@ export const ENV = {
   // coinbase onchainkit
   NEXT_PUBLIC_ONCHAINKIT_API_KEY: process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY,
   NEXT_PUBLIC_CDP_PROJECT_ID: process.env.NEXT_PUBLIC_CDP_PROJECT_ID,
+  // para wallet
+  NEXT_PUBLIC_PARA_API_KEY: process.env.NEXT_PUBLIC_PARA_API_KEY,
   // Feature flags
   NEXT_PUBLIC_FEATURE_EARN_ENABLED:
     process.env.NEXT_PUBLIC_FEATURE_EARN_ENABLED,
