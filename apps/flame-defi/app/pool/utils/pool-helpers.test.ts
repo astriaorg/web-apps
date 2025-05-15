@@ -1,52 +1,25 @@
+import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
+import { getChainConfigs } from "config";
 
-import { TICK_BOUNDARIES } from "pool/types";
+import { type AstriaChain, EvmCurrency, FlameNetwork } from "@repo/flame-types";
 
 import {
-  calculateNearestValidTick,
-  calculatePoolExchangeRate,
+  calculateNearestTickAndPrice,
+  calculateNewPoolPrices,
   calculatePriceToTick,
   calculateTickToPrice,
 } from "./pool-helpers";
 
-// Test our implementation against the values in the Uniswap V3 documentation example.
-describe("calculatePoolExchangeRate", () => {
-  // price = token1/token0 = WETH/USDC
-  const TOKEN_0 = {
-    coinDenom: "USDC",
-    coinDecimals: 6,
-  };
-  const TOKEN_1 = {
-    coinDenom: "WETH",
-    coinDecimals: 18,
-  };
+const ASTRIA_CHAIN = getChainConfigs(FlameNetwork.MAINNET).astriaChains
+  .Astria as AstriaChain;
 
-  it("should return correct exchange rate", () => {
-    const result = calculatePoolExchangeRate({
-      decimal0: TOKEN_0.coinDecimals,
-      decimal1: TOKEN_1.coinDecimals,
-      sqrtPriceX96: 2018382873588440326581633304624437n,
-    });
-
-    expect(
-      new Big(result.rateToken0ToToken1).toFixed(TOKEN_1.coinDecimals),
-    ).toEqual("0.000649004842701370"); // 1 USDC = _ WETH
-    expect(
-      new Big(result.rateToken1ToToken0).toFixed(TOKEN_0.coinDecimals),
-    ).toEqual("1540.820552"); // 1 WETH = _ USDC
-  });
-
-  it("should handle decimal0 > decimal1", () => {
-    const result = calculatePoolExchangeRate({
-      decimal0: 18,
-      decimal1: 6,
-      sqrtPriceX96: 47889311123928123387139217653477427n,
-    });
-
-    expect(result.rateToken0ToToken1).toEqual("0.36535748767549793233");
-    expect(result.rateToken1ToToken0).toEqual("2.73704531515767610072");
-  });
-});
+const TOKEN_0 = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "WTIA",
+) as EvmCurrency;
+const TOKEN_1 = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "USDC",
+) as EvmCurrency;
 
 describe("calculatePriceToTick and calculateTickToPrice", () => {
   // USDC/WETH
@@ -128,24 +101,93 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
   });
 });
 
-describe("calculateNearestValidTick", () => {
-  const TICK_SPACING = 60;
-
-  it("should calculate nearest valid tick for tickLower (min)", () => {
-    const nearestTickLower = calculateNearestValidTick({
-      tick: TICK_BOUNDARIES.MIN,
-      tickSpacing: TICK_SPACING,
+describe("calculateNearestTickAndPrice", () => {
+  it("should calculate nearest tick and price", () => {
+    const result = calculateNearestTickAndPrice({
+      price: 2,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
     });
 
-    expect(nearestTickLower).toEqual(-887220);
+    // Legacy app: 1.9984
+    expect(result.price).toEqual("1.998442298074652790");
   });
 
-  it("should calculate nearest valid tick for tickUpper (max)", () => {
-    const nearestTickUpper = calculateNearestValidTick({
-      tick: TICK_BOUNDARIES.MAX,
-      tickSpacing: TICK_SPACING,
+  it("should handle minimum price", () => {
+    const result = calculateNearestTickAndPrice({
+      price: 0,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
     });
 
-    expect(nearestTickUpper).toEqual(887220);
+    expect(result.tick).toEqual(TickMath.MIN_TICK);
+    expect(result.price).toEqual("0");
+  });
+
+  it("should handle maximum price", () => {
+    const result = calculateNearestTickAndPrice({
+      price: Infinity,
+      token0: TOKEN_0,
+      token1: TOKEN_1,
+      feeTier: 3000,
+    });
+
+    expect(result.tick).toEqual(TickMath.MAX_TICK);
+    expect(result.price).toEqual("Infinity");
+  });
+});
+
+describe("calculateNewPoolPrices", () => {
+  it("should throw an error if price is zero", () => {
+    try {
+      calculateNewPoolPrices({
+        price: 0,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+      });
+    } catch (error) {
+      expect(error).toBeInstanceOf(RangeError);
+    }
+  });
+
+  it("should calculate new pool prices", () => {
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 0.5,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+      });
+
+      // Legacy app: 0.500042
+      expect(result.token0Price).toEqual("0.500042240322764881");
+      // Legacy app: 1.99983
+      expect(result.token1Price).toEqual("1.999831");
+    })();
+
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 1,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+      });
+
+      expect(result.token0Price).toEqual("1.000002643830950671");
+      expect(result.token1Price).toEqual("0.999997");
+    })();
+
+    (() => {
+      const result = calculateNewPoolPrices({
+        price: 2,
+        token0: TOKEN_0,
+        token1: TOKEN_1,
+      });
+
+      // Legacy app: 2.00004
+      expect(result.token0Price).toEqual("2.000041611588882732");
+      // Legacy app: 0.499990
+      expect(result.token1Price).toEqual("0.499990");
+    })();
   });
 });

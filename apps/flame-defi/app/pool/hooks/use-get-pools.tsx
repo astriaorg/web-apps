@@ -1,22 +1,18 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { Pool } from "@uniswap/v3-sdk";
 import { useAstriaChainData } from "config";
-import type { Address } from "viem";
+import { type Address, zeroAddress } from "viem";
 import { useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
-import { isZeroAddress } from "@repo/ui/utils";
 import { createPoolFactoryService } from "features/evm-wallet";
-import { FEE_TIERS, type FeeTier, type PoolWithSlot0 } from "pool/types";
-import { calculatePoolExchangeRate } from "pool/utils";
+import { FEE_TIERS, type FeeTier } from "pool/types";
 
 type GetPoolsResult = {
-  [key in FeeTier]: PoolWithSlot0 | null;
+  [key in FeeTier]: Pool | null;
 };
 
-export const useGetPools = ({
-  token0,
-  token1,
-}: {
+export const useGetPools = (params: {
   token0?: EvmCurrency;
   token1?: EvmCurrency;
 }): UseQueryResult<GetPoolsResult | null> => {
@@ -25,10 +21,10 @@ export const useGetPools = ({
 
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
-    enabled: !!token0 && !!token1,
-    queryKey: ["useGetPools", token0, token1, chain],
+    enabled: !!params.token0 && !!params.token1,
+    queryKey: ["useGetPools", params.token0, params.token1, chain],
     queryFn: async () => {
-      if (!token0 || !token1) {
+      if (!params.token0 || !params.token1) {
         return null;
       }
 
@@ -37,25 +33,24 @@ export const useGetPools = ({
         chain.contracts.poolFactory.address,
       );
 
-      // Handle native tokens. If one of the tokens is native, we need to get the wrapped token address.
-      const token0Address = token0.isNative
-        ? chain.contracts.wrappedNativeToken.address
-        : (token0.erc20ContractAddress as Address);
-      const token1Address = token1.isNative
-        ? chain.contracts.wrappedNativeToken.address
-        : (token1.erc20ContractAddress as Address);
+      const token0 = params.token0.asToken();
+      const token1 = params.token1.asToken();
 
       const pools = await poolFactoryService.getPools(
         FEE_TIERS.map((it) => ({
-          token0: token0Address,
-          token1: token1Address,
+          token0: token0.address as Address,
+          token1: token1.address as Address,
           fee: it,
         })),
       );
 
-      const validPools = pools.filter((it) => !isZeroAddress(it));
+      const validPools = pools.filter((it) => it !== zeroAddress);
+
+      // TODO: Promise.all or combine multicall.
       const slot0Results =
         await poolFactoryService.getSlot0ForPools(validPools);
+      const liquidityResults =
+        await poolFactoryService.getLiquidityForPools(validPools);
 
       const result = {} as GetPoolsResult;
 
@@ -63,21 +58,25 @@ export const useGetPools = ({
         const feeTier = FEE_TIERS[i] as FeeTier;
 
         const slot0Result = slot0Results.find((it) => it.address === pools[i]);
+        const liquidityResult = liquidityResults.find(
+          (it) => it.address === pools[i],
+        );
 
-        if (!slot0Result) {
+        if (!slot0Result || !liquidityResult) {
           result[feeTier] = null;
           continue;
         }
 
-        result[feeTier] = {
-          address: pools[i] as string,
-          ...calculatePoolExchangeRate({
-            decimal0: token0.coinDecimals,
-            decimal1: token1.coinDecimals,
-            sqrtPriceX96: slot0Result.slot0.sqrtPriceX96,
-          }),
-          ...slot0Result.slot0,
-        };
+        const pool = new Pool(
+          token0,
+          token1,
+          feeTier,
+          slot0Result.slot0.sqrtPriceX96.toString(),
+          liquidityResult.liquidity.toString(),
+          slot0Result.slot0.tick,
+        );
+
+        result[feeTier] = pool;
       }
 
       return result;
