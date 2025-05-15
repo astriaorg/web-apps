@@ -7,7 +7,6 @@ import { useConfig } from "wagmi";
 import type { EvmCurrency } from "@repo/flame-types";
 import { createPoolFactoryService } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier } from "pool/types";
-import { getTokenFromInternalToken } from "pool/utils";
 
 type GetPoolsResult = {
   [key in FeeTier]: Pool | null;
@@ -34,8 +33,8 @@ export const useGetPools = (params: {
         chain.contracts.poolFactory.address,
       );
 
-      const token0 = getTokenFromInternalToken(params.token0, chain);
-      const token1 = getTokenFromInternalToken(params.token1, chain);
+      const token0 = params.token0.asToken();
+      const token1 = params.token1.asToken();
 
       const pools = await poolFactoryService.getPools(
         FEE_TIERS.map((it) => ({

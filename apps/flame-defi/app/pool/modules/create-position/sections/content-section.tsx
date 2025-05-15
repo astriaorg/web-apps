@@ -125,7 +125,6 @@ export const ContentSection = () => {
           price: Number(amountInitialPrice.value),
           token0,
           token1,
-          chain,
           feeTier,
         },
       );
@@ -209,7 +208,6 @@ export const ContentSection = () => {
     amountInitialPrice,
     validate,
     feeTier,
-    chain,
   ]);
 
   const optionsToken0 = useMemo(

@@ -1,5 +1,4 @@
 import Big from "big.js";
-import { useAstriaChainData } from "config";
 import { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 
@@ -38,7 +37,6 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     setMaxPrice,
     isPriceRangeValid,
   } = usePageContext();
-  const { chain } = useAstriaChainData();
   const { formatNumber } = useIntl();
 
   const handleReset = useCallback(() => {
@@ -166,11 +164,10 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
         price,
         token0,
         token1,
-        chain,
         feeTier,
       });
     },
-    [feeTier, token0, token1, chain],
+    [feeTier, token0, token1],
   );
 
   const displayMinPrice = useMemo(() => {

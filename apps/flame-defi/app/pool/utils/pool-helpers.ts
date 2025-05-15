@@ -7,7 +7,7 @@ import {
 } from "@uniswap/v3-sdk";
 import JSBI from "jsbi";
 
-import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
+import type { EvmCurrency } from "@repo/flame-types";
 import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
@@ -18,7 +18,6 @@ import {
   type FeeTier,
   TICK_BOUNDARIES,
 } from "pool/types";
-import { getTokenFromInternalToken } from "pool/utils";
 
 export const calculatePriceToTick = ({
   price,
@@ -111,14 +110,12 @@ export const calculateNearestValidTick = ({
  * Calculates the nearest tick price for a given price based on the tick spacing.
  */
 export const calculateUserPriceToNearestTickPrice = ({
-  chain,
   feeTier,
   ...params
 }: {
   price: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
-  chain: AstriaChain;
   feeTier: FeeTier;
 }): string => {
   if (params.price === MIN_PRICE_DEFAULT) {
@@ -128,8 +125,8 @@ export const calculateUserPriceToNearestTickPrice = ({
     return MAX_PRICE_DEFAULT.toString();
   }
 
-  const token0 = getTokenFromInternalToken(params.token0, chain);
-  const token1 = getTokenFromInternalToken(params.token1, chain);
+  const token0 = params.token0.asToken();
+  const token1 = params.token0.asToken();
 
   const price = new Price(
     token0,
@@ -191,18 +188,16 @@ export const calculateDepositType = ({
  * Calculates token prices and ticks for a new pool.
  */
 export const calculateNewPoolPrices = ({
-  chain,
   feeTier,
   ...params
 }: {
   price: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
-  chain: AstriaChain;
   feeTier: FeeTier;
 }) => {
-  const token0 = getTokenFromInternalToken(params.token0, chain);
-  const token1 = getTokenFromInternalToken(params.token1, chain);
+  const token0 = params.token0.asToken();
+  const token1 = params.token0.asToken();
 
   const price = new Price(
     token0,

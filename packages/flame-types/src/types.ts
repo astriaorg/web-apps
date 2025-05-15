@@ -419,6 +419,18 @@ export class EvmCurrency implements GenericCurrency {
     // if one is native and the other is an ERC-20 token, they are not equal
     return false;
   }
+
+  /**
+   * Converts a currency instance to a Uniswap SDK token instance.
+   */
+  public asToken(): Token {
+    // Handle native tokens. If the token is native, use the wrapped native token address.
+    const address = this.isNative
+      ? (this.wrapped?.erc20ContractAddress as Address)
+      : (this.erc20ContractAddress as Address);
+
+    return new Token(this.chainId, address, this.coinDecimals, this.coinDenom);
+  }
 }
 
 /**
