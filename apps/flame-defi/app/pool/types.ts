@@ -72,6 +72,28 @@ export enum DepositType {
   BOTH = "BOTH",
 }
 
+export interface Position {
+  nonce: bigint;
+  operator: string;
+  token0: Address;
+  token1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: bigint;
+  feeGrowthInside0LastX128: bigint;
+  feeGrowthInside1LastX128: bigint;
+  tokensOwed0: bigint;
+  tokensOwed1: bigint;
+}
+
+export interface PositionWithKey extends Position {
+  /**
+   * The position's key is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
+   */
+  key: string;
+}
+
 // TODO: Remove these once we clean up existing pages.
 
 export enum POOL_INPUT_ID {
@@ -133,27 +155,7 @@ export interface PoolToken {
   liquidityPercentage: number;
   token: EvmCurrency;
 }
-
-export interface PoolPositionResponse {
-  nonce: bigint;
-  operator: string;
-  tokenAddress0: Address;
-  tokenAddress1: Address;
-  fee: number;
-  tickLower: number;
-  tickUpper: number;
-  liquidity: bigint;
-  feeGrowthInside0LastX128: bigint;
-  feeGrowthInside1LastX128: bigint;
-  tokensOwed0: bigint;
-  tokensOwed1: bigint;
-}
-
-export interface GetAllPoolPositionsResponse extends PoolPositionResponse {
-  tokenId: string;
-}
-
-export interface PoolPosition extends GetAllPoolPositionsResponse {
+export interface PoolPosition extends PositionWithKey {
   feePercent: FeeTier;
   inRange: boolean;
   positionStatus: string;
@@ -184,7 +186,7 @@ export type PoolPositionContextProps = {
   handleCollectAsWrappedNative: (isCollectAsWrappedNative: boolean) => void;
   poolToken0: PoolToken | null;
   poolToken1: PoolToken | null;
-  poolPosition: PoolPositionResponse | null;
+  poolPosition: Position | null;
   currentPrice: string;
   minPrice: string;
   maxPrice: string;

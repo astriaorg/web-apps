@@ -11,6 +11,19 @@ const test = testWithSynpress(metaMaskFixtures(basicSetup));
 // Extract expect function from test
 const { expect } = test;
 
+test.beforeEach(async ({ page }) => {
+  // Intercept requests to Base RPC endpoint and remove the Vercel bypass header
+  await page.route("https://mainnet.base.org/", async (route) => {
+    const request = route.request();
+    const headers = { ...request.headers() };
+
+    // Remove the problematic header only for Base RPC requests
+    delete headers["x-vercel-protection-bypass"];
+
+    await route.continue({ headers });
+  });
+});
+
 // A helper function to connect the source wallet (EVM wallet)
 async function connectSourceWallet(page: Page, metamask: MetaMask) {
   // Connect source wallet (EVM wallet)
@@ -63,7 +76,8 @@ test("should handle token approval flow on deposit page", async ({
   // Find and click on Base option
   const baseOption = page.locator('button:has-text("Base")').first();
   await baseOption.click();
-  await page.waitForTimeout(1000); // Wait for UI to stabilize
+  await metamask.approveNewNetwork();
+  await metamask.approveSwitchNetwork();
 
   // Enter a deposit amount
   await page.locator('[placeholder="0.00"]').fill("5");
