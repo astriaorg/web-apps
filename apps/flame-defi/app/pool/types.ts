@@ -1,7 +1,6 @@
 import type { Address, Hash } from "viem";
 
 import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
-import type { Slot0 } from "features/evm-wallet";
 
 /**
  * Fee tiers available in Uniswap V3.
@@ -54,17 +53,13 @@ export enum InputId {
  * Tick boundaries for Uniswap V3.
  *
  * These are the maximum and minimum tick values supported by the protocol.
+ *
+ * @deprecated Use `TickMath.MIN_TICK` and `TickMath.MAX_TICK` instead.
  */
 export const TICK_BOUNDARIES = {
   MAX: 887272,
   MIN: -887272,
 } as const;
-
-export type PoolWithSlot0 = Slot0 & {
-  address: string;
-  rateToken0ToToken1: string;
-  rateToken1ToToken0: string;
-};
 
 export enum DepositType {
   TOKEN_0_ONLY = "TOKEN_0_ONLY",

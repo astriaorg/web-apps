@@ -1,6 +1,7 @@
+import type { Token } from "@uniswap/sdk-core";
 import { type Address } from "viem";
 
-import { Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
+import { TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 
 /**
  * Parameters for the exactInputSingle method

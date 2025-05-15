@@ -14,19 +14,25 @@ import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType, FEE_TIER_TICK_SPACING, PoolWithSlot0 } from "pool/types";
-import {
-  calculateNearestValidTick,
-  calculatePriceToSqrtPriceX96,
-  calculatePriceToTick,
-} from "pool/utils";
+import { DepositType } from "pool/types";
+import { calculateNearestTickAndPrice } from "pool/utils";
 
-interface SubmitButtonProps {
+interface BaseSubmitButtonProps {
   amount0: Amount;
   amount1: Amount;
-  pool: PoolWithSlot0 | null;
   depositType: DepositType;
 }
+
+interface InitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
+  sqrtPriceX96: null;
+}
+interface UninitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
+  sqrtPriceX96: bigint;
+}
+
+type SubmitButtonProps =
+  | InitializedPoolSubmitButtonProps
+  | UninitializedPoolSubmitButtonProps;
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
@@ -44,7 +50,7 @@ enum ButtonState {
 export const SubmitButton = ({
   amount0,
   amount1,
-  pool,
+  sqrtPriceX96,
   depositType,
 }: SubmitButtonProps) => {
   const { isConnected, address } = useAccount();
@@ -196,9 +202,6 @@ export const SubmitButton = ({
     setStatus(TransactionStatus.PENDING);
 
     try {
-      // TODO: Implement create position logic.
-      console.log("Creating position...");
-
       const amount0Desired = parseUnits(
         amount0.value || "0",
         token0.coinDecimals,
@@ -224,45 +227,34 @@ export const SubmitButton = ({
       const amount0Min = calculateAmountWithSlippage(amount0Desired);
       const amount1Min = calculateAmountWithSlippage(amount1Desired);
 
-      const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
-      const tickLower = calculateNearestValidTick({
-        tick: calculatePriceToTick({
-          price: Number(minPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        tickSpacing,
+      let { tick: tickLower } = calculateNearestTickAndPrice({
+        price: Number(minPrice),
+        token0,
+        token1,
+        feeTier,
       });
-      const tickUpper = calculateNearestValidTick({
-        tick: calculatePriceToTick({
-          price: Number(maxPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        tickSpacing,
+      let { tick: tickUpper } = calculateNearestTickAndPrice({
+        price: Number(maxPrice),
+        token0,
+        token1,
+        feeTier,
       });
+
+      if (tickLower > tickUpper) {
+        [tickLower, tickUpper] = [tickUpper, tickLower];
+      }
 
       // 20 minute deadline.
       // TODO: Add this to settings.
       const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
-
-      const sqrtPriceX96 = pool
-        ? undefined
-        : BigInt(
-            calculatePriceToSqrtPriceX96({
-              price: Number(amountInitialPrice.value),
-              decimal0: token0.coinDecimals,
-              decimal1: token1.coinDecimals,
-            }),
-          );
 
       const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
         chain,
         token0,
         token1,
         fee: feeTier,
-        tickLower,
-        tickUpper,
+        tickLower: Number(tickLower),
+        tickUpper: Number(tickUpper),
         amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
         amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
         amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
@@ -293,9 +285,8 @@ export const SubmitButton = ({
     amount1,
     minPrice,
     maxPrice,
-    pool,
-    amountInitialPrice,
     slippageTolerance,
+    sqrtPriceX96,
     mint,
   ]);
 
@@ -312,7 +303,7 @@ export const SubmitButton = ({
       return ButtonState.INVALID_INPUT;
     }
 
-    if (!pool && !amountInitialPrice.validation.isValid) {
+    if (sqrtPriceX96 !== null && !amountInitialPrice.validation.isValid) {
       return ButtonState.INVALID_INPUT;
     }
 
@@ -363,7 +354,7 @@ export const SubmitButton = ({
     isConnected,
     status,
     isPriceRangeValid,
-    pool,
+    sqrtPriceX96,
     amountInitialPrice.validation.isValid,
     token0,
     token1,
