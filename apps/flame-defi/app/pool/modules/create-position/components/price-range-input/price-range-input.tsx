@@ -1,3 +1,4 @@
+import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import { useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -9,7 +10,6 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { TICK_BOUNDARIES } from "pool/types";
 import {
   calculateNearestTickAndPrice,
   calculatePriceToTick,
@@ -65,7 +65,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
 
       // Calculate the range of ticks based on the current tick.
       // We want to exponentially center the range from MIN_TICK to MAX_TICK around the current tick, providing more granular control closer to the current price.
-      const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const tickRange = TickMath.MAX_TICK - TickMath.MIN_TICK;
       const maxOffset = tickRange / 2;
 
       // Normalize slider value to [-1, 1]
@@ -81,8 +81,8 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
 
       // Calculate the new tick, ensuring it stays within the bounds.
       const newTick = Math.max(
-        TICK_BOUNDARIES.MIN,
-        Math.min(TICK_BOUNDARIES.MAX, currentTick + tickOffset),
+        TickMath.MIN_TICK,
+        Math.min(TickMath.MAX_TICK, currentTick + tickOffset),
       );
 
       return calculateTickToPrice({
@@ -107,7 +107,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
       }
 
       const tick = calculatePriceToTick({ price });
-      const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const tickRange = TickMath.MAX_TICK - TickMath.MIN_TICK;
       const maxOffset = tickRange / 2;
 
       const tickOffset = tick - currentTick;

@@ -12,12 +12,7 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import {
-  DepositType,
-  FEE_TIER_TICK_SPACING,
-  type FeeTier,
-  TICK_BOUNDARIES,
-} from "pool/types";
+import { DepositType, FEE_TIER_TICK_SPACING, type FeeTier } from "pool/types";
 
 // TODO: Remove?
 export const calculatePriceToTick = ({
@@ -39,11 +34,11 @@ export const calculatePriceToTick = ({
     tick = Math.floor(Math.log(price) / Math.log(1.0001));
   }
 
-  if (tick < TICK_BOUNDARIES.MIN) {
-    return TICK_BOUNDARIES.MIN;
+  if (tick < TickMath.MIN_TICK) {
+    return TickMath.MIN_TICK;
   }
-  if (tick > TICK_BOUNDARIES.MAX) {
-    return TICK_BOUNDARIES.MAX;
+  if (tick > TickMath.MAX_TICK) {
+    return TickMath.MAX_TICK;
   }
 
   return tick;
@@ -130,11 +125,11 @@ export const calculateDepositType = ({
   let minTick = calculatePriceToTick({ price: minPrice, decimal0, decimal1 });
   let maxTick = calculatePriceToTick({ price: maxPrice, decimal0, decimal1 });
 
-  if (minTick < TICK_BOUNDARIES.MIN) {
-    minTick = TICK_BOUNDARIES.MIN;
+  if (minTick < TickMath.MIN_TICK) {
+    minTick = TickMath.MIN_TICK;
   }
-  if (maxTick > TICK_BOUNDARIES.MAX) {
-    maxTick = TICK_BOUNDARIES.MAX;
+  if (maxTick > TickMath.MAX_TICK) {
+    maxTick = TickMath.MAX_TICK;
   }
 
   const currentTick = calculatePriceToTick({
