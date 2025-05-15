@@ -1,7 +1,7 @@
 import Big from "big.js";
-import { type Address, type ChainContract } from "viem";
+import { getChainConfigs } from "config";
 
-import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
+import { type AstriaChain, EvmCurrency, FlameNetwork } from "@repo/flame-types";
 import { TICK_BOUNDARIES } from "pool/types";
 
 import {
@@ -12,31 +12,15 @@ import {
   calculateUserPriceToNearestTickPrice,
 } from "./pool-helpers";
 
-const TOKEN_0 = {
-  chainId: 1,
-  coinDenom: "WTIS",
-  coinDecimals: 18,
-  erc20ContractAddress: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071" as Address,
-  isNative: false,
-  isWrappedNative: true,
-} as EvmCurrency;
+const ASTRIA_CHAIN = getChainConfigs(FlameNetwork.MAINNET).astriaChains
+  .Astria as AstriaChain;
 
-const TOKEN_1 = {
-  chainId: 1,
-  coinDenom: "USDC",
-  coinDecimals: 6,
-  erc20ContractAddress: "0x3f65144F387f6545bF4B19a1B39C94231E1c849F" as Address,
-  isNative: false,
-  isWrappedNative: false,
-} as EvmCurrency;
-
-const CHAIN = {
-  contracts: {
-    wrappedNativeToken: {
-      address: "0x61B7794B6A0Cc383B367c327B91E5Ba85915a071",
-    } as ChainContract,
-  },
-} as AstriaChain;
+const TOKEN_0 = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "WTIA",
+) as EvmCurrency;
+const TOKEN_1 = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "USDC",
+) as EvmCurrency;
 
 describe("calculatePriceToTick and calculateTickToPrice", () => {
   // USDC/WETH
@@ -147,7 +131,6 @@ describe("calculateUserPriceToNearestTickPrice", () => {
       token0: TOKEN_0,
       token1: TOKEN_1,
       feeTier: 3000,
-      chain: CHAIN,
     });
 
     // Legacy app: 1.9984
@@ -160,7 +143,6 @@ describe("calculateUserPriceToNearestTickPrice", () => {
       token0: TOKEN_0,
       token1: TOKEN_1,
       feeTier: 3000,
-      chain: CHAIN,
     });
 
     expect(result).toEqual("0");
@@ -172,7 +154,6 @@ describe("calculateUserPriceToNearestTickPrice", () => {
       token0: TOKEN_0,
       token1: TOKEN_1,
       feeTier: 3000,
-      chain: CHAIN,
     });
 
     expect(result).toEqual("Infinity");
@@ -187,7 +168,6 @@ describe("calculateNewPoolPrices", () => {
         token0: TOKEN_0,
         token1: TOKEN_1,
         feeTier: 3000,
-        chain: CHAIN,
       });
     } catch (error) {
       expect(error).toBeInstanceOf(RangeError);
@@ -201,7 +181,6 @@ describe("calculateNewPoolPrices", () => {
         token0: TOKEN_0,
         token1: TOKEN_1,
         feeTier: 500,
-        chain: CHAIN,
       });
 
       // Legacy app: 0.500042
@@ -216,7 +195,6 @@ describe("calculateNewPoolPrices", () => {
         token0: TOKEN_0,
         token1: TOKEN_1,
         feeTier: 500,
-        chain: CHAIN,
       });
 
       expect(result.token0Price).toEqual("1.000002643830950671");
@@ -229,7 +207,6 @@ describe("calculateNewPoolPrices", () => {
         token0: TOKEN_0,
         token1: TOKEN_1,
         feeTier: 500,
-        chain: CHAIN,
       });
 
       // Legacy app: 2.00004

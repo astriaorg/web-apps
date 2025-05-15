@@ -126,7 +126,7 @@ export const calculateUserPriceToNearestTickPrice = ({
   }
 
   const token0 = params.token0.asToken();
-  const token1 = params.token0.asToken();
+  const token1 = params.token1.asToken();
 
   const price = new Price(
     token0,
@@ -197,7 +197,7 @@ export const calculateNewPoolPrices = ({
   feeTier: FeeTier;
 }) => {
   const token0 = params.token0.asToken();
-  const token1 = params.token0.asToken();
+  const token1 = params.token1.asToken();
 
   const price = new Price(
     token0,
