@@ -7,7 +7,7 @@ import {
   calculateNewPoolPrices,
   calculatePriceToTick,
   calculateTickToPrice,
-  calculateUserPriceToNearestTickPrice,
+  calculateUserPriceToNearestTickAndPrice,
 } from "./pool-helpers";
 
 const ASTRIA_CHAIN = getChainConfigs(FlameNetwork.MAINNET).astriaChains
@@ -102,7 +102,7 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
 
 describe("calculateUserPriceToNearestTickPrice", () => {
   it("should convert user price to nearest tick price", () => {
-    const result = calculateUserPriceToNearestTickPrice({
+    const result = calculateUserPriceToNearestTickAndPrice({
       price: 2,
       token0: TOKEN_0,
       token1: TOKEN_1,
@@ -114,7 +114,7 @@ describe("calculateUserPriceToNearestTickPrice", () => {
   });
 
   it("should handle minimum price", () => {
-    const result = calculateUserPriceToNearestTickPrice({
+    const result = calculateUserPriceToNearestTickAndPrice({
       price: 0,
       token0: TOKEN_0,
       token1: TOKEN_1,
@@ -125,7 +125,7 @@ describe("calculateUserPriceToNearestTickPrice", () => {
   });
 
   it("should handle maximum price", () => {
-    const result = calculateUserPriceToNearestTickPrice({
+    const result = calculateUserPriceToNearestTickAndPrice({
       price: Infinity,
       token0: TOKEN_0,
       token1: TOKEN_1,
@@ -143,7 +143,6 @@ describe("calculateNewPoolPrices", () => {
         price: 0,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        feeTier: 3000,
       });
     } catch (error) {
       expect(error).toBeInstanceOf(RangeError);
@@ -156,7 +155,6 @@ describe("calculateNewPoolPrices", () => {
         price: 0.5,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        feeTier: 500,
       });
 
       // Legacy app: 0.500042
@@ -170,7 +168,6 @@ describe("calculateNewPoolPrices", () => {
         price: 1,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        feeTier: 500,
       });
 
       expect(result.token0Price).toEqual("1.000002643830950671");
@@ -182,7 +179,6 @@ describe("calculateNewPoolPrices", () => {
         price: 2,
         token0: TOKEN_0,
         token1: TOKEN_1,
-        feeTier: 500,
       });
 
       // Legacy app: 2.00004

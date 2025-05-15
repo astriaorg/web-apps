@@ -1,5 +1,4 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { nearestUsableTick } from "@uniswap/v3-sdk";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
@@ -15,8 +14,8 @@ import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType, FEE_TIER_TICK_SPACING } from "pool/types";
-import { calculatePriceToTick } from "pool/utils";
+import { DepositType } from "pool/types";
+import { calculateUserPriceToNearestTickAndPrice } from "pool/utils";
 
 interface BaseSubmitButtonProps {
   amount0: Amount;
@@ -228,23 +227,22 @@ export const SubmitButton = ({
       const amount0Min = calculateAmountWithSlippage(amount0Desired);
       const amount1Min = calculateAmountWithSlippage(amount1Desired);
 
-      const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
-      const tickLower = nearestUsableTick(
-        calculatePriceToTick({
-          price: Number(minPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        tickSpacing,
-      );
-      const tickUpper = nearestUsableTick(
-        calculatePriceToTick({
-          price: Number(maxPrice),
-          decimal0: token0.coinDecimals,
-          decimal1: token1.coinDecimals,
-        }),
-        tickSpacing,
-      );
+      let { tick: tickLower } = calculateUserPriceToNearestTickAndPrice({
+        price: Number(minPrice),
+        token0,
+        token1,
+        feeTier,
+      });
+      let { tick: tickUpper } = calculateUserPriceToNearestTickAndPrice({
+        price: Number(maxPrice),
+        token0,
+        token1,
+        feeTier,
+      });
+
+      if (tickLower > tickUpper) {
+        [tickLower, tickUpper] = [tickUpper, tickLower];
+      }
 
       // 20 minute deadline.
       // TODO: Add this to settings.
@@ -255,8 +253,8 @@ export const SubmitButton = ({
         token0,
         token1,
         fee: feeTier,
-        tickLower,
-        tickUpper,
+        tickLower: Number(tickLower),
+        tickUpper: Number(tickUpper),
         amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
         amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
         amount0Min: getMaxBigInt(amount0Min, BigInt(1)),

@@ -19,6 +19,7 @@ import {
   TICK_BOUNDARIES,
 } from "pool/types";
 
+// TODO: Remove?
 export const calculatePriceToTick = ({
   price,
   decimal0,
@@ -69,9 +70,9 @@ export const calculateTickToPrice = ({
 };
 
 /**
- * Calculates the nearest tick price for a given price based on the tick spacing.
+ * Calculates the nearest tick and price for a given price based on the tick spacing.
  */
-export const calculateUserPriceToNearestTickPrice = ({
+export const calculateUserPriceToNearestTickAndPrice = ({
   feeTier,
   ...params
 }: {
@@ -79,12 +80,15 @@ export const calculateUserPriceToNearestTickPrice = ({
   token0: EvmCurrency;
   token1: EvmCurrency;
   feeTier: FeeTier;
-}): string => {
+}): {
+  tick: number;
+  price: string;
+} => {
   if (params.price === MIN_PRICE_DEFAULT) {
-    return MIN_PRICE_DEFAULT.toString();
+    return { tick: TickMath.MIN_TICK, price: MIN_PRICE_DEFAULT.toString() };
   }
   if (params.price === MAX_PRICE_DEFAULT) {
-    return MAX_PRICE_DEFAULT.toString();
+    return { tick: TickMath.MAX_TICK, price: MAX_PRICE_DEFAULT.toString() };
   }
 
   const token0 = params.token0.asToken();
@@ -104,7 +108,10 @@ export const calculateUserPriceToNearestTickPrice = ({
 
   const nearestPrice = tickToPrice(token0, token1, nearestTick);
 
-  return nearestPrice.toFixed(token0.decimals);
+  return {
+    tick: nearestTick,
+    price: nearestPrice.toFixed(token0.decimals),
+  };
 };
 
 export const calculateDepositType = ({
@@ -149,14 +156,10 @@ export const calculateDepositType = ({
 /**
  * Calculates token prices and ticks for a new pool.
  */
-export const calculateNewPoolPrices = ({
-  feeTier,
-  ...params
-}: {
+export const calculateNewPoolPrices = (params: {
   price: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
-  feeTier: FeeTier;
 }) => {
   const token0 = params.token0.asToken();
   const token1 = params.token1.asToken();
@@ -168,18 +171,8 @@ export const calculateNewPoolPrices = ({
     JSBI.BigInt(params.price * 10 ** token1.decimals),
   );
 
-  const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
-
   const tick = priceToClosestTick(price);
   const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick);
-
-  let tickLower, tickUpper;
-
-  tickLower = nearestUsableTick(TickMath.MIN_TICK, tickSpacing);
-  tickLower = TickMath.MIN_TICK;
-
-  tickUpper = nearestUsableTick(TickMath.MAX_TICK, tickSpacing);
-  tickUpper = TickMath.MAX_TICK;
 
   const actualPriceObj = tickToPrice(token0, token1, tick);
   const token1Price = actualPriceObj.invert().toFixed(token1.decimals);
@@ -188,11 +181,7 @@ export const calculateNewPoolPrices = ({
   return {
     sqrtPriceX96: BigInt(sqrtPriceX96.toString()),
     tick,
-    tickLower,
-    tickUpper,
     token0Price,
     token1Price,
-    minPriceInTick: tickToPrice(token0, token1, tickLower),
-    maxPriceInTick: tickToPrice(token0, token1, tickUpper),
   };
 };

@@ -13,7 +13,7 @@ import { TICK_BOUNDARIES } from "pool/types";
 import {
   calculatePriceToTick,
   calculateTickToPrice,
-  calculateUserPriceToNearestTickPrice,
+  calculateUserPriceToNearestTickAndPrice,
 } from "pool/utils";
 
 import { MinMaxInput } from "./min-max-input";
@@ -152,20 +152,22 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     [sliderToPrice, setMinPrice, setMaxPrice],
   );
 
-  const getCalculatedPriceRange = useCallback(
-    (params: { price: string }) => {
+  const getNearestPriceRange = useCallback(
+    (params: { price: string }): string | void => {
       const price = Number(params.price);
 
       if (!token0 || !token1 || isNaN(price)) {
         return;
       }
 
-      return calculateUserPriceToNearestTickPrice({
+      const { price: nearestPrice } = calculateUserPriceToNearestTickAndPrice({
         price,
         token0,
         token1,
         feeTier,
       });
+
+      return nearestPrice;
     },
     [feeTier, token0, token1],
   );
@@ -225,7 +227,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             value={displayMinPrice}
             onInput={(event) => setMinPrice(event.currentTarget.value)}
             onBlur={(event) => {
-              const result = getCalculatedPriceRange({
+              const result = getNearestPriceRange({
                 price: event.currentTarget.value,
               });
               if (result) {
@@ -239,7 +241,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             value={displayMaxPrice}
             onInput={(event) => setMaxPrice(event.currentTarget.value)}
             onBlur={(event) => {
-              const result = getCalculatedPriceRange({
+              const result = getNearestPriceRange({
                 price: event.currentTarget.value,
               });
               if (result) {
