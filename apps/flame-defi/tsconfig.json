@@ -12,5 +12,14 @@
     ".next/types/**/*.ts",
     "types-for-contrib.d.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [
+    "node_modules",
+    ".cache-synpress",
+    ".next",
+    ".swc",
+    ".turbo",
+    "coverage",
+    "playwright-report",
+    "test-results"
+  ]
 }

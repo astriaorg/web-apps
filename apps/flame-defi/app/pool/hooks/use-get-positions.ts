@@ -35,7 +35,7 @@ export const useGetPositions = (): UseQueryResult<
     queryKey: ["useGetPositions", chain.chainId, address],
     queryFn: async () => {
       if (!address) {
-        return;
+        return null;
       }
 
       const nonfungiblePositionManagerService =
@@ -71,6 +71,9 @@ export const useGetPositions = (): UseQueryResult<
 
         if (!token0 || !token1) {
           throw new Error("Tokens in position not found.");
+        }
+        if (!pools[index]) {
+          throw new Error("No matching pool for position found.");
         }
 
         return {
