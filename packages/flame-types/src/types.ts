@@ -5,6 +5,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
+import { Token } from "@uniswap/sdk-core";
 import Big from "big.js";
 import JSBI from "jsbi";
 import React from "react";
@@ -609,32 +610,6 @@ export interface GetQuoteResult {
   quoteGasAdjustedDecimals: string;
   route: Array<V3PoolInRoute[]>;
   routeString: string;
-}
-
-export class Token {
-  readonly chainId: number;
-  readonly address: string;
-  readonly decimals: number;
-  readonly symbol: string;
-
-  constructor(
-    chainId: number,
-    address: string,
-    decimals: number,
-    symbol: string,
-  ) {
-    this.chainId = chainId;
-    this.address = address;
-    this.decimals = decimals;
-    this.symbol = symbol;
-  }
-
-  equals(other: Token): boolean {
-    return (
-      this.chainId === other.chainId &&
-      this.address.toLowerCase() === other.address.toLowerCase()
-    );
-  }
 }
 
 // 100% in basis points

@@ -1,12 +1,8 @@
+import { Token } from "@uniswap/sdk-core";
 import { type Config } from "@wagmi/core";
 import { Abi, type Address, Chain, encodeFunctionData, type Hash } from "viem";
 
-import {
-  GetQuoteResult,
-  Token,
-  TokenAmount,
-  TRADE_TYPE,
-} from "@repo/flame-types";
+import { GetQuoteResult, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 
 import { GenericContractService } from "../generic-contract-service";
 import SWAP_ROUTER_ABI from "./swaprouter02.json";

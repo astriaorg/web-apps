@@ -1,3 +1,4 @@
+import type { Token } from "@uniswap/sdk-core";
 import JSBI from "jsbi";
 import { useCallback, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
@@ -5,7 +6,6 @@ import { formatUnits } from "viem";
 
 import {
   GetQuoteResult,
-  Token,
   TokenAmount,
   TokenInputState,
   TRADE_TYPE,

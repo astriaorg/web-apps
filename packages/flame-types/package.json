@@ -2,7 +2,8 @@
   "name": "@repo/flame-types",
   "version": "0.0.0",
   "dependencies": {
-    "jsbi": "^4.3.0"
+    "@uniswap/sdk-core": "^7.7.2",
+    "@uniswap/v3-sdk": "^3.25.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -11,6 +12,9 @@
   },
   "exports": {
     "default": "./src/types.ts"
+  },
+  "peerDependencies": {
+    "jsbi": "^3.2.5"
   },
   "private": true,
   "scripts": {
