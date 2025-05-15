@@ -1,8 +1,10 @@
-import { ParaEvmProvider, coinbaseWallet, metaMaskWallet, walletConnectWallet } from "@getpara/evm-wallet-connectors";
 import {
-  ParaModal,
-  ParaProvider,
-} from "@getpara/react-sdk";
+  coinbaseWallet,
+  metaMaskWallet,
+  ParaEvmProvider,
+  walletConnectWallet,
+} from "@getpara/evm-wallet-connectors";
+import { ParaModal, ParaProvider } from "@getpara/react-sdk";
 import { useConfig } from "config";
 import { ReactNode, useMemo, useState } from "react";
 
@@ -34,7 +36,8 @@ export function ParaClientProvider({ children }: { children: ReactNode }) {
         env: PARA_ENV,
         apiKey: PARA_API_KEY,
       }}
-      config={undefined}>
+      config={undefined}
+    >
       <ParaEvmProvider
         config={{
           projectId: WALLET_CONNECT_PROJECT_ID,
