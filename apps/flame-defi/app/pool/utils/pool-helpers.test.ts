@@ -1,3 +1,4 @@
+import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import { getChainConfigs } from "config";
 
@@ -100,8 +101,8 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
   });
 });
 
-describe("calculateUserPriceToNearestTickPrice", () => {
-  it("should convert user price to nearest tick price", () => {
+describe("calculateNearestTickAndPrice", () => {
+  it("should calculate nearest tick and price", () => {
     const result = calculateNearestTickAndPrice({
       price: 2,
       token0: TOKEN_0,
@@ -110,7 +111,7 @@ describe("calculateUserPriceToNearestTickPrice", () => {
     });
 
     // Legacy app: 1.9984
-    expect(result).toEqual("1.998442298074652790");
+    expect(result.price).toEqual("1.998442298074652790");
   });
 
   it("should handle minimum price", () => {
@@ -121,7 +122,8 @@ describe("calculateUserPriceToNearestTickPrice", () => {
       feeTier: 3000,
     });
 
-    expect(result).toEqual("0");
+    expect(result.tick).toEqual(TickMath.MIN_TICK);
+    expect(result.price).toEqual("0");
   });
 
   it("should handle maximum price", () => {
@@ -132,7 +134,8 @@ describe("calculateUserPriceToNearestTickPrice", () => {
       feeTier: 3000,
     });
 
-    expect(result).toEqual("Infinity");
+    expect(result.tick).toEqual(TickMath.MAX_TICK);
+    expect(result.price).toEqual("Infinity");
   });
 });
 
