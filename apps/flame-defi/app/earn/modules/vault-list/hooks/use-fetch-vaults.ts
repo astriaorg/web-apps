@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { useConfig } from "config/hooks/use-config";
 import request from "graphql-request";
 
-import { useConfig } from "config/hooks/use-config";
 import { graphql } from "earn/generated/gql";
 import {
   OrderDirection,

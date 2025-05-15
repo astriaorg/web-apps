@@ -1,5 +1,4 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
@@ -8,6 +7,7 @@ import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
+import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
 import { getMaxBigInt } from "features/evm-wallet/services/services.utils";
 import { useApproveToken } from "hooks/use-approve-token";

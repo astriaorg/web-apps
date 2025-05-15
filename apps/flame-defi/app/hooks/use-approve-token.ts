@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Big from "big.js";
-import { useAstriaChainData } from "config";
 import { useCallback } from "react";
 import { type Address, formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
 import { createErc20Service } from "features/evm-wallet";
 
 // TODO: Unify token approval hooks.

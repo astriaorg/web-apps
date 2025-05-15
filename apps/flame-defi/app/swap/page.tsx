@@ -1,6 +1,5 @@
 "use client";
 
-import { useAstriaChainData } from "config";
 import debounce from "lodash.debounce";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
@@ -16,6 +15,7 @@ import { Button } from "@repo/ui/components";
 import { ArrowDownIcon } from "@repo/ui/icons";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 
 import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";

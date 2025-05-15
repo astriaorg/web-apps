@@ -1,5 +1,6 @@
 "use client";
 
+import { useAstriaChainData } from "config/hooks/use-config";
 import { useParams } from "next/navigation";
 import {
   createContext,
@@ -12,7 +13,6 @@ import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
-import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,

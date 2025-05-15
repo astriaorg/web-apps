@@ -1,8 +1,8 @@
-import { useAstriaChainData } from "config";
 import debounce from "lodash.debounce";
 import { useEffect, useRef } from "react";
 
 import { EvmCurrency, TokenInputState, TRADE_TYPE } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
 
 import { useGetQuote } from "./use-get-quote";
 

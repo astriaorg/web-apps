@@ -1,10 +1,3 @@
-import {
-  type AppConfig,
-  type Environment,
-  getChainConfigs,
-  getEnvVariable,
-  getOptionalEnvVariable,
-} from "config";
 import React, { useMemo } from "react";
 import { type Address } from "viem";
 
@@ -15,6 +8,13 @@ import {
   FlameNetwork,
 } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
+import {
+  type AppConfig,
+  type Environment,
+  getChainConfigs,
+  getEnvVariable,
+  getOptionalEnvVariable,
+} from "config";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,

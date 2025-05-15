@@ -1,10 +1,10 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { Pool } from "@uniswap/v3-sdk";
-import { useAstriaChainData } from "config";
 import { type Address, zeroAddress } from "viem";
 import { useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
 import { createPoolFactoryService } from "features/evm-wallet";
 import { FEE_TIERS, type FeeTier } from "pool/types";
 
