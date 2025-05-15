@@ -1,4 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { nearestUsableTick } from "@uniswap/v3-sdk";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
@@ -15,7 +16,7 @@ import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, FEE_TIER_TICK_SPACING } from "pool/types";
-import { calculateNearestValidTick, calculatePriceToTick } from "pool/utils";
+import { calculatePriceToTick } from "pool/utils";
 
 interface BaseSubmitButtonProps {
   amount0: Amount;
@@ -228,22 +229,22 @@ export const SubmitButton = ({
       const amount1Min = calculateAmountWithSlippage(amount1Desired);
 
       const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
-      const tickLower = calculateNearestValidTick({
-        tick: calculatePriceToTick({
+      const tickLower = nearestUsableTick(
+        calculatePriceToTick({
           price: Number(minPrice),
           decimal0: token0.coinDecimals,
           decimal1: token1.coinDecimals,
         }),
         tickSpacing,
-      });
-      const tickUpper = calculateNearestValidTick({
-        tick: calculatePriceToTick({
+      );
+      const tickUpper = nearestUsableTick(
+        calculatePriceToTick({
           price: Number(maxPrice),
           decimal0: token0.coinDecimals,
           decimal1: token1.coinDecimals,
         }),
         tickSpacing,
-      });
+      );
 
       // 20 minute deadline.
       // TODO: Add this to settings.
@@ -304,7 +305,7 @@ export const SubmitButton = ({
       return ButtonState.INVALID_INPUT;
     }
 
-    if (sqrtPriceX96 === null && !amountInitialPrice.validation.isValid) {
+    if (sqrtPriceX96 !== null && !amountInitialPrice.validation.isValid) {
       return ButtonState.INVALID_INPUT;
     }
 

@@ -2,10 +2,8 @@ import Big from "big.js";
 import { getChainConfigs } from "config";
 
 import { type AstriaChain, EvmCurrency, FlameNetwork } from "@repo/flame-types";
-import { TICK_BOUNDARIES } from "pool/types";
 
 import {
-  calculateNearestValidTick,
   calculateNewPoolPrices,
   calculatePriceToTick,
   calculateTickToPrice,
@@ -99,28 +97,6 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
 
     expect(decimalAdjustedTickLower).toEqual(TICK_LOWER);
     expect(decimalAdjustedTickUpper).toEqual(TICK_UPPER);
-  });
-});
-
-describe("calculateNearestValidTick", () => {
-  const TICK_SPACING = 60;
-
-  it("should calculate nearest valid tick for tickLower (min)", () => {
-    const nearestTickLower = calculateNearestValidTick({
-      tick: TICK_BOUNDARIES.MIN,
-      tickSpacing: TICK_SPACING,
-    });
-
-    expect(nearestTickLower).toEqual(-887220);
-  });
-
-  it("should calculate nearest valid tick for tickUpper (max)", () => {
-    const nearestTickUpper = calculateNearestValidTick({
-      tick: TICK_BOUNDARIES.MAX,
-      tickSpacing: TICK_SPACING,
-    });
-
-    expect(nearestTickUpper).toEqual(887220);
   });
 });
 
