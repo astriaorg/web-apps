@@ -1,5 +1,6 @@
 "use client";
 
+import { useAstriaChainData } from "config/hooks/use-config";
 import { useParams } from "next/navigation";
 import {
   createContext,
@@ -12,7 +13,6 @@ import { useIntl } from "react-intl";
 import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
-import { useAstriaChainData } from "config/hooks/use-config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
@@ -40,7 +40,7 @@ export const PoolPositionContextProvider = ({
   const wagmiConfig = useConfig();
   const { address } = useAccount();
   const { formatNumber } = useIntl();
-  const positionNftId = params["position-nft-id"] as string;
+  const positionNftId = params["token-id"] as string;
   const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
   const { currencies } = chain;
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =

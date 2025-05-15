@@ -29,7 +29,7 @@ export interface CreateAndInitializePoolIfNecessaryAndMintParams {
   amount1Min: bigint;
   recipient: Address;
   deadline: bigint;
-  sqrtPriceX96?: bigint;
+  sqrtPriceX96: bigint | null;
 }
 
 export interface CreateAndInitializePoolIfNecessaryParams {

@@ -1,6 +1,4 @@
 import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
-import { useAstriaChainData } from "config";
-import { useConfig } from "config";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { type Address, Chain, type Hash } from "viem";
 import {
@@ -16,6 +14,8 @@ import {
 } from "@repo/flame-types";
 import { TRADE_TYPE, TXN_STATUS } from "@repo/flame-types";
 import { getSlippageTolerance } from "@repo/ui/utils";
+import { useAstriaChainData } from "config";
+import { useConfig } from "config";
 import {
   createSwapRouterService,
   createTradeFromQuote,

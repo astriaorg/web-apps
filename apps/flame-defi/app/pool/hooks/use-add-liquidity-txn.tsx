@@ -1,10 +1,10 @@
-import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import { useEffect, useState } from "react";
 import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 
 import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
 import { getSlippageTolerance } from "@repo/ui/utils";
+import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,

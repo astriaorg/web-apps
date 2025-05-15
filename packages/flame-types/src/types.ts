@@ -5,6 +5,7 @@ import type {
   DenomUnit,
 } from "@chain-registry/types";
 import type { Chain } from "@rainbow-me/rainbowkit";
+import { Token } from "@uniswap/sdk-core";
 import Big from "big.js";
 import JSBI from "jsbi";
 import React from "react";
@@ -331,6 +332,9 @@ export class EvmCurrency implements GenericCurrency {
   public readonly coinMinimalDenom: string;
   public readonly coinDecimals: number;
 
+  /** The wrapped token if this is a native token (e.g., TIA). */
+  public readonly wrapped: EvmCurrency | null;
+
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
   public readonly ibcWithdrawalFeeWei?: string;
 
@@ -355,6 +359,7 @@ export class EvmCurrency implements GenericCurrency {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
+    wrapped: EvmCurrency | null;
     ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: Address;
     nativeTokenWithdrawerContractAddress?: Address;
@@ -366,6 +371,7 @@ export class EvmCurrency implements GenericCurrency {
     this.coinDenom = params.coinDenom;
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;
+    this.wrapped = params.wrapped;
     this.ibcWithdrawalFeeWei = params.ibcWithdrawalFeeWei;
     this.erc20ContractAddress = params.erc20ContractAddress;
     this.nativeTokenWithdrawerContractAddress =
@@ -412,6 +418,18 @@ export class EvmCurrency implements GenericCurrency {
 
     // if one is native and the other is an ERC-20 token, they are not equal
     return false;
+  }
+
+  /**
+   * Converts a currency instance to a Uniswap SDK token instance.
+   */
+  public asToken(): Token {
+    // Handle native tokens. If the token is native, use the wrapped native token address.
+    const address = this.isNative
+      ? (this.wrapped?.erc20ContractAddress as Address)
+      : (this.erc20ContractAddress as Address);
+
+    return new Token(this.chainId, address, this.coinDecimals, this.coinDenom);
   }
 }
 
@@ -604,32 +622,6 @@ export interface GetQuoteResult {
   quoteGasAdjustedDecimals: string;
   route: Array<V3PoolInRoute[]>;
   routeString: string;
-}
-
-export class Token {
-  readonly chainId: number;
-  readonly address: string;
-  readonly decimals: number;
-  readonly symbol: string;
-
-  constructor(
-    chainId: number,
-    address: string,
-    decimals: number,
-    symbol: string,
-  ) {
-    this.chainId = chainId;
-    this.address = address;
-    this.decimals = decimals;
-    this.symbol = symbol;
-  }
-
-  equals(other: Token): boolean {
-    return (
-      this.chainId === other.chainId &&
-      this.address.toLowerCase() === other.address.toLowerCase()
-    );
-  }
 }
 
 // 100% in basis points

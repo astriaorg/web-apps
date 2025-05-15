@@ -1,54 +1,20 @@
-import Big from "big.js";
-
+import { Price } from "@uniswap/sdk-core";
 import {
-  DepositType,
-  FEE_TIER_TICK_SPACING,
-  type FeeTier,
-  TICK_BOUNDARIES,
-} from "pool/types";
+  nearestUsableTick,
+  priceToClosestTick,
+  TickMath,
+  tickToPrice,
+} from "@uniswap/v3-sdk";
+import JSBI from "jsbi";
 
-/**
- * Implements the calculation to get the exchange rate of the pool.
- *
- * The exchange rate is calculated using the formula defined in the Uniswap V3 documentation.
- *
- * Ref: https://blog.uniswap.org/uniswap-v3-math-primer#how-do-i-calculate-the-current-exchange-rate
- */
-export const calculatePoolExchangeRate = ({
-  decimal0,
-  decimal1,
-  sqrtPriceX96,
-}: {
-  decimal0: number;
-  decimal1: number;
-  sqrtPriceX96: bigint;
-}): {
-  /**
-   * 1 Token 0 = _ Token 1
-   */
-  rateToken0ToToken1: string;
-  /**
-   * 1 Token 1 = _ Token 0
-   */
-  rateToken1ToToken0: string;
-} => {
-  // Calculate the numerator: (sqrtPriceX96 / 2**96)**2
-  const numerator = new Big(sqrtPriceX96.toString())
-    .div(new Big(2).pow(96))
-    .pow(2);
-  // Calculate the denominator: 10**Decimal1 / 10**Decimal0
-  // We still divide by the same amount to normalize the raw price to the adjusted price, so it doesn't matter which token has more decimals.
-  const denominator = new Big(10).pow(Math.abs(decimal1 - decimal0));
+import type { EvmCurrency } from "@repo/flame-types";
+import {
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+} from "pool/modules/create-position/types";
+import { DepositType, FEE_TIER_TICK_SPACING, type FeeTier } from "pool/types";
 
-  const buyOneOfToken0 = numerator.div(denominator).toFixed();
-  const buyOneOfToken1 = new Big(1).div(buyOneOfToken0).toFixed();
-
-  return {
-    rateToken0ToToken1: buyOneOfToken0,
-    rateToken1ToToken0: buyOneOfToken1,
-  };
-};
-
+// TODO: Remove?
 export const calculatePriceToTick = ({
   price,
   decimal0,
@@ -68,11 +34,11 @@ export const calculatePriceToTick = ({
     tick = Math.floor(Math.log(price) / Math.log(1.0001));
   }
 
-  if (tick < TICK_BOUNDARIES.MIN) {
-    return TICK_BOUNDARIES.MIN;
+  if (tick < TickMath.MIN_TICK) {
+    return TickMath.MIN_TICK;
   }
-  if (tick > TICK_BOUNDARIES.MAX) {
-    return TICK_BOUNDARIES.MAX;
+  if (tick > TickMath.MAX_TICK) {
+    return TickMath.MAX_TICK;
   }
 
   return tick;
@@ -98,108 +64,48 @@ export const calculateTickToPrice = ({
   return price;
 };
 
-export const calculatePriceToSqrtPriceX96 = ({
-  price,
-  decimal0,
-  decimal1,
+/**
+ * Calculates the nearest tick and price for a given user price based on the fee tier.
+ */
+export const calculateNearestTickAndPrice = ({
+  feeTier,
+  ...params
 }: {
   price: number;
-  decimal0: number;
-  decimal1: number;
-}) => {
-  const sqrtPrice = Math.sqrt(price * Math.pow(10, decimal0 - decimal1));
-  const sqrtPriceX96 = sqrtPrice * Math.pow(2, 96);
-
-  return sqrtPriceX96;
-};
-
-/**
- * Calculates the nearest valid tick for a given tick lower or upper bound.
- *
- * Rounding behavior:
- * - For positive ticks: Always round DOWN to the nearest multiple of `tickSpacing`.
- * - For negative ticks: Always round UP (toward zero) to the nearest multiple of `tickSpacing`.
- *
- * This matches the implementation in the contract.
- */
-export const calculateNearestValidTick = ({
-  tick,
-  tickSpacing,
-}: {
-  tick: number;
-  tickSpacing: number;
-}): number => {
-  // For negative ticks, round toward zero (ceil)
-  // For positive ticks, round down (floor)
-  return tick < 0
-    ? Math.ceil(tick / tickSpacing) * tickSpacing
-    : Math.floor(tick / tickSpacing) * tickSpacing;
-};
-
-export const calculatePriceRange = ({
-  feeTier,
-  decimal0,
-  decimal1,
-  minPrice,
-  maxPrice,
-}: {
+  token0: EvmCurrency;
+  token1: EvmCurrency;
   feeTier: FeeTier;
-  decimal0: number;
-  decimal1: number;
-  minPrice: number;
-  maxPrice: number;
-}) => {
+}): {
+  tick: number;
+  price: string;
+} => {
+  if (params.price === MIN_PRICE_DEFAULT) {
+    return { tick: TickMath.MIN_TICK, price: MIN_PRICE_DEFAULT.toString() };
+  }
+  if (params.price === MAX_PRICE_DEFAULT) {
+    return { tick: TickMath.MAX_TICK, price: MAX_PRICE_DEFAULT.toString() };
+  }
+
+  const token0 = params.token0.asToken();
+  const token1 = params.token1.asToken();
+
+  const price = new Price(
+    token0,
+    token1,
+    JSBI.BigInt(10 ** token0.decimals),
+    JSBI.BigInt(Math.round(params.price * 10 ** token1.decimals)),
+  );
+
+  const tick = priceToClosestTick(price);
+
   const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+  const nearestTick = nearestUsableTick(tick, tickSpacing);
 
-  const minTick = calculatePriceToTick({
-    price: minPrice,
-    decimal0,
-    decimal1,
-  });
-  const maxTick = calculatePriceToTick({
-    price: maxPrice,
-    decimal0,
-    decimal1,
-  });
-
-  const validMinTick = calculateNearestValidTick({
-    tick: minTick,
-    tickSpacing,
-  });
-  const validMaxTick = calculateNearestValidTick({
-    tick: maxTick,
-    tickSpacing,
-  });
-
-  const actualMinPrice = calculateTickToPrice({
-    tick: validMinTick,
-    decimal0,
-    decimal1,
-  });
-  const actualMaxPrice = calculateTickToPrice({
-    tick: validMaxTick,
-    decimal0,
-    decimal1,
-  });
-
-  const minSqrtPriceX96 = calculatePriceToSqrtPriceX96({
-    price: actualMinPrice,
-    decimal0,
-    decimal1,
-  });
-  const maxSqrtPriceX96 = calculatePriceToSqrtPriceX96({
-    price: actualMaxPrice,
-    decimal0,
-    decimal1,
-  });
+  const nearestPrice = tickToPrice(token0, token1, nearestTick);
 
   return {
-    minTick: validMinTick,
-    maxTick: validMaxTick,
-    minPrice: actualMinPrice,
-    maxPrice: actualMaxPrice,
-    minSqrtPriceX96,
-    maxSqrtPriceX96,
+    tick: nearestTick,
+    price: nearestPrice.toFixed(token0.decimals),
   };
 };
 
@@ -219,11 +125,11 @@ export const calculateDepositType = ({
   let minTick = calculatePriceToTick({ price: minPrice, decimal0, decimal1 });
   let maxTick = calculatePriceToTick({ price: maxPrice, decimal0, decimal1 });
 
-  if (minTick < TICK_BOUNDARIES.MIN) {
-    minTick = TICK_BOUNDARIES.MIN;
+  if (minTick < TickMath.MIN_TICK) {
+    minTick = TickMath.MIN_TICK;
   }
-  if (maxTick > TICK_BOUNDARIES.MAX) {
-    maxTick = TICK_BOUNDARIES.MAX;
+  if (maxTick > TickMath.MAX_TICK) {
+    maxTick = TickMath.MAX_TICK;
   }
 
   const currentTick = calculatePriceToTick({
@@ -240,4 +146,37 @@ export const calculateDepositType = ({
   }
 
   return DepositType.BOTH;
+};
+
+/**
+ * Calculates token prices and ticks for a new pool.
+ */
+export const calculateNewPoolPrices = (params: {
+  price: number;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+}) => {
+  const token0 = params.token0.asToken();
+  const token1 = params.token1.asToken();
+
+  const price = new Price(
+    token0,
+    token1,
+    JSBI.BigInt(10 ** token0.decimals),
+    JSBI.BigInt(params.price * 10 ** token1.decimals),
+  );
+
+  const tick = priceToClosestTick(price);
+  const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick);
+
+  const actualPriceObj = tickToPrice(token0, token1, tick);
+  const token1Price = actualPriceObj.invert().toFixed(token1.decimals);
+  const token0Price = actualPriceObj.toFixed(token0.decimals);
+
+  return {
+    sqrtPriceX96: BigInt(sqrtPriceX96.toString()),
+    tick,
+    token0Price,
+    token1Price,
+  };
 };

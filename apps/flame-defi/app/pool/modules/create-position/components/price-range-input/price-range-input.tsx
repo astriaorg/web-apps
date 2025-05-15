@@ -1,5 +1,6 @@
+import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
 import { Card, CardContent, Slider } from "@repo/ui/components";
@@ -9,9 +10,8 @@ import {
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
 } from "pool/modules/create-position/types";
-import { TICK_BOUNDARIES } from "pool/types";
 import {
-  calculatePriceRange,
+  calculateNearestTickAndPrice,
   calculatePriceToTick,
   calculateTickToPrice,
 } from "pool/utils";
@@ -20,10 +20,10 @@ import { MinMaxInput } from "./min-max-input";
 
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
-const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
+const SLIDER_EXPONENT = 8; // Control the curve steepness of the slider.
 
 interface PriceRangeInputProps {
-  rate?: string;
+  rate: string | null;
 }
 
 export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
@@ -49,6 +49,11 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     handleReset();
   }, [rate, handleReset]);
 
+  const [sliderValue, setSliderValue] = useState<number[]>([
+    SLIDER_MIN,
+    SLIDER_MAX,
+  ]);
+
   const sliderToPrice = useCallback(
     (value: number): number => {
       const currentTick = calculatePriceToTick({
@@ -65,7 +70,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
 
       // Calculate the range of ticks based on the current tick.
       // We want to exponentially center the range from MIN_TICK to MAX_TICK around the current tick, providing more granular control closer to the current price.
-      const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
+      const tickRange = TickMath.MAX_TICK - TickMath.MIN_TICK;
       const maxOffset = tickRange / 2;
 
       // Normalize slider value to [-1, 1]
@@ -81,8 +86,8 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
 
       // Calculate the new tick, ensuring it stays within the bounds.
       const newTick = Math.max(
-        TICK_BOUNDARIES.MIN,
-        Math.min(TICK_BOUNDARIES.MAX, currentTick + tickOffset),
+        TickMath.MIN_TICK,
+        Math.min(TickMath.MAX_TICK, currentTick + tickOffset),
       );
 
       return calculateTickToPrice({
@@ -92,55 +97,13 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     [rate],
   );
 
-  const priceToSlider = useCallback(
-    (price: number): number => {
-      const currentTick = calculatePriceToTick({
-        price: Number(rate),
-      });
-
-      if (price <= MIN_PRICE_DEFAULT) {
-        return SLIDER_MIN;
-      }
-
-      if (price >= MAX_PRICE_DEFAULT) {
-        return SLIDER_MAX;
-      }
-
-      const tick = calculatePriceToTick({ price });
-      const tickRange = TICK_BOUNDARIES.MAX - TICK_BOUNDARIES.MIN;
-      const maxOffset = tickRange / 2;
-
-      const tickOffset = tick - currentTick;
-
-      // Normalize the tick offset to the [-1, 1] range.
-      const normalizedOffset = tickOffset / maxOffset;
-
-      // Invert the exponential scaling.
-      const invertedScaledOffset =
-        Math.sign(normalizedOffset) *
-        Math.pow(Math.abs(normalizedOffset), 1 / SLIDER_EXPONENT);
-
-      // Map the normalized offset to the slider range [0, SLIDER_MAX].
-      const sliderValue =
-        SLIDER_MAX / 2 + invertedScaledOffset * (SLIDER_MAX / 2);
-
-      return Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, sliderValue));
-    },
-    [rate],
-  );
-
-  const sliderValue = useMemo(() => {
-    const min = priceToSlider(Number(minPrice));
-    const max = priceToSlider(Number(maxPrice));
-
-    return [min, max];
-  }, [priceToSlider, minPrice, maxPrice]);
-
   const handleSliderValueChange = useCallback(
     (values: number[]) => {
       if (values.length !== 2) {
         return;
       }
+
+      setSliderValue(values);
 
       const minPrice = sliderToPrice(values[0] as number);
       const maxPrice = sliderToPrice(values[1] as number);
@@ -151,22 +114,22 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     [sliderToPrice, setMinPrice, setMaxPrice],
   );
 
-  const getCalculatedPriceRange = useCallback(
-    ({ minPrice, maxPrice }: { minPrice: string; maxPrice: string }) => {
-      const min = Number(minPrice);
-      const max = Number(maxPrice);
+  const getNearestPriceRange = useCallback(
+    (params: { price: string }): string | void => {
+      const price = Number(params.price);
 
-      if (!token0 || !token1 || isNaN(min) || isNaN(max)) {
+      if (!token0 || !token1 || isNaN(price)) {
         return;
       }
 
-      return calculatePriceRange({
+      const { price: nearestPrice } = calculateNearestTickAndPrice({
+        price,
+        token0,
+        token1,
         feeTier,
-        decimal0: token0.coinDecimals,
-        decimal1: token1.coinDecimals,
-        minPrice: min,
-        maxPrice: max,
       });
+
+      return nearestPrice;
     },
     [feeTier, token0, token1],
   );
@@ -226,12 +189,11 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             value={displayMinPrice}
             onInput={(event) => setMinPrice(event.currentTarget.value)}
             onBlur={(event) => {
-              const result = getCalculatedPriceRange({
-                minPrice: event.currentTarget.value,
-                maxPrice,
+              const result = getNearestPriceRange({
+                price: event.currentTarget.value,
               });
               if (result) {
-                setMinPrice(result.minPrice.toString());
+                setMinPrice(result.toString());
               }
             }}
             aria-invalid={!isPriceRangeValid}
@@ -241,12 +203,11 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
             value={displayMaxPrice}
             onInput={(event) => setMaxPrice(event.currentTarget.value)}
             onBlur={(event) => {
-              const result = getCalculatedPriceRange({
-                minPrice,
-                maxPrice: event.currentTarget.value,
+              const result = getNearestPriceRange({
+                price: event.currentTarget.value,
               });
               if (result) {
-                setMaxPrice(result.maxPrice.toString());
+                setMaxPrice(result.toString());
               }
             }}
             aria-invalid={!isPriceRangeValid}

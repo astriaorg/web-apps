@@ -1,5 +1,4 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { useAstriaChainData, useConfig } from "config";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -26,6 +25,7 @@ import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
+import { useAstriaChainData, useConfig } from "config";
 import { useAstriaWallet } from "features/evm-wallet";
 
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";

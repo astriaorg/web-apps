@@ -1,6 +1,6 @@
-import { useAstriaChainData } from "config";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useAstriaChainData } from "config";
 import { PoolToken } from "pool/types";
 
 import { usePoolPositionContext } from ".";

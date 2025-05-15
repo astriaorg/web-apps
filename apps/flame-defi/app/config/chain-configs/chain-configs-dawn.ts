@@ -272,6 +272,21 @@ export const cosmosChains: CosmosChains = {
   "Neutron Testnet": NeutronChainInfo,
 };
 
+const WRAPPED_NATIVE_TOKEN = new EvmCurrency({
+  chainId: 16604737732183,
+  coinDenom: "WTIA",
+  title: "Wrapped Celestia",
+  coinMinimalDenom: "wtia",
+  coinDecimals: 18,
+  erc20ContractAddress: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",
+  wrapped: null,
+  isNative: false,
+  isWrappedNative: true,
+  ibcWithdrawalFeeWei: "10000000000000000",
+  isBridgeable: true,
+  IconComponent: WrappedTiaIcon,
+});
+
 const FlameChainInfo: AstriaChain = {
   chainType: ChainType.ASTRIA,
   chainId: 16604737732183,
@@ -307,25 +322,14 @@ const FlameChainInfo: AstriaChain = {
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
+      wrapped: WRAPPED_NATIVE_TOKEN,
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
-    new EvmCurrency({
-      chainId: 16604737732183,
-      coinDenom: "WTIA",
-      title: "Wrapped Celestia",
-      coinMinimalDenom: "wtia",
-      coinDecimals: 18,
-      erc20ContractAddress: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",
-      isNative: false,
-      isWrappedNative: true,
-      ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
-      IconComponent: WrappedTiaIcon,
-    }),
+    WRAPPED_NATIVE_TOKEN,
     new EvmCurrency({
       chainId: 16604737732183,
       coinDenom: "USDC",
@@ -333,6 +337,7 @@ const FlameChainInfo: AstriaChain = {
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
+      wrapped: null,
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
@@ -349,6 +354,7 @@ const FlameChainInfo: AstriaChain = {
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
       isNative: false,
       isWrappedNative: false,
+      wrapped: null,
       ibcWithdrawalFeeWei: "10000000000000000",
       isBridgeable: true,
       IconComponent: DropTiaIcon,
@@ -378,6 +384,7 @@ const BaseChainInfo: EvmChainInfo = {
       // is gwei correct?
       coinMinimalDenom: "gwei",
       coinDecimals: 18,
+      wrapped: null,
       isNative: true,
       isWrappedNative: false,
       isBridgeable: false,
@@ -390,6 +397,7 @@ const BaseChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
       astriaIntentBridgeAddress: "0x",
+      wrapped: null,
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",

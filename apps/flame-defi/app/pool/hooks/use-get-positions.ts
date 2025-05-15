@@ -1,8 +1,8 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { useAstriaChainData } from "config";
 import { useAccount, useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
 import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,

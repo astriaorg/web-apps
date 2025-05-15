@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAstriaChainData } from "config";
 import { type Address } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
+import { useAstriaChainData } from "config";
 import { createErc20Service } from "features/evm-wallet";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
