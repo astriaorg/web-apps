@@ -1,10 +1,10 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ConfigContextProvider } from "config";
 import type { ReactNode } from "react";
 import { IntlProvider } from "react-intl";
 
+import { ConfigContextProvider } from "config";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
 import { CosmosKitChainProvider } from "features/cosmos-wallet/providers/cosmos-kit";
 import {

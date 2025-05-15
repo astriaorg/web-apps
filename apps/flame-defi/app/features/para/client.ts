@@ -1,5 +1,6 @@
 import { getParaWallet } from "@getpara/rainbowkit-wallet";
 import { Environment as ParaEnvironment, ParaWeb } from "@getpara/react-sdk";
+
 import { Environment, getEnvVariable } from "config";
 
 export const PARA_API_KEY = getEnvVariable("NEXT_PUBLIC_PARA_API_KEY");

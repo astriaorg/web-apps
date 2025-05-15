@@ -5,10 +5,10 @@ import {
   walletConnectWallet,
 } from "@getpara/evm-wallet-connectors";
 import { ParaModal, ParaProvider } from "@getpara/react-sdk";
-import { useConfig } from "config";
 import { ReactNode, useMemo, useState } from "react";
 
 import { evmChainsToRainbowKitChains } from "@repo/flame-types";
+import { useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/evm-wallet/providers/wallet-connect";
 import { para, PARA_API_KEY, PARA_ENV } from "features/para/client";
 

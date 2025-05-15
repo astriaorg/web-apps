@@ -2,13 +2,13 @@ import { wallets as keplrWallets } from "@cosmos-kit/keplr";
 import { wallets as leapWallets } from "@cosmos-kit/leap";
 import { ChainProvider } from "@cosmos-kit/react";
 import { assets, chains as cosmosRegistryChains } from "chain-registry";
-import { useConfig } from "config";
 import { ReactNode, useMemo } from "react";
 
 import {
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
 } from "@repo/flame-types";
+import { useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/evm-wallet/providers/wallet-connect";
 
 /**
