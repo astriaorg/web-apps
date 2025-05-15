@@ -25,8 +25,9 @@ export function ParaClientProvider({ children }: { children: ReactNode }) {
     ]);
   }, [astriaChains, coinbaseChains]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isOpen, setIsOpen] = useState(true);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 

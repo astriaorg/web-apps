@@ -14,7 +14,7 @@ import {
 import { OnchainKitProvider } from "features/evm-wallet/providers/onchainkit";
 import { WagmiRainbowKitProvider } from "features/evm-wallet/providers/wagmi-rainbowkit";
 import { NotificationsContextProvider } from "features/notifications";
-import { ParaClientProvider } from "features/para/providers";
+import { PrivyProvider, PrivyWalletProvider } from "features/privy";
 
 // tanstack
 const queryClient = new QueryClient();
@@ -26,19 +26,25 @@ export function Providers({ children }: { children: ReactNode }) {
       <NotificationsContextProvider>
         <QueryClientProvider client={queryClient}>
           <ConfigContextProvider>
-            <WagmiRainbowKitProvider>
-              <CosmosKitChainProvider>
-                <OnchainKitProvider>
-                  <AstriaWalletContextProvider>
-                    {/* Bridge specific providers moved here from bridge/layout.tsx to
-                        prevent re-initialization during page navigation */}
-                    <EvmWalletProvider>
-                      <CosmosWalletProvider>{children}</CosmosWalletProvider>
-                    </EvmWalletProvider>
-                  </AstriaWalletContextProvider>
-                </OnchainKitProvider>
-              </CosmosKitChainProvider>
-            </WagmiRainbowKitProvider>
+            <PrivyProvider>
+              <WagmiRainbowKitProvider>
+                <CosmosKitChainProvider>
+                  <OnchainKitProvider>
+                    <AstriaWalletContextProvider>
+                      {/* Bridge specific providers moved here from bridge/layout.tsx to
+                          prevent re-initialization during page navigation */}
+                      <EvmWalletProvider>
+                        <PrivyWalletProvider>
+                          <CosmosWalletProvider>
+                            {children}
+                          </CosmosWalletProvider>
+                        </PrivyWalletProvider>
+                      </EvmWalletProvider>
+                    </AstriaWalletContextProvider>
+                  </OnchainKitProvider>
+                </CosmosKitChainProvider>
+              </WagmiRainbowKitProvider>
+            </PrivyProvider>
           </ConfigContextProvider>
         </QueryClientProvider>
       </NotificationsContextProvider>
