@@ -22,7 +22,6 @@
         "@uniswap/sdk-core",
         "@uniswap/v3-sdk",
         "big.js",
-        "jsbi",
         "motion",
         "react",
         "react-dom",

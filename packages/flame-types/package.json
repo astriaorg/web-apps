@@ -14,7 +14,7 @@
     "default": "./src/types.ts"
   },
   "peerDependencies": {
-    "jsbi": "^3.2.5"
+    "jsbi": "3.2.5"
   },
   "private": true,
   "scripts": {
