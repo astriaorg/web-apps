@@ -53,6 +53,8 @@ export enum InputId {
  * Tick boundaries for Uniswap V3.
  *
  * These are the maximum and minimum tick values supported by the protocol.
+ *
+ * @deprecated Use `TickMath.MIN_TICK` and `TickMath.MAX_TICK` instead.
  */
 export const TICK_BOUNDARIES = {
   MAX: 887272,
