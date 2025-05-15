@@ -1,6 +1,6 @@
 import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
 import { Card, CardContent, Slider } from "@repo/ui/components";
@@ -20,7 +20,7 @@ import { MinMaxInput } from "./min-max-input";
 
 const SLIDER_MIN = 0;
 const SLIDER_MAX = 100;
-const SLIDER_EXPONENT = 10; // Control the curve steepness of the slider.
+const SLIDER_EXPONENT = 8; // Control the curve steepness of the slider.
 
 interface PriceRangeInputProps {
   rate: string | null;
@@ -48,6 +48,11 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     // When the rate changes, i.e. user swaps inputs or changes fee tier, reset the slider.
     handleReset();
   }, [rate, handleReset]);
+
+  const [sliderValue, setSliderValue] = useState<number[]>([
+    SLIDER_MIN,
+    SLIDER_MAX,
+  ]);
 
   const sliderToPrice = useCallback(
     (value: number): number => {
@@ -92,56 +97,13 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     [rate],
   );
 
-  const priceToSlider = useCallback(
-    (price: number): number => {
-      const currentTick = calculatePriceToTick({
-        price: Number(rate),
-      });
-
-      if (price <= MIN_PRICE_DEFAULT) {
-        return SLIDER_MIN;
-      }
-
-      if (price >= MAX_PRICE_DEFAULT) {
-        return SLIDER_MAX;
-      }
-
-      const tick = calculatePriceToTick({ price });
-      const tickRange = TickMath.MAX_TICK - TickMath.MIN_TICK;
-      const maxOffset = tickRange / 2;
-
-      const tickOffset = tick - currentTick;
-
-      // Normalize the tick offset to the [-1, 1] range.
-      const normalizedOffset = tickOffset / maxOffset;
-
-      // Invert the exponential scaling.
-      const invertedScaledOffset =
-        Math.sign(normalizedOffset) *
-        Math.pow(Math.abs(normalizedOffset), 1 / SLIDER_EXPONENT);
-
-      // Map the normalized offset to the slider range [0, SLIDER_MAX].
-      const sliderValue =
-        SLIDER_MAX / 2 + invertedScaledOffset * (SLIDER_MAX / 2);
-
-      return Math.max(SLIDER_MIN, Math.min(SLIDER_MAX, sliderValue));
-    },
-    [rate],
-  );
-
-  const sliderValue = useMemo(() => {
-    const min = priceToSlider(Number(minPrice));
-    const max = priceToSlider(Number(maxPrice));
-
-    return [min, max];
-  }, [priceToSlider, minPrice, maxPrice]);
-
-  // TODO: Slider is sticky near current price.
   const handleSliderValueChange = useCallback(
     (values: number[]) => {
       if (values.length !== 2) {
         return;
       }
+
+      setSliderValue(values);
 
       const minPrice = sliderToPrice(values[0] as number);
       const maxPrice = sliderToPrice(values[1] as number);
