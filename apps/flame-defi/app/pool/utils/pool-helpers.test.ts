@@ -4,10 +4,10 @@ import { getChainConfigs } from "config";
 import { type AstriaChain, EvmCurrency, FlameNetwork } from "@repo/flame-types";
 
 import {
+  calculateNearestTickAndPrice,
   calculateNewPoolPrices,
   calculatePriceToTick,
   calculateTickToPrice,
-  calculateUserPriceToNearestTickAndPrice,
 } from "./pool-helpers";
 
 const ASTRIA_CHAIN = getChainConfigs(FlameNetwork.MAINNET).astriaChains
@@ -102,7 +102,7 @@ describe("calculatePriceToTick and calculateTickToPrice", () => {
 
 describe("calculateUserPriceToNearestTickPrice", () => {
   it("should convert user price to nearest tick price", () => {
-    const result = calculateUserPriceToNearestTickAndPrice({
+    const result = calculateNearestTickAndPrice({
       price: 2,
       token0: TOKEN_0,
       token1: TOKEN_1,
@@ -114,7 +114,7 @@ describe("calculateUserPriceToNearestTickPrice", () => {
   });
 
   it("should handle minimum price", () => {
-    const result = calculateUserPriceToNearestTickAndPrice({
+    const result = calculateNearestTickAndPrice({
       price: 0,
       token0: TOKEN_0,
       token1: TOKEN_1,
@@ -125,7 +125,7 @@ describe("calculateUserPriceToNearestTickPrice", () => {
   });
 
   it("should handle maximum price", () => {
-    const result = calculateUserPriceToNearestTickAndPrice({
+    const result = calculateNearestTickAndPrice({
       price: Infinity,
       token0: TOKEN_0,
       token1: TOKEN_1,

@@ -15,7 +15,7 @@ import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
-import { calculateUserPriceToNearestTickAndPrice } from "pool/utils";
+import { calculateNearestTickAndPrice } from "pool/utils";
 
 interface BaseSubmitButtonProps {
   amount0: Amount;
@@ -227,13 +227,13 @@ export const SubmitButton = ({
       const amount0Min = calculateAmountWithSlippage(amount0Desired);
       const amount1Min = calculateAmountWithSlippage(amount1Desired);
 
-      let { tick: tickLower } = calculateUserPriceToNearestTickAndPrice({
+      let { tick: tickLower } = calculateNearestTickAndPrice({
         price: Number(minPrice),
         token0,
         token1,
         feeTier,
       });
-      let { tick: tickUpper } = calculateUserPriceToNearestTickAndPrice({
+      let { tick: tickUpper } = calculateNearestTickAndPrice({
         price: Number(maxPrice),
         token0,
         token1,

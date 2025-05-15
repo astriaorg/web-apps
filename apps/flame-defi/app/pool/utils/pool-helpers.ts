@@ -70,9 +70,9 @@ export const calculateTickToPrice = ({
 };
 
 /**
- * Calculates the nearest tick and price for a given price based on the tick spacing.
+ * Calculates the nearest tick and price for a given user price based on the fee tier.
  */
-export const calculateUserPriceToNearestTickAndPrice = ({
+export const calculateNearestTickAndPrice = ({
   feeTier,
   ...params
 }: {

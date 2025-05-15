@@ -11,9 +11,9 @@ import {
 } from "pool/modules/create-position/types";
 import { TICK_BOUNDARIES } from "pool/types";
 import {
+  calculateNearestTickAndPrice,
   calculatePriceToTick,
   calculateTickToPrice,
-  calculateUserPriceToNearestTickAndPrice,
 } from "pool/utils";
 
 import { MinMaxInput } from "./min-max-input";
@@ -160,7 +160,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
         return;
       }
 
-      const { price: nearestPrice } = calculateUserPriceToNearestTickAndPrice({
+      const { price: nearestPrice } = calculateNearestTickAndPrice({
         price,
         token0,
         token1,
