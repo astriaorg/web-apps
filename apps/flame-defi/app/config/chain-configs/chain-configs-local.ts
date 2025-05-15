@@ -192,6 +192,22 @@ export const cosmosChains: CosmosChains = {
   "Noble Local": NobleChainInfo,
 };
 
+const WRAPPED_NATIVE_TOKEN = new EvmCurrency({
+  chainId: 53,
+  title: "TIA",
+  coinDenom: "TIA",
+  coinMinimalDenom: "utia",
+  coinDecimals: 6,
+  nativeTokenWithdrawerContractAddress:
+    "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+  wrapped: null,
+  isNative: false,
+  isWrappedNative: false,
+  ibcWithdrawalFeeWei: "10000000000000000",
+  isBridgeable: true,
+  IconComponent: CelestiaIcon,
+});
+
 const FlameChainInfo: AstriaChain = {
   chainType: ChainType.ASTRIA,
   chainId: 53,
@@ -227,26 +243,14 @@ const FlameChainInfo: AstriaChain = {
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      wrapped: WRAPPED_NATIVE_TOKEN,
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
       isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
-    new EvmCurrency({
-      chainId: 53,
-      title: "TIA",
-      coinDenom: "TIA",
-      coinMinimalDenom: "utia",
-      coinDecimals: 6,
-      nativeTokenWithdrawerContractAddress:
-        "0xA58639fB5458e65E4fA917FF951C390292C24A15",
-      isNative: false,
-      isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
-      IconComponent: CelestiaIcon,
-    }),
+    WRAPPED_NATIVE_TOKEN,
   ],
   IconComponent: AstriaIcon,
 };
@@ -284,6 +288,7 @@ const FakeChainInfo: AstriaChain = {
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      wrapped: null,
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
@@ -299,6 +304,7 @@ const FakeChainInfo: AstriaChain = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      wrapped: null,
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
@@ -331,6 +337,7 @@ const BaseChainInfo: EvmChainInfo = {
       // is gwei correct?
       coinMinimalDenom: "gwei",
       coinDecimals: 18,
+      wrapped: null,
       isNative: true,
       isWrappedNative: false,
       isBridgeable: false,
@@ -343,6 +350,7 @@ const BaseChainInfo: EvmChainInfo = {
       coinDecimals: 6,
       erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
       astriaIntentBridgeAddress: "0x",
+      wrapped: null,
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",

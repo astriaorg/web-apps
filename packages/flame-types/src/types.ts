@@ -331,6 +331,9 @@ export class EvmCurrency implements GenericCurrency {
   public readonly coinMinimalDenom: string;
   public readonly coinDecimals: number;
 
+  /** The wrapped token if this is a native token (e.g., TIA). */
+  public readonly wrapped: EvmCurrency | null;
+
   /** Fee required for IBC withdrawal, in wei (18 decimals) */
   public readonly ibcWithdrawalFeeWei?: string;
 
@@ -355,6 +358,7 @@ export class EvmCurrency implements GenericCurrency {
     coinDenom: string;
     coinMinimalDenom: string;
     coinDecimals: number;
+    wrapped: EvmCurrency | null;
     ibcWithdrawalFeeWei?: string;
     erc20ContractAddress?: Address;
     nativeTokenWithdrawerContractAddress?: Address;
@@ -366,6 +370,7 @@ export class EvmCurrency implements GenericCurrency {
     this.coinDenom = params.coinDenom;
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;
+    this.wrapped = params.wrapped;
     this.ibcWithdrawalFeeWei = params.ibcWithdrawalFeeWei;
     this.erc20ContractAddress = params.erc20ContractAddress;
     this.nativeTokenWithdrawerContractAddress =
