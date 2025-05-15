@@ -18,7 +18,7 @@
     "@grafana/faro-web-sdk": "^1.14.1",
     "@grafana/faro-web-tracing": "^1.14.1",
     "@metamask/jazzicon": "^2.0.0",
-    "@privy-io/cross-app-connect": "^0.2.1",
+    "@privy-io/react-auth": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.2",
     "@repo/flame-types": "*",
     "@repo/ui": "*",

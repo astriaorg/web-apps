@@ -25,18 +25,12 @@ export function WagmiRainbowKitProvider({ children }: { children: ReactNode }) {
     ]);
   }, [astriaChains, coinbaseChains]);
 
-  const privyWallet = toPrivyWallet({
-    id: "cmaog1m900046id0mzm9wzk8x",
-    name: "astria-exchange",
-    iconUrl: "https://steezeburger.com/img/favicon.ico",
-  });
-
   const connectors = useMemo(() => {
     return connectorsForWallets(
       [
         {
           groupName: "Recommended",
-          wallets: [privyWallet, metaMaskWallet, coinbaseWallet],
+          wallets: [metaMaskWallet, coinbaseWallet],
         },
       ],
       {
