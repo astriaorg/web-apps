@@ -1,8 +1,8 @@
 import { TickMath } from "@uniswap/v3-sdk";
 import Big from "big.js";
-import { getChainConfigs } from "config";
 
 import { type AstriaChain, EvmCurrency, FlameNetwork } from "@repo/flame-types";
+import { getChainConfigs } from "config";
 
 import {
   calculateNearestTickAndPrice,

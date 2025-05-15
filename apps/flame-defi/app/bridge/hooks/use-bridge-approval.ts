@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Big from "big.js";
-import { Environment, useConfig } from "config";
 import { useMemo } from "react";
 import { Address, formatUnits, maxUint256, parseUnits } from "viem";
 import { useConfig as useWagmiConfig } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { ChainConnection } from "bridge/types";
+import { Environment, useConfig } from "config";
 import { createErc20Service } from "features/evm-wallet";
 
 type UseApprovalProps = {

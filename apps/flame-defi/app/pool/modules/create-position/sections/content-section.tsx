@@ -1,7 +1,6 @@
 "use client";
 
 import Big from "big.js";
-import { useAstriaChainData } from "config";
 import { motion, type Transition } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -9,6 +8,7 @@ import type { EvmCurrency } from "@repo/flame-types";
 import type { Amount } from "@repo/ui/components";
 import { useValidateTokenAmount } from "@repo/ui/hooks";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
+import { useAstriaChainData } from "config";
 import { filterPoolTokens } from "pool/components/token-select";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";

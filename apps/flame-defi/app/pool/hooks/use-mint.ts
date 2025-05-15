@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAstriaChainData } from "config";
 import { useCallback } from "react";
 import { useConfig } from "wagmi";
 
+import { useAstriaChainData } from "config";
 import {
   type CreateAndInitializePoolIfNecessaryAndMintParams,
   createNonfungiblePositionManagerService,

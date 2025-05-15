@@ -1,8 +1,9 @@
 "use client";
 
-import { useConfig } from "config";
 import type React from "react";
 import { useMemo } from "react";
+
+import { useConfig } from "config";
 
 import { LINKS } from "./links";
 import { NetworkStatus } from "./network-status";
