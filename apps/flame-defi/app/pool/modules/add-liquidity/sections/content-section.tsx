@@ -2,10 +2,10 @@
 
 import { useCallback, useState } from "react";
 
-import { TXN_STATUS } from "@repo/flame-types";
+import { TransactionStatus } from "@repo/flame-types";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
-import { PoolTxnSteps, PriceRangeBlock } from "pool/components";
+import { PoolTransactionSteps, PriceRangeBlock } from "pool/components";
 import {
   useAddLiquidityTxn,
   useAddLiquidityValidation,
@@ -27,18 +27,15 @@ export const ContentSection = () => {
     handleReverseTokenData,
     refreshPoolPosition,
   } = usePoolPositionContext();
+
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
+
   const { balance: token0Balance } = useEvmCurrencyBalance(poolToken0?.token);
   const { balance: token1Balance } = useEvmCurrencyBalance(poolToken1?.token);
-  const {
-    addLiquidity,
-    txnStatus,
-    txnHash,
-    errorText,
-    setErrorText,
-    setTxnStatus,
-  } = useAddLiquidityTxn(input0, input1);
+
+  const { status, hash, error, setError, setStatus, addLiquidity } =
+    useAddLiquidityTxn(input0, input1);
   const { validPoolInputs, buttonText } = useAddLiquidityValidation(
     input0,
     input1,
@@ -65,7 +62,7 @@ export const ContentSection = () => {
   const handleInputChange = useCallback(
     (value: string, id: POOL_INPUT_ID, coinDecimals?: number) => {
       if (!coinDecimals) return;
-      setErrorText(null);
+      setError(null);
       if (id === POOL_INPUT_ID.INPUT_ZERO) {
         setInput0(value);
         setInput1(getTokenCalculatedTokenValue(value, id, coinDecimals));
@@ -74,24 +71,24 @@ export const ContentSection = () => {
         setInput0(getTokenCalculatedTokenValue(value, id, coinDecimals));
       }
     },
-    [getTokenCalculatedTokenValue, setErrorText],
+    [getTokenCalculatedTokenValue, setError],
   );
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
-    setTxnStatus(TXN_STATUS.IDLE);
+    setStatus(TransactionStatus.IDLE);
     setInput0("");
     setInput1("");
     refreshPoolPosition();
-  }, [setModalOpen, setInput0, setInput1, setTxnStatus, refreshPoolPosition]);
+  }, [setModalOpen, setInput0, setInput1, setStatus, refreshPoolPosition]);
 
   const handleModalActionButton = useCallback(() => {
-    if (txnStatus !== TXN_STATUS.IDLE) {
+    if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
       void addLiquidity();
     }
-  }, [handleCloseModal, addLiquidity, txnStatus]);
+  }, [handleCloseModal, addLiquidity, status]);
 
   return (
     <div className="flex flex-col flex-1 mt-0 md:mt-12">
@@ -131,7 +128,7 @@ export const ContentSection = () => {
                 open={modalOpen}
                 buttonText={"Add liquidity"}
                 actionButtonText={
-                  txnStatus !== TXN_STATUS.IDLE ? "Close" : "Add liquidity"
+                  status !== TransactionStatus.IDLE ? "Close" : "Add liquidity"
                 }
                 showOpenButton={true}
                 handleOpenModal={() => setModalOpen(true)}
@@ -139,12 +136,12 @@ export const ContentSection = () => {
                 handleCloseModal={handleCloseModal}
                 title={"Add liquidity"}
               >
-                <PoolTxnSteps
-                  txnStatus={txnStatus}
-                  poolTokens={[poolToken0, poolToken1]}
+                <PoolTransactionSteps
+                  status={status}
+                  tokens={[poolToken0, poolToken1]}
                   addLiquidityInputValues={[input0, input1]}
-                  txnHash={txnHash}
-                  txnMsg={errorText || ""}
+                  hash={hash}
+                  message={error || ""}
                 />
               </ConfirmationModal>
             )}

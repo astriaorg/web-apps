@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { TokenInputState, TransactionStatus } from "@repo/flame-types";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import {
@@ -12,45 +12,44 @@ import {
 
 import { usePoolPositionContext } from "./use-pool-position-context";
 
-export const useAddLiquidityTxn = (
-  input0Amount: string,
-  input1Amount: string,
-) => {
+export const useAddLiquidityTxn = (amount0: string, amount1: string) => {
   const { address } = useAccount();
-  const wagmiConfig = useConfig();
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
-  const [errorText, setErrorText] = useState<string | null>(null);
+  const config = useConfig();
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
+  const [hash, setHash] = useState<Hash | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
 
   const { chain } = useAstriaChainData();
-  const { poolToken0, poolToken1, positionNftId } = usePoolPositionContext();
+  const { poolToken0, poolToken1, tokenId } = usePoolPositionContext();
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
-    hash: txnHash,
+    hash,
   });
 
   useEffect(() => {
-    if (!txnHash) return;
+    if (!hash) return;
     if (transactionData?.status === "success") {
-      setTxnStatus(TXN_STATUS.SUCCESS);
+      setStatus(TransactionStatus.SUCCESS);
     } else if (transactionData?.status === "reverted") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction reverted");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction reverted.");
     } else if (transactionData?.status === "error") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction failed");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction failed.");
     }
-  }, [transactionData, txnHash, setTxnStatus]);
+  }, [transactionData, hash, setStatus]);
 
   const addLiquidity = async () => {
     if (
       !address ||
       !poolToken0 ||
       !poolToken1 ||
-      !positionNftId ||
-      parseFloat(input0Amount) <= 0 ||
-      parseFloat(input1Amount) <= 0
+      !tokenId ||
+      parseFloat(amount0) <= 0 ||
+      parseFloat(amount1) <= 0
     ) {
       console.warn("Missing required data for increasing liquidity");
       return;
@@ -58,11 +57,11 @@ export const useAddLiquidityTxn = (
 
     const tokenInput0: TokenInputState = {
       token: poolToken0.token,
-      value: input0Amount,
+      value: amount0,
     };
     const tokenInput1: TokenInputState = {
       token: poolToken1.token,
-      value: input1Amount,
+      value: amount1,
     };
 
     const increaseLiquidityParams =
@@ -74,37 +73,37 @@ export const useAddLiquidityTxn = (
       );
 
     try {
-      setTxnStatus(TXN_STATUS.PENDING);
+      setStatus(TransactionStatus.PENDING);
       const NonfungiblePositionManagerService =
         createNonfungiblePositionManagerService(
-          wagmiConfig,
+          config,
           chain.contracts.nonfungiblePositionManager.address,
         );
 
       const tx = await NonfungiblePositionManagerService.increaseLiquidity(
-        positionNftId,
+        tokenId,
         increaseLiquidityParams,
       );
-      setTxnHash(tx);
+      setHash(tx);
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setErrorText("Transaction rejected");
-        setTxnStatus(TXN_STATUS.FAILED);
+        setError("Transaction rejected");
+        setStatus(TransactionStatus.FAILED);
       } else {
         console.warn(error);
-        setErrorText("Error increasing liquidity");
-        setTxnStatus(TXN_STATUS.FAILED);
+        setError("Error increasing liquidity");
+        setStatus(TransactionStatus.FAILED);
       }
     }
   };
 
   return {
-    txnStatus,
-    txnHash,
-    errorText,
-    setErrorText,
-    setTxnStatus,
+    status,
+    hash,
+    error,
+    setError,
+    setStatus,
     addLiquidity,
   };
 };

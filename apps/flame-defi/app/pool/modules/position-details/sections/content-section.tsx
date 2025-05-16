@@ -3,17 +3,21 @@
 import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
-import { TXN_STATUS } from "@repo/flame-types";
+import { TransactionStatus } from "@repo/flame-types";
 import { Switch } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { PoolTxnSteps, PriceRangeBlock, TokenInfoCard } from "pool/components";
+import {
+  PoolTransactionSteps,
+  PriceRangeBlock,
+  TokenInfoCard,
+} from "pool/components";
 import {
   useCollectFeesTxn,
   usePoolContext,
   usePoolPositionContext,
 } from "pool/hooks";
+import { PositionInfoCard } from "pool/modules/position-details/components";
 
-import { PositionInfoCard } from "../components";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const { formatNumber } = useIntl();
@@ -28,21 +32,15 @@ export const ContentSection = () => {
     refreshPoolPosition,
   } = usePoolPositionContext();
   const hasValidTokens = poolToken0 && poolToken1;
-  const poolTokens = hasValidTokens ? [poolToken0, poolToken1] : [];
-  const {
-    txnStatus,
-    txnHash,
-    errorText,
-    setTxnStatus,
-    setErrorText,
-    collectFees,
-  } = useCollectFeesTxn(poolTokens, isCollectAsWrappedNative);
+  const tokens = hasValidTokens ? [poolToken0, poolToken1] : [];
+  const { status, hash, error, setStatus, setError, collectFees } =
+    useCollectFeesTxn(tokens, isCollectAsWrappedNative);
 
   // NOTE: This poolTokensForDisplay is necessary for the pool position details page to be able to reverse the token order in all components on the page.
   // All other pages only reverse the values of the price range block when this happens.
   const poolTokensForDisplay = isReversedPoolTokens
-    ? [...poolTokens].reverse()
-    : poolTokens;
+    ? [...tokens].reverse()
+    : tokens;
   const token0ForDisplay = poolTokensForDisplay[0] ?? null;
   const token1ForDisplay = poolTokensForDisplay[1] ?? null;
 
@@ -53,11 +51,11 @@ export const ContentSection = () => {
       token1ForDisplay.unclaimedFees > 0,
   );
 
-  const totalLiquidity = poolTokens.reduce(
+  const totalLiquidity = tokens.reduce(
     (sum, token) => sum + token.liquidity,
     0,
   );
-  const totalUnclaimedFees = poolTokens.reduce(
+  const totalUnclaimedFees = tokens.reduce(
     (sum, token) => sum + token.unclaimedFees,
     0,
   );
@@ -82,18 +80,18 @@ export const ContentSection = () => {
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
-    setTxnStatus(TXN_STATUS.IDLE);
+    setStatus(TransactionStatus.IDLE);
     refreshPoolPosition();
-    setErrorText(null);
-  }, [setModalOpen, setTxnStatus, refreshPoolPosition, setErrorText]);
+    setError(null);
+  }, [setModalOpen, setStatus, refreshPoolPosition, setError]);
 
   const handleModalActionButton = useCallback(() => {
-    if (txnStatus !== TXN_STATUS.IDLE) {
+    if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
       collectFees();
     }
-  }, [handleCloseModal, collectFees, txnStatus]);
+  }, [handleCloseModal, collectFees, status]);
 
   return (
     <div className="flex flex-col flex-1 mt-8">
@@ -142,7 +140,7 @@ export const ContentSection = () => {
             />
           </div>
         </div>
-        {hasUnclaimedFees && poolTokens.length > 0 && (
+        {hasUnclaimedFees && tokens.length > 0 && (
           <div className="w-full md:w-2/4">
             <ConfirmationModal
               open={modalOpen}
@@ -154,11 +152,11 @@ export const ContentSection = () => {
               handleCloseModal={handleCloseModal}
               title={"Claim Fees"}
             >
-              <PoolTxnSteps
-                txnStatus={txnStatus}
-                poolTokens={poolTokens}
-                txnHash={txnHash}
-                txnMsg={errorText || ""}
+              <PoolTransactionSteps
+                status={status}
+                tokens={tokens}
+                hash={hash}
+                message={error || ""}
                 addLiquidityInputValues={null}
               />
             </ConfirmationModal>

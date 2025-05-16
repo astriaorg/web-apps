@@ -7,7 +7,7 @@ import {
   TokenAllowance,
   TokenInputState,
   tokenStateToBig,
-  TXN_STATUS,
+  TransactionStatus,
 } from "@repo/flame-types";
 
 import { createErc20Service } from "../services/erc-20-service";
@@ -17,7 +17,7 @@ type TokenApprovalProps = {
   addressToApprove: Address;
   // FIXME - could we remove these callbacks and instead return the txnHash from
   //  handleTokenApproval and try/catch errors at the calling site?
-  setTxnStatus: (status: TXN_STATUS) => void;
+  setTxnStatus: (status: TransactionStatus) => void;
   setTxnHash: (hash?: Hash) => void;
   setErrorText: (error: string) => void;
 };
@@ -166,7 +166,7 @@ export const useTokenApproval = ({
       return;
     }
     try {
-      setTxnStatus(TXN_STATUS.PENDING);
+      setTxnStatus(TransactionStatus.PENDING);
       const txHash = await approveToken({
         token: tokenInputToApprove.token,
         value: maxUint256.toString(),
@@ -178,12 +178,12 @@ export const useTokenApproval = ({
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setTxnStatus(TXN_STATUS.FAILED);
+        setTxnStatus(TransactionStatus.FAILED);
         return;
       } else {
         console.warn(error);
         setErrorText("Error approving token");
-        setTxnStatus(TXN_STATUS.FAILED);
+        setTxnStatus(TransactionStatus.FAILED);
       }
 
       return;

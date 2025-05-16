@@ -785,8 +785,8 @@ export enum TXN_STATUS {
   FAILED = "failed",
 }
 
-export type TxnFailedProps = {
-  txnMsg?: string;
+export type TransactionFailedProps = {
+  message?: string;
 };
 
 export type Balance = {

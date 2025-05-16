@@ -1,6 +1,6 @@
 "use client";
 
-import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
+import { TXN_STATUS, TransactionFailedProps } from "@repo/flame-types";
 import {
   BlockLoader,
   InfoTooltip,
@@ -218,7 +218,7 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed({ txnMsg }: TxnFailedProps) {
+function TxnFailed({ message: txnMsg }: TransactionFailedProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange-soft" />
@@ -274,7 +274,7 @@ export function SwapTxnSteps({
           txnHash={txnHash}
         />
       )}
-      {txnStatus === TXN_STATUS.FAILED && <TxnFailed txnMsg={txnMsg} />}
+      {txnStatus === TXN_STATUS.FAILED && <TxnFailed message={txnMsg} />}
     </div>
   );
 }

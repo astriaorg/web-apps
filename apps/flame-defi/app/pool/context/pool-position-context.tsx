@@ -37,12 +37,14 @@ export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const wagmiConfig = useConfig();
+  const tokenId = params["token-id"] as string;
+
+  const config = useConfig();
   const { address } = useAccount();
   const { formatNumber } = useIntl();
-  const positionNftId = params["token-id"] as string;
   const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
   const { currencies } = chain;
+
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(false);
   const [currentPrice, setCurrentPrice] = useState<string>("");
@@ -66,17 +68,17 @@ export const PoolPositionContextProvider = ({
     setInvertedPrice(!invertedPrice);
     setIsReversedPoolTokens(!isReversedPoolTokens);
   };
-  const NonfungiblePositionManagerService =
+  const nonfungiblePositionManagerService =
     createNonfungiblePositionManagerService(
-      wagmiConfig,
+      config,
       chain.contracts.nonfungiblePositionManager.address,
     );
 
   const getPoolTokens = useCallback(async () => {
     try {
-      const position = await NonfungiblePositionManagerService.positions(
+      const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        positionNftId,
+        tokenId,
       );
       const isPositionClosed = position.liquidity === 0n;
       setIsPositionClosed(isPositionClosed);
@@ -102,7 +104,7 @@ export const PoolPositionContextProvider = ({
         );
 
         const factoryService = createPoolFactoryService(
-          wagmiConfig,
+          config,
           chain.contracts.poolFactory.address,
         );
         const poolAddress = await factoryService.getPool(
@@ -111,7 +113,7 @@ export const PoolPositionContextProvider = ({
           position.token1,
           position.fee,
         );
-        const poolService = createPoolService(wagmiConfig, poolAddress);
+        const poolService = createPoolService(config, poolAddress);
         const slot0 = await poolService.slot0(chain.chainId);
 
         const { amount0, amount1 } = getTokensLiquidityAmounts(
@@ -143,18 +145,18 @@ export const PoolPositionContextProvider = ({
     }
   }, [
     currencies,
-    NonfungiblePositionManagerService,
+    nonfungiblePositionManagerService,
     chain.chainId,
     chain.contracts.poolFactory.address,
     chain.contracts.wrappedNativeToken.address,
-    positionNftId,
-    wagmiConfig,
+    tokenId,
+    config,
   ]);
 
   const getFeeTier = useCallback(async () => {
-    const position = await NonfungiblePositionManagerService.positions(
+    const position = await nonfungiblePositionManagerService.positions(
       chain.chainId,
-      positionNftId,
+      tokenId,
     );
     const feeTier = formatNumber(position.fee / 1_000_000, {
       style: "percent",
@@ -162,12 +164,7 @@ export const PoolPositionContextProvider = ({
     });
     setFeeTier(feeTier);
     setRawFeeTier(position.fee);
-  }, [
-    formatNumber,
-    NonfungiblePositionManagerService,
-    chain.chainId,
-    positionNftId,
-  ]);
+  }, [formatNumber, nonfungiblePositionManagerService, chain.chainId, tokenId]);
 
   const getPriceRange = useCallback(async () => {
     if (!address) {
@@ -175,12 +172,12 @@ export const PoolPositionContextProvider = ({
     }
 
     try {
-      const position = await NonfungiblePositionManagerService.positions(
+      const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        positionNftId,
+        tokenId,
       );
       const factoryService = createPoolFactoryService(
-        wagmiConfig,
+        config,
         chain.contracts.poolFactory.address,
       );
 
@@ -202,7 +199,7 @@ export const PoolPositionContextProvider = ({
         position.token1,
         position.fee,
       );
-      const poolService = createPoolService(wagmiConfig, poolAddress);
+      const poolService = createPoolService(config, poolAddress);
       const slot0 = await poolService.slot0(chain.chainId);
       const pricePerToken = sqrtPriceX96ToPrice(
         slot0.sqrtPriceX96,
@@ -243,11 +240,11 @@ export const PoolPositionContextProvider = ({
     }
   }, [
     address,
-    NonfungiblePositionManagerService,
+    nonfungiblePositionManagerService,
     chain,
-    positionNftId,
+    tokenId,
     currencies,
-    wagmiConfig,
+    config,
     invertedPrice,
   ]);
 
@@ -304,7 +301,7 @@ export const PoolPositionContextProvider = ({
         isReversedPoolTokens,
         isPositionClosed,
         refreshPoolPosition,
-        positionNftId,
+        tokenId: tokenId,
       }}
     >
       {children}

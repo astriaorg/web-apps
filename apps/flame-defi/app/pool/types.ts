@@ -1,6 +1,10 @@
 import type { Address, Hash } from "viem";
 
-import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  TokenInputState,
+  TransactionStatus,
+} from "@repo/flame-types";
 
 /**
  * Fee tiers available in Uniswap V3.
@@ -188,48 +192,48 @@ export type PoolPositionContextProps = {
   isReversedPoolTokens: boolean; // This boolean is only used by the pool position details page and the pool context to reverse the token order based on the selected symbol
   isPositionClosed: boolean; // This boolean is use to know when the position is closed and to hide collect fees and remove liquidity buttons
   refreshPoolPosition: () => void;
-  positionNftId: string;
+  tokenId: string;
 };
 
-export type PoolTxnStepsProps = {
-  txnStatus: TXN_STATUS;
-  poolTokens: PoolToken[];
-  txnHash?: Hash;
-  txnMsg: string;
+export type PoolTransactionStepsProps = {
+  status: TransactionStatus;
+  tokens: PoolToken[];
+  hash?: Hash;
+  message: string;
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
 };
 
-export enum POOL_TXN_TYPE {
+export enum PoolTransactionType {
   ADD_LIQUIDITY = "add-liquidity",
   COLLECT_FEE = "collect-fee",
   NEW_POSITION = "new-position",
   REMOVE_LIQUIDITY = "remove-liquidity",
 }
 
-export const getTxnType = (pathname: string): POOL_TXN_TYPE => {
-  if (pathname.includes(POOL_TXN_TYPE.ADD_LIQUIDITY))
-    return POOL_TXN_TYPE.ADD_LIQUIDITY;
-  if (pathname.includes(POOL_TXN_TYPE.NEW_POSITION))
-    return POOL_TXN_TYPE.NEW_POSITION;
-  if (pathname.includes(POOL_TXN_TYPE.REMOVE_LIQUIDITY))
-    return POOL_TXN_TYPE.REMOVE_LIQUIDITY;
-  return POOL_TXN_TYPE.COLLECT_FEE;
+export const getTransactionType = (pathname: string): PoolTransactionType => {
+  if (pathname.includes(PoolTransactionType.ADD_LIQUIDITY))
+    return PoolTransactionType.ADD_LIQUIDITY;
+  if (pathname.includes(PoolTransactionType.NEW_POSITION))
+    return PoolTransactionType.NEW_POSITION;
+  if (pathname.includes(PoolTransactionType.REMOVE_LIQUIDITY))
+    return PoolTransactionType.REMOVE_LIQUIDITY;
+  return PoolTransactionType.COLLECT_FEE;
 };
 
-export type TxnComponentProps = {
-  poolTokens: PoolToken[];
+export type TransactionComponentProps = {
+  tokens: PoolToken[];
   addLiquidityInputValues: string[] | null;
   selectedFeeTier?: string;
 };
 
-export type TxnLoaderProps = {
-  poolTokens: PoolToken[];
+export type TransactionLoaderProps = {
+  tokens: PoolToken[];
   addLiquidityInputValues: string[] | null;
-  poolTxnType: POOL_TXN_TYPE;
+  type: PoolTransactionType;
 };
 
-export type TxnSuccessProps = {
-  poolTokens: PoolToken[];
-  txnHash: Hash;
+export type TransactionSuccessProps = {
+  tokens: PoolToken[];
+  hash: Hash;
 };

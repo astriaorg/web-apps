@@ -3,7 +3,10 @@
 import { usePathname } from "next/navigation";
 import { useIntl } from "react-intl";
 
-import { TXN_STATUS, TxnFailedProps } from "@repo/flame-types";
+import {
+  TransactionFailedProps as TransactionFailedProps,
+  TransactionStatus,
+} from "@repo/flame-types";
 import {
   BlockLoader,
   Skeleton,
@@ -15,24 +18,26 @@ import { ErrorIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
 import { usePoolPositionContext } from "pool/hooks";
 import {
-  getTxnType,
-  POOL_TXN_TYPE,
-  PoolTxnStepsProps,
-  TxnComponentProps,
-  TxnLoaderProps,
-  TxnSuccessProps,
+  getTransactionType,
+  PoolTransactionStepsProps,
+  PoolTransactionType,
+  TransactionComponentProps,
+  TransactionLoaderProps,
+  TransactionSuccessProps,
 } from "pool/types";
 
 import { PriceRangeCard } from "./price-range-card";
 
-export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
+export const CollectFeeTransactionSummary = ({
+  tokens,
+}: TransactionComponentProps) => {
   const { formatNumber } = useIntl();
   return (
     <>
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg gap-2">
-            {poolTokens.map(({ token, unclaimedFees }) => (
+            {tokens.map(({ token, unclaimedFees }) => (
               <div
                 key={token.coinDenom}
                 className="flex items-center justify-between"
@@ -59,11 +64,11 @@ export const CollectFeeTxnSummary = ({ poolTokens }: TxnComponentProps) => {
   );
 };
 
-export const AddLiquidityTxnSummary = ({
-  poolTokens,
+export const AddLiquidityTransactionSummary = ({
+  tokens,
   addLiquidityInputValues,
   selectedFeeTier,
-}: TxnComponentProps) => {
+}: TransactionComponentProps) => {
   const { formatNumber } = useIntl();
   const {
     feeTier,
@@ -79,7 +84,7 @@ export const AddLiquidityTxnSummary = ({
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map(({ token }, index) => (
+            {tokens.map(({ token }, index) => (
               <div
                 key={token.coinDenom}
                 className="flex items-center justify-between"
@@ -111,10 +116,10 @@ export const AddLiquidityTxnSummary = ({
           <h2 className="text-base font-medium">Selected Range</h2>
           <Skeleton
             className="w-[200px] h-[40px]"
-            isLoading={poolTokens.length === 0}
+            isLoading={tokens.length === 0}
           >
             <ToggleSwitch
-              toggleOptions={poolTokens.map(({ token }) => token.coinDenom)}
+              toggleOptions={tokens.map(({ token }) => token.coinDenom)}
               className="text-sm w-[200px] h-[40px]"
               selectedOption={selectedSymbol}
               setSelectedOption={handleReverseTokenData}
@@ -135,7 +140,7 @@ export const AddLiquidityTxnSummary = ({
           />
           <PriceRangeCard
             leftLabel="Max price"
-            tooltipText={`Your position will be 100% ${poolTokens[0]?.token.coinDenom === selectedSymbol ? poolTokens[1]?.token.coinDenom : poolTokens[0]?.token.coinDenom} at this price.`}
+            tooltipText={`Your position will be 100% ${tokens[0]?.token.coinDenom === selectedSymbol ? tokens[1]?.token.coinDenom : tokens[0]?.token.coinDenom} at this price.`}
             value={maxPrice}
             variant="small"
           />
@@ -145,16 +150,16 @@ export const AddLiquidityTxnSummary = ({
   );
 };
 
-export const RemoveLiquidityTxnSummary = ({
-  poolTokens,
-}: TxnComponentProps) => {
+export const RemoveLiquidityTransactionSummary = ({
+  tokens,
+}: TransactionComponentProps) => {
   const { formatNumber } = useIntl();
   return (
     <>
       <div className="flex flex-col justify-start items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={false}>
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map(({ token, liquidity }) => (
+            {tokens.map(({ token, liquidity }) => (
               <div
                 key={token.coinDenom}
                 className="flex items-center justify-between"
@@ -176,7 +181,7 @@ export const RemoveLiquidityTxnSummary = ({
           </div>
           <hr className="border-t border-border mt-2 mb-2 w-full" />
           <div className="flex flex-col w-full gap-2">
-            {poolTokens.map(({ token, unclaimedFees }) => (
+            {tokens.map(({ token, unclaimedFees }) => (
               <div
                 key={token.coinDenom}
                 className="flex items-center justify-between"
@@ -205,11 +210,11 @@ export const RemoveLiquidityTxnSummary = ({
   );
 };
 
-const TxnLoader = ({
-  poolTokens,
+const TransactionLoader = ({
+  tokens,
   addLiquidityInputValues,
-  poolTxnType,
-}: TxnLoaderProps) => {
+  type,
+}: TransactionLoaderProps) => {
   const { formatNumber } = useIntl();
 
   return (
@@ -220,7 +225,7 @@ const TxnLoader = ({
           Confirm Transaction in wallet
         </span>
         <div className="flex items-center gap-1 justify-center text-sm md:text-base">
-          {poolTxnType === POOL_TXN_TYPE.COLLECT_FEE && (
+          {type === PoolTransactionType.COLLECT_FEE && (
             <span>Collecting Fees</span>
           )}
           {addLiquidityInputValues?.[0] && addLiquidityInputValues?.[1] && (
@@ -231,7 +236,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens[0]?.token.coinDenom}</span>
+                <span>{tokens[0]?.token.coinDenom}</span>
               </span>
               <span>and</span>
               <span className="flex items-center gap-1">
@@ -239,7 +244,7 @@ const TxnLoader = ({
                   minimumFractionDigits: 6,
                   maximumFractionDigits: 6,
                 })}
-                <span>{poolTokens[1]?.token.coinDenom}</span>
+                <span>{tokens[1]?.token.coinDenom}</span>
               </span>
             </>
           )}
@@ -249,7 +254,7 @@ const TxnLoader = ({
   );
 };
 
-const TxnSuccess = ({ poolTokens, txnHash }: TxnSuccessProps) => {
+const TransactionSuccess = ({ tokens, hash }: TransactionSuccessProps) => {
   const { chain } = useAstriaChainData();
 
   return (
@@ -257,18 +262,18 @@ const TxnSuccess = ({ poolTokens, txnHash }: TxnSuccessProps) => {
       <SuccessCheck />
       <div className="text-white font-medium mt-6 mb-6 text-center w-full">
         <div className="flex flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
-          {poolTokens[0] && poolTokens[1] && (
+          {tokens[0] && tokens[1] && (
             <div className="flex items-center gap-1">
               <span>
-                Successfully added {poolTokens[0].token.coinDenom} /{" "}
-                {poolTokens[1].token.coinDenom} liquidity
+                Successfully added {tokens[0].token.coinDenom} /{" "}
+                {tokens[1].token.coinDenom} liquidity
               </span>
             </div>
           )}
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
-            href={`${chain.blockExplorerUrl}/tx/${txnHash}`}
+            href={`${chain.blockExplorerUrl}/tx/${hash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-orange hover:text-orange/80 transition text-base md:text-lg underline"
@@ -281,58 +286,60 @@ const TxnSuccess = ({ poolTokens, txnHash }: TxnSuccessProps) => {
   );
 };
 
-const TxnFailed = ({ txnMsg }: TxnFailedProps) => {
+const TransactionFailed = ({ message }: TransactionFailedProps) => {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange" />
       <div className="text-white font-medium mt-6 text-center">
         <div className="flex items-center gap-1 justify-center text-base">
-          <span>{txnMsg || "An error occurred"}</span>
+          <span>{message || "An error occurred."}</span>
         </div>
       </div>
     </div>
   );
 };
 
-const TxnDetails = {
-  [POOL_TXN_TYPE.ADD_LIQUIDITY]: AddLiquidityTxnSummary,
-  [POOL_TXN_TYPE.NEW_POSITION]: AddLiquidityTxnSummary,
-  [POOL_TXN_TYPE.REMOVE_LIQUIDITY]: RemoveLiquidityTxnSummary,
-  [POOL_TXN_TYPE.COLLECT_FEE]: CollectFeeTxnSummary,
+const TransactionDetails = {
+  [PoolTransactionType.ADD_LIQUIDITY]: AddLiquidityTransactionSummary,
+  [PoolTransactionType.NEW_POSITION]: AddLiquidityTransactionSummary,
+  [PoolTransactionType.REMOVE_LIQUIDITY]: RemoveLiquidityTransactionSummary,
+  [PoolTransactionType.COLLECT_FEE]: CollectFeeTransactionSummary,
 } as const;
 
-export function PoolTxnSteps({
-  txnStatus,
-  poolTokens,
-  txnHash,
-  txnMsg,
+export const PoolTransactionSteps = ({
+  status,
+  tokens,
+  hash,
+  message,
   addLiquidityInputValues,
   selectedFeeTier,
-}: PoolTxnStepsProps) {
+}: PoolTransactionStepsProps) => {
   const pathname = usePathname();
-  const poolTxnType = getTxnType(pathname);
-  const TxnComponent = TxnDetails[poolTxnType];
+  const poolTransactionType = getTransactionType(pathname);
+  const TransactionComponent = TransactionDetails[poolTransactionType];
 
   return (
     <div>
-      {txnStatus === TXN_STATUS.IDLE && (
-        <TxnComponent
-          poolTokens={poolTokens}
+      {status === TransactionStatus.IDLE && (
+        <TransactionComponent
+          tokens={tokens}
           addLiquidityInputValues={addLiquidityInputValues}
           selectedFeeTier={selectedFeeTier}
         />
       )}
-      {txnStatus === TXN_STATUS.PENDING && (
-        <TxnLoader
-          poolTokens={poolTokens}
-          poolTxnType={poolTxnType}
+      {status === TransactionStatus.PENDING && (
+        <TransactionLoader
+          tokens={tokens}
+          type={poolTransactionType}
           addLiquidityInputValues={addLiquidityInputValues}
         />
       )}
-      {txnStatus === TXN_STATUS.SUCCESS && txnHash && (
-        <TxnSuccess poolTokens={poolTokens} txnHash={txnHash} />
+      {status === TransactionStatus.SUCCESS && hash && (
+        <TransactionSuccess tokens={tokens} hash={hash} />
       )}
-      {txnStatus === TXN_STATUS.FAILED && <TxnFailed txnMsg={txnMsg} />}
+      {status === TransactionStatus.FAILED && (
+        <TransactionFailed message={message} />
+      )}
     </div>
   );
-}
+};
