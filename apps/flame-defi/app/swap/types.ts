@@ -1,6 +1,10 @@
 import { type Hash } from "viem";
 
-import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  TokenInputState,
+  type TransactionStatus,
+} from "@repo/flame-types";
 
 export enum SWAP_INPUT_ID {
   INPUT_ONE = "input_one",
@@ -56,7 +60,7 @@ export interface SwapTxnStepsProps {
   txnInfo: TransactionInfo;
   topToken: TokenInputState;
   bottomToken: TokenInputState;
-  txnStatus?: TXN_STATUS;
+  txnStatus?: TransactionStatus;
   txnHash?: Hash;
   txnMsg?: string;
   isTiaWtia: boolean;

@@ -1,6 +1,6 @@
 "use client";
 
-import { TXN_STATUS, TransactionFailedProps } from "@repo/flame-types";
+import { TransactionFailedProps, TransactionStatus } from "@repo/flame-types";
 import {
   BlockLoader,
   InfoTooltip,
@@ -244,7 +244,7 @@ export function SwapTxnSteps({
 }: SwapTxnStepsProps) {
   return (
     <div className="h-[320px]">
-      {txnStatus === TXN_STATUS.IDLE && !isTiaWtia && (
+      {txnStatus === TransactionStatus.IDLE && !isTiaWtia && (
         <TxnDetails
           topToken={topToken}
           bottomToken={bottomToken}
@@ -257,7 +257,7 @@ export function SwapTxnSteps({
           frontendFeeEstimate={txnInfo.frontendFeeEstimate}
         />
       )}
-      {txnStatus === TXN_STATUS.PENDING && (
+      {txnStatus === TransactionStatus.PENDING && (
         <TxnLoader
           topToken={topToken}
           bottomToken={bottomToken}
@@ -265,7 +265,7 @@ export function SwapTxnSteps({
           isTiaWtia={isTiaWtia}
         />
       )}
-      {txnStatus === TXN_STATUS.SUCCESS && (
+      {txnStatus === TransactionStatus.SUCCESS && (
         <TxnSuccess
           topToken={topToken}
           bottomToken={bottomToken}
@@ -274,7 +274,7 @@ export function SwapTxnSteps({
           txnHash={txnHash}
         />
       )}
-      {txnStatus === TXN_STATUS.FAILED && <TxnFailed message={txnMsg} />}
+      {txnStatus === TransactionStatus.FAILED && <TxnFailed message={txnMsg} />}
     </div>
   );
 }

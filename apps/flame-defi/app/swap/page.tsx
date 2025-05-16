@@ -9,7 +9,7 @@ import {
   TokenInputState,
   TRADE_TYPE,
   TRADE_TYPE_OPPOSITES,
-  TXN_STATUS,
+  TransactionStatus,
 } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
 import { ArrowDownIcon } from "@repo/ui/icons";
@@ -305,9 +305,9 @@ export default function SwapPage(): React.ReactElement {
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
     if (
-      txnStatus === TXN_STATUS.SUCCESS ||
+      txnStatus === TransactionStatus.SUCCESS ||
       txnStatus === undefined ||
-      txnStatus === TXN_STATUS.FAILED
+      txnStatus === TransactionStatus.FAILED
     ) {
       handleResetInputs();
     }
@@ -318,12 +318,12 @@ export default function SwapPage(): React.ReactElement {
     if (isTiaWtia) {
       onSubmitCallback();
     } else {
-      setTxnStatus(TXN_STATUS.IDLE);
+      setTxnStatus(TransactionStatus.IDLE);
     }
   }, [isTiaWtia, onSubmitCallback, setTxnStatus]);
 
   const handleModalActionButton = useCallback(() => {
-    if (txnStatus !== TXN_STATUS.IDLE) {
+    if (txnStatus !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
       onSubmitCallback();

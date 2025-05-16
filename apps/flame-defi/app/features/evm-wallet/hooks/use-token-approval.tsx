@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { type Address, type Hash, maxUint256 } from "viem";
-import { useAccount, useConfig as useWagmiConfig } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import {
   EvmChainInfo,
@@ -17,9 +17,9 @@ type TokenApprovalProps = {
   addressToApprove: Address;
   // FIXME - could we remove these callbacks and instead return the txnHash from
   //  handleTokenApproval and try/catch errors at the calling site?
-  setTxnStatus: (status: TransactionStatus) => void;
-  setTxnHash: (hash?: Hash) => void;
-  setErrorText: (error: string) => void;
+  setStatus: (status: TransactionStatus) => void;
+  setHash: (hash?: Hash) => void;
+  setError: (error: string) => void;
 };
 
 /**
@@ -44,15 +44,15 @@ export type TokenApprovalReturn = {
 export const useTokenApproval = ({
   chain,
   addressToApprove,
-  setTxnStatus,
-  setTxnHash,
-  setErrorText,
+  setStatus: setStatus,
+  setHash: setHash,
+  setError: setError,
 }: TokenApprovalProps): TokenApprovalReturn => {
   const { currencies } = chain;
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
 
-  const wagmiConfig = useWagmiConfig();
-  const userAccount = useAccount();
+  const config = useConfig();
+  const account = useAccount();
 
   const approveToken = useCallback(
     async (tokenInputState: TokenInputState): Promise<Hash | null> => {
@@ -61,7 +61,7 @@ export const useTokenApproval = ({
         return null;
       }
       const erc20Service = createErc20Service(
-        wagmiConfig,
+        config,
         token.erc20ContractAddress as Address,
       );
 
@@ -85,24 +85,24 @@ export const useTokenApproval = ({
 
       return txHash;
     },
-    [wagmiConfig, chain.chainId, addressToApprove, tokenAllowances],
+    [config, chain.chainId, addressToApprove, tokenAllowances],
   );
 
   const getTokenAllowances = useCallback(async () => {
-    if (!userAccount.address) {
+    if (!account.address) {
       return;
     }
     const newTokenAllowances: TokenAllowance[] = [];
     for (const currency of currencies) {
       if (currency.erc20ContractAddress) {
         const erc20Service = createErc20Service(
-          wagmiConfig,
+          config,
           currency.erc20ContractAddress as Address,
         );
         try {
           const allowance = await erc20Service.allowance(
             chain.chainId, // Use wallet's chain ID if available
-            userAccount.address,
+            account.address,
             addressToApprove,
           );
 
@@ -118,13 +118,7 @@ export const useTokenApproval = ({
 
     console.log({ newTokenAllowances });
     setTokenAllowances(newTokenAllowances);
-  }, [
-    userAccount.address,
-    currencies,
-    wagmiConfig,
-    chain.chainId,
-    addressToApprove,
-  ]);
+  }, [account.address, currencies, config, chain.chainId, addressToApprove]);
 
   const getTokenNeedingApproval = useCallback(
     (tokenInputState: TokenInputState): TokenInputState | null => {
@@ -154,10 +148,10 @@ export const useTokenApproval = ({
 
   // get token allowances when address is set and we don't have any tokenAllowances yet
   useEffect(() => {
-    if (userAccount.address && tokenAllowances.length === 0) {
+    if (account.address && tokenAllowances.length === 0) {
       void getTokenAllowances();
     }
-  }, [getTokenAllowances, userAccount.address, tokenAllowances]);
+  }, [getTokenAllowances, account.address, tokenAllowances]);
 
   const handleTokenApproval = async (
     tokenInputToApprove: TokenInputState,
@@ -166,24 +160,24 @@ export const useTokenApproval = ({
       return;
     }
     try {
-      setTxnStatus(TransactionStatus.PENDING);
+      setStatus(TransactionStatus.PENDING);
       const txHash = await approveToken({
         token: tokenInputToApprove.token,
         value: maxUint256.toString(),
       });
       if (txHash) {
-        setTxnHash(txHash);
+        setHash(txHash);
       }
       return;
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setTxnStatus(TransactionStatus.FAILED);
+        setStatus(TransactionStatus.FAILED);
         return;
       } else {
         console.warn(error);
-        setErrorText("Error approving token");
-        setTxnStatus(TransactionStatus.FAILED);
+        setError("Error approving token");
+        setStatus(TransactionStatus.FAILED);
       }
 
       return;
