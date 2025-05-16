@@ -86,21 +86,15 @@ export const MultiTokenIcon = ({
   size?: number;
 }) => {
   return (
-    <div
-      className="flex items-center h-full"
-      style={{
-        marginRight: `${-MULTI_TOKEN_ICON_SHIFT * (symbols.length - 1)}px`,
-      }}
-    >
+    <div className="flex items-center h-full">
       {symbols.map((symbol, index) => (
         <div
           key={symbol}
-          className="relative h-full"
+          className="h-full"
           style={{
             height: size,
             width: size,
-            right: `${MULTI_TOKEN_ICON_SHIFT * index}px`,
-            zIndex: symbols.length,
+            marginLeft: `-${MULTI_TOKEN_ICON_SHIFT * index}px`,
           }}
         >
           <TokenIcon symbol={symbol} size={size} />
