@@ -15,7 +15,7 @@ import { createErc20Service } from "../services/erc-20-service";
 type TokenApprovalProps = {
   chain: EvmChainInfo;
   addressToApprove: Address;
-  // FIXME - could we remove these callbacks and instead return the txnHash from
+  // FIXME - could we remove these callbacks and instead return the hash from
   //  handleTokenApproval and try/catch errors at the calling site?
   setStatus: (status: TransactionStatus) => void;
   setHash: (hash?: Hash) => void;

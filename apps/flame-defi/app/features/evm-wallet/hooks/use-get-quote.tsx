@@ -10,7 +10,7 @@ export const useGetQuote = () => {
     chain: { chainId, contracts: chainContracts },
   } = useAstriaChainData();
   const [quote, setQuote] = useState<GetQuoteResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -69,7 +69,7 @@ export const useGetQuote = () => {
       const tokenOutSymbol = tokenOut.token.coinDenom.toLocaleLowerCase();
 
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
 
         const url =
@@ -109,7 +109,7 @@ export const useGetQuote = () => {
           throw err;
         }
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
     [chainId, chainContracts.wrappedNativeToken?.address, swapQuoteAPIURL],
@@ -123,8 +123,8 @@ export const useGetQuote = () => {
 
   return {
     quote,
-    loading,
-    quoteError: error,
+    isLoading,
+    error,
     getQuote,
     setQuote,
     cancelGetQuote,

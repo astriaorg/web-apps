@@ -11,18 +11,22 @@ import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 import { useAstriaChainData } from "config";
 
-import { SwapTxnStepsProps, TxnDetailsProps, TxnStepsProps } from "../types";
+import {
+  SwapTransactionStepsProps,
+  TransactionDetailsProps,
+  TransactionStepsProps,
+} from "../types";
 
-export function TxnDetails({
-  topToken,
-  bottomToken,
+export function TransactionDetails({
+  token0,
+  token1,
   expectedOutputFormatted,
   priceImpact,
   minimumReceived,
   oneToOneQuote,
   isQuoteLoading,
   frontendFeeEstimate,
-}: TxnDetailsProps) {
+}: TransactionDetailsProps) {
   const {
     topTokenSymbol,
     bottomTokenSymbol,
@@ -38,11 +42,11 @@ export function TxnDetails({
       <div className="flex flex-col items-center gap-3 mb-8 mt-6 relative">
         <Skeleton className="rounded-sm w-full" isLoading={isQuoteLoading}>
           <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl w-full text-lg">
-            <span>{formatDecimalValues(topToken.value || "0", 6)}</span>
+            <span>{formatDecimalValues(token0.value || "0", 6)}</span>
             <span className="flex items-center gap-1">
-              {topToken.token?.IconComponent &&
-                topToken.token.IconComponent({ size: 24 })}
-              {topToken.token?.coinDenom}
+              {token0.token?.IconComponent &&
+                token0.token.IconComponent({ size: 24 })}
+              {token0.token?.coinDenom}
             </span>
           </div>
         </Skeleton>
@@ -50,9 +54,9 @@ export function TxnDetails({
           <div className="flex justify-between bg-semi-white border border-solid border-grey-medium p-4 rounded-xl text-md w-full text-lg">
             <span>{expectedOutputFormatted}</span>
             <span className="flex items-center gap-1">
-              {bottomToken.token?.IconComponent &&
-                bottomToken.token.IconComponent({ size: 24 })}
-              {bottomToken.token?.coinDenom}
+              {token1.token?.IconComponent &&
+                token1.token.IconComponent({ size: 24 })}
+              {token1.token?.coinDenom}
             </span>
           </div>
         </Skeleton>
@@ -91,8 +95,7 @@ export function TxnDetails({
             />
           </span>
           <span className="text-grey-light text-sm font-medium">
-            {expectedOutputFormatted}{" "}
-            <span>{bottomToken.token?.coinDenom}</span>
+            {expectedOutputFormatted} <span>{token1.token?.coinDenom}</span>
           </span>
         </div>
         <div className="flex justify-between">
@@ -118,7 +121,7 @@ export function TxnDetails({
               />
             </span>
             <span className="text-grey-light text-sm font-medium">
-              {frontendFeeEstimate} <span>{bottomToken.token?.coinDenom}</span>
+              {frontendFeeEstimate} <span>{token1.token?.coinDenom}</span>
             </span>
           </div>
         )}
@@ -135,7 +138,7 @@ export function TxnDetails({
           </div>
           <div className="text-grey-light flex items-center gap-1 text-sm font-medium">
             <span>{minimumReceived}</span>
-            <span>{bottomToken.token?.coinDenom}</span>
+            <span>{token1.token?.coinDenom}</span>
           </div>
         </div>
       </div>
@@ -143,12 +146,12 @@ export function TxnDetails({
   );
 }
 
-function TxnLoader({
+function TransactionLoader({
   expectedOutputFormatted,
-  topToken,
-  bottomToken,
+  token0: topToken,
+  token1: bottomToken,
   isTiaWtia,
-}: TxnStepsProps) {
+}: TransactionStepsProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full mt-20">
       <BlockLoader className="mb-20" />
@@ -174,13 +177,13 @@ function TxnLoader({
   );
 }
 
-function TxnSuccess({
-  topToken,
-  bottomToken,
+function TransactionSuccess({
+  token0,
+  token1,
   expectedOutputFormatted,
   isTiaWtia,
-  txnHash,
-}: TxnStepsProps) {
+  hash,
+}: TransactionStepsProps) {
   const { chain } = useAstriaChainData();
   return (
     <div className="flex flex-col items-center justify-center h-full">
@@ -191,21 +194,21 @@ function TxnSuccess({
           <div className="flex items-center gap-1">
             <span>Swapped</span>
             <span>
-              {formatDecimalValues(topToken.value || "0", 6)}{" "}
-              <span>{topToken.token?.coinDenom}</span>
+              {formatDecimalValues(token0.value || "0", 6)}{" "}
+              <span>{token0.token?.coinDenom}</span>
             </span>
           </div>
           <span>for</span>
           <div className="flex items-center gap-1">
             {isTiaWtia
-              ? formatDecimalValues(bottomToken.value || "0", 6)
+              ? formatDecimalValues(token1.value || "0", 6)
               : expectedOutputFormatted}{" "}
-            <span>{bottomToken.token?.coinDenom}</span>
+            <span>{token1.token?.coinDenom}</span>
           </div>
         </div>
         <div className="flex items-center gap-1 justify-center text-base">
           <a
-            href={`${chain.blockExplorerUrl}/tx/${txnHash}`}
+            href={`${chain.blockExplorerUrl}/tx/${hash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 text-orange hover:text-orange/80  transition text-base md:text-lg underline"
@@ -218,63 +221,65 @@ function TxnSuccess({
   );
 }
 
-function TxnFailed({ message: txnMsg }: TransactionFailedProps) {
+function TransactionFailed({ message }: TransactionFailedProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <ErrorIcon size={170} className="text-orange-soft" />
       <div className="text-white font-medium mt-6 text-center">
         <div className="flex items-center gap-1 justify-center text-base">
-          <span>{txnMsg || "An error occurred"}</span>
+          <span>{message || "An error occurred."}</span>
         </div>
       </div>
     </div>
   );
 }
 
-export function SwapTxnSteps({
-  txnStatus,
-  txnInfo,
-  topToken,
-  bottomToken,
+export function SwapTransactionSteps({
+  status,
+  info,
+  token0,
+  token1,
   isTiaWtia,
-  txnHash,
-  txnMsg,
+  hash,
+  message,
   oneToOneQuote,
   isQuoteLoading,
-}: SwapTxnStepsProps) {
+}: SwapTransactionStepsProps) {
   return (
     <div className="h-[320px]">
-      {txnStatus === TransactionStatus.IDLE && !isTiaWtia && (
-        <TxnDetails
-          topToken={topToken}
-          bottomToken={bottomToken}
-          expectedOutputFormatted={txnInfo.expectedOutputFormatted}
-          priceImpact={txnInfo.priceImpact}
-          minimumReceived={txnInfo.minimumReceived}
+      {status === TransactionStatus.IDLE && !isTiaWtia && (
+        <TransactionDetails
+          token0={token0}
+          token1={token1}
+          expectedOutputFormatted={info.expectedOutputFormatted}
+          priceImpact={info.priceImpact}
+          minimumReceived={info.minimumReceived}
           isTiaWtia={isTiaWtia}
           oneToOneQuote={oneToOneQuote}
           isQuoteLoading={isQuoteLoading}
-          frontendFeeEstimate={txnInfo.frontendFeeEstimate}
+          frontendFeeEstimate={info.frontendFeeEstimate}
         />
       )}
-      {txnStatus === TransactionStatus.PENDING && (
-        <TxnLoader
-          topToken={topToken}
-          bottomToken={bottomToken}
-          expectedOutputFormatted={txnInfo.expectedOutputFormatted}
+      {status === TransactionStatus.PENDING && (
+        <TransactionLoader
+          token0={token0}
+          token1={token1}
+          expectedOutputFormatted={info.expectedOutputFormatted}
           isTiaWtia={isTiaWtia}
         />
       )}
-      {txnStatus === TransactionStatus.SUCCESS && (
-        <TxnSuccess
-          topToken={topToken}
-          bottomToken={bottomToken}
-          expectedOutputFormatted={txnInfo.expectedOutputFormatted}
+      {status === TransactionStatus.SUCCESS && (
+        <TransactionSuccess
+          token0={token0}
+          token1={token1}
+          expectedOutputFormatted={info.expectedOutputFormatted}
           isTiaWtia={isTiaWtia}
-          txnHash={txnHash}
+          hash={hash}
         />
       )}
-      {txnStatus === TransactionStatus.FAILED && <TxnFailed message={txnMsg} />}
+      {status === TransactionStatus.FAILED && (
+        <TransactionFailed message={message} />
+      )}
     </div>
   );
 }

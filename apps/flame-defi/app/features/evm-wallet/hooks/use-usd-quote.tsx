@@ -11,7 +11,7 @@ export const useUsdQuote = (inputToken: TokenInputState) => {
   const usdcToken = chain.currencies.find(
     (currency) => currency.coinDenom === "USDC",
   );
-  const { quote, loading, quoteError, getQuote } = useGetQuote();
+  const { quote, isLoading, error, getQuote } = useGetQuote();
 
   const debouncedGetQuoteRef = useRef(
     debounce(
@@ -34,5 +34,5 @@ export const useUsdQuote = (inputToken: TokenInputState) => {
     }
   }, [inputToken, usdcToken]);
 
-  return { quote, loading, quoteError };
+  return { quote, isLoading, error };
 };

@@ -38,7 +38,7 @@ export const ConnectEvmWalletButton = ({
     [nativeToken, tokenBalance?.value],
   );
 
-  const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
+  const { quote, isLoading: quoteLoading } = useUsdQuote(quoteInput);
 
   const fiatValue = useMemo<Balance | undefined>(() => {
     if (!quote) {

@@ -18,8 +18,8 @@ import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 
-import { SwapInput, SwapTxnSteps, TxnInfo } from "./components";
-import { useOneToOneQuote, useSwapButton, useTxnInfo } from "./hooks";
+import { SwapInput, SwapTransactionSteps, TransactionInfo } from "./components";
+import { useOneToOneQuote, useSwapButton, useTransactionInfo } from "./hooks";
 import { SWAP_INPUT_ID, SwapPairProps } from "./types";
 
 export default function SwapPage(): React.ReactElement {
@@ -47,8 +47,14 @@ export default function SwapPage(): React.ReactElement {
 
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
-  const { quote, loading, quoteError, getQuote, setQuote, cancelGetQuote } =
-    useGetQuote();
+  const {
+    quote,
+    isLoading: loading,
+    error: quoteError,
+    getQuote,
+    setQuote,
+    cancelGetQuote,
+  } = useGetQuote();
 
   const { balance: inputOneBalance } = useEvmCurrencyBalance(inputOne.token);
 
@@ -75,38 +81,38 @@ export default function SwapPage(): React.ReactElement {
     SwapPairProps,
     SwapPairProps,
   ];
-  const topToken = swapPairs[0].inputToken;
-  const bottomToken = swapPairs[1].inputToken;
-  const topTokenBalance = swapPairs[0].balance;
+  const token0 = swapPairs[0].inputToken;
+  const token1 = swapPairs[1].inputToken;
+  const token0Balance = swapPairs[0].balance;
 
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
 
   const {
     titleText,
-    txnHash,
+    hash,
     onSubmitCallback,
     buttonText,
     actionButtonText,
     validSwapInputs,
-    txnStatus,
-    setTxnStatus,
-    txnMsg,
+    status,
+    setStatus,
+    message,
     tokenApprovalNeeded,
-    errorText,
-    setErrorText,
+    error: errorText,
+    setError: setErrorText,
   } = useSwapButton({
-    topToken,
-    bottomToken,
-    topTokenBalance,
+    token0: token0,
+    token1: token1,
+    token0Balance: token0Balance,
     quote,
     loading,
-    quoteError,
+    error: quoteError,
     tradeType,
   });
-  const txnInfo = useTxnInfo({
+  const info = useTransactionInfo({
     quote,
-    topToken,
-    bottomToken,
+    token0: token0,
+    token1: token1,
     tradeType,
     validSwapInputs: validSwapInputs,
   });
@@ -147,12 +153,12 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleResetInputs = useCallback(() => {
-    setInputOne({ token: topToken.token, value: "", isQuoteValue: false });
-    setInputTwo({ token: bottomToken.token, value: "", isQuoteValue: true });
+    setInputOne({ token: token0.token, value: "", isQuoteValue: false });
+    setInputTwo({ token: token1.token, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
-    setTxnStatus(undefined);
-  }, [setQuote, setTxnStatus, topToken, bottomToken]);
+    setStatus(undefined);
+  }, [setQuote, setStatus, token0, token1]);
 
   const handleInputChange = useCallback(
     (value: string, inputId: SWAP_INPUT_ID) => {
@@ -305,30 +311,30 @@ export default function SwapPage(): React.ReactElement {
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
     if (
-      txnStatus === TransactionStatus.SUCCESS ||
-      txnStatus === undefined ||
-      txnStatus === TransactionStatus.FAILED
+      status === TransactionStatus.SUCCESS ||
+      status === undefined ||
+      status === TransactionStatus.FAILED
     ) {
       handleResetInputs();
     }
-  }, [handleResetInputs, txnStatus]);
+  }, [handleResetInputs, status]);
 
   const handleOpenModal = useCallback(() => {
     setModalOpen(true);
     if (isTiaWtia) {
       onSubmitCallback();
     } else {
-      setTxnStatus(TransactionStatus.IDLE);
+      setStatus(TransactionStatus.IDLE);
     }
-  }, [isTiaWtia, onSubmitCallback, setTxnStatus]);
+  }, [isTiaWtia, onSubmitCallback, setStatus]);
 
   const handleModalActionButton = useCallback(() => {
-    if (txnStatus !== TransactionStatus.IDLE) {
+    if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
       onSubmitCallback();
     }
-  }, [handleCloseModal, onSubmitCallback, txnStatus]);
+  }, [handleCloseModal, onSubmitCallback, status]);
 
   return (
     <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
@@ -351,7 +357,7 @@ export default function SwapPage(): React.ReactElement {
                   onInputChange={handleInputChange}
                   onTokenSelect={handleTokenSelect}
                   oppositeToken={oppositeToken}
-                  txnQuoteLoading={loading}
+                  isQuoteLoading={loading}
                 />
               ),
             )}
@@ -381,15 +387,15 @@ export default function SwapPage(): React.ReactElement {
           handleCloseModal={handleCloseModal}
           title={titleText}
         >
-          <SwapTxnSteps
-            txnStatus={txnStatus}
-            txnInfo={txnInfo}
-            topToken={topToken}
-            bottomToken={bottomToken}
+          <SwapTransactionSteps
+            status={status}
+            info={info}
+            token0={token0}
+            token1={token1}
             isTiaWtia={isTiaWtia}
             oneToOneQuote={oneToOneQuote}
-            txnHash={txnHash}
-            txnMsg={txnMsg}
+            hash={hash}
+            message={message}
             isQuoteLoading={loading}
           />
         </ConfirmationModal>
@@ -412,10 +418,10 @@ export default function SwapPage(): React.ReactElement {
           !isTiaWtia &&
           validSwapInputs &&
           quote && (
-            <TxnInfo
-              txnInfo={txnInfo}
-              topToken={topToken}
-              bottomToken={bottomToken}
+            <TransactionInfo
+              info={info}
+              token0={token0}
+              token1={token1}
               oneToOneQuote={oneToOneQuote}
               quote={quote}
             />

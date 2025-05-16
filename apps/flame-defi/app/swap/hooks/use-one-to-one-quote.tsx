@@ -18,7 +18,7 @@ export const useOneToOneQuote = (
     [flipDirection, inputOne, inputTwo],
   );
 
-  const { quoteError, getQuote } = useGetQuote();
+  const { error: quoteError, getQuote } = useGetQuote();
   const topTokenSymbol = oneToOneValueTokens[0]?.coinDenom;
   const bottomTokenSymbol = oneToOneValueTokens[1]?.coinDenom;
   const bottomTokenValue = flipDirection

@@ -25,45 +25,45 @@ import {
 } from "features/evm-wallet";
 
 interface SwapButtonProps {
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
-  topTokenBalance: string;
+  token0: TokenInputState;
+  token1: TokenInputState;
+  token0Balance: string;
   quote: GetQuoteResult | null;
   loading: boolean;
-  quoteError: string | null;
+  error: string | null;
   tradeType: TRADE_TYPE;
 }
 
 export function useSwapButton({
-  topToken,
-  bottomToken,
-  topTokenBalance,
+  token0: topToken,
+  token1: bottomToken,
+  token0Balance: topTokenBalance,
   quote,
   loading,
-  quoteError,
+  error: quoteError,
   tradeType,
 }: SwapButtonProps) {
   const { chain } = useAstriaChainData();
   const { feeRecipient } = useConfig();
-  const wagmiConfig = useWagmiConfig();
+  const config = useWagmiConfig();
   const userAccount = useAccount();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
   const { connectWallet } = useAstriaWallet();
-  const [txnStatus, setTxnStatus] = useState<TransactionStatus | undefined>(
+  const [status, setStatus] = useState<TransactionStatus | undefined>(
     undefined,
   );
-  const [txnMsg, setTxnMsg] = useState<string | undefined>(undefined);
-  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
-  const [errorText, setErrorText] = useState<string | null>(null);
-  const result = useWaitForTransactionReceipt({ hash: txnHash });
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [hash, setHash] = useState<Hash | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
+  const result = useWaitForTransactionReceipt({ hash: hash });
 
   const { handleTokenApproval, getTokenNeedingApproval } = useTokenApproval({
     chain,
     addressToApprove: chain.contracts.swapRouter.address,
-    setStatus: setTxnStatus,
-    setHash: setTxnHash,
-    setError: setErrorText,
+    setStatus,
+    setHash,
+    setError,
   });
   const tokenNeedingApproval = getTokenNeedingApproval(topToken);
 
@@ -72,21 +72,24 @@ export function useSwapButton({
   const unwrapTia =
     topToken.token?.isWrappedNative && bottomToken.token?.isNative;
 
-  const handleTxnModalErrorMsgs = (error: string, defaultMsg?: string) => {
+  const handleTransactionModalErrorMsgs = (
+    error: string,
+    defaultMsg?: string,
+  ) => {
     if (error.includes("rejected")) {
-      setTxnMsg("Transaction rejected");
+      setMessage("Transaction rejected");
     } else if (defaultMsg) {
-      setTxnMsg(defaultMsg);
+      setMessage(defaultMsg);
     } else {
-      setTxnMsg("Transaction error");
+      setMessage("Transaction error");
     }
   };
 
   useEffect(() => {
     if (quoteError) {
-      setErrorText(quoteError);
+      setError(quoteError);
     } else {
-      setErrorText(null);
+      setError(null);
     }
   }, [quoteError]);
 
@@ -95,28 +98,28 @@ export function useSwapButton({
       return;
     }
     if (result.data?.status === "success") {
-      setTxnStatus(TransactionStatus.SUCCESS);
+      setStatus(TransactionStatus.SUCCESS);
       addRecentTransaction({
-        hash: txnHash || "",
+        hash: hash || "",
         description: "Successful transaction",
       });
     } else if (result.data?.status === "reverted") {
-      setTxnStatus(TransactionStatus.FAILED);
-      handleTxnModalErrorMsgs("", "Transaction reverted");
+      setStatus(TransactionStatus.FAILED);
+      handleTransactionModalErrorMsgs("", "Transaction reverted");
     } else if (result.data?.status === "error") {
-      setTxnStatus(TransactionStatus.FAILED);
-      handleTxnModalErrorMsgs("", "Transaction failed");
+      setStatus(TransactionStatus.FAILED);
+      handleTransactionModalErrorMsgs("", "Transaction failed");
     }
-  }, [result.data, txnHash, addRecentTransaction, userAccount.address]);
+  }, [result.data, hash, addRecentTransaction, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wtiaAddress = chain.contracts.wrappedNativeToken?.address;
     if (!chain.chainId || !wtiaAddress) {
       return;
     }
-    setTxnStatus(TransactionStatus.PENDING);
+    setStatus(TransactionStatus.PENDING);
 
-    const wethService = createWethService(wagmiConfig, wtiaAddress);
+    const wethService = createWethService(config, wtiaAddress);
 
     if (type === "wrap") {
       try {
@@ -125,12 +128,12 @@ export function useSwapButton({
           topToken.value,
           topToken.token?.coinDecimals || 18,
         );
-        setTxnHash(tx);
+        setHash(tx);
       } catch (error) {
         const errorMessage =
           (error instanceof Error && error.message) || "Error unwrapping";
-        setTxnStatus(TransactionStatus.FAILED);
-        handleTxnModalErrorMsgs(errorMessage);
+        setStatus(TransactionStatus.FAILED);
+        handleTransactionModalErrorMsgs(errorMessage);
       }
     } else {
       try {
@@ -139,12 +142,12 @@ export function useSwapButton({
           bottomToken.value,
           bottomToken.token?.coinDecimals || 18,
         );
-        setTxnHash(tx);
+        setHash(tx);
       } catch (error) {
         const errorMessage =
           (error instanceof Error && error.message) || "Error unwrapping";
-        setTxnStatus(TransactionStatus.FAILED);
-        handleTxnModalErrorMsgs(errorMessage);
+        setStatus(TransactionStatus.FAILED);
+        handleTransactionModalErrorMsgs(errorMessage);
       }
     }
   };
@@ -160,7 +163,7 @@ export function useSwapButton({
     if (!trade || !userAccount.address || !chain.chainId) {
       return;
     }
-    setTxnStatus(TransactionStatus.PENDING);
+    setStatus(TransactionStatus.PENDING);
     try {
       const swapRouterAddress = chain.contracts.swapRouter?.address;
       if (!swapRouterAddress) {
@@ -169,7 +172,7 @@ export function useSwapButton({
       }
 
       const swapRouterService = createSwapRouterService(
-        wagmiConfig,
+        config,
         swapRouterAddress as Address,
         evmChainToRainbowKitChain(chain) as Chain,
       );
@@ -188,12 +191,12 @@ export function useSwapButton({
         trade,
         options,
       );
-      setTxnHash(tx);
+      setHash(tx);
     } catch (error) {
       const errorMessage =
         (error instanceof Error && error.message) || "Error executing swap";
-      setTxnStatus(TransactionStatus.FAILED);
-      handleTxnModalErrorMsgs(errorMessage);
+      setStatus(TransactionStatus.FAILED);
+      handleTransactionModalErrorMsgs(errorMessage);
     }
   }, [
     trade,
@@ -201,7 +204,7 @@ export function useSwapButton({
     bottomToken.token?.coinDenom,
     userAccount,
     chain,
-    wagmiConfig,
+    config,
     slippageTolerance,
     feeRecipient,
   ]);
@@ -209,8 +212,8 @@ export function useSwapButton({
   // FIXME - parseFloat is not sufficient for huge numbers
   const validSwapInputs = Boolean(
     !loading &&
-      txnStatus !== TransactionStatus.PENDING &&
-      errorText === null &&
+      status !== TransactionStatus.PENDING &&
+      error === null &&
       topToken.token &&
       bottomToken.token &&
       topToken.value !== undefined &&
@@ -245,12 +248,12 @@ export function useSwapButton({
       case !topToken.token || !bottomToken.token:
         return "Select a token";
       case tokenNeedingApproval !== null &&
-        txnStatus !== TransactionStatus.PENDING:
+        status !== TransactionStatus.PENDING:
         return `Approve ${tokenNeedingApproval.token?.coinDenom}`;
       case tokenNeedingApproval !== null &&
-        txnStatus === TransactionStatus.PENDING:
+        status === TransactionStatus.PENDING:
         return "Pending wallet approval...";
-      case txnStatus === TransactionStatus.PENDING:
+      case status === TransactionStatus.PENDING:
         return "Pending...";
       case topToken.value === undefined:
         return "Enter an amount";
@@ -274,11 +277,11 @@ export function useSwapButton({
 
   const getActionButtonText = () => {
     switch (true) {
-      case txnStatus === TransactionStatus.PENDING:
+      case status === TransactionStatus.PENDING:
         return "Close";
-      case txnStatus === TransactionStatus.SUCCESS:
+      case status === TransactionStatus.SUCCESS:
         return "Close";
-      case txnStatus === TransactionStatus.FAILED:
+      case status === TransactionStatus.FAILED:
         return "Dismiss";
       case wrapTia:
         return "Confirm Wrap";
@@ -295,7 +298,7 @@ export function useSwapButton({
         return "Confirm Wrap";
       case unwrapTia:
         return "Confirm Unwrap";
-      case txnStatus === TransactionStatus.FAILED:
+      case status === TransactionStatus.FAILED:
         return "Error";
       default:
         return "Confirm Swap";
@@ -303,18 +306,18 @@ export function useSwapButton({
   };
 
   return {
-    txnHash,
+    hash,
     titleText: getTitleText(),
     onSubmitCallback,
     buttonText: getButtonText(),
-    errorText,
-    setErrorText,
+    error,
+    setError,
     actionButtonText: getActionButtonText(),
     validSwapInputs,
-    txnStatus,
-    setTxnStatus,
-    txnMsg,
+    status,
+    setStatus,
+    message,
     tokenApprovalNeeded:
-      tokenNeedingApproval !== null && txnStatus !== TransactionStatus.PENDING,
+      tokenNeedingApproval !== null && status !== TransactionStatus.PENDING,
   };
 }
