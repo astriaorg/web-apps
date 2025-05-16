@@ -12,7 +12,7 @@ import {
   TokenInfoCard,
 } from "pool/components";
 import {
-  useCollectFeesTxn,
+  useCollectFeesTransaction,
   usePoolContext,
   usePoolPositionContext,
 } from "pool/hooks";
@@ -34,7 +34,7 @@ export const ContentSection = () => {
   const hasValidTokens = poolToken0 && poolToken1;
   const tokens = hasValidTokens ? [poolToken0, poolToken1] : [];
   const { status, hash, error, setStatus, setError, collectFees } =
-    useCollectFeesTxn(tokens, isCollectAsWrappedNative);
+    useCollectFeesTransaction(tokens, isCollectAsWrappedNative);
 
   // NOTE: This poolTokensForDisplay is necessary for the pool position details page to be able to reverse the token order in all components on the page.
   // All other pages only reverse the values of the price range block when this happens.

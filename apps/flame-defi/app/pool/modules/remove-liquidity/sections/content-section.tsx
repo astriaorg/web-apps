@@ -10,7 +10,7 @@ import {
   usePoolContext,
   usePoolPositionContext,
   useRemoveLiquidityPercentage,
-  useRemoveLiquidityTxn,
+  useRemoveLiquidityTransaction,
 } from "pool/hooks";
 
 import { TokenLiquidityBlock } from "../components";
@@ -32,7 +32,7 @@ export const ContentSection = () => {
     refreshLiquidityToRemove,
   } = useRemoveLiquidityPercentage();
   const { hash, status, setStatus, error, setError, removeLiquidity } =
-    useRemoveLiquidityTxn(
+    useRemoveLiquidityTransaction(
       liquidityToRemove,
       isCollectAsWrappedNative,
       percentageToRemove,

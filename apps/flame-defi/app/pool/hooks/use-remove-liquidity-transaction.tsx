@@ -13,7 +13,7 @@ import { PoolToken } from "pool/types";
 
 import { usePoolPositionContext } from ".";
 
-export const useRemoveLiquidityTxn = (
+export const useRemoveLiquidityTransaction = (
   tokens: PoolToken[],
   isCollectAsWrappedNative: boolean,
   percentageToRemove: number,

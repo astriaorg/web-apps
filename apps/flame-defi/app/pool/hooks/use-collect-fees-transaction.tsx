@@ -3,30 +3,30 @@ import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 
 import { TokenInputState, TransactionStatus } from "@repo/flame-types";
-import { getSlippageTolerance } from "@repo/ui/utils";
-import { useAstriaChainData, useConfig as useAppConfig } from "config";
+import { useAstriaChainData } from "config";
 import {
   createNonfungiblePositionManagerService,
   NonfungiblePositionManagerService,
 } from "features/evm-wallet";
+import { PoolToken } from "pool/types";
 
-import { usePoolPositionContext } from "./use-pool-position-context";
+import { usePoolPositionContext } from ".";
 
-export const useAddLiquidityTxn = (amount0: string, amount1: string) => {
+export const useCollectFeesTransaction = (
+  tokens: PoolToken[],
+  isCollectAsWrappedNative: boolean,
+) => {
+  const { tokenId } = usePoolPositionContext();
   const { address } = useAccount();
   const config = useConfig();
+  const { chain } = useAstriaChainData();
   const [status, setStatus] = useState<TransactionStatus>(
     TransactionStatus.IDLE,
   );
   const [hash, setHash] = useState<Hash | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
-
-  const { chain } = useAstriaChainData();
-  const { poolToken0, poolToken1, tokenId } = usePoolPositionContext();
-  const { defaultSlippageTolerance } = useAppConfig();
-  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
-    hash,
+    hash: hash,
   });
 
   useEffect(() => {
@@ -35,64 +35,67 @@ export const useAddLiquidityTxn = (amount0: string, amount1: string) => {
       setStatus(TransactionStatus.SUCCESS);
     } else if (transactionData?.status === "reverted") {
       setStatus(TransactionStatus.FAILED);
-      setError("Transaction reverted.");
+      setError("Transaction reverted");
     } else if (transactionData?.status === "error") {
       setStatus(TransactionStatus.FAILED);
-      setError("Transaction failed.");
+      setError("Transaction failed");
     }
   }, [transactionData, hash, setStatus]);
 
-  const addLiquidity = async () => {
+  const formatFeesToCollectToTokenInputState = (
+    tokens: PoolToken[],
+  ): TokenInputState[] => {
+    return tokens.map((data) => {
+      return {
+        token: data.token,
+        value: data.unclaimedFees?.toString() || "0",
+      };
+    });
+  };
+
+  const tokenInputs = formatFeesToCollectToTokenInputState(tokens);
+
+  const collectFees = async () => {
     if (
       !address ||
-      !poolToken0 ||
-      !poolToken1 ||
+      tokens.length === 0 ||
       !tokenId ||
-      parseFloat(amount0) <= 0 ||
-      parseFloat(amount1) <= 0
+      !tokenInputs[0] ||
+      !tokenInputs[1]
     ) {
-      console.warn("Missing required data for increasing liquidity");
+      console.warn("Missing required data for collecting fees");
       return;
     }
 
-    const tokenInput0: TokenInputState = {
-      token: poolToken0.token,
-      value: amount0,
-    };
-    const tokenInput1: TokenInputState = {
-      token: poolToken1.token,
-      value: amount1,
-    };
-
-    const increaseLiquidityParams =
-      NonfungiblePositionManagerService.getIncreaseLiquidityParams(
-        tokenInput0,
-        tokenInput1,
-        slippageTolerance,
-        chain,
-      );
-
     try {
       setStatus(TransactionStatus.PENDING);
-      const NonfungiblePositionManagerService =
+      const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
           config,
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const tx = await NonfungiblePositionManagerService.increaseLiquidity(
-        tokenId,
-        increaseLiquidityParams,
-      );
+      const collectFeesParams =
+        NonfungiblePositionManagerService.getCollectFeesParams(
+          chain,
+          tokenId,
+          tokenInputs[0],
+          tokenInputs[1],
+          address,
+          isCollectAsWrappedNative,
+        );
+
+      const tx =
+        await nonfungiblePositionService.collectFees(collectFeesParams);
       setHash(tx);
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setError("Transaction rejected");
+        setError("Transaction rejected.");
         setStatus(TransactionStatus.FAILED);
       } else {
         console.warn(error);
-        setError("Error increasing liquidity");
+        setError("Error collecting fees.");
         setStatus(TransactionStatus.FAILED);
       }
     }
@@ -102,8 +105,8 @@ export const useAddLiquidityTxn = (amount0: string, amount1: string) => {
     status,
     hash,
     error,
-    setError,
     setStatus,
-    addLiquidity,
+    setError,
+    collectFees,
   };
 };

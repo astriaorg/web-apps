@@ -7,7 +7,7 @@ import { ConfirmationModal } from "components/confirmation-modal/confirmation-mo
 import { useEvmCurrencyBalance } from "features/evm-wallet";
 import { PoolTransactionSteps, PriceRangeBlock } from "pool/components";
 import {
-  useAddLiquidityTxn,
+  useAddLiquidityTransaction,
   useAddLiquidityValidation,
   usePoolContext,
   usePoolPositionContext,
@@ -35,7 +35,7 @@ export const ContentSection = () => {
   const { balance: token1Balance } = useEvmCurrencyBalance(poolToken1?.token);
 
   const { status, hash, error, setError, setStatus, addLiquidity } =
-    useAddLiquidityTxn(input0, input1);
+    useAddLiquidityTransaction(input0, input1);
   const { validPoolInputs, buttonText } = useAddLiquidityValidation(
     input0,
     input1,
