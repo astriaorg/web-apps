@@ -5,11 +5,11 @@ import { cn } from "@repo/ui/utils";
 import { PoolToken } from "pool/types";
 
 export const PoolFeesAndLiquidityCard = ({
-  poolTokens,
+  tokens,
   className,
   liquidityToRemove,
 }: {
-  poolTokens: PoolToken[];
+  tokens: PoolToken[];
   className: string;
   liquidityToRemove: PoolToken[];
 }) => {
@@ -48,8 +48,8 @@ export const PoolFeesAndLiquidityCard = ({
         </div>
         <hr className="border-t border-border mt-4 mb-4" />
         <div className="flex flex-col gap-4">
-          <Skeleton isLoading={poolTokens.length === 0} className="h-16 w-full">
-            {poolTokens.map(({ token, unclaimedFees }, index) => (
+          <Skeleton isLoading={tokens.length === 0} className="h-16 w-full">
+            {tokens.map(({ token, unclaimedFees }, index) => (
               <div
                 key={index}
                 className="flex justify-between items-center gap-2"

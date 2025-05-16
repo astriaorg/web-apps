@@ -37,12 +37,14 @@ export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const wagmiConfig = useConfig();
+  const tokenId = params["token-id"] as string;
+
+  const config = useConfig();
   const { address } = useAccount();
   const { formatNumber } = useIntl();
-  const positionNftId = params["token-id"] as string;
   const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
   const { currencies } = chain;
+
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(false);
   const [currentPrice, setCurrentPrice] = useState<string>("");
@@ -51,13 +53,13 @@ export const PoolPositionContextProvider = ({
   const [invertedPrice, setInvertedPrice] = useState<boolean>(false);
   const [isReversedPoolTokens, setIsReversedPoolTokens] =
     useState<boolean>(false);
-  const [poolTokens, setPoolTokens] = useState<PoolToken[] | []>([]);
-  const [poolPosition, setPoolPosition] = useState<Position | null>(null);
+  const [tokens, setTokens] = useState<PoolToken[] | []>([]);
+  const [position, setPoolPosition] = useState<Position | null>(null);
   const [feeTier, setFeeTier] = useState<string>("");
   const [rawFeeTier, setRawFeeTier] = useState<number>(0);
   const [isPositionClosed, setIsPositionClosed] = useState<boolean>(false);
-  const poolToken0 = poolTokens[0] || null;
-  const poolToken1 = poolTokens[1] || null;
+  const token0 = tokens[0] || null;
+  const token1 = tokens[1] || null;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
 
@@ -66,17 +68,17 @@ export const PoolPositionContextProvider = ({
     setInvertedPrice(!invertedPrice);
     setIsReversedPoolTokens(!isReversedPoolTokens);
   };
-  const NonfungiblePositionManagerService =
+  const nonfungiblePositionManagerService =
     createNonfungiblePositionManagerService(
-      wagmiConfig,
+      config,
       chain.contracts.nonfungiblePositionManager.address,
     );
 
   const getPoolTokens = useCallback(async () => {
     try {
-      const position = await NonfungiblePositionManagerService.positions(
+      const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        positionNftId,
+        tokenId,
       );
       const isPositionClosed = position.liquidity === 0n;
       setIsPositionClosed(isPositionClosed);
@@ -102,7 +104,7 @@ export const PoolPositionContextProvider = ({
         );
 
         const factoryService = createPoolFactoryService(
-          wagmiConfig,
+          config,
           chain.contracts.poolFactory.address,
         );
         const poolAddress = await factoryService.getPool(
@@ -111,7 +113,7 @@ export const PoolPositionContextProvider = ({
           position.token1,
           position.fee,
         );
-        const poolService = createPoolService(wagmiConfig, poolAddress);
+        const poolService = createPoolService(config, poolAddress);
         const slot0 = await poolService.slot0(chain.chainId);
 
         const { amount0, amount1 } = getTokensLiquidityAmounts(
@@ -135,7 +137,7 @@ export const PoolPositionContextProvider = ({
           token: token1,
         };
 
-        setPoolTokens([poolToken0, poolToken1]);
+        setTokens([poolToken0, poolToken1]);
         setSelectedSymbol(poolToken0.token.coinDenom);
       }
     } catch (error) {
@@ -143,18 +145,18 @@ export const PoolPositionContextProvider = ({
     }
   }, [
     currencies,
-    NonfungiblePositionManagerService,
+    nonfungiblePositionManagerService,
     chain.chainId,
     chain.contracts.poolFactory.address,
     chain.contracts.wrappedNativeToken.address,
-    positionNftId,
-    wagmiConfig,
+    tokenId,
+    config,
   ]);
 
   const getFeeTier = useCallback(async () => {
-    const position = await NonfungiblePositionManagerService.positions(
+    const position = await nonfungiblePositionManagerService.positions(
       chain.chainId,
-      positionNftId,
+      tokenId,
     );
     const feeTier = formatNumber(position.fee / 1_000_000, {
       style: "percent",
@@ -162,12 +164,7 @@ export const PoolPositionContextProvider = ({
     });
     setFeeTier(feeTier);
     setRawFeeTier(position.fee);
-  }, [
-    formatNumber,
-    NonfungiblePositionManagerService,
-    chain.chainId,
-    positionNftId,
-  ]);
+  }, [formatNumber, nonfungiblePositionManagerService, chain.chainId, tokenId]);
 
   const getPriceRange = useCallback(async () => {
     if (!address) {
@@ -175,12 +172,12 @@ export const PoolPositionContextProvider = ({
     }
 
     try {
-      const position = await NonfungiblePositionManagerService.positions(
+      const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        positionNftId,
+        tokenId,
       );
       const factoryService = createPoolFactoryService(
-        wagmiConfig,
+        config,
         chain.contracts.poolFactory.address,
       );
 
@@ -202,7 +199,7 @@ export const PoolPositionContextProvider = ({
         position.token1,
         position.fee,
       );
-      const poolService = createPoolService(wagmiConfig, poolAddress);
+      const poolService = createPoolService(config, poolAddress);
       const slot0 = await poolService.slot0(chain.chainId);
       const pricePerToken = sqrtPriceX96ToPrice(
         slot0.sqrtPriceX96,
@@ -243,20 +240,20 @@ export const PoolPositionContextProvider = ({
     }
   }, [
     address,
-    NonfungiblePositionManagerService,
+    nonfungiblePositionManagerService,
     chain,
-    positionNftId,
+    tokenId,
     currencies,
-    wagmiConfig,
+    config,
     invertedPrice,
   ]);
 
   useEffect(() => {
-    if (poolTokens.length === 0) {
+    if (tokens.length === 0) {
       void getPoolTokens();
       void getFeeTier();
     }
-  }, [poolTokens.length, getPoolTokens, getFeeTier]);
+  }, [tokens.length, getPoolTokens, getFeeTier]);
 
   const refreshPoolPosition = useCallback(() => {
     void getPoolTokens();
@@ -270,20 +267,20 @@ export const PoolPositionContextProvider = ({
   const handleCollectAsWrappedNative = (isCollectAsWrappedNative: boolean) => {
     setIsCollectAsWrappedNative(isCollectAsWrappedNative);
     if (isCollectAsWrappedNative) {
-      poolTokens.map((poolToken) => {
+      tokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {
           poolToken.token = wrappedNativeToken;
         }
       });
     } else {
-      poolTokens.map((poolToken) => {
+      tokens.map((poolToken) => {
         if (poolToken.token.isWrappedNative && nativeToken) {
           poolToken.token = nativeToken;
         }
       });
     }
-    setPoolTokens(poolTokens);
-    setSelectedSymbol(poolTokens[0]?.token.coinDenom ?? "");
+    setTokens(tokens);
+    setSelectedSymbol(tokens[0]?.token.coinDenom ?? "");
   };
 
   return (
@@ -295,16 +292,16 @@ export const PoolPositionContextProvider = ({
         handleReverseTokenData,
         isCollectAsWrappedNative,
         handleCollectAsWrappedNative,
-        poolToken0,
-        poolToken1,
+        token0,
+        token1,
         currentPrice,
         minPrice,
         maxPrice,
-        poolPosition,
+        position,
         isReversedPoolTokens,
         isPositionClosed,
         refreshPoolPosition,
-        positionNftId,
+        tokenId,
       }}
     >
       {children}

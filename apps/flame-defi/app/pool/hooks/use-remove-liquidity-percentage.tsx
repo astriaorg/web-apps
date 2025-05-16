@@ -6,12 +6,11 @@ import { PoolToken } from "pool/types";
 import { usePoolPositionContext } from ".";
 
 export const useRemoveLiquidityPercentage = () => {
-  const { poolToken0, poolToken1, isCollectAsWrappedNative } =
-    usePoolPositionContext();
+  const { token0, token1, isCollectAsWrappedNative } = usePoolPositionContext();
   const { wrappedNativeToken, nativeToken } = useAstriaChainData();
   const poolTokens = useMemo(
-    () => (poolToken0 && poolToken1 ? [poolToken0, poolToken1] : []),
-    [poolToken0, poolToken1],
+    () => (token0 && token1 ? [token0, token1] : []),
+    [token0, token1],
   );
 
   const [liquidityToRemove, setLiquidityToRemove] = useState<PoolToken[]>([]);

@@ -12,24 +12,27 @@ import {
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 
-import { OneToOneQuoteProps, TransactionInfo } from "../types";
+import {
+  OneToOneQuoteProps,
+  TransactionInfo as TransactionInfoType,
+} from "../types";
 import { RoutePath } from "./route-path";
 
-export interface TxnInfoProps {
-  txnInfo: TransactionInfo;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
+export interface TransactionInfoProps {
+  info: TransactionInfoType;
+  token0: TokenInputState;
+  token1: TokenInputState;
   oneToOneQuote: OneToOneQuoteProps;
   quote: GetQuoteResult;
 }
 
-export function TxnInfo({
-  txnInfo,
-  topToken,
-  bottomToken,
+export function TransactionInfo({
+  info,
+  token0,
+  token1,
   oneToOneQuote,
   quote,
-}: TxnInfoProps) {
+}: TransactionInfoProps) {
   const slippageTolerance = getSlippageTolerance();
 
   return (
@@ -62,14 +65,14 @@ export function TxnInfo({
           </Skeleton>
           <Skeleton
             className="rounded-sm w-[100px] h-[25px] mt-3"
-            isLoading={txnInfo.txnQuoteDataLoading}
+            isLoading={info.transactionQuoteDataLoading}
           >
             <AccordionTrigger>
-              {txnInfo.gasUseEstimateUSD && (
+              {info.gasUseEstimateUSD && (
                 <div className="[&>svg]:transform-none! flex items-center gap-1 width: 100%">
                   <GasIcon size={20} />
                   <span className="mr-1">
-                    ${txnInfo.formattedGasUseEstimateUSD}
+                    ${info.formattedGasUseEstimateUSD}
                   </span>
                 </div>
               )}
@@ -88,8 +91,8 @@ export function TxnInfo({
                 />
               </span>
               <span className="text-grey-light">
-                {txnInfo.expectedOutputFormatted}{" "}
-                <span>{bottomToken.token?.coinDenom}</span>
+                {info.expectedOutputFormatted}{" "}
+                <span>{token1.token?.coinDenom}</span>
               </span>
             </p>
             <p className="flex justify-between">
@@ -100,7 +103,7 @@ export function TxnInfo({
                   side="right"
                 />
               </span>
-              <span className="text-grey-light">{txnInfo.priceImpact}</span>
+              <span className="text-grey-light">{info.priceImpact}</span>
             </p>
             <p className="flex justify-between">
               <span className="text-grey-light flex items-center gap-1">
@@ -111,10 +114,10 @@ export function TxnInfo({
                 />
               </span>
               <span className="text-grey-light">
-                ${txnInfo.formattedGasUseEstimateUSD}
+                ${info.formattedGasUseEstimateUSD}
               </span>
             </p>
-            {Boolean(txnInfo.frontendFeeEstimate) && (
+            {Boolean(info.frontendFeeEstimate) && (
               <p className="flex justify-between">
                 <span className="text-grey-light flex items-center gap-1">
                   {/* TODO - show fee percentage from config */}
@@ -125,8 +128,8 @@ export function TxnInfo({
                   />
                 </span>
                 <span className="text-grey-light">
-                  {txnInfo.frontendFeeEstimate}{" "}
-                  <span>{bottomToken.token?.coinDenom}</span>
+                  {info.frontendFeeEstimate}{" "}
+                  <span>{token1.token?.coinDenom}</span>
                 </span>
               </p>
             )}
@@ -142,8 +145,7 @@ export function TxnInfo({
                 />
               </div>
               <span className="text-grey-light">
-                {txnInfo.minimumReceived}{" "}
-                <span>{bottomToken.token?.coinDenom}</span>
+                {info.minimumReceived} <span>{token1.token?.coinDenom}</span>
               </span>
             </div>
           </div>
@@ -151,10 +153,10 @@ export function TxnInfo({
           {quote && quote.route && (
             <RoutePath
               quoteRoute={quote.route}
-              loading={txnInfo.txnQuoteDataLoading}
-              symbolIn={topToken.token?.coinDenom}
-              symbolOut={bottomToken.token?.coinDenom}
-              networkFee={txnInfo.formattedGasUseEstimateUSD}
+              loading={info.transactionQuoteDataLoading}
+              symbolIn={token0.token?.coinDenom}
+              symbolOut={token1.token?.coinDenom}
+              networkFee={info.formattedGasUseEstimateUSD}
             />
           )}
         </AccordionContent>

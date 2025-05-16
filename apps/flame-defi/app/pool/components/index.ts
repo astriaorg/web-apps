@@ -1,4 +1,4 @@
-export * from "./pool-txn-steps";
+export * from "./pool-transaction-steps";
 export * from "./position-range-badge";
 export * from "./price-range-block";
 export * from "./price-range-card";
