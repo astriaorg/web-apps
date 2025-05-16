@@ -44,9 +44,9 @@ export type TokenApprovalReturn = {
 export const useTokenApproval = ({
   chain,
   addressToApprove,
-  setStatus: setStatus,
-  setHash: setHash,
-  setError: setError,
+  setStatus,
+  setHash,
+  setError,
 }: TokenApprovalProps): TokenApprovalReturn => {
   const { currencies } = chain;
   const [tokenAllowances, setTokenAllowances] = useState<TokenAllowance[]>([]);
@@ -176,7 +176,7 @@ export const useTokenApproval = ({
         return;
       } else {
         console.warn(error);
-        setError("Error approving token");
+        setError("Error approving token.");
         setStatus(TransactionStatus.FAILED);
       }
 

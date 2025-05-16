@@ -41,10 +41,10 @@ export const useRemoveLiquidityTransaction = (
       setStatus(TransactionStatus.SUCCESS);
     } else if (transactionData?.status === "reverted") {
       setStatus(TransactionStatus.FAILED);
-      setError("Transaction reverted");
+      setError("Transaction reverted.");
     } else if (transactionData?.status === "error") {
       setStatus(TransactionStatus.FAILED);
-      setError("Transaction failed");
+      setError("Transaction failed.");
     }
   }, [transactionData, hash, setStatus]);
 

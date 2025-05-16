@@ -91,11 +91,11 @@ export const useAddLiquidityTransaction = (
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setError("Transaction rejected");
+        setError("Transaction rejected.");
         setStatus(TransactionStatus.FAILED);
       } else {
         console.warn(error);
-        setError("Error increasing liquidity");
+        setError("Error increasing liquidity.");
         setStatus(TransactionStatus.FAILED);
       }
     }

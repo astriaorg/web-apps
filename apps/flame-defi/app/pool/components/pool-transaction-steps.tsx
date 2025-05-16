@@ -3,10 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useIntl } from "react-intl";
 
-import {
-  TransactionFailedProps as TransactionFailedProps,
-  TransactionStatus,
-} from "@repo/flame-types";
+import { TransactionFailedProps, TransactionStatus } from "@repo/flame-types";
 import {
   BlockLoader,
   Skeleton,
