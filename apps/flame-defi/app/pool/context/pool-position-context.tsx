@@ -53,13 +53,13 @@ export const PoolPositionContextProvider = ({
   const [invertedPrice, setInvertedPrice] = useState<boolean>(false);
   const [isReversedPoolTokens, setIsReversedPoolTokens] =
     useState<boolean>(false);
-  const [poolTokens, setPoolTokens] = useState<PoolToken[] | []>([]);
-  const [poolPosition, setPoolPosition] = useState<Position | null>(null);
+  const [tokens, setTokens] = useState<PoolToken[] | []>([]);
+  const [position, setPoolPosition] = useState<Position | null>(null);
   const [feeTier, setFeeTier] = useState<string>("");
   const [rawFeeTier, setRawFeeTier] = useState<number>(0);
   const [isPositionClosed, setIsPositionClosed] = useState<boolean>(false);
-  const poolToken0 = poolTokens[0] || null;
-  const poolToken1 = poolTokens[1] || null;
+  const token0 = tokens[0] || null;
+  const token1 = tokens[1] || null;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
 
@@ -137,7 +137,7 @@ export const PoolPositionContextProvider = ({
           token: token1,
         };
 
-        setPoolTokens([poolToken0, poolToken1]);
+        setTokens([poolToken0, poolToken1]);
         setSelectedSymbol(poolToken0.token.coinDenom);
       }
     } catch (error) {
@@ -249,11 +249,11 @@ export const PoolPositionContextProvider = ({
   ]);
 
   useEffect(() => {
-    if (poolTokens.length === 0) {
+    if (tokens.length === 0) {
       void getPoolTokens();
       void getFeeTier();
     }
-  }, [poolTokens.length, getPoolTokens, getFeeTier]);
+  }, [tokens.length, getPoolTokens, getFeeTier]);
 
   const refreshPoolPosition = useCallback(() => {
     void getPoolTokens();
@@ -267,20 +267,20 @@ export const PoolPositionContextProvider = ({
   const handleCollectAsWrappedNative = (isCollectAsWrappedNative: boolean) => {
     setIsCollectAsWrappedNative(isCollectAsWrappedNative);
     if (isCollectAsWrappedNative) {
-      poolTokens.map((poolToken) => {
+      tokens.map((poolToken) => {
         if (poolToken.token.isNative && wrappedNativeToken) {
           poolToken.token = wrappedNativeToken;
         }
       });
     } else {
-      poolTokens.map((poolToken) => {
+      tokens.map((poolToken) => {
         if (poolToken.token.isWrappedNative && nativeToken) {
           poolToken.token = nativeToken;
         }
       });
     }
-    setPoolTokens(poolTokens);
-    setSelectedSymbol(poolTokens[0]?.token.coinDenom ?? "");
+    setTokens(tokens);
+    setSelectedSymbol(tokens[0]?.token.coinDenom ?? "");
   };
 
   return (
@@ -292,16 +292,16 @@ export const PoolPositionContextProvider = ({
         handleReverseTokenData,
         isCollectAsWrappedNative,
         handleCollectAsWrappedNative,
-        poolToken0,
-        poolToken1,
+        token0,
+        token1,
         currentPrice,
         minPrice,
         maxPrice,
-        poolPosition,
+        position,
         isReversedPoolTokens,
         isPositionClosed,
         refreshPoolPosition,
-        tokenId: tokenId,
+        tokenId,
       }}
     >
       {children}

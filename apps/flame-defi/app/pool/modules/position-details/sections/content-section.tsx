@@ -24,15 +24,15 @@ export const ContentSection = () => {
   const {
     selectedSymbol,
     handleReverseTokenData,
-    poolToken0,
-    poolToken1,
+    token0,
+    token1,
     isCollectAsWrappedNative,
     handleCollectAsWrappedNative,
     isReversedPoolTokens,
     refreshPoolPosition,
   } = usePoolPositionContext();
-  const hasValidTokens = poolToken0 && poolToken1;
-  const tokens = hasValidTokens ? [poolToken0, poolToken1] : [];
+  const hasValidTokens = token0 && token1;
+  const tokens = hasValidTokens ? [token0, token1] : [];
   const { status, hash, error, setStatus, setError, collectFees } =
     useCollectFeesTransaction(tokens, isCollectAsWrappedNative);
 
@@ -96,10 +96,7 @@ export const ContentSection = () => {
   return (
     <div className="flex flex-col flex-1 mt-8">
       <PriceRangeBlock
-        symbols={[
-          poolToken0?.token.coinDenom ?? "",
-          poolToken1?.token.coinDenom ?? "",
-        ]}
+        symbols={[token0?.token.coinDenom ?? "", token1?.token.coinDenom ?? ""]}
         selectedSymbol={selectedSymbol}
         handleReverseTokenData={handleReverseTokenData}
       />
@@ -123,8 +120,8 @@ export const ContentSection = () => {
               value={formattedLiquidity}
             />
             <TokenInfoCard
-              poolToken0={token0ForDisplay}
-              poolToken1={token1ForDisplay}
+              token0={token0ForDisplay}
+              token1={token1ForDisplay}
               showLiquidity={true}
               showLiquidityPercentage
             />
@@ -135,8 +132,8 @@ export const ContentSection = () => {
               value={formattedUnclaimedFees}
             />
             <TokenInfoCard
-              poolToken0={token0ForDisplay}
-              poolToken1={token1ForDisplay}
+              token0={token0ForDisplay}
+              token1={token1ForDisplay}
             />
           </div>
         </div>

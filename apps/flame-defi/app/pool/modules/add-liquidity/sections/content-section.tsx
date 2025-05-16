@@ -19,8 +19,8 @@ import { AddLiquidityInputsBlock, TokenLiquidityBlock } from "../components";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const {
-    poolToken0,
-    poolToken1,
+    token0,
+    token1,
     feeTier,
     currentPrice,
     selectedSymbol,
@@ -31,8 +31,8 @@ export const ContentSection = () => {
   const [input0, setInput0] = useState<string>("");
   const [input1, setInput1] = useState<string>("");
 
-  const { balance: token0Balance } = useEvmCurrencyBalance(poolToken0?.token);
-  const { balance: token1Balance } = useEvmCurrencyBalance(poolToken1?.token);
+  const { balance: token0Balance } = useEvmCurrencyBalance(token0?.token);
+  const { balance: token1Balance } = useEvmCurrencyBalance(token1?.token);
 
   const { status, hash, error, setError, setStatus, addLiquidity } =
     useAddLiquidityTransaction(input0, input1);
@@ -93,24 +93,21 @@ export const ContentSection = () => {
   return (
     <div className="flex flex-col flex-1 mt-0 md:mt-12">
       <PriceRangeBlock
-        symbols={[
-          poolToken0?.token.coinDenom ?? "",
-          poolToken1?.token.coinDenom ?? "",
-        ]}
+        symbols={[token0?.token.coinDenom ?? "", token1?.token.coinDenom ?? ""]}
         selectedSymbol={selectedSymbol}
         handleReverseTokenData={handleReverseTokenData}
       />
       <div className="flex flex-col gap-4 mt-4">
         <TokenLiquidityBlock
-          poolToken0={poolToken0}
-          poolToken1={poolToken1}
+          token0={token0}
+          token1={token1}
           feeTier={feeTier}
         />
         <AddLiquidityInputsBlock
           input0={input0}
           input1={input1}
-          token0={poolToken0?.token}
-          token1={poolToken1?.token}
+          token0={token0?.token}
+          token1={token1?.token}
           token0Balance={token0Balance}
           token1Balance={token1Balance}
           handleInputChange={handleInputChange}
@@ -123,7 +120,7 @@ export const ContentSection = () => {
                 {buttonText}
               </div>
             )}
-            {poolToken0 && poolToken1 && validPoolInputs && (
+            {token0 && token1 && validPoolInputs && (
               <ConfirmationModal
                 open={modalOpen}
                 buttonText={"Add liquidity"}
@@ -138,7 +135,7 @@ export const ContentSection = () => {
               >
                 <PoolTransactionSteps
                   status={status}
-                  tokens={[poolToken0, poolToken1]}
+                  tokens={[token0, token1]}
                   addLiquidityInputValues={[input0, input1]}
                   hash={hash}
                   message={error || ""}

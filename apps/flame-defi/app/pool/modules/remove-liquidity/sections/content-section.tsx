@@ -19,8 +19,8 @@ import { RemoveAmountSlider } from "../components";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const {
-    poolToken0,
-    poolToken1,
+    token0,
+    token1,
     isCollectAsWrappedNative,
     handleCollectAsWrappedNative,
     refreshPoolPosition,
@@ -38,10 +38,10 @@ export const ContentSection = () => {
       percentageToRemove,
     );
   const poolContainsNativeOrWrappedToken =
-    poolToken0?.token.isNative ||
-    poolToken1?.token.isNative ||
-    poolToken0?.token.isWrappedNative ||
-    poolToken1?.token.isWrappedNative;
+    token0?.token.isNative ||
+    token1?.token.isNative ||
+    token0?.token.isWrappedNative ||
+    token1?.token.isWrappedNative;
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);

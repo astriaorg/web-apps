@@ -25,7 +25,7 @@ export const useAddLiquidityTransaction = (
   const [error, setError] = useState<string | null>(null);
 
   const { chain } = useAstriaChainData();
-  const { poolToken0, poolToken1, tokenId } = usePoolPositionContext();
+  const { token0, token1, tokenId } = usePoolPositionContext();
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
@@ -48,8 +48,8 @@ export const useAddLiquidityTransaction = (
   const addLiquidity = async () => {
     if (
       !address ||
-      !poolToken0 ||
-      !poolToken1 ||
+      !token0 ||
+      !token1 ||
       !tokenId ||
       parseFloat(amount0) <= 0 ||
       parseFloat(amount1) <= 0
@@ -59,11 +59,11 @@ export const useAddLiquidityTransaction = (
     }
 
     const tokenInput0: TokenInputState = {
-      token: poolToken0.token,
+      token: token0.token,
       value: amount0,
     };
     const tokenInput1: TokenInputState = {
-      token: poolToken1.token,
+      token: token1.token,
       value: amount1,
     };
 

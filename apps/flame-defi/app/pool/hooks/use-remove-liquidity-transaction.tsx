@@ -18,15 +18,17 @@ export const useRemoveLiquidityTransaction = (
   isCollectAsWrappedNative: boolean,
   percentageToRemove: number,
 ) => {
-  const { tokenId, poolPosition } = usePoolPositionContext();
+  const { tokenId, position } = usePoolPositionContext();
   const { address } = useAccount();
   const config = useConfig();
   const { chain } = useAstriaChainData();
+
   const [status, setStatus] = useState<TransactionStatus>(
     TransactionStatus.IDLE,
   );
   const [hash, setHash] = useState<Hash | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
@@ -68,7 +70,7 @@ export const useRemoveLiquidityTransaction = (
       !tokenId ||
       !tokenInputs[0] ||
       !tokenInputs[1] ||
-      !poolPosition
+      !position
     ) {
       console.warn("Missing required data for removing liquidity");
       return;
@@ -76,9 +78,8 @@ export const useRemoveLiquidityTransaction = (
 
     const rawLiquidityToRemove =
       percentageToRemove === 100
-        ? poolPosition.liquidity
-        : (poolPosition.liquidity * BigInt(Math.round(percentageToRemove))) /
-          100n;
+        ? position.liquidity
+        : (position.liquidity * BigInt(Math.round(percentageToRemove))) / 100n;
 
     try {
       setStatus(TransactionStatus.PENDING);

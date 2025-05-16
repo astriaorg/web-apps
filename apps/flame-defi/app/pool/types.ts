@@ -183,9 +183,9 @@ export type PoolPositionContextProps = {
   handleReverseTokenData: (symbol: string) => void;
   isCollectAsWrappedNative: boolean; // This boolean controls the toggle in the UI to collect fees as the native token
   handleCollectAsWrappedNative: (isCollectAsWrappedNative: boolean) => void;
-  poolToken0: PoolToken | null;
-  poolToken1: PoolToken | null;
-  poolPosition: Position | null;
+  token0: PoolToken | null;
+  token1: PoolToken | null;
+  position: Position | null;
   currentPrice: string;
   minPrice: string;
   maxPrice: string;
