@@ -1,8 +1,8 @@
+import { useLoginWithEmail, useLoginWithSms } from "@privy-io/react-auth";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useLoginWithEmail, useLoginWithSms } from "@privy-io/react-auth";
 
 import type { FlameNetwork } from "@repo/flame-types";
 import {
@@ -18,7 +18,8 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle, Input,
+  DrawerTitle,
+  Input,
   Tabs,
   TabsContent,
   TabsList,
@@ -59,26 +60,26 @@ export const MobileNavigationMenu = () => {
     quoteLoading,
   } = useAstriaWallet();
   const { evmAccountAddress, connectEvmWallet } = useEvmWallet();
-  const { 
-    privyAccountAddress, 
-    privyIsConnected,
-    connectPrivyWallet 
-  } = usePrivyWallet();
-  
+  const { privyAccountAddress, privyIsConnected, connectPrivyWallet } =
+    usePrivyWallet();
+
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [authMethod, setAuthMethod] = useState<"email" | "phone" | null>(null);
-  
-  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } = useLoginWithEmail();
-  const { sendCode: sendPhoneCode, loginWithCode: loginWithPhoneCode } = useLoginWithSms();
+
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
+    useLoginWithEmail();
+  const { sendCode: sendPhoneCode, loginWithCode: loginWithPhoneCode } =
+    useLoginWithSms();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
   const [isConnectWalletOpen, setIsConnectWalletOpen] = useState(false);
 
-  const isConnected = !!account.address || !!evmAccountAddress || privyIsConnected;
+  const isConnected =
+    !!account.address || !!evmAccountAddress || privyIsConnected;
 
   const handleNetworkSelect = useCallback(
     (network: FlameNetwork) => {
@@ -267,7 +268,12 @@ export const MobileNavigationMenu = () => {
                 explorer={{
                   url: `${chain.blockExplorerUrl}/address/${account.address || evmAccountAddress || privyAccountAddress}`,
                 }}
-                label={shortenAddress(account.address || evmAccountAddress || privyAccountAddress || "")}
+                label={shortenAddress(
+                  account.address ||
+                    evmAccountAddress ||
+                    privyAccountAddress ||
+                    "",
+                )}
                 icon={<AstriaIcon />}
                 onConnectWallet={connectWallet}
                 onDisconnectWallet={() => {
@@ -282,30 +288,32 @@ export const MobileNavigationMenu = () => {
               <div className="flex flex-col gap-6">
                 {/* Wallet connection option */}
                 <div>
-                  <Button 
+                  <Button
                     onClick={() => {
                       connectEvmWallet();
                       setIsConnectWalletOpen(false);
                     }}
-                    variant="outline" 
+                    variant="outline"
                     className="w-full justify-start gap-3"
                   >
                     <WalletIcon className="h-5 w-5" />
                     <span>Connect EVM Wallet</span>
                   </Button>
                 </div>
-                
+
                 <div className="relative flex items-center">
                   <div className="flex-grow border-t border-border-default"></div>
-                  <span className="mx-2 text-xs text-typography-subdued">OR</span>
+                  <span className="mx-2 text-xs text-typography-subdued">
+                    OR
+                  </span>
                   <div className="flex-grow border-t border-border-default"></div>
                 </div>
-                
+
                 {/* Login form */}
-                <form 
+                <form
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    
+
                     if (!showCodeInput) {
                       // Send verification code
                       if (email && !phone) {
@@ -314,7 +322,9 @@ export const MobileNavigationMenu = () => {
                         setShowCodeInput(true);
                       } else if (phone && !email) {
                         // Ensure phone number has proper format with country code
-                        const formattedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+                        const formattedPhone = phone.startsWith("+")
+                          ? phone
+                          : `+1${phone.replace(/\D/g, "")}`;
                         await sendPhoneCode({ phoneNumber: formattedPhone });
                         setAuthMethod("phone");
                         setShowCodeInput(true);
@@ -333,7 +343,7 @@ export const MobileNavigationMenu = () => {
                       }
                       setIsConnectWalletOpen(false);
                     }
-                  }} 
+                  }}
                   className="space-y-4"
                 >
                   {!showCodeInput ? (
@@ -348,9 +358,11 @@ export const MobileNavigationMenu = () => {
                           onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                      
+
                       <div className="space-y-2">
-                        <p className="text-sm font-medium mb-1.5">Phone Number</p>
+                        <p className="text-sm font-medium mb-1.5">
+                          Phone Number
+                        </p>
                         <Input
                           id="mobile-phone"
                           type="tel"
@@ -359,8 +371,8 @@ export const MobileNavigationMenu = () => {
                           onChange={(e) => setPhone(e.target.value)}
                         />
                       </div>
-                      
-                      <Button 
+
+                      <Button
                         type="submit"
                         className="w-full"
                         disabled={!email && !phone}
@@ -372,7 +384,10 @@ export const MobileNavigationMenu = () => {
                     <>
                       <div className="space-y-2">
                         <p className="text-sm font-medium mb-1.5">
-                          Verification Code {authMethod === "email" ? `(sent to ${email})` : `(sent to ${phone})`}
+                          Verification Code{" "}
+                          {authMethod === "email"
+                            ? `(sent to ${email})`
+                            : `(sent to ${phone})`}
                         </p>
                         <Input
                           id="mobile-verification-code"
@@ -382,9 +397,9 @@ export const MobileNavigationMenu = () => {
                           onChange={(e) => setVerificationCode(e.target.value)}
                         />
                       </div>
-                      
+
                       <div className="flex gap-2">
-                        <Button 
+                        <Button
                           type="button"
                           variant="outline"
                           className="flex-1"
@@ -396,8 +411,8 @@ export const MobileNavigationMenu = () => {
                         >
                           Back
                         </Button>
-                        
-                        <Button 
+
+                        <Button
                           type="submit"
                           className="flex-1"
                           disabled={!verificationCode}

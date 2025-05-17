@@ -1,8 +1,8 @@
 "use client";
 
+import { useLoginWithEmail, useLoginWithSms } from "@privy-io/react-auth";
 import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { useLoginWithEmail, useLoginWithSms } from "@privy-io/react-auth";
 
 import {
   Button,
@@ -30,19 +30,19 @@ export const WalletInterstitial = () => {
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [authMethod, setAuthMethod] = useState<"email" | "phone" | null>(null);
-  
-  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } = useLoginWithEmail();
-  const { sendCode: sendPhoneCode, loginWithCode: loginWithPhoneCode } = useLoginWithSms();
-  
+
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } =
+    useLoginWithEmail();
+  const { sendCode: sendPhoneCode, loginWithCode: loginWithPhoneCode } =
+    useLoginWithSms();
+
   const { evmAccountAddress, connectEvmWallet } = useEvmWallet();
-  const { 
-    privyAccountAddress, 
-    privyIsConnected,
-    connectPrivyWallet 
-  } = usePrivyWallet();
-  
+  const { privyAccountAddress, privyIsConnected, connectPrivyWallet } =
+    usePrivyWallet();
+
   const account = useAccount();
-  const walletConnected = !!account.address || !!evmAccountAddress || privyIsConnected;
+  const walletConnected =
+    !!account.address || !!evmAccountAddress || privyIsConnected;
 
   const buttonLabel = useMemo(() => {
     if (account.address) {
@@ -59,16 +59,12 @@ export const WalletInterstitial = () => {
 
   // If wallet is already connected, just show the button with address
   if (walletConnected) {
-    return (
-      <Button size="sm">
-        {buttonLabel}
-      </Button>
-    );
+    return <Button size="sm">{buttonLabel}</Button>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!showCodeInput) {
       // Send verification code
       if (email && !phone) {
@@ -77,7 +73,9 @@ export const WalletInterstitial = () => {
         setShowCodeInput(true);
       } else if (phone && !email) {
         // Ensure phone number has proper format with country code
-        const formattedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+        const formattedPhone = phone.startsWith("+")
+          ? phone
+          : `+1${phone.replace(/\D/g, "")}`;
         await sendPhoneCode({ phoneNumber: formattedPhone });
         setAuthMethod("phone");
         setShowCodeInput(true);
@@ -100,34 +98,32 @@ export const WalletInterstitial = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm">
-          Connect Wallet
-        </Button>
+        <Button size="sm">Connect Wallet</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">Connect Wallet</DialogTitle>
         </DialogHeader>
-        
+
         <div className="flex flex-col gap-6">
           {/* Wallet connection option */}
           <div>
-            <Button 
+            <Button
               onClick={connectEvmWallet}
-              variant="outline" 
+              variant="outline"
               className="w-full justify-start gap-3"
             >
               <WalletIcon className="h-5 w-5" />
               <span>Connect EVM Wallet</span>
             </Button>
           </div>
-          
+
           <div className="relative flex items-center">
             <div className="flex-grow border-t border-border-default"></div>
             <span className="mx-2 text-xs text-typography-subdued">OR</span>
             <div className="flex-grow border-t border-border-default"></div>
           </div>
-          
+
           {/* Login form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {!showCodeInput ? (
@@ -142,7 +138,7 @@ export const WalletInterstitial = () => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <p className="text-sm font-medium mb-1.5">Phone Number</p>
                   <Input
@@ -153,8 +149,8 @@ export const WalletInterstitial = () => {
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
-                
-                <Button 
+
+                <Button
                   type="submit"
                   className="w-full"
                   disabled={!email && !phone}
@@ -166,7 +162,10 @@ export const WalletInterstitial = () => {
               <>
                 <div className="space-y-2">
                   <p className="text-sm font-medium mb-1.5">
-                    Verification Code {authMethod === "email" ? `(sent to ${email})` : `(sent to ${phone})`}
+                    Verification Code{" "}
+                    {authMethod === "email"
+                      ? `(sent to ${email})`
+                      : `(sent to ${phone})`}
                   </p>
                   <Input
                     id="verification-code"
@@ -176,9 +175,9 @@ export const WalletInterstitial = () => {
                     onChange={(e) => setVerificationCode(e.target.value)}
                   />
                 </div>
-                
+
                 <div className="flex gap-2">
-                  <Button 
+                  <Button
                     type="button"
                     variant="outline"
                     className="flex-1"
@@ -190,8 +189,8 @@ export const WalletInterstitial = () => {
                   >
                     Back
                   </Button>
-                  
-                  <Button 
+
+                  <Button
                     type="submit"
                     className="flex-1"
                     disabled={!verificationCode}
