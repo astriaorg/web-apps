@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { AstriaLogo } from "@repo/ui/logos";
+import { WalletInterstitial } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 
@@ -71,7 +72,7 @@ export const NavigationMenu = () => {
       </div>
       <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
-        {!isBridgePage && <ConnectAstriaWalletButton />}
+        {!isBridgePage && <WalletInterstitial />}
       </div>
       <div className="md:hidden">
         <MobileNavigationMenu />

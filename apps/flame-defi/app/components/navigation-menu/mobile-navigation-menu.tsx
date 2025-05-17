@@ -2,6 +2,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import { useLoginWithEmail, useLoginWithSms } from "@privy-io/react-auth";
 
 import type { FlameNetwork } from "@repo/flame-types";
 import {
@@ -17,16 +18,22 @@ import {
   DrawerClose,
   DrawerContent,
   DrawerHeader,
-  DrawerTitle,
+  DrawerTitle, Input,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "@repo/ui/components";
 import { CheckIcon, ChevronDownIcon, CloseIcon } from "@repo/ui/icons";
+import { InfoIcon, WalletIcon } from "@repo/ui/icons/monochrome";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { AstriaLogo } from "@repo/ui/logos";
 import { cn, shortenAddress } from "@repo/ui/utils";
 import { ConnectWalletContent } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useAstriaChainData, useConfig } from "config";
-import { useAstriaWallet } from "features/evm-wallet";
+import { useAstriaWallet, useEvmWallet } from "features/evm-wallet";
+import { usePrivyWallet } from "features/privy";
 
 import { MobileNavigationMenuLink } from "./mobile-navigation-menu-link";
 import { NavigationMenuButton } from "./navigation-menu-button";
@@ -51,12 +58,27 @@ export const MobileNavigationMenu = () => {
     usdcToNativeQuote,
     quoteLoading,
   } = useAstriaWallet();
+  const { evmAccountAddress, connectEvmWallet } = useEvmWallet();
+  const { 
+    privyAccountAddress, 
+    privyIsConnected,
+    connectPrivyWallet 
+  } = usePrivyWallet();
+  
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [authMethod, setAuthMethod] = useState<"email" | "phone" | null>(null);
+  
+  const { sendCode: sendEmailCode, loginWithCode: loginWithEmailCode } = useLoginWithEmail();
+  const { sendCode: sendPhoneCode, loginWithCode: loginWithPhoneCode } = useLoginWithSms();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isNetworkSelectOpen, setIsNetworkSelectOpen] = useState(false);
   const [isConnectWalletOpen, setIsConnectWalletOpen] = useState(false);
 
-  const isConnected = !!account.address;
+  const isConnected = !!account.address || !!evmAccountAddress || privyIsConnected;
 
   const handleNetworkSelect = useCallback(
     (network: FlameNetwork) => {
@@ -226,34 +248,169 @@ export const MobileNavigationMenu = () => {
       <Drawer open={isConnectWalletOpen} onOpenChange={setIsConnectWalletOpen}>
         <DrawerContent>
           <DrawerHeader className="flex items-center justify-between px-6 py-0">
-            <DrawerTitle className="opacity-0">Wallet</DrawerTitle>
+            <DrawerTitle>Connect Wallet</DrawerTitle>
             <DrawerClose>
               <CloseIcon size={20} className="text-icon-subdued" />
             </DrawerClose>
           </DrawerHeader>
-          <div className="flex flex-col p-6">
-            <ConnectWalletContent
-              isConnected={!!account.address}
-              isLoading={
-                (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
-                quoteLoading
-              }
-              account={account}
-              balance={nativeTokenBalance ?? undefined}
-              fiat={usdcToNativeQuote}
-              explorer={{
-                url: `${chain.blockExplorerUrl}/address/${account.address}`,
-              }}
-              label={shortenAddress(account.address as string)}
-              icon={<AstriaIcon />}
-              onConnectWallet={connectWallet}
-              onDisconnectWallet={() => {
-                setIsConnectWalletOpen(false);
-                disconnectWallet();
-              }}
-              isCollapsible={false}
-            />
-          </div>
+          {isConnected ? (
+            <div className="flex flex-col p-6">
+              <ConnectWalletContent
+                isConnected={true}
+                isLoading={
+                  (isLoadingNativeTokenBalance && !nativeTokenBalance) ||
+                  quoteLoading
+                }
+                account={account}
+                balance={nativeTokenBalance ?? undefined}
+                fiat={usdcToNativeQuote}
+                explorer={{
+                  url: `${chain.blockExplorerUrl}/address/${account.address || evmAccountAddress || privyAccountAddress}`,
+                }}
+                label={shortenAddress(account.address || evmAccountAddress || privyAccountAddress || "")}
+                icon={<AstriaIcon />}
+                onConnectWallet={connectWallet}
+                onDisconnectWallet={() => {
+                  setIsConnectWalletOpen(false);
+                  disconnectWallet();
+                }}
+                isCollapsible={false}
+              />
+            </div>
+          ) : (
+            <div className="p-6">
+              <div className="flex flex-col gap-6">
+                {/* Wallet connection option */}
+                <div>
+                  <Button 
+                    onClick={() => {
+                      connectEvmWallet();
+                      setIsConnectWalletOpen(false);
+                    }}
+                    variant="outline" 
+                    className="w-full justify-start gap-3"
+                  >
+                    <WalletIcon className="h-5 w-5" />
+                    <span>Connect EVM Wallet</span>
+                  </Button>
+                </div>
+                
+                <div className="relative flex items-center">
+                  <div className="flex-grow border-t border-border-default"></div>
+                  <span className="mx-2 text-xs text-typography-subdued">OR</span>
+                  <div className="flex-grow border-t border-border-default"></div>
+                </div>
+                
+                {/* Login form */}
+                <form 
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    
+                    if (!showCodeInput) {
+                      // Send verification code
+                      if (email && !phone) {
+                        await sendEmailCode({ email });
+                        setAuthMethod("email");
+                        setShowCodeInput(true);
+                      } else if (phone && !email) {
+                        // Ensure phone number has proper format with country code
+                        const formattedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+                        await sendPhoneCode({ phoneNumber: formattedPhone });
+                        setAuthMethod("phone");
+                        setShowCodeInput(true);
+                      } else if (email && phone) {
+                        // Use email if both are provided
+                        await sendEmailCode({ email });
+                        setAuthMethod("email");
+                        setShowCodeInput(true);
+                      }
+                    } else {
+                      // Verify the code
+                      if (authMethod === "email") {
+                        await loginWithEmailCode({ code: verificationCode });
+                      } else if (authMethod === "phone") {
+                        await loginWithPhoneCode({ code: verificationCode });
+                      }
+                      setIsConnectWalletOpen(false);
+                    }
+                  }} 
+                  className="space-y-4"
+                >
+                  {!showCodeInput ? (
+                    <>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium mb-1.5">Email</p>
+                        <Input
+                          id="mobile-email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium mb-1.5">Phone Number</p>
+                        <Input
+                          id="mobile-phone"
+                          type="tel"
+                          placeholder="+1 5551234567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit"
+                        className="w-full"
+                        disabled={!email && !phone}
+                      >
+                        Send Verification Code
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium mb-1.5">
+                          Verification Code {authMethod === "email" ? `(sent to ${email})` : `(sent to ${phone})`}
+                        </p>
+                        <Input
+                          id="mobile-verification-code"
+                          type="text"
+                          placeholder="Enter code"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                        />
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => {
+                            setShowCodeInput(false);
+                            setVerificationCode("");
+                            setAuthMethod(null);
+                          }}
+                        >
+                          Back
+                        </Button>
+                        
+                        <Button 
+                          type="submit"
+                          className="flex-1"
+                          disabled={!verificationCode}
+                        >
+                          Verify
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </form>
+              </div>
+            </div>
+          )}
         </DrawerContent>
       </Drawer>
     </>
