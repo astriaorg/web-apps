@@ -200,13 +200,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<unknown> {
     const calls: string[] = [];
 
-    const token0Address = token0.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : (token0.erc20ContractAddress as Address);
-
-    const token1Address = token1.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : (token1.erc20ContractAddress as Address);
+    const token0Address = token0.asToken().address as Address;
+    const token1Address = token1.asToken().address as Address;
 
     let sortedToken0 = token0;
     let sortedToken1 = token1;
