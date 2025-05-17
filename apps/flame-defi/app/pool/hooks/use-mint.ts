@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useConfig } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
 
 import { useAstriaChainData } from "config";
 import {
@@ -8,9 +8,10 @@ import {
   createNonfungiblePositionManagerService,
 } from "features/evm-wallet";
 
-export const useCreateAndInitializePoolIfNecessaryAndMint = () => {
+export const useMint = () => {
   const queryClient = useQueryClient();
   const config = useConfig();
+  const { address } = useAccount();
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
@@ -32,9 +33,8 @@ export const useCreateAndInitializePoolIfNecessaryAndMint = () => {
     },
     onSuccess: (hash) => {
       if (hash) {
-        // TODO: Make positions fetch a query.
         void queryClient.invalidateQueries({
-          queryKey: ["usePositions"],
+          queryKey: ["usePositions", chain.chainId, address],
         });
       }
     },
