@@ -12,9 +12,9 @@ export const PositionFeeBadge = ({
 
   return (
     <Badge className="flex items-center space-x-2">
-      {formatNumber(fee / 10000000, {
+      {formatNumber(fee / 1000000, {
         style: "percent",
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 1,
         maximumFractionDigits: 2,
       })}
     </Badge>
