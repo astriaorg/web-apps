@@ -5,10 +5,7 @@ import { useIntl } from "react-intl";
 import { Card, CardContent, Slider } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import {
-  MAX_PRICE_DEFAULT,
-  MIN_PRICE_DEFAULT,
-} from "pool/modules/create-position/types";
+import { MAX_PRICE_DEFAULT, MIN_PRICE_DEFAULT } from "pool/types";
 import {
   calculateNearestTickAndPrice,
   calculatePriceToTick,

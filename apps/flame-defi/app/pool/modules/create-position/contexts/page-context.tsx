@@ -7,10 +7,12 @@ import { type Amount, useTokenAmountInput } from "@repo/ui/components";
 import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
 import {
+  FEE_TIER,
+  type FeeTier,
+  InputId,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
-} from "pool/modules/create-position/types";
-import { FEE_TIER, type FeeTier, InputId } from "pool/types";
+} from "pool/types";
 
 export interface PageContextProps extends PropsWithChildren {
   amount0: Amount;
