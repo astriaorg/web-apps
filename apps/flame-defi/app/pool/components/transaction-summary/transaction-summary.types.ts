@@ -6,7 +6,7 @@ import type { Position } from "pool/types";
 export enum TransactionType {
   ADD_LIQUIDITY = "ADD_LIQUIDITY",
   COLLECT_FEES = "COLLECT_FEES",
-  NEW_POSITION = "NEW_POSITION",
+  CREATE_POSITION = "CREATE_POSITION",
   REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY",
 }
 

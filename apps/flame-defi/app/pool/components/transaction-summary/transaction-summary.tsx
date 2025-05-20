@@ -6,7 +6,6 @@ import { TransactionStatus } from "@repo/flame-types";
 import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
-import { PoolTransactionType } from "pool/types";
 
 import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
 import {
@@ -77,12 +76,14 @@ const TransactionFailed = ({ error }: TransactionFailedProps) => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// TODO: Update this to handle each transaction type.
 const TransactionDetails = {
-  [PoolTransactionType.COLLECT_FEE]: CollectFeesTransactionSummary,
+  [TransactionType.CREATE_POSITION]: CollectFeesTransactionSummary,
+  [TransactionType.COLLECT_FEES]: CollectFeesTransactionSummary,
+  [TransactionType.ADD_LIQUIDITY]: CollectFeesTransactionSummary,
+  [TransactionType.REMOVE_LIQUIDITY]: CollectFeesTransactionSummary,
 } as const;
 
-// TODO: Clean up component.
 export const TransactionSummary = ({
   position,
   token0,
@@ -95,7 +96,7 @@ export const TransactionSummary = ({
   error,
   onSubmit,
 }: TransactionSummaryProps) => {
-  const TransactionComponent = CollectFeesTransactionSummary;
+  const TransactionComponent = TransactionDetails[type];
 
   return (
     <>
