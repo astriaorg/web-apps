@@ -1,21 +1,28 @@
 "use client";
 
-import { PrivyProvider } from "@privy-io/react-auth";
+import { PrivyProvider as Provider } from "@privy-io/react-auth";
+import React from "react";
 
-export default function Provider({ children }: { children: React.ReactNode }) {
-  // TODO - values from config
+import { getEnvVariable } from "config";
+
+/**
+ * PrivyProvider with values from env.
+ */
+export function PrivyProvider({ children }: { children: React.ReactNode }) {
+  const appId = getEnvVariable("NEXT_PUBLIC_PRIVY_APP_ID");
+  const clientId = getEnvVariable("NEXT_PUBLIC_PRIVY_CLIENT_ID");
   return (
-    <PrivyProvider
-      appId="cmaog1m900046id0mzm9wzk8x"
-      clientId="client-WY6LJbDNcnWpoxCb6PwA8JS1mhxtPbWW24Qp2LMjF5fWz"
+    <Provider
+      appId={appId}
+      clientId={clientId}
       config={{
-        // Create embedded wallets for users who don't have a wallet
+        // create embedded wallets for users who don't have a wallet
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
       }}
     >
       {children}
-    </PrivyProvider>
+    </Provider>
   );
 }

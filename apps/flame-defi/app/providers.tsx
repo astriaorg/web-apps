@@ -5,16 +5,16 @@ import type { ReactNode } from "react";
 import { IntlProvider } from "react-intl";
 
 import { ConfigContextProvider } from "config";
+import { CosmosKitProvider } from "features/cosmos-kit";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
-import { CosmosKitChainProvider } from "features/cosmos-wallet/providers/cosmos-kit";
 import {
   AstriaWalletContextProvider,
   EvmWalletProvider,
 } from "features/evm-wallet";
-import { OnchainKitProvider } from "features/evm-wallet/providers/onchainkit";
-import { WagmiRainbowKitProvider } from "features/evm-wallet/providers/wagmi-rainbowkit";
 import { NotificationsContextProvider } from "features/notifications";
+import { OnchainKitProvider } from "features/onchain-kit";
 import { PrivyProvider, PrivyWalletProvider } from "features/privy";
+import { WagmiRainbowKitProvider } from "features/wagmi-rainbow-kit";
 
 // tanstack
 const queryClient = new QueryClient();
@@ -24,11 +24,11 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <IntlProvider locale="en">
       <NotificationsContextProvider>
-        <QueryClientProvider client={queryClient}>
-          <ConfigContextProvider>
-            <PrivyProvider>
+        <ConfigContextProvider>
+          <PrivyProvider>
+            <QueryClientProvider client={queryClient}>
               <WagmiRainbowKitProvider>
-                <CosmosKitChainProvider>
+                <CosmosKitProvider>
                   <OnchainKitProvider>
                     <AstriaWalletContextProvider>
                       {/* Bridge specific providers moved here from bridge/layout.tsx to
@@ -42,11 +42,11 @@ export function Providers({ children }: { children: ReactNode }) {
                       </EvmWalletProvider>
                     </AstriaWalletContextProvider>
                   </OnchainKitProvider>
-                </CosmosKitChainProvider>
+                </CosmosKitProvider>
               </WagmiRainbowKitProvider>
-            </PrivyProvider>
-          </ConfigContextProvider>
-        </QueryClientProvider>
+            </QueryClientProvider>
+          </PrivyProvider>
+        </ConfigContextProvider>
       </NotificationsContextProvider>
     </IntlProvider>
   );

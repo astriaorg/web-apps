@@ -9,12 +9,12 @@ import {
   cosmosChainInfosToCosmosKitChains,
 } from "@repo/flame-types";
 import { useConfig } from "config";
-import { WALLET_CONNECT_PROJECT_ID } from "features/evm-wallet/providers/wallet-connect";
+import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
 /**
  * Provider for CosmosKit functionality
  */
-export function CosmosKitChainProvider({ children }: { children: ReactNode }) {
+export function CosmosKitProvider({ children }: { children: ReactNode }) {
   const { cosmosChains } = useConfig();
 
   const { cosmosKitChains, cosmosKitAssetLists } = useMemo(() => {

@@ -1,13 +1,15 @@
-import { connectorsForWallets } from "@getpara/rainbowkit";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { createConfig, WagmiProvider } from "@privy-io/wagmi";
+import {
+  connectorsForWallets,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import { coinbaseWallet, metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { ReactNode, useMemo } from "react";
 import { http } from "viem";
-import { createConfig, WagmiProvider as Wagmi } from "wagmi";
 
 import { ChainId, evmChainsToRainbowKitChains } from "@repo/flame-types";
 import { useConfig } from "config";
-import { WALLET_CONNECT_PROJECT_ID } from "features/evm-wallet/providers/wallet-connect";
+import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
 /**
  * Provider for Wagmi and RainbowKit functionality
@@ -52,10 +54,10 @@ export function WagmiRainbowKitProvider({ children }: { children: ReactNode }) {
   }, [chains, connectors, transports]);
 
   return (
-    <Wagmi config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig}>
       <RainbowKitProvider initialChain={ChainId.MAINNET}>
         {children}
       </RainbowKitProvider>
-    </Wagmi>
+    </WagmiProvider>
   );
 }
