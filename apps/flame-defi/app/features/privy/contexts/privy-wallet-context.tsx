@@ -1,7 +1,7 @@
 "use client";
 
 import { ConnectedWallet, usePrivy, useWallets } from "@privy-io/react-auth";
-import {useSetActiveWallet} from '@privy-io/wagmi';
+import { useSetActiveWallet } from "@privy-io/wagmi";
 import React, { useCallback, useEffect, useState } from "react";
 
 export interface PrivyWalletContextProps {
@@ -34,9 +34,12 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
     null,
   );
 
-  const setWallet = useCallback(async (activeWallet: ConnectedWallet) => {
-    return await setActiveWallet(activeWallet);
-  }, [setActiveWallet]);
+  const setWallet = useCallback(
+    async (activeWallet: ConnectedWallet) => {
+      return await setActiveWallet(activeWallet);
+    },
+    [setActiveWallet],
+  );
 
   // Set the address when the wallets change
   useEffect(() => {
@@ -47,14 +50,14 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
       );
 
       if (embeddedWallet && embeddedWallet.address) {
-        setPrivyAccountAddress(embeddedWallet.address);
+        // TODO -
         console.log("embedded wallet");
+        setPrivyAccountAddress(embeddedWallet.address);
         void setWallet(embeddedWallet);
       } else if (wallets[0]?.address) {
-        console.log("not embedded wallet");
-        // Fallback to first wallet if no embedded wallet found
-        setPrivyAccountAddress(wallets[0].address);
-        void setWallet(wallets[0]);
+        // TODO - what do we do here?
+        //  atm it keeps defaulting to Phantom, which we don't even support.
+        console.log("no embedded wallets found");
       }
     } else {
       setPrivyAccountAddress(null);

@@ -7,7 +7,7 @@ import { coinbaseWallet, metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { ReactNode, useMemo } from "react";
 import { http } from "viem";
 
-import { ChainId, evmChainsToRainbowKitChains } from "@repo/flame-types";
+import { evmChainsToRainbowKitChains } from "@repo/flame-types";
 import { useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
@@ -44,18 +44,26 @@ export function WagmiRainbowKitProvider({ children }: { children: ReactNode }) {
     return Object.fromEntries(chains.map((chain) => [chain.id, http()]));
   }, [chains]);
 
+  // TODO - these aren't showing up in rainbowkit, only phantom is.
+  //  privy's `createConfig` has code `connectors:r.connectors?.filter((e=>"mock"===e.type))`
+  //  so our connectors are getting filtered out
+  console.log("connectors", connectors);
+
   const wagmiConfig = useMemo(() => {
     return createConfig({
       chains,
       connectors,
-      ssr: false,
       transports,
+      // content from the external stores will be hydrated on the client after the initial mount
+      ssr: true,
+      // privy overrides this to false because privy handles the injected wallets
+      multiInjectedProviderDiscovery: false,
     });
   }, [chains, connectors, transports]);
 
   return (
     <WagmiProvider config={wagmiConfig}>
-      <RainbowKitProvider initialChain={ChainId.MAINNET}>
+      <RainbowKitProvider initialChain={astriaChains[0]?.chainId}>
         {children}
       </RainbowKitProvider>
     </WagmiProvider>
