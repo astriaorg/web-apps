@@ -1,11 +1,22 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { tickToPrice } from "@uniswap/v3-sdk";
+import Big from "big.js";
+import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
-import { createNonfungiblePositionManagerService } from "features/evm-wallet";
-import { type Position } from "pool/types";
-import { getTokenFromAddress } from "pool/utils";
+import {
+  createNonfungiblePositionManagerService,
+  createPoolFactoryService,
+  createPoolService,
+} from "features/evm-wallet";
+import { type FeeTier, MIN_PRICE_DEFAULT, type Position } from "pool/types";
+import {
+  calculateTokenAmountsFromPosition,
+  getMinMaxTick,
+  getTokenFromAddress,
+} from "pool/utils";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
 const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
@@ -14,6 +25,12 @@ export type GetPositionResult = {
   position: Position;
   token0: EvmCurrency;
   token1: EvmCurrency;
+  amount0: string;
+  amount1: string;
+  price: string;
+  minPrice: string;
+  maxPrice: string;
+  totalUnclaimedFees: string;
 };
 
 export const useGetPosition = ({
@@ -50,13 +67,64 @@ export const useGetPosition = ({
         return null;
       }
 
-      // const unclaimedFees0 = formatUnits(position.tokensOwed0, token0.coinDecimals)
-      // const unclaimedFees1 = formatUnits(position.tokensOwed1, token1.coinDecimals)
+      const poolFactoryService = createPoolFactoryService(
+        config,
+        chain.contracts.poolFactory.address,
+      );
+
+      const pool = await poolFactoryService.getPool(
+        chain.chainId,
+        position.token0,
+        position.token1,
+        position.fee,
+      );
+
+      const poolService = createPoolService(config, pool);
+      const slot0 = await poolService.slot0(chain.chainId);
+
+      const { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+        position,
+        sqrtPriceX96: slot0.sqrtPriceX96,
+        token0,
+        token1,
+      });
+
+      const { minTick, maxTick } = getMinMaxTick(position.fee as FeeTier);
+      let minPrice = tickToPrice(
+        token0.asToken(),
+        token1.asToken(),
+        position.tickLower,
+      ).toFixed(token0.coinDecimals);
+      let maxPrice = tickToPrice(
+        token0.asToken(),
+        token1.asToken(),
+        position.tickUpper,
+      ).toFixed();
+
+      if (position.tickLower === minTick) {
+        minPrice = MIN_PRICE_DEFAULT.toString();
+      }
+      console.log(position.tickUpper);
+      if (position.tickUpper === maxTick) {
+        maxPrice = "Infinity";
+      }
+
+      const totalUnclaimedFees = new Big(
+        formatUnits(position.tokensOwed0, token0.coinDecimals),
+      )
+        .add(formatUnits(position.tokensOwed1, token1.coinDecimals))
+        .toFixed();
 
       return {
         position,
         token0,
         token1,
+        amount0,
+        amount1,
+        price,
+        minPrice,
+        maxPrice,
+        totalUnclaimedFees,
       };
     },
     enabled: !!address,
