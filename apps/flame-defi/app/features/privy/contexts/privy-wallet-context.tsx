@@ -1,6 +1,7 @@
 "use client";
 
-import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { ConnectedWallet, usePrivy, useWallets } from "@privy-io/react-auth";
+import {useSetActiveWallet} from '@privy-io/wagmi';
 import React, { useCallback, useEffect, useState } from "react";
 
 export interface PrivyWalletContextProps {
@@ -25,10 +26,17 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
 }) => {
   const { login, logout, ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
+  const { setActiveWallet } = useSetActiveWallet();
+
+  console.log(wallets);
 
   const [privyAccountAddress, setPrivyAccountAddress] = useState<string | null>(
     null,
   );
+
+  const setWallet = useCallback(async (activeWallet: ConnectedWallet) => {
+    return await setActiveWallet(activeWallet);
+  }, [setActiveWallet]);
 
   // Set the address when the wallets change
   useEffect(() => {
@@ -40,14 +48,18 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
 
       if (embeddedWallet && embeddedWallet.address) {
         setPrivyAccountAddress(embeddedWallet.address);
+        console.log("embedded wallet");
+        void setWallet(embeddedWallet);
       } else if (wallets[0]?.address) {
+        console.log("not embedded wallet");
         // Fallback to first wallet if no embedded wallet found
         setPrivyAccountAddress(wallets[0].address);
+        void setWallet(wallets[0]);
       }
     } else {
       setPrivyAccountAddress(null);
     }
-  }, [wallets, authenticated]);
+  }, [setWallet, wallets, authenticated]);
 
   const resetState = useCallback(() => {
     console.log("Privy wallet state reset called");
