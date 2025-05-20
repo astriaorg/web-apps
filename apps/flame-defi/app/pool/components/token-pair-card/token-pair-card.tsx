@@ -26,7 +26,7 @@ export const TokenPairCard = ({
       <Skeleton isLoading={isLoading}>
         <div className="flex items-center gap-2 h-6">
           <TokenIcon size={16} symbol={token0?.coinDenom} />
-          <div className="text-typography-light font-sans flex-1">
+          <div className="text-typography-light flex-1">
             {token0?.coinDenom}
           </div>
           <div className="text-sm font-medium text-typography-light">
@@ -37,7 +37,7 @@ export const TokenPairCard = ({
       <Skeleton isLoading={isLoading}>
         <div className="flex items-center gap-2 h-6">
           <TokenIcon size={16} symbol={token1?.coinDenom} />
-          <div className="text-typography-light font-sans flex-1">
+          <div className="text-typography-light flex-1">
             {token1?.coinDenom}
           </div>
           <div className="text-sm font-medium text-typography-light">
