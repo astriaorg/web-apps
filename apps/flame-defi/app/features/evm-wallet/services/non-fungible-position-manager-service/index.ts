@@ -327,7 +327,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       sortedToken1.isNative ||
       sortedToken0.isWrappedNative ||
       sortedToken1.isWrappedNative;
-    console.log(isCollectNativeTokens, options.isCollectAsWrappedNative);
+
     if (options.isCollectAsWrappedNative || !isCollectNativeTokens) {
       // Collects the wrapped native token and other token values to recipient directly since unwrapping to native token is not needed.
       const collectCall = this.encodeCollect(
