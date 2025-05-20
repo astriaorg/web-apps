@@ -5,6 +5,7 @@ import {
   TickMath,
   tickToPrice,
 } from "@uniswap/v3-sdk";
+import Big from "big.js";
 import JSBI from "jsbi";
 
 import type { EvmCurrency } from "@repo/flame-types";
@@ -169,9 +170,9 @@ export const calculateNewPoolPrices = (params: {
   const tick = priceToClosestTick(price);
   const sqrtPriceX96 = TickMath.getSqrtRatioAtTick(tick);
 
-  const actualPriceObj = tickToPrice(token0, token1, tick);
-  const token1Price = actualPriceObj.invert().toFixed(token1.decimals);
-  const token0Price = actualPriceObj.toFixed(token0.decimals);
+  const nearestPrice = tickToPrice(token0, token1, tick);
+  const token1Price = nearestPrice.invert().toFixed(token1.decimals);
+  const token0Price = nearestPrice.toFixed(token0.decimals);
 
   return {
     sqrtPriceX96: BigInt(sqrtPriceX96.toString()),
@@ -179,4 +180,22 @@ export const calculateNewPoolPrices = (params: {
     token0Price,
     token1Price,
   };
+};
+
+export const getDisplayMinPrice = (minPrice: string) => {
+  if (!minPrice) {
+    return minPrice;
+  }
+  return Number(minPrice) === MIN_PRICE_DEFAULT
+    ? "0"
+    : new Big(minPrice).toFixed();
+};
+
+export const getDisplayMaxPrice = (maxPrice: string) => {
+  if (!maxPrice) {
+    return maxPrice;
+  }
+  return Number(maxPrice) === MAX_PRICE_DEFAULT
+    ? "∞"
+    : new Big(maxPrice).toFixed();
 };

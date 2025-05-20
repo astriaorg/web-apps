@@ -1,5 +1,4 @@
 import { TickMath } from "@uniswap/v3-sdk";
-import Big from "big.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
@@ -14,6 +13,8 @@ import {
   calculateNearestTickAndPrice,
   calculatePriceToTick,
   calculateTickToPrice,
+  getDisplayMaxPrice,
+  getDisplayMinPrice,
 } from "pool/utils";
 
 import { MinMaxInput } from "./min-max-input";
@@ -134,26 +135,6 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
     [feeTier, token0, token1],
   );
 
-  const displayMinPrice = useMemo(() => {
-    if (!minPrice) {
-      return minPrice;
-    }
-
-    return Number(minPrice) === MIN_PRICE_DEFAULT
-      ? "0"
-      : new Big(minPrice).toFixed();
-  }, [minPrice]);
-
-  const displayMaxPrice = useMemo(() => {
-    if (!maxPrice) {
-      return maxPrice;
-    }
-
-    return Number(maxPrice) === MAX_PRICE_DEFAULT
-      ? "∞"
-      : new Big(maxPrice).toFixed();
-  }, [maxPrice]);
-
   const exchangeRate = useMemo(() => {
     if (!rate || !token0 || !token1) {
       return null;
@@ -186,7 +167,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
         <div className="grid grid-cols-2 gap-2 mt-4">
           <MinMaxInput
             label="Min"
-            value={displayMinPrice}
+            value={getDisplayMinPrice(minPrice)}
             onInput={(event) => setMinPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getNearestPriceRange({
@@ -200,7 +181,7 @@ export const PriceRangeInput = ({ rate }: PriceRangeInputProps) => {
           />
           <MinMaxInput
             label="Max"
-            value={displayMaxPrice}
+            value={getDisplayMaxPrice(maxPrice)}
             onInput={(event) => setMaxPrice(event.currentTarget.value)}
             onBlur={(event) => {
               const result = getNearestPriceRange({
