@@ -14,7 +14,7 @@ import { getDisplayMaxPrice, getDisplayMinPrice } from "pool/utils";
 
 const PricePerTokenLabel = () => {
   const { tokenId } = usePoolPositionContextV2();
-  const { data, isPending } = useGetPosition({ tokenId });
+  const { data } = useGetPosition({ tokenId });
 
   return (
     <CardLabel className="text-xs">

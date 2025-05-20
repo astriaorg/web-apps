@@ -1,165 +1,180 @@
 "use client";
 
-import { useCallback } from "react";
+import Big from "big.js";
+import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
+import { type Address } from "viem";
+import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Switch } from "@repo/ui/components";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import {
-  PoolTransactionSteps,
-  PriceRangeBlock,
-  TokenInfoCard,
-} from "pool/components";
-import {
-  useCollectFeesTransaction,
-  usePoolContext,
-  usePoolPositionContext,
-} from "pool/hooks";
-import { PositionInfoCard } from "pool/modules/position-details/components";
+import { Button, Card, CardContent, Switch } from "@repo/ui/components";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
+import { useAstriaChainData } from "config";
+import { PriceRangeSummary } from "pool/components/price-range-summary";
+import { TokenPairCard } from "pool/components/token-pair-card";
+import { TransactionSummary } from "pool/components/transaction-summary";
+import { TransactionType } from "pool/components/transaction-summary/transaction-summary.types";
+import { useCollectFees } from "pool/hooks/use-collect-fees";
+import { useGetPosition } from "pool/hooks/use-get-position";
+import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 
 export const ContentSection = () => {
-  const { modalOpen, setModalOpen } = usePoolContext();
   const { formatNumber } = useIntl();
-  const {
-    selectedSymbol,
-    handleReverseTokenData,
-    token0,
-    token1,
-    isCollectAsWrappedNative,
-    handleCollectAsWrappedNative,
-    isReversedPoolTokens,
-    refreshPoolPosition,
-  } = usePoolPositionContext();
-  const hasValidTokens = token0 && token1;
-  const tokens = hasValidTokens ? [token0, token1] : [];
-  const { status, hash, error, setStatus, setError, collectFees } =
-    useCollectFeesTransaction(tokens, isCollectAsWrappedNative);
+  const { chain } = useAstriaChainData();
+  const { address } = useAccount();
 
-  // NOTE: This poolTokensForDisplay is necessary for the pool position details page to be able to reverse the token order in all components on the page.
-  // All other pages only reverse the values of the price range block when this happens.
-  const poolTokensForDisplay = isReversedPoolTokens
-    ? [...tokens].reverse()
-    : tokens;
-  const token0ForDisplay = poolTokensForDisplay[0] ?? null;
-  const token1ForDisplay = poolTokensForDisplay[1] ?? null;
+  const { tokenId } = usePoolPositionContextV2();
+  const { data, isPending, refetch } = useGetPosition({ tokenId });
 
-  const hasUnclaimedFees = Boolean(
-    token0ForDisplay?.unclaimedFees &&
-      token1ForDisplay?.unclaimedFees &&
-      token0ForDisplay.unclaimedFees > 0 &&
-      token1ForDisplay.unclaimedFees > 0,
+  const { collectFees } = useCollectFees();
+
+  const [error, setError] = useState<string | null>(null);
+
+  const [hash, setHash] = useState<Address | null>(null);
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
   );
 
-  const totalLiquidity = tokens.reduce(
-    (sum, token) => sum + token.liquidity,
-    0,
-  );
-  const totalUnclaimedFees = tokens.reduce(
-    (sum, token) => sum + token.unclaimedFees,
-    0,
-  );
-  const formattedLiquidity =
-    totalLiquidity > 0
-      ? formatNumber(totalLiquidity, {
-          style: "currency",
-          currency: "USD",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : "$-";
-  const formattedUnclaimedFees =
-    totalUnclaimedFees > 0
-      ? formatNumber(totalUnclaimedFees, {
-          style: "currency",
-          currency: "USD",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })
-      : "$-";
+  const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
+    useState<boolean>(false);
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
 
-  const handleCloseModal = useCallback(() => {
-    setModalOpen(false);
+  const handleCloseConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(false);
     setStatus(TransactionStatus.IDLE);
-    refreshPoolPosition();
+    refetch();
     setError(null);
-  }, [setModalOpen, setStatus, refreshPoolPosition, setError]);
+  }, [refetch, setIsConfirmationModalOpen, setStatus, setError]);
 
-  const handleModalActionButton = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (status !== TransactionStatus.IDLE) {
-      handleCloseModal();
+      handleCloseConfirmationModal();
     } else {
-      collectFees();
+      if (!data || !address) {
+        handleCloseConfirmationModal();
+        return;
+      }
+
+      setStatus(TransactionStatus.PENDING);
+
+      try {
+        const hash = await collectFees({
+          chain,
+          tokenId,
+          token0: data.token0,
+          token1: data.token1,
+          recipient: address,
+          position: data.position,
+          options: {
+            isCollectAsWrappedNative,
+          },
+        });
+
+        setHash(hash);
+        setStatus(TransactionStatus.SUCCESS);
+      } catch {
+        setStatus(TransactionStatus.FAILED);
+      }
     }
-  }, [handleCloseModal, collectFees, status]);
+  }, [
+    handleCloseConfirmationModal,
+    collectFees,
+    status,
+    data,
+    address,
+    tokenId,
+    chain,
+    isCollectAsWrappedNative,
+  ]);
 
   return (
     <div className="flex flex-col flex-1 mt-8">
-      <PriceRangeBlock
-        symbols={[token0?.token.coinDenom ?? "", token1?.token.coinDenom ?? ""]}
-        selectedSymbol={selectedSymbol}
-        handleReverseTokenData={handleReverseTokenData}
-      />
-      <div className="flex flex-col gap-4 mt-4 items-end">
-        {hasUnclaimedFees && (
-          <div className="flex items-center gap-2 justify-end">
-            <span className="text-sm">Collect as WTIA</span>
-            <Switch
-              checked={isCollectAsWrappedNative}
-              onCheckedChange={() =>
-                handleCollectAsWrappedNative(!isCollectAsWrappedNative)
-              }
-              className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
-            />
-          </div>
-        )}
-        <div className="flex flex-col md:flex-row gap-2 w-full">
-          <div className="flex flex-col gap-2 w-full md:w-2/4">
-            <PositionInfoCard
-              leftLabel="Liquidity"
-              value={formattedLiquidity}
-            />
-            <TokenInfoCard
-              token0={token0ForDisplay}
-              token1={token1ForDisplay}
-              showLiquidity={true}
-              showLiquidityPercentage
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-full md:w-2/4">
-            <PositionInfoCard
-              leftLabel="Unclaimed fees"
-              value={formattedUnclaimedFees}
-            />
-            <TokenInfoCard
-              token0={token0ForDisplay}
-              token1={token1ForDisplay}
-            />
-          </div>
-        </div>
-        {hasUnclaimedFees && tokens.length > 0 && (
-          <div className="w-full md:w-2/4">
-            <ConfirmationModal
-              open={modalOpen}
-              buttonText={"Collect Fees"}
-              actionButtonText={"Collect"}
-              showOpenButton={true}
-              handleOpenModal={() => setModalOpen(true)}
-              handleModalActionButton={handleModalActionButton}
-              handleCloseModal={handleCloseModal}
-              title={"Claim Fees"}
-            >
-              <PoolTransactionSteps
-                status={status}
-                tokens={tokens}
-                hash={hash}
-                message={error || ""}
-                addLiquidityInputValues={null}
-              />
-            </ConfirmationModal>
-          </div>
-        )}
-      </div>
+      <Card>
+        <CardContent>
+          <TokenPairCard
+            title="Liquidity"
+            token0={data?.token0}
+            token1={data?.token1}
+            value0={formatNumber(Number(data?.amount0 ?? 0), {
+              maximumFractionDigits: data?.token0?.coinDecimals,
+            })}
+            value1={formatNumber(Number(data?.amount1 ?? 0), {
+              maximumFractionDigits: data?.token1?.coinDecimals,
+            })}
+            isLoading={isPending}
+          />
+          <hr className="border-t border-stroke-default my-5" />
+          <TokenPairCard
+            title={
+              <div className="flex items-center justify-between h-5">
+                <span className="">Unclaimed Fees</span>
+                {data?.hasUnclaimedFees && (
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="normal-case tracking-normal">
+                      Collect as WTIA
+                    </span>
+                    <Switch
+                      checked={isCollectAsWrappedNative}
+                      onCheckedChange={() =>
+                        setIsCollectAsWrappedNative((value) => !value)
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            }
+            token0={data?.token0}
+            token1={data?.token1}
+            value0={formatNumber(
+              +new Big(data?.position.tokensOwed0.toString() ?? 0)
+                .div(10 ** (data?.token0?.coinDecimals ?? 18))
+                .toFixed(),
+              {
+                maximumFractionDigits: data?.token0?.coinDecimals,
+              },
+            )}
+            value1={formatNumber(
+              +new Big(data?.position.tokensOwed1.toString() ?? 0)
+                .div(10 ** (data?.token1?.coinDecimals ?? 18))
+                .toFixed(),
+              {
+                maximumFractionDigits: data?.token1?.coinDecimals,
+              },
+            )}
+            isLoading={isPending}
+          />
+          <Button
+            onClick={() => setIsConfirmationModalOpen(true)}
+            className="mt-5 w-full"
+          >
+            Collect Fees
+          </Button>
+        </CardContent>
+      </Card>
+
+      <PriceRangeSummary />
+
+      {data && (
+        <ConfirmationModal
+          title="Collect Fees"
+          open={isConfirmationModalOpen}
+          onOpenChange={(value) => setIsConfirmationModalOpen(value)}
+        >
+          <TransactionSummary
+            position={data.position}
+            token0={data.token0}
+            token1={data.token1}
+            unclaimedFees0={data.unclaimedFees0}
+            unclaimedFees1={data.unclaimedFees1}
+            type={TransactionType.COLLECT_FEES}
+            hash={hash}
+            status={status}
+            error={error}
+            onSubmit={handleSubmit}
+          />
+        </ConfirmationModal>
+      )}
     </div>
   );
 };

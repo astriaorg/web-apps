@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { tickToPrice } from "@uniswap/v3-sdk";
+import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
@@ -33,6 +34,8 @@ export type GetPositionResult = {
   price: string;
   minPrice: string;
   maxPrice: string;
+  unclaimedFees0: string;
+  unclaimedFees1: string;
   hasUnclaimedFees: boolean;
 };
 
@@ -115,6 +118,15 @@ export const useGetPosition = ({
       const hasUnclaimedFees =
         position.tokensOwed0 > 0n || position.tokensOwed1 > 0n;
 
+      const unclaimedFees0 = formatUnits(
+        position.tokensOwed0,
+        token0.coinDecimals,
+      );
+      const unclaimedFees1 = formatUnits(
+        position.tokensOwed1,
+        token1.coinDecimals,
+      );
+
       return {
         position,
         token0,
@@ -124,6 +136,8 @@ export const useGetPosition = ({
         price,
         minPrice,
         maxPrice,
+        unclaimedFees0,
+        unclaimedFees1,
         hasUnclaimedFees,
       };
     },
