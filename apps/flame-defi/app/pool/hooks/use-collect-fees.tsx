@@ -7,8 +7,7 @@ import {
   type CollectFeesV2Params,
   createNonfungiblePositionManagerService,
 } from "features/evm-wallet";
-
-import { usePoolPositionContext } from ".";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
 
 export const useCollectFees = () => {
   const queryClient = useQueryClient();
