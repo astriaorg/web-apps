@@ -1,7 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { tickToPrice } from "@uniswap/v3-sdk";
-import Big from "big.js";
-import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
@@ -11,7 +9,12 @@ import {
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
-import { type FeeTier, MIN_PRICE_DEFAULT, type Position } from "pool/types";
+import {
+  type FeeTier,
+  MAX_PRICE_DEFAULT,
+  MIN_PRICE_DEFAULT,
+  type Position,
+} from "pool/types";
 import {
   calculateTokenAmountsFromPosition,
   getMinMaxTick,
@@ -30,7 +33,7 @@ export type GetPositionResult = {
   price: string;
   minPrice: string;
   maxPrice: string;
-  totalUnclaimedFees: string;
+  hasUnclaimedFees: boolean;
 };
 
 export const useGetPosition = ({
@@ -90,6 +93,7 @@ export const useGetPosition = ({
       });
 
       const { minTick, maxTick } = getMinMaxTick(position.fee as FeeTier);
+
       let minPrice = tickToPrice(
         token0.asToken(),
         token1.asToken(),
@@ -104,16 +108,12 @@ export const useGetPosition = ({
       if (position.tickLower === minTick) {
         minPrice = MIN_PRICE_DEFAULT.toString();
       }
-      console.log(position.tickUpper);
       if (position.tickUpper === maxTick) {
-        maxPrice = "Infinity";
+        maxPrice = MAX_PRICE_DEFAULT.toString();
       }
 
-      const totalUnclaimedFees = new Big(
-        formatUnits(position.tokensOwed0, token0.coinDecimals),
-      )
-        .add(formatUnits(position.tokensOwed1, token1.coinDecimals))
-        .toFixed();
+      const hasUnclaimedFees =
+        position.tokensOwed0 > 0n || position.tokensOwed1 > 0n;
 
       return {
         position,
@@ -124,7 +124,7 @@ export const useGetPosition = ({
         price,
         minPrice,
         maxPrice,
-        totalUnclaimedFees,
+        hasUnclaimedFees,
       };
     },
     enabled: !!address,

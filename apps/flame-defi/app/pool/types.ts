@@ -198,6 +198,9 @@ export type PoolPositionContextProps = {
   tokenId: string;
 };
 
+/**
+ * @deprecated TODO: Remove in favor of `TransactionSummaryProps` type.
+ */
 export type PoolTransactionStepsProps = {
   status: TransactionStatus;
   tokens: PoolToken[];

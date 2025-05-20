@@ -59,11 +59,11 @@ export const TokenIcon = ({
   size = DEFAULT_ICON_SIZE,
   className = "",
 }: {
-  symbol: string;
+  symbol?: string;
   size?: number;
   className?: string;
 }) => {
-  const normalizedSymbol = symbol.toLowerCase() as TokenSymbol;
+  const normalizedSymbol = symbol?.toLowerCase() as TokenSymbol;
   const FallbackIcon = DotIcon;
 
   // Check if the symbol exists in our map.

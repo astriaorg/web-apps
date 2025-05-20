@@ -45,7 +45,9 @@ export const PriceRangeSummary = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="flex flex-col gap-1">
-                <CardLabel className="text-xs uppercase">Min Price</CardLabel>
+                <CardLabel className="text-xs font-medium tracking-wider uppercase">
+                  Min Price
+                </CardLabel>
                 <CardFigureLabel className="text-typography-light font-sans">
                   {getDisplayMinPrice(data?.minPrice ?? "0")}
                 </CardFigureLabel>
@@ -73,7 +75,9 @@ export const PriceRangeSummary = () => {
         <Card variant="accent" isLoading={isPending}>
           <CardContent className="h-full">
             <div className="flex flex-col gap-1 h-full">
-              <CardLabel className="text-xs uppercase">Current Price</CardLabel>
+              <CardLabel className="text-xs font-medium tracking-wider uppercase">
+                Current Price
+              </CardLabel>
               <CardFigureLabel className="truncate">
                 {formatNumber(Number(data?.price ?? 0), {
                   maximumFractionDigits: 4,
