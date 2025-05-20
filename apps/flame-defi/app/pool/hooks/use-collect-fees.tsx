@@ -7,6 +7,7 @@ import {
   type CollectFeesV2Params,
   createNonfungiblePositionManagerService,
 } from "features/evm-wallet";
+import { QUERY_KEYS } from "pool/constants/query-keys";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
 
 export const useCollectFees = () => {
@@ -35,7 +36,11 @@ export const useCollectFees = () => {
     onSuccess: (hash) => {
       if (hash) {
         void queryClient.invalidateQueries({
-          queryKey: ["useGetPosition", chain.chainId, tokenId],
+          queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+        });
+
+        void queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.USE_GET_POSITIONS, chain.chainId, address],
         });
       }
     },

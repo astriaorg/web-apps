@@ -4,6 +4,7 @@ import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
+import { QUERY_KEYS } from "constants/query-keys";
 import { createErc20Service } from "features/evm-wallet";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
@@ -22,7 +23,7 @@ export const useTokenAllowance = ({
   const { chain } = useAstriaChainData();
 
   return useQuery<bigint | null>({
-    queryKey: ["useTokenAllowance", token, spender],
+    queryKey: [QUERY_KEYS.USE_TOKEN_ALLOWANCE, token, spender],
     queryFn: async () => {
       if (!address || !chainId || !token || !spender) {
         return null;

@@ -6,6 +6,7 @@ import { useAccount, useConfig } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
+import { QUERY_KEYS } from "constants/query-keys";
 import { createErc20Service } from "features/evm-wallet";
 
 // TODO: Unify token approval hooks.
@@ -45,16 +46,16 @@ export const useApproveToken = () => {
       return hash;
     },
     onSuccess: (hash, variables) => {
-      console.log("onSuccess", hash);
       // Invalidate relevant queries after successful approval.
-      if (!hash) {
-        return;
+      if (hash) {
+        void queryClient.invalidateQueries({
+          queryKey: [
+            QUERY_KEYS.USE_TOKEN_ALLOWANCE,
+            variables.token,
+            variables.spender,
+          ],
+        });
       }
-
-      void queryClient.invalidateQueries({
-        // TODO: Share allowance query key.
-        queryKey: ["useTokenAllowance", variables.token, variables.spender],
-      });
     },
   });
 

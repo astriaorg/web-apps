@@ -7,6 +7,7 @@ import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
+import { QUERY_KEYS } from "pool/constants/query-keys";
 import { type PositionWithKey } from "pool/types";
 import { getTokenFromAddress } from "pool/utils";
 
@@ -31,7 +32,7 @@ export const useGetPositions = (): UseQueryResult<
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: ["useGetPositions", chain.chainId, address],
+    queryKey: [QUERY_KEYS.USE_GET_POSITIONS, chain.chainId, address],
     queryFn: async () => {
       if (!address) {
         return null;

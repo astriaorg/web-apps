@@ -10,6 +10,7 @@ import {
   createPoolFactoryService,
   createPoolService,
 } from "features/evm-wallet";
+import { QUERY_KEYS } from "pool/constants/query-keys";
 import {
   type FeeTier,
   MAX_PRICE_DEFAULT,
@@ -49,7 +50,7 @@ export const useGetPosition = ({
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: ["useGetPosition", chain.chainId, tokenId],
+    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
     queryFn: async () => {
       if (!address) {
         return null;

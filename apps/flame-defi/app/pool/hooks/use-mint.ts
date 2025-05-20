@@ -7,6 +7,7 @@ import {
   type CreateAndInitializePoolIfNecessaryAndMintParams,
   createNonfungiblePositionManagerService,
 } from "features/evm-wallet";
+import { QUERY_KEYS } from "pool/constants/query-keys";
 
 export const useMint = () => {
   const queryClient = useQueryClient();
@@ -34,7 +35,7 @@ export const useMint = () => {
     onSuccess: (hash) => {
       if (hash) {
         void queryClient.invalidateQueries({
-          queryKey: ["usePositions", chain.chainId, address],
+          queryKey: [QUERY_KEYS.USE_GET_POSITIONS, chain.chainId, address],
         });
       }
     },
