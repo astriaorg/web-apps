@@ -8,14 +8,17 @@ import {
   cosmosChainInfosToCosmosKitAssetLists,
   cosmosChainInfosToCosmosKitChains,
 } from "@repo/flame-types";
-import { useConfig } from "config";
+import { getAllChainConfigs } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
 /**
  * Provider for CosmosKit functionality
  */
 export function CosmosKitProvider({ children }: { children: ReactNode }) {
-  const { cosmosChains } = useConfig();
+  // NOTE - i tried using cosmosChains from useConfig, where they're filtered by
+  //  the selected flame network, but it caused errors saying "chain mocha not provided",
+  //  so i'm providing the full list of chains from ALL configs
+  const { cosmosChains } = getAllChainConfigs();
 
   const { cosmosKitChains, cosmosKitAssetLists } = useMemo(() => {
     const chainValues = Object.values(cosmosChains);
