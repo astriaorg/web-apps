@@ -28,8 +28,6 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
   const { wallets } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
 
-  console.log(wallets);
-
   const [privyAccountAddress, setPrivyAccountAddress] = useState<string | null>(
     null,
   );
@@ -51,13 +49,13 @@ export const PrivyWalletProvider: React.FC<PrivyWalletProviderProps> = ({
 
       if (embeddedWallet && embeddedWallet.address) {
         // TODO -
-        console.log("embedded wallet");
+        console.log("privy embedded wallet found");
         setPrivyAccountAddress(embeddedWallet.address);
         void setWallet(embeddedWallet);
       } else if (wallets[0]?.address) {
         // TODO - what do we do here?
         //  atm it keeps defaulting to Phantom, which we don't even support.
-        console.log("no embedded wallets found");
+        console.log("no privy embedded wallets found");
       }
     } else {
       setPrivyAccountAddress(null);

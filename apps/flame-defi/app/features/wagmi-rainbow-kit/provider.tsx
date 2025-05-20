@@ -25,6 +25,7 @@ export function WagmiRainbowKitProvider({ children }: { children: ReactNode }) {
     ]);
   }, [astriaChains, coinbaseChains]);
 
+  // TODO - remove when removing rainbowkit
   const connectors = useMemo(() => {
     return connectorsForWallets(
       [
@@ -43,11 +44,6 @@ export function WagmiRainbowKitProvider({ children }: { children: ReactNode }) {
   const transports = useMemo(() => {
     return Object.fromEntries(chains.map((chain) => [chain.id, http()]));
   }, [chains]);
-
-  // TODO - these aren't showing up in rainbowkit, only phantom is.
-  //  privy's `createConfig` has code `connectors:r.connectors?.filter((e=>"mock"===e.type))`
-  //  so our connectors are getting filtered out
-  console.log("connectors", connectors);
 
   const wagmiConfig = useMemo(() => {
     return createConfig({

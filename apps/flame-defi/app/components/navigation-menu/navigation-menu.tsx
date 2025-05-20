@@ -72,7 +72,7 @@ export const NavigationMenu = () => {
       </div>
       <div className="hidden md:flex gap-2 items-center">
         <NetworkSelect />
-        {!isBridgePage && <WalletInterstitial />}
+        {!isBridgePage && <ConnectAstriaWalletButton />}
       </div>
       <div className="md:hidden">
         <MobileNavigationMenu />

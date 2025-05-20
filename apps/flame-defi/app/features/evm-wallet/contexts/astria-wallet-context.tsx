@@ -29,12 +29,12 @@ export const AstriaWalletContextProvider: React.FC<{
   const { astriaChains } = useConfig();
   const { chain, nativeToken } = useAstriaChainData();
   const userAccount = useAccount();
-  const { connectWallet: privyConnectWallet } = usePrivy();
+  const { connectOrCreateWallet, logout } = usePrivy();
   const { disconnect } = useDisconnect();
 
   const connectWallet = useCallback(
-    () => privyConnectWallet(),
-    [privyConnectWallet],
+    () => connectOrCreateWallet(),
+    [connectOrCreateWallet],
   );
 
   const {

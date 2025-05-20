@@ -7,7 +7,6 @@ export interface EvmWalletContextProps {
   connectToSpecificChain: (chainId: number) => void;
   disconnectEvmWallet: () => void;
   evmAccountAddress: string | null;
-  resetState: () => void;
 }
 
 export const EvmWalletContext = React.createContext<EvmWalletContextProps>(
@@ -21,7 +20,7 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { connectWallet } = usePrivy();
+  const { connectOrCreateWallet, logout } = usePrivy();
   const { disconnect } = useDisconnect();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
@@ -39,37 +38,31 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
     }
   }, [userAccount.address]);
 
-  const resetState = useCallback(() => {
-    console.log("EVM wallet state reset called");
-    setEvmAccountAddress(null);
-  }, []);
-
   const connectEvmWallet = useCallback(
-    () => connectWallet(),
-    [connectWallet],
+    () => connectOrCreateWallet(),
+    [connectOrCreateWallet],
   );
 
   const connectToSpecificChain = (chainId: number) => {
-    console.log({ evmAccountAddress, chainId });
     if (!evmAccountAddress) {
       // FIXME - how do i switch chains after they connect?
-      connectWallet();
+      connectOrCreateWallet();
     } else {
       switchChain({ chainId });
     }
   };
 
-  const disconnectEvmWallet = useCallback(() => {
+  const disconnectEvmWallet = useCallback(async () => {
     disconnect();
-    resetState();
-  }, [disconnect, resetState]);
+    // FIXME - do we want to logout the privy user here too?
+    await logout();
+  }, [disconnect, logout]);
 
   const value = {
     connectEvmWallet,
     connectToSpecificChain,
     disconnectEvmWallet,
     evmAccountAddress,
-    resetState,
   };
 
   return (

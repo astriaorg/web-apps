@@ -4,6 +4,7 @@ import { PrivyProvider as Provider } from "@privy-io/react-auth";
 import React from "react";
 
 import { getEnvVariable } from "config";
+import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
 /**
  * PrivyProvider with values from env.
@@ -22,11 +23,14 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
         },
         appearance: {
           walletChainType: "ethereum-only",
+          showWalletLoginFirst: true,
           // FIXME - is there a way to remove phantom?
           //  we could define an explicit list but then it wouldn't show
           //  injected wallets that aren't defined in privy e.g. keplr
           walletList: ["metamask", "wallet_connect", "detected_ethereum_wallets", ],
         },
+        loginMethods: ["email", "sms", "wallet"],
+        walletConnectCloudProjectId: WALLET_CONNECT_PROJECT_ID,
       }}
     >
       {children}
