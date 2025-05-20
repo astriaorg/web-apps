@@ -47,40 +47,40 @@ export const ContentSection = () => {
     setError(null);
   }, [refetch, setIsConfirmationModalOpen, setStatus, setError]);
 
-  const handleSubmit = useCallback(async () => {
-    if (status !== TransactionStatus.IDLE) {
-      handleCloseConfirmationModal();
-    } else {
-      if (!data || !address) {
-        handleCloseConfirmationModal();
-        return;
-      }
+  const handleOpenConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(true);
+    setStatus(TransactionStatus.IDLE);
+  }, []);
 
+  const handleSubmit = useCallback(async () => {
+    if (!data || !address) {
+      handleCloseConfirmationModal();
+      return;
+    }
+
+    try {
       setStatus(TransactionStatus.PENDING);
 
-      try {
-        const hash = await collectFees({
-          chain,
-          tokenId,
-          token0: data.token0,
-          token1: data.token1,
-          recipient: address,
-          position: data.position,
-          options: {
-            isCollectAsWrappedNative,
-          },
-        });
+      const hash = await collectFees({
+        chain,
+        tokenId,
+        token0: data.token0,
+        token1: data.token1,
+        recipient: address,
+        position: data.position,
+        options: {
+          isCollectAsWrappedNative,
+        },
+      });
 
-        setHash(hash);
-        setStatus(TransactionStatus.SUCCESS);
-      } catch {
-        setStatus(TransactionStatus.FAILED);
-      }
+      setHash(hash);
+      setStatus(TransactionStatus.SUCCESS);
+    } catch {
+      setStatus(TransactionStatus.FAILED);
     }
   }, [
     handleCloseConfirmationModal,
     collectFees,
-    status,
     data,
     address,
     tokenId,
@@ -145,7 +145,8 @@ export const ContentSection = () => {
             isLoading={isPending}
           />
           <Button
-            onClick={() => setIsConfirmationModalOpen(true)}
+            onClick={handleOpenConfirmationModal}
+            disabled={isPending}
             className="mt-5 w-full"
           >
             Collect Fees

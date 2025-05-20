@@ -1,7 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { TransactionStatus } from "@repo/flame-types";
-import { BlockLoader, SuccessCheck } from "@repo/ui/components";
+import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
 import { PoolTransactionType } from "pool/types";
@@ -14,19 +16,12 @@ import {
   TransactionType,
 } from "./transaction-summary.types";
 
-const TransactionLoader = ({ type }: TransactionSummaryProps) => {
+const TransactionLoader = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-full mt-20">
-      <BlockLoader className="mb-20" />
-      <div className="text-white font-medium mt-6 text-center">
-        <span className="text-base md:text-lg mb-2">
-          Confirm this transaction in your wallet.
-        </span>
-        <div className="flex items-center gap-1 justify-center text-sm md:text-base">
-          {type === TransactionType.COLLECT_FEES && (
-            <span>Collecting Fees</span>
-          )}
-        </div>
+    <div className="flex flex-col items-center justify-center">
+      <BlockLoader className="my-24" />
+      <div className="mt-6">
+        <span>Confirm this transaction in your wallet.</span>
       </div>
     </div>
   );
@@ -35,45 +30,48 @@ const TransactionLoader = ({ type }: TransactionSummaryProps) => {
 const TransactionSuccess = ({
   token0,
   token1,
+  type,
   hash,
 }: TransactionSuccessProps) => {
   const { chain } = useAstriaChainData();
 
+  const message = useMemo(() => {
+    if (type === TransactionType.COLLECT_FEES) {
+      return `Successfully collected fees for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
+  }, [type, token0, token1]);
+
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <SuccessCheck />
-      <div className="text-white font-medium mt-6 mb-6 text-center w-full">
-        <div className="flex flex-col md:flex-row items-center gap-1 justify-center text-sm md:text-base">
-          <div className="flex items-center gap-1">
-            <span>
-              Successfully added {token0.coinDenom}/{token1.coinDenom}{" "}
-              liquidity.
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 justify-center text-base">
-          <a
-            href={`${chain.blockExplorerUrl}/tx/${hash}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 text-orange hover:text-orange/80 transition text-base md:text-lg underline"
-          >
-            View on Explorer
-          </a>
+    <div className="flex flex-col items-center justify-center">
+      <div className="my-6">
+        <SuccessCheck />
+      </div>
+      <div className="flex flex-col">
+        <div className="flex items-center gap-1">
+          <span>{message}</span>
         </div>
       </div>
+      <Button asChild className="w-full mt-6">
+        <a
+          href={`${chain.blockExplorerUrl}/tx/${hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View on Explorer
+        </a>
+      </Button>
     </div>
   );
 };
 
 const TransactionFailed = ({ error }: TransactionFailedProps) => {
   return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <ErrorIcon size={170} className="text-orange" />
-      <div className="text-white font-medium mt-6 text-center">
-        <div className="flex items-center gap-1 justify-center text-base">
-          <span>{error}</span>
-        </div>
+    <div className="flex flex-col items-center justify-center">
+      <div className="my-6">
+        <ErrorIcon size={100} className="text-danger" />
+      </div>
+      <div className="mt-4">
+        <span>{error || "An error occurred. Please try again."}</span>
       </div>
     </div>
   );
@@ -115,22 +113,14 @@ export const TransactionSummary = ({
           onSubmit={onSubmit}
         />
       )}
-      {status === TransactionStatus.PENDING && (
-        <TransactionLoader
-          position={position}
+      {status === TransactionStatus.PENDING && <TransactionLoader />}
+      {status === TransactionStatus.SUCCESS && hash && (
+        <TransactionSuccess
           token0={token0}
           token1={token1}
-          unclaimedFees0={unclaimedFees0}
-          unclaimedFees1={unclaimedFees1}
           type={type}
           hash={hash}
-          status={status}
-          error={error}
-          onSubmit={onSubmit}
         />
-      )}
-      {status === TransactionStatus.SUCCESS && hash && (
-        <TransactionSuccess token0={token0} token1={token1} hash={hash} />
       )}
       {status === TransactionStatus.FAILED && (
         <TransactionFailed error={error} />

@@ -26,6 +26,7 @@ export interface TransactionSummaryProps {
 export type TransactionSuccessProps = {
   token0: EvmCurrency;
   token1: EvmCurrency;
+  type: TransactionType;
   hash: Hash;
 };
 
