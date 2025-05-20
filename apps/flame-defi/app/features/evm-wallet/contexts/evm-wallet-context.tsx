@@ -1,4 +1,4 @@
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { usePrivy } from "@privy-io/react-auth";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 
@@ -21,7 +21,7 @@ interface EvmWalletProviderProps {
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {
-  const { openConnectModal } = useConnectModal();
+  const { connectWallet } = usePrivy();
   const { disconnect } = useDisconnect();
   const userAccount = useAccount();
   const { switchChain } = useSwitchChain();
@@ -45,15 +45,15 @@ export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   }, []);
 
   const connectEvmWallet = useCallback(
-    () => openConnectModal?.(),
-    [openConnectModal],
+    () => connectWallet(),
+    [connectWallet],
   );
 
   const connectToSpecificChain = (chainId: number) => {
     console.log({ evmAccountAddress, chainId });
     if (!evmAccountAddress) {
       // FIXME - how do i switch chains after they connect?
-      openConnectModal?.();
+      connectWallet();
     } else {
       switchChain({ chainId });
     }

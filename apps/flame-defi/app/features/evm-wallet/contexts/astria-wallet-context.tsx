@@ -1,4 +1,4 @@
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { usePrivy } from "@privy-io/react-auth";
 import React, { useCallback, useMemo } from "react";
 import { type Address, formatUnits } from "viem";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
@@ -29,12 +29,12 @@ export const AstriaWalletContextProvider: React.FC<{
   const { astriaChains } = useConfig();
   const { chain, nativeToken } = useAstriaChainData();
   const userAccount = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { connectWallet: privyConnectWallet } = usePrivy();
   const { disconnect } = useDisconnect();
 
   const connectWallet = useCallback(
-    () => openConnectModal?.(),
-    [openConnectModal],
+    () => privyConnectWallet(),
+    [privyConnectWallet],
   );
 
   const {
