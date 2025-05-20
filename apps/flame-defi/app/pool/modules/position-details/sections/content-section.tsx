@@ -89,7 +89,7 @@ export const ContentSection = () => {
   ]);
 
   return (
-    <div className="flex flex-col flex-1 mt-8">
+    <section className="flex flex-col">
       <Card>
         <CardContent>
           <TokenPairCard
@@ -146,7 +146,7 @@ export const ContentSection = () => {
           />
           <Button
             onClick={handleOpenConfirmationModal}
-            disabled={isPending}
+            disabled={isPending || !data?.hasUnclaimedFees}
             className="mt-5 w-full"
           >
             Collect Fees
@@ -176,6 +176,6 @@ export const ContentSection = () => {
           />
         </ConfirmationModal>
       )}
-    </div>
+    </section>
   );
 };

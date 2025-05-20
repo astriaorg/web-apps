@@ -18,25 +18,24 @@ export const HeaderSection = () => {
 
   return (
     <Header onClickBack={() => router.back()}>
-      <div className="flex flex-col w-full gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col w-full gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col space-y-3">
           <Skeleton isLoading={isPending} className="w-48 h-8">
             {data && (
-              <div className="flex items-center space-x-2">
-                <MultiTokenIcon
-                  symbols={[data?.token0.coinDenom, data?.token1.coinDenom]}
-                />
-                <HeaderTitle>
-                  {data.token0.coinDenom}/{data.token1.coinDenom}
-                </HeaderTitle>
-              </div>
-            )}
-          </Skeleton>
-          <Skeleton isLoading={isPending} className="w-24 h-5">
-            {data && (
-              <div className="flex gap-2">
-                <PositionRangeBadge position={data.position} />
-                <PositionFeeBadge position={data.position} />
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <div className="flex items-center">
+                  <MultiTokenIcon
+                    symbols={[data?.token0.coinDenom, data?.token1.coinDenom]}
+                  />
+                  <HeaderTitle>
+                    {data.token0.coinDenom}/{data.token1.coinDenom}
+                  </HeaderTitle>
+                </div>
+
+                <div className="flex gap-2">
+                  <PositionRangeBadge position={data.position} />
+                  <PositionFeeBadge position={data.position} />
+                </div>
               </div>
             )}
           </Skeleton>
