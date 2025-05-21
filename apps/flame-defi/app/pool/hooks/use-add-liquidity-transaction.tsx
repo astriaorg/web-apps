@@ -21,8 +21,8 @@ export const useAddLiquidityTransaction = (
   const [status, setStatus] = useState<TransactionStatus>(
     TransactionStatus.IDLE,
   );
-  const [hash, setHash] = useState<Hash | undefined>(undefined);
-  const [error, setError] = useState<string | null>(null);
+  const [hash, setHash] = useState<Hash>();
+  const [error, setError] = useState<string>();
 
   const { chain } = useAstriaChainData();
   const { token0, token1, tokenId } = usePoolPositionContext();

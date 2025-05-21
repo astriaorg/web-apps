@@ -17,9 +17,9 @@ export interface TransactionSummaryProps {
   unclaimedFees0: string;
   unclaimedFees1: string;
   type: TransactionType;
-  hash: Hash | null;
   status: TransactionStatus;
-  error: string | null;
+  hash?: Hash;
+  error?: string;
   onSubmit: () => void;
 }
 
@@ -31,5 +31,5 @@ export type TransactionSuccessProps = {
 };
 
 export type TransactionFailedProps = {
-  error: string | null;
+  error?: string;
 };

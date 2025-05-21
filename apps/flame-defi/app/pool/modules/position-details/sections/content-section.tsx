@@ -14,8 +14,10 @@ import {
   TokenPairCard,
   TokenPairCardDivider,
 } from "pool/components/token-pair-card";
-import { TransactionSummary } from "pool/components/transaction-summary";
-import { TransactionType } from "pool/components/transaction-summary/transaction-summary.types";
+import {
+  TransactionSummary,
+  TransactionType,
+} from "pool/components/transaction-summary";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
@@ -30,9 +32,8 @@ export const ContentSection = () => {
 
   const { collectFees } = useCollectFees();
 
-  const [error, setError] = useState<string | null>(null);
-
-  const [hash, setHash] = useState<Address | null>(null);
+  const [hash, setHash] = useState<Address>();
+  const [error, setError] = useState<string>();
   const [status, setStatus] = useState<TransactionStatus>(
     TransactionStatus.IDLE,
   );
@@ -46,7 +47,7 @@ export const ContentSection = () => {
     setIsConfirmationModalOpen(false);
     setStatus(TransactionStatus.IDLE);
     refetch();
-    setError(null);
+    setError(undefined);
   }, [refetch, setIsConfirmationModalOpen, setStatus, setError]);
 
   const handleOpenConfirmationModal = useCallback(() => {
