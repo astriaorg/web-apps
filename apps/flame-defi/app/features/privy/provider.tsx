@@ -1,9 +1,9 @@
 "use client";
 
 import { PrivyProvider as Provider } from "@privy-io/react-auth";
-import { evmChainsToRainbowKitChains, evmChainToRainbowKitChain } from "@repo/flame-types";
 import React, { useMemo } from "react";
 
+import { evmChainsToRainbowKitChains } from "@repo/flame-types";
 import { getEnvVariable, useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
