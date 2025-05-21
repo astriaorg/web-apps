@@ -1,9 +1,10 @@
 "use client";
 
 import { PrivyProvider as Provider } from "@privy-io/react-auth";
-import React from "react";
+import { evmChainsToRainbowKitChains, evmChainToRainbowKitChain } from "@repo/flame-types";
+import React, { useMemo } from "react";
 
-import { getEnvVariable } from "config";
+import { getEnvVariable, useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
 /**
@@ -12,6 +13,21 @@ import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 export function PrivyProvider({ children }: { children: React.ReactNode }) {
   const appId = getEnvVariable("NEXT_PUBLIC_PRIVY_APP_ID");
   const clientId = getEnvVariable("NEXT_PUBLIC_PRIVY_CLIENT_ID");
+  const { astriaChains, coinbaseChains } = useConfig();
+
+  const supportedChains = useMemo(() => {
+    return evmChainsToRainbowKitChains([
+      ...Object.values(astriaChains),
+      ...Object.values(coinbaseChains),
+    ]);
+  }, [astriaChains, coinbaseChains]);
+
+  const defaultChain = useMemo(() => {
+    return supportedChains[0] ?? undefined;
+  }, [supportedChains]);
+
+  console.log("defaultChain", defaultChain);
+
   return (
     <Provider
       appId={appId}
@@ -36,6 +52,9 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
         },
         loginMethods: ["email", "sms", "wallet"],
         walletConnectCloudProjectId: WALLET_CONNECT_PROJECT_ID,
+        // NOTE - privy provider takes Chain[], not [Chain, ...Chain[]]
+        supportedChains: [...supportedChains],
+        defaultChain,
       }}
     >
       {children}
