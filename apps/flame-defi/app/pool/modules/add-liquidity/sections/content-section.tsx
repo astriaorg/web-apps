@@ -1,26 +1,37 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import { useIntl } from "react-intl";
 
 import { TransactionStatus } from "@repo/flame-types";
+import { Card, CardContent, useTokenAmountInput } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
-import { PoolTransactionSteps, PriceRangeBlock } from "pool/components";
+import {
+  PositionFeeBadge,
+  PositionSummaryCard,
+} from "pool/components/position";
+import { PriceRangeSummary } from "pool/components/price-range-summary";
+import {
+  TokenPairCard,
+  TokenPairCardDivider,
+} from "pool/components/token-pair-card";
 import {
   useAddLiquidityTransaction,
-  useAddLiquidityValidation,
   usePoolContext,
   usePoolPositionContext,
 } from "pool/hooks";
+import { useGetPosition } from "pool/hooks/use-get-position";
+import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { POOL_INPUT_ID } from "pool/types";
 
-import { AddLiquidityInputsBlock, TokenLiquidityBlock } from "../components";
-
+// TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
+  const { formatNumber } = useIntl();
   const { modalOpen, setModalOpen } = usePoolContext();
   const {
-    token0,
-    token1,
+    // token0,
+    // token1,
     feeTier,
     currentPrice,
     selectedSymbol,
@@ -28,20 +39,38 @@ export const ContentSection = () => {
     refreshPoolPosition,
   } = usePoolPositionContext();
 
-  const [input0, setInput0] = useState<string>("");
-  const [input1, setInput1] = useState<string>("");
+  const { tokenId, invert } = usePoolPositionContextV2();
+  const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
 
-  const { balance: token0Balance } = useEvmCurrencyBalance(token0?.token);
-  const { balance: token1Balance } = useEvmCurrencyBalance(token1?.token);
+  const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
+    useEvmCurrencyBalance(data?.token0);
+  const { balance: token1Balance, isLoading: isLoadingToken1Balance } =
+    useEvmCurrencyBalance(data?.token1);
+
+  const { amount: amount0, onInput: onInput0 } = useTokenAmountInput({
+    balance: token0Balance?.value,
+    minimum: "0",
+    token: data?.token0
+      ? {
+          symbol: data.token0.coinDenom,
+          decimals: data.token0.coinDecimals,
+        }
+      : undefined,
+  });
+
+  const { amount: amount1, onInput: onInput1 } = useTokenAmountInput({
+    balance: token1Balance?.value,
+    minimum: "0",
+    token: data?.token1
+      ? {
+          symbol: data.token1.coinDenom,
+          decimals: data.token1.coinDecimals,
+        }
+      : undefined,
+  });
 
   const { status, hash, error, setError, setStatus, addLiquidity } =
-    useAddLiquidityTransaction(input0, input1);
-  const { validPoolInputs, buttonText } = useAddLiquidityValidation(
-    input0,
-    input1,
-    token0Balance,
-    token1Balance,
-  );
+    useAddLiquidityTransaction(amount0.value, amount1.value);
 
   const getTokenCalculatedTokenValue = useCallback(
     (value: string, sourceId: POOL_INPUT_ID, coinDecimals: number) => {
@@ -64,23 +93,29 @@ export const ContentSection = () => {
       if (!coinDecimals) return;
       setError(null);
       if (id === POOL_INPUT_ID.INPUT_ZERO) {
-        setInput0(value);
-        setInput1(getTokenCalculatedTokenValue(value, id, coinDecimals));
+        onInput0({ value });
+        onInput1({
+          value: getTokenCalculatedTokenValue(value, id, coinDecimals),
+        });
       } else {
-        setInput1(value);
-        setInput0(getTokenCalculatedTokenValue(value, id, coinDecimals));
+        onInput1({ value });
+        onInput0({
+          value: getTokenCalculatedTokenValue(value, id, coinDecimals),
+        });
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [getTokenCalculatedTokenValue, setError],
   );
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
     setStatus(TransactionStatus.IDLE);
-    setInput0("");
-    setInput1("");
+    onInput0({ value: "" });
+    onInput1({ value: "" });
     refreshPoolPosition();
-  }, [setModalOpen, setInput0, setInput1, setStatus, refreshPoolPosition]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setModalOpen, setStatus, refreshPoolPosition]);
 
   const handleModalActionButton = useCallback(() => {
     if (status !== TransactionStatus.IDLE) {
@@ -91,14 +126,45 @@ export const ContentSection = () => {
   }, [handleCloseModal, addLiquidity, status]);
 
   return (
-    <div className="flex flex-col flex-1 mt-0 md:mt-12">
-      <PriceRangeBlock
-        symbols={[token0?.token.coinDenom ?? "", token1?.token.coinDenom ?? ""]}
-        selectedSymbol={selectedSymbol}
-        handleReverseTokenData={handleReverseTokenData}
-      />
+    <section className="flex flex-col">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <PositionSummaryCard
+          token0={data?.token0}
+          token1={data?.token1}
+          position={data?.position}
+          isLoading={isPending}
+        />
+
+        <Card className="col-span-1 md:col-span-2">
+          <CardContent>
+            <TokenPairCard
+              token0={data?.token0}
+              token1={data?.token1}
+              value0={formatNumber(Number(data?.amount0 ?? 0), {
+                maximumFractionDigits: data?.token0?.coinDecimals,
+              })}
+              value1={formatNumber(Number(data?.amount1 ?? 0), {
+                maximumFractionDigits: data?.token1?.coinDecimals,
+              })}
+              isLoading={isPending}
+            />
+            <TokenPairCardDivider />
+            <div className="flex text-sm font-medium text-typography-light">
+              <span className="flex-1">Fee Tier</span>
+              {data?.position && (
+                <PositionFeeBadge
+                  position={data?.position}
+                  className="p-0 bg-transparent text-initial"
+                />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <PriceRangeSummary />
       <div className="flex flex-col gap-4 mt-4">
-        <TokenLiquidityBlock
+        {/* <TokenLiquidityBlock
           token0={token0}
           token1={token1}
           feeTier={feeTier}
@@ -111,40 +177,45 @@ export const ContentSection = () => {
           token0Balance={token0Balance}
           token1Balance={token1Balance}
           handleInputChange={handleInputChange}
-        />
+        /> */}
         <div className="flex w-full gap-4">
           <div className="hidden md:block md:w-1/2" />
           <div className="w-full md:w-1/2">
-            {!validPoolInputs && (
+            {(!amount0.validation.isValid || !amount1.validation.isValid) && (
               <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-surface-1 mt-2">
-                {buttonText}
+                :-(
               </div>
             )}
-            {token0 && token1 && validPoolInputs && (
-              <ConfirmationModal
-                open={modalOpen}
-                buttonText={"Add liquidity"}
-                actionButtonText={
-                  status !== TransactionStatus.IDLE ? "Close" : "Add liquidity"
-                }
-                showOpenButton={true}
-                handleOpenModal={() => setModalOpen(true)}
-                handleModalActionButton={handleModalActionButton}
-                handleCloseModal={handleCloseModal}
-                title={"Add liquidity"}
-              >
-                <PoolTransactionSteps
+            {data?.token0 &&
+              data?.token1 &&
+              amount0.validation.isValid &&
+              amount1.validation.isValid && (
+                <ConfirmationModal
+                  open={modalOpen}
+                  buttonText={"Add liquidity"}
+                  actionButtonText={
+                    status !== TransactionStatus.IDLE
+                      ? "Close"
+                      : "Add liquidity"
+                  }
+                  showOpenButton={true}
+                  handleOpenModal={() => setModalOpen(true)}
+                  handleModalActionButton={handleModalActionButton}
+                  handleCloseModal={handleCloseModal}
+                  title={"Add liquidity"}
+                >
+                  {/* <PoolTransactionSteps
                   status={status}
                   tokens={[token0, token1]}
                   addLiquidityInputValues={[input0, input1]}
                   hash={hash}
                   message={error || ""}
-                />
-              </ConfirmationModal>
-            )}
+                /> */}
+                </ConfirmationModal>
+              )}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

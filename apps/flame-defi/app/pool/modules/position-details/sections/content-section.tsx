@@ -10,7 +10,10 @@ import { Button, Card, CardContent, Switch } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
 import { PriceRangeSummary } from "pool/components/price-range-summary";
-import { TokenPairCard } from "pool/components/token-pair-card";
+import {
+  TokenPairCard,
+  TokenPairCardDivider,
+} from "pool/components/token-pair-card";
 import { TransactionSummary } from "pool/components/transaction-summary";
 import { TransactionType } from "pool/components/transaction-summary/transaction-summary.types";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
@@ -103,7 +106,7 @@ export const ContentSection = () => {
             })}
             isLoading={isPending}
           />
-          <hr className="border-t border-stroke-default my-5" />
+          <TokenPairCardDivider />
           <TokenPairCard
             title={
               <div className="flex items-center justify-between h-5">
