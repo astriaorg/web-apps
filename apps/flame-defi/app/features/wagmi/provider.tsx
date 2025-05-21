@@ -34,9 +34,5 @@ export function WagmiProvider({ children }: { children: ReactNode }) {
     });
   }, [chains, transports]);
 
-  return (
-    <Provider config={wagmiConfig}>
-      {children}
-    </Provider>
-  );
+  return <Provider config={wagmiConfig}>{children}</Provider>;
 }

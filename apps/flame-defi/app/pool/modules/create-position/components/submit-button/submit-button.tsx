@@ -7,7 +7,10 @@ import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { Environment, useAstriaChainData, useConfig } from "config";
-import { CreateAndInitializePoolIfNecessaryAndMintParams, useAstriaWallet } from "features/evm-wallet";
+import {
+  CreateAndInitializePoolIfNecessaryAndMintParams,
+  useAstriaWallet,
+} from "features/evm-wallet";
 import { getMaxBigInt } from "features/evm-wallet/services/services.utils";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";

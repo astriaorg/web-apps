@@ -37,6 +37,12 @@ export const AstriaWalletContextProvider: React.FC<{
     [connectOrCreateWallet],
   );
 
+  const disconnectWallet = useCallback(async () => {
+    disconnect();
+    // FIXME - do we want to logout the privy user here too?
+    await logout();
+  }, [disconnect, logout]);
+
   const {
     status: nativeBalanceStatus,
     data: nativeBalance,
@@ -83,7 +89,7 @@ export const AstriaWalletContextProvider: React.FC<{
     <AstriaWalletContext.Provider
       value={{
         connectWallet,
-        disconnectWallet: disconnect,
+        disconnectWallet,
         accountAddress: userAccount.address ?? null,
         chains: Object.values(astriaChains),
         nativeTokenBalance,

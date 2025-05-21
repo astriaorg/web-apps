@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 
 import { AstriaLogo } from "@repo/ui/logos";
-import { WalletInterstitial } from "components/connect-wallet";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
 
