@@ -47,8 +47,7 @@ export const ContentSection = () => {
   const handleOpenConfirmationModal = useCallback(() => {
     setIsConfirmationModalOpen(true);
     setStatus(TransactionStatus.IDLE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setStatus]);
 
   const handleSubmit = useCallback(async () => {
     if (!data || !address) {
@@ -76,7 +75,6 @@ export const ContentSection = () => {
     } catch {
       setStatus(TransactionStatus.FAILED);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     handleCloseConfirmationModal,
     collectFees,
@@ -85,6 +83,8 @@ export const ContentSection = () => {
     tokenId,
     chain,
     isCollectAsWrappedNative,
+    setHash,
+    setStatus,
   ]);
 
   return (
