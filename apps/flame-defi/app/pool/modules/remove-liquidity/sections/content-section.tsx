@@ -2,15 +2,15 @@
 
 import { useCallback } from "react";
 
-import { TXN_STATUS } from "@repo/flame-types";
+import { TransactionStatus } from "@repo/flame-types";
 import { Switch } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { PoolTxnSteps } from "pool/components";
+import { PoolTransactionSteps } from "pool/components";
 import {
   usePoolContext,
   usePoolPositionContext,
   useRemoveLiquidityPercentage,
-  useRemoveLiquidityTxn,
+  useRemoveLiquidityTransaction,
 } from "pool/hooks";
 
 import { TokenLiquidityBlock } from "../components";
@@ -19,8 +19,8 @@ import { RemoveAmountSlider } from "../components";
 export const ContentSection = () => {
   const { modalOpen, setModalOpen } = usePoolContext();
   const {
-    poolToken0,
-    poolToken1,
+    token0,
+    token1,
     isCollectAsWrappedNative,
     handleCollectAsWrappedNative,
     refreshPoolPosition,
@@ -31,47 +31,41 @@ export const ContentSection = () => {
     percentageToRemove,
     refreshLiquidityToRemove,
   } = useRemoveLiquidityPercentage();
-  const {
-    removeLiquidity,
-    txnHash,
-    txnStatus,
-    setTxnStatus,
-    errorText,
-    setErrorText,
-  } = useRemoveLiquidityTxn(
-    liquidityToRemove,
-    isCollectAsWrappedNative,
-    percentageToRemove,
-  );
+  const { hash, status, setStatus, error, setError, removeLiquidity } =
+    useRemoveLiquidityTransaction(
+      liquidityToRemove,
+      isCollectAsWrappedNative,
+      percentageToRemove,
+    );
   const poolContainsNativeOrWrappedToken =
-    poolToken0?.token.isNative ||
-    poolToken1?.token.isNative ||
-    poolToken0?.token.isWrappedNative ||
-    poolToken1?.token.isWrappedNative;
+    token0?.token.isNative ||
+    token1?.token.isNative ||
+    token0?.token.isWrappedNative ||
+    token1?.token.isWrappedNative;
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
-    setTxnStatus(TXN_STATUS.IDLE);
-    setErrorText(null);
+    setStatus(TransactionStatus.IDLE);
+    setError(null);
     refreshPoolPosition();
     refreshLiquidityToRemove();
     handleCollectAsWrappedNative(false);
   }, [
     setModalOpen,
-    setTxnStatus,
-    setErrorText,
+    setStatus,
+    setError,
     refreshPoolPosition,
     refreshLiquidityToRemove,
     handleCollectAsWrappedNative,
   ]);
 
   const handleModalActionButton = useCallback(() => {
-    if (txnStatus !== TXN_STATUS.IDLE) {
+    if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
       removeLiquidity();
     }
-  }, [handleCloseModal, removeLiquidity, txnStatus]);
+  }, [handleCloseModal, removeLiquidity, status]);
 
   return (
     <div className="flex flex-col flex-1 mt-0 md:mt-12">
@@ -103,7 +97,7 @@ export const ContentSection = () => {
               open={modalOpen}
               buttonText={"Remove liquidity"}
               actionButtonText={
-                txnStatus !== TXN_STATUS.IDLE ? "Close" : "Remove liquidity"
+                status !== TransactionStatus.IDLE ? "Close" : "Remove liquidity"
               }
               showOpenButton={true}
               handleOpenModal={() => setModalOpen(true)}
@@ -111,11 +105,11 @@ export const ContentSection = () => {
               handleCloseModal={handleCloseModal}
               title={"Remove liquidity"}
             >
-              <PoolTxnSteps
-                txnStatus={txnStatus}
-                poolTokens={liquidityToRemove}
-                txnHash={txnHash}
-                txnMsg={errorText ?? ""}
+              <PoolTransactionSteps
+                status={status}
+                tokens={liquidityToRemove}
+                hash={hash}
+                message={error ?? ""}
                 addLiquidityInputValues={null}
               />
             </ConfirmationModal>

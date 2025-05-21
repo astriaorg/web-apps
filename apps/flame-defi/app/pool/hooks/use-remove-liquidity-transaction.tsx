@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { TokenInputState, TransactionStatus } from "@repo/flame-types";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { useAstriaChainData, useConfig as useAppConfig } from "config";
 import {
@@ -13,41 +13,45 @@ import { PoolToken } from "pool/types";
 
 import { usePoolPositionContext } from ".";
 
-export const useRemoveLiquidityTxn = (
-  liquidityToRemove: PoolToken[],
+export const useRemoveLiquidityTransaction = (
+  tokens: PoolToken[],
   isCollectAsWrappedNative: boolean,
   percentageToRemove: number,
 ) => {
-  const { positionNftId, poolPosition } = usePoolPositionContext();
+  const { tokenId, position } = usePoolPositionContext();
   const { address } = useAccount();
-  const wagmiConfig = useConfig();
+  const config = useConfig();
   const { chain } = useAstriaChainData();
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
-  const [errorText, setErrorText] = useState<string | null>(null);
+
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
+  const [hash, setHash] = useState<Hash | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
+
   const { defaultSlippageTolerance } = useAppConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const { data: transactionData } = useWaitForTransactionReceipt({
-    hash: txnHash,
+    hash: hash,
   });
 
   useEffect(() => {
-    if (!txnHash) return;
+    if (!hash) return;
     if (transactionData?.status === "success") {
-      setTxnStatus(TXN_STATUS.SUCCESS);
+      setStatus(TransactionStatus.SUCCESS);
     } else if (transactionData?.status === "reverted") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction reverted");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction reverted.");
     } else if (transactionData?.status === "error") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction failed");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction failed.");
     }
-  }, [transactionData, txnHash, setTxnStatus]);
+  }, [transactionData, hash, setStatus]);
 
   const formatLiquidityToRemoveToTokenInputState = (
-    liquidityToRemove: PoolToken[],
+    tokens: PoolToken[],
   ): TokenInputState[] => {
-    return liquidityToRemove.map((data) => {
+    return tokens.map((data) => {
       const value = data.liquidity;
       return {
         token: data.token,
@@ -56,18 +60,17 @@ export const useRemoveLiquidityTxn = (
     });
   };
 
-  const tokenInputs =
-    formatLiquidityToRemoveToTokenInputState(liquidityToRemove);
+  const tokenInputs = formatLiquidityToRemoveToTokenInputState(tokens);
 
   const removeLiquidity = async () => {
     if (
       !address ||
-      !liquidityToRemove ||
-      liquidityToRemove.length === 0 ||
-      !positionNftId ||
+      !tokens ||
+      tokens.length === 0 ||
+      !tokenId ||
       !tokenInputs[0] ||
       !tokenInputs[1] ||
-      !poolPosition
+      !position
     ) {
       console.warn("Missing required data for removing liquidity");
       return;
@@ -75,22 +78,21 @@ export const useRemoveLiquidityTxn = (
 
     const rawLiquidityToRemove =
       percentageToRemove === 100
-        ? poolPosition.liquidity
-        : (poolPosition.liquidity * BigInt(Math.round(percentageToRemove))) /
-          100n;
+        ? position.liquidity
+        : (position.liquidity * BigInt(Math.round(percentageToRemove))) / 100n;
 
     try {
-      setTxnStatus(TXN_STATUS.PENDING);
+      setStatus(TransactionStatus.PENDING);
 
       const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
-          wagmiConfig,
+          config,
           chain.contracts.nonfungiblePositionManager.address,
         );
 
       const params =
         NonfungiblePositionManagerService.getDecreaseLiquidityAndCollectParams(
-          positionNftId,
+          tokenId,
           rawLiquidityToRemove,
           tokenInputs[0],
           tokenInputs[1],
@@ -100,29 +102,29 @@ export const useRemoveLiquidityTxn = (
           isCollectAsWrappedNative,
         );
 
-      const tx =
+      const response =
         await nonfungiblePositionService.decreaseLiquidityAndCollect(params);
 
-      setTxnHash(tx);
+      setHash(response);
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setTxnStatus(TXN_STATUS.FAILED);
-        setErrorText("Transaction rejected");
+        setStatus(TransactionStatus.FAILED);
+        setError("Transaction rejected.");
       } else {
         console.warn(error);
-        setTxnStatus(TXN_STATUS.FAILED);
-        setErrorText("Error removing liquidity");
+        setStatus(TransactionStatus.FAILED);
+        setError("Error removing liquidity.");
       }
     }
   };
 
   return {
+    status,
+    hash,
+    error,
+    setStatus,
+    setError,
     removeLiquidity,
-    txnStatus,
-    txnHash,
-    errorText,
-    setTxnStatus,
-    setErrorText,
   };
 };

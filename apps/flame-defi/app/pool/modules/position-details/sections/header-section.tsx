@@ -12,16 +12,9 @@ import { ROUTES } from "../../../constants/routes";
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const {
-    poolToken0,
-    poolToken1,
-    feeTier,
-    isReversedPoolTokens,
-    isPositionClosed,
-  } = usePoolPositionContext();
-  const poolTokens = isReversedPoolTokens
-    ? [poolToken1, poolToken0]
-    : [poolToken0, poolToken1];
+  const { token0, token1, feeTier, isReversedPoolTokens, isPositionClosed } =
+    usePoolPositionContext();
+  const tokens = isReversedPoolTokens ? [token1, token0] : [token0, token1];
 
   return (
     <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
@@ -38,27 +31,26 @@ export const HeaderSection = () => {
         </div>
         <div className="flex flex-col space-y-3">
           <Skeleton
-            isLoading={!poolTokens[0]?.token && !poolTokens[1]?.token}
+            isLoading={!tokens[0]?.token && !tokens[1]?.token}
             className="w-full h-[40px]"
           >
-            {poolTokens[0]?.token && poolTokens[1]?.token && (
+            {tokens[0]?.token && tokens[1]?.token && (
               <div className="flex items-center space-x-2">
                 <MultiTokenIcon
                   symbols={[
-                    poolTokens[0].token.coinDenom,
-                    poolTokens[1].token.coinDenom,
+                    tokens[0].token.coinDenom,
+                    tokens[1].token.coinDenom,
                   ]}
                   size={24}
                 />
                 <h1 className="text-3xl/8">
-                  {poolTokens[0].token.coinDenom}/
-                  {poolTokens[1].token.coinDenom}
+                  {tokens[0].token.coinDenom}/{tokens[1].token.coinDenom}
                 </h1>
               </div>
             )}
           </Skeleton>
           <Skeleton
-            isLoading={!poolTokens[0]?.token && !poolTokens[1]?.token}
+            isLoading={!tokens[0]?.token && !tokens[1]?.token}
             className="w-full h-[20px]"
           >
             <div className="flex space-x-2">

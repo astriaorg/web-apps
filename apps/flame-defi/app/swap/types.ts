@@ -1,6 +1,10 @@
 import { type Hash } from "viem";
 
-import { EvmCurrency, TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import {
+  EvmCurrency,
+  TokenInputState,
+  type TransactionStatus,
+} from "@repo/flame-types";
 
 export enum SWAP_INPUT_ID {
   INPUT_ONE = "input_one",
@@ -24,16 +28,16 @@ export interface SwapPairProps {
   label: string;
 }
 
-export interface TxnStepsProps {
+export interface TransactionStepsProps {
   expectedOutputFormatted?: string;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
+  token0: TokenInputState;
+  token1: TokenInputState;
   isTiaWtia: boolean;
-  txnHash?: Hash;
-  txnMsg?: string;
+  hash?: Hash;
+  message?: string;
 }
 
-export interface TxnDetailsProps extends TxnStepsProps {
+export interface TransactionDetailsProps extends TransactionStepsProps {
   priceImpact?: string;
   minimumReceived?: string;
   oneToOneQuote: OneToOneQuoteProps;
@@ -42,7 +46,7 @@ export interface TxnDetailsProps extends TxnStepsProps {
 }
 
 export interface TransactionInfo {
-  txnQuoteDataLoading: boolean;
+  transactionQuoteDataLoading: boolean;
   gasUseEstimateUSD: string;
   formattedGasUseEstimateUSD: string;
   expectedOutputBigInt: bigint;
@@ -52,13 +56,13 @@ export interface TransactionInfo {
   frontendFeeEstimate?: string;
 }
 
-export interface SwapTxnStepsProps {
-  txnInfo: TransactionInfo;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
-  txnStatus?: TXN_STATUS;
-  txnHash?: Hash;
-  txnMsg?: string;
+export interface SwapTransactionStepsProps {
+  info: TransactionInfo;
+  token0: TokenInputState;
+  token1: TokenInputState;
+  status?: TransactionStatus;
+  hash?: Hash;
+  message?: string;
   isTiaWtia: boolean;
   oneToOneQuote: OneToOneQuoteProps;
   isQuoteLoading: boolean;
@@ -73,5 +77,5 @@ export interface SwapInputProps extends SwapPairProps {
   ) => void;
   availableTokens: EvmCurrency[];
   label: string;
-  txnQuoteLoading: boolean;
+  isQuoteLoading: boolean;
 }

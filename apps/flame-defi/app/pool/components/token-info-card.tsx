@@ -4,32 +4,31 @@ import { Badge, Skeleton, TokenIcon } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
 import { PoolToken } from "pool/types";
 
-export function TokenInfoCard({
-  poolToken0,
-  poolToken1,
-  showLiquidity = false,
-  showLiquidityPercentage = false,
-  className,
-}: {
-  poolToken0: PoolToken | null;
-  poolToken1: PoolToken | null;
+interface TokenInfoCardProps {
+  token0: PoolToken | null;
+  token1: PoolToken | null;
   showLiquidity?: boolean;
   showLiquidityPercentage?: boolean;
   className?: string;
-}) {
+}
+
+export const TokenInfoCard = ({
+  token0,
+  token1,
+  showLiquidity = false,
+  showLiquidityPercentage = false,
+  className,
+}: TokenInfoCardProps) => {
   const { formatNumber } = useIntl();
 
   return (
     <div className={cn("flex-1 bg-surface-1 rounded-lg p-6", className)}>
       <div className="flex flex-col space-y-4">
-        <Skeleton
-          className="w-full h-[64px]"
-          isLoading={!poolToken0 || !poolToken1}
-        >
+        <Skeleton className="w-full h-[64px]" isLoading={!token0 || !token1}>
           <div className="flex flex-col gap-4">
-            {poolToken0 &&
-              poolToken1 &&
-              [poolToken0, poolToken1].map(
+            {token0 &&
+              token1 &&
+              [token0, token1].map(
                 (
                   { token, liquidity, unclaimedFees, liquidityPercentage },
                   index,
@@ -68,4 +67,4 @@ export function TokenInfoCard({
       </div>
     </div>
   );
-}
+};

@@ -69,7 +69,7 @@ export const AstriaWalletContextProvider: React.FC<{
     [nativeToken, nativeTokenBalance?.value],
   );
 
-  const { quote, loading: quoteLoading } = useUsdQuote(quoteInput);
+  const { quote, isLoading: quoteLoading } = useUsdQuote(quoteInput);
 
   const usdcToNativeQuote = useMemo<Balance>(() => {
     if (!quote) {

@@ -772,21 +772,8 @@ export const TRADE_TYPE_OPPOSITES: Record<TRADE_TYPE, TRADE_TYPE> = {
   [TRADE_TYPE.EXACT_OUT]: TRADE_TYPE.EXACT_IN,
 };
 
-/**
- * @deprecated
- * Use `TransactionStatus` instead.
- *
- * TODO: Refactor.
- */
-export enum TXN_STATUS {
-  IDLE = "idle",
-  PENDING = "pending",
-  SUCCESS = "success",
-  FAILED = "failed",
-}
-
-export type TxnFailedProps = {
-  txnMsg?: string;
+export type TransactionFailedProps = {
+  message?: string;
 };
 
 export type Balance = {

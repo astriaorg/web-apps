@@ -15,7 +15,7 @@ export function SwapInput({
   onInputChange,
   onTokenSelect,
   oppositeToken,
-  txnQuoteLoading,
+  isQuoteLoading,
 }: SwapInputProps) {
   const { locale, formatNumber } = useIntl();
   const { isConnected } = useAccount();
@@ -62,7 +62,7 @@ export function SwapInput({
       <div className="text-base font-medium text-grey-light">{label}</div>
       <div className="flex justify-between items-center">
         <Skeleton
-          isLoading={txnQuoteLoading && inputToken.isQuoteValue}
+          isLoading={isQuoteLoading && inputToken.isQuoteValue}
           className="rounded-sm w-[45%] sm:max-w-[62%] h-[40px] mt-3"
         >
           <input
@@ -116,7 +116,7 @@ export function SwapInput({
       </div>
       <div>
         <Skeleton
-          isLoading={usdQuote.loading || txnQuoteLoading}
+          isLoading={usdQuote.isLoading || isQuoteLoading}
           className="rounded-sm w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">

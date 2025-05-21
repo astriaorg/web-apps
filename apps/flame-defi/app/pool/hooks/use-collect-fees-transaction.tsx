@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { type Hash } from "viem";
 import { useAccount, useConfig, useWaitForTransactionReceipt } from "wagmi";
 
-import { TokenInputState, TXN_STATUS } from "@repo/flame-types";
+import { TokenInputState, TransactionStatus } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
 import {
   createNonfungiblePositionManagerService,
@@ -12,38 +12,40 @@ import { PoolToken } from "pool/types";
 
 import { usePoolPositionContext } from ".";
 
-export const useCollectFeesTxn = (
-  poolTokens: PoolToken[],
+export const useCollectFeesTransaction = (
+  tokens: PoolToken[],
   isCollectAsWrappedNative: boolean,
 ) => {
-  const { positionNftId } = usePoolPositionContext();
+  const { tokenId } = usePoolPositionContext();
   const { address } = useAccount();
-  const wagmiConfig = useConfig();
+  const config = useConfig();
   const { chain } = useAstriaChainData();
-  const [txnStatus, setTxnStatus] = useState<TXN_STATUS>(TXN_STATUS.IDLE);
-  const [txnHash, setTxnHash] = useState<Hash | undefined>(undefined);
-  const [errorText, setErrorText] = useState<string | null>(null);
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
+  const [hash, setHash] = useState<Hash | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
   const { data: transactionData } = useWaitForTransactionReceipt({
-    hash: txnHash,
+    hash: hash,
   });
 
   useEffect(() => {
-    if (!txnHash) return;
+    if (!hash) return;
     if (transactionData?.status === "success") {
-      setTxnStatus(TXN_STATUS.SUCCESS);
+      setStatus(TransactionStatus.SUCCESS);
     } else if (transactionData?.status === "reverted") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction reverted");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction reverted.");
     } else if (transactionData?.status === "error") {
-      setTxnStatus(TXN_STATUS.FAILED);
-      setErrorText("Transaction failed");
+      setStatus(TransactionStatus.FAILED);
+      setError("Transaction failed.");
     }
-  }, [transactionData, txnHash, setTxnStatus]);
+  }, [transactionData, hash, setStatus]);
 
   const formatFeesToCollectToTokenInputState = (
-    poolTokens: PoolToken[],
+    tokens: PoolToken[],
   ): TokenInputState[] => {
-    return poolTokens.map((data) => {
+    return tokens.map((data) => {
       return {
         token: data.token,
         value: data.unclaimedFees?.toString() || "0",
@@ -51,13 +53,13 @@ export const useCollectFeesTxn = (
     });
   };
 
-  const tokenInputs = formatFeesToCollectToTokenInputState(poolTokens);
+  const tokenInputs = formatFeesToCollectToTokenInputState(tokens);
 
   const collectFees = async () => {
     if (
       !address ||
-      poolTokens.length === 0 ||
-      !positionNftId ||
+      tokens.length === 0 ||
+      !tokenId ||
       !tokenInputs[0] ||
       !tokenInputs[1]
     ) {
@@ -66,17 +68,17 @@ export const useCollectFeesTxn = (
     }
 
     try {
-      setTxnStatus(TXN_STATUS.PENDING);
+      setStatus(TransactionStatus.PENDING);
       const nonfungiblePositionService =
         createNonfungiblePositionManagerService(
-          wagmiConfig,
+          config,
           chain.contracts.nonfungiblePositionManager.address,
         );
 
       const collectFeesParams =
         NonfungiblePositionManagerService.getCollectFeesParams(
           chain,
-          positionNftId,
+          tokenId,
           tokenInputs[0],
           tokenInputs[1],
           address,
@@ -85,26 +87,26 @@ export const useCollectFeesTxn = (
 
       const tx =
         await nonfungiblePositionService.collectFees(collectFeesParams);
-      setTxnHash(tx);
+      setHash(tx);
     } catch (error) {
       if (error instanceof Error && error.message.includes("User rejected")) {
         console.warn(error);
-        setErrorText("Transaction rejected");
-        setTxnStatus(TXN_STATUS.FAILED);
+        setError("Transaction rejected.");
+        setStatus(TransactionStatus.FAILED);
       } else {
         console.warn(error);
-        setErrorText("Error collecting fees");
-        setTxnStatus(TXN_STATUS.FAILED);
+        setError("Error collecting fees.");
+        setStatus(TransactionStatus.FAILED);
       }
     }
   };
 
   return {
-    txnStatus,
-    txnHash,
-    errorText,
-    setTxnStatus,
-    setErrorText,
+    status,
+    hash,
+    error,
+    setStatus,
+    setError,
     collectFees,
   };
 };

@@ -1,5 +1,5 @@
-import { PoolPositionDetails } from "pool/modules/pool-position-details/pool-position-details";
+import { Page as PositionDetailsPage } from "pool/modules/position-details";
 
-export default function PoolPositionDetailsPage() {
-  return <PoolPositionDetails />;
+export default function Page() {
+  return <PositionDetailsPage />;
 }

@@ -19,29 +19,28 @@ import { TransactionInfo } from "../types";
 // quoteGas values are the values we display in top token input field.
 // They are not the calculated output values we need
 
-const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
-  const { quoteError, getQuote } = useGetQuote();
-  const [txnQuote, setTxnQuote] = useState<GetQuoteResult | null>(null);
-  const [txnQuoteLoading, setTxnQuoteLoading] = useState(false);
+const useTransactionQuote = (
+  inputOne: TokenInputState,
+  inputTwo: TokenInputState,
+) => {
+  const { error, getQuote } = useGetQuote();
+  const [quote, setQuote] = useState<GetQuoteResult | null>(null);
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
 
-  const fetchTxnQuote = useCallback(async () => {
-    setTxnQuoteLoading(true);
-    const txnQuoteData = await getQuote(
-      TRADE_TYPE.EXACT_IN,
-      inputOne,
-      inputTwo,
-    );
-    if (txnQuoteData) {
-      setTxnQuote(txnQuoteData);
+  const fetchQuote = useCallback(async () => {
+    setIsQuoteLoading(true);
+    const quote = await getQuote(TRADE_TYPE.EXACT_IN, inputOne, inputTwo);
+    if (quote) {
+      setQuote(quote);
     }
-    setTxnQuoteLoading(false);
+    setIsQuoteLoading(false);
   }, [inputOne, inputTwo, getQuote]);
 
   return {
-    txnQuote,
-    txnQuoteLoading,
-    fetchTxnQuote,
-    quoteError,
+    quote,
+    isQuoteLoading,
+    fetchQuote,
+    error,
   };
 };
 
@@ -49,8 +48,8 @@ const useTxnQuote = (inputOne: TokenInputState, inputTwo: TokenInputState) => {
  * Calculates the price impact
  * Returns the price impact as a decimal (e.g. -0.002 means -0.2%).
  */
-const calculatePriceImpact = (txnQuoteData: GetQuoteResult): number => {
-  const hops = txnQuoteData.route?.[0];
+const calculatePriceImpact = (quote: GetQuoteResult): number => {
+  const hops = quote.route?.[0];
 
   if (!hops) {
     return 0;
@@ -100,10 +99,10 @@ const calculatePriceImpact = (txnQuoteData: GetQuoteResult): number => {
   }
 
   // Compute the overall execution price:
-  // - txnQuoteData.amountDecimals: initial input amount
-  // - txnQuoteData.quoteDecimals: final output amount
-  const overallInput = parseFloat(txnQuoteData.amountDecimals);
-  const overallOutput = parseFloat(txnQuoteData.quoteDecimals);
+  // - quote.amountDecimals: initial input amount
+  // - quote.quoteDecimals: final output amount
+  const overallInput = parseFloat(quote.amountDecimals);
+  const overallOutput = parseFloat(quote.quoteDecimals);
   const overallExecutionPrice = overallOutput / overallInput;
 
   // Price impact is defined as:
@@ -135,43 +134,45 @@ const calculateMinimumReceived = (
   );
 };
 
-export const useTxnInfo = ({
+export const useTransactionInfo = ({
   quote,
-  topToken,
-  bottomToken,
+  token0,
+  token1,
   tradeType,
   validSwapInputs,
 }: {
   quote: GetQuoteResult | null;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
+  token0: TokenInputState;
+  token1: TokenInputState;
   tradeType: TRADE_TYPE;
   validSwapInputs: boolean;
 }): TransactionInfo => {
   const { formatNumber } = useIntl();
-  const { txnQuote, txnQuoteLoading, fetchTxnQuote } = useTxnQuote(
-    topToken,
-    bottomToken,
-  );
+  const {
+    quote: transactionQuote,
+    isQuoteLoading: isQuoteLoading,
+    fetchQuote,
+  } = useTransactionQuote(token0, token1);
   const swapSlippageTolerance = getSlippageTolerance();
 
   useEffect(() => {
     if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
-      void fetchTxnQuote();
+      void fetchQuote();
     }
-  }, [tradeType, fetchTxnQuote, validSwapInputs]);
+  }, [tradeType, fetchQuote, validSwapInputs]);
 
-  const txnQuoteData = tradeType === TRADE_TYPE.EXACT_IN ? quote : txnQuote;
-  const priceImpact = txnQuoteData ? calculatePriceImpact(txnQuoteData) : 0;
+  const quoteData =
+    tradeType === TRADE_TYPE.EXACT_IN ? quote : transactionQuote;
+  const priceImpact = quoteData ? calculatePriceImpact(quoteData) : 0;
 
   // calculate and format the fee in the output token
   const frontendFeeEstimate =
-    txnQuoteData && bottomToken.token
+    quoteData && token1.token
       ? formatNumber(
           parseFloat(
             formatUnits(
-              BigInt(txnQuoteData.quoteGasAdjusted || "0"),
-              bottomToken.token.coinDecimals,
+              BigInt(quoteData.quoteGasAdjusted || "0"),
+              token1.token.coinDecimals,
             ),
           ) * 0.0025, // TODO - get fee percentage from config
           { minimumFractionDigits: 6, maximumFractionDigits: 6 },
@@ -179,18 +180,18 @@ export const useTxnInfo = ({
       : undefined;
 
   return {
-    txnQuoteDataLoading: txnQuoteLoading,
-    gasUseEstimateUSD: txnQuoteData?.gasUseEstimateUSD || "0",
+    transactionQuoteDataLoading: isQuoteLoading,
+    gasUseEstimateUSD: quoteData?.gasUseEstimateUSD || "0",
     formattedGasUseEstimateUSD: formatNumber(
-      parseFloat(txnQuoteData?.gasUseEstimateUSD || "0"),
+      parseFloat(quoteData?.gasUseEstimateUSD || "0"),
       { minimumFractionDigits: 4, maximumFractionDigits: 4 },
     ),
-    expectedOutputBigInt: BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
+    expectedOutputBigInt: BigInt(quoteData?.quoteGasAdjusted || "0"),
     expectedOutputFormatted: formatNumber(
       parseFloat(
         formatUnits(
-          BigInt(txnQuoteData?.quoteGasAdjusted || "0"),
-          bottomToken.token?.coinDecimals || 18,
+          BigInt(quoteData?.quoteGasAdjusted || "0"),
+          token1.token?.coinDecimals || 18,
         ),
       ),
       { minimumFractionDigits: 6, maximumFractionDigits: 6 },
@@ -199,10 +200,10 @@ export const useTxnInfo = ({
       priceImpact !== 0
         ? `${formatNumber(priceImpact, { minimumFractionDigits: 2, maximumFractionDigits: 2, style: "percent" })}`
         : "0.00",
-    minimumReceived: txnQuoteData
+    minimumReceived: quoteData
       ? formatNumber(
           parseFloat(
-            calculateMinimumReceived(txnQuoteData, swapSlippageTolerance),
+            calculateMinimumReceived(quoteData, swapSlippageTolerance),
           ),
           { minimumFractionDigits: 6, maximumFractionDigits: 6 },
         )
