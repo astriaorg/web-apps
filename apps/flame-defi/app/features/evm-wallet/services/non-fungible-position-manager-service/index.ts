@@ -23,6 +23,7 @@ import {
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
 export interface CreateAndInitializePoolIfNecessaryAndMintParams {
+  // TODO: Change this back to chainId since we removed token wrapping/unwrapping to the currency class level.
   chain: AstriaChain;
   token0: EvmCurrency;
   token1: EvmCurrency;
@@ -61,12 +62,14 @@ export interface MintParams {
 
 export interface IncreaseLiquidityParams {
   chainId: number;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  tokenId: string;
   amount0Desired: bigint;
   amount1Desired: bigint;
   amount0Min: bigint;
   amount1Min: bigint;
   deadline: number;
-  value: bigint;
 }
 
 export interface DecreaseLiquidityParams {
@@ -105,6 +108,7 @@ export interface CollectFeesParams {
 }
 
 export interface CollectFeesV2Params {
+  // TODO: Change back to chainId.
   chain: AstriaChain;
   tokenId: string;
   token0: EvmCurrency;
@@ -231,7 +235,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     let sortedAmount0Min = amount0Min;
     let sortedAmount1Min = amount1Min;
 
-    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
       sortedToken0 = token1;
       sortedToken1 = token0;
       sortedToken0Address = token1Address;
@@ -315,7 +319,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     let sortedToken1 = token1;
 
     // Sorted tokens should match the order of tokens in the position.
-    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
       sortedToken0 = token1;
       sortedToken1 = token0;
     }
@@ -389,94 +393,56 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   /**
    * Increases liquidity for an existing position.
    */
-  async increaseLiquidity(
-    tokenId: string,
-    {
-      chainId,
-      amount0Desired,
-      amount1Desired,
-      amount0Min,
-      amount1Min,
-      deadline,
-      value,
-    }: IncreaseLiquidityParams,
-  ): Promise<Hash> {
+  async increaseLiquidity({
+    chainId,
+    token0,
+    token1,
+    tokenId,
+    amount0Desired,
+    amount1Desired,
+    amount0Min,
+    amount1Min,
+    deadline,
+  }: IncreaseLiquidityParams): Promise<Hash> {
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+    let sortedAmount0Desired = amount0Desired;
+    let sortedAmount1Desired = amount1Desired;
+    let sortedAmount0Min = amount0Min;
+    let sortedAmount1Min = amount1Min;
+
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+      sortedAmount0Desired = amount1Desired;
+      sortedAmount1Desired = amount0Desired;
+      sortedAmount0Min = amount1Min;
+      sortedAmount1Min = amount0Min;
+    }
+
+    let value: bigint = 0n;
+    if (sortedToken0.isNative) {
+      value = sortedAmount0Desired;
+    }
+    if (sortedToken1.isNative) {
+      value = sortedAmount1Desired;
+    }
+
     return await this.writeContractMethod(
       chainId,
       "increaseLiquidity",
       [
         {
           tokenId: BigInt(tokenId),
-          amount0Desired,
-          amount1Desired,
-          amount0Min,
-          amount1Min,
+          amount0Desired: sortedAmount0Desired,
+          amount1Desired: sortedAmount1Desired,
+          amount0Min: sortedAmount0Min,
+          amount1Min: sortedAmount1Min,
           deadline,
         },
       ],
       value,
     );
-  }
-
-  public static getIncreaseLiquidityParams(
-    tokenInput0: TokenInputState,
-    tokenInput1: TokenInputState,
-    slippageTolerance: number,
-    chain: AstriaChain,
-  ): IncreaseLiquidityParams {
-    const token0Address = tokenInput0.token?.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : tokenInput0.token?.erc20ContractAddress;
-    const token1Address = tokenInput1.token?.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : tokenInput1.token?.erc20ContractAddress;
-
-    if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing.");
-    }
-
-    const shouldReverseOrder = needToReverseTokenOrder(
-      token0Address,
-      token1Address,
-    );
-
-    let tokens = [
-      tokenInputStateToTokenAmount(tokenInput0, chain.chainId),
-      tokenInputStateToTokenAmount(tokenInput1, chain.chainId),
-    ];
-    if (shouldReverseOrder) {
-      tokens = tokens.reverse();
-    }
-
-    if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set.");
-    }
-
-    let value = 0n;
-    const nativeTokenInput = [tokenInput0, tokenInput1].find(
-      (tInput) => tInput.token?.isNative,
-    );
-    if (nativeTokenInput) {
-      value =
-        tokenInputStateToTokenAmount(
-          nativeTokenInput,
-          chain.chainId,
-        )?.amountAsBigInt() ?? 0n;
-    }
-
-    return {
-      chainId: chain.chainId,
-      amount0Desired: tokens[0].amountAsBigInt(),
-      amount1Desired: tokens[1].amountAsBigInt(),
-      amount0Min: tokens[0]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      amount1Min: tokens[1]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      deadline: Math.floor(Date.now() / 1000) + 10 * 60,
-      value,
-    };
   }
 
   public static getDecreaseLiquidityParams(

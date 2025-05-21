@@ -1,12 +1,22 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
+import { parseUnits } from "viem";
+import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Card, CardContent, useTokenAmountInput } from "@repo/ui/components";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import {
+  Button,
+  Card,
+  CardContent,
+  useTokenAmountInput,
+} from "@repo/ui/components";
+import { getSlippageTolerance } from "@repo/ui/utils";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
+import { useAstriaChainData, useConfig } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
+import { getMaxBigInt } from "features/evm-wallet/services";
 import {
   PositionFeeBadge,
   PositionSummaryCard,
@@ -17,30 +27,28 @@ import {
   TokenPairCardDivider,
 } from "pool/components/token-pair-card";
 import {
-  useAddLiquidityTransaction,
-  usePoolContext,
-  usePoolPositionContext,
-} from "pool/hooks";
+  TransactionSummary,
+  TransactionType,
+} from "pool/components/transaction-summary";
+import { useAddLiquidity } from "pool/hooks/use-add-liquidity";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
-import { POOL_INPUT_ID } from "pool/types";
+import { TokenAmountInput } from "pool/modules/add-liquidity/components/token-amount-input";
 
 // TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
   const { formatNumber } = useIntl();
-  const { modalOpen, setModalOpen } = usePoolContext();
-  const {
-    // token0,
-    // token1,
-    feeTier,
-    currentPrice,
-    selectedSymbol,
-    handleReverseTokenData,
-    refreshPoolPosition,
-  } = usePoolPositionContext();
+  const { chain } = useAstriaChainData();
+  const { address } = useAccount();
+  const { defaultSlippageTolerance } = useConfig();
+  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
-  const { tokenId, invert } = usePoolPositionContextV2();
+  const { tokenId, invert, hash, setHash, error, setError, status, setStatus } =
+    usePoolPositionContextV2();
   const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
 
   const { balance: token0Balance, isLoading: isLoadingToken0Balance } =
     useEvmCurrencyBalance(data?.token0);
@@ -69,61 +77,90 @@ export const ContentSection = () => {
       : undefined,
   });
 
-  const { status, hash, error, setError, setStatus, addLiquidity } =
-    useAddLiquidityTransaction(amount0.value, amount1.value);
+  const { addLiquidity } = useAddLiquidity();
 
-  const getTokenCalculatedTokenValue = useCallback(
-    (value: string, sourceId: POOL_INPUT_ID, coinDecimals: number) => {
-      if (!value || isNaN(Number(value)) || !currentPrice) return "";
-      const numericValue = parseFloat(value);
-      const numericPrice = parseFloat(currentPrice);
-
-      const tokenValue =
-        sourceId === POOL_INPUT_ID.INPUT_ZERO
-          ? numericValue * numericPrice
-          : numericValue / numericPrice;
-
-      return tokenValue.toFixed(coinDecimals);
-    },
-    [currentPrice],
-  );
-
-  const handleInputChange = useCallback(
-    (value: string, id: POOL_INPUT_ID, coinDecimals?: number) => {
-      if (!coinDecimals) return;
-      setError(null);
-      if (id === POOL_INPUT_ID.INPUT_ZERO) {
-        onInput0({ value });
-        onInput1({
-          value: getTokenCalculatedTokenValue(value, id, coinDecimals),
-        });
-      } else {
-        onInput1({ value });
-        onInput0({
-          value: getTokenCalculatedTokenValue(value, id, coinDecimals),
-        });
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [getTokenCalculatedTokenValue, setError],
-  );
-
-  const handleCloseModal = useCallback(() => {
-    setModalOpen(false);
+  const handleCloseConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(false);
     setStatus(TransactionStatus.IDLE);
-    onInput0({ value: "" });
-    onInput1({ value: "" });
-    refreshPoolPosition();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setModalOpen, setStatus, refreshPoolPosition]);
+    refetch();
+    setError(undefined);
+  }, [refetch, setIsConfirmationModalOpen, setStatus, setError]);
 
-  const handleModalActionButton = useCallback(() => {
-    if (status !== TransactionStatus.IDLE) {
-      handleCloseModal();
-    } else {
-      void addLiquidity();
+  const handleOpenConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(true);
+    setStatus(TransactionStatus.IDLE);
+  }, [setStatus]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!data || !address) {
+      handleCloseConfirmationModal();
+      return;
     }
-  }, [handleCloseModal, addLiquidity, status]);
+
+    const { token0, token1 } = data;
+
+    try {
+      setStatus(TransactionStatus.PENDING);
+
+      const amount0Desired = parseUnits(
+        amount0.value || "0",
+        token0.coinDecimals,
+      );
+      const amount1Desired = parseUnits(
+        amount1.value || "0",
+        token1.coinDecimals,
+      );
+
+      /**
+       * TODO: Use slippage calculation in `TokenAmount` class.
+       * Too bulky to use here for now, wait until the class is refactored to implement it.
+       */
+      const calculateAmountWithSlippage = (amount: bigint) => {
+        // Convert slippage to basis points (1 bp = 0.01%)
+        // Example: 0.1% = 10 basis points
+        const basisPoints = Math.round(slippageTolerance * 100);
+
+        // Calculate: amount * (10000 - basisPoints) / 10000
+        return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
+      };
+
+      const amount0Min = calculateAmountWithSlippage(amount0Desired);
+      const amount1Min = calculateAmountWithSlippage(amount1Desired);
+
+      // 20 minute deadline.
+      // TODO: Add this to settings.
+      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+      const hash = await addLiquidity({
+        chainId: chain.chainId,
+        token0,
+        token1,
+        tokenId,
+        amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
+        amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
+        amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
+        amount1Min: getMaxBigInt(amount1Min, BigInt(1)),
+        deadline,
+      });
+
+      setHash(hash);
+      setStatus(TransactionStatus.SUCCESS);
+    } catch {
+      setStatus(TransactionStatus.FAILED);
+    }
+  }, [
+    data,
+    amount0,
+    amount1,
+    address,
+    tokenId,
+    chain.chainId,
+    slippageTolerance,
+    handleCloseConfirmationModal,
+    addLiquidity,
+    setHash,
+    setStatus,
+  ]);
 
   return (
     <section className="flex flex-col">
@@ -163,59 +200,53 @@ export const ContentSection = () => {
       </div>
 
       <PriceRangeSummary />
-      <div className="flex flex-col gap-4 mt-4">
-        {/* <TokenLiquidityBlock
-          token0={token0}
-          token1={token1}
-          feeTier={feeTier}
+
+      <div className="font-semibold mt-6">Add More Liquidity</div>
+      <div className="flex flex-col md:flex-row gap-6 mt-3">
+        <TokenAmountInput
+          value={amount0.value}
+          onInput={onInput0}
+          token={data?.token0}
+          balance={token0Balance}
+          isLoading={isLoadingToken0Balance}
         />
-        <AddLiquidityInputsBlock
-          input0={input0}
-          input1={input1}
-          token0={token0?.token}
-          token1={token1?.token}
-          token0Balance={token0Balance}
-          token1Balance={token1Balance}
-          handleInputChange={handleInputChange}
-        /> */}
-        <div className="flex w-full gap-4">
-          <div className="hidden md:block md:w-1/2" />
-          <div className="w-full md:w-1/2">
-            {(!amount0.validation.isValid || !amount1.validation.isValid) && (
-              <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-surface-1 mt-2">
-                :-(
-              </div>
-            )}
-            {data?.token0 &&
-              data?.token1 &&
-              amount0.validation.isValid &&
-              amount1.validation.isValid && (
-                <ConfirmationModal
-                  open={modalOpen}
-                  buttonText={"Add liquidity"}
-                  actionButtonText={
-                    status !== TransactionStatus.IDLE
-                      ? "Close"
-                      : "Add liquidity"
-                  }
-                  showOpenButton={true}
-                  handleOpenModal={() => setModalOpen(true)}
-                  handleModalActionButton={handleModalActionButton}
-                  handleCloseModal={handleCloseModal}
-                  title={"Add liquidity"}
-                >
-                  {/* <PoolTransactionSteps
-                  status={status}
-                  tokens={[token0, token1]}
-                  addLiquidityInputValues={[input0, input1]}
-                  hash={hash}
-                  message={error || ""}
-                /> */}
-                </ConfirmationModal>
-              )}
-          </div>
-        </div>
+        <TokenAmountInput
+          value={amount1.value}
+          onInput={onInput1}
+          token={data?.token1}
+          balance={token1Balance}
+          isLoading={isLoadingToken1Balance}
+        />
       </div>
+
+      <Button
+        onClick={handleOpenConfirmationModal}
+        disabled={isPending}
+        className="mt-6 w-full"
+      >
+        Add Liquidity
+      </Button>
+
+      {data && (
+        <ConfirmationModal
+          title="Collect Fees"
+          open={isConfirmationModalOpen}
+          onOpenChange={(value) => setIsConfirmationModalOpen(value)}
+        >
+          <TransactionSummary
+            position={data.position}
+            token0={data.token0}
+            token1={data.token1}
+            unclaimedFees0={data.unclaimedFees0}
+            unclaimedFees1={data.unclaimedFees1}
+            type={TransactionType.ADD_LIQUIDITY}
+            hash={hash}
+            status={status}
+            error={error}
+            onSubmit={handleSubmit}
+          />
+        </ConfirmationModal>
+      )}
     </section>
   );
 };
