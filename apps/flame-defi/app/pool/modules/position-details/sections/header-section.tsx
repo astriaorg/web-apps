@@ -23,7 +23,7 @@ export const HeaderSection = () => {
           <Skeleton isLoading={isPending} className="w-48 h-8">
             {data && (
               <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <MultiTokenIcon
                     symbols={[data?.token0.coinDenom, data?.token1.coinDenom]}
                   />

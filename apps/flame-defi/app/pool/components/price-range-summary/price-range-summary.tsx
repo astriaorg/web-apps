@@ -49,7 +49,9 @@ export const PriceRangeSummary = () => {
                   Min Price
                 </CardLabel>
                 <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMinPrice(data?.minPrice ?? "0")}
+                  {getDisplayMinPrice(data?.minPrice ?? "0", {
+                    minimumFractionDigits: 4,
+                  })}
                 </CardFigureLabel>
                 <PricePerTokenLabel />
                 <CardLabel className="text-xs text-typography-subdued">
@@ -61,7 +63,9 @@ export const PriceRangeSummary = () => {
                 <CardLabel className="text-xs uppercase">Max Price</CardLabel>
                 {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
                 <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMaxPrice(data?.maxPrice ?? "0")}
+                  {getDisplayMaxPrice(data?.maxPrice ?? "0", {
+                    minimumFractionDigits: 4,
+                  })}
                 </CardFigureLabel>
                 <PricePerTokenLabel />
                 <CardLabel className="text-xs text-typography-subdued">

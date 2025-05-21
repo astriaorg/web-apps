@@ -269,20 +269,30 @@ export const getMinMaxTick = (feeTier: FeeTier) => {
   return { minTick, maxTick };
 };
 
-export const getDisplayMinPrice = (minPrice: string) => {
+export const getDisplayMinPrice = (
+  minPrice: string,
+  options: {
+    minimumFractionDigits?: number;
+  } = {},
+) => {
   if (!minPrice) {
     return minPrice;
   }
   return Number(minPrice) === MIN_PRICE_DEFAULT
     ? "0"
-    : new Big(minPrice).toFixed();
+    : new Big(minPrice).toFixed(options.minimumFractionDigits);
 };
 
-export const getDisplayMaxPrice = (maxPrice: string) => {
+export const getDisplayMaxPrice = (
+  maxPrice: string,
+  options: {
+    minimumFractionDigits?: number;
+  } = {},
+) => {
   if (!maxPrice) {
     return maxPrice;
   }
   return Number(maxPrice) === MAX_PRICE_DEFAULT
     ? "∞"
-    : new Big(maxPrice).toFixed();
+    : new Big(maxPrice).toFixed(options.minimumFractionDigits);
 };
