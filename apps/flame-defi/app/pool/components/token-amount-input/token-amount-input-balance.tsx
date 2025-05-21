@@ -3,10 +3,10 @@ import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
 
 export interface TokenAmountInputBalanceProps {
   onInput: ({ value }: { value: string }) => void;
-  balance?: {
+  balance: {
     value: string;
     symbol: string;
-  };
+  } | null;
   isLoading: boolean;
 }
 

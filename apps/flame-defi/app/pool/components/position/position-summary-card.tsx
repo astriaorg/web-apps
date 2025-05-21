@@ -1,5 +1,11 @@
 import type { EvmCurrency } from "@repo/flame-types";
-import { Card, CardContent, MultiTokenIcon } from "@repo/ui/components";
+import {
+  Card,
+  CardContent,
+  CardTitle,
+  MultiTokenIcon,
+  Skeleton,
+} from "@repo/ui/components";
 import { PositionRangeBadge } from "pool/components/position/position-range-badge";
 import type { Position } from "pool/types";
 
@@ -17,12 +23,15 @@ export const PositionSummaryCard = ({
   return (
     <Card isLoading={isLoading}>
       <CardContent className="flex flex-col gap-3 h-full">
-        <MultiTokenIcon
-          symbols={[token0?.coinDenom ?? "", token1?.coinDenom ?? ""]}
-        />
-        <div className="text-2xl">
+        <Skeleton isLoading={isLoading} className="w-full h-6">
+          <MultiTokenIcon
+            size={24}
+            symbols={[token0?.coinDenom ?? "", token1?.coinDenom ?? ""]}
+          />
+        </Skeleton>
+        <CardTitle>
           {token0?.coinDenom}/{token1?.coinDenom}
-        </div>
+        </CardTitle>
         <div className="flex-1" />
         {position && (
           <PositionRangeBadge
