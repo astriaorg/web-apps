@@ -60,7 +60,7 @@ export const PriceRangeSummary = () => {
     <div className="mt-8">
       <div className="flex items-center gap-2 mb-6">
         <Skeleton isLoading={isPending} className="h-8 w-full">
-          <h2 className="font-semibold">Price Range</h2>
+          <div className="font-semibold">Price Range</div>
         </Skeleton>
         {data && (
           <>

@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
-import { type Address } from "viem";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
@@ -27,16 +26,11 @@ export const ContentSection = () => {
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
 
-  const { tokenId, invert } = usePoolPositionContextV2();
+  const { tokenId, invert, hash, setHash, error, setError, status, setStatus } =
+    usePoolPositionContextV2();
   const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
 
   const { collectFees } = useCollectFees();
-
-  const [hash, setHash] = useState<Address>();
-  const [error, setError] = useState<string>();
-  const [status, setStatus] = useState<TransactionStatus>(
-    TransactionStatus.IDLE,
-  );
 
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(false);
@@ -53,6 +47,7 @@ export const ContentSection = () => {
   const handleOpenConfirmationModal = useCallback(() => {
     setIsConfirmationModalOpen(true);
     setStatus(TransactionStatus.IDLE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = useCallback(async () => {
@@ -81,6 +76,7 @@ export const ContentSection = () => {
     } catch {
       setStatus(TransactionStatus.FAILED);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     handleCloseConfirmationModal,
     collectFees,
