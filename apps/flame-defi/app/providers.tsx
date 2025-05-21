@@ -13,7 +13,7 @@ import {
 } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
 import { OnchainKitProvider } from "features/onchain-kit";
-import { PrivyProvider, PrivyWalletProvider } from "features/privy";
+import { PrivyProvider } from "features/privy";
 import { WagmiRainbowKitProvider } from "features/wagmi-rainbow-kit";
 
 // tanstack
@@ -35,11 +35,7 @@ export function Providers({ children }: { children: ReactNode }) {
                       {/* Bridge specific providers moved here from bridge/layout.tsx to
                           prevent re-initialization during page navigation */}
                       <EvmWalletProvider>
-                        <PrivyWalletProvider>
-                          <CosmosWalletProvider>
-                            {children}
-                          </CosmosWalletProvider>
-                        </PrivyWalletProvider>
+                        <CosmosWalletProvider>{children}</CosmosWalletProvider>
                       </EvmWalletProvider>
                     </AstriaWalletContextProvider>
                   </OnchainKitProvider>
