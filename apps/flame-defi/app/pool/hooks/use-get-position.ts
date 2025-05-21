@@ -40,10 +40,19 @@ export type GetPositionResult = {
   hasUnclaimedFees: boolean;
 };
 
+/**
+ *
+ * Get position data from the pool.
+ * If `invert` is true, token0, token1 and their calculated amounts will be swapped in the result.
+ *
+ * **Do not token data in the position itself, as it may not be in the correct order.**
+ */
 export const useGetPosition = ({
   tokenId,
+  invert,
 }: {
   tokenId: string;
+  invert: boolean;
 }): UseQueryResult<GetPositionResult | null> => {
   const config = useConfig();
   const { address } = useAccount();
@@ -89,29 +98,63 @@ export const useGetPosition = ({
       const poolService = createPoolService(config, pool);
       const slot0 = await poolService.slot0(chain.chainId);
 
-      const { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+      return {
         position,
-        sqrtPriceX96: slot0.sqrtPriceX96,
         token0,
         token1,
+        slot0,
+      };
+    },
+    // Handle inversion in the select function to prevent duplicate caching when display order changes.
+    select: (data) => {
+      if (!data) {
+        return null;
+      }
+
+      const { position, slot0 } = data;
+
+      let { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+        position,
+        sqrtPriceX96: slot0.sqrtPriceX96,
+        token0: data.token0,
+        token1: data.token1,
       });
+
+      let token0 = data.token0;
+      let token1 = data.token1;
+      if (invert) {
+        token0 = data.token1;
+        token1 = data.token0;
+      }
 
       const { minTick, maxTick } = getMinMaxTick(position.fee as FeeTier);
 
-      let minPrice = tickToPrice(
-        token0.asToken(),
-        token1.asToken(),
-        position.tickLower,
-      ).toFixed(token0.coinDecimals);
-      let maxPrice = tickToPrice(
-        token0.asToken(),
-        token1.asToken(),
-        position.tickUpper,
-      ).toFixed();
+      let { minPrice, maxPrice } = (() => {
+        let minPrice = tickToPrice(
+          token1.asToken(),
+          token0.asToken(),
+          position.tickLower,
+        );
+        let maxPrice = tickToPrice(
+          token1.asToken(),
+          token0.asToken(),
+          position.tickUpper,
+        );
+
+        if (minPrice.greaterThan(maxPrice)) {
+          [minPrice, maxPrice] = [maxPrice, minPrice];
+        }
+
+        return {
+          minPrice: minPrice.toFixed(token0.coinDecimals),
+          maxPrice: maxPrice.toFixed(token0.coinDecimals),
+        };
+      })();
 
       if (position.tickLower === minTick) {
         minPrice = MIN_PRICE_DEFAULT.toString();
       }
+
       if (position.tickUpper === maxTick) {
         maxPrice = MAX_PRICE_DEFAULT.toString();
       }
@@ -119,14 +162,23 @@ export const useGetPosition = ({
       const hasUnclaimedFees =
         position.tokensOwed0 > 0n || position.tokensOwed1 > 0n;
 
-      const unclaimedFees0 = formatUnits(
+      let unclaimedFees0 = formatUnits(
         position.tokensOwed0,
-        token0.coinDecimals,
+        data.token0.coinDecimals,
       );
-      const unclaimedFees1 = formatUnits(
+      let unclaimedFees1 = formatUnits(
         position.tokensOwed1,
-        token1.coinDecimals,
+        data.token1.coinDecimals,
       );
+
+      if (invert) {
+        unclaimedFees0 = formatUnits(position.tokensOwed1, token1.coinDecimals);
+        unclaimedFees1 = formatUnits(position.tokensOwed0, token0.coinDecimals);
+        const amount0Original = amount0;
+        amount0 = amount1;
+        amount1 = amount0Original;
+        price = (1 / Number(price)).toString();
+      }
 
       return {
         position,

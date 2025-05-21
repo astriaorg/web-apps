@@ -1,6 +1,5 @@
 "use client";
 
-import Big from "big.js";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
 import { type Address } from "viem";
@@ -23,8 +22,8 @@ export const ContentSection = () => {
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
 
-  const { tokenId } = usePoolPositionContextV2();
-  const { data, isPending, refetch } = useGetPosition({ tokenId });
+  const { tokenId, invert } = usePoolPositionContextV2();
+  const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
 
   const { collectFees } = useCollectFees();
 
@@ -126,22 +125,12 @@ export const ContentSection = () => {
             }
             token0={data?.token0}
             token1={data?.token1}
-            value0={formatNumber(
-              +new Big(data?.position.tokensOwed0.toString() ?? 0)
-                .div(10 ** (data?.token0?.coinDecimals ?? 18))
-                .toFixed(),
-              {
-                maximumFractionDigits: data?.token0?.coinDecimals,
-              },
-            )}
-            value1={formatNumber(
-              +new Big(data?.position.tokensOwed1.toString() ?? 0)
-                .div(10 ** (data?.token1?.coinDecimals ?? 18))
-                .toFixed(),
-              {
-                maximumFractionDigits: data?.token1?.coinDecimals,
-              },
-            )}
+            value0={formatNumber(+(data?.unclaimedFees0 ?? 0), {
+              maximumFractionDigits: data?.token0?.coinDecimals,
+            })}
+            value1={formatNumber(+(data?.unclaimedFees1 ?? 0), {
+              maximumFractionDigits: data?.token1?.coinDecimals,
+            })}
             isLoading={isPending}
           />
           <Button

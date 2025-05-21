@@ -1,10 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useState } from "react";
 
 export interface PoolPositionContextProps {
   tokenId: string;
+  invert: boolean;
+  setInvert: (value: boolean) => void;
 }
 
 export const PoolPositionContext = createContext<
@@ -17,10 +19,14 @@ export const PoolPositionContextProvider = ({
   const params = useParams();
   const tokenId = params["token-id"] as string;
 
+  const [invert, setInvert] = useState(false);
+
   return (
     <PoolPositionContext.Provider
       value={{
         tokenId,
+        invert,
+        setInvert,
       }}
     >
       {children}
