@@ -309,10 +309,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     position,
     recipient,
     options,
-    ...params
+    calls = [],
   }: CollectFeesV2Params): Promise<Hash> {
-    const calls: string[] = params.calls ?? [];
-
     let sortedToken0 = token0;
     let sortedToken1 = token1;
 

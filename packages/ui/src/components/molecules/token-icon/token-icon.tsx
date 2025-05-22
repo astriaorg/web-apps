@@ -65,6 +65,7 @@ export const TokenIcon = ({
   className?: string;
 }) => {
   const normalizedSymbol = symbol?.toUpperCase();
+
   const IconComponent = (() => {
     if (
       normalizedSymbol &&
