@@ -13,6 +13,7 @@ import {
   WrappedTiaIcon,
 } from "../../../icons";
 import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
+import { cn } from "../../../utils";
 
 const TOKEN_SYMBOL_TO_ICON_MAP: {
   [key: string]: ComponentType<IconProps>;
@@ -29,13 +30,11 @@ const TOKEN_SYMBOL_TO_ICON_MAP: {
 export const TokenIcon = ({
   symbol,
   size = DEFAULT_ICON_SIZE,
-  className = "",
+  className,
 }: {
   symbol?: string;
-  size?: number;
-  className?: string;
-}) => {
-  const normalizedSymbol = symbol?.toUpperCase();
+} & IconProps) => {
+  const normalizedSymbol = symbol?.toLowerCase();
 
   const IconComponent = (() => {
     if (normalizedSymbol && TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol]) {
@@ -44,7 +43,7 @@ export const TokenIcon = ({
     return DotIcon;
   })();
 
-  return <IconComponent size={size} className={className} />;
+  return <IconComponent size={size} className={cn("shrink-0", className)} />;
 };
 
 const MULTI_TOKEN_ICON_SHIFT = 6;
@@ -57,11 +56,10 @@ export const MultiTokenIcon = ({
   size?: number;
 }) => {
   return (
-    <div className="flex items-center h-full">
+    <div className="flex items-center">
       {symbols.map((symbol, index) => (
         <div
-          key={symbol}
-          className="h-full"
+          key={`multi-token-icon_${symbol}_${index}`}
           style={{
             height: size,
             width: size,

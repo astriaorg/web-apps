@@ -12,9 +12,9 @@ import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2"
 
 export const useCollectFees = () => {
   const queryClient = useQueryClient();
+  const config = useConfig();
   const { tokenId } = usePoolPositionContext();
   const { address } = useAccount();
-  const config = useConfig();
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({

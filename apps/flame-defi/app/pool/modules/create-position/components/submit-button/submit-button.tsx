@@ -9,7 +9,7 @@ import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
-import { getMaxBigInt } from "features/evm-wallet/services/services.utils";
+import { getMaxBigInt } from "features/evm-wallet/services";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useMint } from "pool/hooks/use-mint";
