@@ -16,12 +16,42 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { getDisplayMaxPrice, getDisplayMinPrice } from "pool/utils";
 
+const PriceRangeBlock = ({ type }: { type: "min" | "max" }) => {
+  const { tokenId, invert } = usePoolPositionContextV2();
+  const { data } = useGetPosition({ tokenId, invert });
+
+  const price =
+    type === "min"
+      ? getDisplayMinPrice(data?.minPrice ?? "0", {
+          minimumFractionDigits: 4,
+        })
+      : getDisplayMaxPrice(data?.maxPrice ?? "0", {
+          minimumFractionDigits: 4,
+        });
+
+  return (
+    <div className="flex flex-col gap-1">
+      <CardLabel className="text-xs font-medium tracking-wider uppercase">
+        {type === "min" ? "Min Price" : "Max Price"}
+      </CardLabel>
+      {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
+      <CardFigureLabel className="text-typography-light font-sans">
+        {price}
+      </CardFigureLabel>
+      <PricePerTokenLabel />
+      <CardLabel className="text-xs text-typography-subdued">
+        Your position will be 100% {data?.token0.coinDenom} at this price.
+      </CardLabel>
+    </div>
+  );
+};
+
 const PricePerTokenLabel = () => {
   const { tokenId, invert } = usePoolPositionContextV2();
   const { data } = useGetPosition({ tokenId, invert });
 
   return (
-    <CardLabel className="text-xs">
+    <CardLabel className="text-xs font-medium">
       {data?.token0.coinDenom} per {data?.token1.coinDenom}
     </CardLabel>
   );
@@ -69,7 +99,6 @@ export const PriceRangeSummary = () => {
             </div>
             <Tabs
               defaultValue={data.token1.coinDenom}
-              // value={data.token0.coinDenom}
               onValueChange={handleInvert}
             >
               <TabsList>
@@ -94,35 +123,8 @@ export const PriceRangeSummary = () => {
         >
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="flex flex-col gap-1">
-                <CardLabel className="text-xs font-medium tracking-wider uppercase">
-                  Min Price
-                </CardLabel>
-                <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMinPrice(data?.minPrice ?? "0", {
-                    minimumFractionDigits: 4,
-                  })}
-                </CardFigureLabel>
-                <PricePerTokenLabel />
-                <CardLabel className="text-xs text-typography-subdued">
-                  Your position will be 100% {data?.token1.coinDenom} at this
-                  price.
-                </CardLabel>
-              </div>
-              <div className="flex flex-col gap-1">
-                <CardLabel className="text-xs uppercase">Max Price</CardLabel>
-                {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
-                <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMaxPrice(data?.maxPrice ?? "0", {
-                    minimumFractionDigits: 4,
-                  })}
-                </CardFigureLabel>
-                <PricePerTokenLabel />
-                <CardLabel className="text-xs text-typography-subdued">
-                  Your position will be 100% {data?.token0.coinDenom} at this
-                  price.
-                </CardLabel>
-              </div>
+              <PriceRangeBlock type="min" />
+              <PriceRangeBlock type="max" />
             </div>
           </CardContent>
         </Card>
