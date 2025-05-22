@@ -125,10 +125,10 @@ export const ContentSection = () => {
             }
             token0={data?.token0}
             token1={data?.token1}
-            value0={formatNumber(+(data?.unclaimedFees0 ?? 0), {
+            value0={formatNumber(Number(data?.unclaimedFees0 ?? 0), {
               maximumFractionDigits: data?.token0?.coinDecimals,
             })}
-            value1={formatNumber(+(data?.unclaimedFees1 ?? 0), {
+            value1={formatNumber(Number(data?.unclaimedFees1 ?? 0), {
               maximumFractionDigits: data?.token1?.coinDecimals,
             })}
             isLoading={isPending}

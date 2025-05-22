@@ -25,7 +25,7 @@ export const CollectFeesTransactionSummary = ({
             {token0.coinDenom}
           </span>
           <span>
-            {formatNumber(+unclaimedFees0, {
+            {formatNumber(Number(unclaimedFees0), {
               minimumFractionDigits: token0.coinDecimals,
               maximumFractionDigits: token0.coinDecimals,
             })}
@@ -41,7 +41,7 @@ export const CollectFeesTransactionSummary = ({
             {token1.coinDenom}
           </span>
           <span>
-            {formatNumber(+unclaimedFees1, {
+            {formatNumber(Number(unclaimedFees1), {
               minimumFractionDigits: token1.coinDecimals,
               maximumFractionDigits: token1.coinDecimals,
             })}
