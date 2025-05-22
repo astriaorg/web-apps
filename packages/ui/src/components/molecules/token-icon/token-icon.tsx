@@ -1,5 +1,7 @@
 import { type ComponentType } from "react";
 
+import type { IconProps } from "@repo/flame-types";
+
 import {
   CelestiaIcon,
   DotIcon,
@@ -25,34 +27,15 @@ const TOKEN_SYMBOLS = {
 type TokenSymbol = keyof typeof TOKEN_SYMBOLS;
 
 const TOKEN_SYMBOL_TO_ICON_MAP: {
-  [key in TokenSymbol]: {
-    Icon: ComponentType<{
-      size?: number;
-      className?: string;
-    }>;
-  };
+  [key in TokenSymbol]: ComponentType<IconProps>;
 } = {
-  [TOKEN_SYMBOLS.TIA]: {
-    Icon: CelestiaIcon,
-  },
-  [TOKEN_SYMBOLS.DTIA]: {
-    Icon: DropTiaIcon,
-  },
-  [TOKEN_SYMBOLS.WTIA]: {
-    Icon: WrappedTiaIcon,
-  },
-  [TOKEN_SYMBOLS.STTIA]: {
-    Icon: StrideTiaIcon,
-  },
-  [TOKEN_SYMBOLS.USDC]: {
-    Icon: UsdcIcon,
-  },
-  [TOKEN_SYMBOLS.MILKTIA]: {
-    Icon: MilkTiaIcon,
-  },
-  [TOKEN_SYMBOLS.STRIDE]: {
-    Icon: StrideIcon,
-  },
+  [TOKEN_SYMBOLS.TIA]: CelestiaIcon,
+  [TOKEN_SYMBOLS.DTIA]: DropTiaIcon,
+  [TOKEN_SYMBOLS.WTIA]: WrappedTiaIcon,
+  [TOKEN_SYMBOLS.STTIA]: StrideTiaIcon,
+  [TOKEN_SYMBOLS.USDC]: UsdcIcon,
+  [TOKEN_SYMBOLS.MILKTIA]: MilkTiaIcon,
+  [TOKEN_SYMBOLS.STRIDE]: StrideIcon,
 };
 
 export const TokenIcon = ({
@@ -68,7 +51,7 @@ export const TokenIcon = ({
 
   const IconComponent = (() => {
     if (normalizedSymbol && normalizedSymbol in TOKEN_SYMBOLS) {
-      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol].Icon;
+      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol];
     }
     return DotIcon;
   })();
