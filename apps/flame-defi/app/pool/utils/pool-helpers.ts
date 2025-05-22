@@ -8,6 +8,7 @@ import {
 } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import JSBI from "jsbi";
+import { formatUnits } from "viem";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import {
@@ -244,12 +245,8 @@ export const calculateTokenAmountsFromPosition = ({
 
   return {
     // Don't use JSBI for the final division. JSBI does integer division, so precision is lost for small amounts and 0 is returned.
-    amount0: new Big(amount0.toString())
-      .div(10 ** token0.coinDecimals)
-      .toString(),
-    amount1: new Big(amount1.toString())
-      .div(10 ** token1.coinDecimals)
-      .toString(),
+    amount0: formatUnits(BigInt(amount0.toString()), token0.coinDecimals),
+    amount1: formatUnits(BigInt(amount1.toString()), token1.coinDecimals),
     price: price.toFixed(token0.coinDecimals),
   };
 };
