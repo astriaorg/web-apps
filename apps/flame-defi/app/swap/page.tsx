@@ -101,9 +101,9 @@ export default function SwapPage(): React.ReactElement {
     error: errorText,
     setError: setErrorText,
   } = useSwapButton({
-    token0: token0,
-    token1: token1,
-    token0Balance: token0Balance,
+    token0,
+    token1,
+    token0Balance,
     quote,
     loading,
     error: quoteError,
@@ -111,10 +111,10 @@ export default function SwapPage(): React.ReactElement {
   });
   const info = useTransactionInfo({
     quote,
-    token0: token0,
-    token1: token1,
+    token0,
+    token1,
     tradeType,
-    validSwapInputs: validSwapInputs,
+    validSwapInputs,
   });
 
   const debouncedGetQuoteRef = useRef(
