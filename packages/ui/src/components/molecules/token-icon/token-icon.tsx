@@ -13,15 +13,16 @@ import {
 import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
 
 // FIXME - this is redundant and can be derived from the chain configs
-export enum TokenSymbol {
-  TIA = "tia",
-  DTIA = "dtia",
-  WTIA = "wtia",
-  STTIA = "sttia",
-  USDC = "usdc",
-  MILKTIA = "milktia",
-  STRIDE = "stride",
-}
+const TOKEN_SYMBOLS = {
+  TIA: "TIA",
+  DTIA: "DTIA",
+  WTIA: "WTIA",
+  STTIA: "STTIA",
+  USDC: "USDC",
+  MILKTIA: "MILKTIA",
+  STRIDE: "STRIDE",
+} as const;
+type TokenSymbol = keyof typeof TOKEN_SYMBOLS;
 
 const TOKEN_SYMBOL_TO_ICON_MAP: {
   [key in TokenSymbol]: {
@@ -31,25 +32,25 @@ const TOKEN_SYMBOL_TO_ICON_MAP: {
     }>;
   };
 } = {
-  [TokenSymbol.TIA]: {
+  [TOKEN_SYMBOLS.TIA]: {
     Icon: CelestiaIcon,
   },
-  [TokenSymbol.DTIA]: {
+  [TOKEN_SYMBOLS.DTIA]: {
     Icon: DropTiaIcon,
   },
-  [TokenSymbol.WTIA]: {
+  [TOKEN_SYMBOLS.WTIA]: {
     Icon: WrappedTiaIcon,
   },
-  [TokenSymbol.STTIA]: {
+  [TOKEN_SYMBOLS.STTIA]: {
     Icon: StrideTiaIcon,
   },
-  [TokenSymbol.USDC]: {
+  [TOKEN_SYMBOLS.USDC]: {
     Icon: UsdcIcon,
   },
-  [TokenSymbol.MILKTIA]: {
+  [TOKEN_SYMBOLS.MILKTIA]: {
     Icon: MilkTiaIcon,
   },
-  [TokenSymbol.STRIDE]: {
+  [TOKEN_SYMBOLS.STRIDE]: {
     Icon: StrideIcon,
   },
 };
@@ -63,15 +64,17 @@ export const TokenIcon = ({
   size?: number;
   className?: string;
 }) => {
-  const normalizedSymbol = symbol?.toLowerCase() as TokenSymbol;
-  const FallbackIcon = DotIcon;
-
-  // Check if the symbol exists in our map.
-  const isKnownToken = Object.values(TokenSymbol).includes(normalizedSymbol);
-
-  const IconComponent = isKnownToken
-    ? TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol].Icon
-    : FallbackIcon;
+  const normalizedSymbol = symbol?.toUpperCase();
+  const IconComponent = (() => {
+    if (
+      normalizedSymbol &&
+      normalizedSymbol in TOKEN_SYMBOLS &&
+      TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol]
+    ) {
+      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol].Icon;
+    }
+    return DotIcon;
+  })();
 
   return <IconComponent size={size} className={className} />;
 };
