@@ -67,11 +67,7 @@ export const TokenIcon = ({
   const normalizedSymbol = symbol?.toUpperCase();
 
   const IconComponent = (() => {
-    if (
-      normalizedSymbol &&
-      normalizedSymbol in TOKEN_SYMBOLS &&
-      TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol]
-    ) {
+    if (normalizedSymbol && normalizedSymbol in TOKEN_SYMBOLS) {
       return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol].Icon;
     }
     return DotIcon;
