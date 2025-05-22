@@ -7,10 +7,8 @@ import {
 } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import { useIntl } from "react-intl";
 
 import {
-  Badge,
   Card,
   MultiTokenIcon,
   Skeleton,
@@ -21,8 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui/components";
-import { DotIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
+import { PositionFeeBadge, PositionRangeBadge } from "pool/components/position";
 import { ROUTES } from "pool/constants/routes";
 import {
   type GetPositionsResult,
@@ -34,7 +32,6 @@ import { getPlaceholderData } from "./position-list-table.utils";
 
 export const PositionListTable = () => {
   const router = useRouter();
-  const { formatNumber } = useIntl();
   const { data, isPending } = useGetPositions();
   const { isClosedPositionsShown } = usePageContext();
 
@@ -59,12 +56,7 @@ export const PositionListTable = () => {
                 {row.original.pool.token0.coinDenom}/
                 {row.original.pool.token1.coinDenom}
               </span>
-              <Badge>
-                {formatNumber(row.original.pool.feeTier / 1000000, {
-                  style: "percent",
-                  maximumFractionDigits: 2,
-                })}
-              </Badge>
+              <PositionFeeBadge position={row.original.position} />
             </div>
           );
         },
@@ -73,20 +65,11 @@ export const PositionListTable = () => {
         id: "position.liquidity",
         header: "Status",
         cell: ({ row }) => {
-          const isPositionInRange = row.original.position.liquidity !== 0n;
-
-          return (
-            <Badge className="gap-1">
-              {isPositionInRange && (
-                <DotIcon size={12} className="fill-success" />
-              )}
-              {isPositionInRange ? "In Range" : "Closed"}
-            </Badge>
-          );
+          return <PositionRangeBadge position={row.original.position} />;
         },
       }),
     ];
-  }, [columnHelper, formatNumber]);
+  }, [columnHelper]);
 
   const filteredData: GetPositionsResult[] = useMemo(() => {
     if (isPending) {

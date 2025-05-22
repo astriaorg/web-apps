@@ -9,10 +9,10 @@ import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
-import { getMaxBigInt } from "features/evm-wallet/services/services.utils";
+import { getMaxBigInt } from "features/evm-wallet/services";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
-import { useCreateAndInitializePoolIfNecessaryAndMint } from "pool/hooks/use-mint";
+import { useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
 import { calculateNearestTickAndPrice } from "pool/utils";
@@ -70,7 +70,7 @@ export const SubmitButton = ({
   const { defaultSlippageTolerance, environment } = useConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
-  const { mint } = useCreateAndInitializePoolIfNecessaryAndMint();
+  const { mint } = useMint();
   const { approve, getIsApproved } = useApproveToken();
 
   const {

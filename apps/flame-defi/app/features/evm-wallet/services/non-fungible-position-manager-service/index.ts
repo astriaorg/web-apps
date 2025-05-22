@@ -1,5 +1,11 @@
 import { Config } from "@wagmi/core";
-import { Abi, type Address, encodeFunctionData, type Hash } from "viem";
+import {
+  Abi,
+  type Address,
+  encodeFunctionData,
+  type Hash,
+  maxUint128,
+} from "viem";
 
 import {
   AstriaChain,
@@ -96,6 +102,19 @@ export interface CollectFeesParams {
   isToken0Native: boolean;
   isToken1Native: boolean;
   gasLimit?: bigint;
+}
+
+export interface CollectFeesV2Params {
+  chain: AstriaChain;
+  tokenId: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  recipient: Address;
+  position: Position;
+  calls?: string[];
+  options: {
+    isCollectAsWrappedNative: boolean;
+  };
 }
 
 export class NonfungiblePositionManagerService extends GenericContractService {
@@ -200,13 +219,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<unknown> {
     const calls: string[] = [];
 
-    const token0Address = token0.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : (token0.erc20ContractAddress as Address);
-
-    const token1Address = token1.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : (token1.erc20ContractAddress as Address);
+    const token0Address = token0.asToken().address as Address;
+    const token1Address = token1.asToken().address as Address;
 
     let sortedToken0 = token0;
     let sortedToken1 = token1;
@@ -278,6 +292,96 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       "multicall",
       [calls],
       value,
+      gasLimit,
+    );
+  }
+
+  /**
+   * Collect fees and tokens from a position with support for wrapped native tokens and multicall operations.
+   *
+   * This method handles both wrapped native token collection and non-native token collection scenarios.
+   */
+  async collectFeesV2({
+    chain,
+    tokenId,
+    token0,
+    token1,
+    position,
+    recipient,
+    options,
+    calls = [],
+  }: CollectFeesV2Params): Promise<Hash> {
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+
+    // Sorted tokens should match the order of tokens in the position.
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+    }
+
+    const isCollectNativeTokens =
+      sortedToken0.isNative ||
+      sortedToken1.isNative ||
+      sortedToken0.isWrappedNative ||
+      sortedToken1.isWrappedNative;
+
+    if (options.isCollectAsWrappedNative || !isCollectNativeTokens) {
+      // Collects the wrapped native token and other token values to recipient directly since unwrapping to native token is not needed.
+      const collectCall = this.encodeCollect(
+        tokenId,
+        recipient,
+        maxUint128,
+        maxUint128,
+      );
+
+      calls.push(collectCall);
+    } else {
+      // Collects the wrapped native token and other token values to contract so we can unwrap the values after.
+      const collectCall = this.encodeCollect(
+        tokenId,
+        this.address, // Collect to the contract itself.
+        maxUint128,
+        maxUint128,
+      );
+
+      calls.push(collectCall);
+
+      // Unwraps the wrapped native token to native token and sends it to the recipient.
+      const unwrapCall = this.encodeUnwrapWETH9(1n, recipient);
+      calls.push(unwrapCall);
+
+      // Sweeps non-native tokens to the recipient.
+      if (!sortedToken0.isNative) {
+        const sweepToken0Call = this.encodeSweepToken(
+          position.token0,
+          0n,
+          recipient,
+        );
+        calls.push(sweepToken0Call);
+      }
+
+      if (!sortedToken1.isNative) {
+        const sweepToken1Call = this.encodeSweepToken(
+          position.token1,
+          0n,
+          recipient,
+        );
+        calls.push(sweepToken1Call);
+      }
+    }
+
+    const gasLimit = await this.estimateContractGasWithBuffer(
+      chain.chainId,
+      calls,
+      0n,
+    );
+
+    return await this.writeContractMethod(
+      chain.chainId,
+      "multicall",
+      [calls],
+      undefined,
       gasLimit,
     );
   }
@@ -429,6 +533,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    *
    * @param params - Parameters for the collect fees operation
    * @returns Transaction hash if successful
+   *
+   * @deprecated TODO: Remove this method and use collectFeesV2 instead.
    */
   async collectFees(params: CollectFeesParams): Promise<Hash> {
     const {
@@ -509,6 +615,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * Helper method to generate parameters for collecting fees from a position
    * Determines if native tokens are involved and sets the appropriate flags
    * to handle automatic unwrapping of wrapped native token to native token and proper token collection.
+   *
+   * @deprecated TODO: Remove this method and use collectFeesV2 instead.
    */
   public static getCollectFeesParams(
     chain: AstriaChain,

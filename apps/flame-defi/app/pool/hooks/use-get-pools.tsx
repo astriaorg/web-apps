@@ -6,6 +6,7 @@ import { useConfig } from "wagmi";
 import type { EvmCurrency } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
 import { createPoolFactoryService } from "features/evm-wallet";
+import { QUERY_KEYS } from "pool/constants/query-keys";
 import { FEE_TIERS, type FeeTier } from "pool/types";
 
 type GetPoolsResult = {
@@ -22,7 +23,7 @@ export const useGetPools = (params: {
   return useQuery({
     // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!params.token0 && !!params.token1,
-    queryKey: ["useGetPools", params.token0, params.token1, chain],
+    queryKey: [QUERY_KEYS.USE_GET_POOLS, params.token0, params.token1, chain],
     queryFn: async () => {
       if (!params.token0 || !params.token1) {
         return null;

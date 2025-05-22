@@ -2,7 +2,12 @@ import { type Address } from "viem";
 
 import { EvmCurrency } from "@repo/flame-types";
 
-import { FEE_TIER, TICK_BOUNDARIES, TICK_SPACING_BY_FEE_TIER } from "../types";
+import {
+  FEE_TIER,
+  type Position,
+  TICK_BOUNDARIES,
+  TICK_SPACING_BY_FEE_TIER,
+} from "../types";
 
 export const sqrtPriceX96ToPrice = (
   sqrtPriceX96: bigint,
@@ -79,7 +84,7 @@ export const getMinMaxTick = (
 };
 
 export const getTokensLiquidityAmounts = (
-  position: { liquidity: bigint; tickLower: number; tickUpper: number },
+  position: Position,
   sqrtPriceX96: bigint,
   token0Decimals: number,
   token1Decimals: number,

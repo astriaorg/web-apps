@@ -7,7 +7,8 @@ import {
   createNonfungiblePositionManagerService,
   createPoolFactoryService,
 } from "features/evm-wallet";
-import { type FeeTier, type PositionWithKey } from "pool/types";
+import { QUERY_KEYS } from "pool/constants/query-keys";
+import { type PositionWithKey } from "pool/types";
 import { getTokenFromAddress } from "pool/utils";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
@@ -19,7 +20,6 @@ export type GetPositionsResult = {
     token0: EvmCurrency;
     token1: EvmCurrency;
     liquidity: bigint;
-    feeTier: FeeTier;
   };
   position: PositionWithKey;
 };
@@ -32,7 +32,7 @@ export const useGetPositions = (): UseQueryResult<
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: ["useGetPositions", chain.chainId, address],
+    queryKey: [QUERY_KEYS.USE_GET_POSITIONS, chain.chainId, address],
     queryFn: async () => {
       if (!address) {
         return null;
@@ -84,7 +84,6 @@ export const useGetPositions = (): UseQueryResult<
             token1,
             liquidity: (liquidityResults[index] as { liquidity: bigint })
               .liquidity,
-            feeTier: position.fee as FeeTier,
           },
         };
       });
