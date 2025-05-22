@@ -1,22 +1,23 @@
 import { Badge, InfoTooltip } from "@repo/ui/components";
 import { DotIcon } from "@repo/ui/icons";
-
-interface PositionRangeBadgeProps {
-  isPositionClosed: boolean;
-}
+import type { Position } from "pool/types";
 
 export const PositionRangeBadge = ({
-  isPositionClosed,
-}: PositionRangeBadgeProps) => {
+  position: { liquidity },
+}: {
+  position: Position;
+}) => {
+  const isPositionClosed = liquidity === 0n;
+
   return (
     <>
       {!isPositionClosed ? (
-        <Badge variant="default" className="flex items-center space-x-2 z-2">
-          <DotIcon size={12} className="fill-green z-999999999" />
-          <span>In range</span>
+        <Badge className="gap-1">
+          <DotIcon size={12} className="fill-success" />
+          <span>In Range</span>
         </Badge>
       ) : (
-        <Badge variant="default" className="flex items-center space-x-2 z-2">
+        <Badge className="gap-1">
           <span>Closed</span>
           <InfoTooltip content="Your position has zero liquidity and is not earning fees." />
         </Badge>

@@ -2,82 +2,60 @@
 
 import { usePathname, useRouter } from "next/navigation";
 
-import { Badge, Button, MultiTokenIcon, Skeleton } from "@repo/ui/components";
-import { ArrowLeftIcon } from "@repo/ui/icons";
-import { PositionRangeBadge } from "pool/components";
-import { usePoolPositionContext } from "pool/hooks";
-
-import { ROUTES } from "../../../constants/routes";
+import { Button, MultiTokenIcon, Skeleton } from "@repo/ui/components";
+import { Header, HeaderTitle } from "components/header";
+import { PositionFeeBadge, PositionRangeBadge } from "pool/components/position";
+import { ROUTES } from "pool/constants/routes";
+import { useGetPosition } from "pool/hooks/use-get-position";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
 
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { token0, token1, feeTier, isReversedPoolTokens, isPositionClosed } =
-    usePoolPositionContext();
-  const tokens = isReversedPoolTokens ? [token1, token0] : [token0, token1];
+  const { tokenId, invert } = usePoolPositionContext();
+  const { data, isPending } = useGetPosition({ tokenId, invert });
 
   return (
-    <div className="flex flex-col items-start gap-8 md:gap-4 md:items-center md:justify-between md:flex-row">
-      <div className="flex items-baseline relative">
-        <div
-          onClick={() => router.back()}
-          className="mb-10 md:absolute md:-left-10 md:mt-2 md:mb-0"
-        >
-          <ArrowLeftIcon
-            aria-label="Back"
-            size={16}
-            className="cursor-pointer text-icon-light hover:text-white transition"
-          />
-        </div>
+    <Header onClickBack={() => router.back()}>
+      <div className="flex flex-col w-full gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col space-y-3">
-          <Skeleton
-            isLoading={!tokens[0]?.token && !tokens[1]?.token}
-            className="w-full h-[40px]"
-          >
-            {tokens[0]?.token && tokens[1]?.token && (
-              <div className="flex items-center space-x-2">
-                <MultiTokenIcon
-                  symbols={[
-                    tokens[0].token.coinDenom,
-                    tokens[1].token.coinDenom,
-                  ]}
-                  size={24}
-                />
-                <h1 className="text-3xl/8">
-                  {tokens[0].token.coinDenom}/{tokens[1].token.coinDenom}
-                </h1>
+          <Skeleton isLoading={isPending} className="w-48 h-8">
+            {data && (
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <div className="flex items-center gap-2">
+                  <MultiTokenIcon
+                    symbols={[data?.token0.coinDenom, data?.token1.coinDenom]}
+                  />
+                  <HeaderTitle>
+                    {data.token0.coinDenom}/{data.token1.coinDenom}
+                  </HeaderTitle>
+                </div>
+
+                <div className="flex gap-2">
+                  <PositionRangeBadge position={data.position} />
+                  <PositionFeeBadge position={data.position} />
+                </div>
               </div>
             )}
           </Skeleton>
-          <Skeleton
-            isLoading={!tokens[0]?.token && !tokens[1]?.token}
-            className="w-full h-[20px]"
+        </div>
+
+        <div className="flex gap-4">
+          <Button
+            variant="secondary"
+            onClick={() => router.push(`${pathname}${ROUTES.REMOVE_LIQUIDITY}`)}
+            disabled={isPending}
           >
-            <div className="flex space-x-2">
-              <PositionRangeBadge isPositionClosed={isPositionClosed} />
-              <Badge variant="default" className="flex items-center space-x-2">
-                {feeTier}
-              </Badge>
-            </div>
-          </Skeleton>
+            Remove Liquidity
+          </Button>
+          <Button
+            onClick={() => router.push(`${pathname}${ROUTES.ADD_LIQUIDITY}`)}
+            disabled={isPending}
+          >
+            Add Liquidity
+          </Button>
         </div>
       </div>
-      <div className="flex gap-4">
-        <Button
-          variant="default"
-          size="default"
-          onClick={() => router.push(`${pathname}${ROUTES.ADD_LIQUIDITY}`)}
-        >
-          Add Liquidity
-        </Button>
-        <Button
-          variant="outline"
-          size="default"
-          onClick={() => router.push(`${pathname}${ROUTES.REMOVE_LIQUIDITY}`)}
-        >
-          Remove Liquidity
-        </Button>
-      </div>
-    </div>
+    </Header>
   );
 };

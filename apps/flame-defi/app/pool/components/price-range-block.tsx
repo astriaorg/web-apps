@@ -1,7 +1,6 @@
 import { Skeleton, ToggleSwitch } from "@repo/ui/components";
 import { usePoolPositionContext } from "pool/hooks";
 
-import { PositionRangeBadge } from "./position-range-badge";
 import { PriceRangeCard } from "./price-range-card";
 
 export const PriceRangeBlock = ({
@@ -13,15 +12,14 @@ export const PriceRangeBlock = ({
   selectedSymbol: string;
   handleReverseTokenData: (symbol: string) => void;
 }) => {
-  const { currentPrice, minPrice, maxPrice, isPositionClosed } =
-    usePoolPositionContext();
+  const { currentPrice, minPrice, maxPrice } = usePoolPositionContext();
 
   return (
     <>
       <div className="flex gap-4 mb-2 w-full justify-between items-center">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-medium">Price Range</h2>
-          <PositionRangeBadge isPositionClosed={isPositionClosed} />
+          {/* <PositionRangeBadge position={position} /> */}
         </div>
         <Skeleton
           className="w-[200px] h-[40px]"
