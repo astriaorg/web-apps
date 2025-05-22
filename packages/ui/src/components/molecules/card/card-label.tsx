@@ -11,7 +11,7 @@ const cardLabelVariants = cva("flex items-center space-x-2 text-sm/5", {
     variant: {
       default: "text-typography-subdued",
       secondary: "text-typography-default",
-      accent: "text-typography-inverted",
+      accent: "text-typography-white",
     },
   },
   defaultVariants: {

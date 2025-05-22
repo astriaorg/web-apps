@@ -11,7 +11,7 @@ const cardDescriptionVariants = cva("", {
     variant: {
       default: "text-typography-subdued",
       secondary: "text-typography-default",
-      accent: "text-typography-default",
+      accent: "text-typography-white",
     },
   },
   defaultVariants: {
