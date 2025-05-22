@@ -14,28 +14,16 @@ import {
 } from "../../../icons";
 import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
 
-// FIXME - this is redundant and can be derived from the chain configs
-const TOKEN_SYMBOLS = {
-  TIA: "TIA",
-  DTIA: "DTIA",
-  WTIA: "WTIA",
-  STTIA: "STTIA",
-  USDC: "USDC",
-  MILKTIA: "MILKTIA",
-  STRIDE: "STRIDE",
-} as const;
-type TokenSymbol = keyof typeof TOKEN_SYMBOLS;
-
 const TOKEN_SYMBOL_TO_ICON_MAP: {
-  [key in TokenSymbol]: ComponentType<IconProps>;
+  [key: string]: ComponentType<IconProps>;
 } = {
-  [TOKEN_SYMBOLS.TIA]: CelestiaIcon,
-  [TOKEN_SYMBOLS.DTIA]: DropTiaIcon,
-  [TOKEN_SYMBOLS.WTIA]: WrappedTiaIcon,
-  [TOKEN_SYMBOLS.STTIA]: StrideTiaIcon,
-  [TOKEN_SYMBOLS.USDC]: UsdcIcon,
-  [TOKEN_SYMBOLS.MILKTIA]: MilkTiaIcon,
-  [TOKEN_SYMBOLS.STRIDE]: StrideIcon,
+  tia: CelestiaIcon,
+  dtia: DropTiaIcon,
+  wtia: WrappedTiaIcon,
+  sttia: StrideTiaIcon,
+  usdc: UsdcIcon,
+  milktia: MilkTiaIcon,
+  stride: StrideIcon,
 };
 
 export const TokenIcon = ({
@@ -50,8 +38,8 @@ export const TokenIcon = ({
   const normalizedSymbol = symbol?.toUpperCase();
 
   const IconComponent = (() => {
-    if (normalizedSymbol && normalizedSymbol in TOKEN_SYMBOLS) {
-      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol as TokenSymbol];
+    if (normalizedSymbol && TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol]) {
+      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol];
     }
     return DotIcon;
   })();
