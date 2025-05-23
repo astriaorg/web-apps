@@ -12,12 +12,14 @@ import {
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import {
+  type DepositType,
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
   type Position,
 } from "pool/types";
 import {
+  calculateDepositType,
   calculateTokenAmountsFromPosition,
   getMinMaxTick,
   getTokenFromAddress,
@@ -38,6 +40,7 @@ export type GetPositionResult = {
   unclaimedFees0: string;
   unclaimedFees1: string;
   hasUnclaimedFees: boolean;
+  depositType: DepositType;
 };
 
 /**
@@ -180,6 +183,12 @@ export const useGetPosition = ({
         price = (1 / Number(price)).toString();
       }
 
+      const depositType = calculateDepositType({
+        currentPrice: Number(price),
+        minPrice: Number(minPrice),
+        maxPrice: Number(maxPrice),
+      });
+
       return {
         position,
         token0,
@@ -192,6 +201,7 @@ export const useGetPosition = ({
         unclaimedFees0,
         unclaimedFees1,
         hasUnclaimedFees,
+        depositType,
       };
     },
     enabled: !!address,

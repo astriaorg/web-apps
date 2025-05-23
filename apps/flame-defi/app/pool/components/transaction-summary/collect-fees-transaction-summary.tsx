@@ -1,8 +1,7 @@
-import { useIntl } from "react-intl";
+import { Button } from "@repo/ui/components";
 
-import { Button, TokenIcon } from "@repo/ui/components";
-
-import type { TransactionSummaryProps } from "./transaction-summary.types";
+import type { CollectFeesTransactionSummaryProps } from "./transaction-summary.types";
+import { TransactionSummaryTokenRow } from "./transaction-summary-token-row";
 
 export const CollectFeesTransactionSummary = ({
   token0,
@@ -10,43 +9,12 @@ export const CollectFeesTransactionSummary = ({
   unclaimedFees0,
   unclaimedFees1,
   onSubmit,
-}: TransactionSummaryProps) => {
-  const { formatNumber } = useIntl();
-
+}: CollectFeesTransactionSummaryProps) => {
   return (
     <div className="flex flex-col justify-start items-center gap-3">
       <div className="flex flex-col p-4 rounded-xl w-full text-lg gap-2">
-        <div
-          key={token0.coinDenom}
-          className="flex items-center justify-between"
-        >
-          <span className="flex items-center gap-2">
-            <TokenIcon symbol={token0.coinDenom} size={20} />
-            {token0.coinDenom}
-          </span>
-          <span>
-            {formatNumber(Number(unclaimedFees0), {
-              minimumFractionDigits: token0.coinDecimals,
-              maximumFractionDigits: token0.coinDecimals,
-            })}
-          </span>
-        </div>
-
-        <div
-          key={token1.coinDenom}
-          className="flex items-center justify-between"
-        >
-          <span className="flex items-center gap-2">
-            <TokenIcon symbol={token1.coinDenom} size={20} />
-            {token1.coinDenom}
-          </span>
-          <span>
-            {formatNumber(Number(unclaimedFees1), {
-              minimumFractionDigits: token1.coinDecimals,
-              maximumFractionDigits: token1.coinDecimals,
-            })}
-          </span>
-        </div>
+        <TransactionSummaryTokenRow token={token0} value={unclaimedFees0} />
+        <TransactionSummaryTokenRow token={token1} value={unclaimedFees1} />
       </div>
 
       <span className="text-sm">

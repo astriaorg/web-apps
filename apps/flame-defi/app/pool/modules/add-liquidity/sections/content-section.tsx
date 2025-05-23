@@ -1,27 +1,32 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import Big from "big.js";
+import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 
-import { TransactionStatus } from "@repo/flame-types";
+import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import {
+  type Amount,
   Button,
   Card,
   CardContent,
+  Skeleton,
   useTokenAmountInput,
 } from "@repo/ui/components";
-import { getSlippageTolerance } from "@repo/ui/utils";
+import { useValidateTokenAmount } from "@repo/ui/hooks";
+import {
+  formatNumberWithoutTrailingZeros,
+  getSlippageTolerance,
+} from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData, useConfig } from "config";
 import { useEvmCurrencyBalance } from "features/evm-wallet";
-import { getMaxBigInt } from "features/evm-wallet/services";
 import {
   PositionFeeBadge,
   PositionSummaryCard,
 } from "pool/components/position";
-import { PriceRangeSummary } from "pool/components/price-range-summary";
+import { PriceRangeSummary } from "pool/components/price-range";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -34,6 +39,8 @@ import { useAddLiquidity } from "pool/hooks/use-add-liquidity";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { TokenAmountInput } from "pool/modules/add-liquidity/components/token-amount-input";
+import { DepositType, InputId } from "pool/types";
+import { getTransactionAmounts } from "pool/utils";
 
 // TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
@@ -42,11 +49,14 @@ export const ContentSection = () => {
   const { address } = useAccount();
   const { defaultSlippageTolerance } = useConfig();
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
+  const validate = useValidateTokenAmount();
 
   const { tokenId, invert, hash, setHash, error, setError, status, setStatus } =
     usePoolPositionContextV2();
   const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
+  const { addLiquidity } = useAddLiquidity();
 
+  const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
 
@@ -77,7 +87,82 @@ export const ContentSection = () => {
       : undefined,
   });
 
-  const { addLiquidity } = useAddLiquidity();
+  const derivedValues = useMemo((): {
+    derivedAmount0: Amount;
+    derivedAmount1: Amount;
+  } => {
+    if (isPending || !data) {
+      return {
+        derivedAmount0: amount0,
+        derivedAmount1: amount1,
+      };
+    }
+
+    const { token0, token1, price } = data;
+
+    // TODO: Unify with create position logic.
+    const getDerivedAmount = (
+      amount: string,
+      token: EvmCurrency,
+      balance?: string,
+    ): Amount => {
+      return {
+        value: amount,
+        validation: validate({
+          value: amount,
+          token: {
+            symbol: token.coinDenom,
+            decimals: token.coinDecimals,
+          },
+          decimals: token.coinDecimals,
+          minimum: "0",
+          maximum: balance,
+        }),
+      };
+    };
+
+    if (currentInput === InputId.INPUT_0 && amount0.value) {
+      const derivedAmount1 = new Big(amount0.value)
+        .mul(new Big(1).div(price)) // TODO: Invert price to match create position logic.
+        .toFixed(token1.coinDecimals);
+      return {
+        derivedAmount0: amount0,
+        derivedAmount1: getDerivedAmount(
+          formatNumberWithoutTrailingZeros(derivedAmount1),
+          token1,
+          token1Balance?.value,
+        ),
+      };
+    }
+
+    if (currentInput === InputId.INPUT_1 && amount1.value) {
+      const derivedAmount0 = new Big(amount1.value)
+        .mul(price)
+        .toFixed(token0.coinDecimals);
+      return {
+        derivedAmount0: getDerivedAmount(
+          formatNumberWithoutTrailingZeros(derivedAmount0),
+          token0,
+          token0Balance?.value,
+        ),
+        derivedAmount1: amount1,
+      };
+    }
+
+    return {
+      derivedAmount0: getDerivedAmount("", token0, token0Balance?.value),
+      derivedAmount1: getDerivedAmount("", token1, token1Balance?.value),
+    };
+  }, [
+    data,
+    isPending,
+    currentInput,
+    amount0,
+    amount1,
+    token0Balance,
+    token1Balance,
+    validate,
+  ]);
 
   const handleCloseConfirmationModal = useCallback(() => {
     setIsConfirmationModalOpen(false);
@@ -99,47 +184,41 @@ export const ContentSection = () => {
 
     const { token0, token1 } = data;
 
+    setStatus(TransactionStatus.PENDING);
+
     try {
-      setStatus(TransactionStatus.PENDING);
+      const {
+        amount0Min,
+        amount1Min,
+        amount0Desired,
+        amount1Desired,
+        deadline,
+      } = getTransactionAmounts({
+        amount0: amount0.value,
+        amount1: amount1.value,
+        token0,
+        token1,
+        depositType: data.depositType,
+        slippageTolerance,
+      });
 
-      const amount0Desired = parseUnits(
-        amount0.value || "0",
-        token0.coinDecimals,
+      console.log(
+        amount0Min,
+        amount1Min,
+        amount0Desired,
+        amount1Desired,
+        deadline,
       );
-      const amount1Desired = parseUnits(
-        amount1.value || "0",
-        token1.coinDecimals,
-      );
-
-      /**
-       * TODO: Use slippage calculation in `TokenAmount` class.
-       * Too bulky to use here for now, wait until the class is refactored to implement it.
-       */
-      const calculateAmountWithSlippage = (amount: bigint) => {
-        // Convert slippage to basis points (1 bp = 0.01%)
-        // Example: 0.1% = 10 basis points
-        const basisPoints = Math.round(slippageTolerance * 100);
-
-        // Calculate: amount * (10000 - basisPoints) / 10000
-        return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
-      };
-
-      const amount0Min = calculateAmountWithSlippage(amount0Desired);
-      const amount1Min = calculateAmountWithSlippage(amount1Desired);
-
-      // 20 minute deadline.
-      // TODO: Add this to settings.
-      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
 
       const hash = await addLiquidity({
         chainId: chain.chainId,
         token0,
         token1,
         tokenId,
-        amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
-        amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
-        amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
-        amount1Min: getMaxBigInt(amount1Min, BigInt(1)),
+        amount0Desired,
+        amount1Desired,
+        amount0Min,
+        amount1Min,
         deadline,
       });
 
@@ -162,6 +241,7 @@ export const ContentSection = () => {
     setStatus,
   ]);
 
+  console.log(data?.depositType);
   return (
     <section className="flex flex-col">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -203,20 +283,36 @@ export const ContentSection = () => {
 
       <div className="font-semibold mt-6">Add More Liquidity</div>
       <div className="flex flex-col md:flex-row gap-6 mt-3">
-        <TokenAmountInput
-          value={amount0.value}
-          onInput={onInput0}
-          token={data?.token0}
-          balance={token0Balance}
-          isLoading={isLoadingToken0Balance}
-        />
-        <TokenAmountInput
-          value={amount1.value}
-          onInput={onInput1}
-          token={data?.token1}
-          balance={token1Balance}
-          isLoading={isLoadingToken1Balance}
-        />
+        {(data?.depositType === DepositType.BOTH ||
+          data?.depositType === DepositType.TOKEN_0_ONLY) && (
+          <Skeleton isLoading={isPending}>
+            <TokenAmountInput
+              value={derivedValues.derivedAmount0.value}
+              onInput={({ value }) => {
+                onInput0({ value });
+                setCurrentInput(InputId.INPUT_0);
+              }}
+              token={data?.token0}
+              balance={token0Balance}
+              isLoading={isLoadingToken0Balance}
+            />
+          </Skeleton>
+        )}
+        {(data?.depositType === DepositType.BOTH ||
+          data?.depositType === DepositType.TOKEN_1_ONLY) && (
+          <Skeleton isLoading={isPending}>
+            <TokenAmountInput
+              value={derivedValues.derivedAmount1.value}
+              onInput={({ value }) => {
+                onInput1({ value });
+                setCurrentInput(InputId.INPUT_1);
+              }}
+              token={data?.token1}
+              balance={token1Balance}
+              isLoading={isLoadingToken1Balance}
+            />
+          </Skeleton>
+        )}
       </div>
 
       <Button
@@ -229,21 +325,23 @@ export const ContentSection = () => {
 
       {data && (
         <ConfirmationModal
-          title="Collect Fees"
+          title="Add Liquidity"
           open={isConfirmationModalOpen}
           onOpenChange={(value) => setIsConfirmationModalOpen(value)}
         >
           <TransactionSummary
+            type={TransactionType.ADD_LIQUIDITY}
             position={data.position}
             token0={data.token0}
             token1={data.token1}
-            unclaimedFees0={data.unclaimedFees0}
-            unclaimedFees1={data.unclaimedFees1}
-            type={TransactionType.ADD_LIQUIDITY}
             hash={hash}
             status={status}
             error={error}
             onSubmit={handleSubmit}
+            amount0={amount0.value}
+            amount1={amount1.value}
+            minPrice={data.minPrice}
+            maxPrice={data.maxPrice}
           />
         </ConfirmationModal>
       )}

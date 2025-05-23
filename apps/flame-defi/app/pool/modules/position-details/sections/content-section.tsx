@@ -8,7 +8,7 @@ import { TransactionStatus } from "@repo/flame-types";
 import { Button, Card, CardContent, Switch } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
-import { PriceRangeSummary } from "pool/components/price-range-summary";
+import { PriceRangeSummary } from "pool/components/price-range";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -152,16 +152,16 @@ export const ContentSection = () => {
           onOpenChange={(value) => setIsConfirmationModalOpen(value)}
         >
           <TransactionSummary
+            type={TransactionType.COLLECT_FEES}
             position={data.position}
             token0={data.token0}
             token1={data.token1}
-            unclaimedFees0={data.unclaimedFees0}
-            unclaimedFees1={data.unclaimedFees1}
-            type={TransactionType.COLLECT_FEES}
             hash={hash}
             status={status}
             error={error}
             onSubmit={handleSubmit}
+            unclaimedFees0={data.unclaimedFees0}
+            unclaimedFees1={data.unclaimedFees1}
           />
         </ConfirmationModal>
       )}

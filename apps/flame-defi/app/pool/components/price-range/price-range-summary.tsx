@@ -88,13 +88,17 @@ export const PriceRangeSummary = () => {
               <PriceRangeBlock
                 token0={data?.token0}
                 token1={data?.token1}
-                price={getDisplayMinPrice(data?.minPrice ?? "0")}
+                price={getDisplayMinPrice(data?.minPrice ?? "0", {
+                  minimumFractionDigits: 4,
+                })}
                 label="Min Price"
               />
               <PriceRangeBlock
                 token0={data?.token0}
                 token1={data?.token1}
-                price={getDisplayMaxPrice(data?.maxPrice ?? "0")}
+                price={getDisplayMaxPrice(data?.maxPrice ?? "0", {
+                  minimumFractionDigits: 4,
+                })}
                 label="Max Price"
               />
             </div>

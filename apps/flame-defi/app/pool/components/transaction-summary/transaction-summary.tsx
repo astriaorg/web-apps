@@ -7,6 +7,7 @@ import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
 import { ErrorIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
 
+import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
 import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
 import {
   type TransactionFailedProps,
@@ -76,56 +77,34 @@ const TransactionFailed = ({ error }: TransactionFailedProps) => {
   );
 };
 
-// TODO: Update this to handle each transaction type.
-const TransactionDetails = {
-  [TransactionType.CREATE_POSITION]: CollectFeesTransactionSummary,
-  [TransactionType.COLLECT_FEES]: CollectFeesTransactionSummary,
-  [TransactionType.ADD_LIQUIDITY]: CollectFeesTransactionSummary,
-  [TransactionType.REMOVE_LIQUIDITY]: CollectFeesTransactionSummary,
-} as const;
+export const TransactionSummary = (props: TransactionSummaryProps) => {
+  const { token0, token1, type, hash, status, error } = props;
 
-export const TransactionSummary = ({
-  position,
-  token0,
-  token1,
-  unclaimedFees0,
-  unclaimedFees1,
-  type,
-  hash,
-  status,
-  error,
-  onSubmit,
-}: TransactionSummaryProps) => {
-  const TransactionComponent = TransactionDetails[type];
+  if (status === TransactionStatus.PENDING) {
+    return <TransactionLoader />;
+  }
 
-  return (
-    <>
-      {status === TransactionStatus.IDLE && (
-        <TransactionComponent
-          position={position}
-          token0={token0}
-          token1={token1}
-          unclaimedFees0={unclaimedFees0}
-          unclaimedFees1={unclaimedFees1}
-          type={type}
-          hash={hash}
-          status={status}
-          error={error}
-          onSubmit={onSubmit}
-        />
-      )}
-      {status === TransactionStatus.PENDING && <TransactionLoader />}
-      {status === TransactionStatus.SUCCESS && hash && (
-        <TransactionSuccess
-          token0={token0}
-          token1={token1}
-          type={type}
-          hash={hash}
-        />
-      )}
-      {status === TransactionStatus.FAILED && (
-        <TransactionFailed error={error} />
-      )}
-    </>
-  );
+  if (status === TransactionStatus.SUCCESS && hash) {
+    return (
+      <TransactionSuccess
+        token0={token0}
+        token1={token1}
+        type={type}
+        hash={hash}
+      />
+    );
+  }
+
+  if (status === TransactionStatus.FAILED) {
+    return <TransactionFailed error={error} />;
+  }
+
+  if (type === TransactionType.COLLECT_FEES) {
+    return <CollectFeesTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.ADD_LIQUIDITY) {
+    return <AddLiquidityTransactionSummary {...props} />;
+  }
+
+  throw new Error(`Unknown transaction type: ${type}`);
 };
