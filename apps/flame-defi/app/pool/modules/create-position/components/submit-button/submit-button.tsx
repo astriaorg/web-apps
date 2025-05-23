@@ -9,7 +9,6 @@ import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
-import { getMaxBigInt } from "features/evm-wallet/services";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useMint } from "pool/hooks/use-mint";
@@ -202,14 +201,21 @@ export const SubmitButton = ({
     setStatus(TransactionStatus.PENDING);
 
     try {
-      const amount0Desired = parseUnits(
+      let amount0Desired = parseUnits(
         amount0.value || "0",
         token0.coinDecimals,
       );
-      const amount1Desired = parseUnits(
+      let amount1Desired = parseUnits(
         amount1.value || "0",
         token1.coinDecimals,
       );
+
+      if (depositType === DepositType.TOKEN_0_ONLY) {
+        amount1Desired = 0n;
+      }
+      if (depositType === DepositType.TOKEN_1_ONLY) {
+        amount0Desired = 0n;
+      }
 
       /**
        * TODO: Use slippage calculation in `TokenAmount` class.
@@ -255,10 +261,10 @@ export const SubmitButton = ({
         fee: feeTier,
         tickLower: Number(tickLower),
         tickUpper: Number(tickUpper),
-        amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
-        amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
-        amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
-        amount1Min: getMaxBigInt(amount1Min, BigInt(1)),
+        amount0Desired,
+        amount1Desired,
+        amount0Min,
+        amount1Min,
         recipient: address,
         deadline: BigInt(deadline),
         sqrtPriceX96,
@@ -278,6 +284,7 @@ export const SubmitButton = ({
   }, [
     address,
     chain,
+    depositType,
     feeTier,
     token0,
     token1,
