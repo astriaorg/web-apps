@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { type Address, Chain, type Hash } from "viem";
 import {
   useAccount,
-  useChainId,
   useConfig as useWagmiConfig,
   useWaitForTransactionReceipt,
 } from "wagmi";
@@ -55,7 +54,7 @@ interface SwapButtonReturn {
   /** Current transaction status */
   status?: TransactionStatus;
   /** Function to update the transaction status */
-  setStatus: (status: TransactionStatus | undefined) => void;
+  setStatus: (status?: TransactionStatus) => void
   /** Optional message to display (usually for errors) */
   message?: string;
   /** Whether token approval is needed before swap can proceed */
@@ -70,12 +69,11 @@ export function useSwapButton({
   loading,
   error: quoteError,
   tradeType,
-}: SwapButtonProps) {
+}: SwapButtonProps): SwapButtonReturn {
   const { chain } = useAstriaChainData();
   const { feeRecipient } = useConfig();
   const config = useWagmiConfig();
   const userAccount = useAccount();
-  const currentChainId = useChainId();
   const { connectWallet, switchToFlameChain, isConnectedToFlameChain } = useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
