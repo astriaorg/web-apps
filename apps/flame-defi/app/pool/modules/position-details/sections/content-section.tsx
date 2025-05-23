@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
@@ -17,11 +18,13 @@ import {
   TransactionSummary,
   TransactionType,
 } from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 
 export const ContentSection = () => {
+  const router = useRouter();
   const { formatNumber } = useIntl();
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
@@ -149,7 +152,13 @@ export const ContentSection = () => {
         <ConfirmationModal
           title="Collect Fees"
           open={isConfirmationModalOpen}
-          onOpenChange={(value) => setIsConfirmationModalOpen(value)}
+          onOpenChange={(value) => {
+            if (!value && status === TransactionStatus.SUCCESS) {
+              router.push(ROUTES.POSITION_LIST);
+              return;
+            }
+            setIsConfirmationModalOpen(value);
+          }}
         >
           <TransactionSummary
             type={TransactionType.COLLECT_FEES}

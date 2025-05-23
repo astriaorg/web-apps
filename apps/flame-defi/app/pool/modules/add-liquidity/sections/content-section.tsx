@@ -1,6 +1,7 @@
 "use client";
 
 import Big from "big.js";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
@@ -44,6 +45,7 @@ import { getTransactionAmounts } from "pool/utils";
 
 // TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
+  const router = useRouter();
   const { formatNumber } = useIntl();
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
@@ -327,7 +329,13 @@ export const ContentSection = () => {
         <ConfirmationModal
           title="Add Liquidity"
           open={isConfirmationModalOpen}
-          onOpenChange={(value) => setIsConfirmationModalOpen(value)}
+          onOpenChange={(value) => {
+            if (!value && status === TransactionStatus.SUCCESS) {
+              router.push(`/pool/${tokenId}`);
+              return;
+            }
+            setIsConfirmationModalOpen(value);
+          }}
         >
           <TransactionSummary
             type={TransactionType.ADD_LIQUIDITY}
