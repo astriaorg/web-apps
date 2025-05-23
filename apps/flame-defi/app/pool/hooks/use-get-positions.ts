@@ -9,7 +9,10 @@ import {
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import { type PositionWithKey } from "pool/types";
-import { getTokenFromAddress } from "pool/utils";
+import {
+  calculateTokenAmountsFromPosition,
+  getTokenFromAddress,
+} from "pool/utils";
 
 const STALE_TIME_MILLISECONDS = 1000 * 30; // 30 seconds.
 const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
@@ -22,6 +25,9 @@ export type GetPositionsResult = {
     liquidity: bigint;
   };
   position: PositionWithKey;
+  amount0: string;
+  amount1: string;
+  price: string;
 };
 
 export const useGetPositions = (): UseQueryResult<
@@ -62,6 +68,8 @@ export const useGetPositions = (): UseQueryResult<
         })),
       );
 
+      // TODO: Promise.all or combine multicall.
+      const slot0Results = await poolFactoryService.getSlot0ForPools(pools);
       const liquidityResults =
         await poolFactoryService.getLiquidityForPools(pools);
 
@@ -72,9 +80,16 @@ export const useGetPositions = (): UseQueryResult<
         if (!token0 || !token1) {
           throw new Error("Tokens in position not found.");
         }
-        if (!pools[index]) {
+        if (!pools[index] || !slot0Results[index] || !liquidityResults[index]) {
           throw new Error("No matching pool for position found.");
         }
+
+        const { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+          position,
+          sqrtPriceX96: slot0Results[index]?.slot0.sqrtPriceX96,
+          token0,
+          token1,
+        });
 
         return {
           position,
@@ -85,6 +100,9 @@ export const useGetPositions = (): UseQueryResult<
             liquidity: (liquidityResults[index] as { liquidity: bigint })
               .liquidity,
           },
+          amount0,
+          amount1,
+          price,
         };
       });
     },

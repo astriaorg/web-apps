@@ -65,7 +65,12 @@ export const PositionListTable = () => {
         id: "position.liquidity",
         header: "Status",
         cell: ({ row }) => {
-          return <PositionRangeBadge position={row.original.position} />;
+          return (
+            <PositionRangeBadge
+              position={row.original.position}
+              price={row.original.price}
+            />
+          );
         },
       }),
     ];

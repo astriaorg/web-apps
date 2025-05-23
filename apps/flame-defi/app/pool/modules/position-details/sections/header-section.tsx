@@ -32,7 +32,10 @@ export const HeaderSection = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <PositionRangeBadge position={data.position} />
+                  <PositionRangeBadge
+                    position={data.position}
+                    price={data.price}
+                  />
                   <PositionFeeBadge position={data.position} />
                 </div>
               </div>

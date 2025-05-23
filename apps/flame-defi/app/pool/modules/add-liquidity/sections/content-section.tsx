@@ -251,6 +251,7 @@ export const ContentSection = () => {
           token0={data?.token0}
           token1={data?.token1}
           position={data?.position}
+          price={data?.price}
           isLoading={isPending}
         />
 

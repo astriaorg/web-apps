@@ -57,7 +57,7 @@ export const PriceRangeSummary = () => {
         {data && (
           <>
             <div className="flex-1">
-              <PositionRangeBadge position={data.position} />
+              <PositionRangeBadge position={data.position} price={data.price} />
             </div>
             <Tabs
               defaultValue={data.token1.coinDenom}

@@ -11,11 +11,13 @@ import type { Position } from "pool/types";
 
 export const PositionSummaryCard = ({
   position,
+  price,
   token0,
   token1,
   isLoading,
 }: {
   position?: Position;
+  price?: string;
   token0?: EvmCurrency;
   token1?: EvmCurrency;
   isLoading: boolean;
@@ -33,9 +35,10 @@ export const PositionSummaryCard = ({
           {token0?.coinDenom}/{token1?.coinDenom}
         </CardTitle>
         <div className="flex-1" />
-        {position && (
+        {position && price && (
           <PositionRangeBadge
             position={position}
+            price={price}
             className="p-0 bg-transparent"
           />
         )}
