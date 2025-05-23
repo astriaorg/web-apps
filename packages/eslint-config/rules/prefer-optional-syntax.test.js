@@ -38,6 +38,14 @@ ruleTester.run("prefer-optional-syntax", preferOptionalSyntax, {
         }
       `,
     },
+    // Array of unions with undefined (should NOT be converted - different semantics)
+    {
+      code: `
+        interface TestInterface {
+          items: (string | undefined)[];
+        }
+      `,
+    },
   ],
 
   invalid: [
@@ -110,6 +118,156 @@ ruleTester.run("prefer-optional-syntax", preferOptionalSyntax, {
       output: `
         interface TestInterface {
           update: (id: string, value?: number) => void
+        }
+      `,
+    },
+    // Function type that is itself optional (union with undefined at function level)
+    {
+      code: `
+        interface TestInterface {
+          update: ((id: string, value: number | undefined) => void) | undefined;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+        {
+          message: "Consider using optional syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          update?: (id: string, value?: number) => void
+        }
+      `,
+    },
+    // Method syntax (now fixable!)
+    {
+      code: `
+        interface TestInterface {
+          method(value: string | undefined): void;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          method(value?: string): void
+        }
+      `,
+    },
+    // Function that returns a function with optional parameter (now fixable!)
+    {
+      code: `
+        interface TestInterface {
+          createHandler: () => (value: string | undefined) => void;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          createHandler: () => (value?: string) => void
+        }
+      `,
+    },
+    // Multiple parameters with unions containing undefined
+    {
+      code: `
+        interface TestInterface {
+          update: (id: string | undefined, value: number | undefined) => void;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          update: (id?: string, value?: number) => void
+        }
+      `,
+    },
+    // Union with null AND undefined (should convert to optional but keep null)
+    {
+      code: `
+        interface TestInterface {
+          handler: (value: string | null | undefined) => void;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          handler: (value?: string | null) => void
+        }
+      `,
+    },
+    // Readonly property with union containing undefined
+    {
+      code: `
+        interface TestInterface {
+          readonly config: string | undefined;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          readonly config?: string
+        }
+      `,
+    },
+    // Generic type parameter with undefined
+    {
+      code: `
+        interface TestInterface<T> {
+          handler: (value: T | undefined) => void;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface<T> {
+          handler: (value?: T) => void
+        }
+      `,
+    },
+    // Complex case: readonly method with nested function return and multiple union parameters
+    {
+      code: `
+        interface TestInterface {
+          readonly createProcessor: (config: string | undefined) => (data: number | undefined, callback: ((error: Error | undefined) => void) | undefined) => Promise<string>;
+        }
+      `,
+      errors: [
+        {
+          message: "Use optional property syntax (prop?: type) instead of union with undefined",
+        },
+        {
+          message: "Consider using optional syntax (prop?: type) instead of union with undefined",
+        },
+      ],
+      output: `
+        interface TestInterface {
+          readonly createProcessor: (config?: string) => (data?: number, callback?: (error?: Error) => void) => Promise<string>
         }
       `,
     },
