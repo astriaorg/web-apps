@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useAccount } from "wagmi";
 
-import { Balance } from "@repo/flame-types";
 import { AstriaIcon } from "@repo/ui/icons/polychrome";
 import { shortenAddress } from "@repo/ui/utils";
 import { ConnectMultipleWallets } from "components/connect-wallet";
@@ -20,13 +19,13 @@ export const ConnectEvmWalletButton = ({
   onDisconnectWallet,
 }: ConnectEvmWalletButtonProps) => {
   const userAccount = useAccount();
-  const { 
-    connectWallet, 
+  const {
+    connectWallet,
     disconnectWallet,
     nativeTokenBalance,
     isLoadingNativeTokenBalance,
     usdcToNativeQuote,
-    quoteLoading
+    quoteLoading,
   } = useAstriaWallet();
 
   const { chain } = useAstriaChainData();
@@ -43,7 +42,9 @@ export const ConnectEvmWalletButton = ({
   return (
     <ConnectMultipleWallets
       isConnected={!!userAccount.address}
-      isLoading={(isLoadingNativeTokenBalance && !nativeTokenBalance) || quoteLoading}
+      isLoading={
+        (isLoadingNativeTokenBalance && !nativeTokenBalance) || quoteLoading
+      }
       account={userAccount}
       balance={nativeTokenBalance ?? undefined}
       fiat={usdcToNativeQuote}
