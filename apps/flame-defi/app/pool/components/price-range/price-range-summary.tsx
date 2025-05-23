@@ -111,11 +111,15 @@ export const PriceRangeSummary = () => {
                 Current Price
               </CardLabel>
               <CardFigureLabel className="truncate">
-                {formatNumber(Number(data?.price ?? 0), {
-                  minimumFractionDigits: 4,
-                  maximumFractionDigits: 4,
-                  roundingMode: "trunc",
-                })}
+                {/* TODO: Remove double inversion. */}
+                {formatNumber(
+                  data?.price ? Number(1 / Number(data.price)) : 0,
+                  {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4,
+                    roundingMode: "trunc",
+                  },
+                )}
               </CardFigureLabel>
               <div className="flex-1" />
               <PricePerTokenLabel token0={data?.token0} token1={data?.token1} />

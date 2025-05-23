@@ -125,7 +125,7 @@ export const ContentSection = () => {
 
     if (currentInput === InputId.INPUT_0 && amount0.value) {
       const derivedAmount1 = new Big(amount0.value)
-        .mul(new Big(1).div(price)) // TODO: Invert price to match create position logic.
+        .mul(price)
         .toFixed(token1.coinDecimals);
       return {
         derivedAmount0: amount0,
@@ -139,7 +139,7 @@ export const ContentSection = () => {
 
     if (currentInput === InputId.INPUT_1 && amount1.value) {
       const derivedAmount0 = new Big(amount1.value)
-        .mul(price)
+        .mul(new Big(1).div(price))
         .toFixed(token0.coinDecimals);
       return {
         derivedAmount0: getDerivedAmount(
@@ -316,6 +316,7 @@ export const ContentSection = () => {
             />
           </Skeleton>
         )}
+        {!data && <Skeleton className="w-full h-26" />}
       </div>
 
       <Button

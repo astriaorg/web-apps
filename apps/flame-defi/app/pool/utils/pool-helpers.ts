@@ -204,7 +204,7 @@ export const calculateTokenAmountsFromPosition = ({
   const sqrtPriceUpperX96 = TickMath.getSqrtRatioAtTick(position.tickUpper);
 
   const tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-  const price = tickToPrice(token1.asToken(), token0.asToken(), tick);
+  const price = tickToPrice(token0.asToken(), token1.asToken(), tick);
 
   const liquidity = JSBI.BigInt(position.liquidity.toString());
 

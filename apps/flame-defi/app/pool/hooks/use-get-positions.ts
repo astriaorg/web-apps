@@ -89,11 +89,15 @@ export const useGetPositions = (): UseQueryResult<
         const uniquePool = uniquePools[index];
         const uniqueLiquidityAndSlot0 = uniqueLiquidityAndSlot0ForPools[index];
 
+        if (!uniquePool || !uniqueLiquidityAndSlot0) {
+          throw new Error("No matching pool for position found.");
+        }
+
         return {
           ...position,
-          address: uniquePool!,
-          liquidity: uniqueLiquidityAndSlot0!.liquidity,
-          slot0: uniqueLiquidityAndSlot0!.slot0,
+          address: uniquePool,
+          liquidity: uniqueLiquidityAndSlot0.liquidity,
+          slot0: uniqueLiquidityAndSlot0.slot0,
         };
       });
 
