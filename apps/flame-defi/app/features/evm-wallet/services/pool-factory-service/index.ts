@@ -40,61 +40,48 @@ export class PoolFactoryService extends GenericContractService {
   }
 
   /**
-   * Get the liquidity data for a given array of pool addresses.
+   * Get the liquidity and slot0 data for a given array of pool addresses.
+   * Pools with zero addresses will throw an error for slot0.
+   *
+   * @param addresses - The addresses of the pools to get liquidity and slot0 data for.
+   * @returns An array of objects containing the pool address and its corresponding liquidity and slot0 data.
    */
-  async getLiquidityForPools(addresses: Address[]): Promise<
+  async getLiquidityAndSlot0ForPools(addresses: Address[]): Promise<
     {
       address: Address;
       liquidity: bigint;
-    }[]
-  > {
-    const result = await this.multicall({
-      contracts: addresses.map((it) => {
-        return {
-          functionName: "liquidity",
-          address: it,
-          abi: POOL_ABI as Abi,
-          args: [],
-        };
-      }),
-    });
-
-    return result.map((it, index) => {
-      return {
-        address: addresses[index] as Address,
-        liquidity: it as bigint,
-      };
-    });
-  }
-
-  /**
-   * Get the slot0 data for a given array of pool addresses.
-   * Pools with zero addresses will throw an error.
-   *
-   * @param addresses - The addresses of the pools to get slot0 data for.
-   * @returns An array of objects containing the pool address and its corresponding slot0 data.
-   */
-  async getSlot0ForPools(addresses: Address[]): Promise<
-    {
-      address: Address;
       slot0: Slot0;
     }[]
   > {
+    const contracts = [];
+
+    for (const address of addresses) {
+      contracts.push({
+        functionName: "liquidity",
+        address,
+        abi: POOL_ABI as Abi,
+        args: [],
+      });
+      contracts.push({
+        functionName: "slot0",
+        address,
+        abi: POOL_ABI as Abi,
+        args: [],
+      });
+    }
+
     const result = await this.multicall({
-      contracts: addresses.map((it) => {
-        return {
-          functionName: "slot0",
-          address: it,
-          abi: POOL_ABI as Abi,
-          args: [],
-        };
-      }),
+      contracts,
     });
 
-    return result.map((it, index) => {
+    return addresses.map((it, index) => {
+      const liquidityIndex = index * 2; // Liquidity is at even indices.
+      const slot0Index = liquidityIndex + 1; // Slot0 is at odd indices.
+
       return {
-        address: addresses[index] as Address,
-        slot0: mapSlot0ResponseToSlot0(it as Slot0Response),
+        address: it as Address,
+        liquidity: result[liquidityIndex] as bigint,
+        slot0: mapSlot0ResponseToSlot0(result[slot0Index] as Slot0Response),
       };
     });
   }

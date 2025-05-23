@@ -47,21 +47,16 @@ export const useGetPools = (params: {
 
       const validPools = pools.filter((it) => it !== zeroAddress);
 
-      // TODO: Promise.all or combine multicall.
-      const slot0Results =
-        await poolFactoryService.getSlot0ForPools(validPools);
-      const liquidityResults =
-        await poolFactoryService.getLiquidityForPools(validPools);
+      const results =
+        await poolFactoryService.getLiquidityAndSlot0ForPools(validPools);
 
       const result = {} as GetPoolsResult;
 
       for (let i = 0; i < FEE_TIERS.length; i++) {
         const feeTier = FEE_TIERS[i] as FeeTier;
 
-        const slot0Result = slot0Results.find((it) => it.address === pools[i]);
-        const liquidityResult = liquidityResults.find(
-          (it) => it.address === pools[i],
-        );
+        const slot0Result = results.find((it) => it.address === pools[i]);
+        const liquidityResult = results.find((it) => it.address === pools[i]);
 
         if (!slot0Result || !liquidityResult) {
           result[feeTier] = null;

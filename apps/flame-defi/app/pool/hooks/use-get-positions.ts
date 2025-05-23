@@ -60,33 +60,54 @@ export const useGetPositions = (): UseQueryResult<
         chain.contracts.poolFactory.address,
       );
 
-      const pools = await poolFactoryService.getPools(
-        positions.map((position) => ({
-          token0: position.token0,
-          token1: position.token1,
-          fee: position.fee,
-        })),
+      const getPositionKey = (position: PositionWithKey) => {
+        return `${position.token0}-${position.token1}-${position.fee}`;
+      };
+
+      // Get all positions for a given token pair and fee.
+      // There is only one pool for a given token pair and fee, so we don't need to fetch for every position.
+      const uniquePositionsRecord = positions.reduce(
+        (acc, position) => {
+          const key = getPositionKey(position);
+          if (!acc[key]) {
+            acc[key] = position;
+          }
+          return acc;
+        },
+        {} as Record<string, PositionWithKey>,
       );
+      const uniquePools = await poolFactoryService.getPools(
+        Object.values(uniquePositionsRecord),
+      );
+      const uniqueLiquidityAndSlot0ForPools =
+        await poolFactoryService.getLiquidityAndSlot0ForPools(uniquePools);
 
-      // TODO: Promise.all or combine multicall.
-      const slot0Results = await poolFactoryService.getSlot0ForPools(pools);
-      const liquidityResults =
-        await poolFactoryService.getLiquidityForPools(pools);
+      const positionsWithLiquidityAndSlot0 = positions.map((position) => {
+        const key = getPositionKey(position);
+        const uniquePositionsKeys = Object.keys(uniquePositionsRecord);
+        const index = uniquePositionsKeys.findIndex((it) => it === key);
+        const uniquePool = uniquePools[index];
+        const uniqueLiquidityAndSlot0 = uniqueLiquidityAndSlot0ForPools[index];
 
-      return positions.map((position, index) => {
+        return {
+          ...position,
+          address: uniquePool!,
+          liquidity: uniqueLiquidityAndSlot0!.liquidity,
+          slot0: uniqueLiquidityAndSlot0!.slot0,
+        };
+      });
+
+      return positionsWithLiquidityAndSlot0.map((position) => {
         const token0 = getTokenFromAddress(position.token0, chain);
         const token1 = getTokenFromAddress(position.token1, chain);
 
         if (!token0 || !token1) {
           throw new Error("Tokens in position not found.");
         }
-        if (!pools[index] || !slot0Results[index] || !liquidityResults[index]) {
-          throw new Error("No matching pool for position found.");
-        }
 
         const { amount0, amount1, price } = calculateTokenAmountsFromPosition({
           position,
-          sqrtPriceX96: slot0Results[index]?.slot0.sqrtPriceX96,
+          sqrtPriceX96: position.slot0.sqrtPriceX96,
           token0,
           token1,
         });
@@ -94,11 +115,10 @@ export const useGetPositions = (): UseQueryResult<
         return {
           position,
           pool: {
-            address: pools[index],
+            address: position.address,
             token0,
             token1,
-            liquidity: (liquidityResults[index] as { liquidity: bigint })
-              .liquidity,
+            liquidity: position.liquidity,
           },
           amount0,
           amount1,
@@ -109,5 +129,6 @@ export const useGetPositions = (): UseQueryResult<
     enabled: !!address,
     staleTime: STALE_TIME_MILLISECONDS,
     gcTime: CACHE_TIME_MILLISECONDS,
+    retry: 0,
   });
 };
