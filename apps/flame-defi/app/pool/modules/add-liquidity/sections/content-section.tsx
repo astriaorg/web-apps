@@ -194,21 +194,13 @@ export const ContentSection = () => {
         amount1Desired,
         deadline,
       } = getTransactionAmounts({
-        amount0: amount0.value,
-        amount1: amount1.value,
+        amount0: derivedValues.derivedAmount0.value,
+        amount1: derivedValues.derivedAmount1.value,
         token0,
         token1,
         depositType: data.depositType,
         slippageTolerance,
       });
-
-      console.log(
-        amount0Min,
-        amount1Min,
-        amount0Desired,
-        amount1Desired,
-        deadline,
-      );
 
       const hash = await addLiquidity({
         chainId: chain.chainId,
@@ -229,8 +221,7 @@ export const ContentSection = () => {
     }
   }, [
     data,
-    amount0,
-    amount1,
+    derivedValues,
     address,
     tokenId,
     chain.chainId,
@@ -347,8 +338,8 @@ export const ContentSection = () => {
             status={status}
             error={error}
             onSubmit={handleSubmit}
-            amount0={amount0.value}
-            amount1={amount1.value}
+            amount0={derivedValues.derivedAmount0.value}
+            amount1={derivedValues.derivedAmount1.value}
             minPrice={data.minPrice}
             maxPrice={data.maxPrice}
           />
