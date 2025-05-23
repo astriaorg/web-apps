@@ -20,5 +20,8 @@ export const getPlaceholderData = (length: number): GetPositionsResult[] =>
           liquidity: 0n,
           feeTier: FEE_TIER.LOWEST,
         },
+        amount0: "0",
+        amount1: "0",
+        price: "0",
       }) as GetPositionsResult,
   );
