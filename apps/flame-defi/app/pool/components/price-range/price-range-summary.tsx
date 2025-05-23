@@ -16,46 +16,8 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { getDisplayMaxPrice, getDisplayMinPrice } from "pool/utils";
 
-const PriceRangeBlock = ({ type }: { type: "min" | "max" }) => {
-  const { tokenId, invert } = usePoolPositionContextV2();
-  const { data } = useGetPosition({ tokenId, invert });
-
-  const price =
-    type === "min"
-      ? getDisplayMinPrice(data?.minPrice ?? "0", {
-          minimumFractionDigits: 4,
-        })
-      : getDisplayMaxPrice(data?.maxPrice ?? "0", {
-          minimumFractionDigits: 4,
-        });
-
-  return (
-    <div className="flex flex-col gap-1">
-      <CardLabel className="text-xs font-medium tracking-wider uppercase">
-        {type === "min" ? "Min Price" : "Max Price"}
-      </CardLabel>
-      {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
-      <CardFigureLabel className="text-typography-light font-sans">
-        {price}
-      </CardFigureLabel>
-      <PricePerTokenLabel />
-      <CardLabel className="text-xs text-typography-subdued">
-        Your position will be 100% {data?.token0.coinDenom} at this price.
-      </CardLabel>
-    </div>
-  );
-};
-
-const PricePerTokenLabel = () => {
-  const { tokenId, invert } = usePoolPositionContextV2();
-  const { data } = useGetPosition({ tokenId, invert });
-
-  return (
-    <CardLabel className="text-xs font-medium">
-      {data?.token0.coinDenom} per {data?.token1.coinDenom}
-    </CardLabel>
-  );
-};
+import { PricePerTokenLabel } from "./price-per-token-label";
+import { PriceRangeBlock } from "./price-range-block";
 
 export const PriceRangeSummary = () => {
   const { formatNumber } = useIntl();
@@ -123,8 +85,18 @@ export const PriceRangeSummary = () => {
         >
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <PriceRangeBlock type="min" />
-              <PriceRangeBlock type="max" />
+              <PriceRangeBlock
+                token0={data?.token0}
+                token1={data?.token1}
+                price={getDisplayMinPrice(data?.minPrice ?? "0")}
+                label="Min Price"
+              />
+              <PriceRangeBlock
+                token0={data?.token0}
+                token1={data?.token1}
+                price={getDisplayMaxPrice(data?.maxPrice ?? "0")}
+                label="Max Price"
+              />
             </div>
           </CardContent>
         </Card>
@@ -142,7 +114,7 @@ export const PriceRangeSummary = () => {
                 })}
               </CardFigureLabel>
               <div className="flex-1" />
-              <PricePerTokenLabel />
+              <PricePerTokenLabel token0={data?.token0} token1={data?.token1} />
             </div>
           </CardContent>
         </Card>
