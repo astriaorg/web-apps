@@ -241,7 +241,16 @@ export const ContentSection = () => {
     setStatus,
   ]);
 
-  console.log(data?.depositType);
+  const isDisabled = useMemo(() => {
+    return (
+      isPending ||
+      !data ||
+      !address ||
+      !derivedValues.derivedAmount0.validation.isValid ||
+      !derivedValues.derivedAmount1.validation.isValid
+    );
+  }, [isPending, data, address, derivedValues]);
+
   return (
     <section className="flex flex-col">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -317,7 +326,7 @@ export const ContentSection = () => {
 
       <Button
         onClick={handleOpenConfirmationModal}
-        disabled={isPending}
+        disabled={isDisabled}
         className="mt-6 w-full"
       >
         Add Liquidity
