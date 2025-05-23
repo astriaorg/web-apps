@@ -3,7 +3,7 @@ import React, { useCallback, useMemo } from "react";
 import { type Address, formatUnits } from "viem";
 import { useAccount, useBalance, useDisconnect, useSwitchChain } from "wagmi";
 
-import { AstriaChain, Balance } from "@repo/flame-types";
+import { Balance } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
 
 import { useUsdQuote } from "../hooks/use-usd-quote";
@@ -15,7 +15,6 @@ export interface AstriaWalletContextProps {
   accountAddress: Address | null;
   nativeTokenBalance: Balance | null;
   isLoadingNativeTokenBalance: boolean;
-  chain: AstriaChain | null;
   usdcToNativeQuote: Balance;
   quoteLoading: boolean;
   isConnectedToFlameChain: boolean;
@@ -117,7 +116,6 @@ export const AstriaWalletContextProvider: React.FC<{
         accountAddress: userAccount.address ?? null,
         nativeTokenBalance,
         isLoadingNativeTokenBalance,
-        chain,
         usdcToNativeQuote,
         quoteLoading,
         isConnectedToFlameChain,
