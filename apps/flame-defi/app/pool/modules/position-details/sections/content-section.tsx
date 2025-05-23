@@ -58,9 +58,9 @@ export const ContentSection = () => {
       return;
     }
 
-    try {
-      setStatus(TransactionStatus.PENDING);
+    setStatus(TransactionStatus.PENDING);
 
+    try {
       const hash = await collectFees({
         chain,
         tokenId,
@@ -75,7 +75,10 @@ export const ContentSection = () => {
 
       setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
       setStatus(TransactionStatus.FAILED);
     }
   }, [
@@ -87,6 +90,7 @@ export const ContentSection = () => {
     chain,
     isCollectAsWrappedNative,
     setHash,
+    setError,
     setStatus,
   ]);
 

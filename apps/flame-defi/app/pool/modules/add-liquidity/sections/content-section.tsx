@@ -218,7 +218,10 @@ export const ContentSection = () => {
 
       setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      }
       setStatus(TransactionStatus.FAILED);
     }
   }, [
@@ -231,6 +234,7 @@ export const ContentSection = () => {
     handleCloseConfirmationModal,
     addLiquidity,
     setHash,
+    setError,
     setStatus,
   ]);
 

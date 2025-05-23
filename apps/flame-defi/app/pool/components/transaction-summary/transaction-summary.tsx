@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { TransactionStatus } from "@repo/flame-types";
 import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
-import { ErrorIcon } from "@repo/ui/icons";
+import { WarningTriangleIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
 
 import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
@@ -65,13 +65,22 @@ const TransactionSuccess = ({
 };
 
 const TransactionFailed = ({ error }: TransactionFailedProps) => {
+  const message = useMemo(() => {
+    if (error) {
+      if (error.includes("User rejected the request.")) {
+        return "Transaction rejected.";
+      }
+      return "An error occurred. Please try again.";
+    }
+  }, [error]);
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="my-6">
-        <ErrorIcon size={100} className="text-danger" />
+        <WarningTriangleIcon size={100} className="text-danger" />
       </div>
       <div className="mt-4">
-        <span>{error || "An error occurred. Please try again."}</span>
+        <span>{message}</span>
       </div>
     </div>
   );
