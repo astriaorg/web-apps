@@ -74,7 +74,7 @@ export function useSwapButton({
   const { feeRecipient } = useConfig();
   const config = useWagmiConfig();
   const userAccount = useAccount();
-  const { connectWallet, switchToFlameChain, isConnectedToFlameChain } =
+  const { connectWallet, connectToFlame, isConnectedToFlameChain } =
     useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
@@ -256,7 +256,7 @@ export function useSwapButton({
       case !userAccount.address:
         return connectWallet();
       case !isConnectedToFlameChain:
-        return switchToFlameChain();
+        return connectToFlame();
       case tokenNeedingApproval !== null:
         return handleTokenApproval(tokenNeedingApproval);
       case unwrapTia:

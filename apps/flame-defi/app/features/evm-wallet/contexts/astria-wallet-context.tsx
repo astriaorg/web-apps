@@ -11,7 +11,8 @@ import { useUsdQuote } from "../hooks/use-usd-quote";
 export interface AstriaWalletContextProps {
   connectWallet: () => void;
   disconnectWallet: () => void;
-  switchToFlameChain: () => void;
+  connectToFlame: () => void;
+  connectToChain: (chainId: number) => void;
   accountAddress: Address | null;
   nativeTokenBalance: Balance | null;
   isLoadingNativeTokenBalance: boolean;
@@ -50,7 +51,7 @@ export const AstriaWalletContextProvider: React.FC<{
     await logout();
   }, [disconnect, logout]);
 
-  const switchToFlameChain = useCallback(() => {
+  const connectToFlame = useCallback(() => {
     if (!userAccount.address) {
       // First connect wallet, then the user can switch chains afterward
       connectOrCreateWallet();
@@ -58,6 +59,18 @@ export const AstriaWalletContextProvider: React.FC<{
       switchChain({ chainId: chain.chainId });
     }
   }, [userAccount.address, chain.chainId, connectOrCreateWallet, switchChain]);
+
+  const connectToChain = useCallback(
+    (chainId: number) => {
+      if (!userAccount.address) {
+        // First connect wallet, then the user can switch chains afterward
+        connectOrCreateWallet();
+      } else {
+        switchChain({ chainId });
+      }
+    },
+    [userAccount.address, connectOrCreateWallet, switchChain],
+  );
 
   const isConnectedToFlameChain = useMemo(() => {
     return Boolean(
@@ -112,7 +125,8 @@ export const AstriaWalletContextProvider: React.FC<{
       value={{
         connectWallet,
         disconnectWallet,
-        switchToFlameChain,
+        connectToFlame,
+        connectToChain,
         accountAddress: userAccount.address ?? null,
         nativeTokenBalance,
         isLoadingNativeTokenBalance,

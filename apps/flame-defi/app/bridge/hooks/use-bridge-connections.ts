@@ -12,6 +12,7 @@ import {
 } from "@repo/flame-types";
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
+import { useAstriaWallet } from "features/evm-wallet/hooks/use-astria-wallet";
 import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 
 export interface BridgeConnections {
@@ -38,6 +39,7 @@ export interface BridgeConnections {
 
 export function useBridgeConnections(): BridgeConnections {
   const evmWallet = useEvmWallet();
+  const astriaWallet = useAstriaWallet();
   const cosmosWallet = useCosmosWallet();
   const connectedEvmChainId = useChainId();
   const { switchChain } = useSwitchChain();
@@ -107,7 +109,7 @@ export function useBridgeConnections(): BridgeConnections {
           ...prev,
           chain,
         }));
-        evmWallet.connectToSpecificChain(chain.chainId);
+        astriaWallet.connectToChain(chain.chainId);
 
         // set destination address manually when source is evm type
         if (chain?.chainType === ChainType.EVM) {
@@ -139,6 +141,7 @@ export function useBridgeConnections(): BridgeConnections {
       destinationConnection.chain?.chainType,
       cosmosWallet,
       evmWallet,
+      astriaWallet,
     ],
   );
 
@@ -199,7 +202,7 @@ export function useBridgeConnections(): BridgeConnections {
         ) {
           // need to connect wallet when we don't have a combo of astria/evm.
           // having a combo of astria/evm means we've already got a connection
-          evmWallet.connectToSpecificChain(chain.chainId);
+          astriaWallet.connectToChain(chain.chainId);
         }
       }
 
@@ -211,6 +214,7 @@ export function useBridgeConnections(): BridgeConnections {
       sourceConnection.chain?.chainType,
       cosmosWallet,
       evmWallet,
+      astriaWallet,
     ],
   );
 
