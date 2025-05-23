@@ -61,7 +61,9 @@ export const AstriaWalletContextProvider: React.FC<{
   }, [userAccount.address, chain.chainId, connectOrCreateWallet, switchChain]);
 
   const isConnectedToFlameChain = useMemo(() => {
-    return Boolean(userAccount.address && userAccount.chainId === chain.chainId);
+    return Boolean(
+      userAccount.address && userAccount.chainId === chain.chainId,
+    );
   }, [userAccount.address, userAccount.chainId, chain.chainId]);
 
   const {

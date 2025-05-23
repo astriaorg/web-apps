@@ -54,7 +54,7 @@ interface SwapButtonReturn {
   /** Current transaction status */
   status?: TransactionStatus;
   /** Function to update the transaction status */
-  setStatus: (status?: TransactionStatus) => void
+  setStatus: (status?: TransactionStatus) => void;
   /** Optional message to display (usually for errors) */
   message?: string;
   /** Whether token approval is needed before swap can proceed */
@@ -74,7 +74,8 @@ export function useSwapButton({
   const { feeRecipient } = useConfig();
   const config = useWagmiConfig();
   const userAccount = useAccount();
-  const { connectWallet, switchToFlameChain, isConnectedToFlameChain } = useAstriaWallet();
+  const { connectWallet, switchToFlameChain, isConnectedToFlameChain } =
+    useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
   const [status, setStatus] = useState<TransactionStatus | undefined>(

@@ -16,7 +16,11 @@ import { ArrowDownIcon } from "@repo/ui/icons";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useAstriaChainData } from "config";
-import { useAstriaWallet, useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
+import {
+  useAstriaWallet,
+  useEvmCurrencyBalance,
+  useGetQuote,
+} from "features/evm-wallet";
 
 import { SwapInput, SwapTransactionSteps, TransactionInfo } from "./components";
 import { useOneToOneQuote, useSwapButton, useTransactionInfo } from "./hooks";
@@ -374,11 +378,14 @@ export default function SwapPage(): React.ReactElement {
             </button>
           </div>
         </div>
-        {userAccount.address && !validSwapInputs && !tokenApprovalNeeded && isConnectedToFlameChain && (
-          <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
-            {buttonText}
-          </div>
-        )}
+        {userAccount.address &&
+          !validSwapInputs &&
+          !tokenApprovalNeeded &&
+          isConnectedToFlameChain && (
+            <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
+              {buttonText}
+            </div>
+          )}
         <ConfirmationModal
           open={modalOpen}
           buttonText={buttonText}
@@ -401,7 +408,9 @@ export default function SwapPage(): React.ReactElement {
             isQuoteLoading={loading}
           />
         </ConfirmationModal>
-        {(!userAccount.address || tokenApprovalNeeded || !isConnectedToFlameChain) && (
+        {(!userAccount.address ||
+          tokenApprovalNeeded ||
+          !isConnectedToFlameChain) && (
           <Button
             variant="gradient"
             onClick={onSubmitCallback}
