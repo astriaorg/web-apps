@@ -23,8 +23,7 @@ import {
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
 export interface CreateAndInitializePoolIfNecessaryAndMintParams {
-  // TODO: Change this back to chainId since we removed token wrapping/unwrapping to the currency class level.
-  chain: AstriaChain;
+  chainId: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
   fee: number;
@@ -108,8 +107,7 @@ export interface CollectFeesParams {
 }
 
 export interface CollectFeesV2Params {
-  // TODO: Change back to chainId.
-  chain: AstriaChain;
+  chainId: number;
   tokenId: string;
   token0: EvmCurrency;
   token1: EvmCurrency;
@@ -207,7 +205,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * Creates a new pool if necessary and mints a new position in a single transaction.
    */
   async createAndInitializePoolIfNecessaryAndMint({
-    chain,
+    chainId,
     token0,
     token1,
     fee,
@@ -286,13 +284,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     const gasLimit = await this.estimateContractGasWithBuffer(
-      chain.chainId,
+      chainId,
       calls,
       value,
     );
 
     return await this.writeContractMethod(
-      chain.chainId,
+      chainId,
       "multicall",
       [calls],
       value,
@@ -306,7 +304,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * This method handles both wrapped native token collection and non-native token collection scenarios.
    */
   async collectFeesV2({
-    chain,
+    chainId,
     tokenId,
     token0,
     token1,
@@ -376,13 +374,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     const gasLimit = await this.estimateContractGasWithBuffer(
-      chain.chainId,
+      chainId,
       calls,
       0n,
     );
 
     return await this.writeContractMethod(
-      chain.chainId,
+      chainId,
       "multicall",
       [calls],
       undefined,

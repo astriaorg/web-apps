@@ -62,7 +62,7 @@ export const ContentSection = () => {
 
     try {
       const hash = await collectFees({
-        chain,
+        chainId: chain.chainId,
         tokenId,
         token0: data.token0,
         token1: data.token1,
@@ -87,7 +87,7 @@ export const ContentSection = () => {
     data,
     address,
     tokenId,
-    chain,
+    chain.chainId,
     isCollectAsWrappedNative,
     setHash,
     setError,

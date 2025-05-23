@@ -237,7 +237,7 @@ export const SubmitButton = ({
       }
 
       const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
-        chain,
+        chainId: chain.chainId,
         token0,
         token1,
         fee: feeTier,
@@ -265,7 +265,7 @@ export const SubmitButton = ({
     }
   }, [
     address,
-    chain,
+    chain.chainId,
     depositType,
     feeTier,
     token0,
