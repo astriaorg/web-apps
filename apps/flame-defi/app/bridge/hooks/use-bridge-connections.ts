@@ -13,7 +13,6 @@ import {
 import { ChainConnection } from "bridge/types";
 import { useCosmosWallet } from "features/cosmos-wallet/hooks/use-cosmos-wallet";
 import { useAstriaWallet } from "features/evm-wallet/hooks/use-astria-wallet";
-import { useEvmWallet } from "features/evm-wallet/hooks/use-evm-wallet";
 
 export interface BridgeConnections {
   // Chain connections
@@ -38,7 +37,6 @@ export interface BridgeConnections {
 }
 
 export function useBridgeConnections(): BridgeConnections {
-  const evmWallet = useEvmWallet();
   const astriaWallet = useAstriaWallet();
   const cosmosWallet = useCosmosWallet();
   const connectedEvmChainId = useChainId();
@@ -115,7 +113,7 @@ export function useBridgeConnections(): BridgeConnections {
         if (chain?.chainType === ChainType.EVM) {
           setDestinationConnection((prev) => ({
             ...prev,
-            address: evmWallet.evmAccountAddress,
+            address: astriaWallet.accountAddress,
             isConnected: false,
           }));
         }
@@ -127,7 +125,7 @@ export function useBridgeConnections(): BridgeConnections {
         ) {
           setDestinationConnection((prev) => ({
             ...prev,
-            address: evmWallet.evmAccountAddress,
+            address: astriaWallet.accountAddress,
             isConnected: false,
           }));
         }
@@ -140,7 +138,6 @@ export function useBridgeConnections(): BridgeConnections {
       sourceConnection.chain,
       destinationConnection.chain?.chainType,
       cosmosWallet,
-      evmWallet,
       astriaWallet,
     ],
   );
@@ -189,7 +186,7 @@ export function useBridgeConnections(): BridgeConnections {
         setDestinationConnection((prev) => ({
           ...prev,
           chain,
-          address: evmWallet.evmAccountAddress,
+          address: astriaWallet.accountAddress,
           isConnected: false,
         }));
         if (
@@ -213,7 +210,6 @@ export function useBridgeConnections(): BridgeConnections {
       destinationConnection.chain,
       sourceConnection.chain?.chainType,
       cosmosWallet,
-      evmWallet,
       astriaWallet,
     ],
   );
@@ -234,17 +230,17 @@ export function useBridgeConnections(): BridgeConnections {
     if (
       (sourceConnection.chain?.chainType === ChainType.EVM ||
         sourceConnection.chain?.chainType === ChainType.ASTRIA) &&
-      evmWallet.evmAccountAddress
+      astriaWallet.accountAddress
     ) {
       setSourceConnection((prev) => ({
         ...prev,
-        address: evmWallet.evmAccountAddress,
+        address: astriaWallet.accountAddress,
         isConnected: true,
       }));
     }
   }, [
     cosmosWallet.cosmosAccountAddress,
-    evmWallet.evmAccountAddress,
+    astriaWallet.accountAddress,
     sourceConnection.chain,
   ]);
 
@@ -263,19 +259,19 @@ export function useBridgeConnections(): BridgeConnections {
     if (
       (destinationConnection.chain?.chainType === ChainType.EVM ||
         destinationConnection.chain?.chainType === ChainType.ASTRIA) &&
-      evmWallet.evmAccountAddress
+      astriaWallet.accountAddress
     ) {
       if (destinationConnection.chain?.chainId === connectedEvmChainId) {
         setDestinationConnection((prev) => ({
           ...prev,
-          address: evmWallet.evmAccountAddress,
+          address: astriaWallet.accountAddress,
           isConnected: true,
         }));
       }
     }
   }, [
     cosmosWallet.cosmosAccountAddress,
-    evmWallet.evmAccountAddress,
+    astriaWallet.accountAddress,
     destinationConnection.chain,
     connectedEvmChainId,
   ]);

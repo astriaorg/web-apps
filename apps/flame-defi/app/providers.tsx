@@ -7,10 +7,7 @@ import { IntlProvider } from "react-intl";
 import { ConfigContextProvider } from "config";
 import { CosmosKitProvider } from "features/cosmos-kit";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
-import {
-  AstriaWalletContextProvider,
-  EvmWalletProvider,
-} from "features/evm-wallet";
+import { AstriaWalletContextProvider } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
 import { OnchainKitProvider } from "features/onchain-kit";
 import { PrivyProvider } from "features/privy";
@@ -34,9 +31,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     <AstriaWalletContextProvider>
                       {/* Bridge specific providers moved here from bridge/layout.tsx to
                           prevent re-initialization during page navigation */}
-                      <EvmWalletProvider>
-                        <CosmosWalletProvider>{children}</CosmosWalletProvider>
-                      </EvmWalletProvider>
+                      <CosmosWalletProvider>{children}</CosmosWalletProvider>
                     </AstriaWalletContextProvider>
                   </OnchainKitProvider>
                 </CosmosKitProvider>
