@@ -55,10 +55,11 @@ export const useGetPools = (params: {
       for (let i = 0; i < FEE_TIERS.length; i++) {
         const feeTier = FEE_TIERS[i] as FeeTier;
 
-        const slot0Result = results.find((it) => it.address === pools[i]);
-        const liquidityResult = results.find((it) => it.address === pools[i]);
+        const liquidityAndSlot0Result = results.find(
+          (it) => it.address === pools[i],
+        );
 
-        if (!slot0Result || !liquidityResult) {
+        if (!liquidityAndSlot0Result) {
           result[feeTier] = null;
           continue;
         }
@@ -67,9 +68,9 @@ export const useGetPools = (params: {
           token0,
           token1,
           feeTier,
-          slot0Result.slot0.sqrtPriceX96.toString(),
-          liquidityResult.liquidity.toString(),
-          slot0Result.slot0.tick,
+          liquidityAndSlot0Result.slot0.sqrtPriceX96.toString(),
+          liquidityAndSlot0Result.liquidity.toString(),
+          liquidityAndSlot0Result.slot0.tick,
         );
 
         result[feeTier] = pool;

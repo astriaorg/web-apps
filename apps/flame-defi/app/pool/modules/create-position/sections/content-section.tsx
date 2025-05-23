@@ -243,13 +243,17 @@ export const ContentSection = () => {
       return;
     }
 
-    const price =
-      currentInput === InputId.INPUT_0
-        ? pool?.token0Price.toFixed(pool?.token0.decimals)
-        : pool?.token1Price.toFixed(pool?.token1.decimals);
+    const price = (() => {
+      if (pool) {
+        return currentInput === InputId.INPUT_0
+          ? pool.token0Price.toFixed(pool.token0.decimals)
+          : pool.token1Price.toFixed(pool.token1.decimals);
+      }
+      return amountInitialPrice.value;
+    })();
 
     const depositType = calculateDepositType({
-      currentPrice: pool ? Number(price) : Number(amountInitialPrice.value),
+      currentPrice: Number(price),
       minPrice: Number(minPrice),
       maxPrice: Number(maxPrice),
     });

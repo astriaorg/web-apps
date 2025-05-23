@@ -64,8 +64,8 @@ export const useGetPositions = (): UseQueryResult<
         return `${position.token0}-${position.token1}-${position.fee}`;
       };
 
-      // Get all positions for a given token pair and fee.
-      // There is only one pool for a given token pair and fee, so we don't need to fetch for every position.
+      // Get liquidity and slot0 information for all positions.
+      // There is only one pool per token pair and fee, which can have multiple positions, so we only need to fetch data for unique pools.
       const uniquePositionsRecord = positions.reduce(
         (acc, position) => {
           const key = getPositionKey(position);
