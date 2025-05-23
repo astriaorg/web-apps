@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { type Address, Chain, type Hash } from "viem";
 import {
   useAccount,
+  useChainId,
   useConfig as useWagmiConfig,
   useWaitForTransactionReceipt,
 } from "wagmi";
@@ -34,6 +35,33 @@ interface SwapButtonProps {
   tradeType: TRADE_TYPE;
 }
 
+interface SwapButtonReturn {
+  /** Transaction hash after submission */
+  hash?: Hash;
+  /** Text to display in the modal title */
+  titleText: string;
+  /** Callback function that handles wallet connection, chain switching, token approval, and swap execution based on current state */
+  onSubmitCallback: () => void;
+  /** Text to display on the main swap button */
+  buttonText: string;
+  /** Current error message if any */
+  error: string | null;
+  /** Function to set the current error state */
+  setError: (error: string | null) => void;
+  /** Text to display on the confirmation button in the modal */
+  actionButtonText: string;
+  /** Whether all swap inputs are valid and ready for submission */
+  validSwapInputs: boolean;
+  /** Current transaction status */
+  status?: TransactionStatus;
+  /** Function to update the transaction status */
+  setStatus: (status: TransactionStatus | undefined) => void;
+  /** Optional message to display (usually for errors) */
+  message?: string;
+  /** Whether token approval is needed before swap can proceed */
+  tokenApprovalNeeded: boolean;
+}
+
 export function useSwapButton({
   token0: topToken,
   token1: bottomToken,
@@ -47,9 +75,10 @@ export function useSwapButton({
   const { feeRecipient } = useConfig();
   const config = useWagmiConfig();
   const userAccount = useAccount();
+  const currentChainId = useChainId();
+  const { connectWallet, switchToFlameChain, isConnectedToFlameChain } = useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
   const addRecentTransaction = useAddRecentTransaction();
-  const { connectWallet } = useAstriaWallet();
   const [status, setStatus] = useState<TransactionStatus | undefined>(
     undefined,
   );
@@ -227,6 +256,8 @@ export function useSwapButton({
     switch (true) {
       case !userAccount.address:
         return connectWallet();
+      case !isConnectedToFlameChain:
+        return switchToFlameChain();
       case tokenNeedingApproval !== null:
         return handleTokenApproval(tokenNeedingApproval);
       case unwrapTia:
@@ -245,6 +276,8 @@ export function useSwapButton({
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
+      case !isConnectedToFlameChain:
+        return "Switch to Flame Chain";
       case !topToken.token || !bottomToken.token:
         return "Select a token";
       case tokenNeedingApproval !== null &&

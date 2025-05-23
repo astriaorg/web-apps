@@ -17,6 +17,19 @@ interface EvmWalletProviderProps {
   children: React.ReactNode;
 }
 
+/**
+ * Provider for the EVM wallet context. The EVM wallet context
+ * differs from the Astria wallet context in that it is for pages that
+ * need to connect to other EVM chains (Base, Arbitrum, etc.)
+ *
+ * E.g., the bridge page needs to support connecting to other EVM chains
+ * like Base, Arbitrum, etc.
+ *
+ * FIXME - this context made sense at one point, but the only thing it does
+ *  that the Astria wallet context doesn't do is `connectToSpecificChain`,
+ *  which is used to connect to an EVM chain selected from Bridge source dropdown.
+ *  We could probably just have one context for evm wallet connections.
+ */
 export const EvmWalletProvider: React.FC<EvmWalletProviderProps> = ({
   children,
 }) => {

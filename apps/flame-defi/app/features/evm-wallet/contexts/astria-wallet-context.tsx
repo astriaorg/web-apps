@@ -1,7 +1,7 @@
 import { usePrivy } from "@privy-io/react-auth";
 import React, { useCallback, useMemo } from "react";
 import { type Address, formatUnits } from "viem";
-import { useAccount, useBalance, useDisconnect } from "wagmi";
+import { useAccount, useBalance, useDisconnect, useSwitchChain } from "wagmi";
 
 import { AstriaChain, Balance } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
@@ -11,17 +11,26 @@ import { useUsdQuote } from "../hooks/use-usd-quote";
 export interface AstriaWalletContextProps {
   connectWallet: () => void;
   disconnectWallet: () => void;
+  switchToFlameChain: () => void;
   accountAddress: Address | null;
   nativeTokenBalance: Balance | null;
   isLoadingNativeTokenBalance: boolean;
   chain: AstriaChain | null;
   usdcToNativeQuote: Balance;
   quoteLoading: boolean;
+  isConnectedToFlameChain: boolean;
 }
 
 export const AstriaWalletContext =
   React.createContext<AstriaWalletContextProps>({} as AstriaWalletContextProps);
 
+/**
+ * Provider for the Astria wallet context. The Astria wallet context
+ * differs from the EVM wallet context in that it is for pages that
+ * only need to connect to Flame and not other EVM chains.
+ *
+ * E.g., the swap page only needs to connect to Flame and not other EVM chains.
+ */
 export const AstriaWalletContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
@@ -29,6 +38,7 @@ export const AstriaWalletContextProvider: React.FC<{
   const userAccount = useAccount();
   const { connectOrCreateWallet, logout } = usePrivy();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
 
   const connectWallet = useCallback(
     () => connectOrCreateWallet(),
@@ -40,6 +50,19 @@ export const AstriaWalletContextProvider: React.FC<{
     // FIXME - do we want to logout the privy user here too?
     await logout();
   }, [disconnect, logout]);
+
+  const switchToFlameChain = useCallback(() => {
+    if (!userAccount.address) {
+      // First connect wallet, then the user can switch chains afterward
+      connectOrCreateWallet();
+    } else {
+      switchChain({ chainId: chain.chainId });
+    }
+  }, [userAccount.address, chain.chainId, connectOrCreateWallet, switchChain]);
+
+  const isConnectedToFlameChain = useMemo(() => {
+    return Boolean(userAccount.address && userAccount.chainId === chain.chainId);
+  }, [userAccount.address, userAccount.chainId, chain.chainId]);
 
   const {
     status: nativeBalanceStatus,
@@ -88,12 +111,14 @@ export const AstriaWalletContextProvider: React.FC<{
       value={{
         connectWallet,
         disconnectWallet,
+        switchToFlameChain,
         accountAddress: userAccount.address ?? null,
         nativeTokenBalance,
         isLoadingNativeTokenBalance,
         chain,
         usdcToNativeQuote,
         quoteLoading,
+        isConnectedToFlameChain,
       }}
     >
       {children}
