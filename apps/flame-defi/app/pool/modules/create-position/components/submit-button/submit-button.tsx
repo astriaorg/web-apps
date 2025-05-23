@@ -14,7 +14,10 @@ import { useTokenAllowance } from "hooks/use-token-allowance";
 import { useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
-import { calculateNearestTickAndPrice } from "pool/utils";
+import {
+  calculateNearestTickAndPrice,
+  getTransactionAmounts,
+} from "pool/utils";
 
 interface BaseSubmitButtonProps {
   amount0: Amount;
@@ -201,37 +204,20 @@ export const SubmitButton = ({
     setStatus(TransactionStatus.PENDING);
 
     try {
-      let amount0Desired = parseUnits(
-        amount0.value || "0",
-        token0.coinDecimals,
-      );
-      let amount1Desired = parseUnits(
-        amount1.value || "0",
-        token1.coinDecimals,
-      );
-
-      if (depositType === DepositType.TOKEN_0_ONLY) {
-        amount1Desired = 0n;
-      }
-      if (depositType === DepositType.TOKEN_1_ONLY) {
-        amount0Desired = 0n;
-      }
-
-      /**
-       * TODO: Use slippage calculation in `TokenAmount` class.
-       * Too bulky to use here for now, wait until the class is refactored to implement it.
-       */
-      const calculateAmountWithSlippage = (amount: bigint) => {
-        // Convert slippage to basis points (1 bp = 0.01%)
-        // Example: 0.1% = 10 basis points
-        const basisPoints = Math.round(slippageTolerance * 100);
-
-        // Calculate: amount * (10000 - basisPoints) / 10000
-        return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
-      };
-
-      const amount0Min = calculateAmountWithSlippage(amount0Desired);
-      const amount1Min = calculateAmountWithSlippage(amount1Desired);
+      const {
+        amount0Min,
+        amount1Min,
+        amount0Desired,
+        amount1Desired,
+        deadline,
+      } = getTransactionAmounts({
+        amount0: amount0.value,
+        amount1: amount1.value,
+        token0,
+        token1,
+        depositType,
+        slippageTolerance,
+      });
 
       let { tick: tickLower } = calculateNearestTickAndPrice({
         price: Number(minPrice),
@@ -250,17 +236,13 @@ export const SubmitButton = ({
         [tickLower, tickUpper] = [tickUpper, tickLower];
       }
 
-      // 20 minute deadline.
-      // TODO: Add this to settings.
-      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
-
       const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
         chain,
         token0,
         token1,
         fee: feeTier,
-        tickLower: Number(tickLower),
-        tickUpper: Number(tickUpper),
+        tickLower,
+        tickUpper,
         amount0Desired,
         amount1Desired,
         amount0Min,

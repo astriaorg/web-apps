@@ -8,7 +8,7 @@ import {
 } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import JSBI from "jsbi";
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import {
@@ -146,10 +146,10 @@ export const calculateDepositType = ({
   });
 
   if (currentTick < minTick) {
-    return DepositType.TOKEN_1_ONLY;
+    return DepositType.TOKEN_0_ONLY;
   }
   if (currentTick > maxTick) {
-    return DepositType.TOKEN_0_ONLY;
+    return DepositType.TOKEN_1_ONLY;
   }
 
   return DepositType.BOTH;
@@ -292,4 +292,58 @@ export const getDisplayMaxPrice = (
   return Number(maxPrice) === MAX_PRICE_DEFAULT
     ? "∞"
     : new Big(maxPrice).toFixed(options.minimumFractionDigits);
+};
+
+export const getTransactionAmounts = ({
+  amount0,
+  amount1,
+  token0,
+  token1,
+  depositType,
+  slippageTolerance,
+}: {
+  amount0: string;
+  amount1: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  depositType: DepositType;
+  slippageTolerance: number;
+}) => {
+  let amount0Desired = parseUnits(amount0 || "0", token0.coinDecimals);
+  let amount1Desired = parseUnits(amount1 || "0", token1.coinDecimals);
+
+  if (depositType === DepositType.TOKEN_0_ONLY) {
+    amount1Desired = 0n;
+  }
+  if (depositType === DepositType.TOKEN_1_ONLY) {
+    amount0Desired = 0n;
+  }
+
+  /**
+   * TODO: Use slippage calculation in `TokenAmount` class.
+   * Too bulky to use here for now, wait until the class is refactored to implement it.
+   */
+  const calculateAmountWithSlippage = (amount: bigint) => {
+    // Convert slippage to basis points (1 bp = 0.01%)
+    // Example: 0.1% = 10 basis points
+    const basisPoints = Math.round(slippageTolerance * 100);
+
+    // Calculate: amount * (10000 - basisPoints) / 10000
+    return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
+  };
+
+  const amount0Min = calculateAmountWithSlippage(amount0Desired);
+  const amount1Min = calculateAmountWithSlippage(amount1Desired);
+
+  // 20 minute deadline.
+  // TODO: Add this to settings.
+  const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+  return {
+    amount0Desired,
+    amount1Desired,
+    amount0Min,
+    amount1Min,
+    deadline,
+  };
 };
