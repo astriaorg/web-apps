@@ -40,7 +40,7 @@ export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const tokenId = params["token-id"] as string;
+  const tokenId = params["position-id"] as string;
 
   const config = useConfig();
   const { address } = useAccount();

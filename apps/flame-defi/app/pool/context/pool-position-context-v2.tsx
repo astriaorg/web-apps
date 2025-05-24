@@ -31,7 +31,7 @@ export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const positionId = params["token-id"] as string;
+  const positionId = params["position-id"] as string;
 
   const [invert, setInvert] = useState(false);
 
