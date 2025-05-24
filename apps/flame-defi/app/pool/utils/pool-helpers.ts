@@ -8,9 +8,9 @@ import {
 } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import JSBI from "jsbi";
-import { formatUnits, parseUnits } from "viem";
+import { type Address, formatUnits, parseUnits } from "viem";
 
-import type { EvmCurrency } from "@repo/flame-types";
+import { type EvmCurrency, TokenAmount } from "@repo/flame-types";
 import {
   DepositType,
   FEE_TIER,
@@ -319,21 +319,31 @@ export const getTransactionAmounts = ({
     amount0Desired = 0n;
   }
 
-  /**
-   * TODO: Use slippage calculation in `TokenAmount` class.
-   * Too bulky to use here for now, wait until the class is refactored to implement it.
-   */
-  const calculateAmountWithSlippage = (amount: bigint) => {
-    // Convert slippage to basis points (1 bp = 0.01%)
-    // Example: 0.1% = 10 basis points
-    const basisPoints = Math.round(slippageTolerance * 100);
+  const calculateAmountMin = (
+    amountDesired: bigint,
+    token: EvmCurrency,
+  ): bigint => {
+    if (amountDesired === 0n) {
+      return 0n; // If desired is 0, min must be 0.
+    }
 
-    // Calculate: amount * (10000 - basisPoints) / 10000
-    return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
+    const amountMin = TokenAmount.fromArgs(
+      token.chainId,
+      token.asToken().address as Address,
+      token.coinDecimals,
+      token.coinDenom,
+      // Convert back to unscaled value for constructor.
+      formatUnits(amountDesired, token.coinDecimals),
+    )
+      .withSlippage(slippageTolerance, true)
+      .amountAsBigInt();
+
+    // Ensure minimum is at least 1 if desired > 0.
+    return amountDesired > 1n ? amountMin : 1n;
   };
 
-  const amount0Min = calculateAmountWithSlippage(amount0Desired);
-  const amount1Min = calculateAmountWithSlippage(amount1Desired);
+  const amount0Min = calculateAmountMin(amount0Desired, token0);
+  const amount1Min = calculateAmountMin(amount1Desired, token1);
 
   // 20 minute deadline.
   // TODO: Add this to settings.
