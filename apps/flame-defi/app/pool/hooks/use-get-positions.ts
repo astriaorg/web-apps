@@ -8,7 +8,7 @@ import {
   createPoolFactoryService,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
-import { type PositionWithKey } from "pool/types";
+import { type PositionWithPositionId } from "pool/types";
 import {
   calculateTokenAmountsFromPosition,
   getTokenFromAddress,
@@ -24,7 +24,7 @@ export type GetPositionsResult = {
     token1: EvmCurrency;
     liquidity: bigint;
   };
-  position: PositionWithKey;
+  position: PositionWithPositionId;
   amount0: string;
   amount1: string;
   price: string;
@@ -60,7 +60,7 @@ export const useGetPositions = (): UseQueryResult<
         chain.contracts.poolFactory.address,
       );
 
-      const getPositionKey = (position: PositionWithKey) => {
+      const getPositionKey = (position: PositionWithPositionId) => {
         return `${position.token0}-${position.token1}-${position.fee}`;
       };
 
@@ -74,7 +74,7 @@ export const useGetPositions = (): UseQueryResult<
           }
           return acc;
         },
-        {} as Record<string, PositionWithKey>,
+        {} as Record<string, PositionWithPositionId>,
       );
       const uniquePools = await poolFactoryService.getPools(
         Object.values(uniquePositionsRecord),

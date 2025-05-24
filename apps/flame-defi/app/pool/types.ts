@@ -85,11 +85,13 @@ export interface Position {
   tokensOwed1: bigint;
 }
 
-export interface PositionWithKey extends Position {
+export interface PositionWithPositionId extends Position {
   /**
-   * The position's key is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
+   * Unique identifier for the position.
+   *
+   * The position's ID, also called `key` or `tokenId` in the contract, is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
    */
-  key: string;
+  positionId: string;
 }
 
 // TODO: Remove these once we clean up existing pages.
@@ -109,7 +111,7 @@ export interface PoolToken {
   liquidityPercentage: number;
   token: EvmCurrency;
 }
-export interface PoolPosition extends PositionWithKey {
+export interface PoolPosition extends PositionWithPositionId {
   feePercent: FeeTier;
   inRange: boolean;
   positionStatus: string;

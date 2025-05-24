@@ -13,7 +13,7 @@ import {
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
-import { Position, PositionWithKey } from "pool/types";
+import { Position, PositionWithPositionId } from "pool/types";
 
 import { GenericContractService } from "../generic-contract-service";
 import {
@@ -681,14 +681,14 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   async getPositions(
     chainId: number,
     owner: Address,
-  ): Promise<PositionWithKey[]> {
+  ): Promise<PositionWithPositionId[]> {
     const nftCount = await this.balanceOf(chainId, owner);
-    const positions: PositionWithKey[] = [];
+    const positions: PositionWithPositionId[] = [];
 
     for (let i = 0; i < Number(nftCount); i++) {
       const key = await this.tokenOfOwnerByIndex(chainId, owner, i);
       const position = await this.positions(chainId, key.toString());
-      positions.push({ ...position, key: key.toString() });
+      positions.push({ ...position, positionId: key.toString() });
     }
 
     return positions;
