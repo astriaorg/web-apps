@@ -481,12 +481,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     return {
       chainId: chain.chainId,
       liquidity,
-      amount0Min: tokens[0]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      amount1Min: tokens[1]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
+      amount0Min: tokens[0].withSlippage(slippageTolerance, true).toBigInt(),
+      amount1Min: tokens[1].withSlippage(slippageTolerance, true).toBigInt(),
       deadline: Math.floor(Date.now() / 1000) + 10 * 60,
     };
   }

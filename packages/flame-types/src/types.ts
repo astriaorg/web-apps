@@ -674,7 +674,7 @@ export class TokenAmount {
     this.raw = typeof amount === "string" ? JSBI.BigInt(amount) : amount;
   }
 
-  amountAsBigInt(): bigint {
+  toBigInt(): bigint {
     return BigInt(this.raw.toString());
   }
 

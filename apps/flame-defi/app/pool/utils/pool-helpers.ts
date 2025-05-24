@@ -8,7 +8,7 @@ import {
 } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import JSBI from "jsbi";
-import { type Address, formatUnits, parseUnits } from "viem";
+import { type Address, formatUnits } from "viem";
 
 import { type EvmCurrency, TokenAmount } from "@repo/flame-types";
 import {
@@ -308,42 +308,49 @@ export const getTransactionAmounts = ({
   token1: EvmCurrency;
   depositType: DepositType;
   slippageTolerance: number;
-}) => {
-  let amount0Desired = parseUnits(amount0 || "0", token0.coinDecimals);
-  let amount1Desired = parseUnits(amount1 || "0", token1.coinDecimals);
+}): {
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+} => {
+  amount0 = depositType === DepositType.TOKEN_1_ONLY ? "0" : amount0;
+  amount1 = depositType === DepositType.TOKEN_0_ONLY ? "0" : amount1;
 
-  if (depositType === DepositType.TOKEN_0_ONLY) {
-    amount1Desired = 0n;
-  }
-  if (depositType === DepositType.TOKEN_1_ONLY) {
-    amount0Desired = 0n;
-  }
-
-  const calculateAmountMin = (
-    amountDesired: bigint,
+  const calculateAmount = (
+    amount: string,
     token: EvmCurrency,
-  ): bigint => {
-    if (amountDesired === 0n) {
-      return 0n; // If desired is 0, min must be 0.
+  ): { amountDesired: bigint; amountMin: bigint } => {
+    // If desired is 0, min must be 0.
+    if (amount === "0") {
+      return {
+        amountDesired: 0n,
+        amountMin: 0n,
+      };
     }
 
-    const amountMin = TokenAmount.fromArgs(
+    const amountDesired = TokenAmount.fromArgs(
       token.chainId,
       token.asToken().address as Address,
       token.coinDecimals,
       token.coinDenom,
-      // Convert back to unscaled value for constructor.
-      formatUnits(amountDesired, token.coinDecimals),
-    )
-      .withSlippage(slippageTolerance, true)
-      .amountAsBigInt();
+      amount,
+    );
 
-    // Ensure minimum is at least 1 if desired > 0.
-    return amountDesired > 1n ? amountMin : 1n;
+    const amountMin = amountDesired.withSlippage(slippageTolerance, true);
+
+    return {
+      amountDesired: amountDesired.toBigInt(),
+      // Ensure minimum is at least 1 if desired > 1.
+      amountMin: amountDesired.toBigInt() > 1n ? amountMin.toBigInt() : 1n,
+    };
   };
 
-  const amount0Min = calculateAmountMin(amount0Desired, token0);
-  const amount1Min = calculateAmountMin(amount1Desired, token1);
+  const { amountMin: amount0Min, amountDesired: amount0Desired } =
+    calculateAmount(amount0, token0);
+  const { amountMin: amount1Min, amountDesired: amount1Desired } =
+    calculateAmount(amount1, token1);
 
   // 20 minute deadline.
   // TODO: Add this to settings.
