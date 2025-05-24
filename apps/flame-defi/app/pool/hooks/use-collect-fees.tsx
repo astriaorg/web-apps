@@ -43,7 +43,6 @@ export const useCollectFees = () => {
           if (receipt.status === "success") {
             // Add a small delay to ensure blockchain state is updated.
             await new Promise((resolve) => setTimeout(resolve, 2000));
-            console.log("Transaction confirmed:", receipt);
           }
         }
 
