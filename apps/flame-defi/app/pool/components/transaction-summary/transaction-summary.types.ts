@@ -17,7 +17,7 @@ interface BaseTransactionSummaryProps {
   type: TransactionType;
   status: TransactionStatus;
   hash?: Hash;
-  error?: string;
+  error?: Error;
   onSubmit: () => void;
 }
 
@@ -46,8 +46,4 @@ export type TransactionSuccessProps = {
   token1: EvmCurrency;
   type: TransactionType;
   hash: Hash;
-};
-
-export type TransactionFailedProps = {
-  error?: string;
 };

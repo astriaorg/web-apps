@@ -12,8 +12,8 @@ export interface PoolPositionContextProps {
   setInvert: (value: boolean) => void;
   hash?: Address;
   setHash: (value?: Address) => void;
-  error?: string;
-  setError: (value?: string) => void;
+  error?: Error;
+  setError: (value?: Error) => void;
   status: TransactionStatus;
   setStatus: (value: TransactionStatus) => void;
 }
@@ -31,7 +31,7 @@ export const PoolPositionContextProvider = ({
   const [invert, setInvert] = useState(false);
 
   const [hash, setHash] = useState<Address>();
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<Error>();
   const [status, setStatus] = useState<TransactionStatus>(
     TransactionStatus.IDLE,
   );

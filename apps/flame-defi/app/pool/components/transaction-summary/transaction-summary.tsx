@@ -2,7 +2,10 @@
 
 import { useMemo } from "react";
 
-import { TransactionStatus } from "@repo/flame-types";
+import {
+  type TransactionFailedProps,
+  TransactionStatus,
+} from "@repo/flame-types";
 import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
 import { WarningTriangleIcon } from "@repo/ui/icons";
 import { useAstriaChainData } from "config";
@@ -10,7 +13,6 @@ import { useAstriaChainData } from "config";
 import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
 import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
 import {
-  type TransactionFailedProps,
   type TransactionSuccessProps,
   type TransactionSummaryProps,
   TransactionType,
@@ -39,6 +41,10 @@ const TransactionSuccess = ({
     if (type === TransactionType.COLLECT_FEES) {
       return `Successfully collected fees for ${token0.coinDenom}/${token1.coinDenom}.`;
     }
+    if (type === TransactionType.ADD_LIQUIDITY) {
+      return `Successfully added liquidity for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
+    throw new Error(`Unknown transaction type: ${type}`);
   }, [type, token0, token1]);
 
   return (
@@ -64,15 +70,15 @@ const TransactionSuccess = ({
   );
 };
 
-const TransactionFailed = ({ error }: TransactionFailedProps) => {
-  const message = useMemo(() => {
-    if (error) {
-      if (error.includes("User rejected the request.")) {
+const TransactionFailed = ({ message }: TransactionFailedProps) => {
+  const text = useMemo(() => {
+    if (message) {
+      if (message.includes("User rejected the request.")) {
         return "Transaction rejected.";
       }
       return "An error occurred. Please try again.";
     }
-  }, [error]);
+  }, [message]);
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -80,7 +86,7 @@ const TransactionFailed = ({ error }: TransactionFailedProps) => {
         <WarningTriangleIcon size={100} className="text-danger" />
       </div>
       <div className="mt-4">
-        <span>{message}</span>
+        <span>{text}</span>
       </div>
     </div>
   );
@@ -105,7 +111,7 @@ export const TransactionSummary = (props: TransactionSummaryProps) => {
   }
 
   if (status === TransactionStatus.FAILED) {
-    return <TransactionFailed error={error} />;
+    return <TransactionFailed message={error?.message} />;
   }
 
   if (type === TransactionType.COLLECT_FEES) {

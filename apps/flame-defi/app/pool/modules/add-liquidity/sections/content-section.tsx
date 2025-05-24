@@ -220,7 +220,7 @@ export const ContentSection = () => {
       setStatus(TransactionStatus.SUCCESS);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(error.message);
+        setError(error);
       }
       setStatus(TransactionStatus.FAILED);
     }
