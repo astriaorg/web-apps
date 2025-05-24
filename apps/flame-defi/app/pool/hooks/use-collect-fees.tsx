@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useAccount, useConfig } from "wagmi";
+import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { useAstriaChainData } from "config";
 import {
@@ -12,6 +12,7 @@ import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2"
 
 export const useCollectFees = () => {
   const queryClient = useQueryClient();
+  const publicClient = usePublicClient();
   const config = useConfig();
   const { positionId } = usePoolPositionContext();
   const { address } = useAccount();
@@ -29,12 +30,23 @@ export const useCollectFees = () => {
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const result = await nonfungiblePositionService.collectFeesV2(params);
+      const hash = await nonfungiblePositionService.collectFeesV2(params);
 
-      return result;
+      return hash;
     },
-    onSuccess: (hash) => {
+    onSuccess: async (hash) => {
       if (hash) {
+        if (publicClient) {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            console.log("Transaction confirmed:", receipt);
+          }
+        }
+
         void queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
         });
