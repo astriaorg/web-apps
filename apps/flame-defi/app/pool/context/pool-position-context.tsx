@@ -33,6 +33,9 @@ export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined
 >(undefined);
 
+/**
+ * TODO: Remove this file once all pool pages have been migrated to the new context.
+ */
 export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {

@@ -21,8 +21,8 @@ import { PriceRangeBlock } from "./price-range-block";
 
 export const PriceRangeSummary = () => {
   const { formatNumber } = useIntl();
-  const { tokenId, invert, setInvert } = usePoolPositionContextV2();
-  const { data, isPending } = useGetPosition({ tokenId, invert });
+  const { positionId, invert, setInvert } = usePoolPositionContextV2();
+  const { data, isPending } = useGetPosition({ positionId, invert });
 
   const tokens = useMemo(() => {
     // Return tokens in a consistent order, so they aren't affected by inversion.

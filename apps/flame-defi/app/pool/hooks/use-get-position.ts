@@ -51,10 +51,10 @@ export type GetPositionResult = {
  * **Do not token data in the position itself, as it may not be in the correct order.**
  */
 export const useGetPosition = ({
-  tokenId,
+  positionId,
   invert,
 }: {
-  tokenId: string;
+  positionId: string;
   invert: boolean;
 }): UseQueryResult<GetPositionResult | null> => {
   const config = useConfig();
@@ -62,7 +62,7 @@ export const useGetPosition = ({
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
     queryFn: async () => {
       if (!address) {
         return null;
@@ -76,7 +76,7 @@ export const useGetPosition = ({
 
       const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        tokenId,
+        positionId,
       );
 
       const token0 = getTokenFromAddress(position.token0, chain);

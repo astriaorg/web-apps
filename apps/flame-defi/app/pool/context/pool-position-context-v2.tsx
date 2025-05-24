@@ -7,7 +7,12 @@ import type { Address } from "viem";
 import { TransactionStatus } from "@repo/flame-types";
 
 export interface PoolPositionContextProps {
-  tokenId: string;
+  /**
+   * The ID of the pool position, which is the non-fungible token ID.
+   *
+   * This is called `key` or `tokenId` in the contract.
+   */
+  positionId: string;
   invert: boolean;
   setInvert: (value: boolean) => void;
   hash?: Address;
@@ -26,7 +31,7 @@ export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const tokenId = params["token-id"] as string;
+  const positionId = params["token-id"] as string;
 
   const [invert, setInvert] = useState(false);
 
@@ -39,7 +44,7 @@ export const PoolPositionContextProvider = ({
   return (
     <PoolPositionContext.Provider
       value={{
-        tokenId,
+        positionId,
         invert,
         setInvert,
         hash,

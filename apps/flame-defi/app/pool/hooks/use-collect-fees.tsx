@@ -13,13 +13,13 @@ import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2"
 export const useCollectFees = () => {
   const queryClient = useQueryClient();
   const config = useConfig();
-  const { tokenId } = usePoolPositionContext();
+  const { positionId } = usePoolPositionContext();
   const { address } = useAccount();
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
     mutationFn: async (params: CollectFeesV2Params) => {
-      if (!address || !tokenId || !tokenId) {
+      if (!address || !positionId) {
         throw new Error("Missing required data for collecting fees.");
       }
 
@@ -36,7 +36,7 @@ export const useCollectFees = () => {
     onSuccess: (hash) => {
       if (hash) {
         void queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+          queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
         });
 
         void queryClient.invalidateQueries({

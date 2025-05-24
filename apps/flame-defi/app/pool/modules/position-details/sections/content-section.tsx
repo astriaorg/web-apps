@@ -29,9 +29,20 @@ export const ContentSection = () => {
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
 
-  const { tokenId, invert, hash, setHash, error, setError, status, setStatus } =
-    usePoolPositionContextV2();
-  const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
+  const {
+    positionId,
+    invert,
+    hash,
+    setHash,
+    error,
+    setError,
+    status,
+    setStatus,
+  } = usePoolPositionContextV2();
+  const { data, isPending, refetch } = useGetPosition({
+    positionId,
+    invert,
+  });
 
   const { collectFees } = useCollectFees();
 
@@ -63,7 +74,7 @@ export const ContentSection = () => {
     try {
       const hash = await collectFees({
         chainId: chain.chainId,
-        tokenId,
+        tokenId: positionId,
         token0: data.token0,
         token1: data.token1,
         recipient: address,
@@ -86,7 +97,7 @@ export const ContentSection = () => {
     collectFees,
     data,
     address,
-    tokenId,
+    positionId,
     chain.chainId,
     isCollectAsWrappedNative,
     setHash,

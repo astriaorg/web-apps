@@ -12,8 +12,8 @@ import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2"
 export const HeaderSection = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { tokenId, invert } = usePoolPositionContext();
-  const { data, isPending } = useGetPosition({ tokenId, invert });
+  const { positionId, invert } = usePoolPositionContext();
+  const { data, isPending } = useGetPosition({ positionId, invert });
 
   return (
     <Header onClickBack={() => router.back()}>

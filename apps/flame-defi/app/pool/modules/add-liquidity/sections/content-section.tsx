@@ -53,9 +53,20 @@ export const ContentSection = () => {
   const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
   const validate = useValidateTokenAmount();
 
-  const { tokenId, invert, hash, setHash, error, setError, status, setStatus } =
-    usePoolPositionContextV2();
-  const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
+  const {
+    positionId,
+    invert,
+    hash,
+    setHash,
+    error,
+    setError,
+    status,
+    setStatus,
+  } = usePoolPositionContextV2();
+  const { data, isPending, refetch } = useGetPosition({
+    positionId,
+    invert,
+  });
   const { addLiquidity } = useAddLiquidity();
 
   const [currentInput, setCurrentInput] = useState<InputId>(InputId.INPUT_0);
@@ -208,7 +219,7 @@ export const ContentSection = () => {
         chainId: chain.chainId,
         token0,
         token1,
-        tokenId,
+        tokenId: positionId,
         amount0Desired,
         amount1Desired,
         amount0Min,
@@ -228,7 +239,7 @@ export const ContentSection = () => {
     data,
     derivedValues,
     address,
-    tokenId,
+    positionId,
     chain.chainId,
     slippageTolerance,
     handleCloseConfirmationModal,
@@ -337,7 +348,7 @@ export const ContentSection = () => {
           open={isConfirmationModalOpen}
           onOpenChange={(value) => {
             if (!value && status === TransactionStatus.SUCCESS) {
-              router.push(`/pool/${tokenId}`);
+              router.push(`/pool/${positionId}`);
               return;
             }
             setIsConfirmationModalOpen(value);
