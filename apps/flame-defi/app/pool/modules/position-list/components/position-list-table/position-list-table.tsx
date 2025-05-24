@@ -134,7 +134,9 @@ export const PositionListTable = () => {
                 isPending && "pointer-events-none",
               )}
               onClick={() =>
-                router.push(`${ROUTES.BASE}/${row.original.position.key}`)
+                router.push(
+                  `${ROUTES.BASE}/${row.original.position.positionId}`,
+                )
               }
             >
               {row.getVisibleCells().map((cell) => (
