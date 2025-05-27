@@ -27,6 +27,8 @@ import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/u
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
 import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
 
+const LIQUIDITY_PERCENTAGES = [0, 25, 50, 75, 100];
+
 export const ContentSection = () => {
   const router = useRouter();
   const { formatNumber } = useIntl();
@@ -55,6 +57,9 @@ export const ContentSection = () => {
     useState<boolean>(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
+  const [sliderValue, setSliderValue] = useState<number>(
+    LIQUIDITY_PERCENTAGES[1] as number,
+  );
 
   // const {
   //   token0,
@@ -202,7 +207,11 @@ export const ContentSection = () => {
       <Card variant="secondary" className="mt-4">
         <CardContent>
           {data ? (
-            <RemoveAmountSlider onChange={() => {}} />
+            <RemoveAmountSlider
+              value={sliderValue}
+              onChange={setSliderValue}
+              breakpoints={LIQUIDITY_PERCENTAGES}
+            />
           ) : (
             <Skeleton className="h-46 md:h-29" />
           )}
@@ -230,7 +239,7 @@ export const ContentSection = () => {
           }}
         >
           <TransactionSummary
-            type={TransactionType.ADD_LIQUIDITY}
+            type={TransactionType.REMOVE_LIQUIDITY}
             position={data.position}
             token0={data.token0}
             token1={data.token1}
@@ -238,10 +247,9 @@ export const ContentSection = () => {
             status={status}
             error={error}
             onSubmit={handleSubmit}
-            amount0={"0"}
-            amount1={"0"}
-            minPrice={data.minPrice}
-            maxPrice={data.maxPrice}
+            percentage={sliderValue}
+            amount0={data.amount0}
+            amount1={data.amount1}
           />
         </ConfirmationModal>
       )}

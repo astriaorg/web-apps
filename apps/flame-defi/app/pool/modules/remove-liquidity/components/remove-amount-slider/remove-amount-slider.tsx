@@ -1,23 +1,21 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import { Badge, Slider } from "@repo/ui/components";
 
-const PERCENTAGES = [0, 25, 50, 75, 100] as const;
-
 export const RemoveAmountSlider = ({
+  value,
   onChange,
+  breakpoints,
 }: {
+  value: number;
   onChange: (value: number) => void;
+  breakpoints: number[];
 }) => {
-  const [sliderValue, setSliderValue] = useState<number[]>([PERCENTAGES[1]]);
-
   const handleChange = useCallback(
     (value: number[]) => {
-      console.log(value);
       if (value.length) {
-        setSliderValue(value);
         onChange(value[0] as number);
       }
     },
@@ -31,17 +29,18 @@ export const RemoveAmountSlider = ({
           <span className="text-xs font-medium tracking-wider uppercase">
             Current Price
           </span>
-          <span className="text-5xl/12 font-dot">{sliderValue[0]}%</span>
+          {/* TODO: Add animation. */}
+          <span className="text-5xl/12 font-dot">{value}%</span>
         </div>
         <div className="flex gap-2">
-          {PERCENTAGES.map((value) => (
+          {breakpoints.map((value) => (
             <Badge
               key={`remove-amount-slider_badge_${value}`}
               onClick={() => handleChange([value])}
               variant="secondary"
               className="cursor-pointer"
             >
-              {value === PERCENTAGES[PERCENTAGES.length - 1]
+              {value === breakpoints[breakpoints.length - 1]
                 ? "Max"
                 : `${value}%`}
             </Badge>
@@ -51,15 +50,15 @@ export const RemoveAmountSlider = ({
 
       <div className="flex flex-col gap-4 w-full md:w-1/2 md:mt-6">
         <Slider
-          value={sliderValue}
+          value={[value]}
           onValueChange={handleChange}
-          min={PERCENTAGES[0]}
-          max={PERCENTAGES[PERCENTAGES.length - 1]}
+          min={breakpoints[0]}
+          max={breakpoints[breakpoints.length - 1]}
           step={1}
           className="w-full"
         />
         <div className="flex justify-between">
-          {PERCENTAGES.map((value) => (
+          {breakpoints.map((value) => (
             <span
               key={`remove-amount-slider_label_${value}`}
               className="text-typography-subdued text-xs"

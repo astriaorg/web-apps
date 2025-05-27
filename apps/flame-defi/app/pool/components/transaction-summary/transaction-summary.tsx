@@ -12,6 +12,7 @@ import { useAstriaChainData } from "config";
 
 import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
 import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
+import { RemoveLiquidityTransactionSummary } from "./remove-liquidity-transaction-summary";
 import {
   type TransactionSuccessProps,
   type TransactionSummaryProps,
@@ -119,6 +120,9 @@ export const TransactionSummary = (props: TransactionSummaryProps) => {
   }
   if (type === TransactionType.ADD_LIQUIDITY) {
     return <AddLiquidityTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.REMOVE_LIQUIDITY) {
+    return <RemoveLiquidityTransactionSummary {...props} />;
   }
 
   throw new Error(`Unknown transaction type: ${type}`);

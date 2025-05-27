@@ -32,7 +32,13 @@ export type GetPositionResult = {
   position: Position;
   token0: EvmCurrency;
   token1: EvmCurrency;
+  /**
+   * The liquidity amount of token0 in the position.
+   */
   amount0: string;
+  /**
+   * The liquidity amount of token1 in the position.
+   */
   amount1: string;
   price: string;
   minPrice: string;
