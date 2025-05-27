@@ -1,7 +1,5 @@
 "use client";
 
-import { Percent } from "@uniswap/sdk-core";
-import { Position } from "@uniswap/v3-sdk";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
@@ -25,6 +23,7 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
 import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
+import { getDecreaseLiquidityAmounts } from "pool/utils";
 
 const LIQUIDITY_PERCENTAGES = [0, 25, 50, 75, 100];
 
@@ -52,6 +51,7 @@ export const ContentSection = () => {
   });
   const { removeLiquidity } = useRemoveLiquidity();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
@@ -85,20 +85,12 @@ export const ContentSection = () => {
     try {
       const liquidity = (data.position.liquidity * BigInt(sliderValue)) / 100n;
 
-      // 20 minute deadline.
-      // TODO: Add this to settings.
-      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
-
-      const position = new Position({
+      const { amount0, amount1, deadline } = getDecreaseLiquidityAmounts({
         pool: data.pool,
-        tickLower: data.position.tickLower,
-        tickUpper: data.position.tickUpper,
-        liquidity: liquidity.toString(),
+        position: data.position,
+        liquidity,
+        slippageTolerance,
       });
-
-      const { amount0, amount1 } = position.burnAmountsWithSlippage(
-        new Percent(slippageTolerance * 100, 100 * 100),
-      );
 
       const hash = await removeLiquidity({
         chainId: chain.chainId,

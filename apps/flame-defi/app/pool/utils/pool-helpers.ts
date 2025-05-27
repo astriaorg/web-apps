@@ -1,6 +1,8 @@
-import { Price } from "@uniswap/sdk-core";
+import { Percent, Price } from "@uniswap/sdk-core";
 import {
   nearestUsableTick,
+  type Pool,
+  Position,
   priceToClosestTick,
   SqrtPriceMath,
   TickMath,
@@ -18,7 +20,7 @@ import {
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
-  type Position,
+  type Position as InternalPosition,
 } from "pool/types";
 
 // TODO: Remove?
@@ -194,7 +196,7 @@ export const calculateTokenAmountsFromPosition = ({
   token1,
   ...params
 }: {
-  position: Position;
+  position: InternalPosition;
   sqrtPriceX96: bigint;
   token0: EvmCurrency;
   token1: EvmCurrency;
@@ -366,39 +368,30 @@ export const getIncreaseLiquidityAmounts = ({
 };
 
 export const getDecreaseLiquidityAmounts = ({
-  amount0,
-  amount1,
-  percentage,
+  pool,
+  position,
+  liquidity,
+  slippageTolerance,
 }: {
-  amount0: bigint;
-  amount1: bigint;
-  percentage: number;
-}): {
-  amount0Min: bigint;
-  amount1Min: bigint;
-  deadline: number;
-} => {
-  const calculateAmount = (amount: bigint): bigint => {
-    // If desired is 0, min must be 0.
-    if (amount === 0n) {
-      return 0n;
-    }
-
-    // If expecting >= 1 and removing significant amount, require minimum 1
-    // If expecting < 1 or removing small amount, accept 0
-    return amount >= 1n && percentage >= 50 ? 1n : 0n;
-  };
-
-  const amount0Min = calculateAmount(amount0);
-  const amount1Min = calculateAmount(amount1);
-
+  pool: Pool;
+  position: InternalPosition;
+  liquidity: bigint;
+  slippageTolerance: number;
+}) => {
   // 20 minute deadline.
   // TODO: Add this to settings.
   const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
 
+  const { amount0, amount1 } = new Position({
+    pool,
+    tickLower: position.tickLower,
+    tickUpper: position.tickUpper,
+    liquidity: liquidity.toString(),
+  }).burnAmountsWithSlippage(new Percent(slippageTolerance * 100, 100 * 100));
+
   return {
-    amount0Min,
-    amount1Min,
+    amount0: BigInt(amount0.toString()),
+    amount1: BigInt(amount1.toString()),
     deadline,
   };
 };

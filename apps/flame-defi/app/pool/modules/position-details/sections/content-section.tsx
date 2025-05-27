@@ -46,6 +46,7 @@ export const ContentSection = () => {
 
   const { collectFees } = useCollectFees();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
     useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
