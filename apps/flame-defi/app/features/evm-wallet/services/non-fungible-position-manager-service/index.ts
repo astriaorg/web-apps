@@ -72,7 +72,7 @@ export interface IncreaseLiquidityParams {
 }
 
 /**
- * @deprecated
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
  */
 export interface DecreaseLiquidityParams {
   chainId: number;
@@ -83,7 +83,7 @@ export interface DecreaseLiquidityParams {
 }
 
 /**
- * @deprecated
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
  */
 export interface DecreaseLiquidityAndCollectParams {
   chainId: number;
