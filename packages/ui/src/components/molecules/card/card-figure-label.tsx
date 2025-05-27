@@ -11,7 +11,7 @@ const cardFigureLabelVariants = cva("text-5xl/12 font-dot", {
     variant: {
       default: "text-typography-default",
       secondary: "text-typography-default",
-      accent: "text-typography-inverted",
+      accent: "text-typography-white",
     },
   },
   defaultVariants: {

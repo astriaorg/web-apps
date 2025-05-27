@@ -10,26 +10,40 @@ export enum TransactionType {
   REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY",
 }
 
-export interface TransactionSummaryProps {
+interface BaseTransactionSummaryProps {
   position: Position;
   token0: EvmCurrency;
   token1: EvmCurrency;
-  unclaimedFees0: string;
-  unclaimedFees1: string;
   type: TransactionType;
-  hash: Hash | null;
   status: TransactionStatus;
-  error: string | null;
+  hash?: Hash;
+  error?: Error;
   onSubmit: () => void;
 }
+
+export interface CollectFeesTransactionSummaryProps
+  extends BaseTransactionSummaryProps {
+  type: TransactionType.COLLECT_FEES;
+  unclaimedFees0: string;
+  unclaimedFees1: string;
+}
+
+export interface AddLiquidityTransactionSummaryProps
+  extends BaseTransactionSummaryProps {
+  type: TransactionType.ADD_LIQUIDITY;
+  amount0: string;
+  amount1: string;
+  minPrice: string;
+  maxPrice: string;
+}
+
+export type TransactionSummaryProps =
+  | CollectFeesTransactionSummaryProps
+  | AddLiquidityTransactionSummaryProps;
 
 export type TransactionSuccessProps = {
   token0: EvmCurrency;
   token1: EvmCurrency;
   type: TransactionType;
   hash: Hash;
-};
-
-export type TransactionFailedProps = {
-  error: string | null;
 };

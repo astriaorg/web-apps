@@ -4,13 +4,13 @@ import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { useAstriaChainData } from "config";
 import {
-  type CollectFeesV2Params,
   createNonfungiblePositionManagerService,
+  type IncreaseLiquidityParams,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
 
-export const useCollectFees = () => {
+export const useAddLiquidity = () => {
   const queryClient = useQueryClient();
   const publicClient = usePublicClient();
   const config = useConfig();
@@ -19,9 +19,9 @@ export const useCollectFees = () => {
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
-    mutationFn: async (params: CollectFeesV2Params) => {
+    mutationFn: async (params: IncreaseLiquidityParams) => {
       if (!address || !positionId) {
-        throw new Error("Missing required data for collecting fees.");
+        throw new Error("Missing required data for adding liquidity.");
       }
 
       const nonfungiblePositionService =
@@ -30,7 +30,7 @@ export const useCollectFees = () => {
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const hash = await nonfungiblePositionService.collectFeesV2(params);
+      const hash = await nonfungiblePositionService.increaseLiquidity(params);
 
       return hash;
     },
@@ -56,17 +56,17 @@ export const useCollectFees = () => {
       }
     },
     onError: (error) => {
-      console.warn("Error collecting fees:", error);
+      console.warn("Error adding liquidity:", error);
     },
   });
 
-  const collectFees = useCallback(
-    async (params: CollectFeesV2Params) => {
+  const addLiquidity = useCallback(
+    async (params: IncreaseLiquidityParams) => {
       try {
         const result = await mutation.mutateAsync(params);
         return result;
       } catch (error) {
-        console.error("Error in collect fees:", error);
+        console.error("Error in add liquidity:", error);
         throw error;
       }
     },
@@ -74,7 +74,7 @@ export const useCollectFees = () => {
   );
 
   return {
-    collectFees,
+    addLiquidity,
     ...mutation,
   };
 };

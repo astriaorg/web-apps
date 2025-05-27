@@ -12,12 +12,14 @@ import {
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import {
+  type DepositType,
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
   type Position,
 } from "pool/types";
 import {
+  calculateDepositType,
   calculateTokenAmountsFromPosition,
   getMinMaxTick,
   getTokenFromAddress,
@@ -38,6 +40,7 @@ export type GetPositionResult = {
   unclaimedFees0: string;
   unclaimedFees1: string;
   hasUnclaimedFees: boolean;
+  depositType: DepositType;
 };
 
 /**
@@ -48,10 +51,10 @@ export type GetPositionResult = {
  * **Do not token data in the position itself, as it may not be in the correct order.**
  */
 export const useGetPosition = ({
-  tokenId,
+  positionId,
   invert,
 }: {
-  tokenId: string;
+  positionId: string;
   invert: boolean;
 }): UseQueryResult<GetPositionResult | null> => {
   const config = useConfig();
@@ -59,7 +62,7 @@ export const useGetPosition = ({
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
     queryFn: async () => {
       if (!address) {
         return null;
@@ -73,7 +76,7 @@ export const useGetPosition = ({
 
       const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        tokenId,
+        positionId,
       );
 
       const token0 = getTokenFromAddress(position.token0, chain);
@@ -180,6 +183,12 @@ export const useGetPosition = ({
         price = (1 / Number(price)).toString();
       }
 
+      const depositType = calculateDepositType({
+        currentPrice: Number(price),
+        minPrice: Number(minPrice),
+        maxPrice: Number(maxPrice),
+      });
+
       return {
         position,
         token0,
@@ -192,6 +201,7 @@ export const useGetPosition = ({
         unclaimedFees0,
         unclaimedFees1,
         hasUnclaimedFees,
+        depositType,
       };
     },
     enabled: !!address,

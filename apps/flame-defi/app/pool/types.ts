@@ -1,10 +1,6 @@
 import type { Address, Hash } from "viem";
 
-import {
-  EvmCurrency,
-  TokenInputState,
-  TransactionStatus,
-} from "@repo/flame-types";
+import { EvmCurrency, TransactionStatus } from "@repo/flame-types";
 
 /**
  * Fee tiers available in Uniswap V3.
@@ -89,58 +85,16 @@ export interface Position {
   tokensOwed1: bigint;
 }
 
-export interface PositionWithKey extends Position {
+export interface PositionWithPositionId extends Position {
   /**
-   * The position's key is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
+   * Unique identifier for the position.
+   *
+   * The position's ID, also called `key` or `tokenId` in the contract, is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
    */
-  key: string;
+  positionId: string;
 }
 
 // TODO: Remove these once we clean up existing pages.
-
-export enum POOL_INPUT_ID {
-  INPUT_ZERO = "input_zero",
-  INPUT_ONE = "input_one",
-}
-export interface AddLiquidityInputsBlockProps {
-  input0: string;
-  input1: string;
-  handleInputChange: (
-    value: string,
-    id: POOL_INPUT_ID,
-    coinDecimals?: number,
-  ) => void;
-  token0?: EvmCurrency;
-  token1?: EvmCurrency;
-  token0Balance: {
-    value: string;
-    symbol: string;
-  } | null;
-  token1Balance: {
-    value: string;
-    symbol: string;
-  } | null;
-}
-export interface NewPositionInputsProps {
-  input0: TokenInputState;
-  input1: TokenInputState;
-  setInput0: (value: TokenInputState) => void;
-  setInput1: (value: TokenInputState) => void;
-  currencies: EvmCurrency[];
-}
-
-export interface TokenPair {
-  token0: EvmCurrency | null;
-  token1: EvmCurrency | null;
-}
-
-export interface FeeData {
-  id: number;
-  feeTier: FeeTier;
-  text: string;
-  tvl: string;
-  selectPercent: string;
-}
 
 export interface PriceRangeCardProps {
   leftLabel: string;
@@ -157,7 +111,7 @@ export interface PoolToken {
   liquidityPercentage: number;
   token: EvmCurrency;
 }
-export interface PoolPosition extends PositionWithKey {
+export interface PoolPosition extends PositionWithPositionId {
   feePercent: FeeTier;
   inRange: boolean;
   positionStatus: string;

@@ -47,23 +47,19 @@ export const useGetPools = (params: {
 
       const validPools = pools.filter((it) => it !== zeroAddress);
 
-      // TODO: Promise.all or combine multicall.
-      const slot0Results =
-        await poolFactoryService.getSlot0ForPools(validPools);
-      const liquidityResults =
-        await poolFactoryService.getLiquidityForPools(validPools);
+      const results =
+        await poolFactoryService.getLiquidityAndSlot0ForPools(validPools);
 
       const result = {} as GetPoolsResult;
 
       for (let i = 0; i < FEE_TIERS.length; i++) {
         const feeTier = FEE_TIERS[i] as FeeTier;
 
-        const slot0Result = slot0Results.find((it) => it.address === pools[i]);
-        const liquidityResult = liquidityResults.find(
+        const liquidityAndSlot0Result = results.find(
           (it) => it.address === pools[i],
         );
 
-        if (!slot0Result || !liquidityResult) {
+        if (!liquidityAndSlot0Result) {
           result[feeTier] = null;
           continue;
         }
@@ -72,9 +68,9 @@ export const useGetPools = (params: {
           token0,
           token1,
           feeTier,
-          slot0Result.slot0.sqrtPriceX96.toString(),
-          liquidityResult.liquidity.toString(),
-          slot0Result.slot0.tick,
+          liquidityAndSlot0Result.slot0.sqrtPriceX96.toString(),
+          liquidityAndSlot0Result.liquidity.toString(),
+          liquidityAndSlot0Result.slot0.tick,
         );
 
         result[feeTier] = pool;

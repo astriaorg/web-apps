@@ -16,21 +16,13 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { getDisplayMaxPrice, getDisplayMinPrice } from "pool/utils";
 
-const PricePerTokenLabel = () => {
-  const { tokenId, invert } = usePoolPositionContextV2();
-  const { data } = useGetPosition({ tokenId, invert });
-
-  return (
-    <CardLabel className="text-xs">
-      {data?.token0.coinDenom} per {data?.token1.coinDenom}
-    </CardLabel>
-  );
-};
+import { PricePerTokenLabel } from "./price-per-token-label";
+import { PriceRangeBlock } from "./price-range-block";
 
 export const PriceRangeSummary = () => {
   const { formatNumber } = useIntl();
-  const { tokenId, invert, setInvert } = usePoolPositionContextV2();
-  const { data, isPending } = useGetPosition({ tokenId, invert });
+  const { positionId, invert, setInvert } = usePoolPositionContextV2();
+  const { data, isPending } = useGetPosition({ positionId, invert });
 
   const tokens = useMemo(() => {
     // Return tokens in a consistent order, so they aren't affected by inversion.
@@ -60,16 +52,15 @@ export const PriceRangeSummary = () => {
     <div className="mt-8">
       <div className="flex items-center gap-2 mb-6">
         <Skeleton isLoading={isPending} className="h-8 w-full">
-          <h2 className="font-semibold">Price Range</h2>
+          <div className="font-semibold">Price Range</div>
         </Skeleton>
         {data && (
           <>
             <div className="flex-1">
-              <PositionRangeBadge position={data.position} />
+              <PositionRangeBadge position={data.position} price={data.price} />
             </div>
             <Tabs
               defaultValue={data.token1.coinDenom}
-              // value={data.token0.coinDenom}
               onValueChange={handleInvert}
             >
               <TabsList>
@@ -94,35 +85,22 @@ export const PriceRangeSummary = () => {
         >
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="flex flex-col gap-1">
-                <CardLabel className="text-xs font-medium tracking-wider uppercase">
-                  Min Price
-                </CardLabel>
-                <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMinPrice(data?.minPrice ?? "0", {
-                    minimumFractionDigits: 4,
-                  })}
-                </CardFigureLabel>
-                <PricePerTokenLabel />
-                <CardLabel className="text-xs text-typography-subdued">
-                  Your position will be 100% {data?.token1.coinDenom} at this
-                  price.
-                </CardLabel>
-              </div>
-              <div className="flex flex-col gap-1">
-                <CardLabel className="text-xs uppercase">Max Price</CardLabel>
-                {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
-                <CardFigureLabel className="text-typography-light font-sans">
-                  {getDisplayMaxPrice(data?.maxPrice ?? "0", {
-                    minimumFractionDigits: 4,
-                  })}
-                </CardFigureLabel>
-                <PricePerTokenLabel />
-                <CardLabel className="text-xs text-typography-subdued">
-                  Your position will be 100% {data?.token0.coinDenom} at this
-                  price.
-                </CardLabel>
-              </div>
+              <PriceRangeBlock
+                token0={data?.token0}
+                token1={data?.token1}
+                price={getDisplayMinPrice(data?.minPrice ?? "0", {
+                  minimumFractionDigits: 4,
+                })}
+                label="Min Price"
+              />
+              <PriceRangeBlock
+                token0={data?.token0}
+                token1={data?.token1}
+                price={getDisplayMaxPrice(data?.maxPrice ?? "0", {
+                  minimumFractionDigits: 4,
+                })}
+                label="Max Price"
+              />
             </div>
           </CardContent>
         </Card>
@@ -133,14 +111,18 @@ export const PriceRangeSummary = () => {
                 Current Price
               </CardLabel>
               <CardFigureLabel className="truncate">
-                {formatNumber(Number(data?.price ?? 0), {
-                  minimumFractionDigits: 4,
-                  maximumFractionDigits: 4,
-                  roundingMode: "trunc",
-                })}
+                {/* TODO: Remove double inversion. */}
+                {formatNumber(
+                  data?.price ? Number(1 / Number(data.price)) : 0,
+                  {
+                    minimumFractionDigits: 4,
+                    maximumFractionDigits: 4,
+                    roundingMode: "trunc",
+                  },
+                )}
               </CardFigureLabel>
               <div className="flex-1" />
-              <PricePerTokenLabel />
+              <PricePerTokenLabel token0={data?.token0} token1={data?.token1} />
             </div>
           </CardContent>
         </Card>

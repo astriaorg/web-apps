@@ -1,6 +1,6 @@
 import { type Address } from "viem";
 
-import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
+import type { EvmCurrency } from "@repo/flame-types";
 
 /**
  * TODO: Refactor.
@@ -27,18 +27,12 @@ export const needToReverseTokenOrder = (
 export const shouldReverseTokenOrder = ({
   tokenA,
   tokenB,
-  chain,
 }: {
   tokenA: EvmCurrency;
   tokenB: EvmCurrency;
-  chain: AstriaChain;
 }): boolean => {
-  const tokenAAddress = tokenA.isNative
-    ? chain.contracts.wrappedNativeToken.address
-    : (tokenA.erc20ContractAddress as Address);
-  const tokenBAddress = tokenB.isNative
-    ? chain.contracts.wrappedNativeToken.address
-    : (tokenB.erc20ContractAddress as Address);
+  const tokenAAddress = tokenA.asToken().address;
+  const tokenBAddress = tokenB.asToken().address;
 
   const addressA = tokenAAddress.toLowerCase();
   const addressB = tokenBAddress.toLowerCase();

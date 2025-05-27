@@ -1,37 +1,41 @@
 import type { EvmCurrency } from "@repo/flame-types";
+import { Button, Skeleton, TokenIcon } from "@repo/ui/components";
 import {
   TokenAmountInput as BaseTokenAmountInput,
   TokenAmountInputBalance,
   type TokenAmountInputBalanceProps as BaseTokenAmountInputBalanceProps,
   type TokenAmountInputProps as BaseTokenAmountInputProps,
 } from "pool/components/token-amount-input";
-import { TokenSelect } from "pool/components/token-select";
 
 interface TokenAmountInputProps
   extends BaseTokenAmountInputProps,
     BaseTokenAmountInputBalanceProps {
-  options: EvmCurrency[];
-  selectedToken?: EvmCurrency;
-  setSelectedToken: (value?: EvmCurrency) => void;
+  token?: EvmCurrency;
 }
 
 export const TokenAmountInput = ({
   value,
   onInput,
-  selectedToken,
-  setSelectedToken,
-  options,
   balance,
   isLoading,
+  token,
 }: TokenAmountInputProps) => {
   return (
     <BaseTokenAmountInput value={value} onInput={onInput}>
-      <div className="flex flex-col gap-1 items-end pt-5">
-        <TokenSelect
-          options={options}
-          value={selectedToken}
-          onValueChange={setSelectedToken}
-        />
+      <div className="flex flex-col gap-1 items-end">
+        <Skeleton isLoading={!token} className="w-18">
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            className="pointer-events-none"
+          >
+            <div className="flex items-center gap-2">
+              <TokenIcon size={16} symbol={token?.coinDenom} />
+              <span>{token?.coinDenom}</span>
+            </div>
+          </Button>
+        </Skeleton>
         <TokenAmountInputBalance
           balance={balance}
           onInput={onInput}
