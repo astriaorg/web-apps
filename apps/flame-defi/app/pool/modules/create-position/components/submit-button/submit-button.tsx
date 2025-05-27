@@ -16,7 +16,7 @@ import { usePageContext } from "pool/modules/create-position/hooks/use-page-cont
 import { DepositType } from "pool/types";
 import {
   calculateNearestTickAndPrice,
-  getTransactionAmounts,
+  getIncreaseLiquidityAmounts,
 } from "pool/utils";
 
 interface BaseSubmitButtonProps {
@@ -210,7 +210,7 @@ export const SubmitButton = ({
         amount0Desired,
         amount1Desired,
         deadline,
-      } = getTransactionAmounts({
+      } = getIncreaseLiquidityAmounts({
         amount0: amount0.value,
         amount1: amount1.value,
         token0,

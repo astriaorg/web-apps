@@ -41,7 +41,7 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { TokenAmountInput } from "pool/modules/add-liquidity/components/token-amount-input";
 import { DepositType, InputId } from "pool/types";
-import { getTransactionAmounts } from "pool/utils";
+import { getIncreaseLiquidityAmounts } from "pool/utils";
 
 // TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
@@ -206,7 +206,7 @@ export const ContentSection = () => {
         amount0Desired,
         amount1Desired,
         deadline,
-      } = getTransactionAmounts({
+      } = getIncreaseLiquidityAmounts({
         amount0: derivedValues.derivedAmount0.value,
         amount1: derivedValues.derivedAmount1.value,
         token0,

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
+import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
@@ -13,9 +14,8 @@ import {
   Skeleton,
   Switch,
 } from "@repo/ui/components";
-import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
-import { useAstriaChainData, useConfig } from "config";
+import { useAstriaChainData } from "config";
 import { PositionSummaryCard } from "pool/components/position";
 import {
   TokenPairCard,
@@ -29,7 +29,7 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
 import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
-import { getTransactionAmounts } from "pool/utils";
+import { getDecreaseLiquidityAmounts } from "pool/utils";
 
 const LIQUIDITY_PERCENTAGES = [0, 25, 50, 75, 100];
 
@@ -38,8 +38,6 @@ export const ContentSection = () => {
   const { formatNumber } = useIntl();
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
-  const { defaultSlippageTolerance } = useConfig();
-  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
   const {
     positionId,
@@ -88,13 +86,10 @@ export const ContentSection = () => {
     setStatus(TransactionStatus.PENDING);
 
     try {
-      const { amount0Min, amount1Min, deadline } = getTransactionAmounts({
-        amount0: data.amount0,
-        amount1: data.amount1,
-        token0,
-        token1,
-        depositType: data.depositType,
-        slippageTolerance,
+      const { amount0Min, amount1Min, deadline } = getDecreaseLiquidityAmounts({
+        amount0: BigInt(parseUnits(data.amount0, token0.coinDecimals)),
+        amount1: BigInt(parseUnits(data.amount1, token1.coinDecimals)),
+        percentage: sliderValue,
       });
 
       const hash = await removeLiquidity({
@@ -127,7 +122,6 @@ export const ContentSection = () => {
     address,
     positionId,
     chain.chainId,
-    slippageTolerance,
     sliderValue,
     isCollectAsWrappedNative,
     removeLiquidity,

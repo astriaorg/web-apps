@@ -294,7 +294,7 @@ export const getDisplayMaxPrice = (
     : new Big(maxPrice).toFixed(options.minimumFractionDigits);
 };
 
-export const getTransactionAmounts = ({
+export const getIncreaseLiquidityAmounts = ({
   amount0,
   amount1,
   token0,
@@ -359,6 +359,44 @@ export const getTransactionAmounts = ({
   return {
     amount0Desired,
     amount1Desired,
+    amount0Min,
+    amount1Min,
+    deadline,
+  };
+};
+
+export const getDecreaseLiquidityAmounts = ({
+  amount0,
+  amount1,
+  percentage,
+}: {
+  amount0: bigint;
+  amount1: bigint;
+  percentage: number;
+}): {
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+} => {
+  const calculateAmount = (amount: bigint): bigint => {
+    // If desired is 0, min must be 0.
+    if (amount === 0n) {
+      return 0n;
+    }
+
+    // If expecting >= 1 and removing significant amount, require minimum 1
+    // If expecting < 1 or removing small amount, accept 0
+    return amount >= 1n && percentage >= 50 ? 1n : 0n;
+  };
+
+  const amount0Min = calculateAmount(amount0);
+  const amount1Min = calculateAmount(amount1);
+
+  // 20 minute deadline.
+  // TODO: Add this to settings.
+  const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+  return {
     amount0Min,
     amount1Min,
     deadline,
