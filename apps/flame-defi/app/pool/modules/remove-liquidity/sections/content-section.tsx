@@ -6,7 +6,13 @@ import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent, Switch } from "@repo/ui/components";
+import {
+  Button,
+  Card,
+  CardContent,
+  Skeleton,
+  Switch,
+} from "@repo/ui/components";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData, useConfig } from "config";
@@ -195,7 +201,11 @@ export const ContentSection = () => {
 
       <Card variant="secondary" className="mt-4">
         <CardContent>
-          <RemoveAmountSlider onChange={() => {}} />
+          {data ? (
+            <RemoveAmountSlider onChange={() => {}} />
+          ) : (
+            <Skeleton className="h-46 md:h-29" />
+          )}
         </CardContent>
       </Card>
 

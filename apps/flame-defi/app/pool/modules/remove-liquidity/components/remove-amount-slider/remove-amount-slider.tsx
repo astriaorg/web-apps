@@ -26,7 +26,7 @@ export const RemoveAmountSlider = ({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-between w-full">
-      <div className="flex flex-col gap-4 w-full mb-6 md:mb-0 md:w-1/2">
+      <div className="flex flex-col gap-4 w-full mb-4 md:mb-0 md:w-1/2">
         <div className="flex flex-col gap-4">
           <span className="text-xs font-medium tracking-wider uppercase">
             Current Price
