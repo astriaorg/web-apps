@@ -1,21 +1,17 @@
 "use client";
 
+import { Percent } from "@uniswap/sdk-core";
+import { Position } from "@uniswap/v3-sdk";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
-import { parseUnits } from "viem";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import {
-  Button,
-  Card,
-  CardContent,
-  Skeleton,
-  Switch,
-} from "@repo/ui/components";
+import { Button, Card, CardContent, Skeleton } from "@repo/ui/components";
+import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
-import { useAstriaChainData } from "config";
+import { useAstriaChainData, useConfig } from "config";
 import { PositionSummaryCard } from "pool/components/position";
 import {
   TokenPairCard,
@@ -29,7 +25,6 @@ import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
 import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
-import { getDecreaseLiquidityAmounts } from "pool/utils";
 
 const LIQUIDITY_PERCENTAGES = [0, 25, 50, 75, 100];
 
@@ -38,6 +33,8 @@ export const ContentSection = () => {
   const { formatNumber } = useIntl();
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
+  const { defaultSlippageTolerance } = useConfig();
+  const slippageTolerance = getSlippageTolerance() || defaultSlippageTolerance;
 
   const {
     positionId,
@@ -56,7 +53,7 @@ export const ContentSection = () => {
   const { removeLiquidity } = useRemoveLiquidity();
 
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
   const [sliderValue, setSliderValue] = useState<number>(
@@ -86,11 +83,22 @@ export const ContentSection = () => {
     setStatus(TransactionStatus.PENDING);
 
     try {
-      const { amount0Min, amount1Min, deadline } = getDecreaseLiquidityAmounts({
-        amount0: BigInt(parseUnits(data.amount0, token0.coinDecimals)),
-        amount1: BigInt(parseUnits(data.amount1, token1.coinDecimals)),
-        percentage: sliderValue,
+      const liquidity = (data.position.liquidity * BigInt(sliderValue)) / 100n;
+
+      // 20 minute deadline.
+      // TODO: Add this to settings.
+      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+      const position = new Position({
+        pool: data.pool,
+        tickLower: data.position.tickLower,
+        tickUpper: data.position.tickUpper,
+        liquidity: liquidity.toString(),
       });
+
+      const { amount0, amount1 } = position.burnAmountsWithSlippage(
+        new Percent(slippageTolerance * 100, 100 * 100),
+      );
 
       const hash = await removeLiquidity({
         chainId: chain.chainId,
@@ -98,9 +106,9 @@ export const ContentSection = () => {
         token1,
         tokenId: positionId,
         // Scale liquidity by percentage slider value.
-        liquidity: (data.position.liquidity * BigInt(sliderValue)) / 100n,
-        amount0Min,
-        amount1Min,
+        liquidity,
+        amount0Min: BigInt(amount0.toString()),
+        amount1Min: BigInt(amount1.toString()),
         deadline,
         recipient: address,
         position: data.position,
@@ -112,6 +120,7 @@ export const ContentSection = () => {
       setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
     } catch (error: unknown) {
+      console.error("Error removing liquidity:", error);
       if (error instanceof Error) {
         setError(error);
       }
@@ -123,6 +132,7 @@ export const ContentSection = () => {
     positionId,
     chain.chainId,
     sliderValue,
+    slippageTolerance,
     isCollectAsWrappedNative,
     removeLiquidity,
     handleCloseConfirmationModal,
@@ -179,7 +189,8 @@ export const ContentSection = () => {
 
       <div className="flex items-center justify-between h-6 mt-6">
         <div className="font-semibold">Amount to Remove</div>
-        {data && (
+        {/* TODO: Implement disabling collect as wrapped native. */}
+        {/* {data && (
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium">Collect as WTIA</span>
             <Switch
@@ -189,7 +200,7 @@ export const ContentSection = () => {
               }
             />
           </div>
-        )}
+        )} */}
       </div>
 
       <Card variant="secondary" className="mt-4">

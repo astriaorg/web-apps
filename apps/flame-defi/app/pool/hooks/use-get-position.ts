@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { tickToPrice } from "@uniswap/v3-sdk";
+import { Pool, tickToPrice } from "@uniswap/v3-sdk";
 import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
@@ -30,6 +30,7 @@ const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
 
 export type GetPositionResult = {
   position: Position;
+  pool: Pool;
   token0: EvmCurrency;
   token1: EvmCurrency;
   /**
@@ -136,6 +137,15 @@ export const useGetPosition = ({
         token1 = data.token0;
       }
 
+      const pool = new Pool(
+        data.token0.asToken(),
+        data.token1.asToken(),
+        position.fee,
+        slot0.sqrtPriceX96.toString(),
+        position.liquidity.toString(),
+        slot0.tick,
+      );
+
       const { minTick, maxTick } = getMinMaxTick(position.fee as FeeTier);
 
       let { minPrice, maxPrice } = (() => {
@@ -197,6 +207,7 @@ export const useGetPosition = ({
 
       return {
         position,
+        pool,
         token0,
         token1,
         amount0,

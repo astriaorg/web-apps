@@ -6,7 +6,7 @@ import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent, Switch } from "@repo/ui/components";
+import { Button, Card, CardContent } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
 import { PriceRangeSummary } from "pool/components/price-range";
@@ -47,7 +47,7 @@ export const ContentSection = () => {
   const { collectFees } = useCollectFees();
 
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
 
@@ -126,7 +126,8 @@ export const ContentSection = () => {
             title={
               <div className="flex items-center justify-between h-5">
                 <span className="">Unclaimed Fees</span>
-                {data?.hasUnclaimedFees && (
+                {/* TODO: Implement disabling collect as wrapped native. */}
+                {/* {data?.hasUnclaimedFees && (
                   <div className="flex items-center gap-2 justify-end">
                     <span className="normal-case tracking-normal">
                       Collect as WTIA
@@ -138,7 +139,7 @@ export const ContentSection = () => {
                       }
                     />
                   </div>
-                )}
+                )} */}
               </div>
             }
             token0={data?.token0}
