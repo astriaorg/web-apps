@@ -1,5 +1,5 @@
-import { RemoveLiquidity } from "pool/modules/remove-liquidity/remove-liquidity";
+import { Page as RemoveLiquidityPage } from "pool/modules/remove-liquidity";
 
-export default function RemoveLiquidityPage() {
-  return <RemoveLiquidity />;
+export default function Page() {
+  return <RemoveLiquidityPage />;
 }
