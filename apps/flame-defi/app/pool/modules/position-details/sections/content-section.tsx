@@ -21,7 +21,7 @@ import {
 import { ROUTES } from "pool/constants/routes";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const ContentSection = () => {
   const router = useRouter();
@@ -38,7 +38,7 @@ export const ContentSection = () => {
     setError,
     status,
     setStatus,
-  } = usePoolPositionContextV2();
+  } = usePoolPositionContext();
   const { data, isPending, refetch } = useGetPosition({
     positionId,
     invert,

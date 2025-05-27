@@ -1,4 +1,4 @@
-import { PoolPositionContextProvider as PoolPositionContextProviderV2 } from "pool/context/pool-position-context-v2";
+import { PoolPositionContextProvider as PoolPositionContextProviderV2 } from "pool/context/pool-position-context";
 import { ContentSection } from "pool/modules/add-liquidity/sections/content-section";
 import { HeaderSection } from "pool/modules/add-liquidity/sections/header-section";
 

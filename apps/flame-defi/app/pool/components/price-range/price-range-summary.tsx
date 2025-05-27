@@ -13,7 +13,7 @@ import {
 } from "@repo/ui/components";
 import { PositionRangeBadge } from "pool/components/position";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 import { getDisplayMaxPrice, getDisplayMinPrice } from "pool/utils";
 
 import { PricePerTokenLabel } from "./price-per-token-label";
@@ -21,7 +21,7 @@ import { PriceRangeBlock } from "./price-range-block";
 
 export const PriceRangeSummary = () => {
   const { formatNumber } = useIntl();
-  const { positionId, invert, setInvert } = usePoolPositionContextV2();
+  const { positionId, invert, setInvert } = usePoolPositionContext();
   const { data, isPending } = useGetPosition({ positionId, invert });
 
   const tokens = useMemo(() => {

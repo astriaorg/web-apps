@@ -8,7 +8,7 @@ import {
   type DecreaseLiquidityAndCollectV2Params,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
-import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const useRemoveLiquidity = () => {
   const queryClient = useQueryClient();

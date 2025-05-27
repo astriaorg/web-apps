@@ -7,7 +7,7 @@ import { Header, HeaderTitle } from "components/header";
 import { PositionFeeBadge, PositionRangeBadge } from "pool/components/position";
 import { ROUTES } from "pool/constants/routes";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const HeaderSection = () => {
   const router = useRouter();

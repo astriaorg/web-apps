@@ -20,7 +20,7 @@ import {
   TransactionType,
 } from "pool/components/transaction-summary";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
 import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
 import { getDecreaseLiquidityAmounts } from "pool/utils";
@@ -44,7 +44,7 @@ export const ContentSection = () => {
     setError,
     status,
     setStatus,
-  } = usePoolPositionContextV2();
+  } = usePoolPositionContext();
   const { data, isPending, refetch } = useGetPosition({
     positionId,
     invert,

@@ -38,7 +38,7 @@ import {
 } from "pool/components/transaction-summary";
 import { useAddLiquidity } from "pool/hooks/use-add-liquidity";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 import { TokenAmountInput } from "pool/modules/add-liquidity/components/token-amount-input";
 import { DepositType, InputId } from "pool/types";
 import { getIncreaseLiquidityAmounts } from "pool/utils";
@@ -62,7 +62,7 @@ export const ContentSection = () => {
     setError,
     status,
     setStatus,
-  } = usePoolPositionContextV2();
+  } = usePoolPositionContext();
   const { data, isPending, refetch } = useGetPosition({
     positionId,
     invert,
