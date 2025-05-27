@@ -19,6 +19,7 @@ import {
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
+import { RemoveAmountSlider } from "pool/modules/remove-liquidity/components/remove-amount-slider";
 
 export const ContentSection = () => {
   const router = useRouter();
@@ -191,6 +192,12 @@ export const ContentSection = () => {
           </div>
         )}
       </div>
+
+      <Card variant="secondary" className="mt-4">
+        <CardContent>
+          <RemoveAmountSlider onChange={() => {}} />
+        </CardContent>
+      </Card>
 
       <Button
         onClick={handleOpenConfirmationModal}
