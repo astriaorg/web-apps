@@ -91,7 +91,6 @@ export interface DecreaseLiquidityAndCollectParams {
   isCollectNonNativeTokens: boolean;
   isToken0Native: boolean;
   isToken1Native: boolean;
-  gasLimit?: bigint;
 }
 
 export interface CollectFeesParams {
