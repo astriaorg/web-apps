@@ -5,7 +5,7 @@ import { useAccount, useConfig, usePublicClient } from "wagmi";
 import { useAstriaChainData } from "config";
 import {
   createNonfungiblePositionManagerService,
-  type DecreaseLiquidityAndCollectParams,
+  type DecreaseLiquidityAndCollectV2Params,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
@@ -19,7 +19,7 @@ export const useRemoveLiquidity = () => {
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
-    mutationFn: async (params: DecreaseLiquidityAndCollectParams) => {
+    mutationFn: async (params: DecreaseLiquidityAndCollectV2Params) => {
       if (!address || !positionId) {
         throw new Error("Missing required data for removing liquidity.");
       }
@@ -31,7 +31,7 @@ export const useRemoveLiquidity = () => {
         );
 
       const hash =
-        await nonfungiblePositionService.decreaseLiquidityAndCollect(params);
+        await nonfungiblePositionService.decreaseLiquidityAndCollectV2(params);
 
       return hash;
     },
@@ -62,7 +62,7 @@ export const useRemoveLiquidity = () => {
   });
 
   const removeLiquidity = useCallback(
-    async (params: DecreaseLiquidityAndCollectParams) => {
+    async (params: DecreaseLiquidityAndCollectV2Params) => {
       try {
         const result = await mutation.mutateAsync(params);
         return result;

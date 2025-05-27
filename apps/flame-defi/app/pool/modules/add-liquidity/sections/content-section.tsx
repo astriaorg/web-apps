@@ -273,6 +273,7 @@ export const ContentSection = () => {
         <Card className="col-span-1 md:col-span-2">
           <CardContent>
             <TokenPairCard
+              title="Liquidity"
               token0={data?.token0}
               token1={data?.token1}
               value0={formatNumber(Number(data?.amount0 ?? 0), {
