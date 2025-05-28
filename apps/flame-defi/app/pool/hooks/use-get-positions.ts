@@ -97,7 +97,6 @@ export const useGetPositions = (): UseQueryResult<
         return {
           ...position,
           address: uniquePool,
-          liquidity: uniqueLiquidityAndSlot0.liquidity,
           slot0: uniqueLiquidityAndSlot0.slot0,
         };
       });
