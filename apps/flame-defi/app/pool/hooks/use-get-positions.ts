@@ -1,4 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { Pool } from "@uniswap/v3-sdk";
 import { useAccount, useConfig } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
@@ -96,7 +97,6 @@ export const useGetPositions = (): UseQueryResult<
         return {
           ...position,
           address: uniquePool,
-          liquidity: uniqueLiquidityAndSlot0.liquidity,
           slot0: uniqueLiquidityAndSlot0.slot0,
         };
       });
@@ -109,12 +109,21 @@ export const useGetPositions = (): UseQueryResult<
           throw new Error("Tokens in position not found.");
         }
 
-        const { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+        const { amount0, amount1 } = calculateTokenAmountsFromPosition({
           position,
           sqrtPriceX96: position.slot0.sqrtPriceX96,
           token0,
           token1,
         });
+
+        const pool = new Pool(
+          token0.asToken(),
+          token1.asToken(),
+          position.fee,
+          position.slot0.sqrtPriceX96.toString(),
+          position.liquidity.toString(),
+          position.slot0.tick,
+        );
 
         return {
           position,
@@ -126,7 +135,7 @@ export const useGetPositions = (): UseQueryResult<
           },
           amount0,
           amount1,
-          price,
+          price: pool.token0Price.toFixed(token0.coinDecimals),
         };
       });
     },

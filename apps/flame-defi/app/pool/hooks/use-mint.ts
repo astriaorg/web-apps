@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useAccount, useConfig } from "wagmi";
+import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { useAstriaChainData } from "config";
 import {
@@ -11,6 +11,7 @@ import { QUERY_KEYS } from "pool/constants/query-keys";
 
 export const useMint = () => {
   const queryClient = useQueryClient();
+  const publicClient = usePublicClient();
   const config = useConfig();
   const { address } = useAccount();
   const { chain } = useAstriaChainData();
@@ -25,15 +26,25 @@ export const useMint = () => {
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const result =
+      const hash =
         await nonfungiblePositionManagerService.createAndInitializePoolIfNecessaryAndMint(
           params,
         );
 
-      return result;
+      return hash;
     },
-    onSuccess: (hash) => {
+    onSuccess: async (hash) => {
       if (hash) {
+        if (publicClient) {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+
         void queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.USE_GET_POSITIONS, chain.chainId, address],
         });

@@ -243,6 +243,7 @@ export default function RootLayout({
                 {children}
               </main>
             </RouteAnimation>
+            <div className="flex-1" />
             <Footer />
           </div>
         </Providers>

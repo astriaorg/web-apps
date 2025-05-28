@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Big from "big.js";
 import { useCallback } from "react";
 import { type Address, formatUnits } from "viem";
-import { useAccount, useConfig } from "wagmi";
+import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { type EvmCurrency } from "@repo/flame-types";
 import { useAstriaChainData } from "config";
@@ -12,6 +12,7 @@ import { createErc20Service } from "features/evm-wallet";
 // TODO: Unify token approval hooks.
 export const useApproveToken = () => {
   const queryClient = useQueryClient();
+  const publicClient = usePublicClient();
   const config = useConfig();
   const { address, chainId } = useAccount();
   const { chain } = useAstriaChainData();
@@ -45,9 +46,19 @@ export const useApproveToken = () => {
 
       return hash;
     },
-    onSuccess: (hash, variables) => {
+    onSuccess: async (hash, variables) => {
       // Invalidate relevant queries after successful approval.
       if (hash) {
+        if (publicClient) {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+
         void queryClient.invalidateQueries({
           queryKey: [
             QUERY_KEYS.USE_TOKEN_ALLOWANCE,

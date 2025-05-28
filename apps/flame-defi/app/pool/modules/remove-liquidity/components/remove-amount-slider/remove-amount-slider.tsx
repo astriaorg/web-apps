@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 
-import { Badge, Slider } from "@repo/ui/components";
+import { AnimatedNumber, Badge, Slider } from "@repo/ui/components";
 
 export const RemoveAmountSlider = ({
   value,
@@ -29,8 +29,10 @@ export const RemoveAmountSlider = ({
           <span className="text-xs font-medium tracking-wider uppercase">
             Current Price
           </span>
-          {/* TODO: Add animation. */}
-          <span className="text-5xl/12 font-dot">{value}%</span>
+          <div className="flex text-5xl/12 font-dot">
+            <AnimatedNumber value={value} width={30} height={48} />
+            <span className="ml-1">%</span>
+          </div>
         </div>
         <div className="flex gap-2">
           {breakpoints.map((value) => (

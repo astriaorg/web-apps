@@ -9,7 +9,6 @@ import { useAccount } from "wagmi";
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import {
   type Amount,
-  Button,
   Card,
   CardContent,
   Skeleton,
@@ -28,6 +27,7 @@ import {
   PositionSummaryCard,
 } from "pool/components/position";
 import { PriceRangeSummary } from "pool/components/price-range";
+import { SubmitButton } from "pool/components/submit-button";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -36,6 +36,7 @@ import {
   TransactionSummary,
   TransactionType,
 } from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useAddLiquidity } from "pool/hooks/use-add-liquidity";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
@@ -335,13 +336,13 @@ export const ContentSection = () => {
         {!data && <Skeleton className="w-full h-26" />}
       </div>
 
-      <Button
+      <SubmitButton
         onClick={handleOpenConfirmationModal}
         disabled={isDisabled}
         className="mt-6 w-full"
       >
         Add Liquidity
-      </Button>
+      </SubmitButton>
 
       {data && (
         <ConfirmationModal
@@ -349,7 +350,7 @@ export const ContentSection = () => {
           open={isConfirmationModalOpen}
           onOpenChange={(value) => {
             if (!value && status === TransactionStatus.SUCCESS) {
-              router.push(`/pool/${positionId}`);
+              router.push(`${ROUTES.BASE}/${positionId}`);
               return;
             }
             setIsConfirmationModalOpen(value);
