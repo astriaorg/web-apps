@@ -123,7 +123,7 @@ export const useGetPosition = ({
 
       const { position, slot0 } = data;
 
-      let { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+      let { amount0, amount1 } = calculateTokenAmountsFromPosition({
         position,
         sqrtPriceX96: slot0.sqrtPriceX96,
         token0: data.token0,
@@ -190,13 +190,15 @@ export const useGetPosition = ({
         data.token1.coinDecimals,
       );
 
+      let price = pool.token0Price.toFixed(token0.coinDecimals);
+
       if (invert) {
         unclaimedFees0 = formatUnits(position.tokensOwed1, token1.coinDecimals);
         unclaimedFees1 = formatUnits(position.tokensOwed0, token0.coinDecimals);
         const amount0Original = amount0;
         amount0 = amount1;
         amount1 = amount0Original;
-        price = (1 / Number(price)).toString();
+        price = pool.token1Price.toFixed(token1.coinDecimals);
       }
 
       const depositType = calculateDepositType({

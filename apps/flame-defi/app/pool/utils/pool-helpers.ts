@@ -200,13 +200,10 @@ export const calculateTokenAmountsFromPosition = ({
   sqrtPriceX96: bigint;
   token0: EvmCurrency;
   token1: EvmCurrency;
-}): { amount0: string; amount1: string; price: string } => {
+}): { amount0: string; amount1: string } => {
   const sqrtPriceX96 = JSBI.BigInt(params.sqrtPriceX96.toString());
   const sqrtPriceLowerX96 = TickMath.getSqrtRatioAtTick(position.tickLower);
   const sqrtPriceUpperX96 = TickMath.getSqrtRatioAtTick(position.tickUpper);
-
-  const tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-  const price = tickToPrice(token0.asToken(), token1.asToken(), tick);
 
   const liquidity = JSBI.BigInt(position.liquidity.toString());
 
@@ -249,7 +246,6 @@ export const calculateTokenAmountsFromPosition = ({
     // Don't use JSBI for the final division. JSBI does integer division, so precision is lost for small amounts and 0 is returned.
     amount0: formatUnits(BigInt(amount0.toString()), token0.coinDecimals),
     amount1: formatUnits(BigInt(amount1.toString()), token1.coinDecimals),
-    price: price.toFixed(token0.coinDecimals),
   };
 };
 
