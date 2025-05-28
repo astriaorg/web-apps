@@ -6,11 +6,12 @@ import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent, Skeleton } from "@repo/ui/components";
+import { Card, CardContent, Skeleton } from "@repo/ui/components";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData, useConfig } from "config";
 import { PositionSummaryCard } from "pool/components/position";
+import { SubmitButton } from "pool/components/submit-button";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -210,13 +211,13 @@ export const ContentSection = () => {
         </CardContent>
       </Card>
 
-      <Button
+      <SubmitButton
         onClick={handleOpenConfirmationModal}
         disabled={isDisabled}
         className="mt-6 w-full"
       >
         Remove Liquidity
-      </Button>
+      </SubmitButton>
 
       {data && (
         <ConfirmationModal

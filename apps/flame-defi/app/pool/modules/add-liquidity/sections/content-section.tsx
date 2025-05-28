@@ -9,7 +9,6 @@ import { useAccount } from "wagmi";
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import {
   type Amount,
-  Button,
   Card,
   CardContent,
   Skeleton,
@@ -28,6 +27,7 @@ import {
   PositionSummaryCard,
 } from "pool/components/position";
 import { PriceRangeSummary } from "pool/components/price-range";
+import { SubmitButton } from "pool/components/submit-button";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -336,13 +336,13 @@ export const ContentSection = () => {
         {!data && <Skeleton className="w-full h-26" />}
       </div>
 
-      <Button
+      <SubmitButton
         onClick={handleOpenConfirmationModal}
         disabled={isDisabled}
         className="mt-6 w-full"
       >
         Add Liquidity
-      </Button>
+      </SubmitButton>
 
       {data && (
         <ConfirmationModal

@@ -1,11 +1,10 @@
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
-import { type Amount, Button } from "@repo/ui/components";
+import { type Amount } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
@@ -13,6 +12,7 @@ import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
+import { SubmitButton as BaseSubmitButton } from "pool/components/submit-button";
 import {
   TransactionSummary,
   TransactionType,
@@ -45,7 +45,6 @@ type SubmitButtonProps =
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
-  CONNECT_WALLET = "CONNECT_WALLET",
   INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
   INVALID_INPUT = "INVALID_INPUT",
 
@@ -65,7 +64,6 @@ export const SubmitButton = ({
   const router = useRouter();
   const { isConnected, address } = useAccount();
   const publicClient = usePublicClient();
-  const { openConnectModal } = useConnectModal();
   const { chain } = useAstriaChainData();
   const {
     token0,
@@ -289,10 +287,6 @@ export const SubmitButton = ({
   ]);
 
   const state = useMemo<ButtonState>(() => {
-    if (!isConnected) {
-      return ButtonState.CONNECT_WALLET;
-    }
-
     if (status === TransactionStatus.PENDING) {
       return ButtonState.PENDING_SEND_TRANSACTION;
     }
@@ -380,11 +374,6 @@ export const SubmitButton = ({
       return;
     }
 
-    if (state === ButtonState.CONNECT_WALLET) {
-      openConnectModal?.();
-      return;
-    }
-
     if (state === ButtonState.APPROVE_TOKEN_0) {
       if (!token0 || !amount0.validation.isValid) {
         return;
@@ -424,7 +413,6 @@ export const SubmitButton = ({
     amount1,
     handleCreatePosition,
     handleCloseConfirmationModal,
-    openConnectModal,
     handleApproveToken,
     refetchToken0Allowance,
     refetchToken1Allowance,
@@ -434,8 +422,6 @@ export const SubmitButton = ({
     const action = "Create New Position";
 
     switch (state) {
-      case ButtonState.CONNECT_WALLET:
-        return "Connect Wallet";
       case ButtonState.INSUFFICIENT_BALANCE:
         return "Insufficient Balance";
       case ButtonState.INVALID_INPUT:
@@ -465,9 +451,12 @@ export const SubmitButton = ({
 
   return (
     <>
-      <Button onClick={handleOpenConfirmationModal} disabled={isDisabled}>
+      <BaseSubmitButton
+        onClick={handleOpenConfirmationModal}
+        disabled={isDisabled}
+      >
         {content}
-      </Button>
+      </BaseSubmitButton>
       {token0 && token1 && (
         <ConfirmationModal
           title="Create New Position"

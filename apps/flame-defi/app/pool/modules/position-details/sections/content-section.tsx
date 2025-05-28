@@ -6,10 +6,11 @@ import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent } from "@repo/ui/components";
+import { Card, CardContent } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
 import { PriceRangeSummary } from "pool/components/price-range";
+import { SubmitButton } from "pool/components/submit-button";
 import {
   TokenPairCard,
   TokenPairCardDivider,
@@ -153,13 +154,13 @@ export const ContentSection = () => {
             })}
             isLoading={isPending}
           />
-          <Button
+          <SubmitButton
             onClick={handleOpenConfirmationModal}
             disabled={isPending || !data?.hasUnclaimedFees}
             className="mt-5 w-full"
           >
             Collect Fees
-          </Button>
+          </SubmitButton>
         </CardContent>
       </Card>
 
