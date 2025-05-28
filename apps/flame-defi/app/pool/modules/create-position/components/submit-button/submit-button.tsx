@@ -62,7 +62,7 @@ export const SubmitButton = ({
   depositType,
 }: SubmitButtonProps) => {
   const router = useRouter();
-  const { isConnected, address } = useAccount();
+  const { address } = useAccount();
   const publicClient = usePublicClient();
   const { chain } = useAstriaChainData();
   const {
@@ -177,22 +177,11 @@ export const SubmitButton = ({
         });
 
         if (hash) {
-          const receipt = await publicClient.waitForTransactionReceipt({
-            hash,
-          });
+          await refetch();
 
-          if (receipt.status === "success") {
-            // Add a small delay to ensure blockchain state is updated.
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+          setStatus(TransactionStatus.SUCCESS);
 
-            await refetch();
-
-            setStatus(TransactionStatus.SUCCESS);
-
-            return;
-          } else {
-            throw new Error("Transaction failed.");
-          }
+          return;
         }
       } catch (error) {
         console.error("Error approving token:", error);
@@ -343,7 +332,6 @@ export const SubmitButton = ({
 
     return ButtonState.SEND_TRANSACTION;
   }, [
-    isConnected,
     status,
     isPriceRangeValid,
     sqrtPriceX96,
