@@ -242,7 +242,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient,
     deadline,
     sqrtPriceX96,
-  }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<unknown> {
+  }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<Hash> {
     const calls: string[] = [];
 
     const token0Address = token0.asToken().address as Address;

@@ -11,7 +11,6 @@ export enum TransactionType {
 }
 
 interface BaseTransactionSummaryProps {
-  position: Position;
   token0: EvmCurrency;
   token1: EvmCurrency;
   type: TransactionType;
@@ -21,9 +20,19 @@ interface BaseTransactionSummaryProps {
   onSubmit: () => void;
 }
 
+export interface CreatePositionSummaryProps
+  extends BaseTransactionSummaryProps {
+  type: TransactionType.CREATE_POSITION;
+  amount0: string;
+  amount1: string;
+  minPrice: string;
+  maxPrice: string;
+}
+
 export interface CollectFeesTransactionSummaryProps
   extends BaseTransactionSummaryProps {
   type: TransactionType.COLLECT_FEES;
+  position: Position;
   unclaimedFees0: string;
   unclaimedFees1: string;
 }
@@ -31,6 +40,7 @@ export interface CollectFeesTransactionSummaryProps
 export interface AddLiquidityTransactionSummaryProps
   extends BaseTransactionSummaryProps {
   type: TransactionType.ADD_LIQUIDITY;
+  position: Position;
   amount0: string;
   amount1: string;
   minPrice: string;
@@ -40,12 +50,14 @@ export interface AddLiquidityTransactionSummaryProps
 export interface RemoveLiquidityTransactionSummaryProps
   extends BaseTransactionSummaryProps {
   type: TransactionType.REMOVE_LIQUIDITY;
+  position: Position;
   percentage: number;
   amount0: string;
   amount1: string;
 }
 
 export type TransactionSummaryProps =
+  | CreatePositionSummaryProps
   | CollectFeesTransactionSummaryProps
   | AddLiquidityTransactionSummaryProps
   | RemoveLiquidityTransactionSummaryProps;

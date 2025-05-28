@@ -19,6 +19,7 @@ import {
   TransactionSummary,
   TransactionType,
 } from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useGetPosition } from "pool/hooks/use-get-position";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 import { useRemoveLiquidity } from "pool/hooks/use-remove-liquidity";
@@ -223,7 +224,7 @@ export const ContentSection = () => {
           open={isConfirmationModalOpen}
           onOpenChange={(value) => {
             if (!value && status === TransactionStatus.SUCCESS) {
-              router.push(`/pool/${positionId}`);
+              router.push(`${ROUTES.BASE}/${positionId}`);
               return;
             }
             setIsConfirmationModalOpen(value);

@@ -12,6 +12,7 @@ import { useAstriaChainData } from "config";
 
 import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
 import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
+import { CreatePositionTransactionSummary } from "./create-position-transaction-summary";
 import { RemoveLiquidityTransactionSummary } from "./remove-liquidity-transaction-summary";
 import {
   type TransactionSuccessProps,
@@ -39,11 +40,17 @@ const TransactionSuccess = ({
   const { chain } = useAstriaChainData();
 
   const message = useMemo(() => {
+    if (type === TransactionType.CREATE_POSITION) {
+      return `Successfully created position for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
     if (type === TransactionType.COLLECT_FEES) {
       return `Successfully collected fees for ${token0.coinDenom}/${token1.coinDenom}.`;
     }
     if (type === TransactionType.ADD_LIQUIDITY) {
       return `Successfully added liquidity for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
+    if (type === TransactionType.REMOVE_LIQUIDITY) {
+      return `Successfully removed liquidity for ${token0.coinDenom}/${token1.coinDenom}.`;
     }
     throw new Error(`Unknown transaction type: ${type}`);
   }, [type, token0, token1]);
@@ -123,6 +130,9 @@ export const TransactionSummary = (props: TransactionSummaryProps) => {
   }
   if (type === TransactionType.REMOVE_LIQUIDITY) {
     return <RemoveLiquidityTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.CREATE_POSITION) {
+    return <CreatePositionTransactionSummary {...props} />;
   }
 
   throw new Error(`Unknown transaction type: ${type}`);

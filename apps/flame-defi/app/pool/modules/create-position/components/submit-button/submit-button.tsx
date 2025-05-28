@@ -1,4 +1,5 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
@@ -7,10 +8,16 @@ import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
 import { type Amount, Button } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
+import {
+  TransactionSummary,
+  TransactionType,
+} from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
@@ -55,6 +62,7 @@ export const SubmitButton = ({
   sqrtPriceX96,
   depositType,
 }: SubmitButtonProps) => {
+  const router = useRouter();
   const { isConnected, address } = useAccount();
   const publicClient = usePublicClient();
   const { openConnectModal } = useConnectModal();
@@ -136,12 +144,13 @@ export const SubmitButton = ({
     getIsApproved,
   ]);
 
-  // TODO: Error handling.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [hash, setHash] = useState<string | null>(null);
-  const [status, setStatus] = useState<TransactionStatus>();
+  const [hash, setHash] = useState<Hash>();
+  const [error, setError] = useState<Error>();
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
 
   const handleApproveToken = useCallback(
     async ({
@@ -252,16 +261,16 @@ export const SubmitButton = ({
         sqrtPriceX96,
       };
 
-      await mint(params);
+      const hash = await mint(params);
 
-      setError(null);
+      setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
-      setHash("0x0" as Hash);
     } catch (error) {
       console.error("Error creating position:", error);
-      setError("Failed to create position.");
+      if (error instanceof Error) {
+        setError(error);
+      }
       setStatus(TransactionStatus.FAILED);
-      setHash(null);
     }
   }, [
     address,
@@ -354,7 +363,23 @@ export const SubmitButton = ({
     isToken1Approved,
   ]);
 
+  const handleCloseConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(false);
+    setStatus(TransactionStatus.IDLE);
+    setError(undefined);
+  }, [setIsConfirmationModalOpen, setStatus, setError]);
+
+  const handleOpenConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(true);
+    setStatus(TransactionStatus.IDLE);
+  }, [setStatus]);
+
   const handleSubmit = useCallback(async () => {
+    if (!address) {
+      handleCloseConfirmationModal();
+      return;
+    }
+
     if (state === ButtonState.CONNECT_WALLET) {
       openConnectModal?.();
       return;
@@ -391,12 +416,14 @@ export const SubmitButton = ({
     // If no approvals are needed or approvals are complete, create the position.
     handleCreatePosition();
   }, [
+    address,
     state,
     token0,
     token1,
     amount0,
     amount1,
     handleCreatePosition,
+    handleCloseConfirmationModal,
     openConnectModal,
     handleApproveToken,
     refetchToken0Allowance,
@@ -437,8 +464,37 @@ export const SubmitButton = ({
   }, [isPendingToken0Allowance, isPendingToken1Allowance, state]);
 
   return (
-    <Button onClick={handleSubmit} disabled={isDisabled}>
-      {content}
-    </Button>
+    <>
+      <Button onClick={handleOpenConfirmationModal} disabled={isDisabled}>
+        {content}
+      </Button>
+      {token0 && token1 && (
+        <ConfirmationModal
+          title="Create New Position"
+          open={isConfirmationModalOpen}
+          onOpenChange={(value) => {
+            if (!value && status === TransactionStatus.SUCCESS) {
+              router.push(ROUTES.POSITION_LIST);
+              return;
+            }
+            setIsConfirmationModalOpen(value);
+          }}
+        >
+          <TransactionSummary
+            type={TransactionType.CREATE_POSITION}
+            token0={token0}
+            token1={token1}
+            hash={hash}
+            status={status}
+            error={error}
+            onSubmit={handleSubmit}
+            amount0={amount0.value}
+            amount1={amount1.value}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+          />
+        </ConfirmationModal>
+      )}
+    </>
   );
 };
