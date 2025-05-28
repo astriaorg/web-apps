@@ -38,10 +38,10 @@ import {
 } from "pool/components/transaction-summary";
 import { useAddLiquidity } from "pool/hooks/use-add-liquidity";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 import { TokenAmountInput } from "pool/modules/add-liquidity/components/token-amount-input";
 import { DepositType, InputId } from "pool/types";
-import { getTransactionAmounts } from "pool/utils";
+import { getIncreaseLiquidityAmounts } from "pool/utils";
 
 // TODO: Handle token approval. Shouldn't be an issue since we always set the approval to max on create position.
 export const ContentSection = () => {
@@ -62,7 +62,7 @@ export const ContentSection = () => {
     setError,
     status,
     setStatus,
-  } = usePoolPositionContextV2();
+  } = usePoolPositionContext();
   const { data, isPending, refetch } = useGetPosition({
     positionId,
     invert,
@@ -206,7 +206,7 @@ export const ContentSection = () => {
         amount0Desired,
         amount1Desired,
         deadline,
-      } = getTransactionAmounts({
+      } = getIncreaseLiquidityAmounts({
         amount0: derivedValues.derivedAmount0.value,
         amount1: derivedValues.derivedAmount1.value,
         token0,
@@ -273,6 +273,7 @@ export const ContentSection = () => {
         <Card className="col-span-1 md:col-span-2">
           <CardContent>
             <TokenPairCard
+              title="Liquidity"
               token0={data?.token0}
               token1={data?.token1}
               value0={formatNumber(Number(data?.amount0 ?? 0), {

@@ -71,6 +71,9 @@ export interface IncreaseLiquidityParams {
   deadline: number;
 }
 
+/**
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
+ */
 export interface DecreaseLiquidityParams {
   chainId: number;
   liquidity: bigint;
@@ -79,6 +82,9 @@ export interface DecreaseLiquidityParams {
   deadline: number;
 }
 
+/**
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
+ */
 export interface DecreaseLiquidityAndCollectParams {
   chainId: number;
   tokenId: string;
@@ -91,9 +97,27 @@ export interface DecreaseLiquidityAndCollectParams {
   isCollectNonNativeTokens: boolean;
   isToken0Native: boolean;
   isToken1Native: boolean;
-  gasLimit?: bigint;
 }
 
+export interface DecreaseLiquidityAndCollectV2Params {
+  chainId: number;
+  tokenId: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  liquidity: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+  recipient: Address;
+  position: Position;
+  options: {
+    isCollectAsWrappedNative: boolean;
+  };
+}
+
+/**
+ * @deprecated
+ */
 export interface CollectFeesParams {
   calls?: string[];
   chainId: number;
@@ -763,6 +787,61 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       abi: this.abi,
       functionName: "sweepToken",
       args: [token, amountMinimum, recipient],
+    });
+  }
+
+  /**
+   * Performs a multicall that combines decreaseLiquidity, collect, unwrap, and sweep operations in a single transaction.
+   * By default, it will collect all available fees and tokens released by decreaseLiquidity.
+   *
+   * @param params - Parameters for the multicall operation
+   * @returns The transaction hash
+   */
+  async decreaseLiquidityAndCollectV2({
+    chainId,
+    tokenId,
+    token0,
+    token1,
+    liquidity,
+    amount0Min,
+    amount1Min,
+    deadline,
+    recipient,
+    position,
+    options,
+  }: DecreaseLiquidityAndCollectV2Params): Promise<Hash> {
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+    let sortedAmount0Min = amount0Min;
+    let sortedAmount1Min = amount1Min;
+
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+      sortedAmount0Min = amount1Min;
+      sortedAmount1Min = amount0Min;
+    }
+
+    const calls: string[] = [];
+    const decreaseCall = this.encodeDecreaseLiquidity(
+      tokenId,
+      liquidity,
+      sortedAmount0Min,
+      sortedAmount1Min,
+      deadline,
+    );
+
+    calls.push(decreaseCall);
+
+    return await this.collectFeesV2({
+      chainId,
+      tokenId,
+      token0: sortedToken0,
+      token1: sortedToken1,
+      position,
+      recipient,
+      options,
+      calls,
     });
   }
 

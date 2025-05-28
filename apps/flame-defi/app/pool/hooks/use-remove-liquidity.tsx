@@ -5,12 +5,12 @@ import { useAccount, useConfig, usePublicClient } from "wagmi";
 import { useAstriaChainData } from "config";
 import {
   createNonfungiblePositionManagerService,
-  type IncreaseLiquidityParams,
+  type DecreaseLiquidityAndCollectV2Params,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
-export const useAddLiquidity = () => {
+export const useRemoveLiquidity = () => {
   const queryClient = useQueryClient();
   const publicClient = usePublicClient();
   const config = useConfig();
@@ -19,9 +19,9 @@ export const useAddLiquidity = () => {
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
-    mutationFn: async (params: IncreaseLiquidityParams) => {
+    mutationFn: async (params: DecreaseLiquidityAndCollectV2Params) => {
       if (!address || !positionId) {
-        throw new Error("Missing required data for adding liquidity.");
+        throw new Error("Missing required data for removing liquidity.");
       }
 
       const nonfungiblePositionService =
@@ -30,7 +30,8 @@ export const useAddLiquidity = () => {
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const hash = await nonfungiblePositionService.increaseLiquidity(params);
+      const hash =
+        await nonfungiblePositionService.decreaseLiquidityAndCollectV2(params);
 
       return hash;
     },
@@ -56,17 +57,17 @@ export const useAddLiquidity = () => {
       }
     },
     onError: (error) => {
-      console.warn("Error adding liquidity:", error);
+      console.warn("Error removing liquidity:", error);
     },
   });
 
-  const addLiquidity = useCallback(
-    async (params: IncreaseLiquidityParams) => {
+  const removeLiquidity = useCallback(
+    async (params: DecreaseLiquidityAndCollectV2Params) => {
       try {
         const result = await mutation.mutateAsync(params);
         return result;
       } catch (error) {
-        console.error("Error in add liquidity:", error);
+        console.error("Error in remove liquidity:", error);
         throw error;
       }
     },
@@ -74,7 +75,7 @@ export const useAddLiquidity = () => {
   );
 
   return {
-    addLiquidity,
+    removeLiquidity,
     ...mutation,
   };
 };

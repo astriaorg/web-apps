@@ -1,310 +1,58 @@
 "use client";
 
-import { useAstriaChainData } from "config/hooks/use-config";
 import { useParams } from "next/navigation";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { useIntl } from "react-intl";
-import { formatUnits } from "viem";
-import { useAccount, useConfig } from "wagmi";
+import { createContext, PropsWithChildren, useState } from "react";
+import type { Address } from "viem";
 
-import {
-  createNonfungiblePositionManagerService,
-  createPoolFactoryService,
-  createPoolService,
-} from "features/evm-wallet";
-import { PoolToken, Position } from "pool/types";
-import { PoolPositionContextProps } from "pool/types";
+import { TransactionStatus } from "@repo/flame-types";
 
-import {
-  getMinMaxTick,
-  getTokenDataFromCurrencies,
-  getTokensLiquidityAmounts,
-  sqrtPriceX96ToPrice,
-  tickToPrice,
-} from "./pool-position-helpers";
+export interface PoolPositionContextProps {
+  /**
+   * The ID of the pool position, which is the non-fungible token ID.
+   *
+   * This is called `key` or `tokenId` in the contract.
+   */
+  positionId: string;
+  invert: boolean;
+  setInvert: (value: boolean) => void;
+  hash?: Address;
+  setHash: (value?: Address) => void;
+  error?: Error;
+  setError: (value?: Error) => void;
+  status: TransactionStatus;
+  setStatus: (value: TransactionStatus) => void;
+}
 
 export const PoolPositionContext = createContext<
   PoolPositionContextProps | undefined
 >(undefined);
 
-/**
- * TODO: Remove this file once all pool pages have been migrated to the new context.
- */
 export const PoolPositionContextProvider = ({
   children,
 }: PropsWithChildren) => {
   const params = useParams();
-  const tokenId = params["position-id"] as string;
+  const positionId = params["position-id"] as string;
 
-  const config = useConfig();
-  const { address } = useAccount();
-  const { formatNumber } = useIntl();
-  const { chain, nativeToken, wrappedNativeToken } = useAstriaChainData();
-  const { currencies } = chain;
+  const [invert, setInvert] = useState(false);
 
-  const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
-    useState<boolean>(false);
-  const [currentPrice, setCurrentPrice] = useState<string>("");
-  const [minPrice, setMinPrice] = useState<string>("");
-  const [maxPrice, setMaxPrice] = useState<string>("");
-  const [invertedPrice, setInvertedPrice] = useState<boolean>(false);
-  const [isReversedPoolTokens, setIsReversedPoolTokens] =
-    useState<boolean>(false);
-  const [tokens, setTokens] = useState<PoolToken[] | []>([]);
-  const [position, setPoolPosition] = useState<Position | null>(null);
-  const [feeTier, setFeeTier] = useState<string>("");
-  const [rawFeeTier, setRawFeeTier] = useState<number>(0);
-  const [isPositionClosed, setIsPositionClosed] = useState<boolean>(false);
-  const token0 = tokens[0] || null;
-  const token1 = tokens[1] || null;
-
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
-
-  const handleReverseTokenData = (symbol: string) => {
-    setSelectedSymbol(symbol);
-    setInvertedPrice(!invertedPrice);
-    setIsReversedPoolTokens(!isReversedPoolTokens);
-  };
-  const nonfungiblePositionManagerService =
-    createNonfungiblePositionManagerService(
-      config,
-      chain.contracts.nonfungiblePositionManager.address,
-    );
-
-  const getPoolTokens = useCallback(async () => {
-    try {
-      const position = await nonfungiblePositionManagerService.positions(
-        chain.chainId,
-        tokenId,
-      );
-      const isPositionClosed = position.liquidity === 0n;
-      setIsPositionClosed(isPositionClosed);
-      setPoolPosition(position);
-
-      const token0 = getTokenDataFromCurrencies(
-        currencies,
-        position.token0,
-        chain.contracts.wrappedNativeToken.address,
-      );
-      const token1 = getTokenDataFromCurrencies(
-        currencies,
-        position.token1,
-        chain.contracts.wrappedNativeToken.address,
-      );
-
-      if (token0 && token1) {
-        const unclaimedFees0 = Number(
-          formatUnits(position.tokensOwed0, token0.coinDecimals),
-        );
-        const unclaimedFees1 = Number(
-          formatUnits(position.tokensOwed1, token1.coinDecimals),
-        );
-
-        const factoryService = createPoolFactoryService(
-          config,
-          chain.contracts.poolFactory.address,
-        );
-        const poolAddress = await factoryService.getPool(
-          chain.chainId,
-          position.token0,
-          position.token1,
-          position.fee,
-        );
-        const poolService = createPoolService(config, poolAddress);
-        const slot0 = await poolService.slot0(chain.chainId);
-
-        const { amount0, amount1 } = getTokensLiquidityAmounts(
-          position,
-          slot0.sqrtPriceX96,
-          token0.coinDecimals,
-          token1.coinDecimals,
-        );
-
-        const poolToken0: PoolToken = {
-          unclaimedFees: unclaimedFees0,
-          liquidity: amount0,
-          liquidityPercentage: 50, // TODO: figure out how to calculate this.
-          token: token0,
-        };
-
-        const poolToken1: PoolToken = {
-          unclaimedFees: unclaimedFees1,
-          liquidity: amount1,
-          liquidityPercentage: 50, // TODO: figure out how to calculate this.
-          token: token1,
-        };
-
-        setTokens([poolToken0, poolToken1]);
-        setSelectedSymbol(poolToken0.token.coinDenom);
-      }
-    } catch (error) {
-      console.error("Error fetching pool tokens:", error);
-    }
-  }, [
-    currencies,
-    nonfungiblePositionManagerService,
-    chain.chainId,
-    chain.contracts.poolFactory.address,
-    chain.contracts.wrappedNativeToken.address,
-    tokenId,
-    config,
-  ]);
-
-  const getFeeTier = useCallback(async () => {
-    const position = await nonfungiblePositionManagerService.positions(
-      chain.chainId,
-      tokenId,
-    );
-    const feeTier = formatNumber(position.fee / 1_000_000, {
-      style: "percent",
-      maximumFractionDigits: 2,
-    });
-    setFeeTier(feeTier);
-    setRawFeeTier(position.fee);
-  }, [formatNumber, nonfungiblePositionManagerService, chain.chainId, tokenId]);
-
-  const getPriceRange = useCallback(async () => {
-    if (!address) {
-      return;
-    }
-
-    try {
-      const position = await nonfungiblePositionManagerService.positions(
-        chain.chainId,
-        tokenId,
-      );
-      const factoryService = createPoolFactoryService(
-        config,
-        chain.contracts.poolFactory.address,
-      );
-
-      const token0 = getTokenDataFromCurrencies(
-        currencies,
-        position.token0,
-        chain.contracts.wrappedNativeToken.address,
-      );
-
-      const token1 = getTokenDataFromCurrencies(
-        currencies,
-        position.token1,
-        chain.contracts.wrappedNativeToken.address,
-      );
-
-      const poolAddress = await factoryService.getPool(
-        chain.chainId,
-        position.token0,
-        position.token1,
-        position.fee,
-      );
-      const poolService = createPoolService(config, poolAddress);
-      const slot0 = await poolService.slot0(chain.chainId);
-      const pricePerToken = sqrtPriceX96ToPrice(
-        slot0.sqrtPriceX96,
-        invertedPrice,
-        token0?.coinDecimals,
-        token1?.coinDecimals,
-      );
-      setCurrentPrice(pricePerToken.toFixed(6));
-
-      if (position) {
-        // Get the correct min/max tick values based on fee tier
-        const { MIN_TICK, MAX_TICK } = getMinMaxTick(position.fee);
-
-        // Check if position spans the full range
-        const isFullRange =
-          position.tickLower === MIN_TICK && position.tickUpper === MAX_TICK;
-
-        if (isFullRange) {
-          setMinPrice("0");
-          setMaxPrice("∞");
-        } else {
-          const minPriceFromTick = tickToPrice(
-            position.tickLower,
-            token0?.coinDecimals,
-            token1?.coinDecimals,
-          );
-          const maxPriceFromTick = tickToPrice(
-            position.tickUpper,
-            token0?.coinDecimals,
-            token1?.coinDecimals,
-          );
-          setMinPrice(minPriceFromTick.toFixed(6));
-          setMaxPrice(maxPriceFromTick.toFixed(6));
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching price range:", error);
-    }
-  }, [
-    address,
-    nonfungiblePositionManagerService,
-    chain,
-    tokenId,
-    currencies,
-    config,
-    invertedPrice,
-  ]);
-
-  useEffect(() => {
-    if (tokens.length === 0) {
-      void getPoolTokens();
-      void getFeeTier();
-    }
-  }, [tokens.length, getPoolTokens, getFeeTier]);
-
-  const refreshPoolPosition = useCallback(() => {
-    void getPoolTokens();
-    void getFeeTier();
-  }, [getPoolTokens, getFeeTier]);
-
-  useEffect(() => {
-    void getPriceRange();
-  }, [invertedPrice, getPriceRange]);
-
-  const handleCollectAsWrappedNative = (isCollectAsWrappedNative: boolean) => {
-    setIsCollectAsWrappedNative(isCollectAsWrappedNative);
-    if (isCollectAsWrappedNative) {
-      tokens.map((poolToken) => {
-        if (poolToken.token.isNative && wrappedNativeToken) {
-          poolToken.token = wrappedNativeToken;
-        }
-      });
-    } else {
-      tokens.map((poolToken) => {
-        if (poolToken.token.isWrappedNative && nativeToken) {
-          poolToken.token = nativeToken;
-        }
-      });
-    }
-    setTokens(tokens);
-    setSelectedSymbol(tokens[0]?.token.coinDenom ?? "");
-  };
+  const [hash, setHash] = useState<Address>();
+  const [error, setError] = useState<Error>();
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
 
   return (
     <PoolPositionContext.Provider
       value={{
-        feeTier,
-        rawFeeTier,
-        selectedSymbol,
-        handleReverseTokenData,
-        isCollectAsWrappedNative,
-        handleCollectAsWrappedNative,
-        token0,
-        token1,
-        currentPrice,
-        minPrice,
-        maxPrice,
-        position,
-        isReversedPoolTokens,
-        isPositionClosed,
-        refreshPoolPosition,
-        tokenId,
+        positionId,
+        invert,
+        setInvert,
+        hash,
+        setHash,
+        error,
+        setError,
+        status,
+        setStatus,
       }}
     >
       {children}

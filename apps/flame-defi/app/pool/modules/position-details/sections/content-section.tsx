@@ -6,7 +6,7 @@ import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent, Switch } from "@repo/ui/components";
+import { Button, Card, CardContent } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
 import { PriceRangeSummary } from "pool/components/price-range";
@@ -21,7 +21,7 @@ import {
 import { ROUTES } from "pool/constants/routes";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const ContentSection = () => {
   const router = useRouter();
@@ -38,7 +38,7 @@ export const ContentSection = () => {
     setError,
     status,
     setStatus,
-  } = usePoolPositionContextV2();
+  } = usePoolPositionContext();
   const { data, isPending, refetch } = useGetPosition({
     positionId,
     invert,
@@ -46,8 +46,9 @@ export const ContentSection = () => {
 
   const { collectFees } = useCollectFees();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
 
@@ -126,7 +127,8 @@ export const ContentSection = () => {
             title={
               <div className="flex items-center justify-between h-5">
                 <span className="">Unclaimed Fees</span>
-                {data?.hasUnclaimedFees && (
+                {/* TODO: Implement disabling collect as wrapped native. */}
+                {/* {data?.hasUnclaimedFees && (
                   <div className="flex items-center gap-2 justify-end">
                     <span className="normal-case tracking-normal">
                       Collect as WTIA
@@ -138,7 +140,7 @@ export const ContentSection = () => {
                       }
                     />
                   </div>
-                )}
+                )} */}
               </div>
             }
             token0={data?.token0}

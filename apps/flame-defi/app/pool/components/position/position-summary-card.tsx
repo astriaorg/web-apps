@@ -35,12 +35,14 @@ export const PositionSummaryCard = ({
           {token0?.coinDenom}/{token1?.coinDenom}
         </CardTitle>
         <div className="flex-1" />
-        {position && price && (
+        {position && price ? (
           <PositionRangeBadge
             position={position}
             price={price}
             className="p-0 bg-transparent"
           />
+        ) : (
+          <div className="h-4" />
         )}
       </CardContent>
     </Card>

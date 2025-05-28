@@ -1,6 +1,8 @@
-import { Price } from "@uniswap/sdk-core";
+import { Percent, Price } from "@uniswap/sdk-core";
 import {
   nearestUsableTick,
+  type Pool,
+  Position,
   priceToClosestTick,
   SqrtPriceMath,
   TickMath,
@@ -18,7 +20,7 @@ import {
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
-  type Position,
+  type Position as InternalPosition,
 } from "pool/types";
 
 // TODO: Remove?
@@ -194,7 +196,7 @@ export const calculateTokenAmountsFromPosition = ({
   token1,
   ...params
 }: {
-  position: Position;
+  position: InternalPosition;
   sqrtPriceX96: bigint;
   token0: EvmCurrency;
   token1: EvmCurrency;
@@ -294,7 +296,7 @@ export const getDisplayMaxPrice = (
     : new Big(maxPrice).toFixed(options.minimumFractionDigits);
 };
 
-export const getTransactionAmounts = ({
+export const getIncreaseLiquidityAmounts = ({
   amount0,
   amount1,
   token0,
@@ -361,6 +363,35 @@ export const getTransactionAmounts = ({
     amount1Desired,
     amount0Min,
     amount1Min,
+    deadline,
+  };
+};
+
+export const getDecreaseLiquidityAmounts = ({
+  pool,
+  position,
+  liquidity,
+  slippageTolerance,
+}: {
+  pool: Pool;
+  position: InternalPosition;
+  liquidity: bigint;
+  slippageTolerance: number;
+}) => {
+  // 20 minute deadline.
+  // TODO: Add this to settings.
+  const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+  const { amount0, amount1 } = new Position({
+    pool,
+    tickLower: position.tickLower,
+    tickUpper: position.tickUpper,
+    liquidity: liquidity.toString(),
+  }).burnAmountsWithSlippage(new Percent(slippageTolerance * 100, 100 * 100));
+
+  return {
+    amount0: BigInt(amount0.toString()),
+    amount1: BigInt(amount1.toString()),
     deadline,
   };
 };

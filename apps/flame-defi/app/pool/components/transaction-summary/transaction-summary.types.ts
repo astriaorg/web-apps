@@ -37,9 +37,18 @@ export interface AddLiquidityTransactionSummaryProps
   maxPrice: string;
 }
 
+export interface RemoveLiquidityTransactionSummaryProps
+  extends BaseTransactionSummaryProps {
+  type: TransactionType.REMOVE_LIQUIDITY;
+  percentage: number;
+  amount0: string;
+  amount1: string;
+}
+
 export type TransactionSummaryProps =
   | CollectFeesTransactionSummaryProps
-  | AddLiquidityTransactionSummaryProps;
+  | AddLiquidityTransactionSummaryProps
+  | RemoveLiquidityTransactionSummaryProps;
 
 export type TransactionSuccessProps = {
   token0: EvmCurrency;
