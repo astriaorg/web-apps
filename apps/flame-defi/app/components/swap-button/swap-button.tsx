@@ -1,9 +1,16 @@
-import { motion } from "motion/react";
+import { motion, type Transition } from "motion/react";
 import { useCallback, useState } from "react";
 
 import { Button, type ButtonProps } from "@repo/ui/components";
 import { SwapVerticalIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
+
+export const SWAP_BUTTON_TRANSITION: Transition = {
+  duration: 0.1,
+  type: "spring",
+  damping: 30,
+  stiffness: 500,
+};
 
 const CornerMask = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => {
   return (

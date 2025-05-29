@@ -1,15 +1,17 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import { Button, Skeleton, TokenIcon } from "@repo/ui/components";
 import {
-  TokenAmountInput as BaseTokenAmountInput,
   TokenAmountInputBalance,
-  type TokenAmountInputBalanceProps as BaseTokenAmountInputBalanceProps,
+  type TokenAmountInputBalanceProps,
+} from "components/token-amount-input-balance";
+import {
+  TokenAmountInput as BaseTokenAmountInput,
   type TokenAmountInputProps as BaseTokenAmountInputProps,
 } from "pool/components/token-amount-input";
 
 interface TokenAmountInputProps
   extends BaseTokenAmountInputProps,
-    BaseTokenAmountInputBalanceProps {
+    TokenAmountInputBalanceProps {
   token?: EvmCurrency;
 }
 
