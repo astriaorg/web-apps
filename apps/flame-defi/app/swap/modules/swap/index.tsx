@@ -1,7 +1,7 @@
 "use client";
 
 import debounce from "lodash.debounce";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 
 import {
@@ -22,11 +22,19 @@ import {
   useGetQuote,
 } from "features/evm-wallet";
 
-import { SwapInput, SwapTransactionSteps, TransactionInfo } from "./components";
-import { useOneToOneQuote, useSwapButton, useTransactionInfo } from "./hooks";
-import { SWAP_INPUT_ID, SwapPairProps } from "./types";
+import {
+  SwapInput,
+  SwapTransactionSteps,
+  TransactionInfo,
+} from "../../components";
+import {
+  useOneToOneQuote,
+  useSwapButton,
+  useTransactionInfo,
+} from "../../hooks";
+import { SWAP_INPUT_ID, SwapPairProps } from "../../types";
 
-export default function SwapPage(): React.ReactElement {
+export const Page = () => {
   const { chain } = useAstriaChainData();
   const { isConnectedToFlameChain } = useAstriaWallet();
   const { currencies } = chain;
@@ -440,4 +448,4 @@ export default function SwapPage(): React.ReactElement {
       </div>
     </section>
   );
-}
+};
