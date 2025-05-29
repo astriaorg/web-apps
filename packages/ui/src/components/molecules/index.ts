@@ -1,6 +1,6 @@
 export * from "./animated-counter";
 export * from "./animated-down-arrow-spacer";
-export * from "./asset-amount-input";
+export * from "./animated-number";
 export * from "./block-loader";
 export * from "./card";
 export * from "./copy-to-clipboard";
@@ -9,5 +9,6 @@ export * from "./info-tooltip";
 export * from "./status-card";
 export * from "./success-check";
 export * from "./toggle-switch";
+export * from "./token-amount-input";
 export * from "./token-icon";
 export * from "./token-selector";

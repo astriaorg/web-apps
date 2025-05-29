@@ -1,11 +1,12 @@
-import { useDebounce } from "@repo/ui/hooks";
 import { OnChangeFn, SortingState } from "@tanstack/react-table";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
+import { useDebounce } from "@repo/ui/hooks";
 import { MarketOrderBy, OrderDirection } from "earn/generated/gql/graphql";
 import {
   PAGE_SIZE,
   useFetchMarkets,
 } from "earn/modules/market-list/hooks/use-fetch-markets";
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 

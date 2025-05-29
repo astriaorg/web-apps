@@ -1,17 +1,21 @@
 "use client";
 
-import { FlameIcon } from "@repo/ui/icons";
-import ConnectWalletsButton from "components/connect-wallets-button/connect-wallets-button";
+import { usePathname } from "next/navigation";
+
+import { AstriaLogo } from "@repo/ui/logos";
 import { LINKS } from "components/footer/links";
 import { useConfig } from "config";
-import { usePathname } from "next/navigation";
-import NetworkSelector from "../network-selector/network-selector";
+
+import { ConnectAstriaWalletButton } from "./connect-astria-wallet-button";
 import { MobileNavigationMenu } from "./mobile-navigation-menu";
 import { NavigationMenuLink } from "./navigation-menu-link";
+import { NetworkSelect } from "./network-select";
 
 export const NavigationMenu = () => {
   const pathname = usePathname();
   const { brandURL, featureFlags } = useConfig();
+
+  const isBridgePage = pathname.startsWith(LINKS.BRIDGE);
 
   return (
     <nav
@@ -23,14 +27,14 @@ export const NavigationMenu = () => {
         <a
           target="_blank"
           href={brandURL}
-          className="flex items-center w-8 h-8 overflow-hidden mr-12"
+          className="flex items-center h-5 mr-12"
           rel="noreferrer"
-          aria-label="Flame Logo"
+          aria-label="Astria Logo"
         >
-          <FlameIcon size={32} className="text-typography-default scale-175" />
+          <AstriaLogo />
         </a>
-        <div className="items-center space-x-8 hidden lg:flex">
-          <NavigationMenuLink href="/" isActive={pathname === LINKS.BRIDGE}>
+        <div className="items-center space-x-8 hidden md:flex">
+          <NavigationMenuLink href="/" isActive={isBridgePage}>
             Bridge
           </NavigationMenuLink>
           <NavigationMenuLink
@@ -65,11 +69,13 @@ export const NavigationMenu = () => {
           )}
         </div>
       </div>
-      <div className="hidden lg:flex gap-6 items-center">
-        <NetworkSelector />
-        <ConnectWalletsButton />
+      <div className="hidden md:flex gap-2 items-center">
+        <NetworkSelect />
+        {!isBridgePage && <ConnectAstriaWalletButton />}
       </div>
-      <MobileNavigationMenu />
+      <div className="md:hidden">
+        <MobileNavigationMenu />
+      </div>
     </nav>
   );
 };

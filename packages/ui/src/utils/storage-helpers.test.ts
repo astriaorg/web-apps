@@ -1,7 +1,7 @@
 import {
   getFromLocalStorage,
+  getSlippageTolerance,
   setInLocalStorage,
-  getSwapSlippageTolerance,
 } from "./storage-helpers";
 
 describe("storage-helpers", () => {
@@ -99,12 +99,12 @@ describe("storage-helpers", () => {
     });
   });
 
-  describe("getSwapSlippageTolerance", () => {
+  describe("getSlippageTolerance", () => {
     it("should return slippageTolerance from settings", () => {
       const settings = { slippageTolerance: 0.5 };
       window.localStorage.getItem = jest.fn(() => JSON.stringify(settings));
 
-      const result = getSwapSlippageTolerance();
+      const result = getSlippageTolerance();
 
       expect(window.localStorage.getItem).toHaveBeenCalledWith("settings");
       expect(result).toBe(0.5);
@@ -113,7 +113,7 @@ describe("storage-helpers", () => {
     it("should return undefined if settings don't exist", () => {
       window.localStorage.getItem = jest.fn(() => null);
 
-      const result = getSwapSlippageTolerance();
+      const result = getSlippageTolerance();
 
       expect(window.localStorage.getItem).toHaveBeenCalledWith("settings");
       expect(result).toBeUndefined();
@@ -123,7 +123,7 @@ describe("storage-helpers", () => {
       const settings = { otherSetting: "value" };
       window.localStorage.getItem = jest.fn(() => JSON.stringify(settings));
 
-      const result = getSwapSlippageTolerance();
+      const result = getSlippageTolerance();
 
       expect(window.localStorage.getItem).toHaveBeenCalledWith("settings");
       expect(result).toBeUndefined();

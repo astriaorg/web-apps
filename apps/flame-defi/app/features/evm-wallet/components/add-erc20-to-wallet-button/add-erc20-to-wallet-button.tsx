@@ -1,5 +1,6 @@
 import type { EIP1193Provider } from "viem";
 import { useAccount } from "wagmi";
+
 import type { EvmCurrency } from "@repo/flame-types";
 
 interface AddErc20ToWalletButtonProps {
@@ -8,7 +9,7 @@ interface AddErc20ToWalletButtonProps {
 }
 
 // TODO - move to hook useAddErc20ToWallet
-export default function AddErc20ToWalletButton({
+export function AddErc20ToWalletButton({
   evmCurrency,
   buttonClassNameOverride,
 }: AddErc20ToWalletButtonProps) {

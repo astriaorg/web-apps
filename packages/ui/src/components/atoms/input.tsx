@@ -7,7 +7,7 @@ export const inputVariants = cva("", {
   variants: {
     variant: {
       default:
-        "border border-stroke-default bg-surface-1 text-typography shadow-[2px_2px_4px_0px_#00000014_inset] focus-visible:border-stroke-active focus-visible:bg-transparent",
+        "border border-stroke-default bg-surface-1 text-typography focus-visible:border-stroke-active focus-visible:bg-transparent",
     },
   },
   defaultVariants: {
@@ -30,7 +30,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative">
         {startAdornment && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-grey-light">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
             {startAdornment}
           </div>
         )}
@@ -41,8 +41,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "disabled:cursor-not-allowed disabled:opacity-50",
             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
             "focus-visible:outline-hidden",
-            startAdornment && "pl-10",
-            endAdornment && "pr-10",
+            "aria-invalid:border-danger aria-invalid:bg-danger/10",
+            startAdornment && "pl-11",
+            endAdornment && "pr-11",
             inputVariants({ variant }),
             className,
           )}
@@ -50,7 +51,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {endAdornment && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-grey-light">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
             {endAdornment}
           </div>
         )}

@@ -1,5 +1,7 @@
 import { screen } from "@testing-library/react";
+
 import { renderWithProviders } from "testing/helpers";
+
 import { NavigationMenu } from "./navigation-menu";
 
 // Mock the usePathname hook from Next.js
@@ -10,7 +12,7 @@ jest.mock("next/navigation", () => ({
 describe("`NavigationMenu` Component", () => {
   test("renders company logo", () => {
     renderWithProviders(<NavigationMenu />);
-    const logoElem = screen.getByLabelText("Flame Logo");
+    const logoElem = screen.getByLabelText("Astria Logo");
     expect(logoElem).toBeInTheDocument();
   });
 

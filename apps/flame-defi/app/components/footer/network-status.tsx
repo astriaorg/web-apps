@@ -1,8 +1,9 @@
 "use client";
 
-import { DotIcon } from "@repo/ui/icons";
 import { useEffect, useState } from "react";
 import { useBlockNumber } from "wagmi";
+
+import { DotIcon } from "@repo/ui/icons";
 
 export const NetworkStatus = () => {
   const { data: blockNumber, isError } = useBlockNumber({

@@ -1,0 +1,115 @@
+name: E2E Tests
+
+on:
+  deployment_status:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    environment: github-actions
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Cache Playwright Browsers
+        id: cache-browsers
+        uses: actions/cache@v4
+        with:
+          # filepath to playwright browser cache on linux
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-browsers-
+
+      - name: Cache Wallet Setup
+        id: cache-wallet
+        uses: actions/cache@v4
+        with:
+          path: apps/flame-defi/.cache-synpress
+          key: ${{ runner.os }}-wallet-setup-${{ hashFiles('apps/flame-defi/e2e-tests/wallet-setup/.env.e2e-tests') }}
+          restore-keys: |
+            ${{ runner.os }}-wallet-setup-
+
+      - name: Install Dependencies
+        #if: steps.setup-node.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        if: steps.cache-browsers.outputs.cache-hit != 'true'
+        run: |
+          npx playwright install --with-deps
+
+      - name: Setup Wallet
+        if: steps.cache-wallet.outputs.cache-hit != 'true'
+        env:
+          SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
+          PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          PRIVATE_KEY: ${{ secrets.E2E_PRIVATE_KEY }}
+          CI: true
+        run: |
+          cd apps/flame-defi
+          # Create .env file for e2e tests
+          # NOTE - manually creating .env.e2e-tests because it serves as the cache key for the wallet setup cache
+          echo "SEED_PHRASE='$SEED_PHRASE'" > e2e-tests/wallet-setup/.env.e2e-tests
+          echo "PASSWORD=$PASSWORD" >> e2e-tests/wallet-setup/.env.e2e-tests
+          echo "PRIVATE_KEY=$PRIVATE_KEY" >> e2e-tests/wallet-setup/.env.e2e-tests
+          echo "CI=true" >> e2e-tests/wallet-setup/.env.e2e-tests
+
+          # Setup wallets for Synpress (headful mode with xvfb).
+          # path is relative to playwright.config.ts
+          xvfb-run npx synpress -d ./e2e-tests/wallet-setup
+
+      - name: Run E2E Tests
+        env:
+          # e2e testing envars
+          SEED_PHRASE: ${{ secrets.E2E_SEED_PHRASE }}
+          PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          PRIVATE_KEY: ${{ secrets.E2E_PRIVATE_KEY }}
+          CI: true
+          PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          # flame-defi app envars
+          NEXT_PUBLIC_ENV: "develop"
+          NEXT_PUBLIC_VERSION: "0.1.0"
+          NEXT_PUBLIC_NETWORK_LIST_OPTIONS: "dawn,mainnet"
+          NEXT_PUBLIC_BRAND_URL: "https://astria.org"
+          NEXT_PUBLIC_BRIDGE_URL: "https://bridge.astria.org"
+          NEXT_PUBLIC_SWAP_URL: "https://flame.astria.org/swap"
+          NEXT_PUBLIC_POOL_URL: "https://flame.astria.org/pool"
+          NEXT_PUBLIC_EARN_API_URL: "https://blue-api.morpho.org/graphql"
+          NEXT_PUBLIC_FEEDBACK_FORM_URL:  ""
+          NEXT_PUBLIC_GA_TRACKING_ID: ""
+          NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_ONCHAINKIT_API_KEY:  ""
+          NEXT_PUBLIC_CDP_PROJECT_ID:  ""
+          NEXT_PUBLIC_WALLET_CONNECT_DOMAIN_VERIFICATION_CODE: ""
+          NEXT_PUBLIC_FEATURE_EARN_ENABLED:  "true"
+          NEXT_PUBLIC_FEATURE_POOL_ENABLED:  "true"
+          NEXT_PUBLIC_FEE_RECIPIENT:  ${{ secrets.NEXT_PUBLIC_FEE_RECIPIENT }}
+          NEXT_PUBLIC_SWAP_QUOTE_API_URL: ${{ secrets.NEXT_PUBLIC_SWAP_QUOTE_API_URL }}
+          NEXT_PUBLIC_FARO_APP_NAME: ""
+          NEXT_PUBLIC_FARO_APP_NAMESPACE: ""
+          GRAFANA_SOURCE_MAP_UPLOADER_APP_ID: ""
+          GRAFANA_SOURCE_MAP_UPLOADER_STACK_ID: ""
+          GRAFANA_SOURCE_MAP_UPLOADER_ENDPOINT: ""
+          GRAFANA_SOURCE_MAP_UPLOADER_API_KEY: ""
+        run: |
+          cd apps/flame-defi
+          # path is relative to playwright.config.ts
+          xvfb-run npx playwright test e2e-tests
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/flame-defi/playwright-report/
+          retention-days: 30

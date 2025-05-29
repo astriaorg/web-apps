@@ -2,6 +2,7 @@ import type { IconProps } from "@repo/flame-types";
 
 import { DEFAULT_ICON_SIZE } from "../constants";
 
+// TODO: Flatten icon, the mix of stroke and fill causes uneven scaling when vector-effect is set.
 export const WarningTriangleIcon: React.FC<IconProps> = ({
   className = "",
   size = DEFAULT_ICON_SIZE,
@@ -12,10 +13,7 @@ export const WarningTriangleIcon: React.FC<IconProps> = ({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >

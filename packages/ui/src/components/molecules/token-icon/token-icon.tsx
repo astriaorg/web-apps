@@ -1,109 +1,69 @@
-import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
+import { type ComponentType } from "react";
+
+import type { IconProps } from "@repo/flame-types";
+
 import {
+  CelestiaIcon,
+  DotIcon,
+  DropTiaIcon,
   MilkTiaIcon,
   StrideIcon,
-  CelestiaIcon,
   StrideTiaIcon,
   UsdcIcon,
   WrappedTiaIcon,
-  DotIcon,
-  DropTiaIcon,
 } from "../../../icons";
-import { type ComponentType } from "react";
+import { DEFAULT_ICON_SIZE } from "../../../icons/constants";
+import { cn } from "../../../utils";
 
-// FIXME - this is redundant and can be derived from the chain configs
-export enum TokenSymbol {
-  TIA = "tia",
-  DTIA = "dtia",
-  WTIA = "wtia",
-  STTIA = "sttia",
-  USDC = "usdc",
-  MILKTIA = "milktia",
-  STRIDE = "stride",
-}
-
-type IconComponentProps = {
-  size?: number;
-  className?: string;
-};
-
-type TokenIconMap = {
-  [key in TokenSymbol]: {
-    Icon: ComponentType<IconComponentProps>;
-  };
-};
-
-const tokenIcons: TokenIconMap = {
-  [TokenSymbol.TIA]: {
-    Icon: CelestiaIcon,
-  },
-  [TokenSymbol.DTIA]: {
-    Icon: DropTiaIcon,
-  },
-  [TokenSymbol.WTIA]: {
-    Icon: WrappedTiaIcon,
-  },
-  [TokenSymbol.STTIA]: {
-    Icon: StrideTiaIcon,
-  },
-  [TokenSymbol.USDC]: {
-    Icon: UsdcIcon,
-  },
-  [TokenSymbol.MILKTIA]: {
-    Icon: MilkTiaIcon,
-  },
-  [TokenSymbol.STRIDE]: {
-    Icon: StrideIcon,
-  },
+const TOKEN_SYMBOL_TO_ICON_MAP: {
+  [key: string]: ComponentType<IconProps>;
+} = {
+  tia: CelestiaIcon,
+  dtia: DropTiaIcon,
+  wtia: WrappedTiaIcon,
+  sttia: StrideTiaIcon,
+  usdc: UsdcIcon,
+  milktia: MilkTiaIcon,
+  stride: StrideIcon,
 };
 
 export const TokenIcon = ({
   symbol,
   size = DEFAULT_ICON_SIZE,
-  className = "",
+  className,
 }: {
-  symbol: string;
-  size?: number;
-  className?: string;
-}) => {
-  const normalizedSymbol = symbol.toLowerCase();
-  const FallbackIcon = DotIcon;
+  symbol?: string;
+} & IconProps) => {
+  const normalizedSymbol = symbol?.toLowerCase();
 
-  // Check if the symbol exists in our map
-  const isKnownToken = Object.values(TokenSymbol).includes(
-    normalizedSymbol as TokenSymbol,
-  );
+  const IconComponent = (() => {
+    if (normalizedSymbol && TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol]) {
+      return TOKEN_SYMBOL_TO_ICON_MAP[normalizedSymbol];
+    }
+    return DotIcon;
+  })();
 
-  const IconComponent = isKnownToken
-    ? tokenIcons[normalizedSymbol as TokenSymbol].Icon
-    : FallbackIcon;
-
-  return <IconComponent size={size} className={className} />;
+  return <IconComponent size={size} className={cn("shrink-0", className)} />;
 };
+
+const MULTI_TOKEN_ICON_SHIFT = 6;
 
 export const MultiTokenIcon = ({
   symbols,
   size = DEFAULT_ICON_SIZE,
-  shift = 8,
 }: {
   symbols: string[];
   size?: number;
-  shift?: number;
 }) => {
   return (
-    <div
-      className="flex items-center h-full"
-      style={{ marginRight: `${-shift * (symbols.length - 1)}px` }}
-    >
+    <div className="flex items-center">
       {symbols.map((symbol, index) => (
         <div
-          key={symbol}
-          className="relative h-full"
+          key={`multi-token-icon_${symbol}_${index}`}
           style={{
             height: size,
             width: size,
-            right: `${shift * index}px`,
-            zIndex: symbols.length,
+            marginLeft: `-${MULTI_TOKEN_ICON_SHIFT * index}px`,
           }}
         >
           <TokenIcon symbol={symbol} size={size} />

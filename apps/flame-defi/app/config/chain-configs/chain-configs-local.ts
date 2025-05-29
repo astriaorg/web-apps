@@ -1,13 +1,24 @@
-import { CelestiaIcon, FlameIcon, NobleIcon } from "@repo/ui/icons";
 import {
+  AstriaChain,
+  AstriaChains,
+  ChainType,
+  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
-  EvmChains,
   EvmCurrency,
+  IbcCurrency,
 } from "@repo/flame-types";
+import {
+  AstriaIcon,
+  BaseIcon,
+  CelestiaIcon,
+  NobleIcon,
+  UsdcIcon,
+} from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   // Chain-id of the celestia chain.
   chainId: "celestia-local-0",
   // The name of the chain to be displayed to the user.
@@ -48,29 +59,27 @@ const CelestiaChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
+      chainId: "celestia-local-0",
       coinDenom: "TIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "utia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-1",
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqas8d0ans",
+      title: "TIA",
       IconComponent: CelestiaIcon,
-    },
-    {
-      // Not a real currency, just using for developing the ui
-      // Coin denomination to be displayed to the user.
+    }),
+    new IbcCurrency({
+      chainId: "celestia-local-0",
       coinDenom: "STEEZE",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "usteeze",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-    },
+      isBridgeable: false,
+      isNative: false,
+      title: "STEEZE",
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -99,6 +108,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   chainId: "noble-local-0",
   chainName: "noble-local-0",
   // RPC endpoint of the chain
@@ -137,21 +147,19 @@ const NobleChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
+      chainId: "noble-local-0",
       coinDenom: "usdc",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "uusdc",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isBridgeable: true,
+      isNative: true,
       ibcChannel: "channel-0",
       // NOTE - noble requires bech32 address, not bech32m.
       sequencerBridgeAccount: "astria14wyh2u6efndllr8gup29295krc98rqasj3l3kj",
+      title: "USDC",
       IconComponent: NobleIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -184,7 +192,24 @@ export const cosmosChains: CosmosChains = {
   "Noble Local": NobleChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const WRAPPED_NATIVE_TOKEN = new EvmCurrency({
+  chainId: 53,
+  title: "TIA",
+  coinDenom: "TIA",
+  coinMinimalDenom: "utia",
+  coinDecimals: 6,
+  nativeTokenWithdrawerContractAddress:
+    "0xA58639fB5458e65E4fA917FF951C390292C24A15",
+  wrapped: null,
+  isNative: false,
+  isWrappedNative: false,
+  ibcWithdrawalFeeWei: "10000000000000000",
+  isBridgeable: true,
+  IconComponent: CelestiaIcon,
+});
+
+const FlameChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 53,
   chainName: "Flame (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -197,33 +222,41 @@ const FlameChainInfo: EvmChainInfo = {
       address: "0x",
       blockCreated: 42069,
     },
+    // TODO - add these addresses
+    poolFactory: {
+      address: "0x",
+    },
+    poolContract: {
+      address: "0x",
+    },
+    nonfungiblePositionManager: {
+      address: "0x",
+    },
+    multicall3: {
+      address: "0x",
+    },
   },
   currencies: [
     new EvmCurrency({
+      chainId: 53,
       title: "RIA",
       coinDenom: "RIA",
       coinMinimalDenom: "uria",
       coinDecimals: 18,
+      wrapped: WRAPPED_NATIVE_TOKEN,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
-    new EvmCurrency({
-      title: "TIA",
-      coinDenom: "TIA",
-      coinMinimalDenom: "utia",
-      coinDecimals: 6,
-      nativeTokenWithdrawerContractAddress:
-        "0xA58639fB5458e65E4fA917FF951C390292C24A15",
-      isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: CelestiaIcon,
-    }),
+    WRAPPED_NATIVE_TOKEN,
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
-const FakeChainInfo: EvmChainInfo = {
+const FakeChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 530,
   chainName: "FakeChain (local)",
   rpcUrls: ["http://localhost:8545"], // TODO
@@ -234,18 +267,36 @@ const FakeChainInfo: EvmChainInfo = {
     swapRouter: {
       address: "0x",
     },
+    // TODO - add these addresses
+    poolFactory: {
+      address: "0x",
+    },
+    poolContract: {
+      address: "0x",
+    },
+    nonfungiblePositionManager: {
+      address: "0x",
+    },
+    multicall3: {
+      address: "0x",
+    },
   },
   currencies: [
     new EvmCurrency({
+      chainId: 530,
       title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
       coinDecimals: 18,
+      wrapped: null,
+      isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
+      chainId: 530,
       title: "FAKE",
       coinDenom: "FAKE",
       coinMinimalDenom: "ufake",
@@ -253,15 +304,63 @@ const FakeChainInfo: EvmChainInfo = {
       // fake address here so it shows up in the currency dropdown
       nativeTokenWithdrawerContractAddress:
         "0x0000000000000000000000000000000000000000",
+      wrapped: null,
+      isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: FlameIcon,
+      isBridgeable: true,
+      IconComponent: AstriaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
-export const evmChains: EvmChains = {
-  Flame: FlameChainInfo,
+export const astriaChains: AstriaChains = {
+  "Flame(local)": FlameChainInfo,
   Fake: FakeChainInfo,
+};
+
+const BaseChainInfo: EvmChainInfo = {
+  chainType: ChainType.EVM,
+  chainId: 84532,
+  chainName: "Base Sepolia",
+  rpcUrls: ["https://sepolia.base.org"],
+  blockExplorerUrl: "https://sepolia.basescan.org",
+  contracts: {},
+  currencies: [
+    // NOTE - this is really only here to satisfy the config needed
+    //  for wagmi and rainbowkit providers. it's not used atm.
+    new EvmCurrency({
+      chainId: 84532,
+      title: "Ether",
+      coinDenom: "ETH",
+      // is gwei correct?
+      coinMinimalDenom: "gwei",
+      coinDecimals: 18,
+      wrapped: null,
+      isNative: true,
+      isWrappedNative: false,
+      isBridgeable: false,
+    }),
+    new EvmCurrency({
+      chainId: 84532,
+      coinDenom: "USDC",
+      title: "USDC",
+      coinMinimalDenom: "uusdc",
+      coinDecimals: 6,
+      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
+      astriaIntentBridgeAddress: "0x",
+      wrapped: null,
+      isNative: false,
+      isWrappedNative: false,
+      ibcWithdrawalFeeWei: "10000000000000000",
+      isBridgeable: true,
+      IconComponent: UsdcIcon,
+    }),
+  ],
+  IconComponent: BaseIcon,
+};
+
+export const coinbaseChains: CoinbaseChains = {
+  Base: BaseChainInfo,
 };

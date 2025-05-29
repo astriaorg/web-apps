@@ -1,6 +1,11 @@
-export type Validation = {
+export interface ValidationError<T> {
+  type: T;
+  message: string;
+}
+
+export type Validation<T> = {
   isValid: boolean;
-  errors?: string[];
+  errors?: ValidationError<T>[];
 };
 
-export type ValidationAsset = { symbol: string; decimals: number };
+export type ValidationToken = { symbol: string; decimals: number };

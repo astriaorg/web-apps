@@ -1,11 +1,12 @@
-import { useDebounce } from "@repo/ui/hooks";
 import { OnChangeFn, SortingState } from "@tanstack/react-table";
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
+
+import { useDebounce } from "@repo/ui/hooks";
 import { OrderDirection, VaultOrderBy } from "earn/generated/gql/graphql";
 import {
   PAGE_SIZE,
   useFetchVaults,
 } from "earn/modules/vault-list/hooks/use-fetch-vaults";
-import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
 type Status = "error" | "empty" | "success";
 

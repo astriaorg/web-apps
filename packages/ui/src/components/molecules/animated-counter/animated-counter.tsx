@@ -3,6 +3,7 @@
 import { animate } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FormatNumberOptions, useIntl } from "react-intl";
+
 import { useFormatAbbreviatedNumber } from "../../../hooks";
 import { cn } from "../../../utils";
 import { Skeleton } from "../../atoms";

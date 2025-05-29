@@ -102,11 +102,13 @@ const config: Config = {
     "^components/(.*)$": "<rootDir>/app/components/$1",
     "^config": "<rootDir>/app/config/$1",
     "^features/(.*)$": "<rootDir>/app/features/$1",
+    "^hooks": "<rootDir>/app/hooks/$1",
+    "^pool/(.*)$": "<rootDir>/app/pool/$1",
     "^testing/(.*)$": "<rootDir>/app/testing/$1",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
-  // modulePathIgnorePatterns: [],
+  modulePathIgnorePatterns: ["e2e-tests"],
 
   // Activates notifications for test results
   // notify: false,

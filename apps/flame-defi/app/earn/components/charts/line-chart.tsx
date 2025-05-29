@@ -1,3 +1,16 @@
+import { useCallback, useMemo, useRef, useState } from "react";
+import { useIntl } from "react-intl";
+import {
+  CartesianGrid,
+  Label,
+  Line,
+  LineChart as BaseLineChart,
+  ReferenceLine,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
 import {
   Button,
   Card,
@@ -23,18 +36,6 @@ import {
 import { ChevronDownSmallIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
 import { Maybe } from "earn/generated/gql/graphql";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
-import {
-  LineChart as BaseLineChart,
-  CartesianGrid,
-  Label,
-  Line,
-  ReferenceLine,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 // The height of the chart minus axis.
 const CHART_HEIGHT = 169;
@@ -195,19 +196,22 @@ export const LineChart = <
               {options?.length && (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="secondary">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="hover:bg-initial"
+                    >
                       {renderSelectedOption?.(selectedOption as OptionType)}
                       <ChevronDownSmallIcon />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-surface-3">
+                  <DropdownMenuContent align="start">
                     {options.map((option) => (
                       <DropdownMenuItem
                         key={option}
                         onSelect={() => {
                           setSelectedOption?.(option);
                         }}
-                        className="focus:bg-surface-2"
                       >
                         {renderSelectedOption?.(option)}
                       </DropdownMenuItem>

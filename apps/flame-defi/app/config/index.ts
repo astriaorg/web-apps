@@ -1,18 +1,30 @@
+import { type Address } from "viem";
+
 import type {
+  AstriaChains,
+  CoinbaseChains,
   CosmosChains,
-  EvmChains,
   FlameNetwork,
-  HexString,
 } from "@repo/flame-types";
+
+export enum Environment {
+  MAIN = "main",
+  STAGING = "staging",
+  DEVELOP = "develop",
+}
 
 /**
  * Represents the configuration object for the application.
  */
 export interface AppConfig {
+  // The environment in which the application is running (e.g., development, production).
+  environment: Environment;
   // The configurations for Cosmos chains.
   cosmosChains: CosmosChains;
-  // The configurations for EVM chains.
-  evmChains: EvmChains;
+  // The configurations for Astria chains.
+  astriaChains: AstriaChains;
+  // The configurations for Base chains.
+  coinbaseChains: CoinbaseChains;
   // The selected Flame network.
   selectedFlameNetwork: FlameNetwork;
   // Function to select the Flame network.
@@ -33,12 +45,10 @@ export interface AppConfig {
   swapQuoteAPIURL: string;
   // List of networks to display in the network selector.
   networksList: FlameNetwork[];
-  // The default approval amount for tokens.
-  tokenApprovalAmount: string;
-  // The default slippage tolerance for swaps.
-  swapSlippageToleranceDefault: number;
+  // The default slippage tolerance.
+  defaultSlippageTolerance: number;
   // The fee recipient address for swaps.
-  feeRecipient?: HexString;
+  feeRecipient?: Address;
   // Feature flags
   featureFlags: {
     earnEnabled: boolean;
@@ -46,11 +56,7 @@ export interface AppConfig {
   };
 }
 
-export {
-  getAllChainConfigs,
-  getFlameChainId,
-  getFlameNetworkByChainId,
-} from "./chain-configs";
+export { getAllChainConfigs, getChainConfigs } from "./chain-configs";
 export { ConfigContextProvider } from "./contexts/config-context";
 export { getEnvVariable, getOptionalEnvVariable } from "./env";
-export { useConfig, useEvmChainData } from "./hooks/use-config";
+export { useAstriaChainData, useConfig } from "./hooks/use-config";

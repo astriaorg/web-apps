@@ -1,5 +1,6 @@
 # recipes for the flame defi app
 mod flame-defi 'apps/flame-defi'
+mod e2e-tests 'apps/flame-defi/e2e-tests'
 
 _default:
   @just --list
@@ -18,9 +19,14 @@ format:
   npm run format
 alias f := format
 
+check-types:
+  npm run check-types
+alias ct := check-types
+
 # lint everything
-lint:
-  npm run lint
+# Usage: just lint [--fix] (add --fix to auto-fix issues)
+lint fix="":
+  {{ if fix == "--fix" { "npm run lint:fix" } else { "npm run lint" } }}
   just lint-md
 alias l := lint
 
@@ -38,3 +44,13 @@ alias r := run
 build:
   npm run build
 alias b := build
+
+# run all commands to ensure successful build in ci
+# Usage: just prepush [--all] (add --all to include e2e tests)
+prepush all="":
+  just format
+  just lint --fix
+  just check-types
+  just lint
+  just test
+  {{ if all == "--all" { "just e2e-tests run-e2e-tests" } else { "" } }}

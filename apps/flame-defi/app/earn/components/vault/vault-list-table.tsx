@@ -1,19 +1,4 @@
 import {
-  Badge,
-  Table as BaseTable,
-  Card,
-  Skeleton,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableSortIcon,
-} from "@repo/ui/components";
-import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
-import { ChevronRightSmallIcon } from "@repo/ui/icons";
-import { cn } from "@repo/ui/utils";
-import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -24,13 +9,29 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Big from "big.js";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { FormattedNumber } from "react-intl";
+
+import {
+  Badge,
+  Card,
+  Skeleton,
+  Table as BaseTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSortIcon,
+} from "@repo/ui/components";
+import { useFormatAbbreviatedNumber } from "@repo/ui/hooks";
+import { ChevronRightSmallIcon } from "@repo/ui/icons";
+import { cn } from "@repo/ui/utils";
 import { Image } from "components/image";
 import { ROUTES } from "earn/constants/routes";
 import { NON_BREAKING_SPACE } from "earn/constants/utils";
 import { Vault, VaultOrderBy } from "earn/generated/gql/graphql";
-import { useRouter } from "next/navigation";
-import { useMemo } from "react";
-import { FormattedNumber } from "react-intl";
 
 const HIDE_COLUMNS_CLASS_NAME =
   "data-[column-id=th-metadata.curators]:hidden data-[column-id=th-NetApy]:hidden lg:data-[column-id=th-metadata.curators]:table-cell lg:data-[column-id=th-NetApy]:table-cell";

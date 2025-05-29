@@ -1,133 +1,93 @@
-import { EvmCurrency, TXN_STATUS, TokenInputState } from "@repo/flame-types";
+import type { Address } from "viem";
 
-export interface AddLiquidityInputsBlockProps {
-  inputOne: string;
-  inputTwo: string;
-  setInputOne: (value: string) => void;
-  setInputTwo: (value: string) => void;
-}
-export interface NewPositionInputsProps {
-  inputOne: TokenInputState;
-  inputTwo: TokenInputState;
-  setInputOne: (value: TokenInputState) => void;
-  setInputTwo: (value: TokenInputState) => void;
-  currencies: EvmCurrency[];
-}
+/**
+ * Fee tiers available in Uniswap V3.
+ * Values are in hundredths of a basis point (1 = 0.0001%).
+ */
+export const FEE_TIER = {
+  LOWEST: 100, // 0.01%
+  LOW: 500, // 0.05%
+  MEDIUM: 3000, // 0.30%
+  HIGH: 10000, // 1.00%
+} as const;
 
-export interface TokenPair {
-  tokenOne: EvmCurrency | null;
-  tokenTwo: EvmCurrency | null;
-}
+export const FEE_TIERS = [
+  FEE_TIER.LOWEST,
+  FEE_TIER.LOW,
+  FEE_TIER.MEDIUM,
+  FEE_TIER.HIGH,
+];
 
-export interface FeeData {
-  id: number;
-  feePercent: string;
-  text: string;
-  tvl: string;
-  selectPercent: string;
-}
+/**
+ * Returns the same values as "tickSpacing" in the contract, hard-code since these values are fixed.
+ */
+export const FEE_TIER_TICK_SPACING: { [key in FeeTier]: number } = {
+  [FEE_TIER.LOWEST]: 1,
+  [FEE_TIER.LOW]: 10,
+  [FEE_TIER.MEDIUM]: 60,
+  [FEE_TIER.HIGH]: 200,
+};
 
-export interface PriceCardProps {
-  leftLabel: string;
-  value: string | number;
-  rightLabel?: string;
-  tooltipText?: string;
-  className?: string;
-}
+export type FeeTier = (typeof FEE_TIER)[keyof typeof FEE_TIER];
 
-export interface PoolPositionsRecord {
-  position: {
-    id: number;
-    symbol: string;
-    symbolTwo: string;
-    percent: number;
-    apr: number;
-  };
-  positionStatus: string;
-  inRange: boolean;
-}
+/**
+ * Mapping of fee tiers to their corresponding tick spacing values.
+ * Tick spacing determines the interval between initialized ticks.
+ * @deprecated Use `FEE_TIER_TICK_SPACING` instead.
+ */
+export const TICK_SPACING_BY_FEE_TIER: Record<FeeTier, number> = {
+  [FEE_TIER.LOWEST]: 1,
+  [FEE_TIER.LOW]: 10,
+  [FEE_TIER.MEDIUM]: 60,
+  [FEE_TIER.HIGH]: 200,
+};
 
-export interface PoolToken {
-  symbol: string;
-  unclaimedFees: number;
-  liquidity: number;
-  liquidityPercentage: number;
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
 }
 
-export type Position = {
-  tokens: PoolToken[];
-  feeTier: number;
-  inRange: boolean;
-  positionStatus: string;
-  min: number;
-  max: number | "∞";
-};
+export const MIN_PRICE_DEFAULT = 0;
+export const MAX_PRICE_DEFAULT = Infinity;
 
-export type Positions = {
-  [key: number]: Position;
-};
+/**
+ * Tick boundaries for Uniswap V3.
+ *
+ * These are the maximum and minimum tick values supported by the protocol.
+ *
+ * @deprecated Use `TickMath.MIN_TICK` and `TickMath.MAX_TICK` instead.
+ */
+export const TICK_BOUNDARIES = {
+  MAX: 887272,
+  MIN: -887272,
+} as const;
 
-export type PoolContextProps = {
-  feeData: FeeData[];
-  poolPositionsRecord: PoolPositionsRecord[];
-  modalOpen: boolean;
-  setModalOpen: (modalOpen: boolean) => void;
-  txnStatus: TXN_STATUS;
-  setTxnStatus: (txnStatus: TXN_STATUS) => void;
-};
-
-export type PoolPositionContextProps = {
-  position?: Position;
-  poolTokens: PoolToken[];
-  feeTier: string;
-  symbols: string[];
-  selectedSymbol: string;
-  handleReverseTokenData: (symbol: string) => void;
-  collectAsNative: boolean;
-  handleCollectAsNative: (collectAsNative: boolean) => void;
-  poolTokenOne: PoolToken;
-  poolTokenTwo: PoolToken;
-};
-
-export type PoolTxnStepsProps = {
-  txnStatus: TXN_STATUS;
-  poolTokens: PoolToken[];
-  txnHash: string;
-  txnMsg: string;
-  addLiquidityInputValues: string[] | null;
-  selectedFeeTier?: string;
-};
-
-export enum POOL_TXN_TYPE {
-  ADD_LIQUIDITY = "add-liquidity",
-  COLLECT_FEE = "collect-fee",
-  NEW_POSITION = "new-position",
-  REMOVE_LIQUIDITY = "remove-liquidity",
+export enum DepositType {
+  TOKEN_0_ONLY = "TOKEN_0_ONLY",
+  TOKEN_1_ONLY = "TOKEN_1_ONLY",
+  BOTH = "BOTH",
 }
 
-export const getTxnType = (pathname: string): POOL_TXN_TYPE => {
-  if (pathname.includes(POOL_TXN_TYPE.ADD_LIQUIDITY))
-    return POOL_TXN_TYPE.ADD_LIQUIDITY;
-  if (pathname.includes(POOL_TXN_TYPE.NEW_POSITION))
-    return POOL_TXN_TYPE.NEW_POSITION;
-  if (pathname.includes(POOL_TXN_TYPE.REMOVE_LIQUIDITY))
-    return POOL_TXN_TYPE.REMOVE_LIQUIDITY;
-  return POOL_TXN_TYPE.COLLECT_FEE;
-};
+export interface Position {
+  nonce: bigint;
+  operator: string;
+  token0: Address;
+  token1: Address;
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  liquidity: bigint;
+  feeGrowthInside0LastX128: bigint;
+  feeGrowthInside1LastX128: bigint;
+  tokensOwed0: bigint;
+  tokensOwed1: bigint;
+}
 
-export type TxnComponentProps = {
-  poolTokens: PoolToken[];
-  addLiquidityInputValues: string[] | null;
-  selectedFeeTier?: string;
-};
-
-export type TxnLoaderProps = {
-  poolTokens: PoolToken[];
-  addLiquidityInputValues: string[] | null;
-  poolTxnType: POOL_TXN_TYPE;
-};
-
-export type TxnSuccessProps = {
-  poolTokens: PoolToken[];
-  txnHash: string;
-};
+export interface PositionWithPositionId extends Position {
+  /**
+   * Unique identifier for the position.
+   *
+   * The position's ID, also called `key` or `tokenId` in the contract, is a hash of a preimage composed by the `owner`, `tickLower` and `tickUpper`.
+   */
+  positionId: string;
+}

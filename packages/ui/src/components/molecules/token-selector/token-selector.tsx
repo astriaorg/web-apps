@@ -1,8 +1,10 @@
 "use client";
 
-import { EvmCurrency } from "@repo/flame-types";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
+
+import { EvmCurrency } from "@repo/flame-types";
+
 import {
   CheckMarkIcon,
   ChevronDownIcon,
@@ -20,7 +22,7 @@ import {
 import { TokenIcon } from "../token-icon";
 
 interface TokenSelectorProps {
-  tokens: EvmCurrency[] | undefined;
+  tokens?: EvmCurrency[];
   defaultTitle?: string;
   setSelectedToken: (token: EvmCurrency) => void;
   selectedToken?: EvmCurrency | null;

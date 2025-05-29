@@ -1,14 +1,17 @@
-import { Skeleton } from "@repo/ui/components";
-import { cn } from "@repo/ui/utils";
 import { cva } from "class-variance-authority";
 import React, { forwardRef } from "react";
+
+import { Skeleton } from "@repo/ui/components";
+import { cn } from "@repo/ui/utils";
+
 import { useCardContext } from "./card.context";
 
 const cardLabelVariants = cva("flex items-center space-x-2 text-sm/5", {
   variants: {
     variant: {
       default: "text-typography-subdued",
-      accent: "text-typography-default",
+      secondary: "text-typography-default",
+      accent: "text-typography-white",
     },
   },
   defaultVariants: {

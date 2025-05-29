@@ -1,5 +1,6 @@
-import { getChainConfigs } from "./chain-configs";
 import { FlameNetwork } from "@repo/flame-types";
+
+import { getChainConfigs } from "./chain-configs";
 
 describe("Chain Configs", () => {
   describe("getChainConfigs", () => {
@@ -15,7 +16,7 @@ describe("Chain Configs", () => {
         const config = getChainConfigs(network);
         expect(config).toBeDefined();
         expect(config.cosmosChains).toBeDefined();
-        expect(config.evmChains).toBeDefined();
+        expect(config.astriaChains).toBeDefined();
       }
     });
   });

@@ -1,10 +1,10 @@
-import { Skeleton, TokenSelector } from "@repo/ui/components";
-import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
-import AddErc20ToWalletButton from "features/evm-wallet/components/add-erc20-to-wallet-button/add-erc20-to-wallet-button";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
-import { useUsdQuote } from "../hooks";
-import { SwapInputProps } from "../types";
+
+import { Skeleton, TokenSelector } from "@repo/ui/components";
+import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
+import { AddErc20ToWalletButton, useUsdQuote } from "features/evm-wallet";
+import { SwapInputProps } from "swap/types";
 
 export function SwapInput({
   availableTokens,
@@ -15,7 +15,7 @@ export function SwapInput({
   onInputChange,
   onTokenSelect,
   oppositeToken,
-  txnQuoteLoading,
+  isQuoteLoading,
 }: SwapInputProps) {
   const { locale, formatNumber } = useIntl();
   const { isConnected } = useAccount();
@@ -62,7 +62,7 @@ export function SwapInput({
       <div className="text-base font-medium text-grey-light">{label}</div>
       <div className="flex justify-between items-center">
         <Skeleton
-          isLoading={txnQuoteLoading && inputToken.isQuoteValue}
+          isLoading={isQuoteLoading && inputToken.isQuoteValue}
           className="rounded-sm w-[45%] sm:max-w-[62%] h-[40px] mt-3"
         >
           <input
@@ -116,7 +116,7 @@ export function SwapInput({
       </div>
       <div>
         <Skeleton
-          isLoading={usdQuote.loading || txnQuoteLoading}
+          isLoading={usdQuote.isLoading || isQuoteLoading}
           className="rounded-sm w-[70px]"
         >
           <span className="text-sm font-medium text-grey-light">

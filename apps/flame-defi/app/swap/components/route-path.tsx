@@ -1,14 +1,15 @@
 "use client";
 
+import { useIntl } from "react-intl";
+
+import { V3PoolInRoute } from "@repo/flame-types";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/components";
-import { V3PoolInRoute } from "@repo/flame-types";
 import { MultiTokenIcon, Skeleton, TokenIcon } from "@repo/ui/components";
-import { useIntl } from "react-intl";
 import { PathIcon } from "@repo/ui/icons";
 
 interface RoutePathProps {

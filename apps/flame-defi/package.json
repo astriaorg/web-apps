@@ -2,6 +2,7 @@
   "name": "flame-defi",
   "version": "0.1.0",
   "dependencies": {
+    "@coinbase/onchainkit": "^0.38.2",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/math": "^0.32.4",
     "@cosmjs/stargate": "^0.32.3",
@@ -17,6 +18,8 @@
     "@repo/ui": "*",
     "@tanstack/react-query": "^5.61.0",
     "@tanstack/react-table": "^8.20.6",
+    "@uniswap/sdk-core": "^7.7.2",
+    "@uniswap/v3-sdk": "^3.25.2",
     "big.js": "^6.2.2",
     "chain-registry": "^1.69.45",
     "d3": "^7.9.0",
@@ -25,7 +28,6 @@
     "ethers": "^6.13.2",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
-    "jsbi": "^4.3.0",
     "lodash.debounce": "^4.0.8",
     "motion": "^12.4.10",
     "next": "^15.1.0",
@@ -48,8 +50,10 @@
   "devDependencies": {
     "@grafana/faro-webpack-plugin": "^0.1.2",
     "@graphql-codegen/cli": "^5.0.4",
+    "@playwright/test": "^1.48.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@synthetixio/synpress": "^4.0.10",
     "@tailwindcss/postcss": "^4.0.9",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -67,7 +71,10 @@
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.4.49",
     "ts-node": "^10.9.2",
-    "typescript": "5.5.4"
+    "typescript": "5.6.3"
+  },
+  "peerDependencies": {
+    "jsbi": "3.2.5"
   },
   "private": true,
   "scripts": {
@@ -76,8 +83,10 @@
     "codegen": "graphql-codegen",
     "dev": "next dev --turbopack",
     "lint": "next lint --max-warnings 0",
+    "lint:fix": "next lint --fix",
     "start": "next start",
-    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\""
+    "test": "jest --transformIgnorePatterns \"/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/\"",
+    "test:e2e": "playwright test e2e-tests"
   },
   "type": "module"
 }

@@ -1,19 +1,35 @@
+import { cva } from "class-variance-authority";
+import React, { forwardRef } from "react";
+
 import { Skeleton } from "@repo/ui/components";
 import { cn } from "@repo/ui/utils";
-import React, { forwardRef } from "react";
+
 import { useCardContext } from "./card.context";
+
+const cardFigureLabelVariants = cva("text-5xl/12 font-dot", {
+  variants: {
+    variant: {
+      default: "text-typography-default",
+      secondary: "text-typography-default",
+      accent: "text-typography-white",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
 
 export const CardFigureLabel = forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLSpanElement>
 >(({ className, ...props }, ref) => {
-  const { isLoading } = useCardContext();
+  const { isLoading, variant } = useCardContext();
 
   return (
     <Skeleton isLoading={isLoading}>
       <span
         ref={ref}
-        className={cn("text-5xl/12 font-dot", className)}
+        className={cn(cardFigureLabelVariants({ variant }), className)}
         {...props}
       />
     </Skeleton>
