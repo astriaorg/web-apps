@@ -11,12 +11,11 @@ import {
 } from "@repo/ui/components";
 import { GasIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
-
+import { RoutePath } from "swap/modules/swap/components/route-path";
 import {
   OneToOneQuoteProps,
   TransactionInfo as TransactionInfoType,
-} from "../types";
-import { RoutePath } from "./route-path";
+} from "swap/types";
 
 export interface TransactionInfoProps {
   info: TransactionInfoType;

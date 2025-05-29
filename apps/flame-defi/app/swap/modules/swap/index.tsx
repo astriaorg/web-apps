@@ -21,18 +21,15 @@ import {
   useEvmCurrencyBalance,
   useGetQuote,
 } from "features/evm-wallet";
-
-import {
-  SwapInput,
-  SwapTransactionSteps,
-  TransactionInfo,
-} from "../../components";
 import {
   useOneToOneQuote,
   useSwapButton,
   useTransactionInfo,
-} from "../../hooks";
-import { SWAP_INPUT_ID, SwapPairProps } from "../../types";
+} from "swap/hooks";
+import { SwapInput } from "swap/modules/swap/components/swap-input";
+import { SwapTransactionSteps } from "swap/modules/swap/components/swap-transaction-steps";
+import { TransactionInfo } from "swap/modules/swap/components/transaction-info";
+import { SWAP_INPUT_ID, SwapPairProps } from "swap/types";
 
 export const Page = () => {
   const { chain } = useAstriaChainData();

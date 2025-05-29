@@ -10,12 +10,11 @@ import {
 import { ArrowDownIcon, ErrorIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 import { useAstriaChainData } from "config";
-
 import {
   SwapTransactionStepsProps,
   TransactionDetailsProps,
   TransactionStepsProps,
-} from "../types";
+} from "swap/types";
 
 export function TransactionDetails({
   token0,
