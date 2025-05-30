@@ -14,9 +14,10 @@ import { TokenSelect } from "components/token-select";
 import { AddErc20ToWalletButton, useUsdQuote } from "features/evm-wallet";
 import { SwapInputProps } from "swap/types";
 
-export function SwapInput({
+export const SwapInput = ({
   availableTokens,
   balance,
+  isBalanceLoading,
   id,
   inputToken,
   label,
@@ -24,8 +25,8 @@ export function SwapInput({
   onTokenSelect,
   oppositeToken,
   isQuoteLoading,
-}: SwapInputProps) {
-  const { locale, formatNumber } = useIntl();
+}: SwapInputProps) => {
+  const { locale } = useIntl();
   const { isConnected } = useAccount();
   const usdQuote = useUsdQuote(inputToken);
 
@@ -88,7 +89,7 @@ export function SwapInput({
             </div>
             <Skeleton
               isLoading={isQuoteLoading && inputToken.isQuoteValue}
-              className="w-[45%] sm:max-w-[60%] h-10"
+              className="w-[45%] sm:max-w-[60%]"
             >
               <CardFigureInput
                 value={inputToken.value}
@@ -112,14 +113,11 @@ export function SwapInput({
               value={inputToken.token}
               onValueChange={(token) => onTokenSelect(token, oppositeToken, id)}
             />
-            {inputToken.token && balance && (
+            {inputToken.token && (
               <TokenAmountInputBalance
-                balance={{
-                  value: balance,
-                  symbol: inputToken.token.coinDenom,
-                }}
+                balance={balance}
                 onInput={({ value }) => onInputChange(value, id)}
-                isLoading={false}
+                isLoading={isBalanceLoading}
               />
             )}
             {inputToken.token && !inputToken.token.isNative && isConnected ? (
@@ -132,4 +130,4 @@ export function SwapInput({
       </CardContent>
     </Card>
   );
-}
+};

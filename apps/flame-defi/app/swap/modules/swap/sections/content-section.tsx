@@ -25,7 +25,7 @@ import {
 import { SwapInput } from "swap/modules/swap/components/swap-input";
 import { SwapTransactionSteps } from "swap/modules/swap/components/swap-transaction-steps";
 import { TransactionInfo } from "swap/modules/swap/components/transaction-info";
-import { InputId, SWAP_INPUT_ID, SwapPairProps } from "swap/types";
+import { InputId, SwapPairProps } from "swap/types";
 
 export const ContentSection = () => {
   const { chain } = useAstriaChainData();
@@ -61,23 +61,27 @@ export const ContentSection = () => {
     cancelGetQuote,
   } = useGetQuote();
 
-  const { balance: inputOneBalance } = useEvmCurrencyBalance(inputOne.token);
-
-  const { balance: inputTwoBalance } = useEvmCurrencyBalance(inputTwo.token);
+  // TODO: Unify inputOne/INPUT_1 etc. into token0/token1.
+  const { balance: inputOneBalance, isLoading: isLoadingToken0Balance } =
+    useEvmCurrencyBalance(inputOne.token);
+  const { balance: inputTwoBalance, isLoading: isLoadingToken1Balance } =
+    useEvmCurrencyBalance(inputTwo.token);
 
   const swapInputs: SwapPairProps[] = [
     {
-      id: SWAP_INPUT_ID.INPUT_ONE,
+      id: InputId.INPUT_0,
       inputToken: inputOne,
       oppositeToken: inputTwo,
-      balance: inputOneBalance?.value || "0",
+      balance: inputOneBalance,
+      isBalanceLoading: isLoadingToken0Balance,
       label: flipTokens ? "Buy" : "Sell",
     },
     {
-      id: SWAP_INPUT_ID.INPUT_TWO,
+      id: InputId.INPUT_1,
       inputToken: inputTwo,
       oppositeToken: inputOne,
-      balance: inputTwoBalance?.value || "0",
+      balance: inputTwoBalance,
+      isBalanceLoading: isLoadingToken1Balance,
       label: flipTokens ? "Sell" : "Buy",
     },
   ];
@@ -108,7 +112,7 @@ export const ContentSection = () => {
   } = useSwapButton({
     token0,
     token1,
-    token0Balance,
+    token0Balance: token0Balance?.value || "0",
     quote,
     loading,
     error: quoteError,
@@ -129,16 +133,16 @@ export const ContentSection = () => {
         tradeType: TRADE_TYPE,
         tokenIn: TokenInputState,
         tokenOut: TokenInputState,
-        inputId: SWAP_INPUT_ID,
+        inputId: InputId,
       ) => {
         getQuote(tradeType, tokenIn, tokenOut).then((res) => {
-          if (inputId === SWAP_INPUT_ID.INPUT_ONE && res) {
+          if (inputId === InputId.INPUT_0 && res) {
             setInputTwo((prev) => ({
               ...prev,
               value: res.quoteDecimals,
               isQuoteValue: true,
             }));
-          } else if (inputId === SWAP_INPUT_ID.INPUT_TWO && res) {
+          } else if (inputId === InputId.INPUT_1 && res) {
             setInputOne((prev) => ({
               ...prev,
               value: res.quoteDecimals,
@@ -167,7 +171,7 @@ export const ContentSection = () => {
   }, [setQuote, setStatus, token0, token1]);
 
   const handleInputChange = useCallback(
-    (value: string, inputId: SWAP_INPUT_ID) => {
+    (value: string, inputId: InputId) => {
       setErrorText(null);
 
       // clear all values and cancel any current getQuotes if user zeros input
@@ -182,13 +186,13 @@ export const ContentSection = () => {
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+      if (inputId === InputId.INPUT_0) {
         newInputOne = { ...inputOne, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputTwo = { ...inputTwo, value: "", isQuoteValue: true };
         setInputOne(newInputOne);
         setInputTwo(newInputTwo);
-      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+      } else if (inputId === InputId.INPUT_1) {
         newInputTwo = { ...inputTwo, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputOne = { ...inputOne, value: "", isQuoteValue: true };
@@ -237,7 +241,7 @@ export const ContentSection = () => {
     (
       selectedToken: EvmCurrency,
       oppositeTokenInput: TokenInputState,
-      inputId: SWAP_INPUT_ID,
+      inputId: InputId,
     ) => {
       setErrorText(null);
 
@@ -246,10 +250,10 @@ export const ContentSection = () => {
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+      if (inputId === InputId.INPUT_0) {
         newInputOne = { ...inputOne, token: selectedToken };
         setInputOne(newInputOne);
-      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+      } else if (inputId === InputId.INPUT_1) {
         newInputTwo = { ...inputTwo, token: selectedToken };
         setInputTwo(newInputTwo);
       }
@@ -361,6 +365,7 @@ export const ContentSection = () => {
               onTokenSelect={handleTokenSelect}
               oppositeToken={swapPairs[0].oppositeToken}
               isQuoteLoading={loading}
+              isBalanceLoading={isLoadingToken0Balance}
             />
           </motion.div>
           <SwapButton onClick={handleArrowClick} />
@@ -379,6 +384,7 @@ export const ContentSection = () => {
               onTokenSelect={handleTokenSelect}
               oppositeToken={swapPairs[1].oppositeToken}
               isQuoteLoading={loading}
+              isBalanceLoading={isLoadingToken1Balance}
             />
           </motion.div>
         </div>
