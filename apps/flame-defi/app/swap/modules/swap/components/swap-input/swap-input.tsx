@@ -1,8 +1,16 @@
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import { useAccount } from "wagmi";
 
-import { Skeleton, TokenSelector } from "@repo/ui/components";
-import { formatAbbreviatedNumber, isDustAmount } from "@repo/ui/utils";
+import {
+  Card,
+  CardContent,
+  CardFigureInput,
+  Skeleton,
+} from "@repo/ui/components";
+import { formatAbbreviatedNumber } from "@repo/ui/utils";
+import { TokenAmountInputBalance } from "components/token-amount-input-balance";
+import { TokenSelect } from "components/token-select";
 import { AddErc20ToWalletButton, useUsdQuote } from "features/evm-wallet";
 import { SwapInputProps } from "swap/types";
 
@@ -55,75 +63,73 @@ export function SwapInput({
       ? handleFiatValue()
       : "-";
 
+  const options = useMemo(() => {
+    return availableTokens.filter((token) => {
+      // Exclude the input token and the opposite token from the options.
+      return (
+        (inputToken.token
+          ? token.erc20ContractAddress !== inputToken.token.erc20ContractAddress
+          : true) &&
+        (oppositeToken.token
+          ? token.erc20ContractAddress !==
+            oppositeToken.token.erc20ContractAddress
+          : true)
+      );
+    });
+  }, [availableTokens, inputToken.token, oppositeToken.token]);
+
   return (
-    <div
-      className={`flex flex-col rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium focus-within:bg-background focus-within:border-grey-medium`}
-    >
-      <div className="text-base font-medium text-grey-light">{label}</div>
-      <div className="flex justify-between items-center">
-        <Skeleton
-          isLoading={isQuoteLoading && inputToken.isQuoteValue}
-          className="rounded-sm w-[45%] sm:max-w-[62%] h-[40px] mt-3"
-        >
-          <input
-            type="number"
-            value={inputToken.value}
-            onChange={(e) => {
-              onInputChange(e.target.value, id);
-            }}
-            className="normalize-input w-[45%] sm:max-w-[62%] text-ellipsis overflow-hidden text-[36px]"
-            placeholder="0"
-          />
-        </Skeleton>
-        <div className="flex flex-col items-end">
-          <TokenSelector
-            tokens={availableTokens}
-            selectedToken={inputToken.token}
-            unavailableToken={oppositeToken.token}
-            setSelectedToken={(token) =>
-              onTokenSelect(token, oppositeToken, id)
-            }
-          />
-          {inputToken.token && balance && !isDustAmount(balance) ? (
-            <div className="text-sm font-medium text-grey-light flex items-center mt-3">
-              <span className="flex items-center gap-2">
-                {formatNumber(parseFloat(balance), {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 4,
-                })}{" "}
-                {inputToken.token?.coinDenom}
+    <Card variant="secondary">
+      <CardContent>
+        <div className="flex justify-between items-center gap-6">
+          <div className="flex flex-col gap-1">
+            <div className="text-xs font-medium tracking-wider uppercase text-typography-subdued mb-1">
+              {label}
+            </div>
+            <Skeleton
+              isLoading={isQuoteLoading && inputToken.isQuoteValue}
+              className="w-[45%] sm:max-w-[60%] h-10"
+            >
+              <CardFigureInput
+                value={inputToken.value}
+                onInput={(event) =>
+                  onInputChange(event.currentTarget.value, id)
+                }
+              />
+            </Skeleton>
+            <Skeleton
+              isLoading={usdQuote.isLoading || isQuoteLoading}
+              className="w-18"
+            >
+              <span className="text-sm font-medium text-typography-subdued">
+                {fiatValue}
               </span>
-              {
-                <span
-                  onClick={() => {
-                    onInputChange(balance, id);
-                  }}
-                  className="px-3 py-0 ml-2 rounded-2xl bg-grey-dark hover:bg-grey-medium text-white text-sm cursor-pointer transition"
-                >
-                  Max
-                </span>
-              }
-            </div>
-          ) : (
-            <div></div>
-          )}
-          {inputToken.token && !inputToken.token.isNative && isConnected && (
-            <div className="mt-1 text-right">
+            </Skeleton>
+          </div>
+          <div className="flex flex-col gap-1 items-end pt-5">
+            <TokenSelect
+              options={options}
+              value={inputToken.token}
+              onValueChange={(token) => onTokenSelect(token, oppositeToken, id)}
+            />
+            {inputToken.token && balance && (
+              <TokenAmountInputBalance
+                balance={{
+                  value: balance,
+                  symbol: inputToken.token.coinDenom,
+                }}
+                onInput={({ value }) => onInputChange(value, id)}
+                isLoading={false}
+              />
+            )}
+            {inputToken.token && !inputToken.token.isNative && isConnected ? (
               <AddErc20ToWalletButton evmCurrency={inputToken.token} />
-            </div>
-          )}
+            ) : (
+              <div className="h-5" />
+            )}
+          </div>
         </div>
-      </div>
-      <div>
-        <Skeleton
-          isLoading={usdQuote.isLoading || isQuoteLoading}
-          className="rounded-sm w-[70px]"
-        >
-          <span className="text-sm font-medium text-grey-light">
-            {fiatValue}
-          </span>
-        </Skeleton>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

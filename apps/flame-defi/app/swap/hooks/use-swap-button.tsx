@@ -103,11 +103,11 @@ export function useSwapButton({
     defaultMsg?: string,
   ) => {
     if (error.includes("rejected")) {
-      setMessage("Transaction rejected");
+      setMessage("Transaction rejected.");
     } else if (defaultMsg) {
       setMessage(defaultMsg);
     } else {
-      setMessage("Transaction error");
+      setMessage("Transaction error.");
     }
   };
 
@@ -127,10 +127,10 @@ export function useSwapButton({
       setStatus(TransactionStatus.SUCCESS);
     } else if (result.data?.status === "reverted") {
       setStatus(TransactionStatus.FAILED);
-      handleTransactionModalErrorMsgs("", "Transaction reverted");
+      handleTransactionModalErrorMsgs("", "Transaction reverted.");
     } else if (result.data?.status === "error") {
       setStatus(TransactionStatus.FAILED);
-      handleTransactionModalErrorMsgs("", "Transaction failed");
+      handleTransactionModalErrorMsgs("", "Transaction failed.");
     }
   }, [result.data, hash, userAccount.address]);
 
@@ -153,7 +153,7 @@ export function useSwapButton({
         setHash(tx);
       } catch (error) {
         const errorMessage =
-          (error instanceof Error && error.message) || "Error unwrapping";
+          (error instanceof Error && error.message) || "Error unwrapping.";
         setStatus(TransactionStatus.FAILED);
         handleTransactionModalErrorMsgs(errorMessage);
       }
@@ -167,7 +167,7 @@ export function useSwapButton({
         setHash(tx);
       } catch (error) {
         const errorMessage =
-          (error instanceof Error && error.message) || "Error unwrapping";
+          (error instanceof Error && error.message) || "Error unwrapping.";
         setStatus(TransactionStatus.FAILED);
         handleTransactionModalErrorMsgs(errorMessage);
       }
@@ -266,13 +266,15 @@ export function useSwapButton({
 
   // FIXME - parseFloat is not sufficient for huge numbers
   const getButtonText = () => {
+    const defaultText = "Swap";
+
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
       case !isConnectedToFlameChain:
         return "Switch to Flame Chain";
       case !topToken.token || !bottomToken.token:
-        return "Select a token";
+        return "Select a Token";
       case tokenNeedingApproval !== null &&
         status !== TransactionStatus.PENDING:
         return `Approve ${tokenNeedingApproval.token?.coinDenom}`;
@@ -282,22 +284,22 @@ export function useSwapButton({
       case status === TransactionStatus.PENDING:
         return "Pending...";
       case topToken.value === undefined:
-        return "Enter an amount";
+        return defaultText;
       case parseFloat(topToken.value) === 0 || parseFloat(topToken.value) < 0:
-        return "Amount must be greater than 0";
+        return "Invalid Amount";
       case loading:
-        return "loading...";
+        return "Loading...";
       case isNaN(parseFloat(topToken.value)):
-        return "Enter an amount";
+        return defaultText;
       case topTokenBalance === "0" ||
         parseFloat(topTokenBalance) < parseFloat(topToken.value):
-        return "Insufficient funds";
+        return "Insufficient Balance";
       case wrapTia:
         return "Wrap";
       case unwrapTia:
         return "Unwrap";
       default:
-        return "Swap";
+        return defaultText;
     }
   };
 

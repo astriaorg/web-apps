@@ -1,6 +1,7 @@
 "use client";
 
 import debounce from "lodash.debounce";
+import { motion } from "motion/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 
@@ -12,15 +13,10 @@ import {
   TransactionStatus,
 } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
-import { ArrowDownIcon } from "@repo/ui/icons";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { SWAP_BUTTON_TRANSITION, SwapButton } from "components/swap-button";
 import { useAstriaChainData } from "config";
-import {
-  useAstriaWallet,
-  useEvmCurrencyBalance,
-  useGetQuote,
-} from "features/evm-wallet";
+import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 import {
   useOneToOneQuote,
   useSwapButton,
@@ -29,11 +25,10 @@ import {
 import { SwapInput } from "swap/modules/swap/components/swap-input";
 import { SwapTransactionSteps } from "swap/modules/swap/components/swap-transaction-steps";
 import { TransactionInfo } from "swap/modules/swap/components/transaction-info";
-import { SWAP_INPUT_ID, SwapPairProps } from "swap/types";
+import { InputId, SWAP_INPUT_ID, SwapPairProps } from "swap/types";
 
 export const ContentSection = () => {
   const { chain } = useAstriaChainData();
-  const { isConnectedToFlameChain } = useAstriaWallet();
   const { currencies } = chain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -348,99 +343,96 @@ export const ContentSection = () => {
   }, [handleCloseModal, onSubmitCallback, status]);
 
   return (
-    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
-      <div className="max-w-[550px] w-full mx-auto gradient-container">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-2xl font-medium">Swap</h2>
-          <SettingsPopover />
+    <section>
+      <div className="relative flex flex-col items-center">
+        <div className="flex flex-col w-full">
+          <motion.div
+            layout
+            transition={SWAP_BUTTON_TRANSITION}
+            key={flipTokens ? InputId.INPUT_1 : InputId.INPUT_0}
+          >
+            <SwapInput
+              availableTokens={currencies}
+              balance={swapPairs[0].balance}
+              id={swapPairs[0].id}
+              inputToken={swapPairs[0].inputToken}
+              label={swapPairs[0].label}
+              onInputChange={handleInputChange}
+              onTokenSelect={handleTokenSelect}
+              oppositeToken={swapPairs[0].oppositeToken}
+              isQuoteLoading={loading}
+            />
+          </motion.div>
+          <SwapButton onClick={handleArrowClick} />
+          <motion.div
+            layout
+            transition={SWAP_BUTTON_TRANSITION}
+            key={flipTokens ? InputId.INPUT_0 : InputId.INPUT_1}
+          >
+            <SwapInput
+              availableTokens={currencies}
+              balance={swapPairs[1].balance}
+              id={swapPairs[1].id}
+              inputToken={swapPairs[1].inputToken}
+              label={swapPairs[1].label}
+              onInputChange={handleInputChange}
+              onTokenSelect={handleTokenSelect}
+              oppositeToken={swapPairs[1].oppositeToken}
+              isQuoteLoading={loading}
+            />
+          </motion.div>
         </div>
-        <div className="relative flex flex-col items-center">
-          <div className="flex flex-col gap-1 w-full">
-            {swapPairs.map(
-              ({ id, inputToken, oppositeToken, balance, label }, index) => (
-                <SwapInput
-                  availableTokens={currencies}
-                  balance={balance}
-                  id={id}
-                  inputToken={inputToken}
-                  key={index}
-                  label={label}
-                  onInputChange={handleInputChange}
-                  onTokenSelect={handleTokenSelect}
-                  oppositeToken={oppositeToken}
-                  isQuoteLoading={loading}
-                />
-              ),
-            )}
-          </div>
-          <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
-            <button
-              type="button"
-              className="z-10 cursor-pointer p-1 bg-grey-dark hover:bg-black transition rounded-xl border-4 border-black"
-              onClick={handleArrowClick}
-            >
-              <ArrowDownIcon aria-label="Swap" size={28} />
-            </button>
-          </div>
+      </div>
+      <ConfirmationModal
+        open={modalOpen}
+        buttonText={buttonText}
+        actionButtonText={actionButtonText}
+        showOpenButton={Boolean(validSwapInputs && !tokenApprovalNeeded)}
+        handleOpenModal={handleOpenModal}
+        handleModalActionButton={handleModalActionButton}
+        handleCloseModal={handleCloseModal}
+        title={titleText}
+      >
+        <SwapTransactionSteps
+          status={status}
+          info={info}
+          token0={token0}
+          token1={token1}
+          isTiaWtia={isTiaWtia}
+          oneToOneQuote={oneToOneQuote}
+          hash={hash}
+          message={message}
+          isQuoteLoading={loading}
+        />
+      </ConfirmationModal>
+      {(!userAccount.address || tokenApprovalNeeded) && (
+        <Button onClick={onSubmitCallback} className="w-full mt-8">
+          {buttonText}
+        </Button>
+      )}
+      {userAccount.address && !tokenApprovalNeeded && !validSwapInputs && (
+        <Button onClick={onSubmitCallback} className="w-full mt-8" disabled>
+          {buttonText}
+        </Button>
+      )}
+      {errorText && (
+        <div className="flex items-center justify-center text-danger text-sm mt-4">
+          {errorText}
         </div>
-        {userAccount.address &&
-          !validSwapInputs &&
-          !tokenApprovalNeeded &&
-          isConnectedToFlameChain && (
-            <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
-              {buttonText}
-            </div>
-          )}
-        <ConfirmationModal
-          open={modalOpen}
-          buttonText={buttonText}
-          actionButtonText={actionButtonText}
-          showOpenButton={Boolean(validSwapInputs && !tokenApprovalNeeded)}
-          handleOpenModal={handleOpenModal}
-          handleModalActionButton={handleModalActionButton}
-          handleCloseModal={handleCloseModal}
-          title={titleText}
-        >
-          <SwapTransactionSteps
-            status={status}
+      )}
+      {inputOne.token &&
+        inputTwo.token &&
+        !isTiaWtia &&
+        validSwapInputs &&
+        quote && (
+          <TransactionInfo
             info={info}
             token0={token0}
             token1={token1}
-            isTiaWtia={isTiaWtia}
             oneToOneQuote={oneToOneQuote}
-            hash={hash}
-            message={message}
-            isQuoteLoading={loading}
+            quote={quote}
           />
-        </ConfirmationModal>
-        {(!userAccount.address || tokenApprovalNeeded) && (
-          <Button
-            variant="gradient"
-            onClick={onSubmitCallback}
-            className="w-full mt-2"
-          >
-            {buttonText}
-          </Button>
         )}
-        {errorText && (
-          <div className="flex items-center justify-center text-red text-sm mt-4">
-            {errorText}
-          </div>
-        )}
-        {inputOne.token &&
-          inputTwo.token &&
-          !isTiaWtia &&
-          validSwapInputs &&
-          quote && (
-            <TransactionInfo
-              info={info}
-              token0={token0}
-              token1={token1}
-              oneToOneQuote={oneToOneQuote}
-              quote={quote}
-            />
-          )}
-      </div>
     </section>
   );
 };

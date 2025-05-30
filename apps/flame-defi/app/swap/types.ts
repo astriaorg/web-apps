@@ -6,9 +6,17 @@ import {
   type TransactionStatus,
 } from "@repo/flame-types";
 
+/**
+ * @deprecated Use `InputId` instead.`
+ */
 export enum SWAP_INPUT_ID {
   INPUT_ONE = "input_one",
   INPUT_TWO = "input_two",
+}
+
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
 }
 
 export interface OneToOneQuoteProps {

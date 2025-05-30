@@ -11,4 +11,3 @@ export * from "./success-check";
 export * from "./toggle-switch";
 export * from "./token-amount-input";
 export * from "./token-icon";
-export * from "./token-selector";

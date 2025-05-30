@@ -2,21 +2,17 @@ import type { EIP1193Provider } from "viem";
 import { useAccount } from "wagmi";
 
 import type { EvmCurrency } from "@repo/flame-types";
+import { Badge } from "@repo/ui/components";
 
 interface AddErc20ToWalletButtonProps {
   evmCurrency: EvmCurrency;
-  buttonClassNameOverride?: string;
 }
 
 // TODO - move to hook useAddErc20ToWallet
 export function AddErc20ToWalletButton({
   evmCurrency,
-  buttonClassNameOverride,
 }: AddErc20ToWalletButtonProps) {
   const { connector, isConnected } = useAccount();
-
-  const buttonClassName =
-    buttonClassNameOverride ?? "p-0 is-size-7 has-text-light is-ghost";
 
   const addCoinToWallet = async () => {
     if (!connector || !isConnected) {
@@ -47,15 +43,13 @@ export function AddErc20ToWalletButton({
   };
 
   return (
-    <>
-      <button
-        type="button"
-        key={evmCurrency.coinMinimalDenom}
-        onClick={() => addCoinToWallet()}
-        className={`px-3 py-0 rounded-2xl bg-grey-dark hover:bg-grey-medium text-white text-sm cursor-pointer transition ${buttonClassName}`}
-      >
-        Add to wallet
-      </button>
-    </>
+    <Badge
+      variant="secondary"
+      key={evmCurrency.coinMinimalDenom}
+      onClick={() => addCoinToWallet()}
+      className="cursor-pointer user-select-none"
+    >
+      Add to Wallet
+    </Badge>
   );
 }
