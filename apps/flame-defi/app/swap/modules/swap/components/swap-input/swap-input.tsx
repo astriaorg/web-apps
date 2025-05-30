@@ -80,7 +80,7 @@ export const SwapInput = ({
   }, [availableTokens, inputToken.token, oppositeToken.token]);
 
   return (
-    <Card variant="secondary">
+    <Card variant="secondary" className="min-h-38">
       <CardContent>
         <div className="flex justify-between items-center gap-6">
           <div className="flex flex-col gap-1">

@@ -9,7 +9,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@repo/ui/components";
-import { GasIcon } from "@repo/ui/icons";
+import { FuelIcon } from "@repo/ui/icons";
 import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
 import { RoutePath } from "swap/modules/swap/components/route-path";
 import {
@@ -25,28 +25,45 @@ export interface TransactionInfoProps {
   quote: GetQuoteResult;
 }
 
-export function TransactionInfo({
+const TransactionInfoRow = ({
+  left,
+  right,
+  tooltip,
+}: {
+  left: string;
+  right: string;
+  tooltip: string;
+}) => {
+  return (
+    <p className="flex justify-between">
+      <span className="text-typography-subdued flex items-center gap-1">
+        {left}{" "}
+        <InfoTooltip content={tooltip} side="right" className="max-w-[250px]" />
+      </span>
+      <span className="text-typography-subdued">{right}</span>
+    </p>
+  );
+};
+
+export const TransactionInfo = ({
   info,
   token0,
   token1,
   oneToOneQuote,
   quote,
-}: TransactionInfoProps) {
+}: TransactionInfoProps) => {
   const slippageTolerance = getSlippageTolerance();
 
   return (
     <Accordion type="single" collapsible>
       <AccordionItem
         value="transaction-details"
-        className="text-grey-light text-sm border-b-0"
+        className="text-typography-subdued text-sm border-b-0"
       >
-        <div className="flex items-center justify-between pb-2">
-          <Skeleton
-            className="rounded-sm"
-            isLoading={oneToOneQuote.oneToOneLoading}
-          >
+        <div className="flex items-center justify-between pb-2 mt-12">
+          <Skeleton isLoading={oneToOneQuote.oneToOneLoading}>
             <div
-              className="flex items-center cursor-pointer text-white font-medium gap-1"
+              className="flex items-center cursor-pointer gap-1 font-semibold text-typography-default"
               onClick={() =>
                 oneToOneQuote.setFlipDirection(!oneToOneQuote.flipDirection)
               }
@@ -62,14 +79,11 @@ export function TransactionInfo({
               </div>
             </div>
           </Skeleton>
-          <Skeleton
-            className="rounded-sm w-[100px] h-[25px] mt-3"
-            isLoading={info.transactionQuoteDataLoading}
-          >
+          <Skeleton isLoading={info.transactionQuoteDataLoading}>
             <AccordionTrigger>
               {info.gasUseEstimateUSD && (
-                <div className="[&>svg]:transform-none! flex items-center gap-1 width: 100%">
-                  <GasIcon size={20} />
+                <div className="flex items-center gap-1 font-semibold text-typography-default">
+                  <FuelIcon size={20} />
                   <span className="mr-1">
                     ${info.formattedGasUseEstimateUSD}
                   </span>
@@ -80,75 +94,36 @@ export function TransactionInfo({
         </div>
         <AccordionContent>
           <div className="space-y-2">
-            <p className="flex justify-between">
-              <span className="text-grey-light flex items-center gap-1">
-                Expected Output{" "}
-                <InfoTooltip
-                  content="The amount you expect to receive at the current market price. You may receive less or more if the market price changes while your transaction is pending."
-                  side="right"
-                  className="max-w-[250px]"
-                />
-              </span>
-              <span className="text-grey-light">
-                {info.expectedOutputFormatted}{" "}
-                <span>{token1.token?.coinDenom}</span>
-              </span>
-            </p>
-            <p className="flex justify-between">
-              <span className="text-grey-light flex items-center gap-1">
-                Price Impact{" "}
-                <InfoTooltip
-                  content="The impact your trade has on the market price of this pool."
-                  side="right"
-                />
-              </span>
-              <span className="text-grey-light">{info.priceImpact}</span>
-            </p>
-            <p className="flex justify-between">
-              <span className="text-grey-light flex items-center gap-1">
-                Network Fee{" "}
-                <InfoTooltip
-                  content="The network fee for the transaction."
-                  side="right"
-                />
-              </span>
-              <span className="text-grey-light">
-                ${info.formattedGasUseEstimateUSD}
-              </span>
-            </p>
+            <TransactionInfoRow
+              left="Expected Output"
+              right={`${info.expectedOutputFormatted} ${token1.token?.coinDenom}`}
+              tooltip="The amount you expect to receive at the current market price. You may receive less or more if the market price changes while your transaction is pending."
+            />
+            <TransactionInfoRow
+              left="Price Impact"
+              right={info.priceImpact}
+              tooltip="The impact your trade has on the market price of this pool."
+            />
+            <TransactionInfoRow
+              left="Network Fee"
+              right={`$${info.formattedGasUseEstimateUSD}`}
+              tooltip="The network fee for the transaction."
+            />
             {Boolean(info.frontendFeeEstimate) && (
-              <p className="flex justify-between">
-                <span className="text-grey-light flex items-center gap-1">
-                  {/* TODO - show fee percentage from config */}
-                  Fee (0.25%){" "}
-                  <InfoTooltip
-                    content="Fees are applied to ensure the best experience on Flame, and have already been factored into this quote."
-                    side="right"
-                  />
-                </span>
-                <span className="text-grey-light">
-                  {info.frontendFeeEstimate}{" "}
-                  <span>{token1.token?.coinDenom}</span>
-                </span>
-              </p>
+              <TransactionInfoRow
+                // TODO: Show fee percentage from config.
+                left="Fee (0.25%)"
+                right={`${info.frontendFeeEstimate} ${token1.token?.coinDenom}`}
+                tooltip="Fees are applied to ensure the best experience on Flame, and have already been factored into this quote."
+              />
             )}
-            <div className="flex justify-between">
-              <div className="flex gap-1 items-center">
-                <span className="w-[116px] md:w-full text-sm text-grey-light">
-                  Min received after slippage ({slippageTolerance}%)
-                </span>
-                <InfoTooltip
-                  className="max-w-[250px]"
-                  content="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
-                  side="right"
-                />
-              </div>
-              <span className="text-grey-light">
-                {info.minimumReceived} <span>{token1.token?.coinDenom}</span>
-              </span>
-            </div>
+            <TransactionInfoRow
+              left={`Min Received After Slippage (${slippageTolerance}%)`}
+              right={`${info.minimumReceived} ${token1.token?.coinDenom}`}
+              tooltip="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
+            />
           </div>
-          <div className="h-[1px] border border-border w-full my-4"></div>
+          <hr className="border-t border-stroke-default my-5" />
           {quote && quote.route && (
             <RoutePath
               quoteRoute={quote.route}
@@ -162,4 +137,4 @@ export function TransactionInfo({
       </AccordionItem>
     </Accordion>
   );
-}
+};
