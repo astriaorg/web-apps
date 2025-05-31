@@ -3,7 +3,7 @@
 import { PrivyProvider as Provider } from "@privy-io/react-auth";
 import React, { useMemo } from "react";
 
-import { evmChainsToRainbowKitChains } from "@repo/flame-types";
+import { evmChainsToViemChains } from "@repo/flame-types";
 import { getEnvVariable, useConfig } from "config";
 import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 
@@ -16,7 +16,7 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
   const { astriaChains, coinbaseChains } = useConfig();
 
   const supportedChains = useMemo(() => {
-    return evmChainsToRainbowKitChains([
+    return evmChainsToViemChains([
       ...Object.values(astriaChains),
       ...Object.values(coinbaseChains),
     ]);

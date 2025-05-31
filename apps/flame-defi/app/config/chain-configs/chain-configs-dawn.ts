@@ -376,7 +376,7 @@ const BaseChainInfo: EvmChainInfo = {
   contracts: {},
   currencies: [
     // NOTE - this is really only here to satisfy the config needed
-    //  for wagmi and rainbowkit providers. it's not used atm.
+    //  for wagmi providers. it's not used atm.
     new EvmCurrency({
       chainId: 84532,
       title: "Ether",

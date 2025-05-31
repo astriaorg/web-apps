@@ -11,7 +11,7 @@ import { AstriaWalletContextProvider } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
 import { OnchainKitProvider } from "features/onchain-kit";
 import { PrivyProvider } from "features/privy";
-import { WagmiRainbowKitProvider } from "features/wagmi-rainbow-kit";
+import { WagmiProvider } from "features/wagmi";
 
 // tanstack
 const queryClient = new QueryClient();
@@ -24,8 +24,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <ConfigContextProvider>
           <PrivyProvider>
             <QueryClientProvider client={queryClient}>
-              {/* TODO - replace with just WagmiProvider once we fully remove rainbowkit */}
-              <WagmiRainbowKitProvider>
+              <WagmiProvider>
                 <CosmosKitProvider>
                   <OnchainKitProvider>
                     <AstriaWalletContextProvider>
@@ -35,7 +34,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     </AstriaWalletContextProvider>
                   </OnchainKitProvider>
                 </CosmosKitProvider>
-              </WagmiRainbowKitProvider>
+              </WagmiProvider>
             </QueryClientProvider>
           </PrivyProvider>
         </ConfigContextProvider>

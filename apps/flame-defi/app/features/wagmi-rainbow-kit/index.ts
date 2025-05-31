@@ -1,1 +1,0 @@
-export { WagmiRainbowKitProvider } from "./provider";

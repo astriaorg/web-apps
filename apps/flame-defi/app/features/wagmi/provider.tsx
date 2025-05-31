@@ -2,7 +2,7 @@ import { createConfig, WagmiProvider as Provider } from "@privy-io/wagmi";
 import { ReactNode, useMemo } from "react";
 import { http } from "viem";
 
-import { evmChainsToRainbowKitChains } from "@repo/flame-types";
+import { evmChainsToViemChains } from "@repo/flame-types";
 import { useConfig } from "config";
 
 /**
@@ -13,7 +13,7 @@ export function WagmiProvider({ children }: { children: ReactNode }) {
   const { astriaChains, coinbaseChains } = useConfig();
 
   const chains = useMemo(() => {
-    return evmChainsToRainbowKitChains([
+    return evmChainsToViemChains([
       ...Object.values(astriaChains),
       ...Object.values(coinbaseChains),
     ]);

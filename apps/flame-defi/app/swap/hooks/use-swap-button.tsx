@@ -1,6 +1,5 @@
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { type Address, Chain, type Hash } from "viem";
+import type { Address, Hash } from "viem";
 import {
   useAccount,
   useConfig as useWagmiConfig,
@@ -8,7 +7,7 @@ import {
 } from "wagmi";
 
 import {
-  evmChainToRainbowKitChain,
+  evmChainToViemChain,
   GetQuoteResult,
   TokenInputState,
 } from "@repo/flame-types";
@@ -77,7 +76,6 @@ export function useSwapButton({
   const { connectWallet, connectToFlame, isConnectedToFlameChain } =
     useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
-  const addRecentTransaction = useAddRecentTransaction();
   const [status, setStatus] = useState<TransactionStatus | undefined>(
     undefined,
   );
@@ -127,10 +125,6 @@ export function useSwapButton({
     }
     if (result.data?.status === "success") {
       setStatus(TransactionStatus.SUCCESS);
-      addRecentTransaction({
-        hash: hash || "",
-        description: "Successful transaction",
-      });
     } else if (result.data?.status === "reverted") {
       setStatus(TransactionStatus.FAILED);
       handleTransactionModalErrorMsgs("", "Transaction reverted");
@@ -138,7 +132,7 @@ export function useSwapButton({
       setStatus(TransactionStatus.FAILED);
       handleTransactionModalErrorMsgs("", "Transaction failed");
     }
-  }, [result.data, hash, addRecentTransaction, userAccount.address]);
+  }, [result.data, hash, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wtiaAddress = chain.contracts.wrappedNativeToken?.address;
@@ -202,7 +196,7 @@ export function useSwapButton({
       const swapRouterService = createSwapRouterService(
         config,
         swapRouterAddress as Address,
-        evmChainToRainbowKitChain(chain) as Chain,
+        evmChainToViemChain(chain),
       );
 
       const options = {

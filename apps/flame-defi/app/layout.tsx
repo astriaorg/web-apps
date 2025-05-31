@@ -1,5 +1,4 @@
 import "@interchain-ui/react/styles";
-import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";

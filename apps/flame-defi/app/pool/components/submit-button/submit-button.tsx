@@ -1,8 +1,8 @@
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 
 import { Button, type ButtonProps } from "@repo/ui/components";
+import { useAstriaWallet } from "features/evm-wallet";
 
 export const SubmitButton = ({
   children: propsChildren,
@@ -11,18 +11,18 @@ export const SubmitButton = ({
   ...props
 }: ButtonProps) => {
   const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { connectWallet } = useAstriaWallet();
 
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     (event) => {
       if (!isConnected) {
-        openConnectModal?.();
+        connectWallet();
         return;
       }
 
       onClick?.(event);
     },
-    [isConnected, onClick, openConnectModal],
+    [isConnected, onClick, connectWallet],
   );
 
   const children = useMemo(() => {

@@ -467,7 +467,7 @@ const BaseChainInfo: EvmChainInfo = {
   contracts: {},
   currencies: [
     // NOTE - the native currency is really only here to satisfy the config needed
-    //  for wagmi and rainbowkit providers. it's not used atm.
+    //  for wagmi providers. it's not used atm.
     new EvmCurrency({
       chainId: 8453,
       title: "Ether",

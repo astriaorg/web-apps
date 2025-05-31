@@ -4,11 +4,11 @@ import type {
   Chain as CosmosKitChain,
   DenomUnit,
 } from "@chain-registry/types";
-import type { Chain } from "@rainbow-me/rainbowkit";
 import { Token } from "@uniswap/sdk-core";
 import Big from "big.js";
 import JSBI from "jsbi";
 import React from "react";
+import type { Chain } from "viem";
 import { type Address, ChainContract, parseUnits } from "viem";
 
 /**
@@ -468,10 +468,10 @@ export type CoinbaseChains = {
 };
 
 /**
- * Converts an EvmChainInfo object to a Chain object for use with RainbowKit.
+ * Converts an EvmChainInfo object to a Chain object for use with Viem.
  * @param evmChain
  */
-export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
+export function evmChainToViemChain(evmChain: EvmChainInfo): Chain {
   const nativeCurrency = evmChain.currencies.find(
     (currency) => currency.isNative,
   );
@@ -508,16 +508,16 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
 }
 
 /**
- * Converts a map of EVM chains to an array of Chain objects for use with RainbowKit.
+ * Converts a map of EVM chains to an array of Chain objects for use with Viem.
  * @param evmChains
  */
-export function evmChainsToRainbowKitChains(
+export function evmChainsToViemChains(
   evmChains: EvmChainInfo[],
 ): readonly [Chain, ...Chain[]] {
   if (evmChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return evmChains.map((evmChain) => evmChainToRainbowKitChain(evmChain)) as [
+  return evmChains.map((evmChain) => evmChainToViemChain(evmChain)) as [
     Chain,
     ...Chain[],
   ];
