@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useAccount, useConfig } from "wagmi";
+import { useAccount, useConfig, usePublicClient } from "wagmi";
 
 import { useAstriaChainData } from "config";
 import {
@@ -8,18 +8,19 @@ import {
   createNonfungiblePositionManagerService,
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
-import { usePoolPositionContext } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const useCollectFees = () => {
   const queryClient = useQueryClient();
+  const publicClient = usePublicClient();
   const config = useConfig();
-  const { tokenId } = usePoolPositionContext();
+  const { positionId } = usePoolPositionContext();
   const { address } = useAccount();
   const { chain } = useAstriaChainData();
 
   const mutation = useMutation({
     mutationFn: async (params: CollectFeesV2Params) => {
-      if (!address || !tokenId || !tokenId) {
+      if (!address || !positionId) {
         throw new Error("Missing required data for collecting fees.");
       }
 
@@ -29,14 +30,24 @@ export const useCollectFees = () => {
           chain.contracts.nonfungiblePositionManager.address,
         );
 
-      const result = await nonfungiblePositionService.collectFeesV2(params);
+      const hash = await nonfungiblePositionService.collectFeesV2(params);
 
-      return result;
+      return hash;
     },
-    onSuccess: (hash) => {
+    onSuccess: async (hash) => {
       if (hash) {
+        if (publicClient) {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash,
+          });
+          if (receipt.status === "success") {
+            // Add a small delay to ensure blockchain state is updated.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+        }
+
         void queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+          queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
         });
 
         void queryClient.invalidateQueries({

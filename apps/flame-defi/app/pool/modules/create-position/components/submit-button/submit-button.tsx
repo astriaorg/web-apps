@@ -1,23 +1,32 @@
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
 import { type EvmCurrency, TransactionStatus } from "@repo/flame-types";
-import { type Amount, Button } from "@repo/ui/components";
+import { type Amount } from "@repo/ui/components";
 import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { Environment, useAstriaChainData, useConfig } from "config";
 import {
   type CreateAndInitializePoolIfNecessaryAndMintParams,
-  useAstriaWallet,
 } from "features/evm-wallet";
-import { getMaxBigInt } from "features/evm-wallet/services";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
+import { SubmitButton as BaseSubmitButton } from "pool/components/submit-button";
+import {
+  TransactionSummary,
+  TransactionType,
+} from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType } from "pool/types";
-import { calculateNearestTickAndPrice } from "pool/utils";
+import {
+  calculateNearestTickAndPrice,
+  getIncreaseLiquidityAmounts,
+} from "pool/utils";
 
 interface BaseSubmitButtonProps {
   amount0: Amount;
@@ -38,7 +47,6 @@ type SubmitButtonProps =
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
-  CONNECT_WALLET = "CONNECT_WALLET",
   INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE",
   INVALID_INPUT = "INVALID_INPUT",
 
@@ -55,9 +63,9 @@ export const SubmitButton = ({
   sqrtPriceX96,
   depositType,
 }: SubmitButtonProps) => {
-  const { isConnected, address } = useAccount();
+  const router = useRouter();
+  const { address } = useAccount();
   const publicClient = usePublicClient();
-  const { connectWallet } = useAstriaWallet();
   const { chain } = useAstriaChainData();
   const {
     token0,
@@ -136,12 +144,13 @@ export const SubmitButton = ({
     getIsApproved,
   ]);
 
-  // TODO: Error handling.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [error, setError] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [hash, setHash] = useState<string | null>(null);
-  const [status, setStatus] = useState<TransactionStatus>();
+  const [hash, setHash] = useState<Hash>();
+  const [error, setError] = useState<Error>();
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
+  );
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
 
   const handleApproveToken = useCallback(
     async ({
@@ -170,22 +179,11 @@ export const SubmitButton = ({
         });
 
         if (hash) {
-          const receipt = await publicClient.waitForTransactionReceipt({
-            hash,
-          });
+          await refetch();
 
-          if (receipt.status === "success") {
-            // Add a small delay to ensure blockchain state is updated.
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+          setStatus(TransactionStatus.SUCCESS);
 
-            await refetch();
-
-            setStatus(TransactionStatus.SUCCESS);
-
-            return;
-          } else {
-            throw new Error("Transaction failed.");
-          }
+          return;
         }
       } catch (error) {
         console.error("Error approving token:", error);
@@ -204,30 +202,20 @@ export const SubmitButton = ({
     setStatus(TransactionStatus.PENDING);
 
     try {
-      const amount0Desired = parseUnits(
-        amount0.value || "0",
-        token0.coinDecimals,
-      );
-      const amount1Desired = parseUnits(
-        amount1.value || "0",
-        token1.coinDecimals,
-      );
-
-      /**
-       * TODO: Use slippage calculation in `TokenAmount` class.
-       * Too bulky to use here for now, wait until the class is refactored to implement it.
-       */
-      const calculateAmountWithSlippage = (amount: bigint) => {
-        // Convert slippage to basis points (1 bp = 0.01%)
-        // Example: 0.1% = 10 basis points
-        const basisPoints = Math.round(slippageTolerance * 100);
-
-        // Calculate: amount * (10000 - basisPoints) / 10000
-        return (amount * BigInt(10000 - basisPoints)) / BigInt(10000);
-      };
-
-      const amount0Min = calculateAmountWithSlippage(amount0Desired);
-      const amount1Min = calculateAmountWithSlippage(amount1Desired);
+      const {
+        amount0Min,
+        amount1Min,
+        amount0Desired,
+        amount1Desired,
+        deadline,
+      } = getIncreaseLiquidityAmounts({
+        amount0: amount0.value,
+        amount1: amount1.value,
+        token0,
+        token1,
+        depositType,
+        slippageTolerance,
+      });
 
       let { tick: tickLower } = calculateNearestTickAndPrice({
         price: Number(minPrice),
@@ -246,40 +234,37 @@ export const SubmitButton = ({
         [tickLower, tickUpper] = [tickUpper, tickLower];
       }
 
-      // 20 minute deadline.
-      // TODO: Add this to settings.
-      const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
-
       const params: CreateAndInitializePoolIfNecessaryAndMintParams = {
-        chain,
+        chainId: chain.chainId,
         token0,
         token1,
         fee: feeTier,
-        tickLower: Number(tickLower),
-        tickUpper: Number(tickUpper),
-        amount0Desired: getMaxBigInt(amount0Desired, BigInt(1)),
-        amount1Desired: getMaxBigInt(amount1Desired, BigInt(1)),
-        amount0Min: getMaxBigInt(amount0Min, BigInt(1)),
-        amount1Min: getMaxBigInt(amount1Min, BigInt(1)),
+        tickLower,
+        tickUpper,
+        amount0Desired,
+        amount1Desired,
+        amount0Min,
+        amount1Min,
         recipient: address,
         deadline: BigInt(deadline),
         sqrtPriceX96,
       };
 
-      await mint(params);
+      const hash = await mint(params);
 
-      setError(null);
+      setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
-      setHash("0x0" as Hash);
     } catch (error) {
       console.error("Error creating position:", error);
-      setError("Failed to create position.");
+      if (error instanceof Error) {
+        setError(error);
+      }
       setStatus(TransactionStatus.FAILED);
-      setHash(null);
     }
   }, [
     address,
-    chain,
+    chain.chainId,
+    depositType,
     feeTier,
     token0,
     token1,
@@ -293,10 +278,6 @@ export const SubmitButton = ({
   ]);
 
   const state = useMemo<ButtonState>(() => {
-    if (!isConnected) {
-      return ButtonState.CONNECT_WALLET;
-    }
-
     if (status === TransactionStatus.PENDING) {
       return ButtonState.PENDING_SEND_TRANSACTION;
     }
@@ -353,7 +334,6 @@ export const SubmitButton = ({
 
     return ButtonState.SEND_TRANSACTION;
   }, [
-    isConnected,
     status,
     isPriceRangeValid,
     sqrtPriceX96,
@@ -367,9 +347,20 @@ export const SubmitButton = ({
     isToken1Approved,
   ]);
 
+  const handleCloseConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(false);
+    setStatus(TransactionStatus.IDLE);
+    setError(undefined);
+  }, [setIsConfirmationModalOpen, setStatus, setError]);
+
+  const handleOpenConfirmationModal = useCallback(() => {
+    setIsConfirmationModalOpen(true);
+    setStatus(TransactionStatus.IDLE);
+  }, [setStatus]);
+
   const handleSubmit = useCallback(async () => {
-    if (state === ButtonState.CONNECT_WALLET) {
-      connectWallet();
+    if (!address) {
+      handleCloseConfirmationModal();
       return;
     }
 
@@ -404,13 +395,14 @@ export const SubmitButton = ({
     // If no approvals are needed or approvals are complete, create the position.
     handleCreatePosition();
   }, [
+    address,
     state,
     token0,
     token1,
     amount0,
     amount1,
-    connectWallet,
     handleCreatePosition,
+    handleCloseConfirmationModal,
     handleApproveToken,
     refetchToken0Allowance,
     refetchToken1Allowance,
@@ -420,8 +412,6 @@ export const SubmitButton = ({
     const action = "Create New Position";
 
     switch (state) {
-      case ButtonState.CONNECT_WALLET:
-        return "Connect Wallet";
       case ButtonState.INSUFFICIENT_BALANCE:
         return "Insufficient Balance";
       case ButtonState.INVALID_INPUT:
@@ -450,8 +440,40 @@ export const SubmitButton = ({
   }, [isPendingToken0Allowance, isPendingToken1Allowance, state]);
 
   return (
-    <Button onClick={handleSubmit} disabled={isDisabled}>
-      {content}
-    </Button>
+    <>
+      <BaseSubmitButton
+        onClick={handleOpenConfirmationModal}
+        disabled={isDisabled}
+      >
+        {content}
+      </BaseSubmitButton>
+      {token0 && token1 && (
+        <ConfirmationModal
+          title="Create New Position"
+          open={isConfirmationModalOpen}
+          onOpenChange={(value) => {
+            if (!value && status === TransactionStatus.SUCCESS) {
+              router.push(ROUTES.POSITION_LIST);
+              return;
+            }
+            setIsConfirmationModalOpen(value);
+          }}
+        >
+          <TransactionSummary
+            type={TransactionType.CREATE_POSITION}
+            token0={token0}
+            token1={token1}
+            hash={hash}
+            status={status}
+            error={error}
+            onSubmit={handleSubmit}
+            amount0={amount0.value}
+            amount1={amount1.value}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+          />
+        </ConfirmationModal>
+      )}
+    </>
   );
 };

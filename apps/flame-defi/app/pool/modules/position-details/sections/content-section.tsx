@@ -1,41 +1,55 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
-import { type Address } from "viem";
 import { useAccount } from "wagmi";
 
 import { TransactionStatus } from "@repo/flame-types";
-import { Button, Card, CardContent, Switch } from "@repo/ui/components";
+import { Card, CardContent } from "@repo/ui/components";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { useAstriaChainData } from "config";
-import { PriceRangeSummary } from "pool/components/price-range-summary";
-import { TokenPairCard } from "pool/components/token-pair-card";
-import { TransactionSummary } from "pool/components/transaction-summary";
-import { TransactionType } from "pool/components/transaction-summary/transaction-summary.types";
+import { PriceRangeSummary } from "pool/components/price-range";
+import { SubmitButton } from "pool/components/submit-button";
+import {
+  TokenPairCard,
+  TokenPairCardDivider,
+} from "pool/components/token-pair-card";
+import {
+  TransactionSummary,
+  TransactionType,
+} from "pool/components/transaction-summary";
+import { ROUTES } from "pool/constants/routes";
 import { useCollectFees } from "pool/hooks/use-collect-fees";
 import { useGetPosition } from "pool/hooks/use-get-position";
-import { usePoolPositionContext as usePoolPositionContextV2 } from "pool/hooks/use-pool-position-context-v2";
+import { usePoolPositionContext } from "pool/hooks/use-pool-position-context";
 
 export const ContentSection = () => {
+  const router = useRouter();
   const { formatNumber } = useIntl();
   const { chain } = useAstriaChainData();
   const { address } = useAccount();
 
-  const { tokenId, invert } = usePoolPositionContextV2();
-  const { data, isPending, refetch } = useGetPosition({ tokenId, invert });
+  const {
+    positionId,
+    invert,
+    hash,
+    setHash,
+    error,
+    setError,
+    status,
+    setStatus,
+  } = usePoolPositionContext();
+  const { data, isPending, refetch } = useGetPosition({
+    positionId,
+    invert,
+  });
 
   const { collectFees } = useCollectFees();
 
-  const [error, setError] = useState<string | null>(null);
-
-  const [hash, setHash] = useState<Address | null>(null);
-  const [status, setStatus] = useState<TransactionStatus>(
-    TransactionStatus.IDLE,
-  );
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isCollectAsWrappedNative, setIsCollectAsWrappedNative] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
     useState<boolean>(false);
 
@@ -43,13 +57,13 @@ export const ContentSection = () => {
     setIsConfirmationModalOpen(false);
     setStatus(TransactionStatus.IDLE);
     refetch();
-    setError(null);
+    setError(undefined);
   }, [refetch, setIsConfirmationModalOpen, setStatus, setError]);
 
   const handleOpenConfirmationModal = useCallback(() => {
     setIsConfirmationModalOpen(true);
     setStatus(TransactionStatus.IDLE);
-  }, []);
+  }, [setStatus]);
 
   const handleSubmit = useCallback(async () => {
     if (!data || !address) {
@@ -57,12 +71,12 @@ export const ContentSection = () => {
       return;
     }
 
-    try {
-      setStatus(TransactionStatus.PENDING);
+    setStatus(TransactionStatus.PENDING);
 
+    try {
       const hash = await collectFees({
-        chain,
-        tokenId,
+        chainId: chain.chainId,
+        tokenId: positionId,
         token0: data.token0,
         token1: data.token1,
         recipient: address,
@@ -74,7 +88,10 @@ export const ContentSection = () => {
 
       setHash(hash);
       setStatus(TransactionStatus.SUCCESS);
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error);
+      }
       setStatus(TransactionStatus.FAILED);
     }
   }, [
@@ -82,9 +99,12 @@ export const ContentSection = () => {
     collectFees,
     data,
     address,
-    tokenId,
-    chain,
+    positionId,
+    chain.chainId,
     isCollectAsWrappedNative,
+    setHash,
+    setError,
+    setStatus,
   ]);
 
   return (
@@ -103,12 +123,13 @@ export const ContentSection = () => {
             })}
             isLoading={isPending}
           />
-          <hr className="border-t border-stroke-default my-5" />
+          <TokenPairCardDivider />
           <TokenPairCard
             title={
               <div className="flex items-center justify-between h-5">
                 <span className="">Unclaimed Fees</span>
-                {data?.hasUnclaimedFees && (
+                {/* TODO: Implement disabling collect as wrapped native. */}
+                {/* {data?.hasUnclaimedFees && (
                   <div className="flex items-center gap-2 justify-end">
                     <span className="normal-case tracking-normal">
                       Collect as WTIA
@@ -120,7 +141,7 @@ export const ContentSection = () => {
                       }
                     />
                   </div>
-                )}
+                )} */}
               </div>
             }
             token0={data?.token0}
@@ -133,13 +154,13 @@ export const ContentSection = () => {
             })}
             isLoading={isPending}
           />
-          <Button
+          <SubmitButton
             onClick={handleOpenConfirmationModal}
             disabled={isPending || !data?.hasUnclaimedFees}
             className="mt-5 w-full"
           >
             Collect Fees
-          </Button>
+          </SubmitButton>
         </CardContent>
       </Card>
 
@@ -149,19 +170,25 @@ export const ContentSection = () => {
         <ConfirmationModal
           title="Collect Fees"
           open={isConfirmationModalOpen}
-          onOpenChange={(value) => setIsConfirmationModalOpen(value)}
+          onOpenChange={(value) => {
+            if (!value && status === TransactionStatus.SUCCESS) {
+              router.push(ROUTES.POSITION_LIST);
+              return;
+            }
+            setIsConfirmationModalOpen(value);
+          }}
         >
           <TransactionSummary
+            type={TransactionType.COLLECT_FEES}
             position={data.position}
             token0={data.token0}
             token1={data.token1}
-            unclaimedFees0={data.unclaimedFees0}
-            unclaimedFees1={data.unclaimedFees1}
-            type={TransactionType.COLLECT_FEES}
             hash={hash}
             status={status}
             error={error}
             onSubmit={handleSubmit}
+            unclaimedFees0={data.unclaimedFees0}
+            unclaimedFees1={data.unclaimedFees1}
           />
         </ConfirmationModal>
       )}

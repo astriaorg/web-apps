@@ -65,7 +65,12 @@ export const PositionListTable = () => {
         id: "position.liquidity",
         header: "Status",
         cell: ({ row }) => {
-          return <PositionRangeBadge position={row.original.position} />;
+          return (
+            <PositionRangeBadge
+              position={row.original.position}
+              price={row.original.price}
+            />
+          );
         },
       }),
     ];
@@ -129,7 +134,9 @@ export const PositionListTable = () => {
                 isPending && "pointer-events-none",
               )}
               onClick={() =>
-                router.push(`${ROUTES.BASE}/${row.original.position.key}`)
+                router.push(
+                  `${ROUTES.BASE}/${row.original.position.positionId}`,
+                )
               }
             >
               {row.getVisibleCells().map((cell) => (

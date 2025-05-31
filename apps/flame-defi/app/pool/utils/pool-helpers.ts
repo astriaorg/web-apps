@@ -1,6 +1,8 @@
-import { Price } from "@uniswap/sdk-core";
+import { Percent, Price } from "@uniswap/sdk-core";
 import {
   nearestUsableTick,
+  type Pool,
+  Position,
   priceToClosestTick,
   SqrtPriceMath,
   TickMath,
@@ -8,9 +10,9 @@ import {
 } from "@uniswap/v3-sdk";
 import Big from "big.js";
 import JSBI from "jsbi";
-import { formatUnits } from "viem";
+import { type Address, formatUnits } from "viem";
 
-import type { EvmCurrency } from "@repo/flame-types";
+import { type EvmCurrency, TokenAmount } from "@repo/flame-types";
 import {
   DepositType,
   FEE_TIER,
@@ -18,7 +20,7 @@ import {
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
-  type Position,
+  type Position as InternalPosition,
 } from "pool/types";
 
 // TODO: Remove?
@@ -146,10 +148,10 @@ export const calculateDepositType = ({
   });
 
   if (currentTick < minTick) {
-    return DepositType.TOKEN_1_ONLY;
+    return DepositType.TOKEN_0_ONLY;
   }
   if (currentTick > maxTick) {
-    return DepositType.TOKEN_0_ONLY;
+    return DepositType.TOKEN_1_ONLY;
   }
 
   return DepositType.BOTH;
@@ -194,17 +196,14 @@ export const calculateTokenAmountsFromPosition = ({
   token1,
   ...params
 }: {
-  position: Position;
+  position: InternalPosition;
   sqrtPriceX96: bigint;
   token0: EvmCurrency;
   token1: EvmCurrency;
-}): { amount0: string; amount1: string; price: string } => {
+}): { amount0: string; amount1: string } => {
   const sqrtPriceX96 = JSBI.BigInt(params.sqrtPriceX96.toString());
   const sqrtPriceLowerX96 = TickMath.getSqrtRatioAtTick(position.tickLower);
   const sqrtPriceUpperX96 = TickMath.getSqrtRatioAtTick(position.tickUpper);
-
-  const tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
-  const price = tickToPrice(token1.asToken(), token0.asToken(), tick);
 
   const liquidity = JSBI.BigInt(position.liquidity.toString());
 
@@ -247,7 +246,6 @@ export const calculateTokenAmountsFromPosition = ({
     // Don't use JSBI for the final division. JSBI does integer division, so precision is lost for small amounts and 0 is returned.
     amount0: formatUnits(BigInt(amount0.toString()), token0.coinDecimals),
     amount1: formatUnits(BigInt(amount1.toString()), token1.coinDecimals),
-    price: price.toFixed(token0.coinDecimals),
   };
 };
 
@@ -292,4 +290,104 @@ export const getDisplayMaxPrice = (
   return Number(maxPrice) === MAX_PRICE_DEFAULT
     ? "∞"
     : new Big(maxPrice).toFixed(options.minimumFractionDigits);
+};
+
+export const getIncreaseLiquidityAmounts = ({
+  amount0,
+  amount1,
+  token0,
+  token1,
+  depositType,
+  slippageTolerance,
+}: {
+  amount0: string;
+  amount1: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  depositType: DepositType;
+  slippageTolerance: number;
+}): {
+  amount0Desired: bigint;
+  amount1Desired: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+} => {
+  amount0 = depositType === DepositType.TOKEN_1_ONLY ? "0" : amount0;
+  amount1 = depositType === DepositType.TOKEN_0_ONLY ? "0" : amount1;
+
+  const calculateAmount = (
+    amount: string,
+    token: EvmCurrency,
+  ): { amountDesired: bigint; amountMin: bigint } => {
+    // If desired is 0, min must be 0.
+    if (amount === "0") {
+      return {
+        amountDesired: 0n,
+        amountMin: 0n,
+      };
+    }
+
+    const amountDesired = TokenAmount.fromArgs(
+      token.chainId,
+      token.asToken().address as Address,
+      token.coinDecimals,
+      token.coinDenom,
+      amount,
+    );
+
+    const amountMin = amountDesired.withSlippage(slippageTolerance, true);
+
+    return {
+      amountDesired: amountDesired.toBigInt(),
+      // Ensure minimum is at least 1 if desired > 1.
+      amountMin: amountDesired.toBigInt() > 1n ? amountMin.toBigInt() : 1n,
+    };
+  };
+
+  const { amountMin: amount0Min, amountDesired: amount0Desired } =
+    calculateAmount(amount0, token0);
+  const { amountMin: amount1Min, amountDesired: amount1Desired } =
+    calculateAmount(amount1, token1);
+
+  // 20 minute deadline.
+  // TODO: Add this to settings.
+  const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+  return {
+    amount0Desired,
+    amount1Desired,
+    amount0Min,
+    amount1Min,
+    deadline,
+  };
+};
+
+export const getDecreaseLiquidityAmounts = ({
+  pool,
+  position,
+  liquidity,
+  slippageTolerance,
+}: {
+  pool: Pool;
+  position: InternalPosition;
+  liquidity: bigint;
+  slippageTolerance: number;
+}) => {
+  // 20 minute deadline.
+  // TODO: Add this to settings.
+  const deadline = Math.floor(Date.now() / 1000) + 20 * 60;
+
+  const { amount0, amount1 } = new Position({
+    pool,
+    tickLower: position.tickLower,
+    tickUpper: position.tickUpper,
+    liquidity: liquidity.toString(),
+  }).burnAmountsWithSlippage(new Percent(slippageTolerance * 100, 100 * 100));
+
+  return {
+    amount0: BigInt(amount0.toString()),
+    amount1: BigInt(amount1.toString()),
+    deadline,
+  };
 };

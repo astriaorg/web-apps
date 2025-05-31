@@ -1,9 +1,31 @@
-import type { AstriaChain, EvmCurrency } from "@repo/flame-types";
+import {
+  type AstriaChain,
+  type EvmCurrency,
+  FlameNetwork,
+} from "@repo/flame-types";
+import { getChainConfigs } from "config";
 
 import {
   needToReverseTokenOrder,
   shouldReverseTokenOrder,
 } from "./services.utils";
+
+const ASTRIA_CHAIN = getChainConfigs(FlameNetwork.MAINNET).astriaChains
+  .Astria as AstriaChain;
+
+const TOKEN_A = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "WTIA",
+) as EvmCurrency;
+const TOKEN_B = ASTRIA_CHAIN.currencies.find(
+  (it) => it.coinDenom === "USDC",
+) as EvmCurrency;
+
+Object.defineProperty(TOKEN_A, "erc20ContractAddress", {
+  get: () => "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+});
+Object.defineProperty(TOKEN_B, "erc20ContractAddress", {
+  get: () => "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+});
 
 describe("needToReverseTokenOrder", () => {
   it("should return true when token0 has higher address", () => {
@@ -43,100 +65,44 @@ describe("needToReverseTokenOrder", () => {
   });
 });
 
-/**
- * Helper to create a mock token without all the required properties.
- */
-const createMockToken = (
-  erc20ContractAddress: string,
-  isWrappedNative: boolean,
-): EvmCurrency => {
-  return { erc20ContractAddress, isWrappedNative } as unknown as EvmCurrency;
-};
-
 describe("shouldReverseTokenOrder", () => {
-  const chain = {
-    contracts: {
-      wrappedNativeToken: {
-        address: "0x0000000000000000000000000000000000000001",
-      },
-    },
-  } as unknown as AstriaChain;
-
   it("should return false when tokenA is a wrapped native token and tokenB is not", () => {
-    const tokenA = createMockToken(
-      "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-      true,
-    );
-    const tokenB = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_A, tokenB: TOKEN_B })).toBe(
       false,
     );
-
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(false);
   });
 
   it("should return true when tokenB is a wrapped native token and tokenA is not", () => {
-    const tokenA = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-      false,
-    );
-    const tokenB = createMockToken(
-      "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_B, tokenB: TOKEN_A })).toBe(
       true,
     );
-
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(true);
   });
 
   it("should return true when tokenA has a higher address than tokenB", () => {
-    const tokenA = createMockToken(
-      "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-      false,
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_B, tokenB: TOKEN_A })).toBe(
+      true,
     );
-    const tokenB = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-      false,
-    );
-
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(true);
   });
 
   it("should return false when tokenA has a lower address than tokenB", () => {
-    const tokenA = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_A, tokenB: TOKEN_B })).toBe(
       false,
     );
-    const tokenB = createMockToken(
-      "0xBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-      false,
-    );
-
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(false);
   });
 
   it("should handle case insensitive address comparison", () => {
-    const tokenA = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-      false,
-    );
-    const tokenB = createMockToken(
-      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      false,
-    );
+    Object.defineProperty(TOKEN_B, "erc20ContractAddress", {
+      get: () => "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    });
 
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(false);
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_A, tokenB: TOKEN_B })).toBe(
+      false,
+    );
   });
 
   it("should return false when both tokens have the same address", () => {
-    const tokenA = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    expect(shouldReverseTokenOrder({ tokenA: TOKEN_A, tokenB: TOKEN_A })).toBe(
       false,
     );
-    const tokenB = createMockToken(
-      "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-      false,
-    );
-
-    expect(shouldReverseTokenOrder({ tokenA, tokenB, chain })).toBe(false);
   });
 });

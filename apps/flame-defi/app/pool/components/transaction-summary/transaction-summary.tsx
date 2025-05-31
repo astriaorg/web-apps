@@ -2,14 +2,19 @@
 
 import { useMemo } from "react";
 
-import { TransactionStatus } from "@repo/flame-types";
-import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
-import { ErrorIcon } from "@repo/ui/icons";
-import { useAstriaChainData } from "config";
-
-import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
 import {
   type TransactionFailedProps,
+  TransactionStatus,
+} from "@repo/flame-types";
+import { BlockLoader, Button, SuccessCheck } from "@repo/ui/components";
+import { WarningTriangleIcon } from "@repo/ui/icons";
+import { useAstriaChainData } from "config";
+
+import { AddLiquidityTransactionSummary } from "./add-liquidity-transaction-summary";
+import { CollectFeesTransactionSummary } from "./collect-fees-transaction-summary";
+import { CreatePositionTransactionSummary } from "./create-position-transaction-summary";
+import { RemoveLiquidityTransactionSummary } from "./remove-liquidity-transaction-summary";
+import {
   type TransactionSuccessProps,
   type TransactionSummaryProps,
   TransactionType,
@@ -35,9 +40,19 @@ const TransactionSuccess = ({
   const { chain } = useAstriaChainData();
 
   const message = useMemo(() => {
+    if (type === TransactionType.CREATE_POSITION) {
+      return `Successfully created position for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
     if (type === TransactionType.COLLECT_FEES) {
       return `Successfully collected fees for ${token0.coinDenom}/${token1.coinDenom}.`;
     }
+    if (type === TransactionType.ADD_LIQUIDITY) {
+      return `Successfully added liquidity for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
+    if (type === TransactionType.REMOVE_LIQUIDITY) {
+      return `Successfully removed liquidity for ${token0.coinDenom}/${token1.coinDenom}.`;
+    }
+    throw new Error(`Unknown transaction type: ${type}`);
   }, [type, token0, token1]);
 
   return (
@@ -63,69 +78,62 @@ const TransactionSuccess = ({
   );
 };
 
-const TransactionFailed = ({ error }: TransactionFailedProps) => {
+const TransactionFailed = ({ message }: TransactionFailedProps) => {
+  const text = useMemo(() => {
+    if (message) {
+      if (message.includes("User rejected the request.")) {
+        return "Transaction rejected.";
+      }
+      return "An error occurred. Please try again.";
+    }
+  }, [message]);
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="my-6">
-        <ErrorIcon size={100} className="text-danger" />
+        <WarningTriangleIcon size={100} className="text-danger" />
       </div>
       <div className="mt-4">
-        <span>{error || "An error occurred. Please try again."}</span>
+        <span>{text}</span>
       </div>
     </div>
   );
 };
 
-// TODO: Update this to handle each transaction type.
-const TransactionDetails = {
-  [TransactionType.CREATE_POSITION]: CollectFeesTransactionSummary,
-  [TransactionType.COLLECT_FEES]: CollectFeesTransactionSummary,
-  [TransactionType.ADD_LIQUIDITY]: CollectFeesTransactionSummary,
-  [TransactionType.REMOVE_LIQUIDITY]: CollectFeesTransactionSummary,
-} as const;
+export const TransactionSummary = (props: TransactionSummaryProps) => {
+  const { token0, token1, type, hash, status, error } = props;
 
-export const TransactionSummary = ({
-  position,
-  token0,
-  token1,
-  unclaimedFees0,
-  unclaimedFees1,
-  type,
-  hash,
-  status,
-  error,
-  onSubmit,
-}: TransactionSummaryProps) => {
-  const TransactionComponent = TransactionDetails[type];
+  if (status === TransactionStatus.PENDING) {
+    return <TransactionLoader />;
+  }
 
-  return (
-    <>
-      {status === TransactionStatus.IDLE && (
-        <TransactionComponent
-          position={position}
-          token0={token0}
-          token1={token1}
-          unclaimedFees0={unclaimedFees0}
-          unclaimedFees1={unclaimedFees1}
-          type={type}
-          hash={hash}
-          status={status}
-          error={error}
-          onSubmit={onSubmit}
-        />
-      )}
-      {status === TransactionStatus.PENDING && <TransactionLoader />}
-      {status === TransactionStatus.SUCCESS && hash && (
-        <TransactionSuccess
-          token0={token0}
-          token1={token1}
-          type={type}
-          hash={hash}
-        />
-      )}
-      {status === TransactionStatus.FAILED && (
-        <TransactionFailed error={error} />
-      )}
-    </>
-  );
+  if (status === TransactionStatus.SUCCESS && hash) {
+    return (
+      <TransactionSuccess
+        token0={token0}
+        token1={token1}
+        type={type}
+        hash={hash}
+      />
+    );
+  }
+
+  if (status === TransactionStatus.FAILED) {
+    return <TransactionFailed message={error?.message} />;
+  }
+
+  if (type === TransactionType.COLLECT_FEES) {
+    return <CollectFeesTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.ADD_LIQUIDITY) {
+    return <AddLiquidityTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.REMOVE_LIQUIDITY) {
+    return <RemoveLiquidityTransactionSummary {...props} />;
+  }
+  if (type === TransactionType.CREATE_POSITION) {
+    return <CreatePositionTransactionSummary {...props} />;
+  }
+
+  throw new Error(`Unknown transaction type: ${type}`);
 };

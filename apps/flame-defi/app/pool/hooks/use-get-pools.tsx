@@ -1,5 +1,6 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { Pool } from "@uniswap/v3-sdk";
+import { useMemo } from "react";
 import { type Address, zeroAddress } from "viem";
 import { useConfig } from "wagmi";
 
@@ -20,10 +21,17 @@ export const useGetPools = (params: {
   const config = useConfig();
   const { chain } = useAstriaChainData();
 
+  // Don't care what order the tokens are in for better caching.
+  const queryKey = useMemo(() => {
+    const token0Key = params.token0?.asToken().address;
+    const token1Key = params.token1?.asToken().address;
+
+    return [token0Key, token1Key].sort().join("-");
+  }, [params.token0, params.token1]);
+
   return useQuery({
-    // TODO: For better caching, don't care what order the tokens are passed in.
     enabled: !!params.token0 && !!params.token1,
-    queryKey: [QUERY_KEYS.USE_GET_POOLS, params.token0, params.token1, chain],
+    queryKey: [QUERY_KEYS.USE_GET_POOLS, queryKey, chain],
     queryFn: async () => {
       if (!params.token0 || !params.token1) {
         return null;
@@ -47,23 +55,19 @@ export const useGetPools = (params: {
 
       const validPools = pools.filter((it) => it !== zeroAddress);
 
-      // TODO: Promise.all or combine multicall.
-      const slot0Results =
-        await poolFactoryService.getSlot0ForPools(validPools);
-      const liquidityResults =
-        await poolFactoryService.getLiquidityForPools(validPools);
+      const results =
+        await poolFactoryService.getLiquidityAndSlot0ForPools(validPools);
 
       const result = {} as GetPoolsResult;
 
       for (let i = 0; i < FEE_TIERS.length; i++) {
         const feeTier = FEE_TIERS[i] as FeeTier;
 
-        const slot0Result = slot0Results.find((it) => it.address === pools[i]);
-        const liquidityResult = liquidityResults.find(
+        const liquidityAndSlot0Result = results.find(
           (it) => it.address === pools[i],
         );
 
-        if (!slot0Result || !liquidityResult) {
+        if (!liquidityAndSlot0Result) {
           result[feeTier] = null;
           continue;
         }
@@ -72,9 +76,9 @@ export const useGetPools = (params: {
           token0,
           token1,
           feeTier,
-          slot0Result.slot0.sqrtPriceX96.toString(),
-          liquidityResult.liquidity.toString(),
-          slot0Result.slot0.tick,
+          liquidityAndSlot0Result.slot0.sqrtPriceX96.toString(),
+          liquidityAndSlot0Result.liquidity.toString(),
+          liquidityAndSlot0Result.slot0.tick,
         );
 
         result[feeTier] = pool;

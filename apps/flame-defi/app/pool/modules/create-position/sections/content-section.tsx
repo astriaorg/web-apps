@@ -236,23 +236,37 @@ export const ContentSection = () => {
 
   // Handle single asset deposit when initial price exceeds the min or max price.
   useEffect(() => {
-    if (!isPriceRangeValid || !amountInitialPrice.validation.isValid) {
+    if (
+      !isPriceRangeValid ||
+      (!pool && !amountInitialPrice.validation.isValid)
+    ) {
       return;
     }
 
-    if (pool) {
-      setDepositType(DepositType.BOTH);
-      return;
-    }
+    const price = (() => {
+      if (pool) {
+        return currentInput === InputId.INPUT_0
+          ? pool.token0Price.toFixed(pool.token0.decimals)
+          : pool.token1Price.toFixed(pool.token1.decimals);
+      }
+      return amountInitialPrice.value;
+    })();
 
     const depositType = calculateDepositType({
-      currentPrice: Number(amountInitialPrice.value),
+      currentPrice: Number(price),
       minPrice: Number(minPrice),
       maxPrice: Number(maxPrice),
     });
 
     setDepositType(depositType);
-  }, [amountInitialPrice, minPrice, maxPrice, isPriceRangeValid, pool]);
+  }, [
+    amountInitialPrice,
+    currentInput,
+    minPrice,
+    maxPrice,
+    isPriceRangeValid,
+    pool,
+  ]);
 
   return (
     <section className="flex flex-col gap-6">

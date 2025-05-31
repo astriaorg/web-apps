@@ -1,5 +1,5 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { tickToPrice } from "@uniswap/v3-sdk";
+import { Pool, tickToPrice } from "@uniswap/v3-sdk";
 import { formatUnits } from "viem";
 import { useAccount, useConfig } from "wagmi";
 
@@ -12,12 +12,14 @@ import {
 } from "features/evm-wallet";
 import { QUERY_KEYS } from "pool/constants/query-keys";
 import {
+  type DepositType,
   type FeeTier,
   MAX_PRICE_DEFAULT,
   MIN_PRICE_DEFAULT,
   type Position,
 } from "pool/types";
 import {
+  calculateDepositType,
   calculateTokenAmountsFromPosition,
   getMinMaxTick,
   getTokenFromAddress,
@@ -28,9 +30,16 @@ const CACHE_TIME_MILLISECONDS = 1000 * 60 * 5; // 5 minutes.
 
 export type GetPositionResult = {
   position: Position;
+  pool: Pool;
   token0: EvmCurrency;
   token1: EvmCurrency;
+  /**
+   * The liquidity amount of token0 in the position.
+   */
   amount0: string;
+  /**
+   * The liquidity amount of token1 in the position.
+   */
   amount1: string;
   price: string;
   minPrice: string;
@@ -38,6 +47,7 @@ export type GetPositionResult = {
   unclaimedFees0: string;
   unclaimedFees1: string;
   hasUnclaimedFees: boolean;
+  depositType: DepositType;
 };
 
 /**
@@ -48,10 +58,10 @@ export type GetPositionResult = {
  * **Do not token data in the position itself, as it may not be in the correct order.**
  */
 export const useGetPosition = ({
-  tokenId,
+  positionId,
   invert,
 }: {
-  tokenId: string;
+  positionId: string;
   invert: boolean;
 }): UseQueryResult<GetPositionResult | null> => {
   const config = useConfig();
@@ -59,7 +69,7 @@ export const useGetPosition = ({
   const { chain } = useAstriaChainData();
 
   return useQuery({
-    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, tokenId],
+    queryKey: [QUERY_KEYS.USE_GET_POSITION, chain.chainId, positionId],
     queryFn: async () => {
       if (!address) {
         return null;
@@ -73,7 +83,7 @@ export const useGetPosition = ({
 
       const position = await nonfungiblePositionManagerService.positions(
         chain.chainId,
-        tokenId,
+        positionId,
       );
 
       const token0 = getTokenFromAddress(position.token0, chain);
@@ -113,7 +123,7 @@ export const useGetPosition = ({
 
       const { position, slot0 } = data;
 
-      let { amount0, amount1, price } = calculateTokenAmountsFromPosition({
+      let { amount0, amount1 } = calculateTokenAmountsFromPosition({
         position,
         sqrtPriceX96: slot0.sqrtPriceX96,
         token0: data.token0,
@@ -126,6 +136,15 @@ export const useGetPosition = ({
         token0 = data.token1;
         token1 = data.token0;
       }
+
+      const pool = new Pool(
+        data.token0.asToken(),
+        data.token1.asToken(),
+        position.fee,
+        slot0.sqrtPriceX96.toString(),
+        position.liquidity.toString(),
+        slot0.tick,
+      );
 
       const { minTick, maxTick } = getMinMaxTick(position.fee as FeeTier);
 
@@ -171,17 +190,26 @@ export const useGetPosition = ({
         data.token1.coinDecimals,
       );
 
+      let price = pool.token0Price.toFixed(token0.coinDecimals);
+
       if (invert) {
         unclaimedFees0 = formatUnits(position.tokensOwed1, token1.coinDecimals);
         unclaimedFees1 = formatUnits(position.tokensOwed0, token0.coinDecimals);
         const amount0Original = amount0;
         amount0 = amount1;
         amount1 = amount0Original;
-        price = (1 / Number(price)).toString();
+        price = pool.token1Price.toFixed(token1.coinDecimals);
       }
+
+      const depositType = calculateDepositType({
+        currentPrice: Number(price),
+        minPrice: Number(minPrice),
+        maxPrice: Number(maxPrice),
+      });
 
       return {
         position,
+        pool,
         token0,
         token1,
         amount0,
@@ -192,6 +220,7 @@ export const useGetPosition = ({
         unclaimedFees0,
         unclaimedFees1,
         hasUnclaimedFees,
+        depositType,
       };
     },
     enabled: !!address,

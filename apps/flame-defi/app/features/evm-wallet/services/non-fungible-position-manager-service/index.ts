@@ -13,7 +13,7 @@ import {
   TokenInputState,
   tokenInputStateToTokenAmount,
 } from "@repo/flame-types";
-import { Position, PositionWithKey } from "pool/types";
+import { Position, PositionWithPositionId } from "pool/types";
 
 import { GenericContractService } from "../generic-contract-service";
 import {
@@ -23,7 +23,7 @@ import {
 import NON_FUNGIBLE_POSITION_MANAGER_ABI from "./non-fungible-position-manager-abi.json";
 
 export interface CreateAndInitializePoolIfNecessaryAndMintParams {
-  chain: AstriaChain;
+  chainId: number;
   token0: EvmCurrency;
   token1: EvmCurrency;
   fee: number;
@@ -61,14 +61,19 @@ export interface MintParams {
 
 export interface IncreaseLiquidityParams {
   chainId: number;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  tokenId: string;
   amount0Desired: bigint;
   amount1Desired: bigint;
   amount0Min: bigint;
   amount1Min: bigint;
   deadline: number;
-  value: bigint;
 }
 
+/**
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
+ */
 export interface DecreaseLiquidityParams {
   chainId: number;
   liquidity: bigint;
@@ -77,6 +82,9 @@ export interface DecreaseLiquidityParams {
   deadline: number;
 }
 
+/**
+ * @deprecated TODO: Remove this and use DecreaseLiquidityAndCollectV2Params instead.
+ */
 export interface DecreaseLiquidityAndCollectParams {
   chainId: number;
   tokenId: string;
@@ -89,9 +97,27 @@ export interface DecreaseLiquidityAndCollectParams {
   isCollectNonNativeTokens: boolean;
   isToken0Native: boolean;
   isToken1Native: boolean;
-  gasLimit?: bigint;
 }
 
+export interface DecreaseLiquidityAndCollectV2Params {
+  chainId: number;
+  tokenId: string;
+  token0: EvmCurrency;
+  token1: EvmCurrency;
+  liquidity: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: number;
+  recipient: Address;
+  position: Position;
+  options: {
+    isCollectAsWrappedNative: boolean;
+  };
+}
+
+/**
+ * @deprecated
+ */
 export interface CollectFeesParams {
   calls?: string[];
   chainId: number;
@@ -105,7 +131,7 @@ export interface CollectFeesParams {
 }
 
 export interface CollectFeesV2Params {
-  chain: AstriaChain;
+  chainId: number;
   tokenId: string;
   token0: EvmCurrency;
   token1: EvmCurrency;
@@ -203,7 +229,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * Creates a new pool if necessary and mints a new position in a single transaction.
    */
   async createAndInitializePoolIfNecessaryAndMint({
-    chain,
+    chainId,
     token0,
     token1,
     fee,
@@ -216,7 +242,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     recipient,
     deadline,
     sqrtPriceX96,
-  }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<unknown> {
+  }: CreateAndInitializePoolIfNecessaryAndMintParams): Promise<Hash> {
     const calls: string[] = [];
 
     const token0Address = token0.asToken().address as Address;
@@ -231,7 +257,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     let sortedAmount0Min = amount0Min;
     let sortedAmount1Min = amount1Min;
 
-    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
       sortedToken0 = token1;
       sortedToken1 = token0;
       sortedToken0Address = token1Address;
@@ -282,13 +308,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     const gasLimit = await this.estimateContractGasWithBuffer(
-      chain.chainId,
+      chainId,
       calls,
       value,
     );
 
     return await this.writeContractMethod(
-      chain.chainId,
+      chainId,
       "multicall",
       [calls],
       value,
@@ -302,7 +328,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
    * This method handles both wrapped native token collection and non-native token collection scenarios.
    */
   async collectFeesV2({
-    chain,
+    chainId,
     tokenId,
     token0,
     token1,
@@ -315,7 +341,7 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     let sortedToken1 = token1;
 
     // Sorted tokens should match the order of tokens in the position.
-    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1, chain })) {
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
       sortedToken0 = token1;
       sortedToken1 = token0;
     }
@@ -372,13 +398,13 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     }
 
     const gasLimit = await this.estimateContractGasWithBuffer(
-      chain.chainId,
+      chainId,
       calls,
       0n,
     );
 
     return await this.writeContractMethod(
-      chain.chainId,
+      chainId,
       "multicall",
       [calls],
       undefined,
@@ -389,94 +415,56 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   /**
    * Increases liquidity for an existing position.
    */
-  async increaseLiquidity(
-    tokenId: string,
-    {
-      chainId,
-      amount0Desired,
-      amount1Desired,
-      amount0Min,
-      amount1Min,
-      deadline,
-      value,
-    }: IncreaseLiquidityParams,
-  ): Promise<Hash> {
+  async increaseLiquidity({
+    chainId,
+    token0,
+    token1,
+    tokenId,
+    amount0Desired,
+    amount1Desired,
+    amount0Min,
+    amount1Min,
+    deadline,
+  }: IncreaseLiquidityParams): Promise<Hash> {
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+    let sortedAmount0Desired = amount0Desired;
+    let sortedAmount1Desired = amount1Desired;
+    let sortedAmount0Min = amount0Min;
+    let sortedAmount1Min = amount1Min;
+
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+      sortedAmount0Desired = amount1Desired;
+      sortedAmount1Desired = amount0Desired;
+      sortedAmount0Min = amount1Min;
+      sortedAmount1Min = amount0Min;
+    }
+
+    let value: bigint = 0n;
+    if (sortedToken0.isNative) {
+      value = sortedAmount0Desired;
+    }
+    if (sortedToken1.isNative) {
+      value = sortedAmount1Desired;
+    }
+
     return await this.writeContractMethod(
       chainId,
       "increaseLiquidity",
       [
         {
           tokenId: BigInt(tokenId),
-          amount0Desired,
-          amount1Desired,
-          amount0Min,
-          amount1Min,
+          amount0Desired: sortedAmount0Desired,
+          amount1Desired: sortedAmount1Desired,
+          amount0Min: sortedAmount0Min,
+          amount1Min: sortedAmount1Min,
           deadline,
         },
       ],
       value,
     );
-  }
-
-  public static getIncreaseLiquidityParams(
-    tokenInput0: TokenInputState,
-    tokenInput1: TokenInputState,
-    slippageTolerance: number,
-    chain: AstriaChain,
-  ): IncreaseLiquidityParams {
-    const token0Address = tokenInput0.token?.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : tokenInput0.token?.erc20ContractAddress;
-    const token1Address = tokenInput1.token?.isNative
-      ? chain.contracts.wrappedNativeToken.address
-      : tokenInput1.token?.erc20ContractAddress;
-
-    if (!token0Address || !token1Address) {
-      throw new Error("Token addresses are missing.");
-    }
-
-    const shouldReverseOrder = needToReverseTokenOrder(
-      token0Address,
-      token1Address,
-    );
-
-    let tokens = [
-      tokenInputStateToTokenAmount(tokenInput0, chain.chainId),
-      tokenInputStateToTokenAmount(tokenInput1, chain.chainId),
-    ];
-    if (shouldReverseOrder) {
-      tokens = tokens.reverse();
-    }
-
-    if (!tokens[0] || !tokens[1]) {
-      throw new Error("Must have both tokens set.");
-    }
-
-    let value = 0n;
-    const nativeTokenInput = [tokenInput0, tokenInput1].find(
-      (tInput) => tInput.token?.isNative,
-    );
-    if (nativeTokenInput) {
-      value =
-        tokenInputStateToTokenAmount(
-          nativeTokenInput,
-          chain.chainId,
-        )?.amountAsBigInt() ?? 0n;
-    }
-
-    return {
-      chainId: chain.chainId,
-      amount0Desired: tokens[0].amountAsBigInt(),
-      amount1Desired: tokens[1].amountAsBigInt(),
-      amount0Min: tokens[0]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      amount1Min: tokens[1]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      deadline: Math.floor(Date.now() / 1000) + 10 * 60,
-      value,
-    };
   }
 
   public static getDecreaseLiquidityParams(
@@ -517,12 +505,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     return {
       chainId: chain.chainId,
       liquidity,
-      amount0Min: tokens[0]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
-      amount1Min: tokens[1]
-        .withSlippage(slippageTolerance, true)
-        .amountAsBigInt(),
+      amount0Min: tokens[0].withSlippage(slippageTolerance, true).toBigInt(),
+      amount1Min: tokens[1].withSlippage(slippageTolerance, true).toBigInt(),
       deadline: Math.floor(Date.now() / 1000) + 10 * 60,
     };
   }
@@ -717,14 +701,14 @@ export class NonfungiblePositionManagerService extends GenericContractService {
   async getPositions(
     chainId: number,
     owner: Address,
-  ): Promise<PositionWithKey[]> {
+  ): Promise<PositionWithPositionId[]> {
     const nftCount = await this.balanceOf(chainId, owner);
-    const positions: PositionWithKey[] = [];
+    const positions: PositionWithPositionId[] = [];
 
     for (let i = 0; i < Number(nftCount); i++) {
       const key = await this.tokenOfOwnerByIndex(chainId, owner, i);
       const position = await this.positions(chainId, key.toString());
-      positions.push({ ...position, key: key.toString() });
+      positions.push({ ...position, positionId: key.toString() });
     }
 
     return positions;
@@ -803,6 +787,61 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       abi: this.abi,
       functionName: "sweepToken",
       args: [token, amountMinimum, recipient],
+    });
+  }
+
+  /**
+   * Performs a multicall that combines decreaseLiquidity, collect, unwrap, and sweep operations in a single transaction.
+   * By default, it will collect all available fees and tokens released by decreaseLiquidity.
+   *
+   * @param params - Parameters for the multicall operation
+   * @returns The transaction hash
+   */
+  async decreaseLiquidityAndCollectV2({
+    chainId,
+    tokenId,
+    token0,
+    token1,
+    liquidity,
+    amount0Min,
+    amount1Min,
+    deadline,
+    recipient,
+    position,
+    options,
+  }: DecreaseLiquidityAndCollectV2Params): Promise<Hash> {
+    let sortedToken0 = token0;
+    let sortedToken1 = token1;
+    let sortedAmount0Min = amount0Min;
+    let sortedAmount1Min = amount1Min;
+
+    if (shouldReverseTokenOrder({ tokenA: token0, tokenB: token1 })) {
+      sortedToken0 = token1;
+      sortedToken1 = token0;
+      sortedAmount0Min = amount1Min;
+      sortedAmount1Min = amount0Min;
+    }
+
+    const calls: string[] = [];
+    const decreaseCall = this.encodeDecreaseLiquidity(
+      tokenId,
+      liquidity,
+      sortedAmount0Min,
+      sortedAmount1Min,
+      deadline,
+    );
+
+    calls.push(decreaseCall);
+
+    return await this.collectFeesV2({
+      chainId,
+      tokenId,
+      token0: sortedToken0,
+      token1: sortedToken1,
+      position,
+      recipient,
+      options,
+      calls,
     });
   }
 
