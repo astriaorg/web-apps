@@ -9,9 +9,7 @@ import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { Environment, useAstriaChainData, useConfig } from "config";
-import {
-  type CreateAndInitializePoolIfNecessaryAndMintParams,
-} from "features/evm-wallet";
+import { type CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { SubmitButton as BaseSubmitButton } from "pool/components/submit-button";
