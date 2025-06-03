@@ -43,7 +43,7 @@ export const TransactionInfoDetails = ({
   const slippageTolerance = getSlippageTolerance();
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col space-y-2 w-full">
       <TransactionInfoRow
         left="Expected Output"
         right={`${amountOut} ${token.coinDenom}`}

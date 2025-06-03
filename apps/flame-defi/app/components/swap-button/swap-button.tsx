@@ -31,7 +31,16 @@ const CornerMask = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
+interface SwapButtonProps extends ButtonProps {
+  icon?: React.ReactNode;
+}
+
+export const SwapButton = ({
+  icon = <SwapVerticalIcon />,
+  className,
+  onClick,
+  ...props
+}: SwapButtonProps) => {
   const [isRotated, setIsRotated] = useState(false);
 
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
@@ -74,7 +83,7 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
           animate={{ scaleY: isRotated ? -1 : 1 }}
           transition={{ duration: 0.2 }}
         >
-          <SwapVerticalIcon />
+          {icon}
         </motion.div>
       </Button>
     </div>

@@ -76,8 +76,8 @@ export function useSwapButton({
   const { connectWallet, connectToFlame, isConnectedToFlameChain } =
     useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
-  const [status, setStatus] = useState<TransactionStatus | undefined>(
-    undefined,
+  const [status, setStatus] = useState<TransactionStatus>(
+    TransactionStatus.IDLE,
   );
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [hash, setHash] = useState<Hash | undefined>(undefined);

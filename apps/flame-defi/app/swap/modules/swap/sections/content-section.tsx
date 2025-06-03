@@ -13,17 +13,20 @@ import {
   TransactionStatus,
 } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { SWAP_BUTTON_TRANSITION, SwapButton } from "components/swap-button";
 import { useAstriaChainData } from "config";
 import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
+import {
+  TransactionSummary,
+  TransactionType,
+} from "swap/components/transaction-summary";
 import {
   useOneToOneQuote,
   useSwapButton,
   useTransactionInfo,
 } from "swap/hooks";
 import { SwapInput } from "swap/modules/swap/components/swap-input";
-import { SwapTransactionSteps } from "swap/modules/swap/components/swap-transaction-steps";
 import { TransactionInfo } from "swap/modules/swap/components/transaction-info";
 import { InputId, SwapPairProps } from "swap/types";
 
@@ -31,7 +34,7 @@ export const ContentSection = () => {
   const { chain } = useAstriaChainData();
   const { currencies } = chain;
   const userAccount = useAccount();
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
   const [inputOne, setInputOne] = useState<TokenInputState>({
     token: currencies[0],
     value: "",
@@ -50,6 +53,8 @@ export const ContentSection = () => {
     );
   }, [inputOne.token, inputTwo.token]);
 
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
   const {
@@ -167,7 +172,7 @@ export const ContentSection = () => {
     setInputTwo({ token: token1.token, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
-    setStatus(undefined);
+    setStatus(TransactionStatus.IDLE);
   }, [setQuote, setStatus, token0, token1]);
 
   const handleInputChange = useCallback(
@@ -319,7 +324,7 @@ export const ContentSection = () => {
   };
 
   const handleCloseModal = useCallback(() => {
-    setModalOpen(false);
+    setIsConfirmationModalOpen(false);
     if (
       status === TransactionStatus.SUCCESS ||
       status === undefined ||
@@ -329,16 +334,22 @@ export const ContentSection = () => {
     }
   }, [handleResetInputs, status]);
 
-  const handleOpenModal = useCallback(() => {
-    setModalOpen(true);
+  const handleOpenConfirmationModal = useCallback(() => {
+    if (tokenApprovalNeeded) {
+      onSubmitCallback();
+      return;
+    }
+
+    setIsConfirmationModalOpen(true);
+
     if (isTiaWtia) {
       onSubmitCallback();
     } else {
       setStatus(TransactionStatus.IDLE);
     }
-  }, [isTiaWtia, onSubmitCallback, setStatus]);
+  }, [isTiaWtia, tokenApprovalNeeded, onSubmitCallback, setStatus]);
 
-  const handleModalActionButton = useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
@@ -390,37 +401,39 @@ export const ContentSection = () => {
         </div>
       </div>
       <ConfirmationModal
-        open={modalOpen}
-        buttonText={buttonText}
-        actionButtonText={actionButtonText}
-        showOpenButton={Boolean(validSwapInputs && !tokenApprovalNeeded)}
-        handleOpenModal={handleOpenModal}
-        handleModalActionButton={handleModalActionButton}
-        handleCloseModal={handleCloseModal}
         title={titleText}
+        open={isConfirmationModalOpen}
+        onOpenChange={handleCloseModal}
       >
-        <SwapTransactionSteps
-          status={status}
-          info={info}
-          token0={token0}
-          token1={token1}
-          isTiaWtia={isTiaWtia}
-          oneToOneQuote={oneToOneQuote}
-          hash={hash}
-          message={message}
-          isQuoteLoading={loading}
-        />
+        {token0.token && token1.token && (
+          <TransactionSummary
+            type={TransactionType.SWAP}
+            token0={token0.token}
+            token1={token1.token}
+            hash={hash}
+            status={status}
+            // TODO: Fix error type.
+            error={new Error(errorText || "")}
+            onSubmit={handleSubmit}
+            // TODO: Get action message.
+            action={actionButtonText}
+            fee={info.gasUseEstimateUSD}
+            amountOut={info.expectedOutputFormatted}
+            amountMin={info.minimumReceived}
+            amount0={token0.value}
+            amount1={token1.value}
+            priceImpact={info.priceImpact}
+            frontendFeeEstimate={info.frontendFeeEstimate}
+          />
+        )}
       </ConfirmationModal>
-      {(!userAccount.address || tokenApprovalNeeded) && (
-        <Button onClick={onSubmitCallback} className="w-full mt-8">
-          {buttonText}
-        </Button>
-      )}
-      {userAccount.address && !tokenApprovalNeeded && !validSwapInputs && (
-        <Button onClick={onSubmitCallback} className="w-full mt-8" disabled>
-          {buttonText}
-        </Button>
-      )}
+      <Button
+        onClick={handleOpenConfirmationModal}
+        className="w-full mt-8"
+        disabled={!validSwapInputs || oneToOneQuote.oneToOneLoading}
+      >
+        {buttonText}
+      </Button>
       {errorText && (
         <div className="flex items-center justify-center text-danger text-sm mt-4">
           {errorText}
