@@ -2,7 +2,7 @@
 
 import { TokenInputState } from "@repo/flame-types";
 import { GetQuoteResult } from "@repo/flame-types";
-import { InfoTooltip, Skeleton } from "@repo/ui/components";
+import { Skeleton } from "@repo/ui/components";
 import {
   Accordion,
   AccordionContent,
@@ -10,7 +10,8 @@ import {
   AccordionTrigger,
 } from "@repo/ui/components";
 import { FuelIcon } from "@repo/ui/icons";
-import { formatDecimalValues, getSlippageTolerance } from "@repo/ui/utils";
+import { formatDecimalValues } from "@repo/ui/utils";
+import { TransactionInfoDetails } from "swap/components/transaction-info-details";
 import { RoutePath } from "swap/modules/swap/components/route-path";
 import {
   OneToOneQuoteProps,
@@ -25,26 +26,6 @@ export interface TransactionInfoProps {
   quote: GetQuoteResult;
 }
 
-const TransactionInfoRow = ({
-  left,
-  right,
-  tooltip,
-}: {
-  left: string;
-  right: string;
-  tooltip: string;
-}) => {
-  return (
-    <p className="flex justify-between">
-      <span className="text-typography-subdued flex items-center gap-1">
-        {left}{" "}
-        <InfoTooltip content={tooltip} side="right" className="max-w-[250px]" />
-      </span>
-      <span className="text-typography-subdued">{right}</span>
-    </p>
-  );
-};
-
 export const TransactionInfo = ({
   info,
   token0,
@@ -52,7 +33,9 @@ export const TransactionInfo = ({
   oneToOneQuote,
   quote,
 }: TransactionInfoProps) => {
-  const slippageTolerance = getSlippageTolerance();
+  if (!token0.token || !token1.token) {
+    return null;
+  }
 
   return (
     <Accordion type="single" collapsible>
@@ -93,36 +76,14 @@ export const TransactionInfo = ({
           </Skeleton>
         </div>
         <AccordionContent>
-          <div className="space-y-2">
-            <TransactionInfoRow
-              left="Expected Output"
-              right={`${info.expectedOutputFormatted} ${token1.token?.coinDenom}`}
-              tooltip="The amount you expect to receive at the current market price. You may receive less or more if the market price changes while your transaction is pending."
-            />
-            <TransactionInfoRow
-              left="Price Impact"
-              right={info.priceImpact}
-              tooltip="The impact your trade has on the market price of this pool."
-            />
-            <TransactionInfoRow
-              left="Network Fee"
-              right={`$${info.formattedGasUseEstimateUSD}`}
-              tooltip="The network fee for the transaction."
-            />
-            {Boolean(info.frontendFeeEstimate) && (
-              <TransactionInfoRow
-                // TODO: Show fee percentage from config.
-                left="Fee (0.25%)"
-                right={`${info.frontendFeeEstimate} ${token1.token?.coinDenom}`}
-                tooltip="Fees are applied to ensure the best experience on Flame, and have already been factored into this quote."
-              />
-            )}
-            <TransactionInfoRow
-              left={`Min Received After Slippage (${slippageTolerance}%)`}
-              right={`${info.minimumReceived} ${token1.token?.coinDenom}`}
-              tooltip="The minimum amount you are guaranteed to receive. If the price slips any further, your transaction will revert."
-            />
-          </div>
+          <TransactionInfoDetails
+            token={token1.token}
+            fee={info.formattedGasUseEstimateUSD}
+            amountOut={info.expectedOutputFormatted}
+            amountMin={info.minimumReceived}
+            priceImpact={info.priceImpact}
+            frontendFeeEstimate={info.frontendFeeEstimate}
+          />
           <hr className="border-t border-stroke-default my-5" />
           {quote && quote.route && (
             <RoutePath
