@@ -28,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className="relative">
+      <div className="relative w-full">
         {startAdornment && (
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
             {startAdornment}
@@ -42,6 +42,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
             "focus-visible:outline-hidden",
             "aria-invalid:border-danger aria-invalid:bg-danger/10",
+            props.readOnly && "pointer-events-none",
             startAdornment && "pl-11",
             endAdornment && "pr-11",
             inputVariants({ variant }),
