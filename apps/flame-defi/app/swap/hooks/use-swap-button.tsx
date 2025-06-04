@@ -53,7 +53,7 @@ interface SwapButtonReturn {
   /** Current transaction status */
   status?: TransactionStatus;
   /** Function to update the transaction status */
-  setStatus: (status?: TransactionStatus) => void;
+  setStatus: (status: TransactionStatus) => void;
   /** Optional message to display (usually for errors) */
   message?: string;
   /** Whether token approval is needed before swap can proceed */
