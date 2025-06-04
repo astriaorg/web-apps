@@ -10,7 +10,6 @@ import {
   AccordionTrigger,
 } from "@repo/ui/components";
 import { FuelIcon } from "@repo/ui/icons";
-import { formatDecimalValues } from "@repo/ui/utils";
 import { TransactionInfoDetails } from "swap/components/transaction-info-details";
 import { RoutePath } from "swap/modules/swap/components/route-path";
 import {
@@ -52,7 +51,7 @@ export const TransactionInfo = ({
               }
             >
               <div className="flex items-center gap-1">
-                <span>{formatDecimalValues("1", 0)}</span>
+                <span>1</span>
                 <span>{oneToOneQuote.topTokenSymbol}</span>
               </div>
               <div>=</div>
@@ -67,7 +66,7 @@ export const TransactionInfo = ({
               {info.gasUseEstimateUSD && (
                 <div className="flex items-center gap-1 font-semibold text-typography-default">
                   <FuelIcon size={20} />
-                  <span className="mr-1">
+                  <span className="ml-1">
                     ${info.formattedGasUseEstimateUSD}
                   </span>
                 </div>

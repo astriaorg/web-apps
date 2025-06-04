@@ -16,12 +16,7 @@ import {
   TransactionType,
 } from "./transaction-summary.types";
 
-const TransactionSuccess = ({
-  token0,
-  token1,
-  type,
-  hash,
-}: TransactionSuccessProps) => {
+const TransactionSuccess = ({ type, hash }: TransactionSuccessProps) => {
   const message = useMemo(() => {
     if (type === TransactionType.SWAP) {
       return "Transaction successful!";
