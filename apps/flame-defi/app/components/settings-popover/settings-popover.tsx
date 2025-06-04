@@ -105,7 +105,7 @@ export const SettingsPopover = () => {
           aria-label="Settings"
         >
           <GearIcon
-            className={`transition ${expertMode ? "stroke-orange" : ""}`}
+            className={`transition ${expertMode ? "text-orange" : ""}`}
           />
         </a>
       </PopoverTrigger>
