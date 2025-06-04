@@ -49,7 +49,7 @@ interface SwapButtonReturn {
   /** Text to display on the confirmation button in the modal */
   action: string;
   /** Whether all swap inputs are valid and ready for submission */
-  validSwapInputs: boolean;
+  isValid: boolean;
   /** Current transaction status */
   status: TransactionStatus;
   /** Function to update the transaction status */
@@ -223,7 +223,7 @@ export function useSwapButton({
   ]);
 
   // FIXME - parseFloat is not sufficient for huge numbers
-  const validSwapInputs = Boolean(
+  const isValid = Boolean(
     !loading &&
       status !== TransactionStatus.PENDING &&
       !error &&
@@ -248,7 +248,7 @@ export function useSwapButton({
         return handleWrap("unwrap");
       case wrapTia:
         return handleWrap("wrap");
-      case validSwapInputs:
+      case isValid:
         return handleSwap();
       default:
         return undefined;
@@ -330,7 +330,7 @@ export function useSwapButton({
     error,
     setError,
     action,
-    validSwapInputs,
+    isValid,
     status,
     setStatus,
     tokenApprovalNeeded:

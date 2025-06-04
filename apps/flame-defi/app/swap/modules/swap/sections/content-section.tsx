@@ -105,7 +105,7 @@ export const ContentSection = () => {
     onSubmit,
     buttonText,
     action,
-    validSwapInputs,
+    isValid,
     status,
     setStatus,
     tokenApprovalNeeded,
@@ -126,7 +126,7 @@ export const ContentSection = () => {
     token0,
     token1,
     tradeType,
-    validSwapInputs,
+    isValid,
   });
 
   const debouncedGetQuoteRef = useRef(
@@ -425,23 +425,19 @@ export const ContentSection = () => {
       <Button
         onClick={handleOpenConfirmationModal}
         className="w-full mt-8"
-        disabled={!validSwapInputs || oneToOneQuote.oneToOneLoading}
+        disabled={!isValid || oneToOneQuote.oneToOneLoading}
       >
         {buttonText}
       </Button>
-      {inputOne.token &&
-        inputTwo.token &&
-        !isTiaWtia &&
-        validSwapInputs &&
-        quote && (
-          <TransactionInfo
-            info={info}
-            token0={token0}
-            token1={token1}
-            oneToOneQuote={oneToOneQuote}
-            quote={quote}
-          />
-        )}
+      {inputOne.token && inputTwo.token && !isTiaWtia && isValid && quote && (
+        <TransactionInfo
+          info={info}
+          token0={token0}
+          token1={token1}
+          oneToOneQuote={oneToOneQuote}
+          quote={quote}
+        />
+      )}
     </section>
   );
 };
