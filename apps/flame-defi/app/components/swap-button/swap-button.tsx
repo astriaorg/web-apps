@@ -1,9 +1,16 @@
-import { motion } from "motion/react";
+import { motion, type Transition } from "motion/react";
 import { useCallback, useState } from "react";
 
 import { Button, type ButtonProps } from "@repo/ui/components";
 import { SwapVerticalIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
+
+export const SWAP_BUTTON_TRANSITION: Transition = {
+  duration: 0.1,
+  type: "spring",
+  damping: 30,
+  stiffness: 500,
+};
 
 const CornerMask = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => {
   return (
@@ -24,7 +31,16 @@ const CornerMask = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => {
   );
 };
 
-export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
+interface SwapButtonProps extends ButtonProps {
+  icon?: React.ReactNode;
+}
+
+export const SwapButton = ({
+  icon = <SwapVerticalIcon />,
+  className,
+  onClick,
+  ...props
+}: SwapButtonProps) => {
   const [isRotated, setIsRotated] = useState(false);
 
   const handleClick = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
@@ -67,7 +83,7 @@ export const SwapButton = ({ className, onClick, ...props }: ButtonProps) => {
           animate={{ scaleY: isRotated ? -1 : 1 }}
           transition={{ duration: 0.2 }}
         >
-          <SwapVerticalIcon />
+          {icon}
         </motion.div>
       </Button>
     </div>

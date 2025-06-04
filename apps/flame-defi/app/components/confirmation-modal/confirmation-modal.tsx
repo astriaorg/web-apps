@@ -38,7 +38,7 @@ export function ConfirmationModal({
         asChild
         className={cn("w-full", !showOpenButton && "hidden")}
       >
-        <Button onClick={handleOpenModal} className="w-full mt-2">
+        <Button onClick={handleOpenModal} className="w-full mt-8">
           {buttonText}
         </Button>
       </DialogTrigger>

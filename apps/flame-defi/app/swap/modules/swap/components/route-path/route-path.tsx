@@ -51,32 +51,29 @@ export const RoutePath = ({
     <Accordion type="single" collapsible>
       <AccordionItem
         value="transaction-details"
-        className="text-grey-light text-sm border-b-0"
+        className="text-typography-subdued text-sm border-b-0"
       >
-        <div className="flex items-center justify-between">
-          <Skeleton
-            className="rounded w-[100px] h-[25px] mt-3"
-            isLoading={loading}
-          >
-            <AccordionTrigger className="cursor-pointer text-orange-soft p-2 bg-semi-white text-white border border-border hover:border-orange-soft cursor-pointer transition rounded-xl hover:no-underline">
+        <Skeleton isLoading={loading}>
+          <div className="flex items-center justify-between">
+            <AccordionTrigger className="flex items-center gap-2 px-3 py-2 text-typography-subdued font-medium rounded-xl border border-typography-subdued">
               <PathIcon size={20} />
-              <span className="text-sm px-2">Auto Router</span>
+              Auto Router
             </AccordionTrigger>
-          </Skeleton>
-        </div>
+          </div>
+        </Skeleton>
         <AccordionContent className="relative">
           <div className="relative flex items-center gap-1 md:gap-2 justify-between w-full px-0 py-4 md:p-4">
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-b-[5px] border-dotted border-border overflow-hidden" />
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-b-4 border-dotted border-stroke-default overflow-hidden" />
             <div className="flex items-center gap-2">
               {symbolIn && <TokenIcon symbol={symbolIn} className="z-10" />}
-              <div className="text-xs md:text-sm z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white">
+              <div className="text-xs md:text-sm z-10 bg-surface-inverted-subdued rounded-xl p-1 md:p-2 text-typography-inverted">
                 100%
               </div>
             </div>
             {routeData.map((item) => (
               <div
                 key={item.symbolOne}
-                className="text-xs md:text-sm flex items-center gap-2 z-10 bg-grey-dark rounded-xl p-1 md:p-2 text-white"
+                className="text-xs md:text-sm flex items-center gap-2 z-10 bg-surface-inverted-subdued rounded-xl p-1 md:p-2 text-typography-inverted"
               >
                 {item.symbolOne && item.symbolTwo && (
                   <MultiTokenIcon symbols={[item.symbolOne, item.symbolTwo]} />

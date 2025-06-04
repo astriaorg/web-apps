@@ -1,15 +1,17 @@
 import type { EvmCurrency } from "@repo/flame-types";
 import {
-  TokenAmountInput as BaseTokenAmountInput,
   TokenAmountInputBalance,
-  type TokenAmountInputBalanceProps as BaseTokenAmountInputBalanceProps,
+  type TokenAmountInputBalanceProps,
+} from "components/token-amount-input-balance";
+import { TokenSelect } from "components/token-select";
+import {
+  TokenAmountInput as BaseTokenAmountInput,
   type TokenAmountInputProps as BaseTokenAmountInputProps,
 } from "pool/components/token-amount-input";
-import { TokenSelect } from "pool/components/token-select";
 
 interface TokenAmountInputProps
   extends BaseTokenAmountInputProps,
-    BaseTokenAmountInputBalanceProps {
+    TokenAmountInputBalanceProps {
   options: EvmCurrency[];
   selectedToken?: EvmCurrency;
   setSelectedToken: (value?: EvmCurrency) => void;

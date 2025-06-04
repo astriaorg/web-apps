@@ -139,13 +139,13 @@ export const useTransactionInfo = ({
   token0,
   token1,
   tradeType,
-  validSwapInputs,
+  isValid,
 }: {
   quote: GetQuoteResult | null;
   token0: TokenInputState;
   token1: TokenInputState;
   tradeType: TRADE_TYPE;
-  validSwapInputs: boolean;
+  isValid: boolean;
 }): TransactionInfo => {
   const { formatNumber } = useIntl();
   const {
@@ -156,10 +156,10 @@ export const useTransactionInfo = ({
   const swapSlippageTolerance = getSlippageTolerance();
 
   useEffect(() => {
-    if (tradeType === TRADE_TYPE.EXACT_OUT && validSwapInputs) {
+    if (tradeType === TRADE_TYPE.EXACT_OUT && isValid) {
       void fetchQuote();
     }
-  }, [tradeType, fetchQuote, validSwapInputs]);
+  }, [tradeType, fetchQuote, isValid]);
 
   const quoteData =
     tradeType === TRADE_TYPE.EXACT_IN ? quote : transactionQuote;

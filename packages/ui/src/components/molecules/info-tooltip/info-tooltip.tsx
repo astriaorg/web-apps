@@ -30,7 +30,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
           <span onClick={() => setOpen(!open)}>
             <InfoIcon
               size={16}
-              className="text-grey-light hover:text-white cursor-pointer"
+              className="text-typography-subdued hover:text-typography-default cursor-pointer"
             />
           </span>
         </TooltipTrigger>

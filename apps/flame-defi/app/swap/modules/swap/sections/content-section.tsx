@@ -1,8 +1,8 @@
 "use client";
 
 import debounce from "lodash.debounce";
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { useAccount } from "wagmi";
+import { motion } from "motion/react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
   EvmCurrency,
@@ -12,26 +12,27 @@ import {
   TransactionStatus,
 } from "@repo/flame-types";
 import { Button } from "@repo/ui/components";
-import { ArrowDownIcon } from "@repo/ui/icons";
-import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
-import { SettingsPopover } from "components/settings-popover/settings-popover";
+import { ConfirmationModal } from "components/confirmation-modal-v2";
+import { SWAP_BUTTON_TRANSITION, SwapButton } from "components/swap-button";
 import { useAstriaChainData } from "config";
+import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
 import {
-  useAstriaWallet,
-  useEvmCurrencyBalance,
-  useGetQuote,
-} from "features/evm-wallet";
+  TransactionSummary,
+  TransactionType,
+} from "swap/components/transaction-summary";
+import {
+  useOneToOneQuote,
+  useSwapButton,
+  useTransactionInfo,
+} from "swap/hooks";
+import { SwapInput } from "swap/modules/swap/components/swap-input";
+import { TransactionInfo } from "swap/modules/swap/components/transaction-info";
+import { InputId, SwapPairProps } from "swap/types";
 
-import { SwapInput, SwapTransactionSteps, TransactionInfo } from "./components";
-import { useOneToOneQuote, useSwapButton, useTransactionInfo } from "./hooks";
-import { SWAP_INPUT_ID, SwapPairProps } from "./types";
-
-export default function SwapPage(): React.ReactElement {
+export const ContentSection = () => {
   const { chain } = useAstriaChainData();
-  const { isConnectedToFlameChain } = useAstriaWallet();
   const { currencies } = chain;
-  const userAccount = useAccount();
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
   const [inputOne, setInputOne] = useState<TokenInputState>({
     token: currencies[0],
     value: "",
@@ -50,6 +51,8 @@ export default function SwapPage(): React.ReactElement {
     );
   }, [inputOne.token, inputTwo.token]);
 
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+    useState<boolean>(false);
   const [flipTokens, setFlipTokens] = useState(false);
   const [tradeType, setTradeType] = useState<TRADE_TYPE>(TRADE_TYPE.EXACT_IN);
   const {
@@ -61,23 +64,27 @@ export default function SwapPage(): React.ReactElement {
     cancelGetQuote,
   } = useGetQuote();
 
-  const { balance: inputOneBalance } = useEvmCurrencyBalance(inputOne.token);
-
-  const { balance: inputTwoBalance } = useEvmCurrencyBalance(inputTwo.token);
+  // TODO: Unify inputOne/INPUT_1 etc. into token0/token1.
+  const { balance: inputOneBalance, isLoading: isLoadingToken0Balance } =
+    useEvmCurrencyBalance(inputOne.token);
+  const { balance: inputTwoBalance, isLoading: isLoadingToken1Balance } =
+    useEvmCurrencyBalance(inputTwo.token);
 
   const swapInputs: SwapPairProps[] = [
     {
-      id: SWAP_INPUT_ID.INPUT_ONE,
+      id: InputId.INPUT_0,
       inputToken: inputOne,
       oppositeToken: inputTwo,
-      balance: inputOneBalance?.value || "0",
+      balance: inputOneBalance,
+      isBalanceLoading: isLoadingToken0Balance,
       label: flipTokens ? "Buy" : "Sell",
     },
     {
-      id: SWAP_INPUT_ID.INPUT_TWO,
+      id: InputId.INPUT_1,
       inputToken: inputTwo,
       oppositeToken: inputOne,
-      balance: inputTwoBalance?.value || "0",
+      balance: inputTwoBalance,
+      isBalanceLoading: isLoadingToken1Balance,
       label: flipTokens ? "Sell" : "Buy",
     },
   ];
@@ -93,22 +100,21 @@ export default function SwapPage(): React.ReactElement {
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
 
   const {
-    titleText,
+    title,
     hash,
-    onSubmitCallback,
+    onSubmit,
     buttonText,
-    actionButtonText,
-    validSwapInputs,
+    action,
+    isValid,
     status,
     setStatus,
-    message,
     tokenApprovalNeeded,
-    error: errorText,
-    setError: setErrorText,
+    error,
+    setError,
   } = useSwapButton({
     token0,
     token1,
-    token0Balance,
+    token0Balance: token0Balance?.value || "0",
     quote,
     loading,
     error: quoteError,
@@ -120,7 +126,7 @@ export default function SwapPage(): React.ReactElement {
     token0,
     token1,
     tradeType,
-    validSwapInputs,
+    isValid,
   });
 
   const debouncedGetQuoteRef = useRef(
@@ -129,16 +135,16 @@ export default function SwapPage(): React.ReactElement {
         tradeType: TRADE_TYPE,
         tokenIn: TokenInputState,
         tokenOut: TokenInputState,
-        inputId: SWAP_INPUT_ID,
+        inputId: InputId,
       ) => {
         getQuote(tradeType, tokenIn, tokenOut).then((res) => {
-          if (inputId === SWAP_INPUT_ID.INPUT_ONE && res) {
+          if (inputId === InputId.INPUT_0 && res) {
             setInputTwo((prev) => ({
               ...prev,
               value: res.quoteDecimals,
               isQuoteValue: true,
             }));
-          } else if (inputId === SWAP_INPUT_ID.INPUT_TWO && res) {
+          } else if (inputId === InputId.INPUT_1 && res) {
             setInputOne((prev) => ({
               ...prev,
               value: res.quoteDecimals,
@@ -163,12 +169,12 @@ export default function SwapPage(): React.ReactElement {
     setInputTwo({ token: token1.token, value: "", isQuoteValue: true });
     setQuote(null);
     setFlipTokens(false);
-    setStatus(undefined);
+    setStatus(TransactionStatus.IDLE);
   }, [setQuote, setStatus, token0, token1]);
 
   const handleInputChange = useCallback(
-    (value: string, inputId: SWAP_INPUT_ID) => {
-      setErrorText(null);
+    (value: string, inputId: InputId) => {
+      setError(undefined);
 
       // clear all values and cancel any current getQuotes if user zeros input
       if (value === "" || value === "0") {
@@ -182,13 +188,13 @@ export default function SwapPage(): React.ReactElement {
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+      if (inputId === InputId.INPUT_0) {
         newInputOne = { ...inputOne, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputTwo = { ...inputTwo, value: "", isQuoteValue: true };
         setInputOne(newInputOne);
         setInputTwo(newInputTwo);
-      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+      } else if (inputId === InputId.INPUT_1) {
         newInputTwo = { ...inputTwo, value, isQuoteValue: false };
         // zero out the other input's value and set it as the quoted value when user types in an input
         newInputOne = { ...inputOne, value: "", isQuoteValue: true };
@@ -230,26 +236,26 @@ export default function SwapPage(): React.ReactElement {
         );
       }
     },
-    [setErrorText, inputOne, inputTwo, flipTokens, cancelGetQuote],
+    [setError, inputOne, inputTwo, flipTokens, cancelGetQuote],
   );
 
   const handleTokenSelect = useCallback(
     (
       selectedToken: EvmCurrency,
       oppositeTokenInput: TokenInputState,
-      inputId: SWAP_INPUT_ID,
+      inputId: InputId,
     ) => {
-      setErrorText(null);
+      setError(undefined);
 
       // we won't have up-to-date inputs after setting them in state,
       // so calculate them here so we can use them to get the quote
       let newInputOne = inputOne;
       let newInputTwo = inputTwo;
 
-      if (inputId === SWAP_INPUT_ID.INPUT_ONE) {
+      if (inputId === InputId.INPUT_0) {
         newInputOne = { ...inputOne, token: selectedToken };
         setInputOne(newInputOne);
-      } else if (inputId === SWAP_INPUT_ID.INPUT_TWO) {
+      } else if (inputId === InputId.INPUT_1) {
         newInputTwo = { ...inputTwo, token: selectedToken };
         setInputTwo(newInputTwo);
       }
@@ -285,7 +291,7 @@ export default function SwapPage(): React.ReactElement {
         );
       }
     },
-    [setErrorText, inputOne, inputTwo, flipTokens, tradeType, getQuote],
+    [setError, inputOne, inputTwo, flipTokens, tradeType, getQuote],
   );
 
   // toggle tradeType and flipTokens and get new quote accordingly
@@ -315,129 +321,123 @@ export default function SwapPage(): React.ReactElement {
   };
 
   const handleCloseModal = useCallback(() => {
-    setModalOpen(false);
+    setIsConfirmationModalOpen(false);
     if (
       status === TransactionStatus.SUCCESS ||
-      status === undefined ||
+      status === TransactionStatus.IDLE ||
       status === TransactionStatus.FAILED
     ) {
       handleResetInputs();
     }
   }, [handleResetInputs, status]);
 
-  const handleOpenModal = useCallback(() => {
-    setModalOpen(true);
+  const handleOpenConfirmationModal = useCallback(() => {
+    if (tokenApprovalNeeded) {
+      onSubmit();
+      return;
+    }
+
+    setIsConfirmationModalOpen(true);
+
     if (isTiaWtia) {
-      onSubmitCallback();
+      onSubmit();
     } else {
       setStatus(TransactionStatus.IDLE);
     }
-  }, [isTiaWtia, onSubmitCallback, setStatus]);
+  }, [isTiaWtia, tokenApprovalNeeded, onSubmit, setStatus]);
 
-  const handleModalActionButton = useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
-      onSubmitCallback();
+      onSubmit();
     }
-  }, [handleCloseModal, onSubmitCallback, status]);
+  }, [handleCloseModal, onSubmit, status]);
 
   return (
-    <section className="min-h-[calc(100vh-85px-96px)] flex flex-col mt-[100px]">
-      <div className="max-w-[550px] w-full mx-auto gradient-container">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg md:text-2xl font-medium">Swap</h2>
-          <SettingsPopover />
-        </div>
-        <div className="relative flex flex-col items-center">
-          <div className="flex flex-col gap-1 w-full">
-            {swapPairs.map(
-              ({ id, inputToken, oppositeToken, balance, label }, index) => (
-                <SwapInput
-                  availableTokens={currencies}
-                  balance={balance}
-                  id={id}
-                  inputToken={inputToken}
-                  key={index}
-                  label={label}
-                  onInputChange={handleInputChange}
-                  onTokenSelect={handleTokenSelect}
-                  oppositeToken={oppositeToken}
-                  isQuoteLoading={loading}
-                />
-              ),
-            )}
-          </div>
-          <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-center">
-            <button
-              type="button"
-              className="z-10 cursor-pointer p-1 bg-grey-dark hover:bg-black transition rounded-xl border-4 border-black"
-              onClick={handleArrowClick}
-            >
-              <ArrowDownIcon aria-label="Swap" size={28} />
-            </button>
-          </div>
-        </div>
-        {userAccount.address &&
-          !validSwapInputs &&
-          !tokenApprovalNeeded &&
-          isConnectedToFlameChain && (
-            <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
-              {buttonText}
-            </div>
-          )}
-        <ConfirmationModal
-          open={modalOpen}
-          buttonText={buttonText}
-          actionButtonText={actionButtonText}
-          showOpenButton={Boolean(validSwapInputs && !tokenApprovalNeeded)}
-          handleOpenModal={handleOpenModal}
-          handleModalActionButton={handleModalActionButton}
-          handleCloseModal={handleCloseModal}
-          title={titleText}
-        >
-          <SwapTransactionSteps
-            status={status}
-            info={info}
-            token0={token0}
-            token1={token1}
-            isTiaWtia={isTiaWtia}
-            oneToOneQuote={oneToOneQuote}
-            hash={hash}
-            message={message}
-            isQuoteLoading={loading}
-          />
-        </ConfirmationModal>
-        {(!userAccount.address ||
-          tokenApprovalNeeded ||
-          !isConnectedToFlameChain) && (
-          <Button
-            variant="gradient"
-            onClick={onSubmitCallback}
-            className="w-full mt-2"
+    <section>
+      <div className="relative flex flex-col items-center">
+        <div className="flex flex-col w-full">
+          <motion.div
+            layout
+            transition={SWAP_BUTTON_TRANSITION}
+            key={flipTokens ? InputId.INPUT_1 : InputId.INPUT_0}
           >
-            {buttonText}
-          </Button>
-        )}
-        {errorText && (
-          <div className="flex items-center justify-center text-red text-sm mt-4">
-            {errorText}
-          </div>
-        )}
-        {inputOne.token &&
-          inputTwo.token &&
-          !isTiaWtia &&
-          validSwapInputs &&
-          quote && (
-            <TransactionInfo
-              info={info}
-              token0={token0}
-              token1={token1}
-              oneToOneQuote={oneToOneQuote}
-              quote={quote}
+            <SwapInput
+              availableTokens={currencies}
+              balance={swapPairs[0].balance}
+              id={swapPairs[0].id}
+              inputToken={swapPairs[0].inputToken}
+              label={swapPairs[0].label}
+              onInputChange={handleInputChange}
+              onTokenSelect={handleTokenSelect}
+              oppositeToken={swapPairs[0].oppositeToken}
+              isQuoteLoading={loading}
+              isBalanceLoading={isLoadingToken0Balance}
             />
-          )}
+          </motion.div>
+          <SwapButton onClick={handleArrowClick} />
+          <motion.div
+            layout
+            transition={SWAP_BUTTON_TRANSITION}
+            key={flipTokens ? InputId.INPUT_0 : InputId.INPUT_1}
+          >
+            <SwapInput
+              availableTokens={currencies}
+              balance={swapPairs[1].balance}
+              id={swapPairs[1].id}
+              inputToken={swapPairs[1].inputToken}
+              label={swapPairs[1].label}
+              onInputChange={handleInputChange}
+              onTokenSelect={handleTokenSelect}
+              oppositeToken={swapPairs[1].oppositeToken}
+              isQuoteLoading={loading}
+              isBalanceLoading={isLoadingToken1Balance}
+            />
+          </motion.div>
+        </div>
       </div>
+      <ConfirmationModal
+        title={title}
+        open={isConfirmationModalOpen}
+        onOpenChange={handleCloseModal}
+      >
+        {token0.token && token1.token && (
+          <TransactionSummary
+            type={TransactionType.SWAP}
+            token0={token0.token}
+            token1={token1.token}
+            hash={hash}
+            status={status}
+            error={error}
+            onSubmit={handleSubmit}
+            action={action}
+            fee={info.gasUseEstimateUSD}
+            amountOut={info.expectedOutputFormatted}
+            amountMin={info.minimumReceived}
+            amount0={token0.value}
+            amount1={token1.value}
+            priceImpact={info.priceImpact}
+            frontendFeeEstimate={info.frontendFeeEstimate}
+          />
+        )}
+      </ConfirmationModal>
+      <Button
+        onClick={handleOpenConfirmationModal}
+        className="w-full mt-8"
+        disabled={!isValid || oneToOneQuote.oneToOneLoading}
+      >
+        {buttonText}
+      </Button>
+      {inputOne.token && inputTwo.token && !isTiaWtia && isValid && quote && (
+        <TransactionInfo
+          info={info}
+          token0={token0}
+          token1={token1}
+          oneToOneQuote={oneToOneQuote}
+          quote={quote}
+        />
+      )}
     </section>
   );
-}
+};

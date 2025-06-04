@@ -105,7 +105,7 @@ export const useGetQuote = () => {
           console.warn("Fetch aborted");
         } else {
           console.warn(err);
-          setError("error fetching quote");
+          setError("Error fetching quote.");
           throw err;
         }
       } finally {
