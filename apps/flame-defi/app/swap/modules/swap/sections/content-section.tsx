@@ -3,7 +3,6 @@
 import debounce from "lodash.debounce";
 import { motion } from "motion/react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useAccount } from "wagmi";
 
 import {
   EvmCurrency,
@@ -33,7 +32,6 @@ import { InputId, SwapPairProps } from "swap/types";
 export const ContentSection = () => {
   const { chain } = useAstriaChainData();
   const { currencies } = chain;
-  const userAccount = useAccount();
 
   const [inputOne, setInputOne] = useState<TokenInputState>({
     token: currencies[0],
@@ -327,7 +325,7 @@ export const ContentSection = () => {
     setIsConfirmationModalOpen(false);
     if (
       status === TransactionStatus.SUCCESS ||
-      status === undefined ||
+      status === TransactionStatus.IDLE ||
       status === TransactionStatus.FAILED
     ) {
       handleResetInputs();

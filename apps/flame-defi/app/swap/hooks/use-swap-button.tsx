@@ -51,7 +51,7 @@ interface SwapButtonReturn {
   /** Whether all swap inputs are valid and ready for submission */
   validSwapInputs: boolean;
   /** Current transaction status */
-  status?: TransactionStatus;
+  status: TransactionStatus;
   /** Function to update the transaction status */
   setStatus: (status: TransactionStatus) => void;
   /** Optional message to display (usually for errors) */
