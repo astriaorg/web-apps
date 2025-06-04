@@ -1,6 +1,5 @@
-import { useAddRecentTransaction } from "@rainbow-me/rainbowkit";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { type Address, Chain, type Hash } from "viem";
+import type { Address, Hash } from "viem";
 import {
   useAccount,
   useConfig as useWagmiConfig,
@@ -8,7 +7,7 @@ import {
 } from "wagmi";
 
 import {
-  evmChainToRainbowKitChain,
+  evmChainToViemChain,
   GetQuoteResult,
   TokenInputState,
 } from "@repo/flame-types";
@@ -34,6 +33,33 @@ interface SwapButtonProps {
   tradeType: TRADE_TYPE;
 }
 
+interface SwapButtonReturn {
+  /** Transaction hash after submission */
+  hash?: Hash;
+  /** Text to display in the modal title */
+  titleText: string;
+  /** Callback function that handles wallet connection, chain switching, token approval, and swap execution based on current state */
+  onSubmitCallback: () => void;
+  /** Text to display on the main swap button */
+  buttonText: string;
+  /** Current error message if any */
+  error: string | null;
+  /** Function to set the current error state */
+  setError: (error: string | null) => void;
+  /** Text to display on the confirmation button in the modal */
+  actionButtonText: string;
+  /** Whether all swap inputs are valid and ready for submission */
+  validSwapInputs: boolean;
+  /** Current transaction status */
+  status?: TransactionStatus;
+  /** Function to update the transaction status */
+  setStatus: (status?: TransactionStatus) => void;
+  /** Optional message to display (usually for errors) */
+  message?: string;
+  /** Whether token approval is needed before swap can proceed */
+  tokenApprovalNeeded: boolean;
+}
+
 export function useSwapButton({
   token0: topToken,
   token1: bottomToken,
@@ -42,14 +68,14 @@ export function useSwapButton({
   loading,
   error: quoteError,
   tradeType,
-}: SwapButtonProps) {
+}: SwapButtonProps): SwapButtonReturn {
   const { chain } = useAstriaChainData();
   const { feeRecipient } = useConfig();
   const config = useWagmiConfig();
   const userAccount = useAccount();
+  const { connectWallet, connectToFlame, isConnectedToFlameChain } =
+    useAstriaWallet();
   const slippageTolerance = getSlippageTolerance();
-  const addRecentTransaction = useAddRecentTransaction();
-  const { connectWallet } = useAstriaWallet();
   const [status, setStatus] = useState<TransactionStatus | undefined>(
     undefined,
   );
@@ -99,10 +125,6 @@ export function useSwapButton({
     }
     if (result.data?.status === "success") {
       setStatus(TransactionStatus.SUCCESS);
-      addRecentTransaction({
-        hash: hash || "",
-        description: "Successful transaction",
-      });
     } else if (result.data?.status === "reverted") {
       setStatus(TransactionStatus.FAILED);
       handleTransactionModalErrorMsgs("", "Transaction reverted");
@@ -110,7 +132,7 @@ export function useSwapButton({
       setStatus(TransactionStatus.FAILED);
       handleTransactionModalErrorMsgs("", "Transaction failed");
     }
-  }, [result.data, hash, addRecentTransaction, userAccount.address]);
+  }, [result.data, hash, userAccount.address]);
 
   const handleWrap = async (type: "wrap" | "unwrap") => {
     const wtiaAddress = chain.contracts.wrappedNativeToken?.address;
@@ -174,7 +196,7 @@ export function useSwapButton({
       const swapRouterService = createSwapRouterService(
         config,
         swapRouterAddress as Address,
-        evmChainToRainbowKitChain(chain) as Chain,
+        evmChainToViemChain(chain),
       );
 
       const options = {
@@ -227,6 +249,8 @@ export function useSwapButton({
     switch (true) {
       case !userAccount.address:
         return connectWallet();
+      case !isConnectedToFlameChain:
+        return connectToFlame();
       case tokenNeedingApproval !== null:
         return handleTokenApproval(tokenNeedingApproval);
       case unwrapTia:
@@ -245,6 +269,8 @@ export function useSwapButton({
     switch (true) {
       case !userAccount.address:
         return "Connect Wallet";
+      case !isConnectedToFlameChain:
+        return "Switch to Flame Chain";
       case !topToken.token || !bottomToken.token:
         return "Select a token";
       case tokenNeedingApproval !== null &&
