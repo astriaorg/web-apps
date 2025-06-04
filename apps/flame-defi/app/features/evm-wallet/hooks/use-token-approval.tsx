@@ -18,8 +18,8 @@ type TokenApprovalProps = {
   // FIXME - could we remove these callbacks and instead return the hash from
   //  handleTokenApproval and try/catch errors at the calling site?
   setStatus: (status: TransactionStatus) => void;
-  setHash: (hash?: Hash) => void;
-  setError: (error: string) => void;
+  setHash: (value?: Hash) => void;
+  setError: (value?: Error) => void;
 };
 
 /**
@@ -176,7 +176,7 @@ export const useTokenApproval = ({
         return;
       } else {
         console.warn(error);
-        setError("Error approving token.");
+        setError(new Error("Error approving token."));
         setStatus(TransactionStatus.FAILED);
       }
 

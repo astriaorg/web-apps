@@ -100,18 +100,17 @@ export const ContentSection = () => {
   const oneToOneQuote = useOneToOneQuote(inputOne.token, inputTwo.token);
 
   const {
-    titleText,
+    title,
     hash,
-    onSubmitCallback,
+    onSubmit,
     buttonText,
-    actionButtonText,
+    action,
     validSwapInputs,
     status,
     setStatus,
-    message,
     tokenApprovalNeeded,
-    error: errorText,
-    setError: setErrorText,
+    error,
+    setError,
   } = useSwapButton({
     token0,
     token1,
@@ -175,7 +174,7 @@ export const ContentSection = () => {
 
   const handleInputChange = useCallback(
     (value: string, inputId: InputId) => {
-      setErrorText(null);
+      setError(undefined);
 
       // clear all values and cancel any current getQuotes if user zeros input
       if (value === "" || value === "0") {
@@ -237,7 +236,7 @@ export const ContentSection = () => {
         );
       }
     },
-    [setErrorText, inputOne, inputTwo, flipTokens, cancelGetQuote],
+    [setError, inputOne, inputTwo, flipTokens, cancelGetQuote],
   );
 
   const handleTokenSelect = useCallback(
@@ -246,7 +245,7 @@ export const ContentSection = () => {
       oppositeTokenInput: TokenInputState,
       inputId: InputId,
     ) => {
-      setErrorText(null);
+      setError(undefined);
 
       // we won't have up-to-date inputs after setting them in state,
       // so calculate them here so we can use them to get the quote
@@ -292,7 +291,7 @@ export const ContentSection = () => {
         );
       }
     },
-    [setErrorText, inputOne, inputTwo, flipTokens, tradeType, getQuote],
+    [setError, inputOne, inputTwo, flipTokens, tradeType, getQuote],
   );
 
   // toggle tradeType and flipTokens and get new quote accordingly
@@ -334,26 +333,26 @@ export const ContentSection = () => {
 
   const handleOpenConfirmationModal = useCallback(() => {
     if (tokenApprovalNeeded) {
-      onSubmitCallback();
+      onSubmit();
       return;
     }
 
     setIsConfirmationModalOpen(true);
 
     if (isTiaWtia) {
-      onSubmitCallback();
+      onSubmit();
     } else {
       setStatus(TransactionStatus.IDLE);
     }
-  }, [isTiaWtia, tokenApprovalNeeded, onSubmitCallback, setStatus]);
+  }, [isTiaWtia, tokenApprovalNeeded, onSubmit, setStatus]);
 
   const handleSubmit = useCallback(() => {
     if (status !== TransactionStatus.IDLE) {
       handleCloseModal();
     } else {
-      onSubmitCallback();
+      onSubmit();
     }
-  }, [handleCloseModal, onSubmitCallback, status]);
+  }, [handleCloseModal, onSubmit, status]);
 
   return (
     <section>
@@ -399,7 +398,7 @@ export const ContentSection = () => {
         </div>
       </div>
       <ConfirmationModal
-        title={titleText}
+        title={title}
         open={isConfirmationModalOpen}
         onOpenChange={handleCloseModal}
       >
@@ -410,11 +409,9 @@ export const ContentSection = () => {
             token1={token1.token}
             hash={hash}
             status={status}
-            // TODO: Fix error type.
-            error={new Error(errorText || "")}
+            error={error}
             onSubmit={handleSubmit}
-            // TODO: Get action message.
-            action={actionButtonText}
+            action={action}
             fee={info.gasUseEstimateUSD}
             amountOut={info.expectedOutputFormatted}
             amountMin={info.minimumReceived}
@@ -432,11 +429,6 @@ export const ContentSection = () => {
       >
         {buttonText}
       </Button>
-      {errorText && (
-        <div className="flex items-center justify-center text-danger text-sm mt-4">
-          {errorText}
-        </div>
-      )}
       {inputOne.token &&
         inputTwo.token &&
         !isTiaWtia &&
