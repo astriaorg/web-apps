@@ -23,7 +23,7 @@ Object.defineProperties(global, {
   TextDecoder: { value: TextDecoder },
   TextEncoder: { value: TextEncoder },
 });
-global.setImmediate = jest.useRealTimers as unknown as typeof setImmediate;
+globalThis.setImmediate = jest.useRealTimers as unknown as typeof setImmediate;
 
 // mock styles used by cosmos-kit
 jest.mock("@interchain-ui/react/styles", () => ({}), { virtual: true });
@@ -91,6 +91,20 @@ jest.mock("wagmi", () => {
     })),
   };
 });
+
+// mock Privy
+jest.mock("@privy-io/react-auth", () => ({
+  usePrivy: jest.fn(() => ({
+    login: jest.fn(),
+    logout: jest.fn(),
+    ready: true,
+    authenticated: false,
+  })),
+  useWallets: jest.fn(() => ({
+    wallets: [],
+  })),
+  PrivyProvider: jest.fn(({ children }) => children),
+}));
 
 // mock osmojs
 jest.mock("osmojs", () => ({

@@ -29,7 +29,7 @@ test("should connect wallet using navigation menu wallet connector button", asyn
   // The button is inside a nav element with the "Connect Wallet" text
   await page.locator('nav button:has-text("Connect Wallet")').click();
 
-  // RainbowKit modal opens - click on the MetaMask button
+  // Privy modal opens - click on the MetaMask button
   await page.locator('button:has-text("MetaMask")').click();
 
   // Connect MetaMask to the dapp (this handles the MetaMask approval popup)

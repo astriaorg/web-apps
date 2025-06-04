@@ -16,7 +16,11 @@ import { ArrowDownIcon } from "@repo/ui/icons";
 import { ConfirmationModal } from "components/confirmation-modal/confirmation-modal";
 import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useAstriaChainData } from "config";
-import { useEvmCurrencyBalance, useGetQuote } from "features/evm-wallet";
+import {
+  useAstriaWallet,
+  useEvmCurrencyBalance,
+  useGetQuote,
+} from "features/evm-wallet";
 
 import { SwapInput, SwapTransactionSteps, TransactionInfo } from "./components";
 import { useOneToOneQuote, useSwapButton, useTransactionInfo } from "./hooks";
@@ -24,6 +28,7 @@ import { SWAP_INPUT_ID, SwapPairProps } from "./types";
 
 export default function SwapPage(): React.ReactElement {
   const { chain } = useAstriaChainData();
+  const { isConnectedToFlameChain } = useAstriaWallet();
   const { currencies } = chain;
   const userAccount = useAccount();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -101,20 +106,21 @@ export default function SwapPage(): React.ReactElement {
     error: errorText,
     setError: setErrorText,
   } = useSwapButton({
-    token0: token0,
-    token1: token1,
-    token0Balance: token0Balance,
+    token0,
+    token1,
+    token0Balance,
     quote,
     loading,
     error: quoteError,
     tradeType,
   });
+
   const info = useTransactionInfo({
     quote,
-    token0: token0,
-    token1: token1,
+    token0,
+    token1,
     tradeType,
-    validSwapInputs: validSwapInputs,
+    validSwapInputs,
   });
 
   const debouncedGetQuoteRef = useRef(
@@ -372,11 +378,14 @@ export default function SwapPage(): React.ReactElement {
             </button>
           </div>
         </div>
-        {userAccount.address && !validSwapInputs && !tokenApprovalNeeded && (
-          <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
-            {buttonText}
-          </div>
-        )}
+        {userAccount.address &&
+          !validSwapInputs &&
+          !tokenApprovalNeeded &&
+          isConnectedToFlameChain && (
+            <div className="flex items-center justify-center text-grey-light font-semibold px-4 py-3 rounded-xl bg-semi-white mt-2">
+              {buttonText}
+            </div>
+          )}
         <ConfirmationModal
           open={modalOpen}
           buttonText={buttonText}
@@ -399,7 +408,9 @@ export default function SwapPage(): React.ReactElement {
             isQuoteLoading={loading}
           />
         </ConfirmationModal>
-        {(!userAccount.address || tokenApprovalNeeded) && (
+        {(!userAccount.address ||
+          tokenApprovalNeeded ||
+          !isConnectedToFlameChain) && (
           <Button
             variant="gradient"
             onClick={onSubmitCallback}

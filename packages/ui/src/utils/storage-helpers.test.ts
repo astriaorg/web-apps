@@ -6,7 +6,7 @@ import {
 
 describe("storage-helpers", () => {
   // Save the original localStorage
-  const originalLocalStorage = global.localStorage;
+  const originalLocalStorage = globalThis.localStorage;
 
   beforeEach(() => {
     // Mock localStorage before each test

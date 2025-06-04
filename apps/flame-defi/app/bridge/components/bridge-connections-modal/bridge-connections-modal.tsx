@@ -15,7 +15,7 @@ import {
   ConnectCosmosWalletButton,
   useCosmosWallet,
 } from "features/cosmos-wallet";
-import { ConnectEvmWalletButton, useEvmWallet } from "features/evm-wallet";
+import { ConnectEvmWalletButton, useAstriaWallet } from "features/evm-wallet";
 
 interface BridgeConnectionsModalProps {
   children?: React.ReactNode;
@@ -28,7 +28,7 @@ export function BridgeConnectionsModal({
 }: BridgeConnectionsModalProps): React.ReactElement {
   const [open, setOpen] = useState(false);
   const cosmosWallet = useCosmosWallet();
-  const evmWallet = useEvmWallet();
+  const astriaWallet = useAstriaWallet();
 
   // const handleOpenModal = () => {
   //   setOpen(true);
@@ -57,7 +57,7 @@ export function BridgeConnectionsModal({
             </button>
           </div>
           <div className="flex flex-col gap-4">
-            {evmWallet.evmAccountAddress ? (
+            {astriaWallet.accountAddress ? (
               <div className="mb-2">
                 <ConnectEvmWalletButton />
               </div>

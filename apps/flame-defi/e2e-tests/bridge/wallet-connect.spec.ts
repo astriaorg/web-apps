@@ -34,7 +34,7 @@ test("should connect EVM wallet from bridge connections modal", async ({
   // (In this test, we're targeting the first wallet connect button in the modal, which should be EVM)
   await page.locator('button:has-text("EVM Wallet")').click();
 
-  // RainbowKit modal opens - click on the MetaMask button
+  // Modal opens - click on the MetaMask button
   await page.locator('button:has-text("MetaMask")').click();
 
   // Wait for MetaMask to load and handle the connection
