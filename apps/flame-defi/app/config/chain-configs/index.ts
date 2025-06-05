@@ -1,6 +1,5 @@
 import {
   AstriaChains,
-  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
   EvmChainInfo,
@@ -15,7 +14,6 @@ import * as mainnet from "./chain-configs-mainnet";
 export interface ChainConfigsObject {
   astriaChains: AstriaChains;
   cosmosChains: CosmosChains;
-  coinbaseChains: CoinbaseChains;
 }
 
 export type FlameNetworkConfig = ChainConfigsObject & {
@@ -29,25 +27,21 @@ const NETWORK_CONFIGS: NetworkConfigs = {
     name: FlameNetwork.LOCAL,
     astriaChains: local.astriaChains,
     cosmosChains: local.cosmosChains,
-    coinbaseChains: local.coinbaseChains,
   },
   [FlameNetwork.DUSK]: {
     name: FlameNetwork.DUSK,
     astriaChains: dusk.astriaChains,
     cosmosChains: dusk.cosmosChains,
-    coinbaseChains: dusk.coinbaseChains,
   },
   [FlameNetwork.DAWN]: {
     name: FlameNetwork.DAWN,
     astriaChains: dawn.astriaChains,
     cosmosChains: dawn.cosmosChains,
-    coinbaseChains: dawn.coinbaseChains,
   },
   [FlameNetwork.MAINNET]: {
     name: FlameNetwork.MAINNET,
     astriaChains: mainnet.astriaChains,
     cosmosChains: mainnet.cosmosChains,
-    coinbaseChains: mainnet.coinbaseChains,
   },
 };
 
@@ -68,21 +62,17 @@ export function getChainConfigs(network: FlameNetwork): FlameNetworkConfig {
 export function getAllChainConfigs(): {
   astriaChains: EvmChainInfo[];
   cosmosChains: CosmosChainInfo[];
-  coinbaseChains: EvmChainInfo[];
 } {
   const astriaChains: EvmChainInfo[] = [];
   const cosmosChains: CosmosChainInfo[] = [];
-  const coinbaseChains: EvmChainInfo[] = [];
 
   for (const config of Object.values(NETWORK_CONFIGS)) {
     astriaChains.push(...Object.values(config.astriaChains));
     cosmosChains.push(...Object.values(config.cosmosChains));
-    coinbaseChains.push(...Object.values(config.coinbaseChains));
   }
 
   return {
     astriaChains,
     cosmosChains,
-    coinbaseChains,
   };
 }

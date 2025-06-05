@@ -53,7 +53,7 @@ export const ContentSection = () => {
   const { isLoading, executeWithdraw } = useWithdrawTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+  const { astriaChains, cosmosChains } = useConfig();
 
   const {
     sourceChainOptions,
@@ -64,7 +64,6 @@ export const ContentSection = () => {
   } = useBridgeOptions({
     sourceChains: [...Object.values(astriaChains)],
     destinationChains: [
-      ...Object.values(coinbaseChains),
       ...Object.values(cosmosChains),
     ],
   });

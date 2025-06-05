@@ -2,10 +2,8 @@ import {
   AstriaChain,
   AstriaChains,
   ChainType,
-  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
-  EvmChainInfo,
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
@@ -319,45 +317,3 @@ export const astriaChains: AstriaChains = {
   Fake: FakeChainInfo,
 };
 
-const BaseChainInfo: EvmChainInfo = {
-  chainType: ChainType.EVM,
-  chainId: 84532,
-  chainName: "Base Sepolia",
-  rpcUrls: ["https://sepolia.base.org"],
-  blockExplorerUrl: "https://sepolia.basescan.org",
-  contracts: {},
-  currencies: [
-    // NOTE - this is really only here to satisfy the config needed
-    //  for wagmi providers. it's not used atm.
-    new EvmCurrency({
-      chainId: 84532,
-      title: "Ether",
-      coinDenom: "ETH",
-      // is gwei correct?
-      coinMinimalDenom: "gwei",
-      coinDecimals: 18,
-      wrapped: null,
-      isNative: true,
-      isWrappedNative: false,
-      isBridgeable: false,
-    }),
-    new EvmCurrency({
-      chainId: 84532,
-      coinDenom: "USDC",
-      title: "USDC",
-      coinMinimalDenom: "uusdc",
-      coinDecimals: 6,
-      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
-      astriaIntentBridgeAddress: "0x",
-      wrapped: null,
-      isNative: false,
-      isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: false,
-      IconComponent: UsdcIcon,
-    }),
-  ],
-  IconComponent: BaseIcon,
-};
-
-export const coinbaseChains: CoinbaseChains = {};
