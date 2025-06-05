@@ -36,4 +36,4 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           timeout_minutes: "60"
-          allowed_tools: "Bash(git status),Bash(git log),Bash(git show),Bash(git blame),Bash(git reflog),Bash(git stash list),Bash(git ls-files),Bash(git branch),Bash(git tag),Bash(git diff),Bash(npm install),Bash(npm run lint),Bash(npm run format:check),Bash(npm run check-types),View,GlobTool,GrepTool,BatchTool"
+          allowed_tools: "Bash(git status),Bash(git log),Bash(git show),Bash(git blame),Bash(git reflog),Bash(git stash list),Bash(git ls-files),Bash(git branch),Bash(git tag),Bash(git diff),Bash(npm install),Bash(npm run lint),Bash(npm run format:check),Bash(npm run check-types),Bash(npm run test),View,GlobTool,GrepTool,BatchTool"
