@@ -11,7 +11,6 @@ import {
 } from "@repo/flame-types";
 import {
   AstriaIcon,
-  BaseIcon,
   CelestiaIcon,
   DropTiaIcon,
   MilkTiaIcon,
@@ -458,46 +457,4 @@ export const astriaChains: AstriaChains = {
   Astria: AstriaChainInfo,
 };
 
-const BaseChainInfo: EvmChainInfo = {
-  chainType: ChainType.EVM,
-  chainId: 8453,
-  chainName: "Base",
-  rpcUrls: ["https://mainnet.base.org"],
-  blockExplorerUrl: "https://basescan.org/",
-  contracts: {},
-  currencies: [
-    // NOTE - the native currency is really only here to satisfy the config needed
-    //  for wagmi providers. it's not used atm.
-    new EvmCurrency({
-      chainId: 8453,
-      title: "Ether",
-      coinDenom: "ETH",
-      // is gwei correct?
-      coinMinimalDenom: "gwei",
-      coinDecimals: 18,
-      wrapped: null,
-      isNative: true,
-      isWrappedNative: false,
-      isBridgeable: false,
-    }),
-    new EvmCurrency({
-      chainId: 8453,
-      title: "USDC",
-      coinDenom: "USDC",
-      coinMinimalDenom: "uusdc",
-      coinDecimals: 6,
-      erc20ContractAddress: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-      astriaIntentBridgeAddress: "0x685e7fEF1f7aF56A972540DE99CaB371cD9f8A87",
-      wrapped: null,
-      isNative: false,
-      isWrappedNative: false,
-      isBridgeable: true,
-      IconComponent: UsdcIcon,
-    }),
-  ],
-  IconComponent: BaseIcon,
-};
-
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
-};
+export const coinbaseChains: CoinbaseChains = {};

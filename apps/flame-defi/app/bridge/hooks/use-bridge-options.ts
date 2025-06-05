@@ -65,7 +65,7 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => c.isBridgeable)
+        .filter((c) => c.isBridgeable && c.coinDenom === "TIA")
         .map((c) => ({
           label: c.coinDenom,
           value: c,
@@ -82,7 +82,7 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => c.isBridgeable)
+        .filter((c) => c.isBridgeable && c.coinDenom === "TIA")
         .map((currency) => ({
           label: currency.coinDenom,
           value: currency,
