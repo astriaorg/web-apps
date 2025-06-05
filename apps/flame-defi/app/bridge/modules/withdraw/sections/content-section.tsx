@@ -304,27 +304,7 @@ export const ContentSection = () => {
   ]);
 
   const ibcWithdrawFeeDisplay = useMemo(() => {
-    const destinationChainNativeToken =
-      destinationConnection.chain?.currencies.find(
-        (currency) => currency.isNative,
-      );
-
-    if (
-      !destinationChainNativeToken ||
-      !destinationConnection.currency ||
-      !(
-        destinationConnection.currency instanceof EvmCurrency &&
-        destinationConnection.currency?.ibcWithdrawalFeeWei
-      )
-    ) {
-      return "";
-    }
-
-    const fee = formatUnits(
-      BigInt(destinationConnection.currency.ibcWithdrawalFeeWei),
-      destinationChainNativeToken.coinDecimals,
-    );
-    return `${fee} ${destinationChainNativeToken.coinDenom}`;
+    return "";
   }, [destinationConnection.chain?.currencies, destinationConnection.currency]);
 
   return (
