@@ -16,9 +16,7 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
   const { astriaChains } = useConfig();
 
   const supportedChains = useMemo(() => {
-    return evmChainsToViemChains([
-      ...Object.values(astriaChains),
-    ]);
+    return evmChainsToViemChains(Object.values(astriaChains));
   }, [astriaChains]);
 
   const defaultChain = useMemo(() => {

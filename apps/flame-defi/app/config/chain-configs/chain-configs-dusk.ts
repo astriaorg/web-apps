@@ -11,7 +11,6 @@ import {
   AstriaIcon,
   CelestiaIcon,
   NobleIcon,
-  UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons/polychrome";
 

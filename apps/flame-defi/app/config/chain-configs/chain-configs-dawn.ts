@@ -13,7 +13,6 @@ import {
   DropTiaIcon,
   NeutronIcon,
   NobleIcon,
-  UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons/polychrome";
 

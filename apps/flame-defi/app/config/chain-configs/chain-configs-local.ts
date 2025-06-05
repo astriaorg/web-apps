@@ -11,7 +11,6 @@ import {
   AstriaIcon,
   CelestiaIcon,
   NobleIcon,
-  UsdcIcon,
 } from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
