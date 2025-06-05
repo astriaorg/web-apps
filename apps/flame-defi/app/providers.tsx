@@ -9,7 +9,6 @@ import { CosmosKitProvider } from "features/cosmos-kit";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
 import { AstriaWalletContextProvider } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
-import { OnchainKitProvider } from "features/onchain-kit";
 import { PrivyProvider } from "features/privy";
 import { WagmiProvider } from "features/wagmi";
 
@@ -26,13 +25,11 @@ export function Providers({ children }: { children: ReactNode }) {
             <QueryClientProvider client={queryClient}>
               <WagmiProvider>
                 <CosmosKitProvider>
-                  <OnchainKitProvider>
-                    <AstriaWalletContextProvider>
-                      {/* Bridge specific providers moved here from bridge/layout.tsx to
-                          prevent re-initialization during page navigation */}
-                      <CosmosWalletProvider>{children}</CosmosWalletProvider>
-                    </AstriaWalletContextProvider>
-                  </OnchainKitProvider>
+                  <AstriaWalletContextProvider>
+                    {/* Bridge specific providers moved here from bridge/layout.tsx to
+                        prevent re-initialization during page navigation */}
+                    <CosmosWalletProvider>{children}</CosmosWalletProvider>
+                  </AstriaWalletContextProvider>
                 </CosmosKitProvider>
               </WagmiProvider>
             </QueryClientProvider>
