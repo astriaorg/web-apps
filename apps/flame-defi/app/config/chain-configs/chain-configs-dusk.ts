@@ -11,7 +11,6 @@ import {
 } from "@repo/flame-types";
 import {
   AstriaIcon,
-  BaseIcon,
   CelestiaIcon,
   NobleIcon,
   UsdcIcon,
@@ -77,7 +76,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       coinDenom: "fakeTIA",
       coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: false,
       ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
@@ -158,7 +157,7 @@ const NobleChainInfo: CosmosChainInfo = {
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-231",
       sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
@@ -267,7 +266,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
@@ -284,7 +283,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: CelestiaIcon,
     }),
   ],
@@ -336,6 +335,4 @@ const BaseChainInfo: EvmChainInfo = {
   IconComponent: BaseIcon,
 };
 
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
-};
+export const coinbaseChains: CoinbaseChains = {};

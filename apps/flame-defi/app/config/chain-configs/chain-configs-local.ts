@@ -11,7 +11,6 @@ import {
 } from "@repo/flame-types";
 import {
   AstriaIcon,
-  BaseIcon,
   CelestiaIcon,
   NobleIcon,
   UsdcIcon,
@@ -152,7 +151,7 @@ const NobleChainInfo: CosmosChainInfo = {
       coinDenom: "usdc",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-0",
       // NOTE - noble requires bech32 address, not bech32m.
@@ -292,7 +291,7 @@ const FakeChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
@@ -308,7 +307,7 @@ const FakeChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: AstriaIcon,
     }),
   ],
@@ -354,13 +353,11 @@ const BaseChainInfo: EvmChainInfo = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: UsdcIcon,
     }),
   ],
   IconComponent: BaseIcon,
 };
 
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
-};
+export const coinbaseChains: CoinbaseChains = {};

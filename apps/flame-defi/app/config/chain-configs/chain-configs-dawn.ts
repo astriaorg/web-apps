@@ -11,7 +11,6 @@ import {
 } from "@repo/flame-types";
 import {
   AstriaIcon,
-  BaseIcon,
   CelestiaIcon,
   DropTiaIcon,
   NeutronIcon,
@@ -148,7 +147,7 @@ const NobleChainInfo: CosmosChainInfo = {
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-232",
       sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd",
@@ -231,7 +230,7 @@ const NeutronChainInfo: CosmosChainInfo = {
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
@@ -341,7 +340,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
@@ -356,7 +355,7 @@ const FlameChainInfo: AstriaChain = {
       isWrappedNative: false,
       wrapped: null,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: DropTiaIcon,
     }),
   ],
@@ -401,13 +400,11 @@ const BaseChainInfo: EvmChainInfo = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: UsdcIcon,
     }),
   ],
   IconComponent: BaseIcon,
 };
 
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
-};
+export const coinbaseChains: CoinbaseChains = {};

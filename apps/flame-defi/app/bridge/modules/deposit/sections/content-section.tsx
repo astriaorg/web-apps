@@ -10,9 +10,7 @@ import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer } from "@repo/ui/components";
 import {
   ArrowDownIcon,
-  BaseIcon,
   EditIcon,
-  PlusIcon,
   WalletIcon,
 } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
@@ -61,6 +59,13 @@ export const ContentSection = () => {
 
   const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
 
+  const sourceChains = [
+    ...Object.values(coinbaseChains),
+    ...Object.values(cosmosChains),
+  ].filter((chain) => 
+    chain.currencies?.some((currency) => currency.isBridgeable)
+  );
+
   const {
     sourceChainOptions,
     destinationChainOptions,
@@ -68,10 +73,7 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
-    sourceChains: [
-      ...Object.values(coinbaseChains),
-      ...Object.values(cosmosChains),
-    ],
+    sourceChains,
     destinationChains: [...Object.values(astriaChains)],
   });
 
@@ -178,21 +180,7 @@ export const ContentSection = () => {
   ]);
 
   // additional options
-  const additionalSourceOptions = useMemo(
-    () => [
-      {
-        // TODO - where should the Fund button actually go?
-        label: "Fund with Coinbase OnRamp",
-        action: () => {
-          console.log("Coinbase OnRamp clicked");
-        },
-        className: "text-white",
-        LeftIcon: BaseIcon,
-        RightIcon: PlusIcon,
-      },
-    ],
-    [],
-  );
+  const additionalSourceOptions = useMemo(() => [], []);
 
   // FIXME - should this be an edit button next to the input or something instead?
   //  kinda hard to find as an additional dropdown option
