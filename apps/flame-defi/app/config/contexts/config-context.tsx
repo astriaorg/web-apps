@@ -1,11 +1,7 @@
 import React, { useMemo } from "react";
 import { type Address } from "viem";
 
-import {
-  AstriaChains,
-  CosmosChains,
-  FlameNetwork,
-} from "@repo/flame-types";
+import { AstriaChains, CosmosChains, FlameNetwork } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import {
   type AppConfig,
@@ -62,10 +58,8 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const {
-    astriaChains: astria,
-    cosmosChains: cosmos,
-  } = getChainConfigs(selectedFlameNetwork);
+  const { astriaChains: astria, cosmosChains: cosmos } =
+    getChainConfigs(selectedFlameNetwork);
   const [astriaChains, setAstriaChains] = React.useState<AstriaChains>(astria);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
@@ -79,8 +73,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   // update astria and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
     console.log("selectFlameNetwork called with:", network);
-    const { astriaChains, cosmosChains } =
-      getChainConfigs(network);
+    const { astriaChains, cosmosChains } = getChainConfigs(network);
     setAstriaChains(astriaChains);
     setCosmosChains(cosmosChains);
     setSelectedFlameNetwork(network);

@@ -8,11 +8,7 @@ import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer } from "@repo/ui/components";
-import {
-  ArrowDownIcon,
-  EditIcon,
-  WalletIcon,
-} from "@repo/ui/icons";
+import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
@@ -59,10 +55,8 @@ export const ContentSection = () => {
 
   const { astriaChains, cosmosChains } = useConfig();
 
-  const sourceChains = [
-    ...Object.values(cosmosChains),
-  ].filter((chain) => 
-    chain.currencies?.some((currency) => currency.isBridgeable)
+  const sourceChains = Object.values(cosmosChains).filter((chain) =>
+    chain.currencies?.some((currency) => currency.isBridgeable),
   );
 
   const {
@@ -73,7 +67,7 @@ export const ContentSection = () => {
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
     sourceChains,
-    destinationChains: [...Object.values(astriaChains)],
+    destinationChains: Object.values(astriaChains),
   });
 
   // without these in combination with Dropdown's valueOverride,
@@ -193,7 +187,6 @@ export const ContentSection = () => {
       },
     ];
   }, [handleEditRecipientClick]);
-
 
   const sourceCurrencyOptions = useMemo(
     () => getSourceCurrencyOptions(sourceConnection.chain),

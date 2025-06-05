@@ -13,9 +13,7 @@ export function WagmiProvider({ children }: { children: ReactNode }) {
   const { astriaChains } = useConfig();
 
   const chains = useMemo(() => {
-    return evmChainsToViemChains([
-      ...Object.values(astriaChains),
-    ]);
+    return evmChainsToViemChains(Object.values(astriaChains));
   }, [astriaChains]);
 
   const transports = useMemo(() => {

@@ -7,11 +7,7 @@ import {
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
-import {
-  AstriaIcon,
-  CelestiaIcon,
-  NobleIcon,
-} from "@repo/ui/icons/polychrome";
+import { AstriaIcon, CelestiaIcon, NobleIcon } from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,
@@ -315,4 +311,3 @@ export const astriaChains: AstriaChains = {
   "Flame(local)": FlameChainInfo,
   Fake: FakeChainInfo,
 };
-

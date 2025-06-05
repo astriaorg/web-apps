@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 import { testWithSynpress } from "@synthetixio/synpress";
-import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright";
+import { metaMaskFixtures } from "@synthetixio/synpress/playwright";
 
 import basicSetup from "../wallet-setup/basic.setup";
 
@@ -49,19 +49,8 @@ async function openToDropdown(page: Page) {
 
 // Define the test case for just the manual address functionality - simplifying for debugging
 test("should handle manual address entry in the deposit flow", async ({
-  context,
   page,
-  metamaskPage,
-  extensionId,
 }) => {
-  // Create a new MetaMask instance
-  const metamask = new MetaMask(
-    context,
-    metamaskPage,
-    basicSetup.walletPassword,
-    extensionId,
-  );
-
   // Navigate to the bridge deposit page
   await page.goto("/bridge/deposit");
 

@@ -62,10 +62,8 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
-    sourceChains: [...Object.values(astriaChains)],
-    destinationChains: [
-      ...Object.values(cosmosChains),
-    ],
+    sourceChains: Object.values(astriaChains),
+    destinationChains: Object.values(cosmosChains),
   });
 
   // without these in combination with Dropdown's valueOverride,

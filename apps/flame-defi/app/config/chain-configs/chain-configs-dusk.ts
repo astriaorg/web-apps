@@ -290,4 +290,3 @@ const FlameChainInfo: AstriaChain = {
 export const astriaChains: AstriaChains = {
   "Flame Dusk-11": FlameChainInfo,
 };
-
