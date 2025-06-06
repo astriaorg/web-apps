@@ -53,7 +53,8 @@ export const HeaderSection = () => {
           </Button>
           <Button
             onClick={() => router.push(`${pathname}${ROUTES.ADD_LIQUIDITY}`)}
-            disabled={isPending}
+            // disabled={isPending}
+            disabled={true}
           >
             Add Liquidity
           </Button>
