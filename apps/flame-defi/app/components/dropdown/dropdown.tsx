@@ -124,33 +124,33 @@ export const Dropdown = <T,>({
       <div className="w-full">
         <button
           type="button"
-          className="w-full flex items-center justify-between bg-transparent text-grey-light px-4 py-2 disabled:opacity-50 border border-stroke-default rounded-xl h-14"
+          className="w-full flex items-center justify-between bg-transparent text-typography-light px-4 py-2 disabled:opacity-50 border border-stroke-default rounded-xl h-14"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
           disabled={disabled}
         >
           {LeftIcon && !selectedOption?.LeftIcon && (
-            <span className="text-grey-light ml-1 mr-3 flex">
+            <span className="text-icon-subdued ml-1 mr-3 flex">
               <LeftIcon />
             </span>
           )}
           {selectedOption?.LeftIcon && (
-            <span className="text-grey-light ml-1 mr-3 flex">
+            <span className="text-icon-subdued ml-1 mr-3 flex">
               <selectedOption.LeftIcon />
             </span>
           )}
           <span className="truncate">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="ml-auto text-white">
+          <span className="ml-auto text-icon-default">
             <i className={`fas fa-angle-${isActive ? "up" : "down"}`} />
           </span>
         </button>
       </div>
       {isActive && (
         <div className="absolute w-auto mt-2" id="dropdown-menu" role="menu">
-          <div className="bg-radial-dark border border-white/10 shadow-inner rounded-2xl p-2">
+          <div className="bg-surface-2 border border-stroke-default shadow-inner rounded-2xl p-2">
             {options?.map((option) => (
               <button
                 type="button"
@@ -175,7 +175,7 @@ export const Dropdown = <T,>({
               <button
                 type="button"
                 key={`additional-${option.label}`}
-                className={`w-full text-left text-white ${option.className || ""}`}
+                className={`w-full text-left text-typography-default ${option.className || ""}`}
                 onClick={() => {
                   option.action();
                   setIsActive(false);
@@ -184,14 +184,14 @@ export const Dropdown = <T,>({
                 <span className="flex items-center justify-between w-full p-4 text-sm rounded-xl hover:bg-semi-white transition">
                   <span className="flex items-center">
                     {option.LeftIcon && (
-                      <span className="ml-1 mr-3 text-white flex">
+                      <span className="ml-1 mr-3 text-icon-default flex">
                         <option.LeftIcon />
                       </span>
                     )}
                     <span className="truncate grow">{option.label}</span>
                   </span>
                   {option.RightIcon && (
-                    <span className="text-white flex">
+                    <span className="text-icon-default flex">
                       <option.RightIcon size={20} />
                     </span>
                   )}

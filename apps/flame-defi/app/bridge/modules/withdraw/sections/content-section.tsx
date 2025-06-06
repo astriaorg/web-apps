@@ -342,13 +342,13 @@ export const ContentSection = () => {
 
               {/* Source wallet info */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <p className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <p className="text-typography-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
+                      <p className="mt-2 text-typography-subdued font-semibold">
                         Balance: {isLoadingSourceBalance && "Loading..."}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
@@ -381,7 +381,7 @@ export const ContentSection = () => {
                   <ArrowDownIcon size={32} />
                 </div>
               </Link>
-              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
+              <div className="hidden sm:block ml-4 border-t border-stroke-default my-4 w-full" />
             </div>
           )}
 
@@ -422,9 +422,9 @@ export const ContentSection = () => {
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+                  <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
                     <p
-                      className="text-grey-light font-semibold cursor-pointer"
+                      className="text-typography-light font-semibold cursor-pointer"
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
@@ -434,7 +434,7 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
+                        <p className="mt-2 text-typography-subdued font-semibold">
                           Balance: {isLoadingDestinationBalance && "Loading..."}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
@@ -449,9 +449,9 @@ export const ContentSection = () => {
 
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
                   <p
-                    className="text-grey-light font-semibold cursor-pointer"
+                    className="text-typography-light font-semibold cursor-pointer"
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
@@ -464,7 +464,7 @@ export const ContentSection = () => {
                       Recipient address must be a valid address
                     </div>
                   )}
-                  <p className="mt-2 text-grey-lighter font-semibold text-xs">
+                  <p className="mt-2 text-typography-subdued font-semibold text-xs">
                     Connect via wallet to show balance
                   </p>
                 </div>
@@ -472,10 +472,10 @@ export const ContentSection = () => {
 
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <div className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <div className="text-typography-light font-semibold">
                     <input
-                      className="w-full p-2 bg-transparent border border-white rounded-sm text-white"
+                      className="w-full p-2 bg-transparent border border-stroke-default rounded-sm text-typography-default"
                       type="text"
                       placeholder="Enter address"
                       onChange={updateRecipientAddressOverride}
@@ -484,7 +484,7 @@ export const ContentSection = () => {
                     <div className="mt-3 flex space-x-2">
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientSave}
                       >
                         Save
@@ -504,7 +504,7 @@ export const ContentSection = () => {
           </div>
 
           <div className="flex items-center">
-            <div className="w-full border-t border-grey-dark my-4" />
+            <div className="w-full border-t border-stroke-default my-4" />
           </div>
 
           <AmountInput

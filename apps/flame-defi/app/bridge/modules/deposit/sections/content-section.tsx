@@ -340,13 +340,13 @@ export const ContentSection = () => {
 
               {/* Source wallet info - unified display regardless of chain type */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <p className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <p className="text-typography-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
+                      <p className="mt-2 text-typography-subdued font-semibold">
                         Balance: {isLoadingSourceBalance && "Loading..."}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
@@ -381,7 +381,7 @@ export const ContentSection = () => {
                   <ArrowDownIcon size={32} />
                 </div>
               </Link>
-              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
+              <div className="hidden sm:block ml-4 border-t border-stroke-default my-4 w-full" />
             </div>
           )}
 
@@ -422,9 +422,9 @@ export const ContentSection = () => {
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
                     <p
-                      className="text-grey-light font-semibold cursor-pointer"
+                      className="text-typography-light font-semibold cursor-pointer"
                       onKeyDown={handleEditRecipientClick}
                       onClick={handleEditRecipientClick}
                     >
@@ -435,7 +435,7 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
+                        <p className="mt-2 text-typography-subdued font-semibold">
                           Balance: {isLoadingDestinationBalance && "Loading..."}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
@@ -462,9 +462,9 @@ export const ContentSection = () => {
 
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
                   <p
-                    className="text-grey-light font-semibold cursor-pointer"
+                    className="text-typography-light font-semibold cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
@@ -479,7 +479,7 @@ export const ContentSection = () => {
                     </div>
                   )}
                   {destinationConnection.currency && (
-                    <p className="mt-2 text-grey-lighter font-semibold text-sm">
+                    <p className="mt-2 text-typography-subdued font-semibold text-sm">
                       Connect via wallet to show balance
                     </p>
                   )}
@@ -488,10 +488,10 @@ export const ContentSection = () => {
 
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-grey-medium bg-semi-white">
-                  <div className="text-grey-light font-semibold">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-stroke-default bg-semi-white">
+                  <div className="text-typography-light font-semibold">
                     <input
-                      className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white"
+                      className="w-full p-3 bg-transparent border border-stroke-default focus:border-stroke-active focus:outline-hidden rounded-xl text-typography-default"
                       type="text"
                       placeholder="0x..."
                       onChange={updateRecipientAddressOverride}
@@ -500,14 +500,14 @@ export const ContentSection = () => {
                     <div className="mt-3 flex space-x-2">
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientSave}
                       >
                         Save
                       </button>
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientClear}
                       >
                         Clear
@@ -520,7 +520,7 @@ export const ContentSection = () => {
           </div>
 
           <div className="flex flex-row items-center">
-            <div className="border-t border-grey-dark my-4 w-full" />
+            <div className="border-t border-stroke-default my-4 w-full" />
           </div>
 
           <AmountInput
