@@ -12,6 +12,7 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         default: "text-typography-light",
+        outline: "text-typography-light",
       },
     },
     defaultVariants: {
@@ -26,6 +27,7 @@ const tabsTriggerVariants = cva(
     variants: {
       variant: {
         default: "rounded-lg px-2 py-1.5 text-sm/5 font-medium uppercase",
+        outline: "rounded-lg px-2 py-1.5 text-sm/5 font-medium",
       },
     },
     defaultVariants: {
@@ -34,7 +36,34 @@ const tabsTriggerVariants = cva(
   },
 );
 
-const Tabs = TabsPrimitive.Root;
+const tabsVariants = cva("", {
+  variants: {
+    variant: {
+      default: "",
+      outline:
+        "flex items-center p-1 bg-surface-1 border border-stroke-default rounded-xl",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
+export interface TabsProps
+  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>,
+    VariantProps<typeof tabsListVariants> {}
+
+const Tabs = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Root>,
+  TabsProps
+>(({ className, variant, ...props }, ref) => (
+  <TabsPrimitive.Root
+    ref={ref}
+    className={cn(tabsVariants({ variant }), className)}
+    {...props}
+  />
+));
+Tabs.displayName = TabsPrimitive.Root.displayName;
 
 export interface TabsListProps
   extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>,
