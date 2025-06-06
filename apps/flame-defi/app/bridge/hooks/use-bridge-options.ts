@@ -67,7 +67,9 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => mode === "deposit" ? c.isDepositable : c.isWithdrawable)
+        .filter((c) =>
+          mode === "deposit" ? c.isDepositable : c.isWithdrawable,
+        )
         .map((c) => ({
           label: c.coinDenom,
           value: c,
@@ -84,7 +86,9 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => mode === "deposit" ? c.isDepositable : c.isWithdrawable)
+        .filter((c) =>
+          mode === "deposit" ? c.isDepositable : c.isWithdrawable,
+        )
         .map((currency) => ({
           label: currency.coinDenom,
           value: currency,
