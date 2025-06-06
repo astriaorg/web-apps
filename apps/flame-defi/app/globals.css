@@ -304,7 +304,7 @@ html[data-theme="dark"] {
 }
 
 @utility normalize-input {
-  @apply flex-1 bg-transparent focus:outline-hidden placeholder:text-grey-light [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+  @apply flex-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
 }
 
 @utility fade-out {
