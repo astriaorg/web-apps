@@ -101,7 +101,7 @@ export const SettingsPopover = () => {
     <Popover onOpenChange={handlePopoverOpenChange}>
       <PopoverTrigger>
         <a
-          className="text-grey-light hover:text-white cursor-pointer"
+          className="text-typography-light hover:text-typography-default cursor-pointer"
           aria-label="Settings"
         >
           <GearIcon
@@ -109,13 +109,13 @@ export const SettingsPopover = () => {
           />
         </a>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-radial-dark border-border" align="end">
+      <PopoverContent className="w-80 bg-surface-2 border-stroke-default" align="end">
         <div className="space-y-4">
-          <h2 className="text-md font-semibold text-white">Settings</h2>
+          <h2 className="text-md font-semibold text-typography-default">Settings</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <div className="flex items-center gap-1">
-                <label className="text-sm text-white">Expert Mode</label>
+                <label className="text-sm text-typography-default">Expert Mode</label>
                 <InfoTooltip
                   className="max-w-[250px]"
                   content="Allow high price impact trades and skip the confirm screen. Use at your own risk."
@@ -124,13 +124,13 @@ export const SettingsPopover = () => {
               <Switch
                 checked={expertMode}
                 onCheckedChange={handleExpertModeChange}
-                className="h-7 w-12 data-[state=unchecked]:bg-grey-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
+                className="h-7 w-12 data-[state=unchecked]:bg-typography-light data-[state=checked]:bg-orange [&>span]:h-6 [&>span]:w-6 [&>span[data-state=checked]]:translate-x-5"
               />
             </div>
           </div>
           <div className="space-y-2 mb-2">
             <div className="flex items-center gap-1">
-              <label className="text-sm text-white">Slippage Tolerance</label>
+              <label className="text-sm text-typography-default">Slippage Tolerance</label>
               <InfoTooltip
                 className="max-w-[250px]"
                 content="Your transaction will revert if the price changes unfavorably by more than this percentage."
@@ -139,7 +139,7 @@ export const SettingsPopover = () => {
             <div className="flex justify-between">
               <button
                 disabled={!expertMode}
-                className="text-sm text-white bg-orange px-3 py-1 rounded-lg mr-2 cursor-pointer"
+                className="text-sm text-typography-inverted bg-orange px-3 py-1 rounded-lg mr-2 cursor-pointer"
                 onClick={() => setCustomSlippage(defaultSlippageTolerance)}
               >
                 Auto
@@ -154,9 +154,9 @@ export const SettingsPopover = () => {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                  className="w-full px-3 py-1 pr-7 bg-grey-dark font-sans rounded-lg text-white text-right placeholder:text-grey-light placeholder:text-right focus:outline-hidden focus:ring-1 focus:ring-primary normalize-input"
+                  className="w-full px-3 py-1 pr-7 bg-surface-3 font-sans rounded-lg text-typography-default text-right placeholder:text-typography-light placeholder:text-right focus:outline-hidden focus:ring-1 focus:ring-orange normalize-input"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-typography-default">
                   %
                 </span>
               </div>
@@ -165,7 +165,7 @@ export const SettingsPopover = () => {
           <div className="h-4">
             {slippageError && (
               <p
-                className={`text-sm ${slippageError.error ? "text-red" : "text-orange"}`}
+                className={`text-sm ${slippageError.error ? "text-danger" : "text-orange"}`}
               >
                 {slippageError.msg}
               </p>
@@ -178,26 +178,26 @@ export const SettingsPopover = () => {
         open={showExpertModeDialog}
         onOpenChange={setShowExpertModeDialog}
       >
-        <AlertDialogContent className="bg-radial-dark border-border">
+        <AlertDialogContent className="bg-surface-2 border-stroke-default">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-typography-default">
               Are you sure?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-grey-light">
+            <AlertDialogDescription className="text-typography-light">
               Expert mode turns off the confirm transaction prompt and allows
               high slippage trades that often result in bad rates and lost
               funds.
             </AlertDialogDescription>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-typography-default">
               ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-grey-dark text-white hover:bg-grey-light cursor-pointer">
+            <AlertDialogCancel className="bg-surface-3 text-typography-default hover:bg-typography-light cursor-pointer">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-orange text-white hover:bg-orange/90 cursor-pointer"
+              className="bg-orange text-typography-inverted hover:bg-orange/90 cursor-pointer"
               onClick={() => {
                 setExpertMode(true);
                 setInLocalStorage("settings", {
