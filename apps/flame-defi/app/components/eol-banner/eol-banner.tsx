@@ -9,7 +9,7 @@ export const EolBanner = () => {
   const { feedbackFormURL } = useConfig();
 
   return (
-    <div className="w-full bg-red-600 text-white px-4 py-3">
+    <div className="w-full text-white px-4 py-3 relative z-50" style={{ backgroundColor: "#e63b36" }}>
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
         <div className="flex-1">
           <span className="font-semibold">⚠️ Important Notice:</span> Flame is
@@ -23,7 +23,8 @@ export const EolBanner = () => {
             href={feedbackFormURL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-white text-red-600 font-medium rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
+            className="inline-flex items-center px-4 py-2 bg-white font-medium rounded-md hover:bg-opacity-90 transition-colors whitespace-nowrap"
+            style={{ color: "#e63b36" }}
           >
             Share Feedback
           </a>

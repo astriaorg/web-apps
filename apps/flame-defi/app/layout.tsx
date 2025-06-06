@@ -236,8 +236,8 @@ export default function RootLayout({
         <Providers>
           <Observability />
           <div className="min-h-screen flex flex-col">
-            <NavigationMenu />
             <EolBanner />
+            <NavigationMenu />
             <SideTag label="Get Help" />
             <RouteAnimation>
               <main className="flex flex-col grow items-center w-full">
