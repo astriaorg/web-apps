@@ -34,11 +34,13 @@ export interface BridgeOptions {
 export interface UseBridgeOptionsProps {
   sourceChains: (CosmosChainInfo | EvmChainInfo)[];
   destinationChains: (CosmosChainInfo | EvmChainInfo)[];
+  mode: "deposit" | "withdraw";
 }
 
 export function useBridgeOptions({
   sourceChains,
   destinationChains,
+  mode,
 }: UseBridgeOptionsProps): BridgeOptions {
   // Chain options
   const sourceChainOptions = useMemo(() => {
@@ -65,14 +67,14 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => c.isBridgeable)
+        .filter((c) => mode === "deposit" ? c.isDepositable : c.isWithdrawable)
         .map((c) => ({
           label: c.coinDenom,
           value: c,
           LeftIcon: c.IconComponent,
         }));
     },
-    [],
+    [mode],
   );
 
   const getDestinationCurrencyOptions = useCallback(
@@ -82,14 +84,14 @@ export function useBridgeOptions({
       }
 
       return chain.currencies
-        .filter((c) => c.isBridgeable)
+        .filter((c) => mode === "deposit" ? c.isDepositable : c.isWithdrawable)
         .map((currency) => ({
           label: currency.coinDenom,
           value: currency,
           LeftIcon: currency.IconComponent,
         }));
     },
-    [],
+    [mode],
   );
 
   // Utility to find matching currency

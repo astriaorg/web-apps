@@ -190,8 +190,10 @@ export interface GenericCurrency extends BaseCurrency {
   readonly chainId: string | number;
   /** True if this is the native token (e.g., TIA) */
   readonly isNative: boolean;
-  /** True if this token should be shown in bridge page dropdowns */
-  readonly isBridgeable: boolean;
+  /** True if this token can be deposited in bridge */
+  readonly isDepositable: boolean;
+  /** True if this token can be withdrawn in bridge */
+  readonly isWithdrawable: boolean;
   /** Component to render the token's icon */
   readonly IconComponent?: React.FC<IconProps>;
 }
@@ -206,7 +208,8 @@ export class IbcCurrency implements GenericCurrency {
   public readonly title: string;
   public readonly chainId: string;
   public readonly isNative: boolean;
-  public readonly isBridgeable: boolean;
+  public readonly isDepositable: boolean;
+  public readonly isWithdrawable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
   public readonly coinGeckoId?: string;
   public readonly coinImageUrl?: string;
@@ -224,7 +227,8 @@ export class IbcCurrency implements GenericCurrency {
     title: string;
     chainId: string;
     isNative: boolean;
-    isBridgeable: boolean;
+    isDepositable: boolean;
+    isWithdrawable: boolean;
     IconComponent?: React.FC<IconProps>;
     coinDenom: string;
     coinMinimalDenom: string;
@@ -240,7 +244,8 @@ export class IbcCurrency implements GenericCurrency {
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;
     this.isNative = params.isNative;
-    this.isBridgeable = params.isBridgeable;
+    this.isDepositable = params.isDepositable;
+    this.isWithdrawable = params.isWithdrawable;
     this.coinGeckoId = params.coinGeckoId;
     this.coinImageUrl = params.coinImageUrl;
     this.ibcChannel = params.ibcChannel;
@@ -326,7 +331,8 @@ export class EvmCurrency implements GenericCurrency {
   public readonly title: string;
   public readonly chainId: number;
   public readonly isNative: boolean;
-  public readonly isBridgeable: boolean;
+  public readonly isDepositable: boolean;
+  public readonly isWithdrawable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
   public readonly coinDenom: string;
   public readonly coinMinimalDenom: string;
@@ -354,7 +360,8 @@ export class EvmCurrency implements GenericCurrency {
     title: string;
     chainId: number;
     isNative: boolean;
-    isBridgeable: boolean;
+    isDepositable: boolean;
+    isWithdrawable: boolean;
     IconComponent?: React.FC<IconProps>;
     coinDenom: string;
     coinMinimalDenom: string;
@@ -379,7 +386,8 @@ export class EvmCurrency implements GenericCurrency {
     this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
     this.isNative = params.isNative;
-    this.isBridgeable = params.isBridgeable;
+    this.isDepositable = params.isDepositable;
+    this.isWithdrawable = params.isWithdrawable;
     this.IconComponent = params.IconComponent;
   }
 
