@@ -251,14 +251,17 @@ export const ContentSection = () => {
   ]);
 
   const isDisabled = useMemo(() => {
-    return (
-      isPending ||
-      !data ||
-      !address ||
-      !derivedValues.derivedAmount0.validation.isValid ||
-      !derivedValues.derivedAmount1.validation.isValid
-    );
-  }, [isPending, data, address, derivedValues]);
+    // Disable adding liquidity for EOL.
+    return true;
+
+    // return (
+    //   isPending ||
+    //   !data ||
+    //   !address ||
+    //   !derivedValues.derivedAmount0.validation.isValid ||
+    //   !derivedValues.derivedAmount1.validation.isValid
+    // );
+  }, []);
 
   return (
     <section className="flex flex-col">
