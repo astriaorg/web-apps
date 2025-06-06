@@ -3,7 +3,6 @@
 import Big from "big.js";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { formatUnits } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
@@ -64,6 +63,7 @@ export const ContentSection = () => {
   } = useBridgeOptions({
     sourceChains: Object.values(astriaChains),
     destinationChains: Object.values(cosmosChains),
+    mode: "withdraw",
   });
 
   // without these in combination with Dropdown's valueOverride,
@@ -300,30 +300,6 @@ export const ContentSection = () => {
     sourceConnection.currency?.coinDenom,
   ]);
 
-  const ibcWithdrawFeeDisplay = useMemo(() => {
-    const destinationChainNativeToken =
-      destinationConnection.chain?.currencies.find(
-        (currency) => currency.isNative,
-      );
-
-    if (
-      !destinationChainNativeToken ||
-      !destinationConnection.currency ||
-      !(
-        destinationConnection.currency instanceof EvmCurrency &&
-        destinationConnection.currency?.ibcWithdrawalFeeWei
-      )
-    ) {
-      return "";
-    }
-
-    const fee = formatUnits(
-      BigInt(destinationConnection.currency.ibcWithdrawalFeeWei),
-      destinationChainNativeToken.coinDecimals,
-    );
-    return `${fee} ${destinationChainNativeToken.coinDenom}`;
-  }, [destinationConnection.chain?.currencies, destinationConnection.currency]);
-
   return (
     <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
       <div className="w-full px-0 md:w-[675px] lg:px-4">
@@ -468,12 +444,6 @@ export const ContentSection = () => {
                             `0 ${destinationConnection.currency.coinDenom}`}
                         </p>
                       )}
-                    {/* Withdrawal fee display */}
-                    {ibcWithdrawFeeDisplay && (
-                      <div className="mt-2 text-grey-light text-sm">
-                        Withdrawal fee: {ibcWithdrawFeeDisplay}
-                      </div>
-                    )}
                   </div>
                 )}
 

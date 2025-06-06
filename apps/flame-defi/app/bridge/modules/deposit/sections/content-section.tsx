@@ -56,7 +56,7 @@ export const ContentSection = () => {
   const { astriaChains, cosmosChains } = useConfig();
 
   const sourceChains = Object.values(cosmosChains).filter((chain) =>
-    chain.currencies?.some((currency) => currency.isBridgeable),
+    chain.currencies?.some((currency) => currency.isDepositable),
   );
 
   const {
@@ -68,6 +68,7 @@ export const ContentSection = () => {
   } = useBridgeOptions({
     sourceChains,
     destinationChains: Object.values(astriaChains),
+    mode: "deposit",
   });
 
   // without these in combination with Dropdown's valueOverride,
