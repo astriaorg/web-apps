@@ -2,7 +2,6 @@ import { type Address } from "viem";
 
 import type {
   AstriaChains,
-  CoinbaseChains,
   CosmosChains,
   FlameNetwork,
 } from "@repo/flame-types";
@@ -23,8 +22,6 @@ export interface AppConfig {
   cosmosChains: CosmosChains;
   // The configurations for Astria chains.
   astriaChains: AstriaChains;
-  // The configurations for Base chains.
-  coinbaseChains: CoinbaseChains;
   // The selected Flame network.
   selectedFlameNetwork: FlameNetwork;
   // Function to select the Flame network.

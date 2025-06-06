@@ -19,7 +19,7 @@ import { type Address, ChainContract, parseUnits } from "viem";
  *
  * An Astria chain is technically an EVM chain, but it is useful
  * to have a mechanism to distinguish between Astria (fka Flame) and
- * other EVM based chains (Arbitrum, Base, Optimism).
+ * other EVM based chains.
  */
 export enum ChainType {
   ASTRIA = "astria",
@@ -461,11 +461,6 @@ export interface AstriaChain extends EvmChainInfo {
     multicall3: ChainContract;
   };
 }
-
-// CoinbaseChains type maps labels to CoinbaseChain objects
-export type CoinbaseChains = {
-  [label: string]: EvmChainInfo;
-};
 
 /**
  * Converts an EvmChainInfo object to a Chain object for use with Viem.

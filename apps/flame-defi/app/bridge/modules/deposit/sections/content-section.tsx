@@ -8,13 +8,7 @@ import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
 import { AnimatedArrowSpacer } from "@repo/ui/components";
-import {
-  ArrowDownIcon,
-  BaseIcon,
-  EditIcon,
-  PlusIcon,
-  WalletIcon,
-} from "@repo/ui/icons";
+import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
@@ -59,7 +53,11 @@ export const ContentSection = () => {
   const { isLoading, executeDeposit } = useDepositTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+  const { astriaChains, cosmosChains } = useConfig();
+
+  const sourceChains = Object.values(cosmosChains).filter((chain) =>
+    chain.currencies?.some((currency) => currency.isBridgeable),
+  );
 
   const {
     sourceChainOptions,
@@ -68,11 +66,8 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
-    sourceChains: [
-      ...Object.values(coinbaseChains),
-      ...Object.values(cosmosChains),
-    ],
-    destinationChains: [...Object.values(astriaChains)],
+    sourceChains,
+    destinationChains: Object.values(astriaChains),
   });
 
   // without these in combination with Dropdown's valueOverride,
@@ -178,21 +173,7 @@ export const ContentSection = () => {
   ]);
 
   // additional options
-  const additionalSourceOptions = useMemo(
-    () => [
-      {
-        // TODO - where should the Fund button actually go?
-        label: "Fund with Coinbase OnRamp",
-        action: () => {
-          console.log("Coinbase OnRamp clicked");
-        },
-        className: "text-white",
-        LeftIcon: BaseIcon,
-        RightIcon: PlusIcon,
-      },
-    ],
-    [],
-  );
+  const additionalSourceOptions = useMemo(() => [], []);
 
   // FIXME - should this be an edit button next to the input or something instead?
   //  kinda hard to find as an additional dropdown option
@@ -206,25 +187,6 @@ export const ContentSection = () => {
       },
     ];
   }, [handleEditRecipientClick]);
-
-  // TODO - coinbase onramp url
-  // Set up Coinbase onramp button URL
-  // const coinbaseOnrampBuyUrl = useMemo(() => {
-  //   if (!evmWallet.evmAccountAddress) {
-  //     return undefined;
-  //   }
-  //
-  //   return getOnrampBuyUrl({
-  //     projectId: "5e9f4c41-a90f-4eb5-b6a4-676eaf0f836d", // TODO - get from config
-  //     // FIXME - does passing in address here mean we have to create the account first?
-  //     addresses: {
-  //       [evmWallet.evmAccountAddress]: ["base"],
-  //     },
-  //     assets: ["USDC"],
-  //     presetFiatAmount: 20,
-  //     fiatCurrency: "USD",
-  //   });
-  // }, [evmWallet.evmAccountAddress]);
 
   const sourceCurrencyOptions = useMemo(
     () => getSourceCurrencyOptions(sourceConnection.chain),

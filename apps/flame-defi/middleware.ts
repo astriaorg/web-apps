@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   // Handle exact matches for / and /bridge
   if (url.pathname === "/" || url.pathname === "/bridge") {
-    url.pathname = "/bridge/deposit";
+    url.pathname = "/bridge/withdraw";
     return NextResponse.redirect(url);
   }
 

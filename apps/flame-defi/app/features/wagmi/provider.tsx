@@ -10,14 +10,11 @@ import { useConfig } from "config";
  */
 export function WagmiProvider({ children }: { children: ReactNode }) {
   // could add more chain types here in the future if needed, e.g. arbitrum, optimism
-  const { astriaChains, coinbaseChains } = useConfig();
+  const { astriaChains } = useConfig();
 
   const chains = useMemo(() => {
-    return evmChainsToViemChains([
-      ...Object.values(astriaChains),
-      ...Object.values(coinbaseChains),
-    ]);
-  }, [astriaChains, coinbaseChains]);
+    return evmChainsToViemChains(Object.values(astriaChains));
+  }, [astriaChains]);
 
   const transports = useMemo(() => {
     return Object.fromEntries(chains.map((chain) => [chain.id, http()]));
