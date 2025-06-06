@@ -12,11 +12,11 @@ export const EolBanner = () => {
     <div className="w-full bg-red-600 text-white px-4 py-3">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
         <div className="flex-1">
-          <span className="font-semibold">⚠️ Important Notice:</span>{" "}
-          Flame is ending support and shutting down by{" "}
-          <strong>September 30, 2025</strong>. You can still deposit TIA for gas,
-          withdraw all assets, close LP positions, and swap tokens. However, you
-          can no longer create new LP positions or add liquidity.
+          <span className="font-semibold">⚠️ Important Notice:</span> Flame is
+          ending support and shutting down by{" "}
+          <strong>September 30, 2025</strong>. You can still deposit TIA for
+          gas, withdraw all assets, close LP positions, and swap tokens.
+          However, you can no longer create new LP positions or add liquidity.
         </div>
         {feedbackFormURL && (
           <a
