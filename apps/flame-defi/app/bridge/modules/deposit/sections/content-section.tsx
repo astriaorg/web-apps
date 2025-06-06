@@ -7,7 +7,7 @@ import { isAddress } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Card, CardContent } from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
@@ -299,12 +299,12 @@ export const ContentSection = () => {
   ]);
 
   return (
-    <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
-      <div className="w-full px-0 md:w-[675px] lg:px-4">
-        <div className="flex justify-end mb-4">
-          <ManageWalletsButton />
-        </div>
-        <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+    <div className="flex flex-col items-center w-full">
+      <div className="flex justify-end mb-4">
+        <ManageWalletsButton />
+      </div>
+      <Card className="w-full">
+        <CardContent>
           <div>
             <div className="flex flex-col">
               <div className="mb-2 sm:hidden">From</div>
@@ -542,8 +542,8 @@ export const ContentSection = () => {
             sourceConnection={sourceConnection}
             amountInput={amount}
           />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

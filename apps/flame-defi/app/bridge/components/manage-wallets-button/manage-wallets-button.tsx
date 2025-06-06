@@ -21,7 +21,7 @@ export const ManageWalletsButton: React.FC = () => {
   return (
     <BridgeConnectionsModal>
       <Button variant="secondary" size="sm" className="flex items-center gap-2">
-        <WalletIcon size={16} />
+        <WalletIcon />
         <span>{buttonText}</span>
       </Button>
     </BridgeConnectionsModal>
