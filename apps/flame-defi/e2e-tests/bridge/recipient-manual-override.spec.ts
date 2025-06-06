@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 import { testWithSynpress } from "@synthetixio/synpress";
-import { MetaMask, metaMaskFixtures } from "@synthetixio/synpress/playwright";
+import { metaMaskFixtures } from "@synthetixio/synpress/playwright";
 
 import basicSetup from "../wallet-setup/basic.setup";
 
@@ -12,30 +12,6 @@ const { expect } = test;
 
 // Valid EVM test address to use for manual override tests
 const TEST_RECIPIENT_ADDRESS = "0x1111111111111111111111111111111111111111";
-
-// A helper function to connect the source wallet
-async function connectSourceWallet(page: Page, metamask: MetaMask) {
-  // Connect source wallet (EVM wallet)
-  await page.locator('button:has-text("Connect Wallet")').first().click();
-  await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
-  await page.locator('button:has-text("EVM Wallet")').click();
-  await page.locator('button:has-text("MetaMask")').click();
-  await metamask.connectToDapp();
-  await metamask.approveNewNetwork();
-  await metamask.approveSwitchNetwork();
-
-  // Click the wallet button again to verify connection
-  await page.waitForTimeout(1000); // Give it a moment to complete the connection
-  await page.locator('button:has-text("Wallets")').click();
-  await page.waitForSelector('div[role="dialog"]', { timeout: 10000 });
-  const walletButton = page
-    .locator('div[role="dialog"] button:has-text("0x")')
-    .first();
-  await expect(walletButton).toBeVisible();
-  // Close the dialog by clicking somewhere else
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(1000); // Give UI time to stabilize
-}
 
 // A helper function to find and click the "To" dropdown
 async function openToDropdown(page: Page) {
@@ -73,33 +49,10 @@ async function openToDropdown(page: Page) {
 
 // Define the test case for just the manual address functionality - simplifying for debugging
 test("should handle manual address entry in the deposit flow", async ({
-  context,
   page,
-  metamaskPage,
-  extensionId,
 }) => {
-  // Create a new MetaMask instance
-  const metamask = new MetaMask(
-    context,
-    metamaskPage,
-    basicSetup.walletPassword,
-    extensionId,
-  );
-
   // Navigate to the bridge deposit page
   await page.goto("/bridge/deposit");
-
-  // Connect the source wallet (simplify with helper function)
-  await connectSourceWallet(page, metamask);
-
-  // First, select a source chain (needed to enable the Deposit button)
-  await page.locator('button:has-text("Select source...")').first().click();
-
-  // Wait for dropdown content without expecting a dialog role
-  await page.waitForSelector("div.absolute", { timeout: 10000 });
-
-  // Select the first available chain option
-  await page.locator("div.absolute button").first().click();
 
   // Try to interact with the To dropdown - the new implementation handles clicking "Enter address manually"
   await openToDropdown(page);
@@ -119,13 +72,4 @@ test("should handle manual address entry in the deposit flow", async ({
   );
   await expect(addressDisplay).toBeVisible();
   console.log("Address display verified");
-
-  // Enter an amount to complete the form
-  await page.locator('[placeholder="0.00"]').fill("0.01");
-  console.log("Entered amount");
-
-  // Verify the deposit button is enabled when using manual address
-  const depositButton = page.locator('button:has-text("Deposit")');
-  await expect(depositButton).toBeEnabled();
-  console.log("Deposit button is enabled");
 });

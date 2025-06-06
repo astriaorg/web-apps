@@ -13,14 +13,11 @@ import { WALLET_CONNECT_PROJECT_ID } from "features/wallet-connect";
 export function PrivyProvider({ children }: { children: React.ReactNode }) {
   const appId = getEnvVariable("NEXT_PUBLIC_PRIVY_APP_ID");
   const clientId = getEnvVariable("NEXT_PUBLIC_PRIVY_CLIENT_ID");
-  const { astriaChains, coinbaseChains } = useConfig();
+  const { astriaChains } = useConfig();
 
   const supportedChains = useMemo(() => {
-    return evmChainsToViemChains([
-      ...Object.values(astriaChains),
-      ...Object.values(coinbaseChains),
-    ]);
-  }, [astriaChains, coinbaseChains]);
+    return evmChainsToViemChains(Object.values(astriaChains));
+  }, [astriaChains]);
 
   const defaultChain = useMemo(() => {
     return supportedChains[0] ?? undefined;

@@ -2,20 +2,12 @@ import {
   AstriaChain,
   AstriaChains,
   ChainType,
-  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
-  EvmChainInfo,
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
-import {
-  AstriaIcon,
-  BaseIcon,
-  CelestiaIcon,
-  NobleIcon,
-  UsdcIcon,
-} from "@repo/ui/icons/polychrome";
+import { AstriaIcon, CelestiaIcon, NobleIcon } from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,
@@ -152,7 +144,7 @@ const NobleChainInfo: CosmosChainInfo = {
       coinDenom: "usdc",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-0",
       // NOTE - noble requires bech32 address, not bech32m.
@@ -292,7 +284,7 @@ const FakeChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: CelestiaIcon,
     }),
     new EvmCurrency({
@@ -308,7 +300,7 @@ const FakeChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: AstriaIcon,
     }),
   ],
@@ -318,49 +310,4 @@ const FakeChainInfo: AstriaChain = {
 export const astriaChains: AstriaChains = {
   "Flame(local)": FlameChainInfo,
   Fake: FakeChainInfo,
-};
-
-const BaseChainInfo: EvmChainInfo = {
-  chainType: ChainType.EVM,
-  chainId: 84532,
-  chainName: "Base Sepolia",
-  rpcUrls: ["https://sepolia.base.org"],
-  blockExplorerUrl: "https://sepolia.basescan.org",
-  contracts: {},
-  currencies: [
-    // NOTE - this is really only here to satisfy the config needed
-    //  for wagmi providers. it's not used atm.
-    new EvmCurrency({
-      chainId: 84532,
-      title: "Ether",
-      coinDenom: "ETH",
-      // is gwei correct?
-      coinMinimalDenom: "gwei",
-      coinDecimals: 18,
-      wrapped: null,
-      isNative: true,
-      isWrappedNative: false,
-      isBridgeable: false,
-    }),
-    new EvmCurrency({
-      chainId: 84532,
-      coinDenom: "USDC",
-      title: "USDC",
-      coinMinimalDenom: "uusdc",
-      coinDecimals: 6,
-      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
-      astriaIntentBridgeAddress: "0x",
-      wrapped: null,
-      isNative: false,
-      isWrappedNative: false,
-      ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
-      IconComponent: UsdcIcon,
-    }),
-  ],
-  IconComponent: BaseIcon,
-};
-
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
 };

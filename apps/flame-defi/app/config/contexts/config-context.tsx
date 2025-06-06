@@ -1,12 +1,7 @@
 import React, { useMemo } from "react";
 import { type Address } from "viem";
 
-import {
-  AstriaChains,
-  CoinbaseChains,
-  CosmosChains,
-  FlameNetwork,
-} from "@repo/flame-types";
+import { AstriaChains, CosmosChains, FlameNetwork } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
 import {
   type AppConfig,
@@ -63,16 +58,10 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const {
-    astriaChains: astria,
-    cosmosChains: cosmos,
-    coinbaseChains: coinbase,
-  } = getChainConfigs(selectedFlameNetwork);
+  const { astriaChains: astria, cosmosChains: cosmos } =
+    getChainConfigs(selectedFlameNetwork);
   const [astriaChains, setAstriaChains] = React.useState<AstriaChains>(astria);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
-  // TODO - rename evmChains now that we've got astriaChains
-  const [coinbaseChains, setCoinbaseChains] =
-    React.useState<CoinbaseChains>(coinbase);
 
   const networksList = useMemo(() => {
     return getEnvVariable(
@@ -81,14 +70,12 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     ).split(",") as FlameNetwork[];
   }, []);
 
-  // update evm and cosmos chains when the network is changed
+  // update astria and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
     console.log("selectFlameNetwork called with:", network);
-    const { astriaChains, cosmosChains, coinbaseChains } =
-      getChainConfigs(network);
+    const { astriaChains, cosmosChains } = getChainConfigs(network);
     setAstriaChains(astriaChains);
     setCosmosChains(cosmosChains);
-    setCoinbaseChains(coinbaseChains);
     setSelectedFlameNetwork(network);
   };
 
@@ -104,7 +91,6 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         environment,
         cosmosChains,
         astriaChains,
-        coinbaseChains,
         selectedFlameNetwork,
         selectFlameNetwork,
         brandURL,

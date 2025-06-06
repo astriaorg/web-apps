@@ -2,19 +2,15 @@ import {
   AstriaChain,
   AstriaChains,
   ChainType,
-  CoinbaseChains,
   CosmosChainInfo,
   CosmosChains,
-  EvmChainInfo,
   EvmCurrency,
   IbcCurrency,
 } from "@repo/flame-types";
 import {
   AstriaIcon,
-  BaseIcon,
   CelestiaIcon,
   NobleIcon,
-  UsdcIcon,
   WrappedTiaIcon,
 } from "@repo/ui/icons/polychrome";
 
@@ -77,7 +73,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
       coinDenom: "fakeTIA",
       coinMinimalDenom: "ufaketia",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: false,
       ibcChannel: "channel-420",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
@@ -158,7 +154,7 @@ const NobleChainInfo: CosmosChainInfo = {
       coinDenom: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 6,
-      isBridgeable: true,
+      isBridgeable: false,
       isNative: true,
       ibcChannel: "channel-231",
       sequencerBridgeAccount: "astria12saluecm8dd7hkutk83eavkl2p70lf5w7txezg",
@@ -267,7 +263,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
@@ -284,7 +280,7 @@ const FlameChainInfo: AstriaChain = {
       isNative: false,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
+      isBridgeable: false,
       IconComponent: CelestiaIcon,
     }),
   ],
@@ -293,49 +289,4 @@ const FlameChainInfo: AstriaChain = {
 
 export const astriaChains: AstriaChains = {
   "Flame Dusk-11": FlameChainInfo,
-};
-
-const BaseChainInfo: EvmChainInfo = {
-  chainType: ChainType.EVM,
-  chainId: 84532,
-  chainName: "Base Sepolia",
-  rpcUrls: ["https://sepolia.base.org"],
-  blockExplorerUrl: "https://sepolia.basescan.org",
-  contracts: {},
-  currencies: [
-    // NOTE - this is really only here to satisfy the config needed
-    //  for wagmi providers. it's not used atm.
-    new EvmCurrency({
-      chainId: 84532,
-      title: "Ether",
-      coinDenom: "ETH",
-      // is gwei correct?
-      coinMinimalDenom: "gwei",
-      coinDecimals: 18,
-      wrapped: null,
-      isNative: true,
-      isWrappedNative: false,
-      isBridgeable: false,
-    }),
-    new EvmCurrency({
-      chainId: 84532,
-      coinDenom: "USDC",
-      title: "USDC",
-      coinMinimalDenom: "uusdc",
-      coinDecimals: 6,
-      erc20ContractAddress: "0x081827b8C3Aa05287b5aA2bC3051fbE638F33152",
-      astriaIntentBridgeAddress: "0x",
-      wrapped: null,
-      isNative: false,
-      isWrappedNative: false,
-      ibcWithdrawalFeeWei: "0",
-      isBridgeable: true,
-      IconComponent: UsdcIcon,
-    }),
-  ],
-  IconComponent: BaseIcon,
-};
-
-export const coinbaseChains: CoinbaseChains = {
-  Base: BaseChainInfo,
 };
