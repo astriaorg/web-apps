@@ -426,16 +426,19 @@ export const SubmitButton = ({
   }, [state, token0?.coinDenom, token1?.coinDenom]);
 
   const isDisabled = useMemo(() => {
-    return (
-      isPendingToken0Allowance ||
-      isPendingToken1Allowance ||
-      [
-        ButtonState.INSUFFICIENT_BALANCE,
-        ButtonState.PENDING_SEND_TRANSACTION,
-        ButtonState.INVALID_INPUT,
-      ].includes(state)
-    );
-  }, [isPendingToken0Allowance, isPendingToken1Allowance, state]);
+    // Disable creating a position for EOL.
+    return true;
+
+    // return (
+    //   isPendingToken0Allowance ||
+    //   isPendingToken1Allowance ||
+    //   [
+    //     ButtonState.INSUFFICIENT_BALANCE,
+    //     ButtonState.PENDING_SEND_TRANSACTION,
+    //     ButtonState.INVALID_INPUT,
+    //   ].includes(state)
+    // );
+  }, []);
 
   return (
     <>
