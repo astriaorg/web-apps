@@ -10,8 +10,7 @@ export const EolBanner = () => {
 
   return (
     <div
-      className="w-full text-white px-4 py-3 relative z-50"
-      style={{ backgroundColor: "#e63b36" }}
+      className="w-full text-white px-4 py-3 relative z-50 bg-danger"
     >
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
         <div className="flex-1">
@@ -26,8 +25,7 @@ export const EolBanner = () => {
             href={feedbackFormURL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-white font-medium rounded-md hover:bg-opacity-90 transition-colors whitespace-nowrap"
-            style={{ color: "#e63b36" }}
+            className="inline-flex items-center px-4 py-2 bg-white font-medium rounded-md hover:bg-opacity-90 transition-colors whitespace-nowrap text-danger"
           >
             Share Feedback
           </a>
