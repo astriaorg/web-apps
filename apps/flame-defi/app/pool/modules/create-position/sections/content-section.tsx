@@ -350,6 +350,7 @@ export const ContentSection = () => {
             depositType={depositType}
             amount0={derivedValues.derivedAmount0}
             amount1={derivedValues.derivedAmount1}
+            pool={pool}
           />
         </div>
       </div>
