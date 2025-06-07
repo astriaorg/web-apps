@@ -5,14 +5,12 @@ interface NetworkIconProps extends IconProps {
 }
 
 const NETWORK_TO_BACKGROUND_COLOR_MAP: { [key in FlameNetwork]: string } = {
-  [FlameNetwork.LOCAL]: "text-surface-1",
   [FlameNetwork.DUSK]: "text-purple",
   [FlameNetwork.DAWN]: "text-chartreuse",
   [FlameNetwork.MAINNET]: "text-orange",
 };
 
 const NETWORK_TO_ICON_COLOR_MAP: { [key in FlameNetwork]: string } = {
-  [FlameNetwork.LOCAL]: "text-black",
   [FlameNetwork.DUSK]: "text-white",
   [FlameNetwork.DAWN]: "text-black",
   [FlameNetwork.MAINNET]: "text-white",

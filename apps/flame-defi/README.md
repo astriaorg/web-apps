@@ -98,7 +98,6 @@ npm run build
 
     ```typescript
     const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {
-      [FlameNetwork.LOCAL]: local,
       [FlameNetwork.DUSK]: dusk,
       [FlameNetwork.DAWN]: dawn,
       [FlameNetwork.MAINNET]: mainnet,

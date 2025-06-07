@@ -759,7 +759,6 @@ export type V3PoolInRoute = {
 };
 
 export enum FlameNetwork {
-  LOCAL = "local",
   DUSK = "dusk",
   DAWN = "dawn",
   MAINNET = "mainnet",

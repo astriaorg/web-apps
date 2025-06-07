@@ -7,6 +7,7 @@ import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
 
+import { EolBanner } from "./components/eol-banner";
 import { SideTag } from "./components/side-tag/side-tag";
 import { Observability } from "./features/observability";
 import { Providers } from "./providers";
@@ -233,6 +234,7 @@ export default function RootLayout({
         <Providers>
           <Observability />
           <div className="min-h-screen flex flex-col">
+            <EolBanner />
             <NavigationMenu />
             <SideTag label="Get Help" />
             <RouteAnimation>
