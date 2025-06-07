@@ -9,9 +9,7 @@ export const EolBanner = () => {
   const { feedbackFormURL } = useConfig();
 
   return (
-    <div
-      className="w-full text-white px-4 py-3 relative z-50 bg-danger"
-    >
+    <div className="w-full text-white px-4 py-3 relative z-50 bg-danger">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
         <div className="flex-1">
           <span className="font-semibold">⚠️ Important Notice:</span> Flame is
