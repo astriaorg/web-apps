@@ -38,7 +38,7 @@ async function openToDropdown(page: Page) {
   console.log(`Found ${potentialDropdowns.length} potential dropdown elements`);
 
   // Instead of looking for a dialog, look for the specific option in dropdown
-  const manualAddressOption = page.locator('text="Enter address manually"');
+  const manualAddressOption = page.locator('text="Enter Address Manually"');
   await manualAddressOption.waitFor({ state: "visible", timeout: 10000 });
   console.log("Found 'Enter address manually' option");
 
@@ -54,7 +54,7 @@ test("should handle manual address entry in the deposit flow", async ({
   // Navigate to the bridge deposit page
   await page.goto("/bridge/deposit");
 
-  // Try to interact with the To dropdown - the new implementation handles clicking "Enter address manually"
+  // Try to interact with the To dropdown - the new implementation handles clicking "Enter Address Manually"
   await openToDropdown(page);
 
   // Enter manual address in the input field with a wait
