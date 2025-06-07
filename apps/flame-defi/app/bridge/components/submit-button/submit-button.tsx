@@ -102,10 +102,9 @@ export const SubmitButton = ({
   }, [isDisabled, isProcessing, needsApproval]);
 
   return (
-    <div className="flex flex-col gap-3 mt-8">
+    <div className="flex flex-col gap-3 mt-6">
       <div className="w-full">
         <Button
-          variant="gradient"
           onClick={handleClick}
           disabled={isDisabledDerived}
           className={className}

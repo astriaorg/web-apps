@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Card, CardContent } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Card } from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
@@ -17,6 +17,7 @@ import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { Dropdown } from "components/dropdown";
+import { SwapButton } from "components/swap-button";
 import { useConfig } from "config";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -171,7 +172,7 @@ export const ContentSection = () => {
   const additionalDestinationOptions = useMemo(() => {
     return [
       {
-        label: "Enter address manually",
+        label: "Enter Address Manually",
         action: handleEditRecipientClick,
         className: "has-text-primary",
         RightIcon: EditIcon,
@@ -302,18 +303,18 @@ export const ContentSection = () => {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="flex justify-end mb-4">
+      <div className="flex self-end mb-4">
         <ManageWalletsButton />
       </div>
-      <Card className="w-full">
-        <CardContent>
+      <div className="w-full">
+        <div>
           <div>
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">From</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  From
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">From</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -338,8 +339,7 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
+              </Card>
               {/* Source wallet info */}
               {sourceConnection.address && (
                 <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
@@ -375,23 +375,21 @@ export const ContentSection = () => {
           {isAnimating ? (
             <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
-            <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
-              <Link href={ROUTES.DEPOSIT}>
-                <div>
-                  <ArrowDownIcon size={32} />
-                </div>
-              </Link>
-              <div className="hidden sm:block ml-4 border-t border-stroke-default my-4 w-full" />
-            </div>
+            <Link href={ROUTES.DEPOSIT}>
+              <SwapButton
+                icon={<ArrowDownIcon />}
+                className="pointer-events-none"
+              />
+            </Link>
           )}
 
           <div className="mb-4">
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">To</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  To
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">To</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -416,7 +414,7 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
+              </Card>
 
               {/* Destination address display - when using wallet address */}
               {destinationConnection.address &&
@@ -472,12 +470,12 @@ export const ContentSection = () => {
 
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                <div className="mt-3 bg-surface-2 rounded-xl p-2">
                   <div className="text-typography-light font-semibold">
                     <input
                       className="w-full p-2 bg-transparent border border-stroke-default rounded-sm text-typography-default"
                       type="text"
-                      placeholder="Enter address"
+                      placeholder="Enter Address"
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
@@ -503,10 +501,6 @@ export const ContentSection = () => {
             </div>
           </div>
 
-          <div className="flex items-center">
-            <div className="w-full border-t border-stroke-default my-4" />
-          </div>
-
           <AmountInput
             amount={amount}
             setAmount={setAmount}
@@ -522,8 +516,8 @@ export const ContentSection = () => {
             sourceConnection={sourceConnection}
             amountInput={amount}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
