@@ -16,8 +16,6 @@ const buttonVariants = cva(
         secondary:
           "bg-surface-3 text-typography-default border-none hover:bg-surface-1 active:bg-surface-3",
         ghost: "hover:text-typography-light",
-        gradient:
-          "bg-button-gradient text-white transition border border-orange-soft hover:border-white",
         link: "",
       },
       size: {
