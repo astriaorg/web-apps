@@ -8,6 +8,5 @@ export * from "./copy-to-clipboard-button";
 export * from "./info-tooltip";
 export * from "./status-card";
 export * from "./success-check";
-export * from "./toggle-switch";
 export * from "./token-amount-input";
 export * from "./token-icon";

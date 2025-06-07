@@ -1,6 +1,8 @@
 import type { FC } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { cn } from "@repo/ui/utils";
+
 // DropdownOption is an interface for the options that can be selected in the dropdown.
 export interface DropdownOption<T> {
   label: string;
@@ -124,46 +126,54 @@ export const Dropdown = <T,>({
       <div className="w-full">
         <button
           type="button"
-          className="w-full flex items-center justify-between bg-transparent text-grey-light px-4 py-2 disabled:opacity-50 border border-stroke-default rounded-xl h-14"
+          className={cn(
+            "w-full flex items-center justify-between bg-surface-1 border border-stroke-default text-typography-light px-4 py-2 disabled:opacity-50 rounded-xl",
+            isActive && "bg-background-default border-stroke-active",
+          )}
           aria-haspopup="true"
           aria-controls="dropdown-menu"
           onClick={toggleDropdown}
           disabled={disabled}
         >
           {LeftIcon && !selectedOption?.LeftIcon && (
-            <span className="text-grey-light ml-1 mr-3 flex">
+            <span className="text-icon-subdued ml-1 mr-3 flex [&_svg]:size-5">
               <LeftIcon />
             </span>
           )}
           {selectedOption?.LeftIcon && (
-            <span className="text-grey-light ml-1 mr-3 flex">
-              <selectedOption.LeftIcon />
+            <span className="text-icon-subdued ml-1 mr-3 flex">
+              <selectedOption.LeftIcon size={20} />
             </span>
           )}
-          <span className="truncate">
+          <span
+            className={cn(
+              "truncate",
+              selectedOption && "text-typography-default",
+            )}
+          >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <span className="ml-auto text-white">
+          <span className="ml-auto text-icon-default">
             <i className={`fas fa-angle-${isActive ? "up" : "down"}`} />
           </span>
         </button>
       </div>
       {isActive && (
         <div className="absolute w-auto mt-2" id="dropdown-menu" role="menu">
-          <div className="bg-radial-dark border border-white/10 shadow-inner rounded-2xl p-2">
+          <div className="bg-surface-1 rounded-xl p-2 shadow-lg flex flex-col gap-0.5">
             {options?.map((option) => (
               <button
                 type="button"
                 key={option.label}
-                className={`w-full text-left ${
-                  selectedOption?.value === option.value ? "bg-semi-white" : ""
+                className={`w-full text-left rounded-lg ${
+                  selectedOption?.value === option.value ? "bg-surface-3" : ""
                 }`}
                 onClick={() => handleSelect(option)}
               >
-                <span className="flex items-center w-full p-4 text-sm rounded-xl hover:bg-semi-white transition">
+                <span className="flex items-center w-full p-2 text-sm font-medium rounded-lg hover:bg-surface-3 transition">
                   {option.LeftIcon && (
                     <span className="ml-1 mr-3 flex">
-                      <option.LeftIcon />
+                      <option.LeftIcon size={32} />
                     </span>
                   )}
                   {option.label}
@@ -175,24 +185,24 @@ export const Dropdown = <T,>({
               <button
                 type="button"
                 key={`additional-${option.label}`}
-                className={`w-full text-left text-white ${option.className || ""}`}
+                className={`w-full text-left font-medium ${option.className || ""}`}
                 onClick={() => {
                   option.action();
                   setIsActive(false);
                 }}
               >
-                <span className="flex items-center justify-between w-full p-4 text-sm rounded-xl hover:bg-semi-white transition">
+                <span className="flex items-center justify-between gap-6 w-full px-3 py-2 h-12 text-sm rounded-lg hover:bg-surface-3 transition">
                   <span className="flex items-center">
                     {option.LeftIcon && (
-                      <span className="ml-1 mr-3 text-white flex">
+                      <span className="ml-1 mr-3 text-icon-default flex">
                         <option.LeftIcon />
                       </span>
                     )}
                     <span className="truncate grow">{option.label}</span>
                   </span>
                   {option.RightIcon && (
-                    <span className="text-white flex">
-                      <option.RightIcon size={20} />
+                    <span className="text-icon-subdued flex">
+                      <option.RightIcon size={24} />
                     </span>
                   )}
                 </span>

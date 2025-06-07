@@ -225,10 +225,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // TODO: Add theme toggle.
     <html
       lang="en"
-      data-theme="dark"
       className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable} ${inter.variable}`}
     >
       <body>
