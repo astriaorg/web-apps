@@ -272,12 +272,11 @@ export const SubmitButton = ({
           useFullPrecision: true,
         });
 
-        const { amount0: amount0Min } = position0.mintAmountsWithSlippage(
-          new Percent(slippageTolerance * 100, 100 * 100),
-        );
-        const { amount0: amount1Min } = position1.mintAmountsWithSlippage(
-          new Percent(slippageTolerance * 100, 100 * 100),
-        );
+        const percent = new Percent(slippageTolerance * 100, 100 * 100);
+        const { amount0: amount0Min } =
+          position0.mintAmountsWithSlippage(percent);
+        const { amount0: amount1Min } =
+          position1.mintAmountsWithSlippage(percent);
 
         params.amount0Min = BigInt(amount0Min.toString());
         params.amount1Min = BigInt(amount1Min.toString());
