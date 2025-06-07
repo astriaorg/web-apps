@@ -1,32 +1,28 @@
 "use client";
 
 import Big from "big.js";
-import { motion, type Transition } from "motion/react";
+import { motion } from "motion/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EvmCurrency } from "@repo/flame-types";
 import type { Amount } from "@repo/ui/components";
 import { useValidateTokenAmount } from "@repo/ui/hooks";
 import { formatNumberWithoutTrailingZeros } from "@repo/ui/utils";
+import { SWAP_BUTTON_TRANSITION, SwapButton } from "components/swap-button";
 import { useAstriaChainData } from "config";
-import { filterPoolTokens } from "pool/components/token-select";
 import { useGetPools } from "pool/hooks/use-get-pools";
 import { FeeTierSelect } from "pool/modules/create-position/components/fee-tier-select";
 import { InitialPriceInput } from "pool/modules/create-position/components/initial-price-input";
 import { PriceRangeInput } from "pool/modules/create-position/components/price-range-input";
 import { SubmitButton } from "pool/modules/create-position/components/submit-button";
-import { SwapButton } from "pool/modules/create-position/components/swap-button";
 import { TokenAmountInput } from "pool/modules/create-position/components/token-amount-input";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
 import { DepositType, InputId } from "pool/types";
-import { calculateDepositType, calculateNewPoolPrices } from "pool/utils";
-
-const TRANSITION: Transition = {
-  duration: 0.1,
-  type: "spring",
-  damping: 30,
-  stiffness: 500,
-};
+import {
+  calculateDepositType,
+  calculateNewPoolPrices,
+  filterPoolTokens,
+} from "pool/utils";
 
 export const ContentSection = () => {
   const { chain } = useAstriaChainData();
@@ -280,7 +276,7 @@ export const ContentSection = () => {
               depositType === DepositType.TOKEN_0_ONLY) && (
               <motion.div
                 layout
-                transition={TRANSITION}
+                transition={SWAP_BUTTON_TRANSITION}
                 key={isInverted ? InputId.INPUT_1 : InputId.INPUT_0}
               >
                 <TokenAmountInput
@@ -308,7 +304,7 @@ export const ContentSection = () => {
               depositType === DepositType.TOKEN_1_ONLY) && (
               <motion.div
                 layout
-                transition={TRANSITION}
+                transition={SWAP_BUTTON_TRANSITION}
                 key={isInverted ? InputId.INPUT_0 : InputId.INPUT_1}
               >
                 <TokenAmountInput
@@ -354,6 +350,7 @@ export const ContentSection = () => {
             depositType={depositType}
             amount0={derivedValues.derivedAmount0}
             amount1={derivedValues.derivedAmount1}
+            pool={pool}
           />
         </div>
       </div>

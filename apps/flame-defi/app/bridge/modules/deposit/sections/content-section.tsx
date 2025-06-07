@@ -7,14 +7,8 @@ import { isAddress } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer } from "@repo/ui/components";
-import {
-  ArrowDownIcon,
-  BaseIcon,
-  EditIcon,
-  PlusIcon,
-  WalletIcon,
-} from "@repo/ui/icons";
+import { AnimatedArrowSpacer, Card } from "@repo/ui/components";
+import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
 import { ManageWalletsButton } from "bridge/components/manage-wallets-button";
@@ -24,6 +18,7 @@ import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 import { useDepositTransaction } from "bridge/modules/deposit/hooks/use-deposit-transaction";
 import { Dropdown } from "components/dropdown";
+import { SwapButton } from "components/swap-button";
 import { useConfig } from "config";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -59,7 +54,11 @@ export const ContentSection = () => {
   const { isLoading, executeDeposit } = useDepositTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+  const { astriaChains, cosmosChains } = useConfig();
+
+  const sourceChains = Object.values(cosmosChains).filter((chain) =>
+    chain.currencies?.some((currency) => currency.isDepositable),
+  );
 
   const {
     sourceChainOptions,
@@ -68,11 +67,9 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
-    sourceChains: [
-      ...Object.values(coinbaseChains),
-      ...Object.values(cosmosChains),
-    ],
-    destinationChains: [...Object.values(astriaChains)],
+    sourceChains,
+    destinationChains: Object.values(astriaChains),
+    mode: "deposit",
   });
 
   // without these in combination with Dropdown's valueOverride,
@@ -178,53 +175,20 @@ export const ContentSection = () => {
   ]);
 
   // additional options
-  const additionalSourceOptions = useMemo(
-    () => [
-      {
-        // TODO - where should the Fund button actually go?
-        label: "Fund with Coinbase OnRamp",
-        action: () => {
-          console.log("Coinbase OnRamp clicked");
-        },
-        className: "text-white",
-        LeftIcon: BaseIcon,
-        RightIcon: PlusIcon,
-      },
-    ],
-    [],
-  );
+  const additionalSourceOptions = useMemo(() => [], []);
 
   // FIXME - should this be an edit button next to the input or something instead?
   //  kinda hard to find as an additional dropdown option
   const additionalDestinationOptions = useMemo(() => {
     return [
       {
-        label: "Enter address manually",
+        label: "Enter Address Manually",
         action: handleEditRecipientClick,
         className: "has-text-primary",
         RightIcon: EditIcon,
       },
     ];
   }, [handleEditRecipientClick]);
-
-  // TODO - coinbase onramp url
-  // Set up Coinbase onramp button URL
-  // const coinbaseOnrampBuyUrl = useMemo(() => {
-  //   if (!evmWallet.evmAccountAddress) {
-  //     return undefined;
-  //   }
-  //
-  //   return getOnrampBuyUrl({
-  //     projectId: "5e9f4c41-a90f-4eb5-b6a4-676eaf0f836d", // TODO - get from config
-  //     // FIXME - does passing in address here mean we have to create the account first?
-  //     addresses: {
-  //       [evmWallet.evmAccountAddress]: ["base"],
-  //     },
-  //     assets: ["USDC"],
-  //     presetFiatAmount: 20,
-  //     fiatCurrency: "USD",
-  //   });
-  // }, [evmWallet.evmAccountAddress]);
 
   const sourceCurrencyOptions = useMemo(
     () => getSourceCurrencyOptions(sourceConnection.chain),
@@ -336,19 +300,19 @@ export const ContentSection = () => {
   ]);
 
   return (
-    <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
-      <div className="w-full px-0 md:w-[675px] lg:px-4">
-        <div className="flex justify-end mb-4">
-          <ManageWalletsButton />
-        </div>
-        <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+    <div className="flex flex-col items-center w-full">
+      <div className="flex self-end mb-4">
+        <ManageWalletsButton />
+      </div>
+      <div className="w-full">
+        <div>
           <div>
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">From</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  From
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">From</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -373,17 +337,17 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
+              </Card>
 
               {/* Source wallet info - unified display regardless of chain type */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <p className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <p className="text-typography-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
+                      <p className="mt-2 text-typography-subdued font-semibold">
                         Balance: {isLoadingSourceBalance && "Loading..."}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
@@ -412,23 +376,21 @@ export const ContentSection = () => {
           {isAnimating ? (
             <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
-            <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
-              <Link href={ROUTES.WITHDRAW}>
-                <div>
-                  <ArrowDownIcon size={32} />
-                </div>
-              </Link>
-              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
-            </div>
+            <Link href={ROUTES.WITHDRAW}>
+              <SwapButton
+                icon={<ArrowDownIcon />}
+                className="pointer-events-none"
+              />
+            </Link>
           )}
 
           <div className="mb-4">
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">To</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  To
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">To</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -453,15 +415,14 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
+              </Card>
               {/* Destination address display - when using wallet address */}
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
                     <p
-                      className="text-grey-light font-semibold cursor-pointer"
+                      className="text-typography-light font-semibold cursor-pointer"
                       onKeyDown={handleEditRecipientClick}
                       onClick={handleEditRecipientClick}
                     >
@@ -472,7 +433,7 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
+                        <p className="mt-2 text-typography-subdued font-semibold">
                           Balance: {isLoadingDestinationBalance && "Loading..."}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
@@ -496,12 +457,11 @@ export const ContentSection = () => {
                       )}
                   </div>
                 )}
-
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-grey-medium">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
                   <p
-                    className="text-grey-light font-semibold cursor-pointer"
+                    className="text-typography-light font-semibold cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
@@ -516,19 +476,18 @@ export const ContentSection = () => {
                     </div>
                   )}
                   {destinationConnection.currency && (
-                    <p className="mt-2 text-grey-lighter font-semibold text-sm">
+                    <p className="mt-2 text-typography-subdued font-semibold text-sm">
                       Connect via wallet to show balance
                     </p>
                   )}
                 </div>
               )}
-
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-grey-medium bg-semi-white">
-                  <div className="text-grey-light font-semibold">
+                <div className="mt-3 rounded-xl p-4 transition border border-solid border-stroke-default bg-semi-white">
+                  <div className="text-typography-light font-semibold">
                     <input
-                      className="w-full p-3 bg-transparent border border-grey-dark focus:border-white focus:outline-hidden rounded-xl text-white"
+                      className="w-full p-3 bg-transparent border border-stroke-default focus:border-stroke-active focus:outline-hidden rounded-xl text-typography-default"
                       type="text"
                       placeholder="0x..."
                       onChange={updateRecipientAddressOverride}
@@ -537,14 +496,14 @@ export const ContentSection = () => {
                     <div className="mt-3 flex space-x-2">
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientSave}
                       >
                         Save
                       </button>
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientClear}
                       >
                         Clear
@@ -554,10 +513,6 @@ export const ContentSection = () => {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="flex flex-row items-center">
-            <div className="border-t border-grey-dark my-4 w-full" />
           </div>
 
           <AmountInput

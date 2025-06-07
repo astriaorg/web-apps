@@ -3,11 +3,10 @@
 import Big from "big.js";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { formatUnits } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer } from "@repo/ui/components";
+import { AnimatedArrowSpacer, Card } from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
@@ -18,6 +17,7 @@ import { useBridgeConnections } from "bridge/hooks/use-bridge-connections";
 import { useBridgeOptions } from "bridge/hooks/use-bridge-options";
 import { useWithdrawTransaction } from "bridge/modules/withdraw/hooks/use-withdraw-transaction";
 import { Dropdown } from "components/dropdown";
+import { SwapButton } from "components/swap-button";
 import { useConfig } from "config";
 import { AddErc20ToWalletButton } from "features/evm-wallet";
 import { NotificationType, useNotifications } from "features/notifications";
@@ -53,7 +53,7 @@ export const ContentSection = () => {
   const { isLoading, executeWithdraw } = useWithdrawTransaction();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  const { astriaChains, cosmosChains, coinbaseChains } = useConfig();
+  const { astriaChains, cosmosChains } = useConfig();
 
   const {
     sourceChainOptions,
@@ -62,11 +62,9 @@ export const ContentSection = () => {
     getDestinationCurrencyOptions,
     findMatchingDestinationCurrency,
   } = useBridgeOptions({
-    sourceChains: [...Object.values(astriaChains)],
-    destinationChains: [
-      ...Object.values(coinbaseChains),
-      ...Object.values(cosmosChains),
-    ],
+    sourceChains: Object.values(astriaChains),
+    destinationChains: Object.values(cosmosChains),
+    mode: "withdraw",
   });
 
   // without these in combination with Dropdown's valueOverride,
@@ -174,7 +172,7 @@ export const ContentSection = () => {
   const additionalDestinationOptions = useMemo(() => {
     return [
       {
-        label: "Enter address manually",
+        label: "Enter Address Manually",
         action: handleEditRecipientClick,
         className: "has-text-primary",
         RightIcon: EditIcon,
@@ -303,44 +301,20 @@ export const ContentSection = () => {
     sourceConnection.currency?.coinDenom,
   ]);
 
-  const ibcWithdrawFeeDisplay = useMemo(() => {
-    const destinationChainNativeToken =
-      destinationConnection.chain?.currencies.find(
-        (currency) => currency.isNative,
-      );
-
-    if (
-      !destinationChainNativeToken ||
-      !destinationConnection.currency ||
-      !(
-        destinationConnection.currency instanceof EvmCurrency &&
-        destinationConnection.currency?.ibcWithdrawalFeeWei
-      )
-    ) {
-      return "";
-    }
-
-    const fee = formatUnits(
-      BigInt(destinationConnection.currency.ibcWithdrawalFeeWei),
-      destinationChainNativeToken.coinDecimals,
-    );
-    return `${fee} ${destinationChainNativeToken.coinDenom}`;
-  }, [destinationConnection.chain?.currencies, destinationConnection.currency]);
-
   return (
-    <div className="w-full min-h-[calc(100vh-85px-96px)] flex flex-col items-center">
-      <div className="w-full px-0 md:w-[675px] lg:px-4">
-        <div className="flex justify-end mb-4">
-          <ManageWalletsButton />
-        </div>
-        <div className="px-4 py-12 sm:px-4 lg:p-12 bg-[radial-gradient(144.23%_141.13%_at_50.15%_0%,#221F1F_0%,#050A0D_100%)] shadow-[inset_1px_1px_1px_-1px_rgba(255,255,255,0.5)] rounded-2xl">
+    <div className="flex flex-col items-center w-full">
+      <div className="flex self-end mb-4">
+        <ManageWalletsButton />
+      </div>
+      <div className="w-full">
+        <div>
           <div>
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">From</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  From
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">From</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -365,17 +339,16 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
+              </Card>
               {/* Source wallet info */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <p className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <p className="text-typography-light font-semibold">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-grey-lighter font-semibold">
+                      <p className="mt-2 text-typography-subdued font-semibold">
                         Balance: {isLoadingSourceBalance && "Loading..."}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
@@ -402,23 +375,21 @@ export const ContentSection = () => {
           {isAnimating ? (
             <AnimatedArrowSpacer isAnimating={isAnimating} />
           ) : (
-            <div className="flex flex-row justify-center sm:justify-start mt-4 sm:my-4">
-              <Link href={ROUTES.DEPOSIT}>
-                <div>
-                  <ArrowDownIcon size={32} />
-                </div>
-              </Link>
-              <div className="hidden sm:block ml-4 border-t border-grey-dark my-4 w-full" />
-            </div>
+            <Link href={ROUTES.DEPOSIT}>
+              <SwapButton
+                icon={<ArrowDownIcon />}
+                className="pointer-events-none"
+              />
+            </Link>
           )}
 
           <div className="mb-4">
             <div className="flex flex-col">
-              <div className="mb-2 sm:hidden">To</div>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="hidden sm:block sm:mr-4 sm:min-w-[60px]">
-                  To
-                </div>
+              <Card
+                variant="secondary"
+                className="flex flex-col px-6 py-10 gap-2 sm:flex-row sm:items-center"
+              >
+                <div className="sm:mr-4 sm:min-w-[60px]">To</div>
                 <div className="flex flex-col sm:flex-row w-full gap-3">
                   <div className="grow">
                     <Dropdown
@@ -443,15 +414,15 @@ export const ContentSection = () => {
                     </div>
                   )}
                 </div>
-              </div>
+              </Card>
 
               {/* Destination address display - when using wallet address */}
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+                  <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
                     <p
-                      className="text-grey-light font-semibold cursor-pointer"
+                      className="text-typography-light font-semibold cursor-pointer"
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
@@ -461,7 +432,7 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-grey-lighter font-semibold">
+                        <p className="mt-2 text-typography-subdued font-semibold">
                           Balance: {isLoadingDestinationBalance && "Loading..."}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
@@ -471,20 +442,14 @@ export const ContentSection = () => {
                             `0 ${destinationConnection.currency.coinDenom}`}
                         </p>
                       )}
-                    {/* Withdrawal fee display */}
-                    {ibcWithdrawFeeDisplay && (
-                      <div className="mt-2 text-grey-light text-sm">
-                        Withdrawal fee: {ibcWithdrawFeeDisplay}
-                      </div>
-                    )}
                   </div>
                 )}
 
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
+                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
                   <p
-                    className="text-grey-light font-semibold cursor-pointer"
+                    className="text-typography-light font-semibold cursor-pointer"
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
@@ -497,7 +462,7 @@ export const ContentSection = () => {
                       Recipient address must be a valid address
                     </div>
                   )}
-                  <p className="mt-2 text-grey-lighter font-semibold text-xs">
+                  <p className="mt-2 text-typography-subdued font-semibold text-xs">
                     Connect via wallet to show balance
                   </p>
                 </div>
@@ -505,19 +470,19 @@ export const ContentSection = () => {
 
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 bg-grey-dark rounded-xl py-2 px-3">
-                  <div className="text-grey-light font-semibold">
+                <div className="mt-3 bg-surface-2 rounded-xl p-2">
+                  <div className="text-typography-light font-semibold">
                     <input
-                      className="w-full p-2 bg-transparent border border-white rounded-sm text-white"
+                      className="w-full p-2 bg-transparent border border-stroke-default rounded-sm text-typography-default"
                       type="text"
-                      placeholder="Enter address"
+                      placeholder="Enter Address"
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
                     <div className="mt-3 flex space-x-2">
                       <button
                         type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
                         onClick={handleEditRecipientSave}
                       >
                         Save
@@ -534,10 +499,6 @@ export const ContentSection = () => {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="flex items-center">
-            <div className="w-full border-t border-grey-dark my-4" />
           </div>
 
           <AmountInput

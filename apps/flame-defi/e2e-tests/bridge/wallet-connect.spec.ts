@@ -34,7 +34,7 @@ test("should connect EVM wallet from bridge connections modal", async ({
   // (In this test, we're targeting the first wallet connect button in the modal, which should be EVM)
   await page.locator('button:has-text("EVM Wallet")').click();
 
-  // RainbowKit modal opens - click on the MetaMask button
+  // Modal opens - click on the MetaMask button
   await page.locator('button:has-text("MetaMask")').click();
 
   // Wait for MetaMask to load and handle the connection
@@ -64,7 +64,7 @@ test("should connect EVM wallet from bridge connections modal", async ({
 
   // Verify that the balance shows TIA tokens,
   // which is the native currency of the default selected cosmos chain
-  await expect(page.locator("text=TIA")).toBeVisible();
+  await expect(page.locator("span.text-4xl:has-text('TIA')")).toBeVisible();
 
   // Wait for USD balance to load (this may take some time)
   // await page.waitForTimeout(5000);

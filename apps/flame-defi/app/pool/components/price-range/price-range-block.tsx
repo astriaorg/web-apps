@@ -22,7 +22,7 @@ export const PriceRangeBlock = ({
         {label}
       </CardLabel>
       {/* Use sans instead of dot font because the dot font infinity symbol looks weird. */}
-      <CardFigureLabel className="text-typography-light font-sans">
+      <CardFigureLabel className="text-typography-light font-sans truncate">
         {price}
       </CardFigureLabel>
       <PricePerTokenLabel token0={token0} token1={token1} />

@@ -48,6 +48,7 @@
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",
     "./icons": "./src/icons/index.ts",
+    "./icons/monochrome": "./src/icons/monochrome/index.ts",
     "./icons/polychrome": "./src/icons/polychrome/index.ts",
     "./logos": "./src/logos/index.ts"
   },

@@ -4,11 +4,11 @@ import type {
   Chain as CosmosKitChain,
   DenomUnit,
 } from "@chain-registry/types";
-import type { Chain } from "@rainbow-me/rainbowkit";
 import { Token } from "@uniswap/sdk-core";
 import Big from "big.js";
 import JSBI from "jsbi";
 import React from "react";
+import type { Chain } from "viem";
 import { type Address, ChainContract, parseUnits } from "viem";
 
 /**
@@ -19,7 +19,7 @@ import { type Address, ChainContract, parseUnits } from "viem";
  *
  * An Astria chain is technically an EVM chain, but it is useful
  * to have a mechanism to distinguish between Astria (fka Flame) and
- * other EVM based chains (Arbitrum, Base, Optimism).
+ * other EVM based chains.
  */
 export enum ChainType {
   ASTRIA = "astria",
@@ -190,8 +190,10 @@ export interface GenericCurrency extends BaseCurrency {
   readonly chainId: string | number;
   /** True if this is the native token (e.g., TIA) */
   readonly isNative: boolean;
-  /** True if this token should be shown in bridge page dropdowns */
-  readonly isBridgeable: boolean;
+  /** True if this token can be deposited in bridge */
+  readonly isDepositable: boolean;
+  /** True if this token can be withdrawn in bridge */
+  readonly isWithdrawable: boolean;
   /** Component to render the token's icon */
   readonly IconComponent?: React.FC<IconProps>;
 }
@@ -206,7 +208,8 @@ export class IbcCurrency implements GenericCurrency {
   public readonly title: string;
   public readonly chainId: string;
   public readonly isNative: boolean;
-  public readonly isBridgeable: boolean;
+  public readonly isDepositable: boolean;
+  public readonly isWithdrawable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
   public readonly coinGeckoId?: string;
   public readonly coinImageUrl?: string;
@@ -224,7 +227,8 @@ export class IbcCurrency implements GenericCurrency {
     title: string;
     chainId: string;
     isNative: boolean;
-    isBridgeable: boolean;
+    isDepositable: boolean;
+    isWithdrawable: boolean;
     IconComponent?: React.FC<IconProps>;
     coinDenom: string;
     coinMinimalDenom: string;
@@ -240,7 +244,8 @@ export class IbcCurrency implements GenericCurrency {
     this.coinMinimalDenom = params.coinMinimalDenom;
     this.coinDecimals = params.coinDecimals;
     this.isNative = params.isNative;
-    this.isBridgeable = params.isBridgeable;
+    this.isDepositable = params.isDepositable;
+    this.isWithdrawable = params.isWithdrawable;
     this.coinGeckoId = params.coinGeckoId;
     this.coinImageUrl = params.coinImageUrl;
     this.ibcChannel = params.ibcChannel;
@@ -326,7 +331,8 @@ export class EvmCurrency implements GenericCurrency {
   public readonly title: string;
   public readonly chainId: number;
   public readonly isNative: boolean;
-  public readonly isBridgeable: boolean;
+  public readonly isDepositable: boolean;
+  public readonly isWithdrawable: boolean;
   public readonly IconComponent?: React.FC<IconProps>;
   public readonly coinDenom: string;
   public readonly coinMinimalDenom: string;
@@ -354,7 +360,8 @@ export class EvmCurrency implements GenericCurrency {
     title: string;
     chainId: number;
     isNative: boolean;
-    isBridgeable: boolean;
+    isDepositable: boolean;
+    isWithdrawable: boolean;
     IconComponent?: React.FC<IconProps>;
     coinDenom: string;
     coinMinimalDenom: string;
@@ -379,7 +386,8 @@ export class EvmCurrency implements GenericCurrency {
     this.astriaIntentBridgeAddress = params.astriaIntentBridgeAddress;
     this.isWrappedNative = params.isWrappedNative;
     this.isNative = params.isNative;
-    this.isBridgeable = params.isBridgeable;
+    this.isDepositable = params.isDepositable;
+    this.isWithdrawable = params.isWithdrawable;
     this.IconComponent = params.IconComponent;
   }
 
@@ -462,16 +470,11 @@ export interface AstriaChain extends EvmChainInfo {
   };
 }
 
-// CoinbaseChains type maps labels to CoinbaseChain objects
-export type CoinbaseChains = {
-  [label: string]: EvmChainInfo;
-};
-
 /**
- * Converts an EvmChainInfo object to a Chain object for use with RainbowKit.
+ * Converts an EvmChainInfo object to a Chain object for use with Viem.
  * @param evmChain
  */
-export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
+export function evmChainToViemChain(evmChain: EvmChainInfo): Chain {
   const nativeCurrency = evmChain.currencies.find(
     (currency) => currency.isNative,
   );
@@ -508,16 +511,16 @@ export function evmChainToRainbowKitChain(evmChain: EvmChainInfo): Chain {
 }
 
 /**
- * Converts a map of EVM chains to an array of Chain objects for use with RainbowKit.
+ * Converts a map of EVM chains to an array of Chain objects for use with Viem.
  * @param evmChains
  */
-export function evmChainsToRainbowKitChains(
+export function evmChainsToViemChains(
   evmChains: EvmChainInfo[],
 ): readonly [Chain, ...Chain[]] {
   if (evmChains.length === 0) {
     throw new Error("At least one chain must be provided");
   }
-  return evmChains.map((evmChain) => evmChainToRainbowKitChain(evmChain)) as [
+  return evmChains.map((evmChain) => evmChainToViemChain(evmChain)) as [
     Chain,
     ...Chain[],
   ];
@@ -756,7 +759,6 @@ export type V3PoolInRoute = {
 };
 
 export enum FlameNetwork {
-  LOCAL = "local",
   DUSK = "dusk",
   DAWN = "dawn",
   MAINNET = "mainnet",

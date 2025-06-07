@@ -1,3 +1,5 @@
+import { Percent } from "@uniswap/sdk-core";
+import { nearestUsableTick, Pool, Position } from "@uniswap/v3-sdk";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { type Hash, maxUint256, parseUnits } from "viem";
@@ -9,7 +11,7 @@ import { ValidateTokenAmountErrorType } from "@repo/ui/hooks";
 import { getSlippageTolerance } from "@repo/ui/utils";
 import { ConfirmationModal } from "components/confirmation-modal-v2";
 import { Environment, useAstriaChainData, useConfig } from "config";
-import type { CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
+import { type CreateAndInitializePoolIfNecessaryAndMintParams } from "features/evm-wallet";
 import { useApproveToken } from "hooks/use-approve-token";
 import { useTokenAllowance } from "hooks/use-token-allowance";
 import { SubmitButton as BaseSubmitButton } from "pool/components/submit-button";
@@ -20,28 +22,26 @@ import {
 import { ROUTES } from "pool/constants/routes";
 import { useMint } from "pool/hooks/use-mint";
 import { usePageContext } from "pool/modules/create-position/hooks/use-page-context";
-import { DepositType } from "pool/types";
+import { DepositType, FEE_TIER_TICK_SPACING } from "pool/types";
 import {
   calculateNearestTickAndPrice,
   getIncreaseLiquidityAmounts,
 } from "pool/utils";
 
-interface BaseSubmitButtonProps {
+interface SubmitButtonProps {
   amount0: Amount;
   amount1: Amount;
   depositType: DepositType;
+  /**
+   * The current price in sqrtPriceX96 format.
+   * If `null`, the pool is uninitialized.
+   */
+  sqrtPriceX96: bigint | null;
+  /**
+   * The pool object if initialized, otherwise `null`.
+   */
+  pool: Pool | null;
 }
-
-interface InitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
-  sqrtPriceX96: null;
-}
-interface UninitializedPoolSubmitButtonProps extends BaseSubmitButtonProps {
-  sqrtPriceX96: bigint;
-}
-
-type SubmitButtonProps =
-  | InitializedPoolSubmitButtonProps
-  | UninitializedPoolSubmitButtonProps;
 
 // TODO: Split into generic button state and pool-specific button states.
 enum ButtonState {
@@ -60,6 +60,7 @@ export const SubmitButton = ({
   amount1,
   sqrtPriceX96,
   depositType,
+  pool,
 }: SubmitButtonProps) => {
   const router = useRouter();
   const { address } = useAccount();
@@ -248,6 +249,39 @@ export const SubmitButton = ({
         sqrtPriceX96,
       };
 
+      if (pool) {
+        const tickSpacing = FEE_TIER_TICK_SPACING[feeTier];
+        const nearestLowerTick = nearestUsableTick(tickLower, tickSpacing);
+        const nearestUpperTick = nearestUsableTick(tickUpper, tickSpacing);
+
+        params.tickLower = nearestLowerTick;
+        params.tickUpper = nearestUpperTick;
+
+        const position0 = Position.fromAmount0({
+          pool,
+          tickLower: nearestLowerTick,
+          tickUpper: nearestUpperTick,
+          amount0: amount0Desired.toString(),
+          useFullPrecision: true,
+        });
+        const position1 = Position.fromAmount0({
+          pool,
+          tickLower: nearestLowerTick,
+          tickUpper: nearestUpperTick,
+          amount0: amount1Desired.toString(),
+          useFullPrecision: true,
+        });
+
+        const percent = new Percent(slippageTolerance * 100, 100 * 100);
+        const { amount0: amount0Min } =
+          position0.mintAmountsWithSlippage(percent);
+        const { amount0: amount1Min } =
+          position1.mintAmountsWithSlippage(percent);
+
+        params.amount0Min = BigInt(amount0Min.toString());
+        params.amount1Min = BigInt(amount1Min.toString());
+      }
+
       const hash = await mint(params);
 
       setHash(hash);
@@ -272,6 +306,7 @@ export const SubmitButton = ({
     maxPrice,
     slippageTolerance,
     sqrtPriceX96,
+    pool,
     mint,
   ]);
 
@@ -426,16 +461,19 @@ export const SubmitButton = ({
   }, [state, token0?.coinDenom, token1?.coinDenom]);
 
   const isDisabled = useMemo(() => {
-    return (
-      isPendingToken0Allowance ||
-      isPendingToken1Allowance ||
-      [
-        ButtonState.INSUFFICIENT_BALANCE,
-        ButtonState.PENDING_SEND_TRANSACTION,
-        ButtonState.INVALID_INPUT,
-      ].includes(state)
-    );
-  }, [isPendingToken0Allowance, isPendingToken1Allowance, state]);
+    // Disable creating a position for EOL.
+    return true;
+
+    // return (
+    //   isPendingToken0Allowance ||
+    //   isPendingToken1Allowance ||
+    //   [
+    //     ButtonState.INSUFFICIENT_BALANCE,
+    //     ButtonState.PENDING_SEND_TRANSACTION,
+    //     ButtonState.INVALID_INPUT,
+    //   ].includes(state)
+    // );
+  }, []);
 
   return (
     <>

@@ -1,107 +1,105 @@
 "use client";
 
-import { OnchainKitProvider } from "@coinbase/onchainkit";
-import { wallets as keplrWallets } from "@cosmos-kit/keplr";
-import { wallets as leapWallets } from "@cosmos-kit/leap";
-import { ChainProvider } from "@cosmos-kit/react";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { assets, chains } from "chain-registry";
-import type { ReactNode } from "react";
+import { createContext, type ReactNode, useEffect, useState } from "react";
 import { IntlProvider } from "react-intl";
-import { WagmiProvider } from "wagmi";
-import { base } from "wagmi/chains";
 
-import {
-  ChainId,
-  cosmosChainInfosToCosmosKitAssetLists,
-  cosmosChainInfosToCosmosKitChains,
-  evmChainsToRainbowKitChains,
-} from "@repo/flame-types";
-import {
-  ConfigContextProvider,
-  getAllChainConfigs,
-  getEnvVariable,
-} from "config";
+import { ConfigContextProvider } from "config";
+import { CosmosKitProvider } from "features/cosmos-kit";
 import { CosmosWalletProvider } from "features/cosmos-wallet";
-import {
-  AstriaWalletContextProvider,
-  EvmWalletProvider,
-} from "features/evm-wallet";
+import { AstriaWalletContextProvider } from "features/evm-wallet";
 import { NotificationsContextProvider } from "features/notifications";
+import { PrivyProvider } from "features/privy";
+import { WagmiProvider } from "features/wagmi";
 
-const WALLET_CONNECT_PROJECT_ID = getEnvVariable(
-  "NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID",
-);
-
-const ONCHAINKIT_API_KEY = getEnvVariable("NEXT_PUBLIC_ONCHAINKIT_API_KEY");
-const CDP_PROJECT_ID = getEnvVariable("NEXT_PUBLIC_CDP_PROJECT_ID");
-
+// tanstack
 const queryClient = new QueryClient();
 
-// FIXME - getting chains across ALL Astria networks (dusk, dawn, mainnet)
-//  so we only have to generate wagmi, rainbowKitConfig, and cosmos kit config once,
-//  BUT this could be avoided if we defined these providers a level under ConfigContextProvider,
-//  so the wagmi, rainbowkit, and cosmoskit providers would rerender with up to date chains
-//  when the selected network (dusk, dawn, mainnet) was changed.
-const { astriaChains, cosmosChains, coinbaseChains } = getAllChainConfigs();
+type Theme = "light" | "dark" | "system";
 
-// for the wagmi and rainbowkit config
-const allEvmChains = [...astriaChains, ...coinbaseChains];
-// wagmi and rainbowkit config, for evm chains
-const rainbowKitConfig = getDefaultConfig({
-  appName: "Flame Bridge",
-  projectId: WALLET_CONNECT_PROJECT_ID,
-  chains: evmChainsToRainbowKitChains(allEvmChains),
-});
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
 
-// TODO - refactor ChainProvider to same level as the cosmos wallet context provider
-//  because they are only used for Bridge
-const cosmosKitChains = cosmosChainInfosToCosmosKitChains(cosmosChains);
-const cosmosKitAssetLists = cosmosChainInfosToCosmosKitAssetLists(cosmosChains);
+interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [theme, setTheme] = useState<Theme>("system");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as Theme | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+      setResolvedTheme(systemTheme);
+    } else {
+      setResolvedTheme(theme);
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = () => {
+      if (theme === "system") {
+        setResolvedTheme(mediaQuery.matches ? "dark" : "light");
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", resolvedTheme);
+  }, [resolvedTheme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
 
 // Common providers for the entire app
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ConfigContextProvider>
+    <ThemeProvider>
       <IntlProvider locale="en">
         <NotificationsContextProvider>
-          <WagmiProvider config={rainbowKitConfig}>
-            <QueryClientProvider client={queryClient}>
-              <RainbowKitProvider initialChain={ChainId.MAINNET}>
-                <ChainProvider
-                  assetLists={[...assets, ...cosmosKitAssetLists]}
-                  chains={[...chains, ...cosmosKitChains]}
-                  wallets={[...keplrWallets, ...leapWallets]}
-                  walletConnectOptions={{
-                    signClient: {
-                      projectId: WALLET_CONNECT_PROJECT_ID,
-                    },
-                  }}
-                  signerOptions={{
-                    preferredSignType: () => "amino",
-                  }}
-                  throwErrors={false}
-                >
-                  <OnchainKitProvider
-                    apiKey={ONCHAINKIT_API_KEY}
-                    projectId={CDP_PROJECT_ID}
-                    chain={base}
-                  >
+          <ConfigContextProvider>
+            <PrivyProvider>
+              <QueryClientProvider client={queryClient}>
+                <WagmiProvider>
+                  <CosmosKitProvider>
                     <AstriaWalletContextProvider>
                       {/* Bridge specific providers moved here from bridge/layout.tsx to
-                          prevent re-initialization during page navigation */}
-                      <EvmWalletProvider>
-                        <CosmosWalletProvider>{children}</CosmosWalletProvider>
-                      </EvmWalletProvider>
+                        prevent re-initialization during page navigation */}
+                      <CosmosWalletProvider>{children}</CosmosWalletProvider>
                     </AstriaWalletContextProvider>
-                  </OnchainKitProvider>
-                </ChainProvider>
-              </RainbowKitProvider>
-            </QueryClientProvider>
-          </WagmiProvider>
+                  </CosmosKitProvider>
+                </WagmiProvider>
+              </QueryClientProvider>
+            </PrivyProvider>
+          </ConfigContextProvider>
         </NotificationsContextProvider>
       </IntlProvider>
-    </ConfigContextProvider>
+    </ThemeProvider>
   );
 }

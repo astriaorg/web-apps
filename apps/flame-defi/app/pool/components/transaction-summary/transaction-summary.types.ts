@@ -1,6 +1,8 @@
-import type { Hash } from "viem";
-
-import type { EvmCurrency, TransactionStatus } from "@repo/flame-types";
+import type { EvmCurrency } from "@repo/flame-types";
+import type {
+  TransactionSuccessProps as BaseTransactionSuccessProps,
+  TransactionSummaryProps as BaseTransactionSummaryProps,
+} from "components/transaction-summary";
 import type { Position } from "pool/types";
 
 export enum TransactionType {
@@ -10,18 +12,14 @@ export enum TransactionType {
   REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY",
 }
 
-interface BaseTransactionSummaryProps {
+interface BasePoolTransactionSummaryProps extends BaseTransactionSummaryProps {
   token0: EvmCurrency;
   token1: EvmCurrency;
   type: TransactionType;
-  status: TransactionStatus;
-  hash?: Hash;
-  error?: Error;
-  onSubmit: () => void;
 }
 
 export interface CreatePositionSummaryProps
-  extends BaseTransactionSummaryProps {
+  extends BasePoolTransactionSummaryProps {
   type: TransactionType.CREATE_POSITION;
   amount0: string;
   amount1: string;
@@ -30,7 +28,7 @@ export interface CreatePositionSummaryProps
 }
 
 export interface CollectFeesTransactionSummaryProps
-  extends BaseTransactionSummaryProps {
+  extends BasePoolTransactionSummaryProps {
   type: TransactionType.COLLECT_FEES;
   position: Position;
   unclaimedFees0: string;
@@ -38,7 +36,7 @@ export interface CollectFeesTransactionSummaryProps
 }
 
 export interface AddLiquidityTransactionSummaryProps
-  extends BaseTransactionSummaryProps {
+  extends BasePoolTransactionSummaryProps {
   type: TransactionType.ADD_LIQUIDITY;
   position: Position;
   amount0: string;
@@ -48,7 +46,7 @@ export interface AddLiquidityTransactionSummaryProps
 }
 
 export interface RemoveLiquidityTransactionSummaryProps
-  extends BaseTransactionSummaryProps {
+  extends BasePoolTransactionSummaryProps {
   type: TransactionType.REMOVE_LIQUIDITY;
   position: Position;
   percentage: number;
@@ -62,9 +60,8 @@ export type TransactionSummaryProps =
   | AddLiquidityTransactionSummaryProps
   | RemoveLiquidityTransactionSummaryProps;
 
-export type TransactionSuccessProps = {
+export interface TransactionSuccessProps extends BaseTransactionSuccessProps {
   token0: EvmCurrency;
   token1: EvmCurrency;
   type: TransactionType;
-  hash: Hash;
-};
+}

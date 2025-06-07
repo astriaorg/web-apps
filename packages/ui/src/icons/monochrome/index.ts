@@ -15,7 +15,7 @@ export * from "./copy-icon";
 export * from "./dot-icon";
 export * from "./edit-icon";
 export * from "./error-icon";
-export * from "./gas-icon";
+export * from "./fuel-icon";
 export * from "./gear-icon";
 export * from "./inbox-icon";
 export * from "./info-icon";

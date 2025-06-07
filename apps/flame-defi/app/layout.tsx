@@ -1,5 +1,4 @@
 import "@interchain-ui/react/styles";
-import "@rainbow-me/rainbowkit/styles.css";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
@@ -8,6 +7,7 @@ import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
 
+import { EolBanner } from "./components/eol-banner";
 import { SideTag } from "./components/side-tag/side-tag";
 import { Observability } from "./features/observability";
 import { Providers } from "./providers";
@@ -226,16 +226,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // TODO: Add theme toggle.
     <html
       lang="en"
-      data-theme="dark"
       className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable} ${inter.variable}`}
     >
       <body>
         <Providers>
           <Observability />
           <div className="min-h-screen flex flex-col">
+            <EolBanner />
             <NavigationMenu />
             <SideTag label="Get Help" />
             <RouteAnimation>

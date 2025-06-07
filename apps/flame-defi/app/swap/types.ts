@@ -1,14 +1,15 @@
 import { type Hash } from "viem";
 
 import {
+  type Balance,
   EvmCurrency,
   TokenInputState,
   type TransactionStatus,
 } from "@repo/flame-types";
 
-export enum SWAP_INPUT_ID {
-  INPUT_ONE = "input_one",
-  INPUT_TWO = "input_two",
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
 }
 
 export interface OneToOneQuoteProps {
@@ -21,10 +22,11 @@ export interface OneToOneQuoteProps {
 }
 
 export interface SwapPairProps {
-  id: SWAP_INPUT_ID;
+  id: InputId;
   inputToken: TokenInputState;
   oppositeToken: TokenInputState;
-  balance: string;
+  balance: Balance | null;
+  isBalanceLoading: boolean;
   label: string;
 }
 
@@ -69,13 +71,14 @@ export interface SwapTransactionStepsProps {
 }
 
 export interface SwapInputProps extends SwapPairProps {
-  onInputChange: (value: string, inputId: SWAP_INPUT_ID) => void;
+  onInputChange: (value: string, inputId: InputId) => void;
   onTokenSelect: (
     token: EvmCurrency,
     oppositeToken: TokenInputState,
-    inputId: SWAP_INPUT_ID,
+    inputId: InputId,
   ) => void;
   availableTokens: EvmCurrency[];
   label: string;
   isQuoteLoading: boolean;
+  isBalanceLoading: boolean;
 }

@@ -30,3 +30,8 @@
 - NEVER write a nested ternary.
 - Do not leave a comment when you remove code explaining why you removed the
   code.
+- Do not leave so many comments in the code, only leave comments when it is
+  necessary.
+- You should mostly comment on code at a high level, explaining the
+  purpose of the code when it is not immediately obvious, rather than
+  commenting on every line or block of code.

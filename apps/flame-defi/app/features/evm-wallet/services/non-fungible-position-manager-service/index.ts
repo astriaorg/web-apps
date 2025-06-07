@@ -302,9 +302,8 @@ export class NonfungiblePositionManagerService extends GenericContractService {
     calls.push(mintCall);
 
     if (token0.isNative || token1.isNative) {
-      // Pass 0 to unwrap all available WTIA to TIA with no minimum amount requirement.
-      const unwrapCall = this.encodeUnwrapWETH9(0n, recipient);
-      calls.push(unwrapCall);
+      const refundCall = this.encodeRefundETH();
+      calls.push(refundCall);
     }
 
     const gasLimit = await this.estimateContractGasWithBuffer(
@@ -771,6 +770,14 @@ export class NonfungiblePositionManagerService extends GenericContractService {
       abi: this.abi,
       functionName: "unwrapWETH9",
       args: [amountMinimum, recipient],
+    });
+  }
+
+  private encodeRefundETH(): string {
+    return encodeFunctionData({
+      abi: this.abi,
+      functionName: "refundETH",
+      args: [],
     });
   }
 
