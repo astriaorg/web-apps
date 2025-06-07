@@ -8,7 +8,6 @@ import {
 
 import * as dawn from "./chain-configs-dawn";
 import * as dusk from "./chain-configs-dusk";
-import * as local from "./chain-configs-local";
 import * as mainnet from "./chain-configs-mainnet";
 
 export interface ChainConfigsObject {
@@ -23,11 +22,6 @@ export type FlameNetworkConfig = ChainConfigsObject & {
 export type NetworkConfigs = Record<FlameNetwork, FlameNetworkConfig>;
 
 const NETWORK_CONFIGS: NetworkConfigs = {
-  [FlameNetwork.LOCAL]: {
-    name: FlameNetwork.LOCAL,
-    astriaChains: local.astriaChains,
-    cosmosChains: local.cosmosChains,
-  },
   [FlameNetwork.DUSK]: {
     name: FlameNetwork.DUSK,
     astriaChains: dusk.astriaChains,
@@ -47,10 +41,10 @@ const NETWORK_CONFIGS: NetworkConfigs = {
 
 /**
  * Gets chain configurations for the specified network.
- * Falls back to local network config if specified network is not found.
+ * Falls back to dusk network config if specified network is not found.
  */
 export function getChainConfigs(network: FlameNetwork): FlameNetworkConfig {
-  return NETWORK_CONFIGS[network] || NETWORK_CONFIGS[FlameNetwork.LOCAL];
+  return NETWORK_CONFIGS[network] || NETWORK_CONFIGS[FlameNetwork.DUSK];
 }
 
 /**

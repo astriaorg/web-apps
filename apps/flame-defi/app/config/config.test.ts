@@ -6,7 +6,6 @@ describe("Chain Configs", () => {
   describe("getChainConfigs", () => {
     it("should return config for each valid network", () => {
       const networks = [
-        FlameNetwork.LOCAL,
         FlameNetwork.DUSK,
         FlameNetwork.DAWN,
         FlameNetwork.MAINNET,
