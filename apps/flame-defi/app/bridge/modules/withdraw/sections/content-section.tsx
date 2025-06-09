@@ -6,7 +6,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Card } from "@repo/ui/components";
+import {
+  AnimatedArrowSpacer,
+  Button,
+  Card,
+  CardContent,
+  Input,
+  Skeleton,
+} from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
@@ -342,21 +349,24 @@ export const ContentSection = () => {
               </Card>
               {/* Source wallet info */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
-                  <p className="text-typography-light font-semibold">
+                <Card variant="secondary" className="mt-3 p-6">
+                  <p className="text-sm text-typography-light">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-typography-subdued font-semibold">
-                        Balance: {isLoadingSourceBalance && "Loading..."}
+                      <div className="flex mt-2 text-sm text-typography-subdued">
+                        Balance:&nbsp;
+                        {isLoadingSourceBalance && (
+                          <Skeleton className="w-32 h-5" />
+                        )}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
                           `${sourceBalance.value} ${sourceBalance.symbol}`}
                         {!isLoadingSourceBalance &&
                           !sourceBalance &&
                           `0 ${sourceConnection.currency.coinDenom}`}
-                      </p>
+                      </div>
                     )}
                   {sourceConnection.currency instanceof EvmCurrency &&
                     !isLoadingSourceBalance &&
@@ -367,7 +377,7 @@ export const ContentSection = () => {
                         />
                       </div>
                     )}
-                </div>
+                </Card>
               )}
             </div>
           </div>
@@ -420,83 +430,89 @@ export const ContentSection = () => {
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                  <Card variant="secondary" className="mt-3 p-6">
                     <p
-                      className="text-typography-light font-semibold cursor-pointer"
+                      className="flex items-center text-sm text-typography-light cursor-pointer"
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
                         Address: {shortenAddress(destinationConnection.address)}
                       </span>
-                      <i className="fas fa-pen-to-square" />
+                      <EditIcon className="inline-block ml-1" size={16} />
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-typography-subdued font-semibold">
-                          Balance: {isLoadingDestinationBalance && "Loading..."}
+                        <div className="flex mt-2 text-sm text-typography-subdued">
+                          Balance:&nbsp;
+                          {isLoadingDestinationBalance && (
+                            <Skeleton className="w-32 h-5" />
+                          )}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
                             `${destinationBalance.value} ${destinationBalance.symbol}`}
                           {!isLoadingDestinationBalance &&
                             !destinationBalance &&
                             `0 ${destinationConnection.currency.coinDenom}`}
-                        </p>
+                        </div>
                       )}
-                  </div>
+                  </Card>
                 )}
 
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
+                <Card
+                  variant="secondary"
+                  className="mt-3 p-6 border border-transparent hover:border-stroke-default"
+                >
                   <p
-                    className="text-typography-light font-semibold cursor-pointer"
+                    className="flex items-center text-sm text-typography-light cursor-pointer"
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
                       Address: {shortenAddress(recipientAddressOverride)}
                     </span>
-                    <i className="fas fa-pen-to-square" />
+                    <EditIcon className="inline-block ml-1" size={16} />
                   </p>
                   {!isRecipientAddressValid && hasTouchedForm && (
-                    <div className="mt-2 text-status-danger text-sm">
-                      Recipient address must be a valid address
+                    <div className="mt-2 text-danger text-xs">
+                      Recipient address must be a valid address.
                     </div>
                   )}
-                  <p className="mt-2 text-typography-subdued font-semibold text-xs">
-                    Connect via wallet to show balance
+                  <p className="mt-2 text-typography-subdued text-xs">
+                    Connect wallet to show balance.
                   </p>
-                </div>
+                </Card>
               )}
 
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 bg-surface-2 rounded-xl p-2">
-                  <div className="text-typography-light font-semibold">
-                    <input
-                      className="w-full p-2 bg-transparent border border-stroke-default rounded-sm text-typography-default"
+                <Card variant="secondary" className="mt-3">
+                  <CardContent>
+                    <Input
                       type="text"
                       placeholder="Enter Address"
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
                     <div className="mt-3 flex space-x-2">
-                      <button
-                        type="button"
-                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
+                      <Button
+                        size="sm"
+                        className="min-w-24"
                         onClick={handleEditRecipientSave}
                       >
                         Save
-                      </button>
-                      <button
-                        type="button"
-                        className="px-3 py-1 text-white bg-transparent border border-grey-medium rounded-lg hover:bg-grey-darker hover:border-white transition"
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="min-w-24"
                         onClick={handleEditRecipientClear}
                       >
                         Clear
-                      </button>
+                      </Button>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </div>
