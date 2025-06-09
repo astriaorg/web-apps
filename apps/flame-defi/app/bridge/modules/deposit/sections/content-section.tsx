@@ -13,6 +13,7 @@ import {
   Card,
   CardContent,
   Input,
+  Skeleton,
 } from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
@@ -348,20 +349,23 @@ export const ContentSection = () => {
               {/* Source wallet info - unified display regardless of chain type */}
               {sourceConnection.address && (
                 <Card variant="secondary" className="mt-3 p-6">
-                  <p className="text-typography-light font-medium">
+                  <p className="text-sm text-typography-light">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-typography-subdued font-medium">
-                        Balance: {isLoadingSourceBalance && "Loading..."}
+                      <div className="flex mt-2 text-sm text-typography-subdued">
+                        Balance:&nbsp;
+                        {isLoadingSourceBalance && (
+                          <Skeleton className="w-32 h-5" />
+                        )}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
                           `${sourceBalance.value} ${sourceBalance.symbol}`}
                         {!isLoadingSourceBalance &&
                           !sourceBalance &&
                           `0 ${sourceConnection.currency.coinDenom}`}
-                      </p>
+                      </div>
                     )}
                   {sourceConnection.currency &&
                     sourceConnection.currency instanceof EvmCurrency &&
@@ -431,26 +435,29 @@ export const ContentSection = () => {
                     className="mt-3 p-6 border border-transparent hover:border-stroke-default"
                   >
                     <p
-                      className="text-typography-light font-medium cursor-pointer"
+                      className="flex items-center text-sm text-typography-light cursor-pointer"
                       onKeyDown={handleEditRecipientClick}
                       onClick={handleEditRecipientClick}
                     >
                       <span className="mr-2">
                         Address: {shortenAddress(destinationConnection.address)}
                       </span>
-                      <i className="fas fa-pen-to-square" />
+                      <EditIcon className="inline-block ml-1" size={16} />
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-typography-subdued font-medium">
-                          Balance: {isLoadingDestinationBalance && "Loading..."}
+                        <div className="flex mt-2 text-sm text-typography-subdued">
+                          Balance:&nbsp;
+                          {isLoadingDestinationBalance && (
+                            <Skeleton className="w-32 h-5" />
+                          )}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
                             `${destinationBalance.value} ${destinationBalance.symbol}`}
                           {!isLoadingDestinationBalance &&
                             !destinationBalance &&
                             `0 ${destinationConnection.currency.coinDenom}`}
-                        </p>
+                        </div>
                       )}
                     {destinationCurrencyOption?.value &&
                       destinationCurrencyOption.value instanceof EvmCurrency &&
@@ -473,14 +480,14 @@ export const ContentSection = () => {
                   className="mt-3 p-6 border border-transparent hover:border-stroke-default"
                 >
                   <p
-                    className="text-typography-light font-medium cursor-pointer"
+                    className="flex items-center text-sm text-typography-light cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
                     <span className="mr-2">
                       Address: {shortenAddress(recipientAddressOverride)}
                     </span>
-                    <i className="fas fa-pen-to-square" />
+                    <EditIcon className="inline-block ml-1" size={16} />
                   </p>
                   {!isRecipientAddressValid && hasTouchedForm && (
                     <div className="text-xs text-danger mt-2">
@@ -489,7 +496,7 @@ export const ContentSection = () => {
                   )}
                   {destinationConnection.currency && (
                     <p className="mt-2 text-typography-subdued text-xs">
-                      Connect via wallet to show balance.
+                      Connect wallet to show balance.
                     </p>
                   )}
                 </Card>
@@ -505,12 +512,17 @@ export const ContentSection = () => {
                       value={recipientAddressOverride}
                     />
                     <div className="mt-3 flex space-x-2">
-                      <Button size="sm" onClick={handleEditRecipientSave}>
+                      <Button
+                        size="sm"
+                        className="min-w-24"
+                        onClick={handleEditRecipientSave}
+                      >
                         Save
                       </Button>
                       <Button
                         size="sm"
                         variant="secondary"
+                        className="min-w-24"
                         onClick={handleEditRecipientClear}
                       >
                         Clear

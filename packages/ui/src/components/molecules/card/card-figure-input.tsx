@@ -17,7 +17,7 @@ export const CardFigureInput = ({
       <TokenAmountInput
         placeholder={placeholder}
         className={cn(
-          "bg-transparent border-none outline-hidden rounded-none shadow-none text-5xl/12 h-12 p-0 font-dot text-typography-default placeholder:text-typography-light",
+          "bg-transparent border-none outline-hidden rounded-none shadow-none text-5xl/12 h-12 p-0 font-dot text-typography-default placeholder:text-typography-light focus-visible:bg-transparent",
           className,
         )}
         {...props}
