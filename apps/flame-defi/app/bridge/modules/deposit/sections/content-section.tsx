@@ -7,7 +7,13 @@ import { isAddress } from "viem";
 import { useSwitchChain } from "wagmi";
 
 import { ChainType, EvmCurrency } from "@repo/flame-types";
-import { AnimatedArrowSpacer, Card } from "@repo/ui/components";
+import {
+  AnimatedArrowSpacer,
+  Button,
+  Card,
+  CardContent,
+  Input,
+} from "@repo/ui/components";
 import { ArrowDownIcon, EditIcon, WalletIcon } from "@repo/ui/icons";
 import { shortenAddress } from "@repo/ui/utils";
 import { AmountInput } from "bridge/components/amount-input";
@@ -341,13 +347,13 @@ export const ContentSection = () => {
 
               {/* Source wallet info - unified display regardless of chain type */}
               {sourceConnection.address && (
-                <div className="mt-3 bg-surface-2 rounded-xl py-2 px-3">
-                  <p className="text-typography-light font-semibold">
+                <Card variant="secondary" className="mt-3 p-6">
+                  <p className="text-typography-light font-medium">
                     Address: {shortenAddress(sourceConnection.address)}
                   </p>
                   {sourceConnection.currency &&
                     sourceConnection.isConnected && (
-                      <p className="mt-2 text-typography-subdued font-semibold">
+                      <p className="mt-2 text-typography-subdued font-medium">
                         Balance: {isLoadingSourceBalance && "Loading..."}
                         {!isLoadingSourceBalance &&
                           sourceBalance &&
@@ -368,7 +374,7 @@ export const ContentSection = () => {
                         />
                       </div>
                     )}
-                </div>
+                </Card>
               )}
             </div>
           </div>
@@ -420,9 +426,12 @@ export const ContentSection = () => {
               {destinationConnection.address &&
                 !isRecipientAddressEditable &&
                 !recipientAddressOverride && (
-                  <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
+                  <Card
+                    variant="secondary"
+                    className="mt-3 p-6 border border-transparent hover:border-stroke-default"
+                  >
                     <p
-                      className="text-typography-light font-semibold cursor-pointer"
+                      className="text-typography-light font-medium cursor-pointer"
                       onKeyDown={handleEditRecipientClick}
                       onClick={handleEditRecipientClick}
                     >
@@ -433,7 +442,7 @@ export const ContentSection = () => {
                     </p>
                     {destinationConnection.currency &&
                       destinationConnection.isConnected && (
-                        <p className="mt-2 text-typography-subdued font-semibold">
+                        <p className="mt-2 text-typography-subdued font-medium">
                           Balance: {isLoadingDestinationBalance && "Loading..."}
                           {!isLoadingDestinationBalance &&
                             destinationBalance &&
@@ -455,13 +464,16 @@ export const ContentSection = () => {
                           />
                         </div>
                       )}
-                  </div>
+                  </Card>
                 )}
               {/* Destination address display - when using manual address */}
               {recipientAddressOverride && !isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-transparent bg-semi-white hover:border-stroke-default">
+                <Card
+                  variant="secondary"
+                  className="mt-3 p-6 border border-transparent hover:border-stroke-default"
+                >
                   <p
-                    className="text-typography-light font-semibold cursor-pointer"
+                    className="text-typography-light font-medium cursor-pointer"
                     onKeyDown={handleEditRecipientClick}
                     onClick={handleEditRecipientClick}
                   >
@@ -471,46 +483,41 @@ export const ContentSection = () => {
                     <i className="fas fa-pen-to-square" />
                   </p>
                   {!isRecipientAddressValid && hasTouchedForm && (
-                    <div className="text-status-danger mt-2">
-                      Recipient address must be a valid EVM address
+                    <div className="text-xs text-danger mt-2">
+                      Recipient address must be a valid EVM address.
                     </div>
                   )}
                   {destinationConnection.currency && (
-                    <p className="mt-2 text-typography-subdued font-semibold text-sm">
-                      Connect via wallet to show balance
+                    <p className="mt-2 text-typography-subdued text-xs">
+                      Connect via wallet to show balance.
                     </p>
                   )}
-                </div>
+                </Card>
               )}
               {/* Address input form when editing */}
               {isRecipientAddressEditable && (
-                <div className="mt-3 rounded-xl p-4 transition border border-solid border-stroke-default bg-semi-white">
-                  <div className="text-typography-light font-semibold">
-                    <input
-                      className="w-full p-3 bg-transparent border border-stroke-default focus:border-stroke-active focus:outline-hidden rounded-xl text-typography-default"
+                <Card variant="secondary" className="mt-3">
+                  <CardContent>
+                    <Input
                       type="text"
                       placeholder="0x..."
                       onChange={updateRecipientAddressOverride}
                       value={recipientAddressOverride}
                     />
                     <div className="mt-3 flex space-x-2">
-                      <button
-                        type="button"
-                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
-                        onClick={handleEditRecipientSave}
-                      >
+                      <Button size="sm" onClick={handleEditRecipientSave}>
                         Save
-                      </button>
-                      <button
-                        type="button"
-                        className="px-3 py-1 text-typography-default bg-transparent border border-stroke-default rounded-lg hover:bg-surface-3 hover:border-stroke-active transition"
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
                         onClick={handleEditRecipientClear}
                       >
                         Clear
-                      </button>
+                      </Button>
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </div>
