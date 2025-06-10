@@ -1,20 +1,23 @@
 import {
+  AstriaChain,
+  AstriaChains,
+  ChainType,
+  CosmosChainInfo,
+  CosmosChains,
+  EvmCurrency,
+  IbcCurrency,
+} from "@repo/flame-types";
+import {
+  AstriaIcon,
   CelestiaIcon,
   DropTiaIcon,
-  FlameIcon,
   NeutronIcon,
   NobleIcon,
   WrappedTiaIcon,
-} from "@repo/ui/icons";
-import {
-  CosmosChainInfo,
-  CosmosChains,
-  EvmChainInfo,
-  EvmChains,
-  EvmCurrency,
-} from "@repo/flame-types";
+} from "@repo/ui/icons/polychrome";
 
 const CelestiaChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   // Chain-id of the celestia chain.
   chainId: "mocha-4",
   // The name of the chain to be displayed to the user.
@@ -55,20 +58,19 @@ const CelestiaChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
+      chainId: "mocha-4",
       coinDenom: "TIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "utia",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isDepositable: true,
+      isWithdrawable: true,
+      isNative: true,
       ibcChannel: "channel-160",
       sequencerBridgeAccount: "astria1lepnry7tlpzvrukp5xej4v5wp532k2f94vxqnr",
+      title: "TIA",
       IconComponent: CelestiaIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -97,6 +99,7 @@ const CelestiaChainInfo: CosmosChainInfo = {
 };
 
 const NobleChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   chainId: "grand-1",
   chainName: "Noble Testnet",
   // RPC endpoint of the chain
@@ -137,20 +140,19 @@ const NobleChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
+      chainId: "grand-1",
       coinDenom: "USDC",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom: "uusdc",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isDepositable: false,
+      isWithdrawable: true,
+      isNative: true,
       ibcChannel: "channel-232",
       sequencerBridgeAccount: "astria1u6ewl0tejz0df2l6tzc7k2degx6mqsjahldqxd",
+      title: "USDC",
       IconComponent: NobleIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -179,6 +181,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 const NeutronChainInfo: CosmosChainInfo = {
+  chainType: ChainType.COSMOS,
   chainId: "pion-1",
   chainName: "Neutron Testnet",
   // RPC endpoint of the chain
@@ -220,21 +223,20 @@ const NeutronChainInfo: CosmosChainInfo = {
   },
   // List of all coin/tokens used in this chain.
   currencies: [
-    {
-      // Coin denomination to be displayed to the user.
+    new IbcCurrency({
+      chainId: "pion-1",
       coinDenom: "dTIA",
-      // Actual denom (i.e. uatom, uscrt) used by the blockchain.
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
-      // # of decimal points to convert minimal denomination to user-facing denomination.
       coinDecimals: 6,
-      // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
-      // You can get id from https://api.coingecko.com/api/v3/coins/list if it is listed.
-      // coinGeckoId: ""
+      isDepositable: false,
+      isWithdrawable: true,
+      isNative: true,
       ibcChannel: "channel-1412",
       sequencerBridgeAccount: "astria1j7juyc9nv6tlv0la74a9rrm7v72y3x336mgxvk",
+      title: "dTIA",
       IconComponent: DropTiaIcon,
-    },
+    }),
   ],
   // List of coin/tokens used as a fee token in this chain.
   feeCurrencies: [
@@ -269,7 +271,24 @@ export const cosmosChains: CosmosChains = {
   "Neutron Testnet": NeutronChainInfo,
 };
 
-const FlameChainInfo: EvmChainInfo = {
+const WRAPPED_NATIVE_TOKEN = new EvmCurrency({
+  chainId: 16604737732183,
+  coinDenom: "WTIA",
+  title: "Wrapped Celestia",
+  coinMinimalDenom: "wtia",
+  coinDecimals: 18,
+  erc20ContractAddress: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",
+  wrapped: null,
+  isNative: false,
+  isWrappedNative: true,
+  ibcWithdrawalFeeWei: "0",
+  isDepositable: true,
+  isWithdrawable: true,
+  IconComponent: WrappedTiaIcon,
+});
+
+const FlameChainInfo: AstriaChain = {
+  chainType: ChainType.ASTRIA,
   chainId: 16604737732183,
   chainName: "Flame Dawn-1",
   rpcUrls: ["https://rpc.flame.dawn-1.astria.org"],
@@ -281,54 +300,72 @@ const FlameChainInfo: EvmChainInfo = {
     swapRouter: {
       address: "0x0DA34E6C6361f5B8f5Bdb6276fEE16dD241108c8",
     },
+    poolFactory: {
+      address: "0xbdb7C721ae69f36A303162E1e1FBC5ec445824E7",
+    },
+    poolContract: {
+      address: "0xAAF22d4931147EDdf1269B16B17DB6F51aF9854D",
+    },
+    nonfungiblePositionManager: {
+      address: "0x186C4bFBef4748d78Bc3C7B7628298528BbFEe47",
+    },
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    },
   },
   currencies: [
     new EvmCurrency({
+      chainId: 16604737732183,
       coinDenom: "TIA",
       title: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 18,
       nativeTokenWithdrawerContractAddress:
         "0x77Af806d724699B3644F9CCBFD45CC999CCC3d49",
+      wrapped: WRAPPED_NATIVE_TOKEN,
+      isNative: true,
       isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
+      ibcWithdrawalFeeWei: "0",
+      isDepositable: true,
+      isWithdrawable: true,
       IconComponent: CelestiaIcon,
     }),
+    WRAPPED_NATIVE_TOKEN,
     new EvmCurrency({
-      coinDenom: "WTIA",
-      title: "Wrapped Celestia",
-      coinMinimalDenom: "wtia",
-      coinDecimals: 18,
-      erc20ContractAddress: "0xb1ed550217B33fdBeA6aA81b074A2DF8979AfA94",
-      isWrappedNative: true,
-      ibcWithdrawalFeeWei: "10000000000000000",
-      IconComponent: WrappedTiaIcon,
-    }),
-    new EvmCurrency({
+      chainId: 16604737732183,
       coinDenom: "USDC",
       title: "USDC",
       coinMinimalDenom: "uusdc",
       coinDecimals: 18,
       erc20ContractAddress: "0x6e18cE6Ec3Fc7b8E3EcFca4fA35e25F3f6FA879a",
+      wrapped: null,
+      isNative: false,
       isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
+      ibcWithdrawalFeeWei: "0",
+      isDepositable: false,
+      isWithdrawable: true,
       IconComponent: NobleIcon,
     }),
     new EvmCurrency({
+      chainId: 16604737732183,
       coinDenom: "dTIA",
       title: "Drop Staked TIA",
       coinMinimalDenom:
         "factory/neutron1tkr6mtll5e2z53ze2urnc3ld3tq3dam2rchezc5lg9c237ft66gqtw94jm/drop",
       coinDecimals: 18,
       erc20ContractAddress: "0x0F0C3207a9fE9B7e8AaE4bb83E865C91A13Fd8a7",
+      isNative: false,
       isWrappedNative: false,
-      ibcWithdrawalFeeWei: "10000000000000000",
+      wrapped: null,
+      ibcWithdrawalFeeWei: "0",
+      isDepositable: false,
+      isWithdrawable: true,
       IconComponent: DropTiaIcon,
     }),
   ],
-  IconComponent: FlameIcon,
+  IconComponent: AstriaIcon,
 };
 
-export const evmChains: EvmChains = {
+export const astriaChains: AstriaChains = {
   "Flame Dawn-1": FlameChainInfo,
 };

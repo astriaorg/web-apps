@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/use-config";
+import request from "graphql-request";
+
 import { graphql } from "earn/generated/gql";
 import {
   MarketFilters,
   MarketOrderBy,
   OrderDirection,
 } from "earn/generated/gql/graphql";
-import request from "graphql-request";
 
 export const PAGE_SIZE = 25;
 

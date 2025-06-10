@@ -1,21 +1,22 @@
+import Big from "big.js";
+import { redirect, useParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
+import { FormattedNumber } from "react-intl";
+import { useAccount } from "wagmi";
+
 import {
   Card,
   CardContent,
   CardLabel,
   Skeleton,
-  useAssetAmountInput,
+  useTokenAmountInput,
 } from "@repo/ui/components";
-import Big from "big.js";
 import { Image } from "components/image";
 import { DepositCard } from "earn/components/deposit-card";
 import { WalletActionButton } from "earn/components/wallet-action-button";
 import { ROUTES } from "earn/constants/routes";
 import { useFetchMarketPosition } from "earn/modules/market-details/hooks/use-fetch-market-position";
 import { usePageContext } from "earn/modules/market-details/hooks/use-page-context";
-import { redirect, useParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
-import { FormattedNumber } from "react-intl";
-import { useAccount } from "wagmi";
 
 // TODO: Get balance from contract.
 const BALANCE = "0";
@@ -50,10 +51,10 @@ export const BorrowCards = () => {
     onInput: onInputSupply,
     onReset: onResetSupply,
     isValid: isValidSupply,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: BALANCE,
     minimum: "0",
-    asset: data?.marketByUniqueKey.collateralAsset ?? undefined,
+    token: data?.marketByUniqueKey.collateralAsset ?? undefined,
   });
 
   const {
@@ -61,10 +62,10 @@ export const BorrowCards = () => {
     onInput: onInputBorrow,
     onReset: onResetBorrow,
     isValid: isValidBorrow,
-  } = useAssetAmountInput({
+  } = useTokenAmountInput({
     balance: BALANCE,
     minimum: "0",
-    asset: data?.marketByUniqueKey.loanAsset ?? undefined,
+    token: data?.marketByUniqueKey.loanAsset ?? undefined,
   });
 
   const items = useMemo<

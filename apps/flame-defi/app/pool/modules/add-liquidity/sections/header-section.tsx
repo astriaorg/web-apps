@@ -1,28 +1,19 @@
 "use client";
 
-import { ArrowLeftIcon } from "@repo/ui/icons";
-import { SettingsPopover } from "components/settings-popover/settings-popover";
 import { useRouter } from "next/navigation";
+
+import { Header, HeaderTitle } from "components/header";
+import { SettingsPopover } from "components/settings-popover/settings-popover";
 
 export const HeaderSection = () => {
   const router = useRouter();
 
   return (
-    <div className="flex items-baseline relative">
-      <div
-        onClick={() => router.back()}
-        className="mb-10 md:absolute md:-left-10 md:mt-2 md:mb-0"
-      >
-        <ArrowLeftIcon
-          aria-label="Back"
-          size={16}
-          className="cursor-pointer text-icon-light hover:text-white transition"
-        />
-      </div>
+    <Header onClickBack={() => router.back()}>
       <div className="flex items-center justify-between w-full">
-        <h1 className="text-3xl/8">Add Liquidity</h1>
+        <HeaderTitle>Add Liquidity</HeaderTitle>
         <SettingsPopover />
       </div>
-    </div>
+    </Header>
   );
 };

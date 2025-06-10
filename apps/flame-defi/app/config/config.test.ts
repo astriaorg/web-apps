@@ -1,11 +1,11 @@
-import { getChainConfigs } from "./chain-configs";
 import { FlameNetwork } from "@repo/flame-types";
+
+import { getChainConfigs } from "./chain-configs";
 
 describe("Chain Configs", () => {
   describe("getChainConfigs", () => {
     it("should return config for each valid network", () => {
       const networks = [
-        FlameNetwork.LOCAL,
         FlameNetwork.DUSK,
         FlameNetwork.DAWN,
         FlameNetwork.MAINNET,
@@ -15,7 +15,7 @@ describe("Chain Configs", () => {
         const config = getChainConfigs(network);
         expect(config).toBeDefined();
         expect(config.cosmosChains).toBeDefined();
-        expect(config.evmChains).toBeDefined();
+        expect(config.astriaChains).toBeDefined();
       }
     });
   });

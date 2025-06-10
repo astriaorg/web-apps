@@ -1,9 +1,10 @@
 "use client";
 
-import { FlameIcon } from "@repo/ui/icons/polychrome";
-import { useConfig } from "config";
 import type React from "react";
 import { useMemo } from "react";
+
+import { useConfig } from "config";
+
 import { LINKS } from "./links";
 import { NetworkStatus } from "./network-status";
 
@@ -87,14 +88,13 @@ export const Footer = (): React.ReactElement => {
 
       <section>
         <div className="px-6 md:px-8 py-2 flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div className="flex items-center space-x-2 order-2 mb-4 md:order-1 md:mb-0">
-            <FlameIcon className="w-4" aria-label="Flame Logo" />
+          <div className="flex items-center order-2 mb-4 md:order-1 md:mb-0">
             <p className="text-xs text-center md:text-left">
               <span>
                 {`© ${new Date().getFullYear()} `}
                 <a
                   href="https://www.astria.org"
-                  className="text-brand hover:underline"
+                  className="hover:underline"
                   rel="noreferrer"
                   target="_blank"
                 >

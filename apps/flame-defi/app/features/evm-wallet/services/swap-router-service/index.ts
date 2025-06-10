@@ -1,19 +1,10 @@
-import { type Config, getPublicClient, getWalletClient } from "@wagmi/core";
-import {
-  Chain,
-  encodeFunctionData,
-  type Address,
-  type PublicClient,
-  type WalletClient,
-  Abi,
-} from "viem";
-import {
-  GetQuoteResult,
-  HexString,
-  Token,
-  TokenAmount,
-  TRADE_TYPE,
-} from "@repo/flame-types";
+import { Token } from "@uniswap/sdk-core";
+import { type Config } from "@wagmi/core";
+import { Abi, type Address, Chain, encodeFunctionData, type Hash } from "viem";
+
+import { GetQuoteResult, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
+
+import { GenericContractService } from "../generic-contract-service";
 import SWAP_ROUTER_ABI from "./swaprouter02.json";
 import {
   ExactInputParams,
@@ -25,7 +16,6 @@ import {
   SwapOptions,
   Trade,
 } from "./types";
-import { GenericContractService } from "../generic-contract-service";
 
 // Default fee in basis points (25 bips = 0.25%)
 // TODO - move to AppConfig
@@ -76,12 +66,12 @@ export class SwapRouterService extends GenericContractService {
       };
     }
 
-    const tokenIn = trade.route.path[0]?.address as HexString;
-    const tokenOut = trade.route.path[1]?.address as HexString;
+    const tokenIn = trade.route.path[0]?.address as Address;
+    const tokenOut = trade.route.path[1]?.address as Address;
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
-      throw new Error("Fee not found in pool");
+      throw new Error("Fee not found in pool.");
     }
 
     return {
@@ -143,12 +133,12 @@ export class SwapRouterService extends GenericContractService {
       };
     }
 
-    const tokenIn = trade.route.path[0]?.address as HexString;
-    const tokenOut = trade.route.path[1]?.address as HexString;
+    const tokenIn = trade.route.path[0]?.address as Address;
+    const tokenOut = trade.route.path[1]?.address as Address;
 
     const fee = trade.route.pools[0]?.fee;
     if (!fee) {
-      throw new Error("Fee not found in pool");
+      throw new Error("Fee not found in pool.");
     }
 
     return {
@@ -173,7 +163,7 @@ export class SwapRouterService extends GenericContractService {
     };
   }
 
-  private encodePath(route: Route): HexString {
+  private encodePath(route: Route): string {
     const encoded = route.pools
       .map((pool, i) => {
         const tokenIn = route.path[i];
@@ -190,7 +180,7 @@ export class SwapRouterService extends GenericContractService {
     return `0x${encoded}`;
   }
 
-  private encodePathReversed(route: Route): HexString {
+  private encodePathReversed(route: Route): string {
     const encoded = [...route.pools]
       .reverse()
       .map((pool, i, reversedPools) => {
@@ -221,13 +211,13 @@ export class SwapRouterService extends GenericContractService {
     chainId: number,
     trade: Trade,
     options: SwapOptions,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     // A default gas limit in case estimation fails.
     const DEFAULT_GAS_LIMIT = 250000n;
 
     const walletClient = await this.getWalletClient(chainId);
     const publicClient = await this.getPublicClient(chainId);
-    const signerAddress = walletClient.account?.address as HexString;
+    const signerAddress = walletClient.account?.address as Address;
 
     // get swap parameters based on trade type
     const swapParams =
@@ -251,7 +241,7 @@ export class SwapRouterService extends GenericContractService {
       let gasLimit: bigint;
       try {
         gasLimit = await publicClient.estimateContractGas({
-          address: this.contractAddress,
+          address: this.address,
           abi: this.abi,
           functionName: swapParams.functionName,
           args: swapParams.args,
@@ -310,7 +300,7 @@ export class SwapRouterService extends GenericContractService {
     } else if (options.feeRecipient) {
       // if we have a fee recipient but not native output, use sweepTokenWithFee
       const tokenOut = trade.route.path[trade.route.path.length - 1]
-        ?.address as HexString;
+        ?.address as Address;
       const minimumAmount = trade.outputAmount
         .withSlippage(options.slippageTolerance, true)
         .raw.toString();
@@ -347,8 +337,8 @@ export class SwapRouterService extends GenericContractService {
    */
   private encodeUnwrapWETHWithFeeCall(
     minimumAmount: string,
-    recipient: HexString,
-    feeRecipient: HexString,
+    recipient: Address,
+    feeRecipient: Address,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -362,10 +352,10 @@ export class SwapRouterService extends GenericContractService {
    * This method is used when collecting fees on token outputs that are not native tokens.
    */
   private encodeSweepTokenWithFeeCall(
-    token: HexString,
+    token: Address,
     minimumAmount: string,
-    recipient: HexString,
-    feeRecipient: HexString,
+    recipient: Address,
+    feeRecipient: Address,
   ): string {
     return encodeFunctionData({
       abi: this.abi,
@@ -383,11 +373,11 @@ export class SwapRouterService extends GenericContractService {
   /**
    * Determines the appropriate recipient address based on swap options.
    */
-  private determineRecipient(options: SwapOptions): HexString {
+  private determineRecipient(options: SwapOptions): Address {
     // For native output or when a fee recipient is specified,
     // we need to send to the router first
     if (options.isNativeOut || options.feeRecipient) {
-      return this.contractAddress;
+      return this.address;
     }
 
     // Otherwise we can send directly to the recipient
@@ -408,34 +398,12 @@ export class SwapRouterService extends GenericContractService {
       | readonly [ExactInputParams]
       | readonly [ExactOutputSingleParams]
       | readonly [ExactOutputParams],
-  ): HexString {
+  ): string {
     return encodeFunctionData({
       abi: this.abi,
       functionName,
       args,
     });
-  }
-
-  /**
-   * Helper to get the wallet client
-   */
-  private async getWalletClient(chainId: number): Promise<WalletClient> {
-    const walletClient = await getWalletClient(this.wagmiConfig, { chainId });
-    if (!walletClient) {
-      throw new Error("No wallet client available");
-    }
-    return walletClient;
-  }
-
-  /**
-   * Helper to get the public client
-   */
-  private async getPublicClient(chainId: number): Promise<PublicClient> {
-    const publicClient = getPublicClient(this.wagmiConfig, { chainId });
-    if (!publicClient) {
-      throw new Error("No public client available");
-    }
-    return publicClient;
   }
 
   /**
@@ -451,12 +419,12 @@ export class SwapRouterService extends GenericContractService {
       | readonly [ExactOutputParams],
     value?: bigint,
     gas?: bigint,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const walletClient = await this.getWalletClient(chainId);
 
     try {
       return await walletClient.writeContract({
-        address: this.contractAddress,
+        address: this.address,
         abi: this.abi,
         functionName: methodName,
         args,
@@ -520,7 +488,7 @@ export function createTradeFromQuote(
   const outputToken = routePools[routePools.length - 1]?.token1;
 
   if (!inputToken || !outputToken) {
-    throw new Error("Invalid route: missing input or output token");
+    throw new Error("Invalid route: missing input or output token.");
   }
 
   const route = new Route(routePools, inputToken, outputToken);

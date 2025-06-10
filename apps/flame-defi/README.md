@@ -8,22 +8,27 @@ the Astria Flame app.
 ### Application directory structure
 
 - `app/bridge` - bridge page
+- `app/borrow` - borrow page
 - `app/components` - More general React components for the app, e.g. `NavigationMenu`,
   Dropdown, CopyToClipboardButton, etc
 - `app/config` - Configuration for the app
-  - `app/config/chainConfigs` - Celestia and Astria chain information
-  - `app/config/components` - components for config, e.g. `NetworkSelector`
+  - `app/config/chain-configs` - Celestia and Astria chain information
   - `app/config/contexts` - Config context and context provider
   - `app/config/hooks` - Custom hook to make config easy to use
   - `app/config/env.ts` - Environment variable definitions plus utilities for
     consuming them
   - `app/config/index.ts` - AppConfig and exports
+- `app/earn` - earn page
 - `app/features` - Organizes components, contexts, hooks, services, types, and
   utils for different features
-  - `app/features/CosmosWallet` - User for interacting with Keplr wallet
-  - `app/features/EvmWallet` - Used for interacting with EVM wallets
-  - `app/features/Notifications` - Used for displaying notifications and toasts
-- `app/fonts` - Fonts
+  - `app/features/cosmos-kit` - Cosmos Kit integration
+  - `app/features/cosmos-wallet` - Used for interacting with Cosmos wallets
+  - `app/features/evm-wallet` - Used for interacting with EVM wallets
+  - `app/features/notifications` - Used for displaying notifications and toasts
+  - `app/features/onchain-kit` - Onchain Kit integration
+  - `app/features/privy` - Privy integration
+  - `app/features/wagmi-rainbow-kit` - Wagmi/Rainbow Kit integration
+  - `app/features/wallet-connect` - WalletConnect integration
 - `app/pool` - pool page
 - `app/swap` - swap page
 - `app/testing/helpers.tsx` - helper functions for testing
@@ -78,22 +83,21 @@ npm run build
   - create file that will contain the config values
 
     ```sh
-    touch ./config/chainConfigs/ChainConfigsMainnet.ts
+    touch ./app/config/chain-configs/chain-configs-mainnet.ts
     ```
 
   - import new configs in
-    `./config/chainConfigs/index.ts`, while renaming
+    `./app/config/chain-configs/index.ts`, while renaming
     them
 
     ```typescript
-    import * as mainnet from "./ChainConfigsMainnet";
+    import * as mainnet from "./chain-configs-mainnet";
     ```
 
   - add entry to `NETWORK_CONFIGS`
 
     ```typescript
     const NETWORK_CONFIGS: Record<FlameNetwork, ChainConfigs> = {
-      [FlameNetwork.LOCAL]: local,
       [FlameNetwork.DUSK]: dusk,
       [FlameNetwork.DAWN]: dawn,
       [FlameNetwork.MAINNET]: mainnet,

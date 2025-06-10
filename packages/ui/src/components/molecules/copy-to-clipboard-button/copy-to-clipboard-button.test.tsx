@@ -1,12 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { act } from "react";
+
 import { CopyToClipboardButton } from "./copy-to-clipboard-button";
 
 describe("<CopyToClipboardButton />", () => {
   const textToCopy = "test text";
 
   beforeAll(() => {
-    Object.defineProperty(global.navigator, "clipboard", {
+    Object.defineProperty(globalThis.navigator, "clipboard", {
       value: {
         writeText: jest.fn(),
       },
@@ -23,7 +24,7 @@ describe("<CopyToClipboardButton />", () => {
     render(<CopyToClipboardButton textToCopy={textToCopy} />);
     const button = screen.getByRole("button");
     fireEvent.click(button);
-    expect(global.navigator.clipboard.writeText).toHaveBeenCalledWith(
+    expect(globalThis.navigator.clipboard.writeText).toHaveBeenCalledWith(
       textToCopy,
     );
   });

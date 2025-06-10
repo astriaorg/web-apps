@@ -1,2 +1,5 @@
-export { type Validation, type ValidationAsset } from "./types";
-export { useValidateAssetAmount } from "./use-validate-asset-amount";
+export { type Validation, type ValidationToken } from "./types";
+export {
+  useValidateTokenAmount,
+  ValidateTokenAmountErrorType,
+} from "./use-validate-token-amount";

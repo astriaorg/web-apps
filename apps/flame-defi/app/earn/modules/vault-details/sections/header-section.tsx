@@ -1,9 +1,10 @@
+import { useRouter } from "next/navigation";
+
 import { Badge, InfoTooltip, Skeleton } from "@repo/ui/components";
 import { Image } from "components/image";
 import { BackButton } from "earn/components/back-button";
 import { ROUTES } from "earn/constants/routes";
 import { usePageContext } from "earn/modules/vault-details/hooks/use-page-context";
-import { useRouter } from "next/navigation";
 
 export const HeaderSection = () => {
   const router = useRouter();

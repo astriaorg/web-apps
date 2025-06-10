@@ -41,20 +41,23 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.1.2",
-    "typescript": "5.5.4"
+    "typescript": "5.6.3"
   },
   "exports": {
     "./components": "./src/components/index.ts",
     "./hooks": "./src/hooks/index.ts",
     "./utils": "./src/utils/index.ts",
     "./icons": "./src/icons/index.ts",
-    "./icons/polychrome": "./src/icons/polychrome/index.ts"
+    "./icons/monochrome": "./src/icons/monochrome/index.ts",
+    "./icons/polychrome": "./src/icons/polychrome/index.ts",
+    "./logos": "./src/logos/index.ts"
   },
   "private": true,
   "scripts": {
     "check-types": "tsc --noEmit",
     "generate:component": "turbo gen react-component",
     "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
     "test": "jest"
   },
   "type": "module"

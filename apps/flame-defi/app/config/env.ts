@@ -21,6 +21,9 @@ export const ENV = {
   // walletconnect
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID:
     process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+  // privy wallet
+  NEXT_PUBLIC_PRIVY_APP_ID: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+  NEXT_PUBLIC_PRIVY_CLIENT_ID: process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID,
   // Feature flags
   NEXT_PUBLIC_FEATURE_EARN_ENABLED:
     process.env.NEXT_PUBLIC_FEATURE_EARN_ENABLED,
@@ -52,7 +55,7 @@ export const getEnvVariable = (
     if (defaultValue !== undefined) {
       return defaultValue;
     }
-    throw new Error(`${key} not set`);
+    throw new Error(`${key} not set.`);
   }
   return value;
 };

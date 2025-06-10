@@ -1,4 +1,5 @@
 import { FormatNumberOptions, useIntl } from "react-intl";
+
 import {
   formatAbbreviatedNumber,
   type FormatAbbreviatedNumberOptions,

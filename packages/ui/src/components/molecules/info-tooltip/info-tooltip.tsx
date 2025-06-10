@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { InfoIcon } from "../../../icons";
 import {
   Tooltip,
@@ -11,7 +12,7 @@ import {
 
 interface InfoTooltipProps {
   content: string;
-  side?: "left" | "right" | "top" | "bottom" | undefined;
+  side?: "left" | "right" | "top" | "bottom";
   className?: string;
 }
 
@@ -29,7 +30,7 @@ export const InfoTooltip: React.FC<InfoTooltipProps> = ({
           <span onClick={() => setOpen(!open)}>
             <InfoIcon
               size={16}
-              className="text-grey-light hover:text-white cursor-pointer"
+              className="text-typography-subdued hover:text-typography-default cursor-pointer"
             />
           </span>
         </TooltipTrigger>

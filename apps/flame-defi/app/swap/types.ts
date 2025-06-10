@@ -1,51 +1,54 @@
+import { type Hash } from "viem";
+
 import {
+  type Balance,
   EvmCurrency,
-  HexString,
   TokenInputState,
-  TXN_STATUS,
+  type TransactionStatus,
 } from "@repo/flame-types";
 
-export enum SWAP_INPUT_ID {
-  INPUT_ONE = "input_one",
-  INPUT_TWO = "input_two",
+export enum InputId {
+  INPUT_0 = "INPUT_0",
+  INPUT_1 = "INPUT_1",
 }
 
 export interface OneToOneQuoteProps {
-  topTokenSymbol: string | undefined;
-  bottomTokenSymbol: string | undefined;
-  bottomTokenValue: string | undefined;
+  topTokenSymbol?: string;
+  bottomTokenSymbol?: string;
+  bottomTokenValue?: string;
   oneToOneLoading: boolean;
   flipDirection: boolean;
   setFlipDirection: (flipDirection: boolean) => void;
 }
 
 export interface SwapPairProps {
-  id: SWAP_INPUT_ID;
+  id: InputId;
   inputToken: TokenInputState;
   oppositeToken: TokenInputState;
-  balance: string;
+  balance: Balance | null;
+  isBalanceLoading: boolean;
   label: string;
 }
 
-export interface TxnStepsProps {
+export interface TransactionStepsProps {
   expectedOutputFormatted?: string;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
+  token0: TokenInputState;
+  token1: TokenInputState;
   isTiaWtia: boolean;
-  txnHash?: HexString;
-  txnMsg?: string;
+  hash?: Hash;
+  message?: string;
 }
 
-export interface TxnDetailsProps extends TxnStepsProps {
-  priceImpact: string | undefined;
-  minimumReceived: string | undefined;
+export interface TransactionDetailsProps extends TransactionStepsProps {
+  priceImpact?: string;
+  minimumReceived?: string;
   oneToOneQuote: OneToOneQuoteProps;
   isQuoteLoading: boolean;
   frontendFeeEstimate?: string;
 }
 
 export interface TransactionInfo {
-  txnQuoteDataLoading: boolean;
+  transactionQuoteDataLoading: boolean;
   gasUseEstimateUSD: string;
   formattedGasUseEstimateUSD: string;
   expectedOutputBigInt: bigint;
@@ -55,26 +58,27 @@ export interface TransactionInfo {
   frontendFeeEstimate?: string;
 }
 
-export interface SwapTxnStepsProps {
-  txnInfo: TransactionInfo;
-  topToken: TokenInputState;
-  bottomToken: TokenInputState;
-  txnStatus: TXN_STATUS | undefined;
-  txnHash: HexString | undefined;
-  txnMsg: string | undefined;
+export interface SwapTransactionStepsProps {
+  info: TransactionInfo;
+  token0: TokenInputState;
+  token1: TokenInputState;
+  status?: TransactionStatus;
+  hash?: Hash;
+  message?: string;
   isTiaWtia: boolean;
   oneToOneQuote: OneToOneQuoteProps;
   isQuoteLoading: boolean;
 }
 
 export interface SwapInputProps extends SwapPairProps {
-  onInputChange: (value: string, inputId: SWAP_INPUT_ID) => void;
+  onInputChange: (value: string, inputId: InputId) => void;
   onTokenSelect: (
     token: EvmCurrency,
     oppositeToken: TokenInputState,
-    inputId: SWAP_INPUT_ID,
+    inputId: InputId,
   ) => void;
   availableTokens: EvmCurrency[];
   label: string;
-  txnQuoteLoading: boolean;
+  isQuoteLoading: boolean;
+  isBalanceLoading: boolean;
 }

@@ -102,11 +102,13 @@ const config: Config = {
     "^components/(.*)$": "<rootDir>/app/components/$1",
     "^config": "<rootDir>/app/config/$1",
     "^features/(.*)$": "<rootDir>/app/features/$1",
+    "^hooks": "<rootDir>/app/hooks/$1",
+    "^pool/(.*)$": "<rootDir>/app/pool/$1",
     "^testing/(.*)$": "<rootDir>/app/testing/$1",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
-  // modulePathIgnorePatterns: [],
+  modulePathIgnorePatterns: ["e2e-tests"],
 
   // Activates notifications for test results
   // notify: false,
@@ -196,7 +198,7 @@ const config: Config = {
     "\\.pnp\\.[^\\/]+$",
     // FIXME - the regex defined below is not being used for some reason.
     //  i had to add it manually in package.json as a flag. why??
-    "/node_modules/(?!(@cosmjs|axios|@rainbow-me/rainbowkit|wagmi|@wagmi))/",
+    "/node_modules/(?!(@cosmjs|axios|wagmi|@wagmi))/",
   ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them

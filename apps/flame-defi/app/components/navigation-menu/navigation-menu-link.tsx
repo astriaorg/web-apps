@@ -1,5 +1,6 @@
-import { cn } from "@repo/ui/utils";
 import Link from "next/link";
+
+import { cn } from "@repo/ui/utils";
 
 export interface NavigationMenuLinkProps
   extends React.ComponentPropsWithoutRef<typeof Link> {

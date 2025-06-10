@@ -1,7 +1,8 @@
+import { useRef, useState } from "react";
+
 import { Input } from "@repo/ui/components";
 import { SearchIcon } from "@repo/ui/icons";
 import { cn } from "@repo/ui/utils";
-import { useRef, useState } from "react";
 
 export const SearchInput = ({
   className,
@@ -29,7 +30,7 @@ export const SearchInput = ({
               }
             }}
           >
-            <SearchIcon aria-label="Search" size={24} />
+            <SearchIcon aria-label="Search" size={20} />
           </div>
         }
         className={cn(

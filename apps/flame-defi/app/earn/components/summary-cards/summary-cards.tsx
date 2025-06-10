@@ -1,3 +1,5 @@
+import { FormatNumberOptions } from "react-intl";
+
 import {
   AnimatedCounter,
   Card,
@@ -5,7 +7,6 @@ import {
   CardLabel,
   Skeleton,
 } from "@repo/ui/components";
-import { FormatNumberOptions } from "react-intl";
 
 export interface SummaryCardsProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -36,7 +37,7 @@ export const SummaryCards = ({
           isLoading={isLoading}
           variant={it.variant}
           // Don't overflow the card on smaller screens after animation completes.
-          className="overflow-hidden max-w-[calc(100vw - 32px)]"
+          className="overflow-hidden max-w-[calc(100vw-32px)]"
         >
           <CardContent className="space-y-2">
             <CardLabel>

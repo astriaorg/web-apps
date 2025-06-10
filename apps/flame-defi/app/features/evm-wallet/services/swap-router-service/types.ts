@@ -1,13 +1,16 @@
-import { HexString, Token, TokenAmount, TRADE_TYPE } from "@repo/flame-types";
+import type { Token } from "@uniswap/sdk-core";
+import { type Address } from "viem";
+
+import { TokenAmount, TRADE_TYPE } from "@repo/flame-types";
 
 /**
  * Parameters for the exactInputSingle method
  */
 export interface ExactInputSingleParams {
-  tokenIn: HexString;
-  tokenOut: HexString;
+  tokenIn: Address;
+  tokenOut: Address;
   fee: number;
-  recipient: HexString;
+  recipient: Address;
   amountIn: bigint;
   amountOutMinimum: bigint;
   sqrtPriceLimitX96: bigint;
@@ -18,8 +21,8 @@ export interface ExactInputSingleParams {
  * Parameters for the exactInput method
  */
 export interface ExactInputParams {
-  path: HexString;
-  recipient: HexString;
+  path: string;
+  recipient: Address;
   amountIn: bigint;
   amountOutMinimum: bigint;
   deadline: bigint;
@@ -29,10 +32,10 @@ export interface ExactInputParams {
  * Parameters for the exactOutputSingle method
  */
 export interface ExactOutputSingleParams {
-  tokenIn: HexString;
-  tokenOut: HexString;
+  tokenIn: Address;
+  tokenOut: Address;
   fee: number;
-  recipient: HexString;
+  recipient: Address;
   amountOut: bigint;
   amountInMaximum: bigint;
   sqrtPriceLimitX96: bigint;
@@ -43,8 +46,8 @@ export interface ExactOutputSingleParams {
  * Parameters for the exactOutput method
  */
 export interface ExactOutputParams {
-  path: HexString;
-  recipient: HexString;
+  path: string;
+  recipient: Address;
   amountOut: bigint;
   amountInMaximum: bigint;
   deadline: bigint;
@@ -127,7 +130,7 @@ export interface SwapOptions {
   /**
    * The address of the recipient of the swap.
    */
-  recipient: HexString;
+  recipient: Address;
   /**
    * The maximum acceptable slippage tolerance for the swap, expressed as a percentage.
    * For example, a value of 0.1 means a 0.1% slippage tolerance.
@@ -149,5 +152,5 @@ export interface SwapOptions {
    * The address of the fee recipient. If provided, a 25 bips (0.25%) fee will be
    * taken and sent to this address. When not provided, no fee is taken.
    */
-  feeRecipient?: HexString;
+  feeRecipient?: Address;
 }

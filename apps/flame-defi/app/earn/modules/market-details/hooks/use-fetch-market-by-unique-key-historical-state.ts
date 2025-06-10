@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useConfig } from "config/hooks/use-config";
+import request from "graphql-request";
+
 import {
   CHART_CACHE_TIME_MILLISECONDS,
   CHART_TYPE,
@@ -7,7 +9,6 @@ import {
 } from "earn/components/charts";
 import { graphql } from "earn/generated/gql";
 import { TimeseriesOptions } from "earn/generated/gql/graphql";
-import request from "graphql-request";
 
 const query = graphql(`
   query MarketByUniqueKeyHistoricalState(

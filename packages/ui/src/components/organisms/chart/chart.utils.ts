@@ -1,4 +1,5 @@
 import simplify from "simplify-js";
+
 import { ChartInterval, ChartTickInterval } from "./chart.types";
 
 type DateParams = number | string | Date;

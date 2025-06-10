@@ -12,10 +12,7 @@ export const TableIcon: React.FC<IconProps> = ({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
@@ -25,6 +22,7 @@ export const TableIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M9.25 3.25V21.25"
@@ -32,6 +30,7 @@ export const TableIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M3.25 15.25H21.25"
@@ -39,6 +38,7 @@ export const TableIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M21.25 19.25V5.25C21.25 4.14543 20.3546 3.25 19.25 3.25H5.25C4.14543 3.25 3.25 4.14543 3.25 5.25V19.25C3.25 20.3546 4.14543 21.25 5.25 21.25H19.25C20.3546 21.25 21.25 20.3546 21.25 19.25Z"
@@ -46,6 +46,7 @@ export const TableIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

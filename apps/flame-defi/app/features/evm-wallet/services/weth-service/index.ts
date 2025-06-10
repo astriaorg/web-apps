@@ -1,9 +1,8 @@
-import { type Abi, type Address, parseUnits } from "viem";
-import type { Config } from "wagmi";
-import { HexString } from "@repo/flame-types";
+import type { Config } from "@wagmi/core";
+import { type Abi, type Address, type Hash, parseUnits } from "viem";
 
-import WETH_ABI from "./weth.json";
 import { GenericContractService } from "../generic-contract-service";
+import WETH_ABI from "./weth.json";
 
 export class WethService extends GenericContractService {
   constructor(wagmiConfig: Config, contractAddress: Address) {
@@ -21,7 +20,7 @@ export class WethService extends GenericContractService {
     chainId: number,
     amount: string,
     decimals: number,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const depositValue = parseUnits(amount, decimals);
     return this.writeContractMethod(chainId, "deposit", [], depositValue);
   }
@@ -37,7 +36,7 @@ export class WethService extends GenericContractService {
     chainId: number,
     amount: string,
     decimals: number,
-  ): Promise<HexString> {
+  ): Promise<Hash> {
     const withdrawValue = parseUnits(amount, decimals);
     // Note that `withdraw` burns WTIA from the caller and sends back TIA to the same caller.
     return this.writeContractMethod(chainId, "withdraw", [withdrawValue]);

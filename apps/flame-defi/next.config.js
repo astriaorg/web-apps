@@ -10,6 +10,11 @@ const nextConfig = {
       },
     ],
   },
+  eslint: {
+    // NOTE - next runs eslint only for `app/` by default, so must include `e2e-tests` explicitly.
+    //   see: https://nextjs.org/docs/app/api-reference/config/eslint#linting-custom-directories-and-files
+    dirs: ["app", "e2e-tests",]
+  },
   webpack: (config) => {
     // NOTE - fixes issue when building. see: https://github.com/WalletConnect/walletconnect-monorepo/issues/4466
     config.externals.push("pino-pretty", "lokijs", "encoding");

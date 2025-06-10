@@ -1,14 +1,15 @@
 import React, { useMemo } from "react";
-import { getChainConfigs } from "../chain-configs";
-import { getEnvVariable, getOptionalEnvVariable } from "../env";
-import type { AppConfig } from "../index";
-import {
-  CosmosChains,
-  EvmChains,
-  FlameNetwork,
-  HexString,
-} from "@repo/flame-types";
+import { type Address } from "viem";
+
+import { AstriaChains, CosmosChains, FlameNetwork } from "@repo/flame-types";
 import { getFromLocalStorage, setInLocalStorage } from "@repo/ui/utils";
+import {
+  type AppConfig,
+  type Environment,
+  getChainConfigs,
+  getEnvVariable,
+  getOptionalEnvVariable,
+} from "config";
 
 export const ConfigContext = React.createContext<AppConfig | undefined>(
   undefined,
@@ -25,6 +26,7 @@ type ConfigContextProps = {
 export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   children,
 }) => {
+  const environment = getEnvVariable("NEXT_PUBLIC_ENV") as Environment;
   const brandURL = getEnvVariable("NEXT_PUBLIC_BRAND_URL");
   const bridgeURL = getEnvVariable("NEXT_PUBLIC_BRIDGE_URL");
   const swapURL = getEnvVariable("NEXT_PUBLIC_SWAP_URL");
@@ -32,17 +34,14 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   const earnAPIURL = getEnvVariable("NEXT_PUBLIC_EARN_API_URL");
   const swapQuoteAPIURL = getEnvVariable("NEXT_PUBLIC_SWAP_QUOTE_API_URL");
 
-  const tokenApprovalAmount =
-    "115792089237316195423570985008687907853269984665640564039457";
-
-  const swapSlippageToleranceDefault = 0.1;
+  const defaultSlippageTolerance = 0.1;
 
   const currentSettings = getFromLocalStorage("settings") || {};
 
   if (!currentSettings.slippageTolerance) {
     setInLocalStorage("settings", {
       ...currentSettings,
-      slippageTolerance: swapSlippageToleranceDefault,
+      slippageTolerance: defaultSlippageTolerance,
     });
   }
 
@@ -52,16 +51,16 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
 
   const feeRecipient = getOptionalEnvVariable(
     "NEXT_PUBLIC_FEE_RECIPIENT",
-  ) as HexString;
+  ) as Address;
 
   // default to Mainnet
   // TODO - remember in localStorage?
   const [selectedFlameNetwork, setSelectedFlameNetwork] =
     React.useState<FlameNetwork>(FlameNetwork.MAINNET);
 
-  const { evmChains: evm, cosmosChains: cosmos } =
+  const { astriaChains: astria, cosmosChains: cosmos } =
     getChainConfigs(selectedFlameNetwork);
-  const [evmChains, setEvmChains] = React.useState<EvmChains>(evm);
+  const [astriaChains, setAstriaChains] = React.useState<AstriaChains>(astria);
   const [cosmosChains, setCosmosChains] = React.useState<CosmosChains>(cosmos);
 
   const networksList = useMemo(() => {
@@ -71,15 +70,16 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
     ).split(",") as FlameNetwork[];
   }, []);
 
-  // update evm and cosmos chains when the network is changed
+  // update astria and cosmos chains when the network is changed
   const selectFlameNetwork = (network: FlameNetwork) => {
-    const { evmChains, cosmosChains } = getChainConfigs(network);
-    setEvmChains(evmChains);
+    console.log("selectFlameNetwork called with:", network);
+    const { astriaChains, cosmosChains } = getChainConfigs(network);
+    setAstriaChains(astriaChains);
     setCosmosChains(cosmosChains);
     setSelectedFlameNetwork(network);
   };
 
-  // Parse feature flags - explicitly check for "true"
+  // parse feature flags - explicitly check for "true"
   const earnEnabled =
     getEnvVariable("NEXT_PUBLIC_FEATURE_EARN_ENABLED", "false") === "true";
   const poolEnabled =
@@ -88,8 +88,9 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
   return (
     <ConfigContext.Provider
       value={{
+        environment,
         cosmosChains,
-        evmChains,
+        astriaChains,
         selectedFlameNetwork,
         selectFlameNetwork,
         brandURL,
@@ -101,8 +102,7 @@ export const ConfigContextProvider: React.FC<ConfigContextProps> = ({
         feeRecipient,
         swapQuoteAPIURL,
         networksList,
-        tokenApprovalAmount,
-        swapSlippageToleranceDefault,
+        defaultSlippageTolerance,
         featureFlags: {
           earnEnabled,
           poolEnabled,

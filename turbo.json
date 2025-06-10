@@ -22,6 +22,9 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
@@ -31,6 +34,9 @@
     },
     "test": {
       "dependsOn": ["^test"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^test:e2e"]
     }
   }
 }

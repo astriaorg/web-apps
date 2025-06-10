@@ -15,13 +15,22 @@ export const PlusIcon: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
-      stroke="currentColor"
-      strokeWidth="2"
     >
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 4.5v15m7.5-7.5h-15"
+        d="M21.25 12.25H3.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
+      />
+      <path
+        d="M12.25 3.25V21.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

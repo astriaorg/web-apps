@@ -15,13 +15,14 @@ export const ArrowDownIcon: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
-      stroke="currentColor"
-      strokeWidth="1.5"
     >
       <path
+        stroke="currentColor"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

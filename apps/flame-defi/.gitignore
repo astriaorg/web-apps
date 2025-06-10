@@ -29,6 +29,7 @@ yarn-error.log*
 .env*
 !.env.test
 !.env.example
+!.env.e2e-tests.example
 
 # vercel
 .vercel
@@ -39,3 +40,13 @@ next-env.d.ts
 
 # ai-digest
 codebase.md
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+# Synpress
+.cache-synpress
+

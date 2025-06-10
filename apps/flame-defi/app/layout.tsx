@@ -1,14 +1,16 @@
 import "@interchain-ui/react/styles";
-import "@rainbow-me/rainbowkit/styles.css";
+import "./globals.css";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
+
 import { Footer } from "components/footer";
 import { NavigationMenu } from "components/navigation-menu";
 import { RouteAnimation } from "components/route-animation/route-animation";
-import localFont from "next/font/local";
+
+import { EolBanner } from "./components/eol-banner";
 import { SideTag } from "./components/side-tag/side-tag";
 import { Observability } from "./features/observability";
 import { Providers } from "./providers";
-
-import "./globals.css";
 
 export const metadata = {
   title: "Flame App",
@@ -99,6 +101,8 @@ const nbAkademieMono = localFont({
     },
   ],
   display: "swap",
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-nb-akademie-mono",
 });
 
@@ -196,13 +200,24 @@ const switzer = localFont({
     },
   ],
   display: "swap",
+  // Disable preloading completely as the browser should load fonts as needed
+  preload: false,
   variable: "--font-switzer",
 });
 
 const ledDotMatrix = localFont({
   src: "../public/fonts/LED_Dot-Matrix.woff2",
   display: "swap",
+  preload: false,
   variable: "--font-dot-matrix",
+});
+
+// Add Inter font using Next.js font system
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  preload: false,
 });
 
 export default function RootLayout({
@@ -211,16 +226,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // TODO: Add theme toggle.
     <html
       lang="en"
-      data-theme="dark"
-      className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable}`}
+      className={`${ledDotMatrix.variable} ${nbAkademieMono.variable} ${switzer.variable} ${inter.variable}`}
     >
       <body>
         <Providers>
           <Observability />
           <div className="min-h-screen flex flex-col">
+            <EolBanner />
             <NavigationMenu />
             <SideTag label="Get Help" />
             <RouteAnimation>
@@ -228,6 +242,7 @@ export default function RootLayout({
                 {children}
               </main>
             </RouteAnimation>
+            <div className="flex-1" />
             <Footer />
           </div>
         </Providers>

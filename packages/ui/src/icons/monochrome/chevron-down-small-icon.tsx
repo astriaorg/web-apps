@@ -10,11 +10,9 @@ export const ChevronDownSmallIcon: React.FC<IconProps> = ({
     <svg
       width={size}
       height={size}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
       viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
@@ -24,6 +22,7 @@ export const ChevronDownSmallIcon: React.FC<IconProps> = ({
         strokeWidth="1.5"
         strokeMiterlimit="10"
         strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );

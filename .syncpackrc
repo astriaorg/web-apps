@@ -19,6 +19,8 @@
     {
       "label": "use exact version numbers in production",
       "packages": [
+        "@uniswap/sdk-core",
+        "@uniswap/v3-sdk",
         "big.js",
         "motion",
         "react",

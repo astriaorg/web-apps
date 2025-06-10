@@ -1,6 +1,7 @@
-import { cn } from "@repo/ui/utils";
 import NextImage from "next/image";
 import { ComponentPropsWithoutRef } from "react";
+
+import { cn } from "@repo/ui/utils";
 
 interface ImageProps
   extends Omit<ComponentPropsWithoutRef<typeof NextImage>, "src" | "alt"> {

@@ -15,13 +15,14 @@ export const ChevronDownIcon: React.FC<IconProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
-      stroke="currentColor"
-      strokeWidth="1.5"
     >
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m19.5 8.25-7.5 7.5-7.5-7.5"
+        d="M21.25 8.25L12.25 17.25L3.25 8.25"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeMiterlimit="10"
+        strokeLinecap="square"
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
