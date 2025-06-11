@@ -240,9 +240,19 @@ export const ContentSection = () => {
         setIsRecipientAddressValid(addressValid);
       }
 
-      const amount = new Big(amountInput || "0");
-      const amountValid = amount.gt(0);
-      setIsAmountValid(amountValid);
+      // Handle edge cases before passing to Big.js
+      if (!amountInput || amountInput === "." || amountInput === "0") {
+        setIsAmountValid(false);
+        return;
+      }
+
+      try {
+        const amount = new Big(amountInput);
+        const amountValid = amount.gt(0);
+        setIsAmountValid(amountValid);
+      } catch {
+        setIsAmountValid(false);
+      }
     },
     [setIsAmountValid, setIsRecipientAddressValid],
   );
