@@ -23,10 +23,10 @@
 - Error handling via try/catch and notifications context
 - Test with React Testing Library
 - Prefer explicit `Boolean(someVar)` over shorthand `!!someVar`
-- Use double quotes for Typescript strings.
-- ALWAYS ENSURE THERE IS A NEW LINE AT THE END OF THE FILE! IT IS
-  VERY IMPORTANT TO ALWAYS ADD AN EMPTY NEW LINE TO THE END OF FILES.
-  THERE MUST NEVER BE A FILE YOU TOUCH THAT DOES NOT END IN A NEW LINE.
+- Use double quotes for TypeScript strings.
+- ALWAYS ENSURE THERE IS A NEW LINE AT THE END OF THE FILE! IF THERE IS NOT A
+  NEW LINE, ADD ONE. THERE MUST NEVER BE A FILE YOU TOUCH THAT DOES NOT END IN A
+  NEW LINE.
 - NEVER write a nested ternary.
 - Do not leave a comment when you remove code explaining why you removed the
   code.
