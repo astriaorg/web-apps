@@ -61,8 +61,8 @@ const CelestiaChainInfo: CosmosChainInfo = {
       coinDenom: "TIA",
       coinMinimalDenom: "utia",
       coinDecimals: 6,
-      isDepositable: true,
-      isWithdrawable: true,
+      isDepositable: false,
+      isWithdrawable: false,
       isNative: true,
       ibcChannel: "channel-159",
       sequencerBridgeAccount: "astria17hvahh8lcas4fhl5urqjnhfqwhffkddaw034lh",
@@ -192,7 +192,7 @@ const NobleChainInfo: CosmosChainInfo = {
 };
 
 export const cosmosChains: CosmosChains = {
-  "Celestia Mocha-4": CelestiaChainInfo,
+  // "Celestia Mocha-4": CelestiaChainInfo,
   "Noble Testnet": NobleChainInfo,
 };
 
@@ -249,8 +249,8 @@ const FlameChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isDepositable: true,
-      isWithdrawable: true,
+      isDepositable: false,
+      isWithdrawable: false,
       IconComponent: CelestiaIcon,
     }),
     WRAPPED_NATIVE_TOKEN,

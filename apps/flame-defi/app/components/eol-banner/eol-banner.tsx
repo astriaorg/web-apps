@@ -17,6 +17,9 @@ export const EolBanner = () => {
           deposit TIA for gas, withdraw all assets, close LP positions, and swap
           tokens. However, you can no longer create new LP positions or add
           liquidity.
+          <br />
+          <br />
+          <span className="font-bold">Note: Transfers of TIA are currently disabled due to technical issues on the Celestia network.</span>
         </div>
         {feedbackFormURL && (
           <a

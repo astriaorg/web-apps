@@ -323,7 +323,7 @@ const StrideChainInfo: CosmosChainInfo = {
 };
 
 export const cosmosChains: CosmosChains = {
-  Celestia: CelestiaChainInfo,
+  // Celestia: CelestiaChainInfo,
   Neutron: NeutronChainInfo,
   Noble: NobleChainInfo,
   Osmosis: OsmosisChainInfo,
@@ -390,8 +390,8 @@ const AstriaChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isDepositable: true,
-      isWithdrawable: true,
+      isDepositable: false,
+      isWithdrawable: false,
       IconComponent: CelestiaIcon,
     }),
     WRAPPED_NATIVE_TOKEN,

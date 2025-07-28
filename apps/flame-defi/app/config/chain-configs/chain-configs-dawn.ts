@@ -266,7 +266,7 @@ const NeutronChainInfo: CosmosChainInfo = {
 };
 
 export const cosmosChains: CosmosChains = {
-  "Celestia Mocha-4": CelestiaChainInfo,
+  // "Celestia Mocha-4": CelestiaChainInfo,
   "Noble Testnet": NobleChainInfo,
   "Neutron Testnet": NeutronChainInfo,
 };
@@ -326,8 +326,8 @@ const FlameChainInfo: AstriaChain = {
       isNative: true,
       isWrappedNative: false,
       ibcWithdrawalFeeWei: "10000000000000000",
-      isDepositable: true,
-      isWithdrawable: true,
+      isDepositable: false,
+      isWithdrawable: false,
       IconComponent: CelestiaIcon,
     }),
     WRAPPED_NATIVE_TOKEN,
