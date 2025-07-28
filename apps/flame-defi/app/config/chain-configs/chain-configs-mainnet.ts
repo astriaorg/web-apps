@@ -21,63 +21,63 @@ import {
   WrappedTiaIcon,
 } from "@repo/ui/icons/polychrome";
 
-const CelestiaChainInfo: CosmosChainInfo = {
-  chainType: ChainType.COSMOS,
-  chainId: "celestia",
-  chainName: "Celestia",
-  rpc: "https://celestia-rpc.polkachu.com:443",
-  rest: "https://celestia-api.polkachu.com",
-  stakeCurrency: {
-    coinDenom: "TIA",
-    coinMinimalDenom: "utia",
-    coinDecimals: 6,
-    coinGeckoId: "celestia",
-  },
-  // The BIP44 path.
-  bip44: {
-    // You can only set the coin type of BIP44.
-    // 'Purpose' is fixed to 44.
-    coinType: 118,
-  },
-  bech32Config: {
-    bech32PrefixAccAddr: "celestia",
-    bech32PrefixAccPub: "celestiapub",
-    bech32PrefixConsAddr: "celestiavalcons",
-    bech32PrefixConsPub: "celestiavalconspub",
-    bech32PrefixValAddr: "celestiavaloper",
-    bech32PrefixValPub: "celestiavaloperpub",
-  },
-  currencies: [
-    new IbcCurrency({
-      chainId: "celestia",
-      coinDecimals: 6,
-      coinDenom: "TIA",
-      coinGeckoId: "celestia",
-      coinMinimalDenom: "utia",
-      ibcChannel: "channel-48",
-      IconComponent: CelestiaIcon,
-      isDepositable: true,
-      isWithdrawable: true,
-      isNative: true,
-      sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
-      title: "TIA",
-    }),
-  ],
-  feeCurrencies: [
-    {
-      coinDenom: "TIA",
-      coinMinimalDenom: "utia",
-      coinDecimals: 6,
-      coinGeckoId: "celestia",
-      gasPriceStep: {
-        low: 0.01,
-        average: 0.02,
-        high: 0.1,
-      },
-    },
-  ],
-  IconComponent: CelestiaIcon,
-};
+// const CelestiaChainInfo: CosmosChainInfo = {
+//   chainType: ChainType.COSMOS,
+//   chainId: "celestia",
+//   chainName: "Celestia",
+//   rpc: "https://celestia-rpc.polkachu.com:443",
+//   rest: "https://celestia-api.polkachu.com",
+//   stakeCurrency: {
+//     coinDenom: "TIA",
+//     coinMinimalDenom: "utia",
+//     coinDecimals: 6,
+//     coinGeckoId: "celestia",
+//   },
+//   // The BIP44 path.
+//   bip44: {
+//     // You can only set the coin type of BIP44.
+//     // 'Purpose' is fixed to 44.
+//     coinType: 118,
+//   },
+//   bech32Config: {
+//     bech32PrefixAccAddr: "celestia",
+//     bech32PrefixAccPub: "celestiapub",
+//     bech32PrefixConsAddr: "celestiavalcons",
+//     bech32PrefixConsPub: "celestiavalconspub",
+//     bech32PrefixValAddr: "celestiavaloper",
+//     bech32PrefixValPub: "celestiavaloperpub",
+//   },
+//   currencies: [
+//     new IbcCurrency({
+//       chainId: "celestia",
+//       coinDecimals: 6,
+//       coinDenom: "TIA",
+//       coinGeckoId: "celestia",
+//       coinMinimalDenom: "utia",
+//       ibcChannel: "channel-48",
+//       IconComponent: CelestiaIcon,
+//       isDepositable: true,
+//       isWithdrawable: true,
+//       isNative: true,
+//       sequencerBridgeAccount: "astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p",
+//       title: "TIA",
+//     }),
+//   ],
+//   feeCurrencies: [
+//     {
+//       coinDenom: "TIA",
+//       coinMinimalDenom: "utia",
+//       coinDecimals: 6,
+//       coinGeckoId: "celestia",
+//       gasPriceStep: {
+//         low: 0.01,
+//         average: 0.02,
+//         high: 0.1,
+//       },
+//     },
+//   ],
+//   IconComponent: CelestiaIcon,
+// };
 
 const NeutronChainInfo: CosmosChainInfo = {
   chainType: ChainType.COSMOS,
