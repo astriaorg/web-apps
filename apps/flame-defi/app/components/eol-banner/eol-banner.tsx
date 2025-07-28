@@ -19,7 +19,10 @@ export const EolBanner = () => {
           liquidity.
           <br />
           <br />
-          <span className="font-bold">Note: Transfers of TIA are currently disabled due to technical issues on the Celestia network.</span>
+          <span className="font-bold">
+            Note: Transfers of TIA are currently disabled due to technical
+            issues on the Celestia network.
+          </span>
         </div>
         {feedbackFormURL && (
           <a
