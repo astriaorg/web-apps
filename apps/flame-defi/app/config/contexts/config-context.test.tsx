@@ -15,7 +15,7 @@ describe("ConfigContextProvider", () => {
 
     const configString = screen.getByText(
       // this string in the mainnet configs, which are used by default
-      /astria15juwcclg07xs38757q257evltequawcejzzs4l/,
+      /astria13vptdafyttpmlwppt0s844efey2cpc0mevy92p/,
     );
     expect(configString).toBeInTheDocument();
     expect(configString).toHaveTextContent("Celestia");
